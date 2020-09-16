@@ -12,14 +12,9 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
@@ -48,18 +43,15 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof HttpServiceTask);
-        assertEquals("servicetask", flowElement.getId());
-        HttpServiceTask serviceTask = (HttpServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Service task", serviceTask.getName());
-
-        List<FieldExtension> fields = serviceTask.getFieldExtensions();
-        assertEquals(0, fields.size());
-        
-        FlowableHttpRequestHandler httpRequestHandler = serviceTask.getHttpRequestHandler();
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, httpRequestHandler.getImplementationType());
-        assertEquals("${delegateExpression}", httpRequestHandler.getImplementation());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
+                    assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
+                    assertThat(httpServiceTask.getName()).isEqualTo("Service task");
+                    assertThat(httpServiceTask.getParallelInSameTransaction()).isNull();
+                    assertThat(httpServiceTask.getFieldExtensions()).isEmpty();
+                    assertThat(httpServiceTask.getHttpRequestHandler())
+                            .extracting(FlowableHttpRequestHandler::getImplementationType, FlowableHttpRequestHandler::getImplementation)
+                            .containsExactly(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${delegateExpression}");
+                });
     }
 }

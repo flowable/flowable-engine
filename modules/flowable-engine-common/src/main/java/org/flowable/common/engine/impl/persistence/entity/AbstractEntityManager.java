@@ -26,9 +26,11 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     implements EntityManager<EntityImpl> {
 
     protected DM dataManager;
+    protected String engineType;
 
-    public AbstractEntityManager(DM dataManager) {
+    public AbstractEntityManager(DM dataManager, String engineType) {
         this.dataManager = dataManager;
+        this.engineType = engineType;
     }
 
     /*
@@ -61,8 +63,8 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     protected void fireEntityInsertedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
-            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity), engineType);
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity), engineType);
         }
     }
 
@@ -83,7 +85,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     protected void fireEntityUpdatedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            getEventDispatcher().dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+            getEventDispatcher().dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity), engineType);
         }
     }
 
@@ -111,7 +113,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity, DM extend
     protected void fireEntityDeletedEvent(Entity entity) {
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+            eventDispatcher.dispatchEvent(createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity), engineType);
         }
     }
 

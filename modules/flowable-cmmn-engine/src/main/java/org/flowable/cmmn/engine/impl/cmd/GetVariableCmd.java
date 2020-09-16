@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -38,8 +39,14 @@ public class GetVariableCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         
-        VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceByScopeIdAndScopeTypeAndName(caseInstanceId, ScopeTypes.CMMN, variableName);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        VariableInstanceEntity variableInstanceEntity = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .scopeId(caseInstanceId)
+                .withoutSubScopeId()
+                .scopeType(ScopeTypes.CMMN)
+                .name(variableName)
+                .singleResult();
         if (variableInstanceEntity != null) {
             return variableInstanceEntity.getValue();
         } 

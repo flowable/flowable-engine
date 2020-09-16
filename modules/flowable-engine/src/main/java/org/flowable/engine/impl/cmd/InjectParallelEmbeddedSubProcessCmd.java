@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicSubProcessJoinInjectUtil;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -58,9 +59,10 @@ public class InjectParallelEmbeddedSubProcessCmd extends AbstractDynamicInjectio
     protected void updateExecutions(CommandContext commandContext, ProcessDefinitionEntity processDefinitionEntity,
                                     ExecutionEntity processInstance, List<ExecutionEntity> childExecutions) {
 
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         ExecutionEntity executionAtTask = executionEntityManager.findById(taskEntity.getExecutionId());
         
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionEntity.getId());

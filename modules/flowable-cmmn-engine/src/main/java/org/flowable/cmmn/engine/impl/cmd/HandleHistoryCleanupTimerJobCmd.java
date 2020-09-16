@@ -36,12 +36,12 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    
     @Override
     public Object execute(CommandContext commandContext) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnManagementService managementService = cmmnEngineConfiguration.getCmmnManagementService();
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        TimerJobService timerJobService = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<Job> cleanupJobs = managementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).list();
         
         if (cleanupJobs.isEmpty()) {

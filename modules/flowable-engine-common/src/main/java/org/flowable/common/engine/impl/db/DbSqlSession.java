@@ -27,9 +27,9 @@ import java.util.Set;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -75,9 +75,9 @@ public class DbSqlSession implements Session {
 
     // insert ///////////////////////////////////////////////////////////////////
 
-    public void insert(Entity entity) {
+    public void insert(Entity entity, IdGenerator idGenerator) {
         if (entity.getId() == null) {
-            String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
+            String id = idGenerator.getNextId();
             if (dbSqlSessionFactory.isUsePrefixId()) {
                 id = entity.getIdPrefix() + id;
             }
@@ -161,8 +161,8 @@ public class DbSqlSession implements Session {
     @SuppressWarnings("rawtypes")
     public List selectList(String statement, ListQueryParameterObject parameter, Class entityClass) {
         parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
-        if (parameter instanceof QueryCacheValues) {
-            return queryWithRawParameter(statement, (QueryCacheValues) parameter, entityClass, true);
+        if (parameter instanceof CacheAwareQuery) {
+            return queryWithRawParameter(statement, (CacheAwareQuery) parameter, entityClass, true);
         } else {
             return selectListWithRawParameter(statement, parameter);
         }
@@ -187,8 +187,8 @@ public class DbSqlSession implements Session {
     public List selectListWithRawParameterNoCacheLoadAndStore(String statement, ListQueryParameterObject parameter, Class entityClass) {
         parameter.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
         
-        if (parameter instanceof QueryCacheValues) {
-            return queryWithRawParameter(statement, (QueryCacheValues) parameter, entityClass, false);
+        if (parameter instanceof CacheAwareQuery) {
+            return queryWithRawParameter(statement, (CacheAwareQuery) parameter, entityClass, false);
         } else {
             return selectListWithRawParameter(statement, parameter, false);
         }
@@ -208,8 +208,8 @@ public class DbSqlSession implements Session {
         }
         parameterToUse.setDatabaseType(dbSqlSessionFactory.getDatabaseType());
         
-        if (parameter instanceof QueryCacheValues) {
-            return queryWithRawParameter(statement, (QueryCacheValues) parameter, entityClass, false);
+        if (parameter instanceof CacheAwareQuery) {
+            return queryWithRawParameter(statement, (CacheAwareQuery) parameter, entityClass, false);
         } else {
             return selectListWithRawParameter(statement, parameterToUse, false);
         }
@@ -235,11 +235,13 @@ public class DbSqlSession implements Session {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List queryWithRawParameter(String statement, QueryCacheValues parameter, Class entityClass, boolean cacheLoadAndStore) {
+    public List queryWithRawParameter(String statement, CacheAwareQuery parameter, Class entityClass, boolean cacheLoadAndStore) {
         if (parameter.getId() != null && !parameter.getId().isEmpty()) {
             Object entity = entityCache.findInCache(entityClass, parameter.getId());
             if (entity != null) {
                 List resultList = new ArrayList<>();
+                // enhance the cached entity
+                parameter.enhanceCachedValue(entity);
                 resultList.add(entity);
                 return resultList;
             }
@@ -249,7 +251,7 @@ public class DbSqlSession implements Session {
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List queryWithRawParameterNoCacheLoadAndStore(String statement, QueryCacheValues parameter, Class entityClass) {
+    public List queryWithRawParameterNoCacheLoadAndStore(String statement, CacheAwareQuery parameter, Class entityClass) {
         if (parameter.getId() != null && !parameter.getId().isEmpty()) {
             Object entity = entityCache.findInCache(entityClass, parameter.getId());
             if (entity != null) {
@@ -268,7 +270,7 @@ public class DbSqlSession implements Session {
         statement = dbSqlSessionFactory.mapStatement(statement);
         List loadedObjects = sqlSession.selectList(statement, parameter);
         if (useCache) {
-            return cacheLoadOrStore(loadedObjects);
+            return cacheLoadOrStore(loadedObjects, parameter);
         } else {
             return loadedObjects;
         }
@@ -279,7 +281,7 @@ public class DbSqlSession implements Session {
         Object result = sqlSession.selectOne(statement, parameter);
         if (result instanceof Entity) {
             Entity loadedObject = (Entity) result;
-            result = cacheLoadOrStore(loadedObject);
+            result = cacheLoadOrStore(loadedObject, parameter);
         }
         return result;
     }
@@ -314,7 +316,7 @@ public class DbSqlSession implements Session {
     // ///////////////////////////////////////////////////
 
     @SuppressWarnings("rawtypes")
-    protected List cacheLoadOrStore(List<Object> loadedObjects) {
+    protected List cacheLoadOrStore(List<Object> loadedObjects, Object parameter) {
         if (loadedObjects.isEmpty()) {
             return loadedObjects;
         }
@@ -324,7 +326,7 @@ public class DbSqlSession implements Session {
 
         List<Entity> filteredObjects = new ArrayList<>(loadedObjects.size());
         for (Object loadedObject : loadedObjects) {
-            Entity cachedEntity = cacheLoadOrStore((Entity) loadedObject);
+            Entity cachedEntity = cacheLoadOrStore((Entity) loadedObject, parameter);
             filteredObjects.add(cachedEntity);
         }
         return filteredObjects;
@@ -334,9 +336,12 @@ public class DbSqlSession implements Session {
      * Returns the object in the cache. If this object was loaded before, then the original object is returned (the cached version is more recent). If this is the first time this object is loaded,
      * then the loadedObject is added to the cache.
      */
-    protected Entity cacheLoadOrStore(Entity entity) {
+    protected Entity cacheLoadOrStore(Entity entity, Object parameter) {
         Entity cachedEntity = entityCache.findInCache(entity.getClass(), entity.getId());
         if (cachedEntity != null) {
+            if (parameter instanceof CacheAwareQuery) {
+                ((CacheAwareQuery) parameter).enhanceCachedValue(cachedEntity);
+            }
             return cachedEntity;
         }
         entityCache.put(entity, true);

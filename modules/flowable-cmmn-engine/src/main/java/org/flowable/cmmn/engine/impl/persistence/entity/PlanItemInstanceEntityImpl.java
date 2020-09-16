@@ -20,13 +20,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
+import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.delegate.ReadOnlyDelegatePlanItemInstanceImpl;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -49,6 +54,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String state;
     protected Date createTime;
     protected Date lastAvailableTime;
+    protected Date lastUnavailableTime;
     protected Date lastEnabledTime;
     protected Date lastDisabledTime;
     protected Date lastStartedTime;
@@ -77,6 +83,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
+
+    protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
+    protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
     
     @Override
     public Object getPersistentState() {
@@ -93,6 +102,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("state", state);
         persistentState.put("createTime", createTime);
         persistentState.put("lastAvailableTime", lastAvailableTime);
+        persistentState.put("lastUnavailableTime", lastUnavailableTime);
         persistentState.put("lastEnabledTime", lastEnabledTime);
         persistentState.put("lastDisabledTime", lastDisabledTime);
         persistentState.put("lastStartedTime", lastStartedTime);
@@ -116,6 +126,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         return persistentState;
     }
     
+    @Override
+    public ReadOnlyDelegatePlanItemInstance snapshotReadOnly() {
+        return new ReadOnlyDelegatePlanItemInstanceImpl(this);
+    }
+
     @Override
     public PlanItem getPlanItem() {
         if (planItem == null) {
@@ -235,6 +250,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setLastAvailableTime(Date lastAvailableTime) {
         this.lastAvailableTime = lastAvailableTime;
+    }
+    @Override
+    public Date getLastUnavailableTime() {
+        return lastUnavailableTime;
+    }
+    @Override
+    public void setLastUnavailableTime(Date lastUnavailableTime) {
+        this.lastUnavailableTime = lastUnavailableTime;
     }
     @Override
     public Date getLastEnabledTime() {
@@ -407,6 +430,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
+        if (childPlanItemInstances == null && id != null) {
+            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findByStagePlanItemInstanceId(id);
+        }
         return childPlanItemInstances;
     }
     
@@ -439,7 +465,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeType(id, ScopeTypes.CMMN);
+        return getVariableServiceConfiguration().getVariableService().findVariableInstanceBySubScopeIdAndScopeType(id, ScopeTypes.CMMN);
     }
 
     @Override
@@ -470,17 +496,32 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .subScopeId(id)
+                .scopeType(ScopeTypes.CMMN)
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesBySubScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .subScopeId(id)
+                .scopeType(ScopeTypes.CMMN)
+                .names(variableNames)
+                .list();
     }
 
     @Override
     protected boolean isPropagateToHistoricVariable() {
         return true;
+    }
+
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getVariableServiceConfiguration();
     }
 
     @Override
@@ -511,6 +552,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
         this.sentryPartInstanceCount = sentryPartInstanceCount;
+    }
+
+    @Override
+    public FlowableListener getCurrentFlowableListener() {
+        return currentFlowableListener;
+    }
+
+    @Override
+    public PlanItemInstanceLifecycleListener getCurrentLifecycleListener() {
+        return currentLifecycleListener;
+    }
+
+    @Override
+    public void setCurrentLifecycleListener(PlanItemInstanceLifecycleListener lifecycleListener, FlowableListener flowableListener) {
+        this.currentLifecycleListener = lifecycleListener;
+        this.currentFlowableListener = flowableListener;
     }
 
     @Override

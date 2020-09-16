@@ -41,24 +41,23 @@ public class MailTaskJsonConverterTest extends AbstractConverterTest {
         assertThat(planModelStage).isNotNull();
 
         PlanItemDefinition mailTaskDefinition = planModelStage.findPlanItemDefinitionInStageOrDownwards("mailTask");
-        assertThat(mailTaskDefinition).isNotNull();
         assertThat(mailTaskDefinition).isInstanceOf(ServiceTask.class);
         ServiceTask mailServiceTask = (ServiceTask) mailTaskDefinition;
         assertThat(mailServiceTask.getType()).isEqualTo(ServiceTask.MAIL_TASK);
         assertThat(mailServiceTask.getFieldExtensions())
-            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
-            .containsExactlyInAnyOrder(
-                tuple("headers", "X-Test: test"),
-                tuple("to", "test-to@test.com"),
-                tuple("from", "test-from@test.com"),
-                tuple("subject", "Test Subject"),
-                tuple("cc", "test-cc@test.com"),
-                tuple("bcc", "test-bcc@test.com"),
-                tuple("text", "Test Text"),
-                tuple("textVar", "testTextVar"),
-                tuple("html", "Test HTML"),
-                tuple("htmlVar", "testHtmlVar"),
-                tuple("charset", "UTF-8")
-            );
+                .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue)
+                .containsExactlyInAnyOrder(
+                        tuple("headers", "X-Test: test"),
+                        tuple("to", "test-to@test.com"),
+                        tuple("from", "test-from@test.com"),
+                        tuple("subject", "Test Subject"),
+                        tuple("cc", "test-cc@test.com"),
+                        tuple("bcc", "test-bcc@test.com"),
+                        tuple("text", "Test Text"),
+                        tuple("textVar", "testTextVar"),
+                        tuple("html", "Test HTML"),
+                        tuple("htmlVar", "testHtmlVar"),
+                        tuple("charset", "UTF-8")
+                );
     }
 }

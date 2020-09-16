@@ -27,11 +27,6 @@ public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariab
         super(Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
     }
     
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-    
     public static boolean isNotEmpty(VariableContainer variableContainer, String variableName) {
         return !VariableIsEmptyExpressionFunction.isEmpty(variableContainer, variableName);
     }

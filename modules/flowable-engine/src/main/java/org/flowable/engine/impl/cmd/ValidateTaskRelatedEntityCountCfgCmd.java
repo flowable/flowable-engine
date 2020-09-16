@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,10 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        PropertyEntityManager propertyEntityManager = processEngineConfiguration.getPropertyEntityManager();
 
-        PropertyEntityManager propertyEntityManager = CommandContextUtil.getPropertyEntityManager(commandContext);
-
-        boolean configProperty = CommandContextUtil.getProcessEngineConfiguration(commandContext).getPerformanceSettings().isEnableTaskRelationshipCounts();
+        boolean configProperty = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
         PropertyEntity propertyEntity = propertyEntityManager.findById(PROPERTY_TASK_RELATED_ENTITY_COUNT);
 
         if (propertyEntity == null) {
@@ -55,7 +56,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
                     LOGGER.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
                             + "Updating all task entities.");
                 }
-                CommandContextUtil.getTaskService().updateAllTaskRelatedEntityCountFlags(configProperty);
+                processEngineConfiguration.getTaskServiceConfiguration().getTaskService().updateAllTaskRelatedEntityCountFlags(configProperty);
             }
 
             // Update property

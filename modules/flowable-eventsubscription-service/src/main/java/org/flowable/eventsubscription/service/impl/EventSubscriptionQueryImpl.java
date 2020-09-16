@@ -20,20 +20,24 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
-import org.flowable.eventsubscription.service.impl.util.CommandContextUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Daniel Meyer
  */
-public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription> implements EventSubscriptionQuery, QueryCacheValues {
+public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQuery, EventSubscription>
+        implements EventSubscriptionQuery, CacheAwareQuery<EventSubscriptionEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration;
 
     protected String id;
     protected String eventType;
@@ -63,12 +67,14 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     }
 
-    public EventSubscriptionQueryImpl(CommandContext commandContext) {
+    public EventSubscriptionQueryImpl(CommandContext commandContext, EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         super(commandContext);
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
     }
 
-    public EventSubscriptionQueryImpl(CommandExecutor commandExecutor) {
+    public EventSubscriptionQueryImpl(CommandExecutor commandExecutor, EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
         super(commandExecutor);
+        this.eventSubscriptionServiceConfiguration = eventSubscriptionServiceConfiguration;
     }
 
     @Override
@@ -243,9 +249,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdBefore = createdBefore;
+            this.currentOrQueryObject.createdBefore = beforeTime;
         } else {
-            this.createdBefore = createdBefore;
+            this.createdBefore = beforeTime;
         }
 
         return this;
@@ -258,9 +264,9 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
         }
 
         if (inOrStatement) {
-            this.currentOrQueryObject.createdAfter = createdAfter;
+            this.currentOrQueryObject.createdAfter = afterTime;
         } else {
-            this.createdAfter = createdAfter;
+            this.createdAfter = afterTime;
         }
 
         return this;
@@ -395,6 +401,11 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
 
     @Override
+    public EventSubscriptionQuery orderByEventName() {
+        return orderBy(EventSubscriptionQueryProperty.EVENT_NAME);
+    }
+
+    @Override
     public EventSubscriptionQuery orderByTenantId() {
         return orderBy(EventSubscriptionQueryProperty.TENANT_ID);
     }
@@ -403,12 +414,12 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionCountByQueryCriteria(this);
+        return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionCountByQueryCriteria(this);
     }
 
     @Override
     public List<EventSubscription> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findEventSubscriptionsByQueryCriteria(this);
+        return eventSubscriptionServiceConfiguration.getEventSubscriptionEntityManager().findEventSubscriptionsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////

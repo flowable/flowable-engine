@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -57,7 +58,8 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessDefinitionEntity processDefinition = processEngineConfiguration.getProcessDefinitionEntityManager().findById(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("Cannot find process definition with id " + processDefinitionId, ProcessDefinition.class);
@@ -69,7 +71,8 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
             return null;
         }
 
-        CommandContextUtil.getIdentityLinkService().deleteProcessDefinitionIdentityLink(processDefinition.getId(), userId, groupId);
+        processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+            .deleteProcessDefinitionIdentityLink(processDefinition.getId(), userId, groupId);
 
         return null;
     }

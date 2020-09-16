@@ -18,9 +18,9 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +34,11 @@ public class MoveTimerToExecutableJobCmd implements Command<JobEntity>, Serializ
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveTimerToExecutableJobCmd.class);
 
     protected String jobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public MoveTimerToExecutableJobCmd(String jobId) {
+    public MoveTimerToExecutableJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class MoveTimerToExecutableJobCmd implements Command<JobEntity>, Serializ
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        TimerJobEntity timerJob = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
+        TimerJobEntity timerJob = jobServiceConfiguration.getTimerJobEntityManager().findById(jobId);
 
         if (timerJob == null) {
             throw new JobNotFoundException(jobId);
@@ -56,7 +58,7 @@ public class MoveTimerToExecutableJobCmd implements Command<JobEntity>, Serializ
             LOGGER.debug("Executing timer job {}", timerJob.getId());
         }
 
-        return CommandContextUtil.getJobManager(commandContext).moveTimerJobToExecutableJob(timerJob);
+        return jobServiceConfiguration.getJobManager().moveTimerJobToExecutableJob(timerJob);
     }
 
     public String getJobId() {

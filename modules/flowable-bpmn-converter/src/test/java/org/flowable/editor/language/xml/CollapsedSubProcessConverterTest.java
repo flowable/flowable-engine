@@ -12,12 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,86 +59,76 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
         validateGraphicInfo(bpmnModel);
     }
 
-    private void validateModel(BpmnModel bpmnModel){
+    private void validateModel(BpmnModel bpmnModel) {
         //temp vars
-        GraphicInfo gi = null;
-        GraphicInfo start = null;
-        GraphicInfo end = null;
-        List<GraphicInfo> flowLocationGraphicInfo = null;
+        GraphicInfo gi;
+        List<GraphicInfo> flowLocationGraphicInfo;
 
         //validate parent
         gi = bpmnModel.getGraphicInfo(START_EVENT);
-        assertThat(gi.getX(),is(73.0));
-        assertThat(gi.getY(),is(96.0));
-        assertThat(gi.getWidth(),is(30.0));
-        assertThat(gi.getHeight(),is(30.0));
-        assertThat(gi.getExpanded(),is(nullValue()));
+        assertThat(gi.getX()).isEqualTo(73.0);
+        assertThat(gi.getY()).isEqualTo(96.0);
+        assertThat(gi.getWidth()).isEqualTo(30.0);
+        assertThat(gi.getHeight()).isEqualTo(30.0);
+        assertThat(gi.getExpanded()).isNull();
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(SEQUENCEFLOW_TO_COLLAPSEDSUBPROCESS);
-        assertThat(flowLocationGraphicInfo.size(),is(2));
 
         gi = bpmnModel.getGraphicInfo(COLLAPSEDSUBPROCESS);
-        assertThat(gi.getExpanded(),is(false));
+        assertThat(gi.getExpanded()).isFalse();
 
         //intersection points traversed from xml are full points it seems...
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX(),is(102.0));
-        assertThat(start.getY(),is(111.0));
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX(),is(165.0));
-        assertThat(end.getY(),is(112.0));
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(102.0, 111.0),
+                        tuple(165.0, 112.0)
+                );
 
         //validate graphic infos
         FlowElement flowElement = bpmnModel.getFlowElement(IN_CSB_START_EVENT);
-        assertThat(flowElement,instanceOf(StartEvent.class));
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
 
         gi = bpmnModel.getGraphicInfo(IN_CSB_START_EVENT);
-        assertThat(gi.getX(),is(90.0));
-        assertThat(gi.getY(),is(135.0));
-        assertThat(gi.getWidth(),is(30.0));
-        assertThat(gi.getHeight(),is(30.0));
-
+        assertThat(gi.getX()).isEqualTo(90.0);
+        assertThat(gi.getY()).isEqualTo(135.0);
+        assertThat(gi.getWidth()).isEqualTo(30.0);
+        assertThat(gi.getHeight()).isEqualTo(30.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowElement,instanceOf(SequenceFlow.class));
-        assertThat(flowElement.getName(),is("to ut"));
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getName()).isEqualTo("to ut");
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_USERTASK);
-        assertThat(flowLocationGraphicInfo.size(),is(2));
-
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX(),is(120.0));
-        assertThat(start.getY(),is(150.0));
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX(),is(232.0));
-        assertThat(end.getY(),is(150.0));
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(120.0, 150.0),
+                        tuple(232.0, 150.0)
+                );
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_USERTASK);
-        assertThat(flowElement,instanceOf(UserTask.class));
-        assertThat(flowElement.getName(),is("User task 1"));
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getName()).isEqualTo("User task 1");
 
         gi = bpmnModel.getGraphicInfo(IN_CSB_USERTASK);
-        assertThat(gi.getX(),is(232.0));
-        assertThat(gi.getY(),is(110.0));
-        assertThat(gi.getWidth(),is(100.0));
-        assertThat(gi.getHeight(),is(80.0));
+        assertThat(gi.getX()).isEqualTo(232.0);
+        assertThat(gi.getY()).isEqualTo(110.0);
+        assertThat(gi.getWidth()).isEqualTo(100.0);
+        assertThat(gi.getHeight()).isEqualTo(80.0);
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowElement,instanceOf(SequenceFlow.class));
-        assertThat(flowElement.getName(),is("to end"));
+        assertThat(flowElement).isInstanceOf(SequenceFlow.class);
+        assertThat(flowElement.getName()).isEqualTo("to end");
 
         flowLocationGraphicInfo = bpmnModel.getFlowLocationGraphicInfo(IN_CSB_SEQUENCEFLOW_TO_END);
-        assertThat(flowLocationGraphicInfo.size() , is(2));
+        assertThat(flowLocationGraphicInfo)
+                .extracting(GraphicInfo::getX, GraphicInfo::getY)
+                .containsExactly(
+                        tuple(332.0, 150.0),
+                        tuple(435.0, 150.0)
+                );
 
-        start = flowLocationGraphicInfo.get(0);
-        assertThat(start.getX(),is(332.0));
-        assertThat(start.getY(),is(150.0));
-
-        end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX(),is(435.0));
-        assertThat(end.getY(),is(150.0));
     }
 
     @Override
@@ -158,49 +144,49 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
     	Map<String, GraphicInfo> locationMap = model.getLocationMap();
 
     	// BPMNDI data
-    	Map<String, Map> baseBpmnDI = parseBPMNDI(new BpmnXMLConverter().convertToXML(model));
-    	
-        // verify sequence flows/edges
-        assertEquals(6, flowLocationMap.size());
+        Map<String, Map> baseBpmnDI = parseBPMNDI(new BpmnXMLConverter().convertToXML(model));
 
-    	// verify other elements/shapes
-        assertEquals(8, locationMap.size());
+        // verify sequence flows/edges
+        assertThat(flowLocationMap).hasSize(6);
+
+        // verify other elements/shapes
+        assertThat(locationMap).hasSize(8);
 
         // verify BPMNDI data
-    	// should have 2 diagrams
-    	assertEquals(2, baseBpmnDI.size());
+        // should have 2 diagrams
+        assertThat(baseBpmnDI).hasSize(2);
 
-		// subprocess diagram
-        assertEquals(1, subList.size());
-    	Map<String, List<GraphicInfo>> multiMainEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_EDGE);
-    	Map<String, GraphicInfo> multiMainShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_SHAPE);
-    	Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);
+        // subprocess diagram
+        assertThat(subList).hasSize(1);
+        Map<String, List<GraphicInfo>> multiMainEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_EDGE);
+        Map<String, GraphicInfo> multiMainShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_SHAPE);
+        Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);
         Map<String, GraphicInfo> multiSubShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_SHAPE);
 
-    	assertEquals(3, multiMainEdgeMap.size());
-    	assertEquals(4, multiMainShapeMap.size());
-    	assertEquals(3, multiSubEdgeMap.size());
-    	assertEquals(4, multiSubShapeMap.size());
+        assertThat(multiMainEdgeMap).hasSize(3);
+        assertThat(multiMainShapeMap).hasSize(4);
+        assertThat(multiSubEdgeMap).hasSize(3);
+        assertThat(multiSubShapeMap).hasSize(4);
 
-    	// verify annotations are in correct diagram
-    	assertTrue(multiMainShapeMap.containsKey("textannotation1"));
-    	assertTrue(multiSubShapeMap.containsKey("textannotation2"));
-    	assertTrue(multiMainEdgeMap.containsKey("association1"));
-    	assertTrue(multiSubEdgeMap.containsKey("association2"));
+        // verify annotations are in correct diagram
+        assertThat(multiMainShapeMap).containsKey("textannotation1");
+        assertThat(multiSubShapeMap).containsKey("textannotation2");
+        assertThat(multiMainEdgeMap).containsKey("association1");
+        assertThat(multiSubEdgeMap).containsKey("association2");
 
-    	// verify sequence flows/edges
+        // verify sequence flows/edges
         List<GraphicInfo> info;
         List<GraphicInfo> diInfo;
         for (String id : flowLocationMap.keySet()) {
-    		info = new ArrayList<>(flowLocationMap.get(id));
-    		diInfo = multiMainEdgeMap.get(id);
-    		// if not found in main process, must be in subprocess
-    		if (diInfo == null) {
-        		diInfo = multiSubEdgeMap.get(id);
-    		}
-    		assertEquals(info.size(), diInfo.size());
-    		compareCollections(info, diInfo);
-    	}
+            info = new ArrayList<>(flowLocationMap.get(id));
+            diInfo = multiMainEdgeMap.get(id);
+            // if not found in main process, must be in subprocess
+            if (diInfo == null) {
+                diInfo = multiSubEdgeMap.get(id);
+            }
+            assertThat(diInfo).hasSameSizeAs(info);
+            compareCollections(info, diInfo);
+        }
 
     	// verify other elements/shapes
         GraphicInfo shapeInfo;
@@ -211,7 +197,8 @@ public class CollapsedSubProcessConverterTest extends AbstractConverterTest {
 			if (shapeInfo == null) {
 				shapeInfo = multiSubShapeMap.get(id);
 			}
-        	assertTrue(locationMap.get(id).equals(shapeInfo));
+            assertThat(locationMap.get(id).equals(shapeInfo));
         }
     }
+
 }

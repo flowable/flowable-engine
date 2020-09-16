@@ -12,6 +12,14 @@
  */
 package org.flowable.cmmn.editor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.data.Offset.offset;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
@@ -21,15 +29,6 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest {
 
@@ -57,110 +56,105 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
     @Override
     protected void validateModel(CmmnModel model) {
         List<Association> associations = model.getAssociations();
-        assertNotNull(associations);
-        assertEquals(5, associations.size());
+        assertThat(associations).isNotNull();
+        assertThat(associations).hasSize(5);
 
         Map<String, List<Association>> byRelationShip = associations.stream()
                 .collect(Collectors.groupingBy(a -> buildAssociationString(model, a)));
 
-        assertEquals(5, byRelationShip.size());
-        assertTrue(byRelationShip.containsKey("taskA|taskC|complete"));
-        assertTrue(byRelationShip.containsKey("taskB|taskC|complete"));
-        assertTrue(byRelationShip.containsKey("stage1|stage2|terminate"));
-        //EXIT CRITERIA ARE "READ" BACKWARDS
-        assertTrue(byRelationShip.containsKey("timedTask|expireTimer|occur"));
-        assertTrue(byRelationShip.containsKey("stage2|abortStageTask|complete"));
+        assertThat(byRelationShip)
+                .containsOnlyKeys("taskA|taskC|complete", "taskB|taskC|complete", "stage1|stage2|terminate",
+                        //EXIT CRITERIA ARE "READ" BACKWARDS
+                        "timedTask|expireTimer|occur", "stage2|abortStageTask|complete");
 
         //Coordinates of associations are recalculated based on other elements?
         //This is only a stub that checks the "approximate" coordinates of 1 association
         Map<String, List<GraphicInfo>> associationsGraphicInfo = associations.stream()
                 .collect(Collectors.toMap(Association::getId, a -> model.getFlowLocationGraphicInfo(a.getId())));
-        assertEquals(5, associationsGraphicInfo.size());
+        assertThat(associationsGraphicInfo).hasSize(5);
         //Coordinates have a loss of precision during conversion and re-conversion
         double delta = 5.0;
         List<GraphicInfo> gInfo = associationsGraphicInfo.get("sid-F8E5EBC5-DCBB-4C01-B7EA-3267631B2625");
-        assertEquals(286.0, gInfo.get(0).getX(), delta);
-        assertEquals(175.0, gInfo.get(0).getY(), delta);
-        assertEquals(345.0, gInfo.get(1).getX(), delta);
-        assertEquals(199.0, gInfo.get(1).getY(), delta);
-
+        assertThat(gInfo.get(0).getX()).isCloseTo(286.0, offset(delta));
+        assertThat(gInfo.get(0).getY()).isCloseTo(175.0, offset(delta));
+        assertThat(gInfo.get(1).getX()).isCloseTo(345.0, offset(delta));
+        assertThat(gInfo.get(1).getY()).isCloseTo(199.0, offset(delta));
 
         //Check the Sentries OnParts
         //TASK C Entry Sentry
         PlanItemDefinition taskC = model.findPlanItemDefinition("taskC");
-        assertNotNull(taskC);
+        assertThat(taskC).isNotNull();
         PlanItem taskBIntance = model.findPlanItem(taskC.getPlanItemRef());
-        assertNotNull(taskBIntance);
+        assertThat(taskBIntance).isNotNull();
         List<Criterion> taskCEntryCriterions = taskBIntance.getEntryCriteria();
-        assertNotNull(taskCEntryCriterions);
-        assertEquals(1, taskCEntryCriterions.size());
+        assertThat(taskCEntryCriterions).isNotNull();
+        assertThat(taskCEntryCriterions).hasSize(1);
         Criterion criterion = taskCEntryCriterions.get(0);
-        assertEquals("taskCEntrySentry", criterion.getId());
+        assertThat(criterion.getId()).isEqualTo("taskCEntrySentry");
         Sentry sentry = criterion.getSentry();
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         List<SentryOnPart> onParts = sentry.getOnParts();
-        assertNotNull(onParts);
-        assertEquals(2, onParts.size());
+        assertThat(onParts).isNotNull();
+        assertThat(onParts).hasSize(2);
         SentryOnPart sentryOnPart = onParts.get(0);
-        assertEquals("taskA", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("taskA");
+        assertThat(sentryOnPart.getStandardEvent()).isEqualTo(PlanItemTransition.COMPLETE);
         sentryOnPart = onParts.get(1);
-        assertEquals("taskB", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("taskB");
+        assertThat(sentryOnPart.getStandardEvent()).isEqualTo(PlanItemTransition.COMPLETE);
 
         //Stage 2
         PlanItemDefinition stage2 = model.findPlanItemDefinition("stage2");
-        assertNotNull(stage2);
+        assertThat(stage2).isNotNull();
         PlanItem stage2Instance = model.findPlanItem(stage2.getPlanItemRef());
-        assertNotNull(stage2Instance);
+        assertThat(stage2Instance).isNotNull();
         //Stage 2 Entry Sentry
         List<Criterion> stage2EntryCriterions = stage2Instance.getEntryCriteria();
-        assertNotNull(stage2EntryCriterions);
-        assertEquals(1, stage2EntryCriterions.size());
+        assertThat(stage2EntryCriterions).isNotNull();
+        assertThat(stage2EntryCriterions).hasSize(1);
         criterion = stage2EntryCriterions.get(0);
-        assertEquals("stage1EntrySentry", criterion.getId());
+        assertThat(criterion.getId()).isEqualTo("stage1EntrySentry");
         sentry = criterion.getSentry();
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         onParts = sentry.getOnParts();
-        assertNotNull(onParts);
-        assertEquals(1, onParts.size());
+        assertThat(onParts)
+                .extracting(SentryOnPart::getStandardEvent)
+                .containsExactly(PlanItemTransition.TERMINATE);
         sentryOnPart = onParts.get(0);
-        assertEquals("stage1", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.TERMINATE, sentryOnPart.getStandardEvent());
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("stage1");
 
         //Stage 2 Exit Sentry
         List<Criterion> stage2ExitCriterions = stage2Instance.getExitCriteria();
-        assertNotNull(stage2ExitCriterions);
-        assertEquals(1, stage2ExitCriterions.size());
+        assertThat(stage2ExitCriterions).isNotNull();
+        assertThat(stage2ExitCriterions).hasSize(1);
         criterion = stage2ExitCriterions.get(0);
-        assertEquals("stage2ExitSentry", criterion.getId());
+        assertThat(criterion.getId()).isEqualTo("stage2ExitSentry");
         sentry = criterion.getSentry();
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         onParts = sentry.getOnParts();
-        assertNotNull(onParts);
-        assertEquals(1, onParts.size());
+        assertThat(onParts)
+                .extracting(SentryOnPart::getStandardEvent)
+                .containsExactly(PlanItemTransition.COMPLETE);
         sentryOnPart = onParts.get(0);
-        assertEquals("abortStageTask", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.COMPLETE, sentryOnPart.getStandardEvent());
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("abortStageTask");
 
         //Timed Task Exit Sentry
         PlanItemDefinition timedTask = model.findPlanItemDefinition("timedTask");
-        assertNotNull(timedTask);
+        assertThat(timedTask).isNotNull();
         PlanItem timedtaskInstance = model.findPlanItem(timedTask.getPlanItemRef());
-        assertNotNull(timedtaskInstance);
+        assertThat(timedtaskInstance).isNotNull();
         List<Criterion> timedTaskExitCriterions = timedtaskInstance.getExitCriteria();
-        assertNotNull(timedTaskExitCriterions);
-        assertEquals(1, timedTaskExitCriterions.size());
+        assertThat(timedTaskExitCriterions).isNotNull();
+        assertThat(timedTaskExitCriterions).hasSize(1);
         criterion = timedTaskExitCriterions.get(0);
-        assertEquals("timedTaskExitSentry", criterion.getId());
+        assertThat(criterion.getId()).isEqualTo("timedTaskExitSentry");
         sentry = criterion.getSentry();
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         onParts = sentry.getOnParts();
-        assertNotNull(onParts);
-        assertEquals(1, onParts.size());
+        assertThat(onParts)
+                .extracting(SentryOnPart::getStandardEvent)
+                .containsExactly(PlanItemTransition.OCCUR);
         sentryOnPart = onParts.get(0);
-        assertEquals("expireTimer", sentryOnPart.getSource().getDefinitionRef());
-        assertEquals(PlanItemTransition.OCCUR, sentryOnPart.getStandardEvent());
-
+        assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("expireTimer");
     }
 }

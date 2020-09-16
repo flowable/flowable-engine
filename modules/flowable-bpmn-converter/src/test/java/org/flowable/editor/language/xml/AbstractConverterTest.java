@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -149,14 +149,14 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 		for (GraphicInfo ginfo : info) {
 			for (GraphicInfo gdInfo : diInfo) {
 				// entries may not be in the same order
-				if (foundMatch == true) {
+				if (foundMatch) {
 					// found one match so reset and try next set of values
 					info.remove(ginfo);
 					foundMatch = false;
 					continue;
-					
+
 				} else {
-					assertTrue(ginfo.equals(gdInfo));
+					assertThat(ginfo.equals(gdInfo)).isTrue();
 					foundMatch = true;
 				}
 			}

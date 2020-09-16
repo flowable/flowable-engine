@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,9 +13,7 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
@@ -58,7 +56,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     public void before() throws Exception {
         super.before();
         classUnderTest = new ResourceParentFolderAutoDeploymentStrategy();
-        assertNotNull(classUnderTest);
+        assertThat(classUnderTest).isNotNull();
 
         when(parentFile1Mock.getName()).thenReturn(parentFilename1);
         when(parentFile1Mock.isDirectory()).thenReturn(true);
@@ -68,9 +66,9 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
 
     @Test
     public void testHandlesMode() {
-        assertTrue(classUnderTest.handlesMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE));
-        assertFalse(classUnderTest.handlesMode("other-mode"));
-        assertFalse(classUnderTest.handlesMode(null));
+        assertThat(classUnderTest.handlesMode(ResourceParentFolderAutoDeploymentStrategy.DEPLOYMENT_MODE)).isTrue();
+        assertThat(classUnderTest.handlesMode("other-mode")).isFalse();
+        assertThat(classUnderTest.handlesMode(null)).isFalse();
     }
 
     @Test

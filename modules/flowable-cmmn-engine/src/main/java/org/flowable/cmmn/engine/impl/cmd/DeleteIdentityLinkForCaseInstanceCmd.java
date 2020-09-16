@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
@@ -33,14 +34,12 @@ public class DeleteIdentityLinkForCaseInstanceCmd implements Command<Object>, Se
     private static final long serialVersionUID = 1L;
 
     protected String caseInstanceId;
-
     protected String userId;
-
     protected String groupId;
-
     protected String type;
 
     public DeleteIdentityLinkForCaseInstanceCmd(String caseInstanceId, String userId, String groupId, String type) {
+        
         validateParams(userId, groupId, caseInstanceId, type);
         this.caseInstanceId = caseInstanceId;
         this.userId = userId;
@@ -64,13 +63,14 @@ public class DeleteIdentityLinkForCaseInstanceCmd implements Command<Object>, Se
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CaseInstance caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstance caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
 
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find case instance with id " + caseInstanceId, CaseInstanceEntity.class);
         }
 
-        IdentityLinkUtil.deleteCaseInstanceIdentityLinks(caseInstance, userId, groupId, type);
+        IdentityLinkUtil.deleteCaseInstanceIdentityLinks(caseInstance, userId, groupId, type, cmmnEngineConfiguration);
         
         return null;
     }

@@ -35,6 +35,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String planItemDefinitionType;
     protected Date createTime;
     protected Date lastAvailableTime;
+    protected Date lastUnavailableTime;
     protected Date lastEnabledTime;
     protected Date lastDisabledTime;
     protected Date lastStartedTime;
@@ -67,6 +68,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("state", state);
         persistentState.put("createTime", createTime);
         persistentState.put("lastAvailableTime", lastAvailableTime);
+        persistentState.put("lastUnavailableTime", lastUnavailableTime);
         persistentState.put("lastEnabledTime", lastEnabledTime);
         persistentState.put("lastDisabledTime", lastDisabledTime);
         persistentState.put("lastStartedTime", lastStartedTime);
@@ -208,6 +210,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setLastAvailableTime(Date lastAvailableTime) {
         this.lastAvailableTime = lastAvailableTime;
+    }
+
+    @Override
+    public Date getLastUnavailableTime() {
+        return lastUnavailableTime;
+    }
+
+    @Override
+    public void setLastUnavailableTime(Date lastUnavailableTime) {
+        this.lastUnavailableTime = lastUnavailableTime;
     }
 
     @Override

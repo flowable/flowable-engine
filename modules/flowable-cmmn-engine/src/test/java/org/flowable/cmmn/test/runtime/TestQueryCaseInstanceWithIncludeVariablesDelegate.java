@@ -20,12 +20,19 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 
 public class TestQueryCaseInstanceWithIncludeVariablesDelegate implements PlanItemJavaDelegate {
 
     public static Map<String, Object> VARIABLES;
 
     public static Map<String, Object> HISTORIC_VARIABLES;
+
+    public static void reset() {
+        VARIABLES = null;
+        HISTORIC_VARIABLES = null;
+    }
 
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
@@ -39,11 +46,13 @@ public class TestQueryCaseInstanceWithIncludeVariablesDelegate implements PlanIt
             .singleResult();
         VARIABLES = caseInstance.getCaseVariables();
 
-        HistoricCaseInstance historicCaseInstance = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
-            .caseInstanceId(planItemInstance.getCaseInstanceId())
-            .includeCaseVariables()
-            .singleResult();
-        HISTORIC_VARIABLES = historicCaseInstance.getCaseVariables();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
+                .caseInstanceId(planItemInstance.getCaseInstanceId())
+                .includeCaseVariables()
+                .singleResult();
+            HISTORIC_VARIABLES = historicCaseInstance.getCaseVariables();
+        }
 
     }
 

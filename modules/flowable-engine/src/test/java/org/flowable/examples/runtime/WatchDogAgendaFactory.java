@@ -12,12 +12,16 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.interceptor.MigrationContext;
 
 /**
  * This class is a simple watchdog agenda implementation. It throws exception in the case when watchdog limit is exceeded for fetching operations from agenda.
@@ -46,8 +50,8 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public Runnable peekOperation() {
-            return agenda.peekOperation();
+        public <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction) {
+            agenda.planFutureOperation(future, completeAction);
         }
 
         @Override
@@ -63,6 +67,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         @Override
         public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
             agenda.planContinueProcessSynchronousOperation(execution);
+        }
+
+        @Override
+        public void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext) {
+            agenda.planContinueProcessWithMigrationContextOperation(execution, migrationContext);
         }
 
         @Override

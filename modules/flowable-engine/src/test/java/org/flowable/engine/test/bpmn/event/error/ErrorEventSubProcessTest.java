@@ -53,9 +53,9 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
 
         // The process will throw an error event, which is caught and escalated by a User org.flowable.task.service.Task
-        assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2").count());
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2").count()).isEqualTo(1);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Escalated Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the task will end the process instance
         taskService.complete(task.getId());
@@ -96,8 +96,8 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     public void testMultipleCatchErrorInTopLevelProcess() {
         String procId = runtimeService.startProcessInstanceByKey("MultipleCatchErrorInTopLevelProcess").getId();
         Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
-        assertNotNull(task);
-        assertEquals("taskAfterErrorCatch2", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterErrorCatch2");
     }
     
     @Test
@@ -105,8 +105,8 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     public void testMultipleCatchErrorInTopLevelProcessFirst() {
         String procId = runtimeService.startProcessInstanceByKey("MultipleCatchErrorInTopLevelProcess").getId();
         Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
-        assertNotNull(task);
-        assertEquals("taskAfterErrorCatch", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterErrorCatch");
     }
 
     @Test
@@ -133,7 +133,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         variableMap.put(STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME, true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY_UNDER_TEST, variableMap);
         
-        assertNotNull(processInstance.getId());
+        assertThat(processInstance.getId()).isNotNull();
     }
 
     @Test
@@ -183,12 +183,60 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment
+    public void testRetriggerEventSubProcessError() {
+        runtimeService.startProcessInstanceByKey("retriggerEventSubProcess");
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+
+        assertThat(runtimeService.createActivityInstanceQuery().list())
+                .extracting(ActivityInstance::getActivityType, ActivityInstance::getActivityId)
+                .containsExactlyInAnyOrder(
+                        tuple("startEvent", "start"),
+                        tuple("sequenceFlow", "flow1"),
+                        tuple("subProcess", "subProcess"),
+                        tuple("startEvent", "subProcessStart"),
+                        tuple("sequenceFlow", "subProcessFlow1"),
+                        tuple("scriptTask", "scriptTask"),
+                        tuple("eventSubProcess", "eventSubProcess"),
+                        tuple("startEvent", "eventSubProcessStart"),
+                        tuple("sequenceFlow", "eventFlow1"),
+                        tuple("endEvent", "eventEnd"),
+                        tuple("boundaryEvent", "subProcessErrorBoundary"),
+                        tuple("sequenceFlow", "flow4"),
+                        tuple("userTask", "taskAfterBoundary")
+                );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().list())
+                    .extracting(HistoricActivityInstance::getActivityType, HistoricActivityInstance::getActivityId)
+                    .containsExactlyInAnyOrder(
+                            tuple("startEvent", "start"),
+                            tuple("sequenceFlow", "flow1"),
+                            tuple("subProcess", "subProcess"),
+                            tuple("startEvent", "subProcessStart"),
+                            tuple("sequenceFlow", "subProcessFlow1"),
+                            tuple("scriptTask", "scriptTask"),
+                            tuple("eventSubProcess", "eventSubProcess"),
+                            tuple("startEvent", "eventSubProcessStart"),
+                            tuple("sequenceFlow", "eventFlow1"),
+                            tuple("endEvent", "eventEnd"),
+                            tuple("boundaryEvent", "subProcessErrorBoundary"),
+                            tuple("sequenceFlow", "flow4"),
+                            tuple("userTask", "taskAfterBoundary")
+                    );
+        }
+    }
+
     private void assertThatErrorHasBeenCaught(String procId) {
         // The process will throw an error event,
         // which is caught and escalated by a User org.flowable.task.service.Task
-        assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).as("No tasks found in task list.").isEqualTo(1);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Escalated Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Escalated Task");
 
         // Completing the org.flowable.task.service.Task will end the process instance
         taskService.complete(task.getId());

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.idm.api.User;
@@ -27,10 +29,9 @@ public class ChangePasswordIdentityServiceTest extends CustomConfigurationFlowab
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         processEngineConfiguration.setIdmEngineConfigurator(
-            new PasswordEncoderIdmEngineConfigurator()
+                new PasswordEncoderIdmEngineConfigurator()
         );
     }
-
 
     @Test
     public void testChangePassword() {
@@ -43,19 +44,19 @@ public class ChangePasswordIdentityServiceTest extends CustomConfigurationFlowab
             user.setFirstName("John Doe");
             identityService.saveUser(user);
             User johndoe = identityService.createUserQuery().userId("johndoe").list().get(0);
-            assertFalse(johndoe.getPassword().equals("xxx"));
-            assertEquals("John Doe", johndoe.getFirstName());
-            assertTrue(identityService.checkPassword("johndoe", "xxx"));
+            assertThat(johndoe.getPassword()).isNotEqualTo("xxx");
+            assertThat(johndoe.getFirstName()).isEqualTo("John Doe");
+            assertThat(identityService.checkPassword("johndoe", "xxx")).isTrue();
 
             user = identityService.createUserQuery().userId("johndoe").list().get(0);
             user.setPassword("yyy");
             identityService.saveUser(user);
-            assertTrue(identityService.checkPassword("johndoe", "xxx"));
+            assertThat(identityService.checkPassword("johndoe", "xxx")).isTrue();
 
             user = identityService.createUserQuery().userId("johndoe").list().get(0);
             user.setPassword("yyy");
             identityService.updateUserPassword(user);
-            assertTrue(identityService.checkPassword("johndoe", "yyy"));
+            assertThat(identityService.checkPassword("johndoe", "yyy")).isTrue();
 
         } finally {
             identityService.deleteUser("johndoe");

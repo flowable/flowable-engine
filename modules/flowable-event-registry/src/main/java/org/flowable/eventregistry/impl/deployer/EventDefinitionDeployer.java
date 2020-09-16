@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.Deployer;
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityManager;
@@ -66,7 +67,12 @@ public class EventDefinitionDeployer implements Deployer {
             Map<ChannelDefinitionEntity, ChannelDefinitionEntity> mapOfNewChannelDefinitionToPreviousVersion = getPreviousVersionsOfChannelDefinitions(parsedDeployment);
             setChannelDefinitionVersionsAndIds(parsedDeployment, mapOfNewChannelDefinitionToPreviousVersion);
             persistChannelDefinitions(parsedDeployment);
-            
+
+            // There should be only one channel definition in the cache (otherwise it could be detected as a 'new version' by the EventRegistryChangeDetectionManager)
+            for (ChannelDefinitionEntity previousChannelDefinition : mapOfNewChannelDefinitionToPreviousVersion.values()) {
+                cachingAndArtifactsManager.removeChannelDefinitionFromCache(previousChannelDefinition.getId());
+            }
+
         } else {
             makeEventDefinitionsConsistentWithPersistedVersions(parsedDeployment);
             makeChannelDefinitionsConsistentWithPersistedVersions(parsedDeployment);
@@ -159,7 +165,8 @@ public class EventDefinitionDeployer implements Deployer {
      * Saves each event definition. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistEventDefinitions(ParsedDeployment parsedDeployment) {
-        EventDefinitionEntityManager eventDefinitionEntityManager = CommandContextUtil.getEventDefinitionEntityManager();
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+        EventDefinitionEntityManager eventDefinitionEntityManager = eventRegistryEngineConfiguration.getEventDefinitionEntityManager();
 
         for (EventDefinitionEntity eventDefinition : parsedDeployment.getAllEventDefinitions()) {
             eventDefinitionEntityManager.insert(eventDefinition);
@@ -170,7 +177,8 @@ public class EventDefinitionDeployer implements Deployer {
      * Saves each channel definition. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistChannelDefinitions(ParsedDeployment parsedDeployment) {
-        ChannelDefinitionEntityManager channelDefinitionEntityManager = CommandContextUtil.getChannelDefinitionEntityManager();
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+        ChannelDefinitionEntityManager channelDefinitionEntityManager = eventRegistryEngineConfiguration.getChannelDefinitionEntityManager();
 
         for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
             channelDefinitionEntityManager.insert(channelDefinition);

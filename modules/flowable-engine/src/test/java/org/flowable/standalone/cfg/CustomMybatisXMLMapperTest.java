@@ -12,6 +12,8 @@
  */
 package org.flowable.standalone.cfg;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -40,20 +42,21 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         final String taskId = createTask("4", null, null, 0);
 
         CustomTask customTask = managementService.executeCommand(new Command<CustomTask>() {
+
             @Override
             public CustomTask execute(CommandContext commandContext) {
                 return (CustomTask) CommandContextUtil.getDbSqlSession(commandContext).selectOne("selectOneCustomTask", taskId);
             }
         });
 
-        assertEquals("4", customTask.getName());
+        assertThat(customTask.getName()).isEqualTo("4");
 
         // test default query as well
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("2").singleResult();
-        assertEquals("2", task.getName());
+        assertThat(task.getName()).isEqualTo("2");
 
         // Cleanup
         deleteTasks(taskService.createTaskQuery().list());
@@ -75,7 +78,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
             }
         });
 
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
 
         // Cleanup
         deleteCustomTasks(tasks);
@@ -91,8 +94,8 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
         List<CustomTask> tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).unOwned().list();
 
-        assertEquals(5, tasks.size());
-        assertEquals(5, new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).unOwned().count());
+        assertThat(tasks).hasSize(5);
+        assertThat(new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).unOwned().count()).isEqualTo(5);
 
         tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).list();
 
@@ -110,7 +113,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
         CustomTask task = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).taskOwner("kermit").singleResult();
 
-        assertEquals("kermit", task.getOwner());
+        assertThat(task.getOwner()).isEqualTo("kermit");
 
         List<CustomTask> tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).list();
         // Cleanup
@@ -126,7 +129,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
         List<CustomTask> tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).listPage(0, 10);
 
-        assertEquals(10, tasks.size());
+        assertThat(tasks).hasSize(10);
 
         tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).list();
 
@@ -143,20 +146,20 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
 
         List<CustomTask> tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).orderByTaskPriority().desc().list();
 
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
 
         for (int i = 0, j = 4; i < 5; i++, j--) {
             CustomTask task = tasks.get(i);
-            assertEquals(j * 20, task.getPriority());
+            assertThat(task.getPriority()).isEqualTo(j * 20);
         }
 
-        tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor() ).orderByTaskPriority().asc().list();
+        tasks = new CustomTaskQuery(processEngineConfiguration.getCommandExecutor()).orderByTaskPriority().asc().list();
 
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
 
         for (int i = 0; i < 5; i++) {
             CustomTask task = tasks.get(i);
-            assertEquals(i * 20, task.getPriority());
+            assertThat(task.getPriority()).isEqualTo(i * 20);
         }
         // Cleanup
         deleteCustomTasks(tasks);
@@ -181,30 +184,33 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
             taskService.createAttachment(null, createTask(String.valueOf(i), null, null, 0), null, "attachmentName" + i, "", "http://activiti.org/" + i);
         }
 
-        assertEquals(attachmentId, new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentId(attachmentId).singleResult().getId());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentId(attachmentId).singleResult().getId())
+                .isEqualTo(attachmentId);
 
-        assertEquals("attachment1", new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentName("attachment1").singleResult().getName());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentName("attachment1").singleResult().getName())
+                .isEqualTo("attachment1");
 
-        assertEquals(18, new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).count());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).count()).isEqualTo(18);
         List<Attachment> attachments = new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).list();
-        assertEquals(18, attachments.size());
+        assertThat(attachments).hasSize(18);
 
         attachments = new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).listPage(0, 10);
-        assertEquals(10, attachments.size());
+        assertThat(attachments).hasSize(10);
 
-        assertEquals(3, new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).taskId(taskId).count());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).taskId(taskId).count()).isEqualTo(3);
         attachments = new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).taskId(taskId).list();
-        assertEquals(3, attachments.size());
+        assertThat(attachments).hasSize(3);
 
-        assertEquals(2, new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).userId("kermit").count());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).userId("kermit").count()).isEqualTo(2);
         attachments = new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).userId("kermit").list();
-        assertEquals(2, attachments.size());
+        assertThat(attachments).hasSize(2);
 
-        assertEquals(1, new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentType("image/jpeg").count());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentType("image/jpeg").count()).isEqualTo(1);
         attachments = new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).attachmentType("image/jpeg").list();
-        assertEquals(1, attachments.size());
+        assertThat(attachments).hasSize(1);
 
-        assertEquals("zattachment3", new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).orderByAttachmentName().desc().list().get(0).getName());
+        assertThat(new AttachmentQuery(processEngineConfiguration.getCommandExecutor()).orderByAttachmentName().desc().list().get(0).getName())
+                .isEqualTo("zattachment3");
 
         // Cleanup
         deleteTasks(taskService.createTaskQuery().list());

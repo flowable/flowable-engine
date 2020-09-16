@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +39,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
@@ -181,6 +182,15 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("involvedUser", "misspiggy");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+
+            // Claim task
+            taskService.claim(processTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            requestNode.removeAll();
+            requestNode.put("candidateGroup", "sales");
+            requestNode.put("ignoreAssignee", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
 
             // Process instance filtering
             requestNode.removeAll();
@@ -666,13 +676,13 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
 
         // Check status and size
         JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
-        JsonNode dataNode = rootNode.get("data");
-        assertEquals(1, dataNode.size());
-
-        // Check presence of tenantId
-        assertNotNull(dataNode.get(0).get("tenantId"));
-        assertEquals("testTenant", dataNode.get(0).get("tenantId").textValue());
-
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "          tenantId: 'testTenant'"
+                        + "      } ]"
+                        + "}");
         closeResponse(response);
     }
 

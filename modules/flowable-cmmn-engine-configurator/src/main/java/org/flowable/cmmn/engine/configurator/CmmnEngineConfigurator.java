@@ -27,6 +27,7 @@ import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstance
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -92,6 +93,21 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
         initCmmnEngine();
 
+        if (processEngineConfiguration != null) {
+            cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.BPMN, processEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+
+            processEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
+
+        JobServiceConfiguration engineJobServiceConfiguration = getJobServiceConfiguration(engineConfiguration);
+        if (engineJobServiceConfiguration != null) {
+            engineJobServiceConfiguration.getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
+
+
         initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }
 
@@ -119,7 +135,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             cmmnEngineConfiguration.setAsyncHistoryJsonGzipCompressionEnabled(processEngineConfiguration.isAsyncHistoryJsonGzipCompressionEnabled());
             
             // See the beforeInit
-            ((CmmnEngineConfiguration) cmmnEngineConfiguration).setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
+            cmmnEngineConfiguration.setHistoryJobExecutionScope(JobServiceConfiguration.JOB_EXECUTION_SCOPE_ALL);
         }
     }
     
@@ -128,6 +144,14 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             return (ProcessEngineConfigurationImpl) engineConfiguration.getEngineConfigurations()
                             .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
+        return null;
+    }
+
+    protected JobServiceConfiguration getJobServiceConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        if (engineConfiguration.getServiceConfigurations().containsKey(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG)) {
+            return (JobServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+        }
+
         return null;
     }
 

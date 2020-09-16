@@ -42,10 +42,10 @@ public class MessageEventHandler extends AbstractEventHandler {
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             String executionId = eventSubscription.getExecutionId();
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
-            eventDispatcher.dispatchEvent(
-                            FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), payload,
-                                    eventSubscription.getExecutionId(), eventSubscription.getProcessInstanceId(), execution.getProcessDefinitionId()));
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(executionId);
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), 
+                    eventSubscription.getEventName(), payload, eventSubscription.getExecutionId(), eventSubscription.getProcessInstanceId(), execution.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         super.handleEvent(eventSubscription, payload, commandContext);

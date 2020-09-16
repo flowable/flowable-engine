@@ -34,8 +34,8 @@ import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.task.service.delegate.BaseTaskListener;
 import org.flowable.task.service.delegate.TaskListener;
@@ -118,7 +118,8 @@ public class ListenerNotificationHelper {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
                 if (listener.getOnTransaction() != null) {
-                    planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
+                    ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                    planTransactionDependentTaskListener(executionEntity, (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
                     taskEntity.setEventHandlerId(listener.getId());

@@ -12,26 +12,29 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Yvo Swillens
@@ -54,6 +57,8 @@ public class CollectionsContainsTest {
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
+        List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
+        List inputVariable8 = Arrays.asList("100", "101");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -68,36 +73,48 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
         processVariablesInput.put("collection6", inputVariable6);
+        processVariablesInput.put("collection7", inputVariable7);
+        processVariablesInput.put("collection8", inputVariable8);
         processVariablesInput.put("arrayNode1", arrayNode1);
         processVariablesInput.put("arrayNode2", arrayNode2);
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
+        processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertTrue(result.getRuleExecutions().get(1).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(2).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(3).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(4).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(7).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(8).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(11).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(13).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(14).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(15).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(16).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(17).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(18).isValid());
-        Assert.assertTrue(result.getRuleExecutions().get(19).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions().get(1).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(2).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(3).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(4).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(7).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(8).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(11).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(13).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(14).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(15).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(16).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(17).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(18).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(19).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(20).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(21).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(22).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(24).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(25).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(26).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(27).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(28).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(29).isValid()).isTrue();
     }
 
     @Test
@@ -111,6 +128,8 @@ public class CollectionsContainsTest {
         List inputVariable4 = Arrays.asList(5L, 10L, 20L, 50L);
         List inputVariable5 = Arrays.asList("test3", "test5");
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
+        List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
+        List inputVariable8 = Arrays.asList("100", "101");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -125,27 +144,30 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collection4", inputVariable4);
         processVariablesInput.put("collection5", inputVariable5);
         processVariablesInput.put("collection6", inputVariable6);
+        processVariablesInput.put("collection7", inputVariable7);
+        processVariablesInput.put("collection8", inputVariable8);
         processVariablesInput.put("arrayNode1", arrayNode1);
         processVariablesInput.put("arrayNode2", arrayNode2);
         processVariablesInput.put("arrayNode3", arrayNode3);
         processVariablesInput.put("arrayNode4", arrayNode4);
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
+        processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
-        Assert.assertFalse(result.getRuleExecutions().get(5).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(6).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(9).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(10).isValid());
-        Assert.assertFalse(result.getRuleExecutions().get(12).isValid());
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getRuleExecutions().get(5).isValid()).isFalse();
+        assertThat(result.getRuleExecutions().get(6).isValid()).isFalse();
+        assertThat(result.getRuleExecutions().get(9).isValid()).isFalse();
+        assertThat(result.getRuleExecutions().get(10).isValid()).isFalse();
+        assertThat(result.getRuleExecutions().get(12).isValid()).isFalse();
     }
 
     @Test
@@ -176,31 +198,31 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collectionDouble", collectionDouble);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithAuditTrail();
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .executeWithAuditTrail();
 
-        Assert.assertFalse(result.isFailed());
+        assertThat(result.isFailed()).isFalse();
 
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(0).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(1).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(2).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(3).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(4).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(5).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(6).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(7).getResult());
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(0).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(1).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(2).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(3).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(4).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(5).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(6).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(7).getResult()).isEqualTo(true);
 
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(0).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(1).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(2).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(3).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(4).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(5).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(6).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(7).getResult());
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(0).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(1).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(2).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(3).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(4).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(5).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(6).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(7).getResult()).isEqualTo(true);
     }
 }

@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -33,15 +31,12 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.DefaultInboundEventProcessor;
 import org.flowable.eventregistry.impl.event.FlowableEventRegistryEvent;
 import org.flowable.eventregistry.impl.pipeline.DefaultInboundEventProcessingPipeline;
-import org.flowable.eventregistry.impl.runtime.EventCorrelationParameterInstanceImpl;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
-import org.flowable.eventregistry.model.EventCorrelationParameter;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.model.InboundChannelModel;
@@ -73,7 +68,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         eventRegistry.registerEventRegistryEventConsumer(this.testEventConsumer);
         eventRegistry.setInboundEventProcessor(new DefaultInboundEventProcessor(eventRegistry));
     }
-    
+
     @AfterEach
     public void tearDown() {
         eventEngineConfiguration.getExpressionManager().setBeans(initialBeans);
@@ -95,13 +90,12 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannel();
 
         repositoryService.createEventModelBuilder()
-            .inboundChannelKey("test-channel")
-            .key("myEvent")
-            .resourceName("myEvent.event")
-            .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("payload1", EventPayloadTypes.STRING)
-            .payload("payload2", EventPayloadTypes.INTEGER)
-            .deploy();
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .correlationParameter("customerId", EventPayloadTypes.STRING)
+                .payload("payload1", EventPayloadTypes.STRING)
+                .payload("payload2", EventPayloadTypes.INTEGER)
+                .deploy();
 
         inboundEventChannelAdapter.triggerTestEvent();
 
@@ -109,17 +103,18 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         FlowableEventRegistryEvent eventRegistryEvent = (FlowableEventRegistryEvent) testEventConsumer.eventsReceived.get(0);
 
         EventInstance eventInstance = eventRegistryEvent.getEventInstance();
-        assertThat(eventInstance.getEventModel().getKey()).isEqualTo("myEvent");
+        assertThat(eventInstance.getEventKey()).isEqualTo("myEvent");
 
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getValue).containsOnly("test");
+                .extracting(EventPayloadInstance::getValue)
+                .containsOnly("test");
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getDefinitionType, EventPayloadInstance::getValue)
-            .containsOnly(
-                tuple("customerId", EventPayloadTypes.STRING, "test"),
-                tuple("payload1", EventPayloadTypes.STRING, "Hello World"),
-                tuple("payload2", EventPayloadTypes.INTEGER, 123)
-            );
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getDefinitionType, EventPayloadInstance::getValue)
+                .containsOnly(
+                        tuple("customerId", EventPayloadTypes.STRING, "test"),
+                        tuple("payload1", EventPayloadTypes.STRING, "Hello World"),
+                        tuple("payload2", EventPayloadTypes.INTEGER, 123)
+                );
     }
 
     @Test
@@ -127,13 +122,12 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = setupTestChannelWithCustomDeserializer();
 
         repositoryService.createEventModelBuilder()
-            .inboundChannelKey("test-channel")
-            .key("myEvent")
-            .resourceName("myEvent.event")
-            .correlationParameter("customerId", EventPayloadTypes.STRING)
-            .payload("payload1", EventPayloadTypes.STRING)
-            .payload("payload2", EventPayloadTypes.INTEGER)
-            .deploy();
+                .key("myEvent")
+                .resourceName("myEvent.event")
+                .correlationParameter("customerId", EventPayloadTypes.STRING)
+                .payload("payload1", EventPayloadTypes.STRING)
+                .payload("payload2", EventPayloadTypes.INTEGER)
+                .deploy();
 
         inboundEventChannelAdapter.triggerTestEvent();
 
@@ -141,33 +135,33 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         FlowableEventRegistryEvent eventRegistryEvent = (FlowableEventRegistryEvent) testEventConsumer.eventsReceived.get(0);
 
         EventInstance eventInstance = eventRegistryEvent.getEventInstance();
-        assertThat(eventInstance.getEventModel().getKey()).isEqualTo("myEvent");
+        assertThat(eventInstance.getEventKey()).isEqualTo("myEvent");
 
         assertThat(eventInstance.getCorrelationParameterInstances())
-            .extracting(EventCorrelationParameterInstance::getValue).containsOnly("test");
+                .extracting(EventPayloadInstance::getValue)
+                .containsOnly("test");
         assertThat(eventInstance.getPayloadInstances())
-            .extracting(p -> p.getEventPayloadDefinition().getName(), p -> p.getEventPayloadDefinition().getType(), EventPayloadInstance::getValue)
-            .containsOnly(
-                tuple("customerId", EventPayloadTypes.STRING, "test"),
-                tuple("payload1", EventPayloadTypes.STRING, "Hello World"),
-                tuple("payload2", EventPayloadTypes.INTEGER, 123)
-            );
+                .extracting(p -> p.getEventPayloadDefinition().getName(), p -> p.getEventPayloadDefinition().getType(), EventPayloadInstance::getValue)
+                .containsOnly(
+                        tuple("customerId", EventPayloadTypes.STRING, "test"),
+                        tuple("payload1", EventPayloadTypes.STRING, "Hello World"),
+                        tuple("payload2", EventPayloadTypes.INTEGER, 123)
+                );
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
         eventEngineConfiguration.getExpressionManager().getBeans()
-            .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
-        
-        eventEngineConfiguration.getEventRepositoryService().createInboundChannelModelBuilder()
-            .key("test-channel")
-            .resourceName("test.channel")
-            .channelAdapter("${inboundEventChannelAdapter}")
-            .jsonDeserializer()
-            .detectEventKeyUsingJsonField("type")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
+                .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
+        eventEngineConfiguration.getEventRepositoryService().createInboundChannelModelBuilder()
+                .key("test-channel")
+                .resourceName("test.channel")
+                .channelAdapter("${inboundEventChannelAdapter}")
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("type")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
 
         return inboundEventChannelAdapter;
     }
@@ -175,18 +169,20 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     @SuppressWarnings("unchecked")
     protected TestInboundEventChannelAdapter setupTestChannelWithCustomDeserializer() {
         eventEngineConfiguration.getEventRepositoryService().createInboundChannelModelBuilder()
-            .key("test-channel")
-            .resourceName("test.channel")
-            .jmsChannelAdapter("test")
-            .eventProcessingPipeline()
-            .jsonDeserializer()
-            .fixedEventKey("test")
-            .jsonFieldsMapDirectlyToPayload()
-            .deploy();
-        
+                .key("test-channel")
+                .resourceName("test.channel")
+                .jmsChannelAdapter("test")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .fixedEventKey("test")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
         TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
-        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService().getChannelModelByKey("test-channel");
-        DefaultInboundEventProcessingPipeline<Customer> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<Customer>) inboundChannelModel.getInboundEventProcessingPipeline();
+        InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService()
+                .getChannelModelByKey("test-channel");
+        DefaultInboundEventProcessingPipeline<Customer> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<Customer>) inboundChannelModel
+                .getInboundEventProcessingPipeline();
         inboundEventProcessingPipeline.setInboundEventDeserializer(new InboundEventDeserializer<Customer>() {
 
             @Override
@@ -199,19 +195,9 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
             }
 
         });
-        
+
         inboundEventProcessingPipeline.setInboundEventKeyDetector(Customer::getType);
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<Customer>() {
-
-            @Override
-            public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, Customer event) {
-                EventCorrelationParameter correlationParameterDefinition = eventDefinition.getCorrelationParameters()
-                    .stream()
-                    .filter(parameterDefinition -> Objects.equals("customerId", parameterDefinition.getName()))
-                    .findAny()
-                    .orElse(null);
-                return Collections.singleton(new EventCorrelationParameterInstanceImpl(correlationParameterDefinition, event.getCustomerId()));
-            }
 
             @Override
             public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Customer event) {
@@ -233,7 +219,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 return payloadInstances;
             }
         });
-        
+
         inboundEventChannelAdapter.setInboundChannelModel(inboundChannelModel);
         inboundEventChannelAdapter.setEventRegistry(eventEngineConfiguration.getEventRegistry());
 
@@ -248,7 +234,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         public String getConsumerKey() {
             return "myTestEventConsumer";
         }
-        
+
         @Override
         public void eventReceived(EventRegistryEvent event) {
             eventsReceived.add(event);

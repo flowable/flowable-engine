@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
+import org.flowable.bpmn.model.ServiceTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,7 +50,8 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) baseElement;
         
         String eventType = sendEventServiceTask.getEventType();
@@ -95,8 +97,10 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         SendEventServiceTask task = new SendEventServiceTask();
+        task.setType(ServiceTask.SEND_EVENT_TASK);
         
         String eventKey = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_EVENT_KEY, elementNode);
         if (StringUtils.isNotEmpty(eventKey)) {
@@ -125,7 +129,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
                 addFlowableExtensionElementWithValue("triggerChannelType", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE, elementNode), task);
                 addFlowableExtensionElementWithValue("triggerChannelDestination", getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION, elementNode), task);
                 
-                convertJsonToCorrelationParameters(elementNode, "triggerEventCorrelationParameter", task); 
+                convertJsonToEventCorrelationParameters(elementNode, "triggerEventCorrelationParameter", task);
                 
                 String fixedValue = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE, elementNode);
                 String jsonField = getPropertyValueAsString(PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD, elementNode);

@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -36,8 +38,11 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.runner.RunWith;
@@ -57,13 +62,14 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected DynamicCmmnService dynamicCmmnService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
+    protected CmmnMigrationService cmmnMigrationService;
 
     protected String deploymentId;
 
     @After
     public void cleanup() {
         if (deploymentId != null) {
-           cmmnRepositoryService.deleteDeployment(deploymentId, true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
         }
     }
 
@@ -112,7 +118,10 @@ public abstract class AbstractFlowableCmmnTestCase {
         long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
         assertEquals(createCaseInstanceEndedErrorMessage(caseInstance, count), 0, count);
         assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+        }
     }
 
     protected String createCaseInstanceEndedErrorMessage(CaseInstance caseInstance, long count) {
@@ -130,13 +139,21 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected void assertCaseInstanceEnded(CaseInstance caseInstance, int nrOfExpectedMilestones) {
         assertCaseInstanceEnded(caseInstance);
         assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
-        assertEquals(nrOfExpectedMilestones, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertEquals(nrOfExpectedMilestones,
+                cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        }
     }
     
     protected void assertCaseInstanceNotEnded(CaseInstance caseInstance) {
         assertTrue("Found no plan items for case instance", cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
         assertTrue("No runtime case instance found", cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
-        assertNull("Historical case instance is already marked as ended", cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertNull("Historical case instance is already marked as ended",
+                cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
+        }
     }
 
     protected void assertSingleTaskExists(List<Task> tasks, String name) {
@@ -333,6 +350,10 @@ public abstract class AbstractFlowableCmmnTestCase {
     
     protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
         CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+    }
+
+    protected void waitForJobExecutorOnCondition(Callable<Boolean> predicate) {
+        CmmnJobTestHelper.waitForJobExecutorOnCondition(cmmnEngineConfiguration, 20000L, 200L, predicate);
     }
 
 }

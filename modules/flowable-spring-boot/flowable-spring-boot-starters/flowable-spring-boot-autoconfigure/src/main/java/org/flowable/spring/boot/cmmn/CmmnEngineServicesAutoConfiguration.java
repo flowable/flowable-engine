@@ -15,6 +15,7 @@ package org.flowable.spring.boot.cmmn;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -152,4 +153,10 @@ public class CmmnEngineServicesAutoConfiguration {
     public CmmnHistoryService cmmnHistoryService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnHistoryService();
     }
+
+    @Bean
+    public CmmnMigrationService cmmnMigrationService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnMigrationService();
+    }
+
 }

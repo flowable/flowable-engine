@@ -33,7 +33,7 @@ public class HistoricVariableInstanceEntityManagerImpl
     implements HistoricVariableInstanceEntityManager {
 
     public HistoricVariableInstanceEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, HistoricVariableInstanceDataManager historicVariableInstanceDataManager) {
-        super(variableServiceConfiguration, historicVariableInstanceDataManager);
+        super(variableServiceConfiguration, variableServiceConfiguration.getEngineName(), historicVariableInstanceDataManager);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class HistoricVariableInstanceEntityManagerImpl
         super.delete(entity, fireDeleteEvent);
 
         if (entity.getByteArrayRef() != null) {
-            entity.getByteArrayRef().delete();
+            entity.getByteArrayRef().delete(serviceConfiguration.getEngineName());
         }
     }
 
@@ -109,6 +109,16 @@ public class HistoricVariableInstanceEntityManagerImpl
         return dataManager.findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
     }
     
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId) {
+        return dataManager.findHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+    }
+
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByTaskId(String taskId) {
+        return dataManager.findHistoricVariableInstancesByTaskId(taskId);
+    }
+
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
         return dataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType);

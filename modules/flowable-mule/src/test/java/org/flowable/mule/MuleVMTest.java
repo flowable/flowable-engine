@@ -12,13 +12,14 @@
  */
 package org.flowable.mule;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -29,7 +30,7 @@ public class MuleVMTest extends AbstractMuleTest {
 
     @Test
     public void send() throws Exception {
-        Assert.assertTrue(muleContext.isStarted());
+        assertThat(muleContext.isStarted()).isTrue();
 
         ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
         RepositoryService repositoryService = processEngine.getRepositoryService();
@@ -37,9 +38,9 @@ public class MuleVMTest extends AbstractMuleTest {
 
         RuntimeService runtimeService = processEngine.getRuntimeService();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("muleProcess");
-        Assert.assertFalse(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isFalse();
         Object result = runtimeService.getVariable(processInstance.getProcessInstanceId(), "theVariable");
-        Assert.assertEquals(30, result);
+        assertThat(result).isEqualTo(30);
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
         processEngine.getHistoryService().deleteHistoricProcessInstance(processInstance.getId());

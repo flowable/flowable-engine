@@ -75,6 +75,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSION_ELEMENTS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+    String ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
     String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
@@ -104,6 +105,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
+    String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
+
+    String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
 
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
@@ -111,9 +115,12 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DISPLAY_ORDER = "displayOrder";
     String ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW = "includeInStageOverview";
 
+    String ATTRIBUTE_MILESTONE_VARIABLE = "milestoneVariable";
+
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
     String ATTRIBUTE_DECISION_REF = "decisionRef";
+    String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
     String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
     String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
@@ -170,6 +177,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_FORM_FIELD_VALIDATION = "formFieldValidation";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
+    String ATTRIBUTE_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
 
     String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
     String ATTRIBUTE_REPETITION_MAX_INSTANCE_COUNT_NAME = "maxInstanceCount";

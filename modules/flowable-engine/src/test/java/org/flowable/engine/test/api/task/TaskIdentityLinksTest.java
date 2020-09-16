@@ -13,8 +13,10 @@
 
 package org.flowable.engine.test.api.task;
 
-import java.util.Collections;
-import java.util.Comparator;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -25,7 +27,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tom Baeyens
@@ -46,18 +51,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.addCandidateUser(taskId, "kermit");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertNull(identityLink.getGroupId());
-        assertEquals("kermit", identityLink.getUserId());
-        assertEquals(IdentityLinkType.CANDIDATE, identityLink.getType());
-        assertEquals(taskId, identityLink.getTaskId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getTaskId)
+                .containsExactly(tuple(null, "kermit", IdentityLinkType.CANDIDATE, taskId));
 
         taskService.deleteCandidateUser(taskId, "kermit");
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
     }
 
     @Test
@@ -70,40 +70,33 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.addCandidateGroup(taskId, "muppets");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertEquals("muppets", identityLink.getGroupId());
-        assertNull("kermit", identityLink.getUserId());
-        assertEquals(IdentityLinkType.CANDIDATE, identityLink.getType());
-        assertEquals(taskId, identityLink.getTaskId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getTaskId)
+                .containsExactly(tuple("muppets", null, IdentityLinkType.CANDIDATE, taskId));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> taskEvents = taskService.getTaskEvents(taskId);
-            assertEquals(1, taskEvents.size());
+            assertThat(taskEvents).hasSize(1);
             Event taskEvent = taskEvents.get(0);
-            assertEquals(Event.ACTION_ADD_GROUP_LINK, taskEvent.getAction());
+            assertThat(taskEvent.getAction()).isEqualTo(Event.ACTION_ADD_GROUP_LINK);
             List<String> taskEventMessageParts = taskEvent.getMessageParts();
-            assertEquals("muppets", taskEventMessageParts.get(0));
-            assertEquals(IdentityLinkType.CANDIDATE, taskEventMessageParts.get(1));
-            assertEquals(2, taskEventMessageParts.size());
+            assertThat(taskEventMessageParts)
+                    .containsExactlyInAnyOrder("muppets", IdentityLinkType.CANDIDATE);
         }
 
         taskService.deleteCandidateGroup(taskId, "muppets");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<Event> taskEvents = taskService.getTaskEvents(taskId);
+            assertThat(taskEvents).hasSize(2);
             Event taskEvent = findTaskEvent(taskEvents, Event.ACTION_DELETE_GROUP_LINK);
-            assertEquals(Event.ACTION_DELETE_GROUP_LINK, taskEvent.getAction());
+            assertThat(taskEvent.getAction()).isEqualTo(Event.ACTION_DELETE_GROUP_LINK);
             List<String> taskEventMessageParts = taskEvent.getMessageParts();
-            assertEquals("muppets", taskEventMessageParts.get(0));
-            assertEquals(IdentityLinkType.CANDIDATE, taskEventMessageParts.get(1));
-            assertEquals(2, taskEventMessageParts.size());
-            assertEquals(2, taskEvents.size());
+            assertThat(taskEventMessageParts)
+                    .containsExactlyInAnyOrder("muppets", IdentityLinkType.CANDIDATE);
         }
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
     }
     
     @Test
@@ -119,36 +112,24 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         taskService.setAssignee(taskId, "kermit");
 
-        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).hasSize(1);
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
         taskService.setAssignee(taskId, null);
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
-        assertEquals(2, history.size());
-        
-        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
-
-            @Override
-            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
-               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
-            }
-            
-        });
-        
-        HistoricIdentityLink assigned = history.get(0);
-        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
-        assertEquals("kermit", assigned.getUserId());
-        HistoricIdentityLink unassigned = history.get(1);
-        assertNull(unassigned.getUserId());
-        assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
-        assertNull(unassigned.getUserId());
+        assertThat(history)
+                .extracting(HistoricIdentityLink::getUserId, HistoricIdentityLink::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("kermit", IdentityLinkType.ASSIGNEE),
+                        tuple(null, IdentityLinkType.ASSIGNEE)
+                );
     }
 
     @Test
@@ -164,36 +145,24 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         taskService.claim(taskId, "kermit");
 
-        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).hasSize(1);
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
         taskService.unclaim(taskId);
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
-        assertEquals(2, history.size());
-        
-        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
-
-            @Override
-            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
-               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
-            }
-            
-        });
-        
-        HistoricIdentityLink assigned = history.get(0);
-        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
-        assertEquals("kermit", assigned.getUserId());
-        HistoricIdentityLink unassigned = history.get(1);
-        assertNull(unassigned.getUserId());
-        assertEquals(IdentityLinkType.ASSIGNEE, unassigned.getType());
-        assertNull(unassigned.getUserId());
+        assertThat(history)
+                .extracting(HistoricIdentityLink::getUserId, HistoricIdentityLink::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("kermit", IdentityLinkType.ASSIGNEE),
+                        tuple(null, IdentityLinkType.ASSIGNEE)
+                );
     }
 
     @Test
@@ -209,35 +178,24 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         taskService.setOwner(taskId, "kermit");
 
-        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).hasSize(1);
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.OWNER);
 
         taskService.setOwner(taskId, null);
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
 
         assertTaskEvent(taskId, 2, Event.ACTION_DELETE_USER_LINK, "kermit", IdentityLinkType.OWNER);
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
-        assertEquals(2, history.size());
-        Collections.sort(history, new Comparator<HistoricIdentityLink>() {
-
-            @Override
-            public int compare(HistoricIdentityLink hi1, HistoricIdentityLink hi2) {
-               return hi1.getCreateTime().compareTo(hi2.getCreateTime());
-            }
-            
-        });
-        
-        HistoricIdentityLink assigned = history.get(0);
-        assertEquals(IdentityLinkType.OWNER, assigned.getType());
-        assertEquals("kermit", assigned.getUserId());
-        HistoricIdentityLink unassigned = history.get(1);
-        assertNull(unassigned.getUserId());
-        assertEquals(IdentityLinkType.OWNER, unassigned.getType());
-        assertNull(unassigned.getUserId());
+        assertThat(history)
+                .extracting(HistoricIdentityLink::getUserId, HistoricIdentityLink::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("kermit", IdentityLinkType.OWNER),
+                        tuple(null, IdentityLinkType.OWNER)
+                );
     }
     
     @Test
@@ -255,16 +213,15 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.claim(taskId, "kermit");
         taskService.setAssignee(taskId, "kermit");
 
-        assertEquals(1, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).hasSize(1);
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
-        assertEquals(1, history.size());
-        HistoricIdentityLink assigned = history.get(0);
-        assertEquals(IdentityLinkType.ASSIGNEE, assigned.getType());
-        assertEquals("kermit", assigned.getUserId());
+        assertThat(history)
+                .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId)
+                .containsExactly(tuple(IdentityLinkType.ASSIGNEE, "kermit"));
     }
 
     @Test
@@ -281,13 +238,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.claim(taskId, null);
         taskService.setAssignee(taskId, null);
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
 
         assertTaskEvent(taskId, 0, null, null, null);
         
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         List<HistoricIdentityLink> history = historyService.getHistoricIdentityLinksForTask(taskId);
-        assertEquals(0, history.size());
+        assertThat(history).isEmpty();
     }
 
     @Test
@@ -300,18 +257,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.addUserIdentityLink(taskId, "kermit", "interestee");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertNull(identityLink.getGroupId());
-        assertEquals("kermit", identityLink.getUserId());
-        assertEquals("interestee", identityLink.getType());
-        assertEquals(taskId, identityLink.getTaskId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getTaskId)
+                .containsExactly(tuple(null, "kermit", "interestee", taskId));
 
         taskService.deleteUserIdentityLink(taskId, "kermit", "interestee");
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
     }
 
     @Test
@@ -324,18 +276,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.addGroupIdentityLink(taskId, "muppets", "playing");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertEquals("muppets", identityLink.getGroupId());
-        assertNull("kermit", identityLink.getUserId());
-        assertEquals("playing", identityLink.getType());
-        assertEquals(taskId, identityLink.getTaskId());
-
-        assertEquals(1, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getTaskId)
+                .containsExactly(tuple("muppets", null, "playing", taskId));
 
         taskService.deleteGroupIdentityLink(taskId, "muppets", "playing");
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
     }
 
     @Test
@@ -347,8 +294,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.deleteUserIdentityLink(task.getId(), "nonExistingUser", IdentityLinkType.ASSIGNEE);
 
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-        assertNull(task.getAssignee());
-        assertEquals(0, taskService.getIdentityLinksForTask(task.getId()).size());
+        assertThat(task.getAssignee()).isNull();
+        assertThat(taskService.getIdentityLinksForTask(task.getId())).isEmpty();
 
         // cleanup
         taskService.deleteTask(task.getId(), true);
@@ -363,8 +310,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.deleteUserIdentityLink(task.getId(), "nonExistingUser", IdentityLinkType.OWNER);
 
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
-        assertNull(task.getOwner());
-        assertEquals(0, taskService.getIdentityLinksForTask(task.getId()).size());
+        assertThat(task.getOwner()).isNull();
+        assertThat(taskService.getIdentityLinksForTask(task.getId())).isEmpty();
 
         // cleanup
         taskService.deleteTask(task.getId(), true);
@@ -378,11 +325,9 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-
-        assertEquals(1, identityLinks.size());
-        IdentityLink identityLink = identityLinks.get(0);
-
-        assertEquals("user", identityLink.getUserId());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getUserId)
+                .containsExactly("user");
     }
 
     @Test
@@ -396,18 +341,13 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         taskService.deleteCandidateUser(taskId, "kermit");
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        assertNotNull(identityLinks);
-        assertEquals(1, identityLinks.size());
-
-        IdentityLink identityLink = identityLinks.get(0);
-        assertEquals("muppets", identityLink.getGroupId());
-        assertNull(identityLink.getUserId());
-        assertEquals(IdentityLinkType.CANDIDATE, identityLink.getType());
-        assertEquals(taskId, identityLink.getTaskId());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType, IdentityLink::getTaskId)
+                .containsExactly(tuple("muppets", null, IdentityLinkType.CANDIDATE, taskId));
 
         taskService.deleteCandidateGroup(taskId, "muppets");
 
-        assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
+        assertThat(taskService.getIdentityLinksForTask(taskId)).isEmpty();
     }
 
     // Test custom identity links
@@ -417,38 +357,80 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("customIdentityLink");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tasks.get(0).getId());
-        assertEquals(2, identityLinks.size());
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getGroupId, IdentityLink::getUserId, IdentityLink::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("management", null, "businessAdministrator"),
+                        tuple(null, "kermit", "businessAdministrator")
+                );
+    }
 
-        for (IdentityLink idLink : identityLinks) {
-            assertEquals("businessAdministrator", idLink.getType());
-            String userId = idLink.getUserId();
-            if (userId == null) {
-                assertEquals("management", idLink.getGroupId());
-            } else {
-                assertEquals("kermit", userId);
-            }
-        }
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLinkExpression.bpmn20.xml")
+    public void testCustomIdentityLinkCollectionExpression() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("customIdentityLink")
+                .transientVariable("userVar", Arrays.asList("kermit", "gonzo"))
+                .transientVariable("groupVar", Arrays.asList("management", "sales"))
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(taskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple("businessAdministrator", "kermit", null),
+                        tuple("businessAdministrator", "gonzo", null),
+                        tuple("businessAdministrator", null, "management"),
+                        tuple("businessAdministrator", null, "sales")
+                );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLinkExpression.bpmn20.xml")
+    public void testCustomIdentityLinkArrayNodeExpression() {
+        ArrayNode userVar = processEngineConfiguration.getObjectMapper().createArrayNode();
+        userVar.add("kermit").add("gonzo");
+        ArrayNode groupVar = processEngineConfiguration.getObjectMapper().createArrayNode();
+        groupVar.add("management").add("sales");
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("customIdentityLink")
+                .variable("userVar", userVar)
+                .variable("groupVar", groupVar)
+                .start();
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(taskService.getIdentityLinksForTask(task.getId()))
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple("businessAdministrator", "kermit", null),
+                        tuple("businessAdministrator", "gonzo", null),
+                        tuple("businessAdministrator", null, "management"),
+                        tuple("businessAdministrator", null, "sales")
+                );
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,
                     String expectedIdentityId, String expectedIdentityType) {
         
         List<Event> taskEvents = taskService.getTaskEvents(taskId);
-        assertEquals(expectedCount, taskEvents.size());
+        assertThat(taskEvents).hasSize(expectedCount);
 
         if (expectedCount == 0) {
             return;
         }
 
         Event lastEvent = taskEvents.get(0);
-        assertEquals(expectedAction, lastEvent.getAction());
+        assertThat(lastEvent.getAction()).isEqualTo(expectedAction);
         List<String> taskEventMessageParts = lastEvent.getMessageParts();
-        assertEquals(expectedIdentityId, taskEventMessageParts.get(0));
-        assertEquals(expectedIdentityType, taskEventMessageParts.get(1));
-        assertEquals(2, taskEventMessageParts.size());
+        assertThat(taskEventMessageParts)
+                .containsOnly(expectedIdentityId, expectedIdentityType);
     }
     
     private Event findTaskEvent(List<Event> taskEvents, String action) {

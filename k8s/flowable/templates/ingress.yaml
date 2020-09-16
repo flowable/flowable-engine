@@ -6,7 +6,15 @@ metadata:
   labels:
     {{ include "flowable.defaultlabels" . }}
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # nginx.ingress.kubernetes.io/enable-access-log: "true"
+    # nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
+    {{- if .Values.ui.enabled }}
+    nginx.ingress.kubernetes.io/app-root: {{ .Values.ui.contextPath }}
+    {{- end}}
+    {{- if .Values.rest.enabled }}
+    nginx.ingress.kubernetes.io/app-root: {{ .Values.rest.contextPath }}
+    {{- end}}
+    nginx.ingress.kubernetes.io/use-regex: "true"
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "{{ .Values.ingress.sslRedirect }}"
     {{- if .Values.ingress.clusterIssuer }}

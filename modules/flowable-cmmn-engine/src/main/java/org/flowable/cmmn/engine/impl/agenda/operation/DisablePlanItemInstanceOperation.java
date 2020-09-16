@@ -28,12 +28,12 @@ public class DisablePlanItemInstanceOperation extends AbstractChangePlanItemInst
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.DISABLE;
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.DISABLED;
     }
     
@@ -44,7 +44,7 @@ public class DisablePlanItemInstanceOperation extends AbstractChangePlanItemInst
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Disable plan item]";
     }
 

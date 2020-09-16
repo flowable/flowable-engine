@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="exitCriteriaBlockingExpression">
+        <casePlanModel id="exitCriteriaBlockingExpressionPlanModel" name="Exit Criteria Blocking Expression CasePlanModel">
+
+            <planItem id="taskA" name="A" definitionRef="taskDefinition"/>
+            <planItem id="taskB" name="B" definitionRef="taskDefinition">
+                <exitCriterion sentryRef="sentry"/>
+            </planItem>
+
+            <sentry id="sentry">
+                <planItemOnPart sourceRef="taskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="taskDefinition" name="A" flowable:isBlockingExpression="${false}"/>
+
+        </casePlanModel>
+    </case>
+</definitions>

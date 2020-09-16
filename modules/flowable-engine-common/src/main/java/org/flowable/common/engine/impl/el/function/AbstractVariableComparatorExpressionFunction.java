@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
  */
 public abstract class AbstractVariableComparatorExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    protected static enum OPERATOR { LT, LTE, GT, GTE, EQ };
+    protected enum OPERATOR { LT, LTE, GT, GTE, EQ };
 
     public AbstractVariableComparatorExpressionFunction(List<String> functionNameOptions, String functionName) {
         super(functionNameOptions, functionName);

@@ -26,11 +26,15 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
 
     protected String linkType;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String parentElementId;
     protected String referenceScopeId;
     protected String referenceScopeType;
     protected String referenceScopeDefinitionId;
+    protected String rootScopeId;
+    protected String rootScopeType;
     protected String hierarchyType;
     protected Date createTime;
 
@@ -43,11 +47,15 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("linkType", this.linkType);
         persistentState.put("scopeId", this.scopeId);
+        persistentState.put("subScopeId", this.subScopeId);
         persistentState.put("scopeType", this.scopeType);
         persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
+        persistentState.put("parentElementId", this.parentElementId);
         persistentState.put("referenceScopeId", this.referenceScopeId);
         persistentState.put("referenceScopeType", this.referenceScopeType);
         persistentState.put("referenceScopeDefinitionId", this.referenceScopeDefinitionId);
+        persistentState.put("rootScopeId", this.rootScopeId);
+        persistentState.put("rootScopeType", this.rootScopeType);
         persistentState.put("hierarchyType", this.hierarchyType);
 
         return persistentState;
@@ -72,6 +80,16 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
 
     @Override
     public String getScopeType() {
@@ -91,6 +109,16 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
     @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+    }
+    
+    @Override
+    public String getParentElementId() {
+        return parentElementId;
+    }
+
+    @Override
+    public void setParentElementId(String parentElementId) {
+        this.parentElementId = parentElementId;
     }
 
     @Override
@@ -121,6 +149,26 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
     @Override
     public void setReferenceScopeDefinitionId(String referenceScopeDefinitionId) {
         this.referenceScopeDefinitionId = referenceScopeDefinitionId;
+    }
+
+    @Override
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    @Override
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    @Override
+    public String getRootScopeType() {
+        return rootScopeType;
+    }
+
+    @Override
+    public void setRootScopeType(String rootScopeType) {
+        this.rootScopeType = rootScopeType;
     }
 
     @Override

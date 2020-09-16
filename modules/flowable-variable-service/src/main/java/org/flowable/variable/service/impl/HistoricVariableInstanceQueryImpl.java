@@ -17,17 +17,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -36,6 +35,9 @@ import org.flowable.variable.service.impl.util.CommandContextUtil;
 public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements HistoricVariableInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    
     protected String id;
     protected String taskId;
     protected Set<String> taskIds;
@@ -55,12 +57,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     public HistoricVariableInstanceQueryImpl() {
     }
 
-    public HistoricVariableInstanceQueryImpl(CommandContext commandContext) {
+    public HistoricVariableInstanceQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
+    public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     @Override
@@ -239,22 +243,21 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
     protected void ensureVariablesInitialized() {
         if (this.queryVariableValue != null) {
-            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
-            queryVariableValue.initialize(variableTypes);
+            queryVariableValue.initialize(variableServiceConfiguration);
         }
     }
 
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstanceCountByQueryCriteria(this);
+        return variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricVariableInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
 
-        List<HistoricVariableInstance> historicVariableInstances = CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstancesByQueryCriteria(this);
+        List<HistoricVariableInstance> historicVariableInstances = variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(this);
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {

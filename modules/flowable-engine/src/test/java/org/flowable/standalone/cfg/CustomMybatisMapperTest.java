@@ -12,6 +12,9 @@
  */
 package org.flowable.standalone.cfg;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +43,8 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Fetch the columns we're interested in
-        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(MyTestMapper.class) {
+        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(
+                MyTestMapper.class) {
 
             @Override
             public List<Map<String, Object>> execute(MyTestMapper customMapper) {
@@ -50,12 +54,12 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Verify
         List<Map<String, Object>> tasks = managementService.executeCustomSql(customSqlExecution);
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
         for (int i = 0; i < 5; i++) {
             Map<String, Object> task = tasks.get(i);
-            assertNotNull(getValue(task, "id"));
-            assertNotNull(getValue(task, "name"));
-            assertNotNull(getValue(task, "createTime"));
+            assertThat(getValue(task, "id")).isNotNull();
+            assertThat(getValue(task, "name")).isNotNull();
+            assertThat(getValue(task, "createTime")).isNotNull();
         }
 
         // Cleanup
@@ -79,7 +83,8 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Fetch data with custom query
-        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(MyTestMapper.class) {
+        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(
+                MyTestMapper.class) {
 
             @Override
             public List<Map<String, Object>> execute(MyTestMapper customMapper) {
@@ -90,12 +95,12 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Verify
         List<Map<String, Object>> results = managementService.executeCustomSql(customSqlExecution);
-        assertEquals(5, results.size());
+        assertThat(results).hasSize(5);
         for (int i = 0; i < 5; i++) {
             Map<String, Object> result = results.get(i);
             Long id = Long.valueOf((String) getValue(result, "taskId"));
             Long variableValue = ((Number) getValue(result, "variableValue")).longValue();
-            assertEquals(id * 2, variableValue.longValue());
+            assertThat(variableValue.longValue()).isEqualTo(id * 2);
         }
 
         // Cleanup

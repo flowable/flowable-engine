@@ -52,6 +52,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
@@ -84,10 +85,16 @@ import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManagerImpl;
+import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -162,6 +169,8 @@ public abstract class AbstractEngineConfiguration {
     protected CommandConfig schemaCommandConfig;
     protected CommandContextFactory commandContextFactory;
     protected CommandInterceptor commandInvoker;
+
+    protected AgendaOperationRunner agendaOperationRunner = (commandContext, runnable) -> runnable.run();
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
@@ -313,10 +322,13 @@ public abstract class AbstractEngineConfiguration {
     // DATA MANAGERS //////////////////////////////////////////////////////////////////
 
     protected PropertyDataManager propertyDataManager;
+    protected ByteArrayDataManager byteArrayDataManager;
+    protected TableDataManager tableDataManager;
 
     // ENTITY MANAGERS ////////////////////////////////////////////////////////////////
 
     protected PropertyEntityManager propertyEntityManager;
+    protected ByteArrayEntityManager byteArrayEntityManager;
 
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
@@ -395,7 +407,7 @@ public abstract class AbstractEngineConfiguration {
     protected int maxLengthStringVariableType = -1;
     
     protected void initEngineConfigurations() {
-        engineConfigurations.put(getEngineCfgKey(), this);
+        addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
 
     // DataSource
@@ -488,7 +500,7 @@ public abstract class AbstractEngineConfiguration {
             logger.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            logger.error("Exception while initializing Database connection", e);
+            throw new RuntimeException("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
@@ -587,11 +599,10 @@ public abstract class AbstractEngineConfiguration {
 
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
+                        classLoader, useClassForNameClassLoading, clock, objectMapper);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);
                 interceptors.add(commandContextInterceptor);
             }
 
@@ -610,6 +621,8 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract String getEngineCfgKey();
+    
+    public abstract String getEngineScopeType();
 
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
         return null;
@@ -660,7 +673,11 @@ public abstract class AbstractEngineConfiguration {
 
     public void initDataManagers() {
         if (propertyDataManager == null) {
-            propertyDataManager = new MybatisPropertyDataManager();
+            propertyDataManager = new MybatisPropertyDataManager(idGenerator);
+        }
+
+        if (byteArrayDataManager == null) {
+            byteArrayDataManager = new MybatisByteArrayDataManager(idGenerator);
         }
     }
 
@@ -669,6 +686,14 @@ public abstract class AbstractEngineConfiguration {
     public void initEntityManagers() {
         if (propertyEntityManager == null) {
             propertyEntityManager = new PropertyEntityManagerImpl(this, propertyDataManager);
+        }
+
+        if (byteArrayEntityManager == null) {
+            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, getEngineCfgKey(), this::getEventDispatcher);
+        }
+
+        if (tableDataManager == null) {
+            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -704,6 +729,11 @@ public abstract class AbstractEngineConfiguration {
             }
             
             commandContextFactory.setSessionFactories(sessionFactories);
+            
+        } else {
+            if (usingRelationalDatabase) {
+                initDbSqlSessionFactoryEntitySettings();
+            }
         }
 
         if (customSessionFactories != null) {
@@ -1008,7 +1038,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public LockManager getLockManager(String lockName) {
-        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate(), getEngineCfgKey());
     }
 
     // getters and setters
@@ -1302,6 +1332,15 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+
+    public AbstractEngineConfiguration setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+        return this;
+    }
+
     public List<CommandInterceptor> getCustomPreCommandInterceptors() {
         return customPreCommandInterceptors;
     }
@@ -1338,11 +1377,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public void addEngineConfiguration(String key, AbstractEngineConfiguration engineConfiguration) {
+    public void addEngineConfiguration(String key, String scopeType, AbstractEngineConfiguration engineConfiguration) {
         if (engineConfigurations == null) {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(key, engineConfiguration);
+        engineConfigurations.put(scopeType, engineConfiguration);
     }
 
     public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
@@ -1823,6 +1863,33 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setPropertyEntityManager(PropertyEntityManager propertyEntityManager) {
         this.propertyEntityManager = propertyEntityManager;
+        return this;
+    }
+
+    public ByteArrayDataManager getByteArrayDataManager() {
+        return byteArrayDataManager;
+    }
+
+    public AbstractEngineConfiguration setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
+        this.byteArrayDataManager = byteArrayDataManager;
+        return this;
+    }
+
+    public ByteArrayEntityManager getByteArrayEntityManager() {
+        return byteArrayEntityManager;
+    }
+
+    public AbstractEngineConfiguration setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
+        this.byteArrayEntityManager = byteArrayEntityManager;
+        return this;
+    }
+
+    public TableDataManager getTableDataManager() {
+        return tableDataManager;
+    }
+
+    public AbstractEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
+        this.tableDataManager = tableDataManager;
         return this;
     }
 

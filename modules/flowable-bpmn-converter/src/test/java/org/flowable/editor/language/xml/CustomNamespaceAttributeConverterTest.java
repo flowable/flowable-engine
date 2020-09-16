@@ -12,9 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 import java.util.Map;
@@ -48,49 +47,31 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
 
     private void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
-        assertNotNull(process.getAttributes());
-        assertEquals(1, process.getAttributes().size());
+        assertThat(process.getAttributes()).isNotNull();
         List<ExtensionAttribute> attributes = process.getAttributes().get("version");
-        assertNotNull(attributes);
-        assertEquals(1, attributes.size());
-        ExtensionAttribute attribute = attributes.get(0);
         // custom:version = "9"
-        assertNotNull(attribute);
-        assertEquals("http://custom.org/bpmn", attribute.getNamespace());
-        assertEquals("custom", attribute.getNamespacePrefix());
-        assertEquals("version", attribute.getName());
-        assertEquals("9", attribute.getValue());
+        assertThat(attributes)
+                .extracting(ExtensionAttribute::getNamespace, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getName, ExtensionAttribute::getValue)
+                .containsExactly(tuple("http://custom.org/bpmn", "custom", "version", "9"));
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("usertask", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getId()).isEqualTo("usertask");
+        assertThat(flowElement.getName()).isEqualTo("User Task");
         UserTask userTask = (UserTask) flowElement;
-        assertEquals("usertask", userTask.getId());
-        assertEquals("User Task", userTask.getName());
 
         Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
-        assertNotNull(attributesMap);
-        assertEquals(2, attributesMap.size());
+        assertThat(attributesMap).isNotNull();
+        assertThat(attributesMap).hasSize(2);
 
         attributes = attributesMap.get("id");
-        assertNotNull(attributes);
-        assertEquals(1, attributes.size());
-        ExtensionAttribute a = attributes.get(0);
-        assertNotNull(a);
-        assertEquals("id", a.getName());
-        assertEquals("test", a.getValue());
-        assertEquals("custom2", a.getNamespacePrefix());
-        assertEquals("http://custom2.org/bpmn", a.getNamespace());
+        assertThat(attributes)
+                .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
+                .containsExactly(tuple("id", "test", "custom2", "http://custom2.org/bpmn"));
 
         attributes = attributesMap.get("attr");
-        assertNotNull(attributes);
-        assertEquals(1, attributes.size());
-        a = attributes.get(0);
-        assertNotNull(a);
-        assertEquals("attr", a.getName());
-        assertEquals("attrValue", a.getValue());
-        assertEquals("custom2", a.getNamespacePrefix());
-        assertEquals("http://custom2.org/bpmn", a.getNamespace());
+        assertThat(attributes)
+                .extracting(ExtensionAttribute::getName, ExtensionAttribute::getValue, ExtensionAttribute::getNamespacePrefix, ExtensionAttribute::getNamespace)
+                .containsExactly(tuple("attr", "attrValue", "custom2", "http://custom2.org/bpmn"));
     }
 }

@@ -27,11 +27,6 @@ public class VariableExistsExpressionFunction extends AbstractFlowableVariableEx
         super(Arrays.asList("exists", "exist"), "exists");
     }
     
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-    
     public static boolean exists(VariableContainer variableContainer, String variableName) {
         return getVariableValue(variableContainer, variableName) != null;
     }

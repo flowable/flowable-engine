@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.app.engine.impl.cmd.GetTableNamesCmd;
+import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
@@ -32,7 +32,7 @@ public class AppManagementServiceImpl extends CommonEngineServiceImpl<AppEngineC
 
     @Override
     public Map<String, Long> getTableCounts() {
-        return commandExecutor.execute(new GetTableCountsCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override

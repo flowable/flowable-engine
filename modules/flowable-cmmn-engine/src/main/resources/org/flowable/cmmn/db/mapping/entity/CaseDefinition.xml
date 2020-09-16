@@ -7,8 +7,7 @@
   <insert id="insertCaseDefinition" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl">
     insert into ${prefix}ACT_CMMN_CASEDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -26,8 +25,7 @@
     VALUES 
       <foreach collection="list" item="caseDefinition" index="index" separator=","> 
         (#{caseDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{caseDefinition.category, jdbcType=VARCHAR},
+         1, #{caseDefinition.category, jdbcType=VARCHAR},
          #{caseDefinition.name, jdbcType=VARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
@@ -47,8 +45,7 @@
       INTO ${prefix}ACT_CMMN_CASEDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_) VALUES 
         (#{caseDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{caseDefinition.category, jdbcType=VARCHAR},
+         1, #{caseDefinition.category, jdbcType=VARCHAR},
          #{caseDefinition.name, jdbcType=VARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
@@ -117,6 +114,22 @@
     select * 
     from ${prefix}ACT_CMMN_CASEDEF 
     where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{caseDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{caseDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
       and KEY_ = #{caseDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>

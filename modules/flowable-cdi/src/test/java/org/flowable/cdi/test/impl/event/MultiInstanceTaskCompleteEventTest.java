@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.impl.event;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
@@ -28,9 +28,9 @@ public class MultiInstanceTaskCompleteEventTest extends CdiFlowableTestCase {
         TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
         listenerBean.reset();
 
-        assertEquals(0, listenerBean.getCreateTask1());
-        assertEquals(0, listenerBean.getAssignTask1());
-        assertEquals(0, listenerBean.getCompleteTask1());
+        assertThat(listenerBean.getCreateTask1()).isZero();
+        assertThat(listenerBean.getAssignTask1()).isZero();
+        assertThat(listenerBean.getCompleteTask1()).isZero();
 
         // start the process
         runtimeService.startProcessInstanceByKey("process1");
@@ -44,9 +44,9 @@ public class MultiInstanceTaskCompleteEventTest extends CdiFlowableTestCase {
         taskService.complete(task.getId());
 
         // assert
-        assertEquals(2, listenerBean.getCreateTask1());
-        assertEquals(1, listenerBean.getAssignTask1());
-        assertEquals(2, listenerBean.getCompleteTask1());
+        assertThat(listenerBean.getCreateTask1()).isEqualTo(2);
+        assertThat(listenerBean.getAssignTask1()).isEqualTo(1);
+        assertThat(listenerBean.getCompleteTask1()).isEqualTo(2);
 
     }
 }

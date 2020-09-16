@@ -15,8 +15,7 @@
     INSERT INTO ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
       <foreach collection="list" item="byteArr" index="index" separator=","> 
         (#{byteArr.id, jdbcType=VARCHAR},
-         1,
-         #{byteArr.name, jdbcType=VARCHAR},
+         1, #{byteArr.name, jdbcType=VARCHAR},
          #{byteArr.bytes, jdbcType=${blobType}},
          #{byteArr.deploymentId, jdbcType=VARCHAR},
          #{byteArr.generated, jdbcType=BOOLEAN})
@@ -28,8 +27,7 @@
       <foreach collection="list" item="resource" index="index"> 
         INTO ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
         (#{resource.id, jdbcType=VARCHAR},
-         1,
-         #{resource.name, jdbcType=VARCHAR},
+         1, #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
          #{resource.deploymentId, jdbcType=VARCHAR},
          #{resource.generated, jdbcType=BOOLEAN})

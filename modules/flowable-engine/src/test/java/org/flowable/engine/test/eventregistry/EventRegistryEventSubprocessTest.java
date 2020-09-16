@@ -56,7 +56,6 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         inboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey("test-channel")
             .key("myEvent")
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -98,46 +97,46 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("customerIdVar", "kermit");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
         
         inboundEventChannelAdapter.triggerTestEvent("notexisting");
         
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         
-        assertEquals(6, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(6);
 
-        assertEquals(2, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         inboundEventChannelAdapter.triggerTestEvent("kermit");
-        assertEquals(9, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(9);
 
-        assertEquals(3, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
         // we still have 7 executions:
-        assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
 
         // now let's complete the first task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
         taskService.complete(task.getId());
 
-        assertEquals(4, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(4);
 
         // complete the second task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -231,23 +230,23 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("customerIdVar", "gonzo");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         inboundEventChannelAdapter.triggerTestEvent("notexisting");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
         
         inboundEventChannelAdapter.triggerTestEvent("gonzo");
-        assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
         // now let's complete the task in the event subprocess
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -312,7 +311,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

@@ -82,6 +82,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     private Boolean withoutTenantId;
     private Boolean withoutDeleteReason;
     private String taskCandidateGroup;
+    private boolean ignoreTaskAssignee;
 
     public String getTaskId() {
         return taskId;
@@ -517,4 +518,11 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
         this.taskCandidateGroup = taskCandidateGroup;
     }
 
+    public boolean isIgnoreTaskAssignee() {
+        return ignoreTaskAssignee;
+    }
+
+    public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
+        this.ignoreTaskAssignee = ignoreTaskAssignee;
+    }
 }

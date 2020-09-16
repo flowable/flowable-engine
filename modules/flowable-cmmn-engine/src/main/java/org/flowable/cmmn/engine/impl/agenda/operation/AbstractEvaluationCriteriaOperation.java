@@ -28,7 +28,6 @@ import org.flowable.cmmn.converter.util.PlanItemUtil;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.EntityWithSentryPartInstances;
@@ -53,7 +52,6 @@ import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -102,7 +100,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             boolean activatePlanItemInstance = evaluateRepetitionRule(planItemInstanceEntity, satisfiedEntryCriterion, planItemInstanceContainer,
                 evaluationResult);
 
-            if (planItem.getPlanItemDefinition() instanceof EventListener && !(planItem.getPlanItemDefinition() instanceof SignalEventListener)) {
+            if (planItem.getPlanItemDefinition() instanceof EventListener) {
                 activatePlanItemInstance = false; // event listeners occur, they don't become active
             }
 
@@ -525,7 +523,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         }
 
                         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances);
+                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                         }
 
                         return criterion;
@@ -536,7 +534,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (LOGGER.isDebugEnabled()) {
@@ -593,7 +591,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                     && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), 
+                                entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
@@ -717,8 +716,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
-        try {
-            Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        try { 
+            Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
             Object result = conditionExpression.getValue(variableContainer);
 
             if (LOGGER.isDebugEnabled()) {
@@ -729,8 +729,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 return (Boolean) result;
             }
         } catch (RuntimeException e) {
-            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, entityWithSentryPartInstances);
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, 
+                        entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
             }
 
             throw e;
@@ -767,7 +768,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
         childPlanItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
@@ -791,7 +793,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;
         childPlanItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
 
         // createPlanItemInstance operations will also sync planItemInstance history
         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(childPlanItemInstanceEntity, entryCriterionId);

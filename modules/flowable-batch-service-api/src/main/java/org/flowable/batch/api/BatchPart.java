@@ -40,7 +40,7 @@ public interface BatchPart {
     
     String getSubScopeId();
 
-    String getResultDocumentJson();
+    String getResultDocumentJson(String engineType);
     
     String getTenantId();
 }

@@ -29,6 +29,8 @@ import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
@@ -49,6 +51,7 @@ import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -59,7 +62,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -119,21 +122,22 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConfigurationProperties(prefix = "flowable.cmmn.async.executor")
     @ConditionalOnMissingBean(name = "cmmnAsyncExecutor")
     public SpringAsyncExecutor cmmnAsyncExecutor(
-        ObjectProvider<TaskExecutor> taskExecutor,
-        @Cmmn ObjectProvider<TaskExecutor> cmmnTaskExecutor,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Cmmn ObjectProvider<SpringRejectedJobsHandler> cmmnRejectedJobsHandler
     ) {
-        return new SpringAsyncExecutor(
-            getIfAvailable(cmmnTaskExecutor, taskExecutor),
-            getIfAvailable(cmmnRejectedJobsHandler, rejectedJobsHandler)
-        );
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        asyncExecutor.setRejectedJobsHandler(getIfAvailable(cmmnRejectedJobsHandler, rejectedJobsHandler));
+        return asyncExecutor;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
+        ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
+        @Cmmn ObjectProvider<AsyncListenableTaskExecutor> cmmnTaskExecutor,
+        @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
+        ObjectProvider<FlowableHttpClient> flowableHttpClient,
         ObjectProvider<List<AutoDeploymentStrategy<CmmnEngine>>> cmmnAutoDeploymentStrategies)
         throws IOException {
         
@@ -155,6 +159,19 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
             configuration.setAsyncExecutor(asyncExecutor);
         }
 
+        AsyncListenableTaskExecutor asyncTaskExecutor = getIfAvailable(cmmnTaskExecutor, taskExecutor);
+        if (asyncTaskExecutor == null) {
+            // Get the applicationTaskExecutor
+            asyncTaskExecutor = applicationTaskExecutorProvider.getObject();
+        }
+        if (asyncTaskExecutor != null) {
+            // The task executors are shared
+            org.flowable.common.engine.api.async.AsyncTaskExecutor flowableTaskExecutor = new SpringAsyncTaskExecutor(asyncTaskExecutor);
+            configuration.setAsyncTaskExecutor(flowableTaskExecutor);
+            configuration.setAsyncHistoryTaskExecutor(flowableTaskExecutor);
+        }
+
+
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
 
@@ -171,6 +188,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
         configuration.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
         configuration.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
+        configuration.getHttpClientConfig().setHttpClient(flowableHttpClient.getIfAvailable());
 
         //TODO Can it have different then the Process engine?
         configuration.setHistoryLevel(flowableProperties.getHistoryLevel());

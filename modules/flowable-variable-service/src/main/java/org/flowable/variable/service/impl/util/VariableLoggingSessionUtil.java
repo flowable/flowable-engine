@@ -34,11 +34,12 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VariableLoggingSessionUtil {
     
-    public static ObjectNode addLoggingData(String message, VariableInstanceEntity variableInstance) {
+    public static ObjectNode addLoggingData(String message, VariableInstanceEntity variableInstance, ObjectMapper objectMapper) {
         ObjectNode loggingNode = null;
         if (variableInstance.getScopeId() != null && ScopeTypes.CMMN.equals(variableInstance.getScopeType())) {
             String subScopeId = null;
@@ -46,7 +47,7 @@ public class VariableLoggingSessionUtil {
                 subScopeId = variableInstance.getSubScopeId();
             }
             
-            loggingNode = LoggingSessionUtil.fillLoggingData(message, variableInstance.getScopeId(), subScopeId, ScopeTypes.CMMN);
+            loggingNode = LoggingSessionUtil.fillLoggingData(message, variableInstance.getScopeId(), subScopeId, ScopeTypes.CMMN, objectMapper);
         
         } else if (variableInstance.getProcessInstanceId() != null) {
             String subScopeId = null;
@@ -54,7 +55,7 @@ public class VariableLoggingSessionUtil {
                 subScopeId = variableInstance.getExecutionId();
             }
             
-            loggingNode = LoggingSessionUtil.fillLoggingData(message, variableInstance.getProcessInstanceId(), subScopeId, ScopeTypes.BPMN);
+            loggingNode = LoggingSessionUtil.fillLoggingData(message, variableInstance.getProcessInstanceId(), subScopeId, ScopeTypes.BPMN, objectMapper);
         }
         
         if (loggingNode != null) {
@@ -110,7 +111,7 @@ public class VariableLoggingSessionUtil {
         } else if (JodaDateType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableValueName, LoggingSessionUtil.formatDate((LocalDate) variableValue));
         } else {
-            loggingNode.put(variableValueName, variableValue.toString());
+            loggingNode.put(variableValueName, String.valueOf(variableValue));
         }
     }
 }

@@ -29,6 +29,10 @@ public interface HistoricCaseInstanceEntity extends Entity, HasRevision, Histori
     void setName(String name);
     void setParentId(String parentId);
     void setCaseDefinitionId(String caseDefinitionId);
+    void setCaseDefinitionKey(String caseDefinitionKey);
+    void setCaseDefinitionName(String caseDefinitionName);
+    void setCaseDefinitionVersion(Integer caseDefinitionVersion);
+    void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId);
     void setState(String state);
     void setStartTime(Date startTime);
     void setEndTime(Date endTime);

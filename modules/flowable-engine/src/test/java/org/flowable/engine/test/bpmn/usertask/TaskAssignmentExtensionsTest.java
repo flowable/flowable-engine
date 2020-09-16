@@ -12,16 +12,23 @@
  */
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * Testcase for the non-spec extensions to the task candidate use case.
@@ -58,19 +65,19 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     public void testAssigneeExtension() {
         runtimeService.startProcessInstanceByKey("assigneeExtension");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
-        assertEquals(1, tasks.size());
-        assertEquals("my task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("my task");
     }
 
     @Test
     public void testDuplicateAssigneeDeclaration() {
-        try {
+        assertThatThrownBy(() -> {
             String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testDuplicateAssigneeDeclaration");
             repositoryService.createDeployment().addClasspathResource(resource).deploy();
-            fail("Invalid BPMN 2.0 process should not parse, but it gets parsed successfully");
-        } catch (XMLException e) {
-            // Exception is to be expected
-        }
+        })
+                .as("Invalid BPMN 2.0 process should not parse, but it gets parsed successfully")
+                .isInstanceOf(XMLException.class);
     }
 
     @Test
@@ -78,8 +85,9 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     public void testOwnerExtension() {
         runtimeService.startProcessInstanceByKey("ownerExtension");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskOwner("gonzo").list();
-        assertEquals(1, tasks.size());
-        assertEquals("my task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("my task");
     }
 
     @Test
@@ -87,9 +95,42 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     public void testCandidateUsersExtension() {
         runtimeService.startProcessInstanceByKey("candidateUsersExtension");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
         tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/usertask/TaskAssignmentExtensionsTest.testCandidateUsersExpressionExtension.bpmn20.xml")
+    public void testCandidateUsersCollectionVariable() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateUsersExtension")
+                .transientVariable("candidateUsersVar", Arrays.asList("kermit", "gonzo"))
+                .start();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        assertThat(tasks).hasSize(1);
+        tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
+        assertThat(tasks).hasSize(1);
+        tasks = taskService.createTaskQuery().taskCandidateUser("rizzo").list();
+        assertThat(tasks).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/usertask/TaskAssignmentExtensionsTest.testCandidateUsersExpressionExtension.bpmn20.xml")
+    public void testCandidateUsersArrayNodeVariable() {
+        ArrayNode users = processEngineConfiguration.getObjectMapper().createArrayNode();
+        users.add("kermit");
+        users.add("gonzo");
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateUsersExtension")
+                .transientVariable("candidateUsersVar", users)
+                .start();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        assertThat(tasks).hasSize(1);
+        tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
+        assertThat(tasks).hasSize(1);
+        tasks = taskService.createTaskQuery().taskCandidateUser("rizzo").list();
+        assertThat(tasks).isEmpty();
     }
 
     @Test
@@ -100,17 +141,74 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         // Bugfix check: potentially the query could return 2 tasks since
         // kermit is a member of the two candidate groups
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
-        assertEquals(1, tasks.size());
-        assertEquals("make profit", tasks.get(0).getName());
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getName()).isEqualTo("make profit");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
 
         tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
-        assertEquals(1, tasks.size());
-        assertEquals("make profit", tasks.get(0).getName());
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getName()).isEqualTo("make profit");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
 
         // Test the task query find-by-candidate-group operation
         TaskQuery query = taskService.createTaskQuery();
-        assertEquals(1, query.taskCandidateGroup("management").count());
-        assertEquals(1, query.taskCandidateGroup("accountancy").count());
+        assertThat(query.taskCandidateGroup("management").count()).isEqualTo(1);
+        assertThat(query.taskCandidateGroup("accountancy").count()).isEqualTo(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/usertask/TaskAssignmentExtensionsTest.testCandidateGroupsExpressionExtension.bpmn20.xml")
+    public void testCandidateGroupsCollectionVariable() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateGroupsExtension")
+                .transientVariable("candidateGroupsVar", Arrays.asList("management", "accountancy"))
+                .start();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
+
+        // Test the task query find-by-candidate-group operation
+        TaskQuery query = taskService.createTaskQuery();
+        assertThat(query.taskCandidateGroup("management").count()).isEqualTo(1);
+        assertThat(query.taskCandidateGroup("accountancy").count()).isEqualTo(1);
+        assertThat(query.taskCandidateGroup("sales").count()).isZero();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/usertask/TaskAssignmentExtensionsTest.testCandidateGroupsExpressionExtension.bpmn20.xml")
+    public void testCandidateGroupsArrayNodeVariable() {
+        ArrayNode users = processEngineConfiguration.getObjectMapper().createArrayNode();
+        users.add("management");
+        users.add("accountancy");
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateGroupsExtension")
+                .transientVariable("candidateGroupsVar", users)
+                .start();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("make profit");
+
+        // Test the task query find-by-candidate-group operation
+        TaskQuery query = taskService.createTaskQuery();
+        assertThat(query.taskCandidateGroup("management").count()).isEqualTo(1);
+        assertThat(query.taskCandidateGroup("accountancy").count()).isEqualTo(1);
+        assertThat(query.taskCandidateGroup("sales").count()).isZero();
     }
 
     // Test where the candidate user extension is used together
@@ -121,16 +219,16 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("mixedCandidateUser");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         tasks = taskService.createTaskQuery().taskCandidateUser("mispiggy").list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
     }
 
 }

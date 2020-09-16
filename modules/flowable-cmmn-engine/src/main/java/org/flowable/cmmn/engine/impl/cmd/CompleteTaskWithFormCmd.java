@@ -72,14 +72,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
         if (formInfo != null) {
             // validate input at first
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(cmmnEngineConfiguration, task)) {
+            if (isFormFieldValidationEnabled(task)) {
                 formService.validateFormFields(formInfo, variables);
             }
             // Extract raw variables and complete the task
@@ -108,7 +108,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         return null;
     }
 
-    protected boolean isFormFieldValidationEnabled(CmmnEngineConfiguration cmmnEngineConfiguration, TaskEntity task) {
+    protected boolean isFormFieldValidationEnabled(TaskEntity task) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         if (cmmnEngineConfiguration.isFormFieldValidationEnabled()) {
             HumanTask humanTask = (HumanTask) CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).
                 findPlanItemDefinition(task.getTaskDefinitionKey());
@@ -120,8 +121,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     protected void completeTask(CommandContext commandContext, TaskEntity task, Map<String, Object> taskVariables) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         String planItemInstanceId = task.getSubScopeId();
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
         if (planItemInstanceEntity == null) {
             throw new FlowableException("Could not find plan item instance for task " + taskId);
         }
@@ -142,9 +144,8 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        logUserTaskCompleted(task);
+        logUserTaskCompleted(task, cmmnEngineConfiguration);
 
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(task);
         }

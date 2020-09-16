@@ -61,7 +61,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
             ((TriggerableActivityBehavior) javaDelegate).trigger(execution, signalName, signalData);
             
             if (processEngineConfiguration.isLoggingSessionEnabled()) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER, 
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
                                 "Triggered service task with java class " + javaDelegate.getClass().getName(), execution);
             }
             

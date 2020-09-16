@@ -28,10 +28,16 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 public class GetPropertiesCmd implements Command<Map<String, String>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected String engineType;
+    
+    public GetPropertiesCmd(String engineType) {
+        this.engineType = engineType;
+    }
 
     @Override
     public Map<String, String> execute(CommandContext commandContext) {
-        List<PropertyEntity> propertyEntities = commandContext.getCurrentEngineConfiguration().getPropertyEntityManager().findAll();
+        List<PropertyEntity> propertyEntities = commandContext.getEngineConfigurations().get(engineType).getPropertyEntityManager().findAll();
 
         Map<String, String> properties = new HashMap<>();
         for (PropertyEntity propertyEntity : propertyEntities) {

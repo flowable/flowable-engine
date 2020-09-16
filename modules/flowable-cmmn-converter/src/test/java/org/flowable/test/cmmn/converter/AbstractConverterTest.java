@@ -22,12 +22,12 @@ import org.flowable.common.engine.impl.util.io.InputStreamSource;
 
 public abstract class AbstractConverterTest implements CmmnXmlConstants {
 
-    protected CmmnModel readXMLFile(String resource) throws Exception {
+    protected CmmnModel readXMLFile(String resource) {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(resource);
         return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(xmlStream), true, false, "UTF-8");
     }
 
-    protected CmmnModel exportAndReadXMLFile(CmmnModel cmmnModel) throws Exception {
+    protected CmmnModel exportAndReadXMLFile(CmmnModel cmmnModel) {
         byte[] xml = new CmmnXmlConverter().convertToXML(cmmnModel);
         return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }

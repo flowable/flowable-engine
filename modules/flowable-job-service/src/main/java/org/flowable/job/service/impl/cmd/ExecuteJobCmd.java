@@ -23,7 +23,6 @@ import org.flowable.job.api.JobNotFoundException;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobListener;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +37,11 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteJobCmd.class);
 
     protected String jobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public ExecuteJobCmd(String jobId) {
+    public ExecuteJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
             throw new FlowableIllegalArgumentException("JobId is null");
         }
 
-        Job job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+        Job job = jobServiceConfiguration.getJobEntityManager().findById(jobId);
 
         if (job == null) {
             throw new JobNotFoundException(jobId);
@@ -60,17 +61,16 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Executing job {}", job.getId());
         }
 
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
         InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
         if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(job)) {
             internalJobCompatibilityManager.executeV5Job(job);
             return null;
         }
 
-        commandContext.addCloseListener(new FailedJobListener(jobServiceConfiguration.getCommandExecutor(), job));
+        commandContext.addCloseListener(new FailedJobListener(jobServiceConfiguration.getCommandExecutor(), job, jobServiceConfiguration));
 
         try {
-            CommandContextUtil.getJobManager(commandContext).execute(job);
+            jobServiceConfiguration.getJobManager().execute(job);
         } catch (Throwable exception) {
             // Finally, Throw the exception to indicate the ExecuteJobCmd failed
             throw new FlowableException("Job " + jobId + " failed", exception);

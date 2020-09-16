@@ -33,7 +33,7 @@
         "title": "Forms"
       },
       "bpmn/ch09-ProcessInstanceMigration": {
-        "title": "Process Instance Migration (Experimental)"
+        "title": "Process Instance Migration"
       },
       "bpmn/ch10-JPA": {
         "title": "JPA"

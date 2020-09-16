@@ -19,7 +19,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +31,7 @@ class TaskFindByProcessInstanceTest extends PluggableFlowableTestCase {
     void testFindByProcessInstanceWithinSameCommandContext() {
         managementService.executeCommand(commandContext -> {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-            assertThat(CommandContextUtil.getTaskEntityManager(commandContext).findTasksByProcessInstanceId(processInstance.getId()))
+            assertThat(processEngineConfiguration.getTaskServiceConfiguration().getTaskEntityManager().findTasksByProcessInstanceId(processInstance.getId()))
                 .extracting(TaskInfo::getTaskDefinitionKey)
                 .containsExactly("theTask");
             return null;
@@ -61,7 +60,7 @@ class TaskFindByProcessInstanceTest extends PluggableFlowableTestCase {
             .containsExactly("taskBefore");
         managementService.executeCommand(commandContext -> {
             taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
-            assertThat(CommandContextUtil.getTaskEntityManager(commandContext).findTasksByProcessInstanceId(processInstance.getId()))
+            assertThat(processEngineConfiguration.getTaskServiceConfiguration().getTaskEntityManager().findTasksByProcessInstanceId(processInstance.getId()))
                 .extracting(TaskInfo::getTaskDefinitionKey)
                 .containsExactlyInAnyOrder("task1", "task2");
             return null;

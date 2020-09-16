@@ -113,7 +113,7 @@ public abstract class AppTestHelper {
                 return resource;
             }
         }
-        return type.getName().replace('.', '/') + "." + name + "." + APP_RESOURCE_SUFFIXES[1];
+        return type.getName().replace('.', '/') + "." + name + "." + APP_RESOURCE_SUFFIXES[0];
     }
 
 }

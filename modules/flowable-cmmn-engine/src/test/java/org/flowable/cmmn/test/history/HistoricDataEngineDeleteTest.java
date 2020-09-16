@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.history;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,16 +39,16 @@ import org.junit.jupiter.api.Test;
 public class HistoricDataEngineDeleteTest {
 
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/human-task-milestone-model.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
     public void testHistoryCleanupTimerJob(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnRuntimeService cmmnRuntimeService,
-                    CmmnHistoryService cmmnHistoryService, CmmnTaskService cmmnTaskService, CmmnManagementService cmmnManagementService) {
-        
+            CmmnHistoryService cmmnHistoryService, CmmnTaskService cmmnTaskService, CmmnManagementService cmmnManagementService) {
+
         try {
             Clock clock = cmmnEngineConfiguration.getClock();
             Calendar cal = clock.getCurrentCalendar();
             cal.add(Calendar.DAY_OF_YEAR, -400);
             clock.setCurrentCalendar(cal);
-            
+
             List<String> caseInstanceIds = new ArrayList<>();
             for (int i = 0; i < 20; i++) {
                 CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
@@ -56,46 +56,49 @@ public class HistoricDataEngineDeleteTest {
                 cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
                 cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
             }
-            
+
             if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
-                
-                assertEquals(20, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
-                
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(20);
+
                 for (int i = 0; i < 10; i++) {
                     Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
                     cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
                     cmmnTaskService.complete(task.getId());
                 }
-                
-                assertEquals(1, cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count());
-                
-                Job executableJob = cmmnManagementService.moveTimerToExecutableJob(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult().getId());
+
+                assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+
+                Job executableJob = cmmnManagementService.moveTimerToExecutableJob(
+                        cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult().getId());
                 cmmnManagementService.executeJob(executableJob.getId());
-                
-                assertEquals(1, cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count());
-                
-                assertEquals(10, cmmnHistoryService.createHistoricCaseInstanceQuery().count());
-                assertEquals(20, cmmnHistoryService.createHistoricPlanItemInstanceQuery().count());
-                assertEquals(10, cmmnHistoryService.createHistoricTaskInstanceQuery().count());
-                
+
+                assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(10);
+                assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(20);
+                assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+
                 for (int i = 0; i < 20; i++) {
                     if (i < 10) {
-                        assertEquals(0, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i)).size());
-                        assertEquals(0, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                        assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                        assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count());
-                        
+                        assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).isEmpty();
+                        assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
+                        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
+                        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count()).isZero();
+
                     } else {
-                        assertEquals(1, cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i)).size());
-                        assertEquals(1, cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                        assertEquals(2, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count());
-                        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count());
+                        assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).hasSize(1);
+                        assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(1);
+                        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isEqualTo(2);
+                        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstanceIds.get(i)).count())
+                                .isEqualTo(1);
                     }
                 }
-                
-                cmmnManagementService.deleteTimerJob(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult().getId());
+
+                cmmnManagementService
+                        .deleteTimerJob(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).singleResult().getId());
             }
-        
+
         } finally {
             cmmnEngineConfiguration.resetClock();
         }

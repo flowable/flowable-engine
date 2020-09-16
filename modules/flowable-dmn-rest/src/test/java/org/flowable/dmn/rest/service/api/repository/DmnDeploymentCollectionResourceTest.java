@@ -12,6 +12,9 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -25,6 +28,8 @@ import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.dmn.rest.service.api.HttpMultipartHelper;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Yvo Swillens
@@ -47,32 +52,26 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             closeResponse(response);
 
             String deploymentId = responseNode.get("id").textValue();
-            String name = responseNode.get("name").textValue();
-            String category = responseNode.get("category").textValue();
-            String deployTime = responseNode.get("deploymentTime").textValue();
-            String url = responseNode.get("url").textValue();
-            String tenantId = responseNode.get("tenantId").textValue();
-
-            assertEquals("", tenantId);
-
-            assertNotNull(deploymentId);
-            assertEquals(1L, dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
-
-            assertNotNull(name);
-            assertEquals("simple.dmn", name);
-
-            assertNotNull(url);
-            assertTrue(url.endsWith(DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: " + responseNode.get("id") + ","
+                            + "  url: '" + SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                            + "  category: " + responseNode.get("category") + ","
+                            + "  name: " + responseNode.get("name") + ","
+                            + "  deploymentTime: '${json-unit.any-string}',"
+                            + "  tenantId: ''"
+                            + "  }"
+                    );
 
             // No deployment-category should have been set
-            assertNull(category);
-            assertNotNull(deployTime);
+            assertThat(responseNode.get("category").textValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
-            assertEquals(1L, resources.size());
-            assertEquals("simple.dmn", resources.get(0));
-            assertEquals(1L, dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).count());
+            assertThat(resources).hasSize(1);
+            assertThat(resources.get(0)).isEqualTo("simple.dmn");
+            assertThat(dmnRepositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1);
         } finally {
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
@@ -140,37 +139,57 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(firstDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "      id: '" + firstDeployment.getId() + "'"
+                            + "   }, {"
+                            + "      id: '" + secondDeployment.getId() + "'"
+                            + "   } ]"
+                    );
 
             // Check ordering by deploy time
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc"), HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(firstDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "      id: '" + firstDeployment.getId() + "'"
+                            + "   }, {"
+                            + "      id: '" + secondDeployment.getId() + "'"
+                            + "   } ]"
+                    );
 
             // Check ordering by tenantId
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=tenantId&order=desc"), HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(secondDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(firstDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "      id: '" + secondDeployment.getId() + "'"
+                            + "   }, {"
+                            + "      id: '" + firstDeployment.getId() + "'"
+                            + "   } ]"
+                    );
 
             // Check paging
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc&start=1&size=1"),
                     HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            dataNode = responseNode.get("data");
-            assertEquals(1L, dataNode.size());
-            assertEquals(secondDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(2L, responseNode.get("total").longValue());
-            assertEquals(1L, responseNode.get("start").longValue());
-            assertEquals(1L, responseNode.get("size").longValue());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  data: [ {"
+                            + "      id: '" + secondDeployment.getId() + "'"
+                            + "        } ],"
+                            + "  total: 2,"
+                            + "  start: 1,"
+                            + "  size: 1"
+                            + " }"
+                    );
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

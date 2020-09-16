@@ -28,43 +28,52 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class TaskQueryRequest extends PaginateRequest {
 
-    private String name;
-    private String nameLike;
-    private String description;
-    private String descriptionLike;
-    private Integer priority;
-    private Integer minimumPriority;
-    private Integer maximumPriority;
-    private String assignee;
-    private String assigneeLike;
-    private String owner;
-    private String ownerLike;
-    private Boolean unassigned;
-    private String delegationState;
-    private String candidateUser;
-    private String candidateGroup;
-    private Collection<String> candidateGroupIn;
-    private String involvedUser;
-    private String caseInstanceId;
-    private String caseInstanceIdWithChildren;
-    private String caseDefinitionId;
-    private Date createdOn;
-    private Date createdBefore;
-    private Date createdAfter;
-    private Boolean excludeSubTasks;
-    private String taskDefinitionKey;
-    private String taskDefinitionKeyLike;
-    private Date dueDate;
-    private Date dueBefore;
-    private Date dueAfter;
-    private Boolean withoutDueDate;
-    private Boolean active;
-    private Boolean includeTaskLocalVariables;
-    private String tenantId;
-    private String tenantIdLike;
-    private Boolean withoutTenantId;
-    private String candidateOrAssigned;
-    private String category;
+    protected String name;
+    protected String nameLike;
+    protected String description;
+    protected String descriptionLike;
+    protected Integer priority;
+    protected Integer minimumPriority;
+    protected Integer maximumPriority;
+    protected String assignee;
+    protected String assigneeLike;
+    protected String owner;
+    protected String ownerLike;
+    protected Boolean unassigned;
+    protected String delegationState;
+    protected String candidateUser;
+    protected String candidateGroup;
+    protected Collection<String> candidateGroupIn;
+    protected boolean ignoreAssignee;
+    protected String involvedUser;
+    protected String caseInstanceId;
+    protected String caseInstanceIdWithChildren;
+    protected String planItemInstanceId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String caseDefinitionId;
+    protected String caseDefinitionKey;
+    protected String caseDefinitionKeyLike;
+    protected String caseDefinitionKeyLikeIgnoreCase;
+    protected Collection<String> caseDefinitionKeys;
+    protected Date createdOn;
+    protected Date createdBefore;
+    protected Date createdAfter;
+    protected Boolean excludeSubTasks;
+    protected String taskDefinitionKey;
+    protected String taskDefinitionKeyLike;
+    protected Date dueDate;
+    protected Date dueBefore;
+    protected Date dueAfter;
+    protected Boolean withoutDueDate;
+    protected Boolean active;
+    protected Boolean includeTaskLocalVariables;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected Boolean withoutTenantId;
+    protected String candidateOrAssigned;
+    protected String category;
 
     private List<QueryVariable> taskVariables;
 
@@ -196,6 +205,14 @@ public class TaskQueryRequest extends PaginateRequest {
         this.candidateGroupIn = candidateGroupIn;
     }
 
+    public boolean isIgnoreAssignee() {
+        return ignoreAssignee;
+    }
+
+    public void setIgnoreAssignee(boolean ignoreAssignee) {
+        this.ignoreAssignee = ignoreAssignee;
+    }
+
     public String getInvolvedUser() {
         return involvedUser;
     }
@@ -260,6 +277,38 @@ public class TaskQueryRequest extends PaginateRequest {
         this.caseInstanceId = caseInstanceId;
     }
 
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
     public String getCaseInstanceIdWithChildren() {
         return caseInstanceIdWithChildren;
     }
@@ -276,6 +325,35 @@ public class TaskQueryRequest extends PaginateRequest {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public void setCaseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public void setCaseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+    }
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+    public void setCaseDefinitionKeys(Collection<String> caseDefinitionKeys) {
+        this.caseDefinitionKeys = caseDefinitionKeys;
+    }
     public Date getDueDate() {
         return dueDate;
     }

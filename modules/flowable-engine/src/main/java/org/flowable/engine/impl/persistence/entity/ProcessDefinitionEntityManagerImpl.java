@@ -82,6 +82,16 @@ public class ProcessDefinitionEntityManagerImpl
     }
 
     @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKey(String parentDeploymentId, String processDefinitionKey) {
+        return dataManager.findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String processDefinitionKey, String tenantId) {
+        return dataManager.findProcessDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, processDefinitionKey, tenantId);
+    }
+
+    @Override
     public ProcessDefinition findProcessDefinitionByKeyAndVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId) {
         if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             return dataManager.findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);

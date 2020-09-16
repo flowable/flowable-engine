@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.el.function;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 
 import org.apache.commons.codec.binary.Base64;
@@ -32,114 +34,114 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
     @Deployment
     public void testGetVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "go to A")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableOrDefault() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()); // Default is 123
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A"); // Default is 123
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 1)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 999)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableContains() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Arrays.asList(2, 3, 4))
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Arrays.asList(1, 2, 3, 4))
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableContainsAny() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Arrays.asList(3, 4))
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Arrays.asList(2, 3, 4))
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Arrays.asList(1, 2, 3, 4))
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableEquals() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 12)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 123)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableNotEquals() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "hello")
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "test")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     
@@ -147,170 +149,170 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
     @Deployment
     public void testGetVariableExists() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "hello")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableIsEmpty() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "abc")
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
     }
     
     @Test
     @Deployment
     public void testGetVariableIsNotEmpty() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "")
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "abc")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableLowerThan() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 1)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 10)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 11)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
     }
     
     @Test
     @Deployment
     public void testGetVariableLowerThanOrEqual() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 1)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 10)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 11)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
     }
     
     @Test
     @Deployment
     public void testGetVariableGreaterThan() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 1)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 10)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 11)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testGetVariableGreaterThanOrEqual() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 1)
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 10)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", 11)
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
     
     @Test
     @Deployment
     public void testVariableBase64() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "test")
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", "hello")
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
 
     }
 
@@ -318,19 +320,19 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
     @Deployment
     public void testVariableBase64Binary() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExpressionFunction");
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Base64.decodeBase64("SGFsbG8sIGhhbGxvIC0gVGVzdCBXUk9ORyE="))
                 .start();
-        assertEquals("B", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
                 .variable("myVar", Base64.decodeBase64("SGFsbG8sIGhhbGxvIC0gVGVzdA=="))
                 .start();
-        assertEquals("A", taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
 
     }
 }

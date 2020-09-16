@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
@@ -63,8 +64,6 @@ import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityMan
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManagerImpl;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManagerImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityManager;
@@ -97,12 +96,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected IdmIdentityService idmIdentityService = new IdmIdentityServiceImpl();
-    protected IdmManagementService idmManagementService = new IdmManagementServiceImpl();
+    protected IdmIdentityService idmIdentityService = new IdmIdentityServiceImpl(this);
+    protected IdmManagementService idmManagementService = new IdmManagementServiceImpl(this);
 
     // DATA MANAGERS ///////////////////////////////////////////////////
 
-    protected ByteArrayDataManager byteArrayDataManager;
+    protected ByteArrayDataManager idmByteArrayDataManager;
     protected GroupDataManager groupDataManager;
     protected IdentityInfoDataManager identityInfoDataManager;
     protected MembershipDataManager membershipDataManager;
@@ -113,12 +112,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     protected PrivilegeMappingDataManager privilegeMappingDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    protected ByteArrayEntityManager byteArrayEntityManager;
+    protected ByteArrayEntityManager idmByteArrayEntityManager;
     protected GroupEntityManager groupEntityManager;
     protected IdentityInfoEntityManager identityInfoEntityManager;
     protected MembershipEntityManager membershipEntityManager;
     protected PropertyEntityManager idmPropertyEntityManager;
-    protected TableDataManager tableDataManager;
     protected TokenEntityManager tokenEntityManager;
     protected UserEntityManager userEntityManager;
     protected PrivilegeEntityManager privilegeEntityManager;
@@ -171,6 +169,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -197,7 +196,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         initServices();
         initDataManagers();
         initEntityManagers();
-        initClock();
         initEventDispatcher();
     }
 
@@ -231,8 +229,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initDataManagers() {
         super.initDataManagers();
-        if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager(this);
+        if (idmByteArrayDataManager == null) {
+            idmByteArrayDataManager = new MybatisByteArrayDataManager(this);
         }
         if (groupDataManager == null) {
             groupDataManager = new MybatisGroupDataManager(this);
@@ -263,8 +261,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public void initEntityManagers() {
         super.initEntityManagers();
-        if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(this, byteArrayDataManager);
+        if (idmByteArrayEntityManager == null) {
+            idmByteArrayEntityManager = new ByteArrayEntityManagerImpl(this, idmByteArrayDataManager);
         }
         if (groupEntityManager == null) {
             groupEntityManager = new GroupEntityManagerImpl(this, groupDataManager);
@@ -277,9 +275,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         }
         if (idmPropertyEntityManager == null) {
             idmPropertyEntityManager = new PropertyEntityManagerImpl(this, idmPropertyDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
         if (tokenEntityManager == null) {
             tokenEntityManager = new TokenEntityManagerImpl(this, tokenDataManager);
@@ -362,6 +357,11 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return "idm";
     }
 
     @Override
@@ -539,12 +539,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
+    public ByteArrayDataManager getIdmByteArrayDataManager() {
+        return idmByteArrayDataManager;
     }
 
-    public IdmEngineConfiguration setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
+    public IdmEngineConfiguration setIdmByteArrayDataManager(ByteArrayDataManager idmByteArrayDataManager) {
+        this.idmByteArrayDataManager = idmByteArrayDataManager;
         return this;
     }
 
@@ -620,12 +620,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ByteArrayEntityManager getByteArrayEntityManager() {
-        return byteArrayEntityManager;
+    public ByteArrayEntityManager getIdmByteArrayEntityManager() {
+        return idmByteArrayEntityManager;
     }
 
-    public IdmEngineConfiguration setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
-        this.byteArrayEntityManager = byteArrayEntityManager;
+    public IdmEngineConfiguration setIdmByteArrayEntityManager(ByteArrayEntityManager idmByteArrayEntityManager) {
+        this.idmByteArrayEntityManager = idmByteArrayEntityManager;
         return this;
     }
 
@@ -699,10 +699,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     public IdmEngineConfiguration setPrivilegeMappingEntityManager(PrivilegeMappingEntityManager privilegeMappingEntityManager) {
         this.privilegeMappingEntityManager = privilegeMappingEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public IdmEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

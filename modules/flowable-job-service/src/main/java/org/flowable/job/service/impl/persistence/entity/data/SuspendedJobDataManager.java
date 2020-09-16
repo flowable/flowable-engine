@@ -24,6 +24,8 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
  */
 public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity> {
 
+    SuspendedJobEntity findJobByCorrelationId(String correlationId);
+
     List<SuspendedJobEntity> findJobsByExecutionId(String executionId);
 
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String processInstanceId);

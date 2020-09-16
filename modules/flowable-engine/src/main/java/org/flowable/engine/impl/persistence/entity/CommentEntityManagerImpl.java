@@ -54,10 +54,12 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
     }
     
@@ -78,8 +80,9 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
         
         return updatedCommentEntity;
@@ -167,8 +170,9 @@ public class CommentEntityManagerImpl
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, 
+                    commentEntity, processInstanceId, processInstanceId, processDefinitionId),
+                    engineConfiguration.getEngineCfgKey());
         }
     }
 

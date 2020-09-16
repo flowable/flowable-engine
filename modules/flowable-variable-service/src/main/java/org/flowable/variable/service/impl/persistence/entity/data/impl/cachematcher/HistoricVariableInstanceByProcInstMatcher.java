@@ -23,7 +23,7 @@ public class HistoricVariableInstanceByProcInstMatcher extends CachedEntityMatch
     @Override
     public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
         return historicVariableInstanceEntity.getProcessInstanceId() != null
-                && historicVariableInstanceEntity.getProcessInstanceId().equals((String) parameter);
+                && historicVariableInstanceEntity.getProcessInstanceId().equals(parameter);
     }
 
 }

@@ -321,6 +321,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 email.setHostName(host);
 
                 email.setSmtpPort(mailServerInfo.getMailServerPort());
+                email.setSslSmtpPort(Integer.toString(mailServerInfo.getMailServerSSLPort()));
 
                 email.setSSLOnConnect(mailServerInfo.isMailServerUseSSL());
                 email.setStartTLSEnabled(mailServerInfo.isMailServerUseTLS());
@@ -349,6 +350,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
                 int port = processEngineConfiguration.getMailServerPort();
                 email.setSmtpPort(port);
+                email.setSslSmtpPort(Integer.toString(processEngineConfiguration.getMailServerSSLPort()));
 
                 email.setSSLOnConnect(processEngineConfiguration.getMailServerUseSSL());
                 email.setStartTLSEnabled(processEngineConfiguration.getMailServerUseTLS());

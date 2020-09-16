@@ -12,14 +12,12 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
@@ -42,20 +40,20 @@ public class SignalExpressionConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         Collection<Signal> signals = model.getSignals();
-        assertEquals(1, signals.size());
+        assertThat(signals).hasSize(1);
 
         Signal signal = signals.iterator().next();
-        assertEquals("signal1", signal.getId());
+        assertThat(signal.getId()).isEqualTo("signal1");
 
         List<StartEvent> startEvents = model.getMainProcess().findFlowElementsOfType(StartEvent.class);
-        assertEquals(1, startEvents.size());
+        assertThat(startEvents).hasSize(1);
         StartEvent startEvent = startEvents.get(0);
-        assertEquals(1, startEvent.getEventDefinitions().size());
+        assertThat(startEvent.getEventDefinitions()).hasSize(1);
+        assertThat(startEvent.getEventDefinitions().get(0))
+                .isInstanceOfSatisfying(SignalEventDefinition.class, signalEventDefinition -> {
+                    assertThat(signalEventDefinition.getSignalExpression()).isEqualTo("${someExpressionThatReturnsSignalId}");
 
-        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-        assertTrue(eventDefinition instanceof SignalEventDefinition);
-        SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-        assertEquals("${someExpressionThatReturnsSignalId}", signalEventDefinition.getSignalExpression());
+                });
     }
 
     @Override

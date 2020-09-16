@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../../../../</relativePath>
-        <version>6.5.1-SNAPSHOT</version>
+        <version>6.6.0-SNAPSHOT</version>
     </parent>
 
 
@@ -35,7 +35,7 @@
         <pluginRepository>
             <id>jcenter-snapshots</id>
             <name>jcenter</name>
-            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
         </pluginRepository>
         <pluginRepository>
             <snapshots>
@@ -43,7 +43,7 @@
             </snapshots>
             <id>jcenter-releases</id>
             <name>jcenter</name>
-            <url>http://jcenter.bintray.com</url>
+            <url>https://jcenter.bintray.com</url>
         </pluginRepository>
     </pluginRepositories>
 

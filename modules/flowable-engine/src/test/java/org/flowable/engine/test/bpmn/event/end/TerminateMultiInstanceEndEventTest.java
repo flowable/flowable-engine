@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.end;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -19,6 +21,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,7 +38,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         taskService.complete(aTask.getId());
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(8, bTasks.size());
+        assertThat(bTasks).hasSize(8);
 
         // Complete 2 tasks by going to task C. The 3th tasks goes to the MI terminate end and shuts down the MI.
         for (int i = 0; i < 2; i++) {
@@ -44,15 +47,15 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         }
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(6, bTasks.size());
+        assertThat(bTasks).hasSize(6);
 
         taskService.complete(bTasks.get(0).getId(), CollectionUtil.singletonMap("myVar", "toEnd"));
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("AfterMi", afterMiTask.getName());
+        assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
         taskService.complete(afterMiTask.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -64,22 +67,22 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         taskService.complete(aTask.getId());
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, bTasks.size());
+        assertThat(bTasks).hasSize(1);
         taskService.complete(bTasks.get(0).getId(), CollectionUtil.singletonMap("myVar", "toC"));
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
-        assertEquals(1, cTasks.size());
+        assertThat(cTasks).hasSize(1);
         taskService.complete(cTasks.get(0).getId());
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(1, bTasks.size());
+        assertThat(bTasks).hasSize(1);
         taskService.complete(bTasks.get(0).getId(), CollectionUtil.singletonMap("myVar", "toEnd"));
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("AfterMi", afterMiTask.getName());
+        assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
         taskService.complete(afterMiTask.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -91,26 +94,26 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         taskService.complete(aTask.getId());
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(5, bTasks.size());
+        assertThat(bTasks).hasSize(5);
 
         // Complete one b task to get one C and D
         taskService.complete(bTasks.get(0).getId());
 
         // C and D should now be active
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(6, tasks.size());
+        assertThat(tasks).hasSize(6);
         // 0-3 are B tasks
-        assertEquals("C", tasks.get(4).getName());
-        assertEquals("D", tasks.get(5).getName());
+        assertThat(tasks.get(4).getName()).isEqualTo("C");
+        assertThat(tasks.get(5).getName()).isEqualTo("D");
 
         // Completing C should terminate the multi instance
         taskService.complete(tasks.get(4).getId());
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("AfterMi", afterMiTask.getName());
+        assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
         taskService.complete(afterMiTask.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -122,25 +125,25 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         taskService.complete(aTask.getId());
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, bTasks.size());
+        assertThat(bTasks).hasSize(1);
 
         // Complete one b task to get one C and D
         taskService.complete(bTasks.get(0).getId());
 
         // C and D should now be active
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("C", tasks.get(0).getName());
-        assertEquals("D", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("C", "D");
 
         // Completing C should terminate the multi instance
         taskService.complete(tasks.get(0).getId());
 
         org.flowable.task.api.Task afterMiTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("AfterMi", afterMiTask.getName());
+        assertThat(afterMiTask.getName()).isEqualTo("AfterMi");
         taskService.complete(afterMiTask.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -152,12 +155,12 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMiCallActivity");
 
         org.flowable.task.api.Task taskA = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("A", taskA.getName());
+        assertThat(taskA.getName()).isEqualTo("A");
         taskService.complete(taskA.getId());
 
         // After completing A, four B's should be active (due to the call activity)
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().taskName("B").list();
-        assertEquals(4, bTasks.size());
+        assertThat(bTasks).hasSize(4);
 
         // Completing 3 B tasks, giving 3 C's and D's
         for (int i = 0; i < 3; i++) {
@@ -165,17 +168,17 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         }
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
-        assertEquals(3, cTasks.size());
+        assertThat(cTasks).hasSize(3);
         List<org.flowable.task.api.Task> dTasks = taskService.createTaskQuery().taskName("D").list();
-        assertEquals(3, dTasks.size());
+        assertThat(dTasks).hasSize(3);
 
         // Completing one of the C tasks should terminate the whole multi instance
         taskService.complete(cTasks.get(0).getId());
 
         List<org.flowable.task.api.Task> afterMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, afterMiTasks.size());
-        assertEquals("AfterMi", afterMiTasks.get(0).getName());
-        assertEquals("Parallel task", afterMiTasks.get(1).getName());
+        assertThat(afterMiTasks)
+                .extracting(Task::getName)
+                .containsExactly("AfterMi", "Parallel task");
     }
 
     @Test
@@ -187,25 +190,25 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateMiCallActivity");
 
         org.flowable.task.api.Task taskA = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("A", taskA.getName());
+        assertThat(taskA.getName()).isEqualTo("A");
         taskService.complete(taskA.getId());
 
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().taskName("B").list();
-        assertEquals(1, bTasks.size());
+        assertThat(bTasks).hasSize(1);
         taskService.complete(bTasks.get(0).getId());
 
         List<org.flowable.task.api.Task> cTasks = taskService.createTaskQuery().taskName("C").list();
-        assertEquals(1, cTasks.size());
+        assertThat(cTasks).hasSize(1);
         List<org.flowable.task.api.Task> dTasks = taskService.createTaskQuery().taskName("D").list();
-        assertEquals(1, dTasks.size());
+        assertThat(dTasks).hasSize(1);
 
         // Completing one of the C tasks should terminate the whole multi instance
         taskService.complete(cTasks.get(0).getId());
 
         List<org.flowable.task.api.Task> afterMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, afterMiTasks.size());
-        assertEquals("AfterMi", afterMiTasks.get(0).getName());
-        assertEquals("Parallel task", afterMiTasks.get(1).getName());
+        assertThat(afterMiTasks)
+                .extracting(Task::getName)
+                .containsExactly("AfterMi", "Parallel task");
     }
 
     @Test
@@ -215,9 +218,9 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
                 "terminateNestedMiEmbeddedSubprocess", CollectionUtil.singletonMap("var", "notEnd"));
 
         List<org.flowable.task.api.Task> aTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("A").list();
-        assertEquals(12, aTasks.size());
+        assertThat(aTasks).hasSize(12);
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(72, bTasks.size());
+        assertThat(bTasks).hasSize(72);
 
         // Completing a few B's will create a subprocess with some C's
         int nrOfBTasksCompleted = 3;
@@ -226,21 +229,21 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
         }
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(72 - nrOfBTasksCompleted, bTasks.size());
+        assertThat(bTasks).hasSize(72 - nrOfBTasksCompleted);
 
         // Firing the timer --> inner MI gets destroyed
         List<Job> timers = managementService.createTimerJobQuery().list();
-        assertEquals(nrOfBTasksCompleted, timers.size());
+        assertThat(timers).hasSize(nrOfBTasksCompleted);
         managementService.moveTimerToExecutableJob(timers.get(0).getId());
         managementService.executeJob(timers.get(0).getId());
 
         // We only completed 3 B's. 3 other ones should be destroyed too (as one inner multi instance are 6 instances of B)
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(66, bTasks.size());
+        assertThat(bTasks).hasSize(66);
 
         // One of the inner multi instances should have been killed
         List<org.flowable.task.api.Task> afterInnerMiTasks = taskService.createTaskQuery().taskName("AfterInnerMi").list();
-        assertEquals(1, afterInnerMiTasks.size());
+        assertThat(afterInnerMiTasks).hasSize(1);
 
         for (org.flowable.task.api.Task aTask : aTasks) {
             taskService.complete(aTask.getId());
@@ -253,7 +256,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
             nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -263,10 +266,9 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
                 "terminateNestedMiEmbeddedSubprocess", CollectionUtil.singletonMap("var", "toEnd"));
 
         List<org.flowable.task.api.Task> aTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("A").list();
-        assertEquals(12, aTasks.size());
+        assertThat(aTasks).hasSize(12);
         List<org.flowable.task.api.Task> afterInnerMiTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("AfterInnerMi").list();
-        assertEquals(12, afterInnerMiTasks.size());
-
+        assertThat(afterInnerMiTasks).hasSize(12);
     }
 
     @Test
@@ -276,26 +278,26 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
                 "terminateNestedMiEmbeddedSubprocess", CollectionUtil.singletonMap("var", "notEnd"));
 
         List<org.flowable.task.api.Task> aTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("A").list();
-        assertEquals(1, aTasks.size());
+        assertThat(aTasks).hasSize(1);
         List<org.flowable.task.api.Task> bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(1, bTasks.size());
+        assertThat(bTasks).hasSize(1);
 
         taskService.complete(bTasks.get(0).getId());
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(0, bTasks.size());
+        assertThat(bTasks).isEmpty();
 
         // Firing the timer --> inner MI gets destroyed
         List<Job> timers = managementService.createTimerJobQuery().list();
-        assertEquals(1, timers.size());
+        assertThat(timers).hasSize(1);
         managementService.moveTimerToExecutableJob(timers.get(0).getId());
         managementService.executeJob(timers.get(0).getId());
 
         bTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("B").list();
-        assertEquals(0, bTasks.size());
+        assertThat(bTasks).isEmpty();
 
         // One of the inner multi instances should have been killed
         List<org.flowable.task.api.Task> afterInnerMiTasks = taskService.createTaskQuery().taskName("AfterInnerMi").list();
-        assertEquals(1, afterInnerMiTasks.size());
+        assertThat(afterInnerMiTasks).hasSize(1);
 
         for (org.flowable.task.api.Task aTask : aTasks) {
             taskService.complete(aTask.getId());
@@ -308,7 +310,7 @@ public class TerminateMultiInstanceEndEventTest extends PluggableFlowableTestCas
             nextTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         }
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
 }

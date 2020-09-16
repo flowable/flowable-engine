@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+        xmlns:flowable="http://flowable.org/cmmn"
+        targetNamespace="http://flowable.org/cmmn">
+
+    <case id="externalWorkerCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItemTaskA" definitionRef="externalWorkerTaskA"/>
+            <planItem id="planItemTaskB" definitionRef="externalWorkerTaskB">
+                <entryCriterion id="criterion" sentryRef="sentryTaskB"/>
+            </planItem>
+
+            <sentry id="sentryTaskB">
+                <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="externalWorkerTaskA" name="A" flowable:type="external-worker" flowable:topic="simple">
+                <extensionElements>
+                    <flowable:customValue>test</flowable:customValue>
+                </extensionElements>
+            </task>
+
+            <task id="externalWorkerTaskB" name="B" flowable:type="external-worker" flowable:exclusive="true" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

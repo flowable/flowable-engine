@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+
 public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements BatchPartEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -34,7 +36,7 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
     protected Date createTime;
     protected Date completeTime;
     protected String status;
-    protected BatchByteArrayRef resultDocRefId;
+    protected ByteArrayRef resultDocRefId;
     protected String tenantId;
 
     @Override
@@ -165,18 +167,18 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
     }
 
     @Override
-    public BatchByteArrayRef getResultDocRefId() {
+    public ByteArrayRef getResultDocRefId() {
         return resultDocRefId;
     }
 
-    public void setResultDocRefId(BatchByteArrayRef resultDocRefId) {
+    public void setResultDocRefId(ByteArrayRef resultDocRefId) {
         this.resultDocRefId = resultDocRefId;
     }
 
     @Override
-    public String getResultDocumentJson() {
-        if (resultDocRefId != null && resultDocRefId.getEntity() != null) {
-            byte[] bytes = resultDocRefId.getEntity().getBytes();
+    public String getResultDocumentJson(String engineType) {
+        if (resultDocRefId != null) {
+            byte[] bytes = resultDocRefId.getBytes(engineType);
             if (bytes != null) {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
@@ -185,8 +187,8 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
     }
 
     @Override
-    public void setResultDocumentJson(String resultDocumentJson) {
-        this.resultDocRefId = setByteArrayRef(this.resultDocRefId, BATCH_RESULT_LABEL, resultDocumentJson);
+    public void setResultDocumentJson(String resultDocumentJson, String engineType) {
+        this.resultDocRefId = setByteArrayRef(this.resultDocRefId, BATCH_RESULT_LABEL, resultDocumentJson, engineType);
     }
 
     @Override
@@ -199,15 +201,15 @@ public class BatchPartEntityImpl extends AbstractBatchServiceEntity implements B
         this.tenantId = tenantId;
     }
 
-    private static BatchByteArrayRef setByteArrayRef(BatchByteArrayRef byteArrayRef, String name, String value) {
+    private static ByteArrayRef setByteArrayRef(ByteArrayRef byteArrayRef, String name, String value, String engineType) {
         if (byteArrayRef == null) {
-            byteArrayRef = new BatchByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
         byte[] bytes = null;
         if (value != null) {
             bytes = value.getBytes(StandardCharsets.UTF_8);
         }
-        byteArrayRef.setValue(name, bytes);
+        byteArrayRef.setValue(name, bytes, engineType);
         return byteArrayRef;
     }
 

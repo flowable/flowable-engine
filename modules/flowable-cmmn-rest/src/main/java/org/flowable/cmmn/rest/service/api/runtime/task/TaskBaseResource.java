@@ -183,11 +183,26 @@ public class TaskBaseResource {
         if (request.getCandidateGroupIn() != null) {
             taskQuery.taskCandidateGroupIn(request.getCandidateGroupIn());
         }
+        if (request.isIgnoreAssignee()) {
+            taskQuery.ignoreAssigneeValue();
+        }
         if (request.getCaseInstanceId() != null) {
             taskQuery.caseInstanceId(request.getCaseInstanceId());
         }
         if (request.getCaseInstanceIdWithChildren() != null) {
             taskQuery.caseInstanceIdWithChildren(request.getCaseInstanceIdWithChildren());
+        }
+        if (request.getPlanItemInstanceId() != null) {
+            taskQuery.planItemInstanceId(request.getPlanItemInstanceId());
+        }
+        if (request.getScopeId() != null) {
+            taskQuery.scopeId(request.getScopeId());
+        }
+        if (request.getSubScopeId() != null) {
+            taskQuery.subScopeId(request.getSubScopeId());
+        }
+        if (request.getScopeType() != null) {
+            taskQuery.scopeType(request.getScopeType());
         }
         if (request.getCreatedOn() != null) {
             taskQuery.taskCreatedOn(request.getCreatedOn());
@@ -240,6 +255,22 @@ public class TaskBaseResource {
 
         if (request.getCaseDefinitionId() != null) {
             taskQuery.caseDefinitionId(request.getCaseDefinitionId());
+        }
+
+        if (request.getCaseDefinitionKey() != null) {
+            taskQuery.caseDefinitionKey(request.getCaseDefinitionKey());
+        }
+
+        if (request.getCaseDefinitionKeys() != null) {
+            taskQuery.caseDefinitionKeyIn(request.getCaseDefinitionKeys());
+        }
+
+        if (request.getCaseDefinitionKeyLike() != null) {
+            taskQuery.caseDefinitionKeyLike(request.getCaseDefinitionKeyLike());
+        }
+
+        if (request.getCaseDefinitionKeyLikeIgnoreCase() != null) {
+            taskQuery.caseDefinitionKeyLikeIgnoreCase(request.getCaseDefinitionKeyLikeIgnoreCase());
         }
 
         if (request.getTaskVariables() != null) {

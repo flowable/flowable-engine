@@ -33,64 +33,70 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class IdentityLinkUtil {
 
-    public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createScopeIdentityLink(
-                        null, caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
+    public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                .getIdentityLinkService().createScopeIdentityLink(null, caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
         
         return identityLinkEntity;
     }
     
-    public static void deleteTaskIdentityLinks(TaskEntity taskEntity, String userId, String groupId, String type) {
-        List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteTaskIdentityLink(
-                        taskEntity.getId(), taskEntity.getIdentityLinks(), userId, groupId, type);
-        handleTaskIdentityLinkDeletions(taskEntity, removedIdentityLinkEntities, true);
+    public static void deleteTaskIdentityLinks(TaskEntity taskEntity, String userId, String groupId, String type, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        List<IdentityLinkEntity> removedIdentityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                .getIdentityLinkService().deleteTaskIdentityLink(taskEntity.getId(), taskEntity.getIdentityLinks(), userId, groupId, type);
+        handleTaskIdentityLinkDeletions(taskEntity, removedIdentityLinkEntities, true, cmmnEngineConfiguration);
     }
 
-    public static void deleteCaseInstanceIdentityLinks(CaseInstance caseInstance, String userId, String groupId, String type) {
-        List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteScopeIdentityLink(
-                        caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
+    public static void deleteCaseInstanceIdentityLinks(CaseInstance caseInstance, String userId, String groupId, String type, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        List<IdentityLinkEntity> removedIdentityLinkEntities = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                .getIdentityLinkService().deleteScopeIdentityLink(caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
         
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
             CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
         }
     }
 
-    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
+    public static void handleTaskIdentityLinkAdditions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities, CmmnEngineConfiguration cmmnEngineConfiguration) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
-            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
+            handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity, cmmnEngineConfiguration);
         }
     }
     
-    public static IdentityLinkEntity createPlanItemInstanceIdentityLink(PlanItemInstance planItemInstance, String userId, String groupId, String type) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createSubScopeIdentityLink(
-                        null, planItemInstance.getCaseInstanceId(), planItemInstance.getId(), ScopeTypes.PLAN_ITEM, userId, groupId, type);
+    public static IdentityLinkEntity createPlanItemInstanceIdentityLink(PlanItemInstance planItemInstance, String userId, 
+            String groupId, String type, CmmnEngineConfiguration cmmnEngineConfiguration) {
         
-        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+        IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                .createSubScopeIdentityLink(null, planItemInstance.getCaseInstanceId(), planItemInstance.getId(), ScopeTypes.PLAN_ITEM, userId, groupId, type);
+        
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
         
         return identityLinkEntity;
     }
 
-    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
-        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+    public static void handleTaskIdentityLinkAddition(TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
 
         CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
         if (countingTaskEntity.isCountEnabled()) {
             countingTaskEntity.setIdentityLinkCount(countingTaskEntity.getIdentityLinkCount() + 1);
         }
 
-        logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
+        logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, 
+                identityLinkEntity, cmmnEngineConfiguration);
 
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddIdentityLinkToTask(taskEntity, identityLinkEntity);
         }
     }
 
-    public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory) {
+    public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
             if (countingTaskEntity.isCountEnabled()) {
@@ -99,17 +105,20 @@ public class IdentityLinkUtil {
             if (cascaseHistory) {
                 CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkDeleted(identityLinkEntity);
             }
-            logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name(), taskEntity, identityLinkEntity);
+            logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_REMOVED.name(), taskEntity, 
+                    identityLinkEntity, cmmnEngineConfiguration);
         }
 
         taskEntity.getIdentityLinks().removeAll(identityLinks);
     }
 
-    protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity) {
-        TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
+    protected static void logTaskIdentityLinkEvent(String eventType, TaskEntity taskEntity, IdentityLinkEntity identityLinkEntity,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        TaskServiceConfiguration taskServiceConfiguration = cmmnEngineConfiguration.getTaskServiceConfiguration();
         if (taskServiceConfiguration.isEnableHistoricTaskLogging()) {
             BaseHistoricTaskLogEntryBuilderImpl taskLogEntryBuilder = new BaseHistoricTaskLogEntryBuilderImpl(taskEntity);
-            ObjectNode data = CommandContextUtil.getTaskServiceConfiguration().getObjectMapper().createObjectNode();
+            ObjectNode data = taskServiceConfiguration.getObjectMapper().createObjectNode();
             if (identityLinkEntity.isUser()) {
                 data.put("userId", identityLinkEntity.getUserId());
             } else if (identityLinkEntity.isGroup()) {

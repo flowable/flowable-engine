@@ -22,6 +22,7 @@ import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 
@@ -51,7 +52,9 @@ public interface JobService {
     List<SuspendedJobEntity> findSuspendedJobsByExecutionId(String executionId);
     
     List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId);
-    
+
+    List<ExternalWorkerJobEntity> findExternalWorkerJobsByExecutionId(String executionId);
+
     List<JobEntity> findJobsByProcessInstanceId(String processInstanceId);
     
     List<SuspendedJobEntity> findSuspendedJobsByProcessInstanceId(String processInstanceId);
@@ -66,13 +69,15 @@ public interface JobService {
     
     void updateAllJobTypesTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    void unacquireWithDecrementRetries(JobInfo job);
-    
     void createAsyncJob(JobEntity job, boolean isExclusive);
     
     JobEntity createJob();
     
     void insertJob(JobEntity job);
+
+    ExternalWorkerJobEntity createExternalWorkerJob();
+
+    void insertExternalWorkerJob(ExternalWorkerJobEntity job);
     
     DeadLetterJobEntity createDeadLetterJob();
     
@@ -89,4 +94,5 @@ public interface JobService {
     void deleteSuspendedJobsByExecutionId(String executionId);
     
     void deleteDeadLetterJobsByExecutionId(String executionId);
+
 }

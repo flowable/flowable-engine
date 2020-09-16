@@ -153,11 +153,15 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.ENTITY_LINK_TYPE, entityLink.getLinkType());
         putIfNotNull(data, HistoryJsonConstants.CREATE_TIME, entityLink.getCreateTime());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_ID, entityLink.getScopeId());
+        putIfNotNull(data, HistoryJsonConstants.SUB_SCOPE_ID, entityLink.getSubScopeId());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_TYPE, entityLink.getScopeType());
         putIfNotNull(data, HistoryJsonConstants.SCOPE_DEFINITION_ID, entityLink.getScopeDefinitionId());
+        putIfNotNull(data, HistoryJsonConstants.PARENT_ELEMENT_ID, entityLink.getParentElementId());
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_ID, entityLink.getReferenceScopeId());
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_TYPE, entityLink.getReferenceScopeType());
         putIfNotNull(data, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID, entityLink.getReferenceScopeDefinitionId());
+        putIfNotNull(data, HistoryJsonConstants.ROOT_SCOPE_ID, entityLink.getRootScopeId());
+        putIfNotNull(data, HistoryJsonConstants.ROOT_SCOPE_TYPE, entityLink.getRootScopeType());
         putIfNotNull(data, HistoryJsonConstants.HIERARCHY_TYPE, entityLink.getHierarchyType());
     }
 
@@ -167,10 +171,11 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, activityInstance.getProcessInstanceId());
         putIfNotNull(data, HistoryJsonConstants.EXECUTION_ID, activityInstance.getExecutionId());
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_ID, activityInstance.getActivityId());
-
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_NAME, activityInstance.getActivityName());
         putIfNotNull(data, HistoryJsonConstants.ACTIVITY_TYPE, activityInstance.getActivityType());
-
+        if (activityInstance.getTransactionOrder() != null) {
+            putIfNotNull(data, HistoryJsonConstants.TRANSACTION_ORDER, activityInstance.getTransactionOrder());
+        }
         putIfNotNull(data, HistoryJsonConstants.TENANT_ID, activityInstance.getTenantId());
     }
 

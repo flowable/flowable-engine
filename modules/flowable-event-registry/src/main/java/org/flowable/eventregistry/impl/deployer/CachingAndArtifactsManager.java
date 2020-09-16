@@ -25,7 +25,6 @@ import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntit
 import org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntity;
 import org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntity;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
-import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
@@ -37,8 +36,11 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
  */
 public class CachingAndArtifactsManager {
 
-    protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
-    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
+    public void removeChannelDefinitionFromCache(String channelDefinitionId) {
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
+        DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = eventRegistryEngineConfiguration.getDeploymentManager().getChannelDefinitionCache();
+        channelDefinitionCache.remove(channelDefinitionId);
+    }
 
     /**
      * Ensures that the event and channel definitions are cached in the appropriate places, including the deployment's collection of deployed artifacts and the deployment manager's cache.
@@ -48,6 +50,7 @@ public class CachingAndArtifactsManager {
         DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache = eventRegistryEngineConfiguration.getDeploymentManager().getEventDefinitionCache();
         EventDeploymentEntity deployment = parsedDeployment.getDeployment();
 
+        EventJsonConverter eventJsonConverter = eventRegistryEngineConfiguration.getEventJsonConverter();
         for (EventDefinitionEntity eventDefinition : parsedDeployment.getAllEventDefinitions()) {
             EventModel eventModel = parsedDeployment.getEventModelForEventDefinition(eventDefinition);
             EventDefinitionCacheEntry cacheEntry = new EventDefinitionCacheEntry(eventDefinition, eventJsonConverter.convertToJson(eventModel));

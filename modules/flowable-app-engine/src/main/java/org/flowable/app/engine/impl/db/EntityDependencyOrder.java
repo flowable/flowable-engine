@@ -19,9 +19,9 @@ import java.util.List;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
@@ -35,7 +35,7 @@ public class EntityDependencyOrder {
     static {
 
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
-        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
+        DELETE_ORDER.add(ByteArrayEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
         DELETE_ORDER.add(AppDefinitionEntityImpl.class);
         DELETE_ORDER.add(AppResourceEntityImpl.class);

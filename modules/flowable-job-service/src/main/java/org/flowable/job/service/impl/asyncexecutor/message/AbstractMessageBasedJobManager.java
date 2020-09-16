@@ -19,7 +19,6 @@ import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.cfg.TransactionState;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.DefaultJobManager;
@@ -60,7 +59,6 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
 
     @Override
     public void unacquire(JobInfo job) {
-
         if (job instanceof JobInfoEntity) {
             JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
 
@@ -73,17 +71,11 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
     }
     
     @Override
-    public void unacquireWithDecrementRetries(JobInfo job) {
-        if (job instanceof HistoryJob) {
-            HistoryJobEntity historyJobEntity = (HistoryJobEntity) job;
-            if (historyJobEntity.getRetries() > 0) {
-                historyJobEntity.setRetries(historyJobEntity.getRetries() - 1);
-                unacquire(historyJobEntity);
-            } else {
-                jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
-            }
-        } else {
-            unacquire(job);
+    public void unacquireWithDecrementRetries(JobInfo job, Throwable throwable) {
+        if (job instanceof JobInfoEntity) {
+            JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
+            jobInfoEntity.setRetries(jobInfoEntity.getRetries() - 1);
+            unacquire(jobInfoEntity);
         }
     }
 

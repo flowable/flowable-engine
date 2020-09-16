@@ -88,7 +88,7 @@ public class EventDefinitionCollectionResourceTest extends BaseSpringRestTestCas
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, myEventDef2.getId(), orderEventDef2.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, firstEventDef.getId(), myEventDef.getId(), orderEventDef.getId(), myEventDef2.getId(), orderEventDef2.getId());
+            assertResultsPresentInDataResponse(url, firstEventDef.getId(), myEventDef.getId(), orderEventDef.getId(), myEventDef2.getId(), orderEventDef2.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

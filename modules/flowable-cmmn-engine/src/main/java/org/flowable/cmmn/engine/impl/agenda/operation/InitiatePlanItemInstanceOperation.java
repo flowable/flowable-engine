@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -30,21 +31,22 @@ public class InitiatePlanItemInstanceOperation extends AbstractChangePlanItemIns
 
     @Override
     protected void internalExecute() {
-       // Regular behavior is enough
+        planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.AVAILABLE;
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.INITIATE;
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Initiate plan item]";
     }
 

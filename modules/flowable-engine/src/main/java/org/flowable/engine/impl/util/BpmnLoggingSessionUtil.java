@@ -44,6 +44,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -63,13 +64,13 @@ public class BpmnLoggingSessionUtil {
         }
         
         ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), 
-                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType);
+                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType, getObjectMapper());
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static void addLoggingData(String type, String message, TaskEntity task, DelegateExecution execution) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getProcessInstanceId(), task.getExecutionId(), ScopeTypes.BPMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getProcessInstanceId(), task.getExecutionId(), ScopeTypes.BPMN, getObjectMapper());
         loggingNode.put("scopeDefinitionId", execution.getProcessDefinitionId());
         loggingNode.put("taskId", task.getId());
         putIfNotNull("taskName", task.getName(), loggingNode);
@@ -82,13 +83,13 @@ public class BpmnLoggingSessionUtil {
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         fillFlowElementInfo(loggingNode, execution);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static void addExecuteActivityBehaviorLoggingData(String type, ActivityBehavior activityBehavior, FlowNode flowNode, ExecutionEntity execution) {
         String message = "In " + flowNode.getClass().getSimpleName() + ", executing " + activityBehavior.getClass().getSimpleName();
         
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN, getObjectMapper());
         loggingNode.put("scopeDefinitionId", execution.getProcessDefinitionId());
         loggingNode.put("elementId", flowNode.getId());
         putIfNotNull("elementName", flowNode.getName(), loggingNode);
@@ -98,11 +99,11 @@ public class BpmnLoggingSessionUtil {
         
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static void addAsyncActivityLoggingData(String message, String type, JobEntity jobEntity, FlowElement flowElement, ExecutionEntity execution) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN, getObjectMapper());
         loggingNode.put("scopeDefinitionId", execution.getProcessDefinitionId());
         loggingNode.put("elementId", flowElement.getId());
         putIfNotNull("elementName", flowElement.getName(), loggingNode);
@@ -112,7 +113,7 @@ public class BpmnLoggingSessionUtil {
         
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static void addSequenceFlowLoggingData(String type, ExecutionEntity execution) {
@@ -130,7 +131,7 @@ public class BpmnLoggingSessionUtil {
             message = "Sequence flow will be taken";
         }
         
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), ScopeTypes.BPMN, getObjectMapper());
         loggingNode.put("scopeDefinitionId", execution.getProcessDefinitionId());
         if (sequenceFlow != null) {
             putIfNotNull("elementId", sequenceFlow.getId(), loggingNode);
@@ -142,11 +143,11 @@ public class BpmnLoggingSessionUtil {
         
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static ObjectNode fillBasicTaskLoggingData(String message, TaskEntity task, DelegateExecution execution) {
-        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getProcessInstanceId(), task.getExecutionId(), ScopeTypes.BPMN);
+        ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, task.getProcessInstanceId(), task.getExecutionId(), ScopeTypes.BPMN, getObjectMapper());
         loggingNode.put("scopeDefinitionId", execution.getProcessDefinitionId());
         loggingNode.put("taskId", task.getId());
         putIfNotNull("taskName", task.getName(), loggingNode);
@@ -171,9 +172,9 @@ public class BpmnLoggingSessionUtil {
         }
         
         ObjectNode loggingNode = LoggingSessionUtil.fillLoggingData(message, execution.getProcessInstanceId(), execution.getId(), 
-                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType);
+                        ScopeTypes.BPMN, execution.getProcessDefinitionId(), activityId, activityName, activityType, activitySubType, getObjectMapper());
         fillScopeDefinitionInfo(execution.getProcessDefinitionId(), loggingNode);
-        LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t);
+        LoggingSessionUtil.addErrorLoggingData(type, loggingNode, t, ScopeTypes.BPMN);
     }
     
     public static void fillLoggingData(ObjectNode loggingNode, ExecutionEntity executionEntity) {
@@ -215,7 +216,7 @@ public class BpmnLoggingSessionUtil {
             }
         }
         
-        LoggingSessionUtil.addLoggingData(type, loggingNode);
+        LoggingSessionUtil.addLoggingData(type, loggingNode, ScopeTypes.BPMN);
     }
     
     public static String getBoundaryCreateEventType(BoundaryEvent boundaryEvent) {
@@ -280,6 +281,9 @@ public class BpmnLoggingSessionUtil {
     }
     
     protected static void fillScopeDefinitionInfo(String processDefinitionId, ObjectNode loggingNode) {
+        if(!loggingNode.has("scopeDefinitionId")) {
+            loggingNode.put("scopeDefinitionId", processDefinitionId);
+        }
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
         loggingNode.put("scopeDefinitionKey", processDefinition.getKey());
         loggingNode.put("scopeDefinitionName", processDefinition.getName());
@@ -293,6 +297,10 @@ public class BpmnLoggingSessionUtil {
             putIfNotNull("elementName", flowElement.getName(), loggingNode);
             loggingNode.put("elementType", flowElement.getClass().getSimpleName());
         }
+    }
+    
+    protected static ObjectMapper getObjectMapper() {
+        return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
     }
     
     protected static void putIfNotNull(String name, String value, ObjectNode loggingNode) {

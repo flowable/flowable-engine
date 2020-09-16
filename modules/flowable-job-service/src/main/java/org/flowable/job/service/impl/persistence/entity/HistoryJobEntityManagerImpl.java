@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class HistoryJobEntityManagerImpl
-    extends JobInfoEntityManagerImpl<HistoryJobEntity, HistoryJobDataManager>
-    implements HistoryJobEntityManager {
+        extends JobInfoEntityManagerImpl<HistoryJobEntity, HistoryJobDataManager>
+        implements HistoryJobEntityManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoryJobEntityManagerImpl.class);
 
@@ -60,7 +60,8 @@ public class HistoryJobEntityManagerImpl
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
 

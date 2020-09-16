@@ -12,20 +12,24 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Yvo Swillens
@@ -41,10 +45,10 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", 10)
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test3", result.get("output1"));
-        Assert.assertSame(Double.class, result.get("output2").getClass());
-        Assert.assertEquals(3D, result.get("output2"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test3");
+        assertThat(result.get("output2").getClass()).isSameAs(Double.class);
+        assertThat(result).containsEntry("output2", 3D);
     }
 
     @Test
@@ -57,8 +61,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -71,8 +75,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -85,8 +89,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -99,8 +103,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -113,8 +117,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", localDate)
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -124,9 +128,9 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "testString")
                 .executeWithSingleResult();
-        Assert.assertNotNull(result);
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test1", result.get("output1"));
+        assertThat(result).isNotNull();
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test1");
     }
 
     @Test
@@ -141,8 +145,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(String.class);
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -157,7 +161,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
             .variables(processVariablesInput)
             .executeWithSingleResult();
 
-        Assert.assertNull(result);
+        assertThat(result).isNull();
     }
 
     @Test
@@ -167,13 +171,18 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         processVariablesInput.put("input1", 11D);
 
-        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
-            .decisionKey("decision")
-            .variables(processVariablesInput)
-            .executeWithSingleResult();
+        List<Map<String, Object>> result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variables(processVariablesInput)
+                .execute();
 
-        Assert.assertEquals(1, result.keySet().size());
-        Assert.assertEquals(11d, result.get("output2"));
+        assertThat(result).hasSize(3);
+        assertThat(result.get(0)).hasSize(1);
+        assertThat(result.get(0)).containsEntry("output1", 11d);
+        assertThat(result.get(1)).hasSize(1);
+        assertThat(result.get(1)).containsEntry("output2", 11d);
+        assertThat(result.get(2)).hasSize(1);
+        assertThat(result.get(2)).containsEntry("output3", 11d);
     }
 
     @Test
@@ -183,8 +192,8 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "blablatest")
                 .executeWithSingleResult();
-        Assert.assertSame(Double.class, result.get("output1").getClass());
-        Assert.assertEquals(5D, result.get("output1"));
+        assertThat(result.get("output1").getClass()).isSameAs(Double.class);
+        assertThat(result).containsEntry("output1", 5D);
     }
 
     @Test
@@ -194,7 +203,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "blablatest")
                 .executeWithAuditTrail();
-        Assert.assertNotNull(result.getRuleExecutions().get(2).getConclusionResults().iterator().next().getException());
+        assertThat(result.getRuleExecutions().get(2).getConclusionResults().iterator().next().getException()).isNotNull();
     }
 
     @Test
@@ -203,7 +212,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .executeWithAuditTrail();
-        Assert.assertEquals(true, result.isFailed());
+        assertThat(result.isFailed()).isTrue();
     }
 
     @Test
@@ -213,7 +222,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variables(new HashMap<>())
                 .executeWithAuditTrail();
-        Assert.assertEquals(false, result.isFailed());
+        assertThat(result.isFailed()).isFalse();
     }
 
     @Test
@@ -223,7 +232,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "blablatest")
                 .executeWithAuditTrail();
-        Assert.assertEquals(true, result.isFailed());
+        assertThat(result.isFailed()).isTrue();
     }
 
     @Test
@@ -234,13 +243,13 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("input1", "blablatest");
         processVariablesInput.put("referenceVar1", 10D);
         processVariablesInput.put("referenceVar2", 20D);
-        
+
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
-        
-        Assert.assertEquals(200D, result.get("output1"));
+
+        assertThat(result).containsEntry("output1", 200D);
     }
 
     @Test
@@ -250,7 +259,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "blablatest")
                 .executeWithAuditTrail();
-        Assert.assertEquals(true, result.isFailed());
+        assertThat(result.isFailed()).isTrue();
     }
 
     @Test
@@ -260,7 +269,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", "testblabla")
                 .executeWithAuditTrail();
-        Assert.assertEquals(false, result.isFailed());
+        assertThat(result.isFailed()).isFalse();
     }
 
     @Test
@@ -270,8 +279,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("input1", null)
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -284,8 +292,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("date", localDate.toDate())
                 .executeWithSingleResult();
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -294,16 +301,15 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         Map<String, Object> processVariablesInput = new HashMap<>();
         processVariablesInput.put("input1", "AAA");
         processVariablesInput.put("input2", "BBB");
-        
+
         List<Map<String, Object>> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .variables(processVariablesInput)
                 .execute();
 
-        Assert.assertEquals(3, result.size());
-        Assert.assertEquals("THIRD", result.get(0).get("output1"));
-        Assert.assertEquals("FIRST", result.get(1).get("output1"));
-        Assert.assertEquals("SECOND", result.get(2).get("output1"));
+        assertThat(result)
+                .extracting("output1")
+                .containsExactly("THIRD", "FIRST", "SECOND");
     }
 
     @Test
@@ -318,27 +324,15 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("RiskRatingDecisionTable")
                 .variables(processVariablesInput)
                 .execute();
-        
-        Map<String, Object> ruleResult1 = result.get(0);
-        Map<String, Object> ruleResult2 = result.get(1);
-        Map<String, Object> ruleResult3 = result.get(2);
-        Map<String, Object> ruleResult4 = result.get(3);
 
-        Assert.assertEquals("DECLINE", ruleResult1.get("routing"));
-        Assert.assertEquals("Applicant too young", ruleResult1.get("reason"));
-        Assert.assertEquals("NONE", ruleResult1.get("reviewlevel"));
-
-        Assert.assertEquals("REFER", ruleResult2.get("routing"));
-        Assert.assertEquals("Applicant under debt review", ruleResult2.get("reason"));
-        Assert.assertEquals("LEVEL 2", ruleResult2.get("reviewlevel"));
-
-        Assert.assertEquals("REFER", ruleResult3.get("routing"));
-        Assert.assertEquals("High risk application", ruleResult3.get("reason"));
-        Assert.assertEquals("LEVEL 1", ruleResult3.get("reviewlevel"));
-
-        Assert.assertEquals("ACCEPT", ruleResult4.get("routing"));
-        Assert.assertEquals("Acceptable", ruleResult4.get("reason"));
-        Assert.assertEquals("NONE", ruleResult4.get("reviewlevel"));
+        assertThat(result)
+                .extracting("routing", "reason", "reviewlevel")
+                .containsExactly(
+                        tuple("DECLINE", "Applicant too young", "NONE"),
+                        tuple("REFER", "Applicant under debt review", "LEVEL 2"),
+                        tuple("REFER", "High risk application", "LEVEL 1"),
+                        tuple("ACCEPT", "Acceptable", "NONE")
+                );
     }
 
     @Test
@@ -350,30 +344,18 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
         processVariablesInput.put("debtreview", true);
 
         List<Map<String, Object>> result = ruleService.createExecuteDecisionBuilder()
-            .decisionKey("RiskRatingDecisionTable")
-            .variables(processVariablesInput)
-            .execute();
+                .decisionKey("RiskRatingDecisionTable")
+                .variables(processVariablesInput)
+                .execute();
 
-        Map<String, Object> ruleResult1 = result.get(0);
-        Map<String, Object> ruleResult2 = result.get(1);
-        Map<String, Object> ruleResult3 = result.get(2);
-        Map<String, Object> ruleResult4 = result.get(3);
-
-        Assert.assertEquals("DECLINE", ruleResult1.get("routing"));
-        Assert.assertEquals("Applicant too young", ruleResult1.get("reason"));
-        Assert.assertEquals("NONE", ruleResult1.get("reviewlevel"));
-
-        Assert.assertEquals("REFER", ruleResult2.get("routing"));
-        Assert.assertEquals("Applicant under debt review", ruleResult2.get("reason"));
-        Assert.assertEquals("LEVEL 2", ruleResult2.get("reviewlevel"));
-
-        Assert.assertEquals("REFER", ruleResult3.get("routing"));
-        Assert.assertEquals("High risk application", ruleResult3.get("reason"));
-        Assert.assertEquals("LEVEL 1", ruleResult3.get("reviewlevel"));
-
-        Assert.assertEquals("ACCEPT", ruleResult4.get("routing"));
-        Assert.assertEquals("Acceptable", ruleResult4.get("reason"));
-        Assert.assertEquals("NONE", ruleResult4.get("reviewlevel"));
+        assertThat(result)
+                .extracting("routing", "reason", "reviewlevel")
+                .containsExactly(
+                        tuple("DECLINE", "Applicant too young", "NONE"),
+                        tuple("REFER", "Applicant under debt review", "LEVEL 2"),
+                        tuple("REFER", "High risk application", "LEVEL 1"),
+                        tuple("ACCEPT", "Acceptable", "NONE")
+                );
     }
 
     @Test
@@ -389,8 +371,11 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
 
-        Assert.assertEquals(500D, result.get("total"));
-        Assert.assertEquals(0D, result.get("discount"));
+        assertThat(result)
+                .containsOnly(
+                        entry("total", 500D),
+                        entry("discount", 0D)
+                );
     }
 
     @Test
@@ -405,10 +390,10 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithAuditTrail();
 
-        Assert.assertNotNull(result);
-        Assert.assertEquals(true, result.getRuleExecutions().get(1).getConditionResults().get(0).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(2).getConditionResults().get(0).getResult());
-        Assert.assertEquals(true, result.getRuleExecutions().get(3).getConditionResults().get(0).getResult());
+        assertThat(result).isNotNull();
+        assertThat(result.getRuleExecutions().get(1).getConditionResults().get(0).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(2).getConditionResults().get(0).getResult()).isEqualTo(true);
+        assertThat(result.getRuleExecutions().get(3).getConditionResults().get(0).getResult()).isEqualTo(true);
     }
 
 
@@ -426,6 +411,6 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variables(processVariablesInput)
                 .executeWithSingleResult();
 
-        Assert.assertEquals("result2", result.get("outputVariable1"));
+        assertThat(result).containsEntry("outputVariable1", "result2");
     }
 }

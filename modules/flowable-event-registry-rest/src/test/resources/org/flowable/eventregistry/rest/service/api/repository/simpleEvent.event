@@ -1,9 +1,6 @@
 {
     "key": "myEvent",
     "name": "My event",
-    "inboundChannelKeys": [
-        "myChannel"
-    ],
     "correlationParameters": [
         {
             "name": "customerId",

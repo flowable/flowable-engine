@@ -77,12 +77,12 @@ public class MixedAsyncExecutorsTest {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageAfterTimerEventListener")
             .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
 
         // Start the Process instance
         ProcessInstance processInstance = processRule.getRuntimeService().createProcessInstanceBuilder().processDefinitionKey("testTimerEvent").start();
 
-        assertThat(processRule.getTaskService().createTaskQuery().count()).isEqualTo(0);
+        assertThat(processRule.getTaskService().createTaskQuery().count()).isZero();
 
         // Timer fires after 1 day, so setting it to 1 day + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
@@ -97,7 +97,7 @@ public class MixedAsyncExecutorsTest {
     
     @Test
     public void testAppDefinitions() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isZero();
     }
 
     protected void setClockTo(Date time) {

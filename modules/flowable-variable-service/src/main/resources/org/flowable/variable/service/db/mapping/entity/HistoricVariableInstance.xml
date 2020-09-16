@@ -108,7 +108,7 @@
             <if test="originalPersistentState.name != name">
                 NAME_ = #{name, jdbcType=VARCHAR},
             </if>
-            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef != null and originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.doubleValue != doubleValue">
@@ -148,7 +148,7 @@
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-        delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
+        delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
         NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where VARINST.PROC_INST_ID_ = PROCINST.ID_)
     </delete>
     
@@ -163,7 +163,7 @@
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-        delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
+        delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
         NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where VARINST.SCOPE_ID_ = CASEINST.ID_)
     </delete>
     
@@ -263,12 +263,11 @@
 
             <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
             <if test="queryVariableValue != null">
-                <if test="!queryVariableValue.type.equals('null')">
-                    <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                <if test="queryVariableValue.needsTypeCheck()">
                     and RES.VAR_TYPE_ = #{queryVariableValue.type}
                 </if>
                 <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                    and RES.TEXT_
+                    and (RES.TEXT_
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                         <otherwise>
@@ -279,6 +278,10 @@
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.TEXT_ is null
+                    </if>
+                    )
                 </if>
                 <if test="queryVariableValue.textValue2 != null">
                     and RES.TEXT2_
@@ -294,14 +297,22 @@
                     </choose>
                 </if>
                 <if test="queryVariableValue.longValue != null">
-                    and RES.LONG_
+                    and (RES.LONG_
                     <include refid="executionVariableOperator" />
                     #{queryVariableValue.longValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.LONG_ is null
+                    </if>
+                    )
                 </if>
                 <if test="queryVariableValue.doubleValue != null">
-                    and RES.DOUBLE_
+                    and (RES.DOUBLE_
                     <include refid="executionVariableOperator" />
                     #{queryVariableValue.doubleValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.DOUBLE_ is null
+                    </if>
+                    )
                 </if>
                 <!-- Null variable type -->
                 <if

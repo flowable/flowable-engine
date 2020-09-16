@@ -12,8 +12,8 @@
  */
 package org.flowable.examples.test;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         this.taskService.complete(this.taskService.createTaskQuery().processInstanceId(oneTaskProcess.getProcessInstanceId()).singleResult().getId());
 
         // Assert -> process instance is finished
-        assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcess.getId()).count(), is(0L));
+        assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(oneTaskProcess.getId()).count()).isZero();
     }
 
     @Test
@@ -89,19 +89,16 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         ProcessInstance pUnitTestProcessInstance = this.runtimeService.startProcessInstanceByKey(model.getMainProcess().getId());
 
         waitForJobExecutorToProcessAllJobs(15000, 200);
-        assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(pUnitTestProcessInstance.getId()).count(), is(0L));
+        assertThat(this.runtimeService.createProcessInstanceQuery().processInstanceId(pUnitTestProcessInstance.getId()).count()).isZero();
     }
 
     @Test
     @Deployment(resources = {"org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml"})
     public void testProcessModelFailure() {
         // deploy different process - test should fail
-        try {
-            testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess"));
-            fail("Expected exception was not thrown.");
-        } catch (AssertionError e) {
-            assertThat(e.getMessage(), is("\nExpected: is <0L>\n     but: was <1L>"));
-        }
+        assertThatThrownBy(() -> testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess")))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("\nExpecting:\n <1L>\nto be equal to:\n <0L>");
     }
 
     @Test

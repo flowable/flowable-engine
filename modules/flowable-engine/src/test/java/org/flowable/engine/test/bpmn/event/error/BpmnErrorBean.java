@@ -14,9 +14,11 @@
 package org.flowable.engine.test.bpmn.event.error;
 
 import java.io.Serializable;
+import java.util.concurrent.Future;
 
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Falko Menge
@@ -27,6 +29,14 @@ public class BpmnErrorBean implements Serializable {
 
     public void throwBpmnError() {
         throw new BpmnError("23", "This is a business fault, which can be caught by a BPMN Error Event.");
+    }
+
+    public Future<?> throwBpmnErrorInFuture() {
+        return CommandContextUtil.getProcessEngineConfiguration()
+                .getAsyncTaskInvoker()
+                .submit(() -> {
+                    throw new BpmnError("23", "This is a business fault, which can be caught by a BPMN Error Event.");
+                });
     }
 
     public JavaDelegate getDelegate() {

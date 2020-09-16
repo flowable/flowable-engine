@@ -36,15 +36,15 @@ public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavi
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER, 
-                            "Executing service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstanceEntity);
+            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_ENTER, "Executing service task with java class " + 
+                    planItemJavaDelegate.getClass().getName(), planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
         
         planItemJavaDelegate.execute(planItemInstanceEntity);
         
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, 
-                            "Executed service task with java class " + planItemJavaDelegate.getClass().getName(), planItemInstanceEntity);
+            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, "Executed service task with java class " + 
+                    planItemJavaDelegate.getClass().getName(), planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
         
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);

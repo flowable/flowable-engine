@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.Objects;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -53,7 +53,9 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         }
 
         planItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
+        CmmnEngineConfiguration cmmnEngineConfiguration =CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
+                commandContext, planItemInstanceEntity, oldState, getNewState());
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
@@ -72,11 +74,11 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
                                 ", old state " + oldState + ", new state " + newState;
             }
             
-            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity);
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
     }
 
-    protected boolean isStateNotChanged(String oldState, String newState) {
+    public boolean isStateNotChanged(String oldState, String newState) {
         // if the old and new state are the same, leave the operation as we don't execute any transition
         return oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState();
     }
@@ -87,9 +89,9 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
     }
 
-    protected abstract String getNewState();
+    public abstract String getNewState();
 
-    protected abstract String getLifeCycleTransition();
+    public abstract String getLifeCycleTransition();
 
     /**
      * Overwrite this default implemented hook, if the operation should be aborted on a void transition which might be the case, if the old and new state
@@ -97,11 +99,11 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
      *
      * @return true, if this operation should be aborted, if the new plan item state is the same as the old one, false, if the operation is to be executed in any case
      */
-    protected boolean abortOperationIfNewStateEqualsOldState() {
+    public boolean abortOperationIfNewStateEqualsOldState() {
         return false;
     }
 
-    protected abstract String getOperationName();
+    public abstract String getOperationName();
 
     @Override
     public String toString() {

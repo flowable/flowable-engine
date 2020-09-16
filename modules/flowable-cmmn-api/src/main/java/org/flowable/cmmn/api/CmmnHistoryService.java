@@ -87,6 +87,11 @@ public interface CmmnHistoryService {
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId);
 
     /**
+     * Retrieves all the {@link HistoricEntityLink}s associated with same root as the given case instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsCaseInstance(String caseInstanceId);
+
+    /**
      * Retrieves the {@link HistoricEntityLink}s where the given case instance is referenced.
      */
     List<HistoricEntityLink> getHistoricEntityLinkParentsForCaseInstance(String caseInstanceId);

@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Tijs Rademakers
  */
 public class TimerJobEntityManagerImpl
-    extends AbstractJobServiceEngineEntityManager<TimerJobEntity, TimerJobDataManager>
+    extends JobInfoEntityManagerImpl<TimerJobEntity, TimerJobDataManager>
     implements TimerJobEntityManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
@@ -61,8 +60,8 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
-    public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
-        return dataManager.findTimerJobsToExecute(page);
+    public TimerJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
@@ -134,6 +133,9 @@ public class TimerJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }
@@ -152,7 +154,8 @@ public class TimerJobEntityManagerImpl
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
     
@@ -165,6 +168,7 @@ public class TimerJobEntityManagerImpl
         newTimerEntity.setRepeat(te.getRepeat());
         newTimerEntity.setRetries(te.getRetries());
         newTimerEntity.setEndDate(te.getEndDate());
+        newTimerEntity.setCategory(te.getCategory());
         newTimerEntity.setExecutionId(te.getExecutionId());
         newTimerEntity.setProcessInstanceId(te.getProcessInstanceId());
         newTimerEntity.setProcessDefinitionId(te.getProcessDefinitionId());

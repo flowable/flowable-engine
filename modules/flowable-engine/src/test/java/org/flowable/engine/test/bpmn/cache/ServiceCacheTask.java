@@ -28,6 +28,12 @@ public class ServiceCacheTask implements JavaDelegate {
     public static String executionId;
     public static String historicProcessInstanceId;
 
+    public static void reset() {
+        processInstanceId = null;
+        executionId = null;
+        historicProcessInstanceId = null;
+    }
+
     @Override
     public void execute(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();

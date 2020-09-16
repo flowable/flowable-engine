@@ -18,7 +18,6 @@ public class DefaultAsyncHistoryJobExecutor extends DefaultAsyncJobExecutor {
         setTimerRunnableNeeded(false);
         setAcquireRunnableThreadName("flowable-acquire-history-jobs");
         setResetExpiredRunnableName("flowable-reset-expired-history-jobs");
-        setThreadPoolNamingPattern("flowable-async-history-job-executor-thread-%d");
         setAsyncRunnableExecutionExceptionHandler(new UnacquireAsyncHistoryJobExceptionHandler());
     }
     
@@ -29,4 +28,8 @@ public class DefaultAsyncHistoryJobExecutor extends DefaultAsyncJobExecutor {
         }
     }
 
+    @Override
+    protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
+        return new ResetExpiredJobsRunnable(resetRunnableName, this, jobServiceConfiguration.getHistoryJobEntityManager());
+    }
 }

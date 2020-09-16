@@ -17,7 +17,7 @@
           <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
         </extensionElements>
       </humanTask>
-      <processTask id="oneprocesstask1" name="Process task">
+      <processTask id="oneprocesstask1" name="Process task" flowable:sameDeployment="true">
         <processRefExpression><![CDATA[myTestProcess]]></processRefExpression>
       </processTask>
     </casePlanModel>

@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
@@ -50,6 +51,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String caseInstanceId;
 
     public GetStageOverviewCmd(String caseInstanceId) {
@@ -58,13 +60,14 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
 
     @Override
     public List<StageResponse> execute(CommandContext commandContext) {
-        CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId, CaseInstanceEntity.class);
         }
 
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-        List<PlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(new PlanItemInstanceQueryImpl(commandContext)
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
+        List<PlanItemInstance> planItemInstances = planItemInstanceEntityManager.findByCriteria(new PlanItemInstanceQueryImpl(commandContext, cmmnEngineConfiguration)
             .caseInstanceId(caseInstanceId)
             .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.STAGE, PlanItemDefinitionType.MILESTONE))
             .includeEnded()
@@ -76,7 +79,7 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
                 || Objects.equals(PlanItemInstanceState.ASYNC_ACTIVE, planItemInstance.getState());
         });
 
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstance.getCaseDefinitionId());
         CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
         List<Stage> stages = cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true);
@@ -106,7 +109,7 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
             } else if (StringUtils.isNotEmpty(overviewElement.getIncludeInStageOverview()) && 
                             !"false".equalsIgnoreCase(overviewElement.getIncludeInStageOverview())) {
                 
-                Expression stageExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(overviewElement.getIncludeInStageOverview());
+                Expression stageExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(overviewElement.getIncludeInStageOverview());
                 Optional<PlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, overviewElement.getPlanItemDefinition());
                 if (planItemInstance.isPresent()) {
                     includeInStageOverview = evaluateIncludeInStageOverviewExpression(stageExpression, overviewElement.getIncludeInStageOverview(), 

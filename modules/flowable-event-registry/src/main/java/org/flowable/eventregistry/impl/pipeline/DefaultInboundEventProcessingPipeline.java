@@ -23,10 +23,10 @@ import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessingPipeline;
 import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
-import org.flowable.eventregistry.api.runtime.EventCorrelationParameterInstance;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
+import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
@@ -62,20 +62,18 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         T event = deserialize(rawEvent);
         String eventKey = detectEventDefinitionKey(event);
 
+        boolean multiTenant = false;
         String tenantId = AbstractEngineConfiguration.NO_TENANT_ID;
-        EventModel eventModel = null;
         if (inboundEventTenantDetector != null) {
             tenantId = inboundEventTenantDetector.detectTenantId(event);
-            eventModel = eventRepositoryService.getEventModelByKey(eventKey, tenantId);
-
-        } else {
-            eventModel = eventRepositoryService.getEventModelByKey(eventKey);
-
+            multiTenant = true;
         }
+
+        EventModel eventModel = multiTenant ? eventRepositoryService.getEventModelByKey(eventKey, tenantId) : eventRepositoryService.getEventModelByKey(eventKey);
+        ChannelModel channelModel = multiTenant ? eventRepositoryService.getChannelModelByKey(channelKey, tenantId) : eventRepositoryService.getChannelModelByKey(channelKey);
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
-            eventModel,
-            extractCorrelationParameters(eventModel, event),
+            eventModel.getKey(),
             extractPayload(eventModel, event),
             tenantId
         );
@@ -89,10 +87,6 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
 
     public String detectEventDefinitionKey(T event) {
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
-    }
-
-    public Collection<EventCorrelationParameterInstance> extractCorrelationParameters(EventModel eventDefinition, T event) {
-        return inboundEventPayloadExtractor.extractCorrelationParameters(eventDefinition, event);
     }
 
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, T event) {

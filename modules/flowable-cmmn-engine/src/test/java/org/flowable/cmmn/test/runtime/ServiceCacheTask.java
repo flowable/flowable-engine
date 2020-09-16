@@ -30,6 +30,13 @@ public class ServiceCacheTask implements PlanItemJavaDelegate {
     public static String historicCaseInstanceId;
     public static String historicPlanItemInstanceId;
 
+    public static void reset() {
+        caseInstanceId = null;
+        planItemInstanceId = null;
+        historicCaseInstanceId = null;
+        historicPlanItemInstanceId = null;
+    }
+
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();

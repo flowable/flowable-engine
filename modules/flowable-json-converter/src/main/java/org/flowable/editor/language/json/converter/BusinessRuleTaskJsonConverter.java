@@ -46,7 +46,8 @@ public class BusinessRuleTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         BusinessRuleTask ruleTask = (BusinessRuleTask) baseElement;
         propertiesNode.put(PROPERTY_RULETASK_CLASS, ruleTask.getClassName());
         propertiesNode.put(PROPERTY_RULETASK_VARIABLES_INPUT, convertListToCommaSeparatedString(ruleTask.getInputVariables()));
@@ -58,7 +59,8 @@ public class BusinessRuleTaskJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         BusinessRuleTask task = new BusinessRuleTask();
         task.setClassName(getPropertyValueAsString(PROPERTY_RULETASK_CLASS, elementNode));
         task.setInputVariables(getPropertyValueAsList(PROPERTY_RULETASK_VARIABLES_INPUT, elementNode));

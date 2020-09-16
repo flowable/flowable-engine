@@ -30,6 +30,6 @@ public interface AsyncHistoryJobMessageHandler {
      * Returning true will delete the job.
      * Returning false will unacquire the job and decrement the retries.
      */
-    public abstract boolean handleJob(HistoryJobEntity historyJobEntity, JsonNode historyData);
+    boolean handleJob(HistoryJobEntity historyJobEntity, JsonNode historyData);
     
 }

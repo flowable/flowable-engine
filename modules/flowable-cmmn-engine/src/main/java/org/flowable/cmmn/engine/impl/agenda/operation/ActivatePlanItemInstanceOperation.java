@@ -70,7 +70,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         return false;
     }
 
-    protected boolean isAsync() {
+    public boolean isAsync() {
         if (planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Task) {
             Task task = (Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
             if (task.isAsync()) {
@@ -85,7 +85,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Activate PlanItem] ");
-       stringBuilder.append(planItem);
+        stringBuilder.append(planItem);
 
         if (entryCriterionId != null) {
             stringBuilder.append(" via entry criterion ").append(entryCriterionId);

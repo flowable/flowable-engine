@@ -18,15 +18,19 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceDeleteHistoryJsonTransformer extends AbstractProcessInstanceDeleteHistoryTransformer {
 
+    public ProcessInstanceDeleteHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_DELETED);
@@ -35,7 +39,7 @@ public class ProcessInstanceDeleteHistoryJsonTransformer extends AbstractProcess
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String id = getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID);
-        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext);
+        HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager = processEngineConfiguration.getHistoricProcessInstanceEntityManager();
         return historicProcessInstanceEntityManager.findById(id) != null;
     }
 

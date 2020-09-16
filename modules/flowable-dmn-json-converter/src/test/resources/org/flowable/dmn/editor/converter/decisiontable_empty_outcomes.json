@@ -1,0 +1,48 @@
+{
+    "hitIndicator": "ANY",
+    "id": 38002,
+    "inputExpressions": [
+        {
+            "entries": null,
+            "id": "3",
+            "label": null,
+            "type": "string",
+            "variableId": "inputVar1",
+            "variableType": "variable"
+        }
+    ],
+    "key": "emptyExpression1",
+    "name": "EmptyExpressionTable1",
+    "outputExpressions": [
+        {
+            "entries": null,
+            "id": "4",
+            "label": null,
+            "type": "string",
+            "variableId": "outputVar1",
+            "variableType": "variable"
+        },
+        {
+            "entries": null,
+            "id": "5",
+            "label": null,
+            "type": "number",
+            "variableId": "outputVar2",
+            "variableType": "variable"
+        }
+    ],
+    "rules": [
+        {
+            "3_operator": "==",
+            "3_expression": "-",
+            "4": "",
+            "5": 10
+        },
+        {
+            "3_operator": "!=",
+            "3_expression": "-",
+            "4": "WAS IGNORE 2",
+            "5": null
+        }
+    ]
+}

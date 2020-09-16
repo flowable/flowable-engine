@@ -12,9 +12,8 @@
  */
 package org.flowable.form.engine.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,8 +42,8 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
         
         OptionFormField optionFormField = (OptionFormField) formModel.getFields().get(0);
-        assertEquals("${optionsVariable}", optionFormField.getOptionsExpression());
-        assertNull(optionFormField.getOptions());
+        assertThat(optionFormField.getOptionsExpression()).isEqualTo("${optionsVariable}");
+        assertThat(optionFormField.getOptions()).isNull();
         
         String expectedJson = "[{\"id\":\"opt0\",\"name\":\"Opt0\"},{\"id\":\"opt1\",\"name\":\"Opt1\"},{\"id\":\"opt2\",\"name\":\"Opt2\"}]";
         List<Option> expectedOptions = new ArrayList<>();
@@ -81,7 +80,7 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         SimpleFormModel formInstanceModel = (SimpleFormModel) formInstanceInfo.getFormModel(); 
         optionFormField = (OptionFormField) formInstanceModel.getFields().get(0);
         assertOptions(optionFormField);
-        assertEquals("Opt2", optionFormField.getValue());
+        assertThat(optionFormField.getValue()).isEqualTo("Opt2");
         
         
         // test form instance from json variable
@@ -98,15 +97,13 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         
         optionFormField = (OptionFormField) formInstanceModel.getFields().get(0);
         assertOptions(optionFormField);
-        assertEquals("Opt2", optionFormField.getValue());
+        assertThat(optionFormField.getValue()).isEqualTo("Opt2");
 
         // test expression failure on model
         variables.clear();
-        try {
-            formModel = getOptionsFormModelWithVariablesByKey(variables);
-            fail("Expression failure should result in a FlowableException");
-        } catch (FlowableException e) {
-        }
+
+        assertThatThrownBy(() -> getOptionsFormModelWithVariablesByKey(variables))
+            .isInstanceOf(FlowableException.class);
 
         // test expression failure on instance
         variables.clear();
@@ -135,8 +132,8 @@ public class OptionFormFieldTest extends AbstractFlowableFormTest {
         List<Option> actualOptions = optionFormField.getOptions();
         for (int i = 0; i < actualOptions.size(); i++) {
             Option option = actualOptions.get(i);
-            assertEquals(option.getId(), "opt" + i);    
-            assertEquals(option.getName(), "Opt" + i);
+            assertThat("opt" + i).isEqualTo(option.getId());
+            assertThat("Opt" + i).isEqualTo(option.getName());
         }
     }
 

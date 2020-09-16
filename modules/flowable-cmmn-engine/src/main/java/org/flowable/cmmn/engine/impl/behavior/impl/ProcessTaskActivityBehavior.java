@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.model.IOParameter;
@@ -30,10 +31,12 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected Expression processRefExpression;
     protected String processRef;
     protected Boolean fallbackToDefaultTenant;
+    protected boolean sameDeployment;
     protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
@@ -56,11 +60,12 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
         this.fallbackToDefaultTenant = processTask.getFallbackToDefaultTenant();
+        this.sameDeployment = processTask.isSameDeployment();
         this.processTask = processTask;
     }
 
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, Map<String, Object> variables) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, ChildTaskActivityBehavior.VariableInfo variableInfo) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
@@ -82,8 +87,17 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         Map<String, Object> inParametersMap = new HashMap<>();
         handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, cmmnEngineConfiguration.getExpressionManager());
 
-        if (variables != null && !variables.isEmpty()) {
-            inParametersMap.putAll(variables);
+        FormInfo variableFormInfo = null;
+        Map<String, Object> variableFormVariables = null;
+        String variableFormOutcome = null;
+        if (variableInfo != null) {
+            variableFormInfo = variableInfo.formInfo;
+            variableFormVariables = variableInfo.formVariables;
+            variableFormOutcome = variableInfo.formOutcome;
+
+            if (variableInfo.variables != null && !variableInfo.variables.isEmpty()) {
+                inParametersMap.putAll(variableInfo.variables);
+            }
         }
 
         String processInstanceId = processInstanceService.generateNewProcessInstanceId();
@@ -99,19 +113,22 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
-            EntityLinkUtil.copyExistingEntityLinks(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
-            EntityLinkUtil.createNewEntityLink(planItemInstanceEntity.getCaseInstanceId(), processInstanceId, ScopeTypes.BPMN);
+            EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
+                    planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration);
         }
 
         String businessKey = getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, processTask);
 
         boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
+
+        String parentDeploymentId = getParentDeploymentIfSameDeployment(cmmnEngineConfiguration, planItemInstanceEntity);
+
         if (blocking) {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         } else {
             processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, inParametersMap, businessKey);
+                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         if (!blocking) {
@@ -122,16 +139,20 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
-            throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
+            throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
         }
         if (planItemInstance.getReferenceId() == null) {
-            throw new FlowableException("Cannot trigger process task plan item instance : no reference id set");
+            throw new FlowableIllegalStateException("Cannot trigger process task plan item instance : no reference id set");
         }
         if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
+        // Need to be set before planning the complete operation
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
+        handleOutParameters(planItemInstance, caseInstance, cmmnEngineConfiguration.getProcessInstanceService());
 
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
@@ -144,13 +165,6 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             // The process task plan item will be deleted by the regular TerminatePlanItemOperation
             if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
                 deleteProcessInstance(commandContext, planItemInstance);
-
-            } else if (PlanItemTransition.COMPLETE.equals(transition)) {
-
-                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-
-                CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
-                handleOutParameters(planItemInstance, caseInstance, cmmnEngineConfiguration.getProcessInstanceService());
 
             }
         }
@@ -206,6 +220,17 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             }
             caseInstance.setVariable(variableName, variableValue);
         }
+    }
+
+    protected String getParentDeploymentIfSameDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (!sameDeployment) {
+            // If not same deployment then return null
+            // Parent deployment should not be taken into consideration then
+            return null;
+        } else {
+            return CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration);
+        }
+
     }
 
 }

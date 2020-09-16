@@ -12,13 +12,15 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.job.service.impl.cmd.MoveTimerJobsToExecutableJobsCmd;
+import org.flowable.job.service.impl.cmd.UnlockTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,19 +56,15 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
         while (!isInterrupted) {
 
+            Collection<TimerJobEntity> timerJobs = Collections.emptyList();
             try {
-                final AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
+                AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
 
-                commandExecutor.execute(new Command<Void>() {
+                timerJobs = acquiredJobs.getJobs();
 
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        for (TimerJobEntity job : acquiredJobs.getJobs()) {
-                            jobManager.moveTimerJobToExecutableJob(job);
-                        }
-                        return null;
-                    }
-                });
+                if (!timerJobs.isEmpty()) {
+                    commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
+                }
 
                 // if all jobs were executed
                 millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
@@ -83,9 +81,13 @@ public class AcquireTimerJobsRunnable implements Runnable {
                             + "You can ignore this message if you indeed have multiple timer executor acquisition threads running against the same database. " + "Exception message: {}",
                             optimisticLockingException.getMessage());
                 }
+
+                unlockTimerJobs(commandExecutor, timerJobs);
             } catch (Throwable e) {
                 LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
                 millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
+
+                unlockTimerJobs(commandExecutor, timerJobs);
             }
 
             if (millisToWait > 0) {
@@ -114,6 +116,18 @@ public class AcquireTimerJobsRunnable implements Runnable {
         }
 
         LOGGER.info("stopped async job due acquisition");
+    }
+
+    protected void unlockTimerJobs(CommandExecutor commandExecutor, Collection<TimerJobEntity> timerJobs) {
+        try {
+            if (!timerJobs.isEmpty()) {
+                commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs, asyncExecutor.getJobServiceConfiguration()));
+            }
+        } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Failed to unlock timer jobs during acquiring. This is OK since they will be unlocked when the reset expired jobs thread runs", e);
+            }
+        }
     }
 
     public void stop() {

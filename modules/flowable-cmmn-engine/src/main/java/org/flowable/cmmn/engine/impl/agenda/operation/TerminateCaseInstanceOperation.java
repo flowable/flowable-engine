@@ -16,8 +16,11 @@ import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -56,16 +59,26 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
      * Checks, if the case is completable and if not, raises an exception.
      */
     protected void checkCaseToBeCompletable() {
+        CaseInstanceEntity caseInstance = getCaseInstanceEntity();
+        boolean isAutoComplete = getPlanModel(caseInstance).isAutoComplete();
+
         // if the case should exit with a complete event instead of exit, we need to make sure it is completable
-        if (!getCaseInstanceEntity().isCompletable()) {
+        // we don't use the completion flag directly on the entity as it gets evaluated only at the end of an evaluation cycle which we didn't hit yet
+        // at this point, so we need a proper evaluation of the completion
+        CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
+            .shouldPlanItemContainerComplete(commandContext, caseInstance, true);
+
+        if (!completionEvaluationResult.isCompletable()) {
             // we can't complete the case as it is currently not completable, so we need to throw an exception
             throw new FlowableIllegalArgumentException(
-                "Cannot exit case with 'complete' event type as the case '" + getCaseInstanceId() + "' is not yet completable.");
+                "Cannot exit case with 'complete' event type as the case '" + getCaseInstanceId() + "' is not yet completable. The plan item '" +
+                    completionEvaluationResult.getPlanItemInstance().getName() + " (" +
+                    completionEvaluationResult.getPlanItemInstance().getPlanItemDefinitionId() + ")' prevented it from completion.");
         }
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         // depending on the exit event type, we will end up in the complete state, even though the case was actually terminated / exited
         if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
             return CaseInstanceState.COMPLETED;
@@ -85,8 +98,32 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     }
     
     @Override
-    protected String getDeleteReason() {
+    public String getDeleteReason() {
         return "cmmn-state-transition-terminate-case";
     }
 
+    public boolean isManualTermination() {
+        return manualTermination;
+    }
+    public void setManualTermination(boolean manualTermination) {
+        this.manualTermination = manualTermination;
+    }
+    public String getExitCriterionId() {
+        return exitCriterionId;
+    }
+    public void setExitCriterionId(String exitCriterionId) {
+        this.exitCriterionId = exitCriterionId;
+    }
+    public String getExitType() {
+        return exitType;
+    }
+    public void setExitType(String exitType) {
+        this.exitType = exitType;
+    }
+    public String getExitEventType() {
+        return exitEventType;
+    }
+    public void setExitEventType(String exitEventType) {
+        this.exitEventType = exitEventType;
+    }
 }

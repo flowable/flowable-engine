@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 import java.util.List;
@@ -103,7 +103,7 @@ public abstract class AbstractProcessEngineIntegrationTest {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     protected Date setCmmnClockFixedToCurrentTime() {
         Date date = new Date();
         cmmnEngineConfiguration.getClock().setCurrentTime(date);
@@ -112,9 +112,9 @@ public abstract class AbstractProcessEngineIntegrationTest {
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
         long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
-        assertEquals(createCaseInstanceEndedErrorMessage(caseInstance, count), 0, count);
-        assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+        assertThat(count).as(createCaseInstanceEndedErrorMessage(caseInstance, count)).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).as("Runtime case instance found").isZero();
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
     }
 
     protected String createCaseInstanceEndedErrorMessage(CaseInstance caseInstance, long count) {
@@ -122,8 +122,8 @@ public abstract class AbstractProcessEngineIntegrationTest {
         if (count != 0) {
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
             String names = planItemInstances.stream()
-                .map(planItemInstance -> planItemInstance.getName() + "(" + planItemInstance.getPlanItemDefinitionType() + ")")
-                .collect(Collectors.joining(", "));
+                    .map(planItemInstance -> planItemInstance.getName() + "(" + planItemInstance.getPlanItemDefinitionType() + ")")
+                    .collect(Collectors.joining(", "));
             errorMessage += names;
         }
         return errorMessage;

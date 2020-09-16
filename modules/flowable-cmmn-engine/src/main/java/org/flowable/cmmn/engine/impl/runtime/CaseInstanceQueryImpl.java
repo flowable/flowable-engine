@@ -19,10 +19,13 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.IdentityLinkQueryObject;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -31,9 +34,12 @@ import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery, QueryCacheValues {
+public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance>
+        implements CaseInstanceQuery, CacheAwareQuery<CaseInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
@@ -60,7 +66,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
     protected String involvedUser;
+    protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    protected IdentityLinkQueryObject involvedGroupIdentityLink;
 
     protected List<CaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected CaseInstanceQueryImpl currentOrQueryObject;
@@ -71,12 +79,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public CaseInstanceQueryImpl() {
     }
 
-    public CaseInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public CaseInstanceQueryImpl(CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandContext, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public CaseInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public CaseInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandExecutor, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -373,6 +383,38 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         }
         return this;
     }
+    
+    @Override
+    public CaseInstanceQuery involvedUser(String userId, String identityLinkType) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        } else {
+            this.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQuery involvedGroup(String groupId, String identityLinkType) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        } else {
+            this.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        }
+        return this;
+    }
 
     @Override
     public CaseInstanceQuery involvedGroups(Set<String> groupIds) {
@@ -397,7 +439,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new CaseInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration);
+        } else {
+            currentOrQueryObject = new CaseInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -596,16 +642,24 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getCaseInstanceEntityManager(commandContext).countByCriteria(this);
+        return cmmnEngineConfiguration.getCaseInstanceEntityManager().countByCriteria(this);
     }
 
     @Override
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         if (this.isIncludeCaseVariables()) {
-            return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+            return cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this);
         }
-        return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findByCriteria(this);
+        return cmmnEngineConfiguration.getCaseInstanceEntityManager().findByCriteria(this);
+    }
+
+    @Override
+    public void enhanceCachedValue(CaseInstanceEntity caseInstance) {
+        if (isIncludeCaseVariables()) {
+            caseInstance.getQueryVariables().addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                    .findVariableInstanceByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+        }
     }
 
     public String getCaseDefinitionKey() {
@@ -660,6 +714,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getParentId() {
         return caseInstanceParentId;
     }
+    
+    public String getCaseInstanceParentPlanItemInstanceId() {
+        return caseInstanceParentPlanItemInstanceId;
+    }
 
     public String getCaseInstanceParentId() {
         return caseInstanceParentId;
@@ -711,6 +769,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return involvedUserIdentityLink;
+    }
+
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return involvedGroupIdentityLink;
     }
 
     public Set<String> getInvolvedGroups() {

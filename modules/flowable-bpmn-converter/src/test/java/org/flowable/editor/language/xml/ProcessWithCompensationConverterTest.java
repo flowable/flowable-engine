@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -59,11 +59,11 @@ public class ProcessWithCompensationConverterTest {
             }
         }, false, false);
 
-        assertEquals(10, bpmnModel1.getLocationMap().size());
-        assertEquals(10, bpmnModel2.getLocationMap().size());
+        assertThat(bpmnModel1.getLocationMap()).hasSize(10);
+        assertThat(bpmnModel2.getLocationMap()).hasSize(10);
 
-        assertEquals(7, bpmnModel1.getFlowLocationMap().size());
-        assertEquals(7, bpmnModel2.getFlowLocationMap().size());
+        assertThat(bpmnModel1.getFlowLocationMap()).hasSize(7);
+        assertThat(bpmnModel2.getFlowLocationMap()).hasSize(7);
     }
 
 }

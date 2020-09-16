@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.cmmn.rest.service.api.history;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic task instance query resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCase {
@@ -143,11 +145,46 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance2.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task2.getId());
-        
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionId", caseInstance.getCaseDefinitionId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionId", "notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKey", "myCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKey", "notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLike", "%Case");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLike", "%notExisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseDefinitionKeyLikeIgnoreCase", "%case");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        ArrayNode caseDefinitionKeyIn = requestNode.putArray("caseDefinitionKeys");
+        caseDefinitionKeyIn.add("myCase");
+        caseDefinitionKeyIn.add("another");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceIdWithChildren", caseInstance.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId());
-        
+
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceIdWithChildren", "nonexisting");
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
@@ -213,14 +250,35 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, finishedTaskCase1.getId(), task2.getId());
     }
 
-    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_QUERY);
+
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("taskCandidateGroup", "test");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+
+        taskService.claim(task.getId(), "johnDoe");
+        requestNode.put("taskCandidateGroup", "test");
+        requestNode.put("ignoreTaskAssignee", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+    }
+
+    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds)
+            throws JsonProcessingException, IOException {
         // Do the actual call
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
         httpPost.setEntity(new StringEntity(body.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (expectedTaskIds != null) {
@@ -230,7 +288,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
                 String id = it.next().get("id").textValue();
                 toBeFound.remove(id);
             }
-            assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
         }
     }
 }

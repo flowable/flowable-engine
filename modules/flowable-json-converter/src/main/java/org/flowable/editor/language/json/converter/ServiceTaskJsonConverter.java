@@ -22,7 +22,6 @@ import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.editor.language.json.model.ModelInfo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
@@ -31,9 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements DecisionTableKeyAwareConverter {
-
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
@@ -56,7 +53,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
         setPropertyValue(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression(), propertiesNode);
@@ -85,22 +83,35 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
 
         } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) &&
-                        decisionTableKeyMap != null && decisionTableKeyMap.containsKey(fieldExtension.getStringValue())) {
-
-                    ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
-                    propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
-
-                    ModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
-                    decisionReferenceNode.put("id", modelInfo.getId());
-                    decisionReferenceNode.put("name", modelInfo.getName());
-                    decisionReferenceNode.put("key", modelInfo.getKey());
+                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {
+                    Map<String, String> decisionServiceModelInfo = converterContext.getDecisionServiceModelInfoForDecisionServiceModelKey(fieldExtension.getStringValue());
+                    if (decisionServiceModelInfo != null) {
+                        ObjectNode decisionServiceReferenceNode = objectMapper.createObjectNode();
+                        propertiesNode.set(PROPERTY_DECISIONSERVICE_REFERENCE, decisionServiceReferenceNode);
+                        decisionServiceReferenceNode.put("id", decisionServiceModelInfo.get("id"));
+                        decisionServiceReferenceNode.put("name", decisionServiceModelInfo.get("name"));
+                        decisionServiceReferenceNode.put("key", decisionServiceModelInfo.get("key"));
+                    } else {
+                        Map<String, String> decisionTableModelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(fieldExtension.getStringValue());
+                        if (decisionTableModelInfo != null) {
+                            ObjectNode decisionTableReferenceNode = objectMapper.createObjectNode();
+                            propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionTableReferenceNode);
+                            decisionTableReferenceNode.put("id", decisionTableModelInfo.get("id"));
+                            decisionTableReferenceNode.put("name", decisionTableModelInfo.get("name"));
+                            decisionTableReferenceNode.put("key", decisionTableModelInfo.get("key"));
+                        }
+                    }
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
                             BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));
                 }
                 if (PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.set(PROPERTY_DECISIONTABLE_FALLBACK_TO_DEFAULT_TENANT,
+                        BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
+                    );
+                }
+                if (PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_SAME_DEPLOYMENT,
                         BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue()))
                     );
                 }
@@ -124,6 +135,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT, "saveResponseParametersTransient", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON, "saveResponseVariableAsJson", serviceTask, propertiesNode);
 
+            Boolean parallelInSameTransaction = ((HttpServiceTask) serviceTask).getParallelInSameTransaction();
+            if (parallelInSameTransaction != null) {
+                setPropertyValue(PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION, parallelInSameTransaction.toString(), propertiesNode);
+            }
+
         } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
             setPropertyFieldValue(PROPERTY_SHELLTASK_COMMAND, "command", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_SHELLTASK_ARG1, "arg1", serviceTask, propertiesNode);
@@ -137,6 +153,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_SHELLTASK_ERROR_REDIRECT, "errorRedirect", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_SHELLTASK_OUTPUT_VARIABLE, "outputVariable", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_SHELLTASK_WAIT, "wait", serviceTask, propertiesNode);
+            
         } else {
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
@@ -157,7 +174,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             if (serviceTask.isUseLocalScopeForResultVariable()) {
                 propertiesNode.put(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, serviceTask.isUseLocalScopeForResultVariable());
             }
-            
+
+            if (serviceTask.isStoreResultVariableAsTransient()) {
+                propertiesNode.put(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, serviceTask.isStoreResultVariableAsTransient());
+            }
+
             if (StringUtils.isNotEmpty(serviceTask.getFailedJobRetryTimeCycleValue())) {
             	propertiesNode.put(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, serviceTask.getFailedJobRetryTimeCycleValue());
             }
@@ -168,7 +189,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ServiceTask task = new ServiceTask();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {
             task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
@@ -194,7 +216,11 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE, elementNode)) {
             task.setUseLocalScopeForResultVariable(true);
         }
-        
+
+        if (getPropertyValueAsBoolean(PROPERTY_SERVICETASK_STORE_TRANSIENT_VARIABLE, elementNode)) {
+            task.setStoreResultVariableAsTransient(true);
+        }
+
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode))) {
             task.setFailedJobRetryTimeCycleValue(getPropertyValueAsString(PROPERTY_SERVICETASK_FAILED_JOB_RETRY_TIME_CYCLE, elementNode));
         }
@@ -269,8 +295,4 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         }
     }
 
-    @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
-        this.decisionTableKeyMap = decisionTableKeyMap;
-    }
 }

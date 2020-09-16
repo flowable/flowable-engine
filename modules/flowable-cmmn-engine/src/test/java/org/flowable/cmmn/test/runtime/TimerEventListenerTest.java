@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -38,42 +37,89 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class TimerEventListenerTest extends FlowableCmmnTestCase {
-    
+
     @Test
     @CmmnDeployment
     public void testTimerExpressionDuration() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
-        assertNotNull(caseInstance);
-        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
-        
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).planItemInstanceStateAvailable().singleResult());
-        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateAvailable().singleResult());
-        
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count());
-        
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable().singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateAvailable()
+                .singleResult()).isNotNull();
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
         // User task should not be active before the timer triggers
-        assertEquals(0L, cmmnTaskService.createTaskQuery().count());
-        
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+
         Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
-        assertNotNull(timerJob);
-        assertEquals("timerListener", timerJob.getElementId());
-        assertEquals("Timer listener", timerJob.getElementName());
-        
+        assertThat(timerJob).isNotNull();
+        assertThat(timerJob.getElementId()).isEqualTo("timerListener");
+        assertThat(timerJob.getElementName()).isEqualTo("Timer listener");
+
         cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
         cmmnManagementService.executeJob(timerJob.getId());
-        
+
         // User task should be active after the timer has triggered
-        assertEquals(1L, cmmnTaskService.createTaskQuery().count());
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
     }
     
+    @Test
+    @CmmnDeployment
+    public void testTimerExpressionDurationWithCategory() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
+        Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        assertThat(timerJob.getCategory()).isEqualTo("myCategory");
+
+        cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
+        cmmnManagementService.executeJob(timerJob.getId());
+
+        // User task should be active after the timer has triggered
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTimerExpressionDurationWithCategoryExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testTimerExpression")
+                .variable("categoryValue", "testValue")
+                .start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
+        Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        assertThat(timerJob.getCategory()).isEqualTo("testValue");
+
+        cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
+        cmmnManagementService.executeJob(timerJob.getId());
+
+        // User task should be active after the timer has triggered
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
+    }
+
     /**
-     * Similar test as #testTimerExpressionDuration but with the real async executor, 
-     * instead of manually triggering the timer. 
+     * Similar test as #testTimerExpressionDuration but with the real async executor,
+     * instead of manually triggering the timer.
      */
     @Test
     @CmmnDeployment
-    public void testTimerExpressionDurationWithRealAsyncExeutor() {
+    public void testTimerExpressionDurationWithRealAsyncExecutor() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
 
@@ -82,10 +128,10 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
 
         // User task should not be active before the timer triggers
-        assertEquals(0L, cmmnTaskService.createTaskQuery().count());
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
 
         // Timer fires after 1 hour, so setting it to 1 hours + 1 second
         setClockTo(new Date(startTime.getTime() + (60 * 60 * 1000 + 1)));
@@ -93,89 +139,91 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
 
         // User task should be active after the timer has triggered 
-        assertEquals(1L, cmmnTaskService.createTaskQuery().count());
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testStageAfterTimer() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageAfterTimerEventListener").start();
-        
+
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
-        assertNotNull(planItemInstance);
-        
-        assertEquals(0L, cmmnTaskService.createTaskQuery().count());
-        
+        assertThat(planItemInstance).isNotNull();
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+
         // Timer fires after 1 day, so setting it to 1 day + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
-        
+
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
-        
+
         // User task should be active after the timer has triggered 
-        assertEquals(2L, cmmnTaskService.createTaskQuery().count());
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTimerInStage() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerInStage").start();
-        
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .count()).isEqualTo(1);
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
-        assertNotNull(planItemInstance);
-        
-        assertEquals(1L, cmmnTaskService.createTaskQuery().count());
-        
+        assertThat(planItemInstance).isNotNull();
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
+
         // Timer fires after 3 hours, so setting it to 3 hours + 1 second
         setClockTo(new Date(startTime.getTime() + (3 * 60 * 60 * 1000 + 1)));
-        
+
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
-        
+
         // User task should be active after the timer has triggered
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("A", tasks.get(0).getName());
-        assertEquals("B", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B");
     }
-    
+
     @Test
     @CmmnDeployment
     public void testExitPlanModelOnTimerOccurrence() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageExitOnTimerOccurrence").start();
-        
-        assertEquals(3L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count());
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).count());
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.STAGE).count());
-        assertEquals(4L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
-        
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).count())
+                .isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.STAGE).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count()).isEqualTo(4);
+
         // Timer fires after 24 hours, so setting it to 24 hours + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
-        
+
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
-        
-        assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testDateExpression() {
-        
+
         // Timer will fire on 2017-12-05T10:00
         // So moving the clock to the day before
         Calendar calendar = Calendar.getInstance();
@@ -186,37 +234,42 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         calendar.set(Calendar.MINUTE, 0);
         Date dayBefore = calendar.getTime();
         setClockTo(dayBefore);
-        
+
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testDateExpression").start();
-        
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
-        assertEquals(2L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count());
-        assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count());
-        assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count());
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count());
-        
-        assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count())
+                .isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count())
+                .isEqualTo(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count())
+                .isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count())
+                .isEqualTo(1);
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
         setClockTo(new Date(dayBefore.getTime() + (24 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
-        
-        assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
-        
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count())
+                .isZero();
+
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
         for (Task task : tasks) {
             cmmnTaskService.complete(task.getId());
         }
-        
+
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTimerWithBeanExpression() {
@@ -225,111 +278,113 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testBean")
                 .variable("startTime", startTime)
                 .start();
-        
-        assertEquals(2L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
-        assertEquals(2L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count());
-        assertEquals(2L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count());
-        
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count())
+                .isEqualTo(2);
+
         setClockTo(new Date(startTime.getTime() + (2 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
-        
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("A", task.getName());
+        assertThat(task.getName()).isEqualTo("A");
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTimerStartTrigger() {
         // Completing the stage will be the start trigger for the timer.
         // The timer event will exit the whole plan model
-        
+
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartTrigger").start();
-        
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
-        
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count()).isEqualTo(1);
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("A", task.getName());
+        assertThat(task.getName()).isEqualTo("A");
         cmmnTaskService.complete(task.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("B", task.getName());
+        assertThat(task.getName()).isEqualTo("B");
         cmmnTaskService.complete(task.getId());
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("C", task.getName());
-        
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
-        
+        assertThat(task.getName()).isEqualTo("C");
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count())
+                .isEqualTo(1);
+
         setClockTo(new Date(startTime.getTime() + (3 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200L, true);
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testExitNestedStageThroughTimer() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testExitNestedStageThroughTimer").start();
-        assertEquals(3L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.STAGE).count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.STAGE)
+                .count()).isEqualTo(3);
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("The task", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("The task");
+
         setClockTo(new Date(startTime.getTime() + (5 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
-        assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void timerActivatesAndExitStages() {
         Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerActivatesAndExitStages").start();
-        
+
         List<Task> tasks = cmmnTaskService.createTaskQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByTaskName().asc()
                 .list();
-        assertEquals(2, tasks.size());
-        assertEquals("A", tasks.get(0).getName());
-        assertEquals("B", tasks.get(1).getName());
-        
-        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B");
+
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isZero();
+
         // Completing A activates the stage and the timer event listener
         cmmnTaskService.complete(tasks.get(0).getId());
         cmmnTaskService.complete(tasks.get(1).getId());
-        
+
         // Timer event listener created a timer job
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
         tasks = cmmnTaskService.createTaskQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByTaskName().asc()
                 .list();
-        assertEquals(3, tasks.size());
-        assertEquals("Stage 1 task", tasks.get(0).getName());
-        assertEquals("Stage 3 task 1", tasks.get(1).getName());
-        assertEquals("Stage 3 task 2", tasks.get(2).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Stage 1 task", "Stage 3 task 1", "Stage 3 task 2");
+
         // Timer is set to 10 hours
         setClockTo(new Date(startTime.getTime() + (11 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
-        
+
         tasks = cmmnTaskService.createTaskQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByTaskName().asc()
                 .list();
-        assertEquals(2, tasks.size());
-        assertEquals("Stage 1 task", tasks.get(0).getName());
-        assertEquals("Stage 2 task", tasks.get(1).getName());
-        
-        for(Task task : tasks) {
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Stage 1 task", "Stage 2 task");
+
+        for (Task task : tasks) {
             cmmnTaskService.complete(task.getId());
         }
         assertCaseInstanceEnded(caseInstance);
@@ -344,17 +399,17 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .orderByTaskName().asc()
                 .list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         // Should have a TimerJob
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
 
-        for(Task task : tasks) {
+        for (Task task : tasks) {
             cmmnTaskService.complete(task.getId());
         }
 
         // TimerJob should be deleted after all tasks have completed in the stage
-        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isZero();
     }
 
     @Test
@@ -362,34 +417,38 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     public void testTimerWithAvailableCondition() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
 
-        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isZero();
 
         // Setting the variable should make the timer available and create the timer job
         cmmnRuntimeService.setVariable(caseInstance.getId(), "timerVar", true);
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
 
-        PlanItemInstance timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult();
-        assertEquals(PlanItemInstanceState.AVAILABLE, timerPlanItemInstance.getState());
+        PlanItemInstance timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         // Setting the variable to false again will dismiss the timer
         cmmnRuntimeService.setVariable(caseInstance.getId(), "timerVar", false);
-        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
-        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult();
-        assertEquals(PlanItemInstanceState.UNAVAILABLE, timerPlanItemInstance.getState());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isZero();
+        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .singleResult();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
 
         cmmnRuntimeService.setVariable(caseInstance.getId(), "timerVar", true);
-        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
-        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult();
-        assertEquals(PlanItemInstanceState.AVAILABLE, timerPlanItemInstance.getState());
+        assertThat(cmmnManagementService.createTimerJobQuery().count()).isEqualTo(1);
+        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .singleResult();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         // Execute the job
         Job timerJob = cmmnManagementService.createTimerJobQuery().scopeDefinitionId(caseInstance.getCaseDefinitionId()).singleResult();
-        assertNotNull(timerJob);
+        assertThat(timerJob).isNotNull();
         cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
         cmmnManagementService.executeJob(timerJob.getId());
 
-        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).includeEnded().singleResult();
-        assertEquals(PlanItemInstanceState.COMPLETED, timerPlanItemInstance.getState());
+        timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .includeEnded().singleResult();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
     }
-    
+
 }

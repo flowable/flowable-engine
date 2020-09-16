@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
@@ -68,7 +69,8 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
-
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        
         String oldAssigneeId = task.getAssignee();
         String oldOwnerId = task.getOwner();
         
@@ -83,7 +85,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-            TaskHelper.changeTaskAssignee(task, identityId);
+            TaskHelper.changeTaskAssignee(task, identityId, cmmnEngineConfiguration);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -96,17 +98,18 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
 
-            TaskHelper.changeTaskOwner(task, identityId);
+            TaskHelper.changeTaskOwner(task, identityId, cmmnEngineConfiguration);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), identityId, null, identityType);
-            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
+            IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .createTaskIdentityLink(task.getId(), identityId, null, identityType);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity, cmmnEngineConfiguration);
 
         } else if (IDENTITY_GROUP == identityIdType) {
-            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), null, identityId, identityType);
-            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
-
+            IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .createTaskIdentityLink(task.getId(), null, identityId, identityType);
+            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity, cmmnEngineConfiguration);
         }
 
         if (assignedToNoOne) {

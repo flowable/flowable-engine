@@ -43,7 +43,7 @@ public class Builder implements TreeBuilder {
 	/**
 	 * Feature enumeration type.
 	 */
-	public static enum Feature {
+	public enum Feature {
 		/**
 		 * Method invocations as in <code>${foo.bar(1)}</code> as specified in JSR 245,
 		 * maintenance release 2.

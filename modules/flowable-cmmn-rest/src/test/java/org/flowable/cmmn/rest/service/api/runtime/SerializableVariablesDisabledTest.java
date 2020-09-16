@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,11 @@
  */
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
@@ -23,7 +25,6 @@ import java.util.Map;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -47,7 +48,6 @@ import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -166,14 +166,14 @@ public class SerializableVariablesDisabledTest {
                 CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
-        // We have serializeable object disabled, we should get a 415.
+        // We have serializable object disabled, we should get a 415.
         assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 
     public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {
-        CloseableHttpResponse response = null;
-        try {
 
+        assertThatCode(() -> {
+            CloseableHttpResponse response = null;
             CredentialsProvider provider = new BasicCredentialsProvider();
             UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
             provider.setCredentials(AuthScope.ANY, credentials);
@@ -181,20 +181,14 @@ public class SerializableVariablesDisabledTest {
 
             response = (CloseableHttpResponse) client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
-            Assert.assertEquals(expectedStatusCode, statusCode);
+            assertThat(statusCode).isEqualTo(expectedStatusCode);
 
             if (client instanceof CloseableHttpClient) {
                 ((CloseableHttpClient) client).close();
             }
 
             response.close();
-
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
-
+        }).doesNotThrowAnyException();
     }
 
 }

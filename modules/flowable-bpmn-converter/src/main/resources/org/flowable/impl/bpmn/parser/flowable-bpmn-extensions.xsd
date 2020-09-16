@@ -222,6 +222,16 @@
     </simpleType>
   </attribute>
 
+  <attribute name="caseDefinitionKey" type="string">
+    <annotation>
+      <documentation>
+        Attribute used on a Case Task.
+        The value can be a key string reference to a case definition
+        or an expression that would return the key fortheh case definition that should be used.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="type">
     <annotation>
       <documentation>
@@ -236,6 +246,9 @@
         <enumeration value="mule"/>
         <enumeration value="shell"/>
         <enumeration value="dmn"/>
+        <enumeration value="case"/>
+        <enumeration value="send-event"/>
+        <enumeration value="external-worker"/>
       </restriction>
     </simpleType>
   </attribute>
@@ -243,9 +256,26 @@
   <attribute name="resultVariable" type="string">
     <annotation>
       <documentation>
-        Attribute on Service and Script Task corresponding with a process variable name.
-        The result of executing the service task logic or the script will be stored
-        in this process variable.
+        Attribute on Script Task corresponding with a process variable name.
+        The result of executing the script will be stored in this process variable.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="resultVariableName" type="string">
+    <annotation>
+      <documentation>
+        Attribute on Service Task corresponding with a process variable name.
+        The result of executing the task logic will be stored in this process variable.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="parallelInSameTransaction" type="boolean">
+    <annotation>
+      <documentation>
+        Attribute on an HTTP Task indicating whether the HTTP call should be executed in parallel in the same transaction
+        or it should be done blocking on the same thread.
       </documentation>
     </annotation>
   </attribute>
@@ -254,6 +284,14 @@
     <annotation>
       <documentation>
         Allows to specify an expression that is evaluated at runtime.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="skipExpression" type="string">
+    <annotation>
+      <documentation>
+        Allows to specify an expression used for skipping a service task that is evaluated at runtime.
       </documentation>
     </annotation>
   </attribute>
@@ -297,6 +335,31 @@
           exclusive asynchronous job. A value of sync means the service task will execute synchronously without
           the creation of a job.
         </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="useLocalScopeForResultVariable" type="boolean">
+    <annotation>
+      <documentation>
+        Stores the variable locally, e.g. on the execution of a sub process.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="storeResultVariableAsTransient" type="boolean">
+    <annotation>
+      <documentation>
+        Can be used to store the result variable of an expression transiently.
+        Transient variables will not be persisted at the end of the database transaction.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="topic" type="string">
+    <annotation>
+      <documentation>
+        The topic that should be used for external worker tasks.
+      </documentation>
     </annotation>
   </attribute>
 
@@ -779,6 +842,17 @@
     </annotation>
   </attribute>
 
+  <attribute name="sameDeployment" type="boolean">
+    <annotation>
+      <documentation>
+        To be used on elements to first search for process / case definitions
+        in the same deployment as the current process definition.
+        If nothing is found in the same deployment it would continue searching in the tenant
+        and finally using fallbackToDefaultTenant
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="businessKey" type="tns:tExpression">
     <annotation>
       <documentation>
@@ -815,6 +889,14 @@
       <documentation>
         Optional script task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored
         in the Execution instance context.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="taskIdVariableName" type="string" default="">
+    <annotation>
+      <documentation>
+        Allows to specify a variable name on a user task where the task ID will be stored.
       </documentation>
     </annotation>
   </attribute>

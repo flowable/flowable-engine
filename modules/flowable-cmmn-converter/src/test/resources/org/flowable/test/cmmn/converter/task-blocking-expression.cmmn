@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="The Task" definitionRef="theTask"/>
+
+            <task id="theTask" name="The Task" flowable:isBlockingExpression="${false}"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

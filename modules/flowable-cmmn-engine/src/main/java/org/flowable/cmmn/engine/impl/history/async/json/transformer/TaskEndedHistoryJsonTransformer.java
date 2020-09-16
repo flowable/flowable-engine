@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.HistoricTaskService;
@@ -25,10 +28,11 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
 public class TaskEndedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
+    
+    public TaskEndedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
     
     @Override
     public List<String> getTypes() {
@@ -54,7 +58,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractTaskHistoryJsonTran
             setEndProperties(historicalData, historicTaskInstance);
             
         } else {
-            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService(commandContext);
+            HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             HistoricTaskInstanceEntity historicTaskInstanceEntity = historicTaskService.createHistoricTask();
             copyCommonHistoricTaskInstanceFields(historicalData, historicTaskInstanceEntity);
             setEndProperties(historicalData, historicTaskInstance);

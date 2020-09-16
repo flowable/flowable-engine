@@ -29,6 +29,7 @@ import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentManagementService;
@@ -45,8 +46,6 @@ import org.flowable.content.engine.impl.db.EntityDependencyOrder;
 import org.flowable.content.engine.impl.fs.SimpleFileSystemContentStorage;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManager;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManagerImpl;
-import org.flowable.content.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
 
@@ -76,7 +75,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected ContentItemEntityManager contentItemEntityManager;
-    protected TableDataManager tableDataManager;
 
     public static ContentEngineConfiguration createContentEngineConfigurationFromResourceDefault() {
         return createContentEngineConfigurationFromResource("flowable.content.cfg.xml", "contentEngineConfiguration");
@@ -119,6 +117,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -145,7 +144,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initDataManagers();
         initEntityManagers();
         initContentStorage();
-        initClock();
     }
 
     // services
@@ -172,9 +170,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         super.initEntityManagers();
         if (contentItemEntityManager == null) {
             contentItemEntityManager = new ContentItemEntityManagerImpl(this, contentItemDataManager);
-        }
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -272,6 +267,11 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return "content";
     }
 
     @Override
@@ -430,10 +430,6 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     public ContentEngineConfiguration setContentItemEntityManager(ContentItemEntityManager contentItemEntityManager) {
         this.contentItemEntityManager = contentItemEntityManager;
         return this;
-    }
-
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
     }
 
     public ContentEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {

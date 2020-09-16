@@ -1743,7 +1743,7 @@ A service task is visualized as a rounded rectangle with a small gear icon in th
 
 There are four ways of declaring how to invoke Java logic:
 
--   Specifying a class that implements JavaDelegate or ActivityBehavior
+-   Specifying a class that implements JavaDelegate, FutureJavaDelegate or ActivityBehavior
 
 -   Evaluating an expression that resolves to a delegation object
 
@@ -1763,7 +1763,7 @@ It’s also possible to use an expression that resolves to an object. This objec
 
     <serviceTask id="serviceTask" flowable:delegateExpression="${delegateExpressionBean}" />
 
-Here, the delegateExpressionBean is a bean that implements the JavaDelegate interface, defined in, for example, the Spring container.
+Here, the delegateExpressionBean is a bean that implements the JavaDelegate or FutureJavaDelegate interface, defined in, for example, the Spring container.
 
 To specify a UEL method expression that should be evaluated, use the attribute **flowable:expression**.
 
@@ -1780,6 +1780,9 @@ It’s also possible to pass parameters with a method used in the expression.
                  flowable:expression="#{printer.printMessage(execution, myVar)}" />
 
 Method printMessage will be called on the object named printer. The first parameter passed is the DelegateExecution, which is available in the expression context, by default, available as execution. The second parameter passed is the value of the variable with name myVar in the current execution.
+
+Note: When the execution of the method defined in **flowable:expression** takes longer time to execute it is possible to return a `CompletableFuture<?>`.
+When this is used then other parallel flows can be executed in the same time.
 
 To specify a UEL value expression that should be evaluated, use the attribute **flowable:expression**.
 
@@ -1808,6 +1811,82 @@ Let’s create, for example, a Java class that can be used to change a process v
 Note: there will be **only one instance of the Java class created for the serviceTask on which it is defined**. All process instances share the same class instance that will be used to call *execute(DelegateExecution)*. This means that the class must not use any member variables and must be thread-safe, as it can be executed simultaneously from different threads. This also influences the way [Field injection](bpmn/ch07b-BPMN-Constructs.md#field-injection) is handled.
 
 The classes that are referenced in the process definition (by using flowable:class) are **NOT instantiated during deployment**. Only when a process execution arrives for the first time at the point in the process where the class is used, an instance of that class will be created. If the class cannot be found, an FlowableException will be thrown. The reasoning for this is that the environment (and more specifically, the *classpath*) when you are deploying is often different from the actual runtime environment. For example, when using *ant* or the business archive upload in the Flowable app to deploy processes, the classpath will not automatically contain the referenced classes.
+
+In case the execution takes longer it is possible to delegate that work on a different thread, but still continue executing parallel activities.
+In order to do this the *org.flowable.engine.delegate.FutureJavaDelegate* needs to be implemented.
+This is a more advanced interface and special care needs to be done in order for data to be set on the `DelegateExecution` and to take care about the transaction boundaries.
+
+```java
+public class LongRunningJavaDelegate implements FutureJavaDelegate<String> {
+
+    public CompletableFuture<String> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
+        // This is running in the same transaction as the process instance and is still possible to set and extract data from the execution
+        String input = (String) execution.getVariable("input");
+        // The taskInvoker is a common invoker provided by Flowable that can be used to submit complex executions on a new thread.
+        // However, you don't have to use it, you can use your own custom ExecutorService or return a CompletableFuture from your own services.
+        return taskInvoker.submit(() -> {
+            // This is running on a new thread. The execution shouldn't be used here.
+            // There is also no transaction here. In case a new transaction is needed, then it should be managed by your own services
+            // Perform some complex logic that takes some time, e.g. invoking an external service
+            return "done";
+        });
+    }
+
+    public void afterExecution(DelegateExecution execution, String executionData) {
+        // This is running in the same transaction and thread as the process instance and data can be set on the execution
+        execution.setVariable("longRunningResult", executionData);
+    }
+}
+```
+
+There are also 2 other interfaces that can be used in to simplify your own implementation: 
+* *org.flowable.engine.delegate.FlowableFutureJavaDelegate*, in which the default (or configured) AsyncTaskInvoker will be used, simplifying the logic.
+* *org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate*, which simplifies the passing of input and output further by using a ReadOnlyDelegateExecution and a Map respectively.
+
+The same implementation with the other interfaces looks like:
+
+```java
+public class LongRunningJavaDelegate implements FlowableFutureJavaDelegate<String, String> {
+
+
+    public String prepareExecutionData(DelegateExecution execution) {
+        // This is running in the same transaction and thread as the process instance.
+        // The execution can be used
+        return execution.getVariable("input");
+    }
+
+    public String execute(String inputData) {
+        // This is running on a new thread. The execution shouldn't be used here.
+        // There is also no transaction here. In case a new transaction is needed, then it should be managed by your own services
+        // Perform some complex logic that takes some time, e.g. invoking an external service
+        return "done";
+    }
+
+    public void afterExecution(DelegateExecution execution, String executionData) {
+        // This is running in the same transaction and thread as the process instance and data can be set on the execution
+        execution.setVariable("longRunningResult", executionData);
+    }
+}
+```
+
+```java
+public class LongRunningJavaDelegate implements MapBasedFlowableFutureJavaDelegate {
+
+    public Map<String, Object> execute(ReadOnlyDelegateExecution execution) {
+        // The execution is a read only snapshot of the delegate execution
+        // This is running on a new thread. The execution shouldn't be used here.
+        // There is also no transaction here. In case a new transaction is needed, then it should be managed by your own services
+        // Perform some complex logic that takes some time, e.g. invoking an external service
+        Map<String, Object> result = new HashMap<>();
+        result.put("longRunningResult", "done");
+        // All the values from the returned map will be set on the execution
+        return result;
+    }
+}
+```
+
+Note: the same rules and logic that applied for the `JavaDelegate` applies for the `FutureJavaDelegate` as well. 
+Keep in mind that when using field expression inject the evaluation of the expression should only be done before or after the execution is done (on the same thread as the process instance).
 
 [\[INTERNAL: non-public implementation classes\]](internal) It is also possible to provide a class that implements the *org.flowable.engine.impl.delegate.ActivityBehavior* interface. Implementations then have access to more powerful engine functionality, for example, to influence the control flow of the process. Note however that this is not a very good practice and should be avoided as much as possible. So, it is advisable to use the *ActivityBehavior* interface only for advanced use cases and if you know exactly what you’re doing.
 
@@ -2101,6 +2180,8 @@ When a result variable name is not specified, the service execution result value
 
 In the example above, the result of the service execution (the return value of the *'doSomething()'* method invocation on an object is made available under the name *'myService'*, either in the process variables or as a Spring bean) is set to the process variable named *'myVar'* after the service execution completes.
 
+Note: When the method returns `CompletableFuture<?>` then the result of the future will be set in the result variable.
+
 #### Triggerable
 
 A common pattern is to trigger an external serviced by sending a JMS message or do a HTTP call and have the process instance go into a wait state. Then at some point the external service will return a response and the process instance continues to the next activity. With default BPMN you would need to model a service task and a receive task. This however introduces some racing conditions because the external service response could be returned before the process instance is persisted and the receive task is active. To solve this, Flowable supports a triggerable attribute on a service task that transforms the single service task in a task that will execute the service logic and then will wait for an external trigger before it continues to the next activity in the process definition. If the async attribute is also set to true for a triggerable service task, the process instance state is first persisted and then the service task logic will be executed in an async job. In BPMN XML an async triggerable service task would be implemented like this:
@@ -2118,7 +2199,7 @@ When custom logic is executed, it is often necessary to catch certain business e
 
 ##### Throwing BPMN Errors
 
-It is possible to throw BPMN Errors from user code inside Service Tasks or Script Tasks. In order to do this, a special FlowableException called *BpmnError* can be thrown in JavaDelegates, scripts, expressions and delegate expressions. The engine will catch this exception and forward it to an appropriate error handler, for example, a Boundary Error Event or an Error Event Sub-Process.
+It is possible to throw BPMN Errors from user code inside Service Tasks or Script Tasks. In order to do this, a special FlowableException called *BpmnError* can be thrown in JavaDelegates, FutureJavaDelegates, scripts, expressions and delegate expressions. The engine will catch this exception and forward it to an appropriate error handler, for example, a Boundary Error Event or an Error Event Sub-Process.
 
     public class ThrowBpmnErrorDelegate implements JavaDelegate {
 
@@ -2797,6 +2878,11 @@ For example, requestUrl is saved as 'task7RequestUrl' for task with id 'task7'.<
 <td><p>If resolves to true, the response body value will be stored as a JSON variable instead of a String. This is useful if the HTTP service returns JSON and you want to reference the fields using the dot notation (e.g. <em>myResponse.user.name</em>) later on.</p></td>
 </tr>
 <tr class="odd">
+<td><p>parallelInSameTransaction</p></td>
+<td><p>-</p></td>
+<td><p>If resolves to true, the HTTP call will be done on a different thread and thus making it possible to execute more HTTP tasks in parallel. This is useful when parallel gateways are used and there are multiple HTTP tasks in the parallel flows.</p></td>
+</tr>
+<tr class="even">
 <td><p>httpActivityBehaviorClass</p></td>
 <td><p>no</p></td>
 <td><p>Full class name of custom extension of org.flowable.http.HttpActivityBehavior.</p></td>
@@ -3428,6 +3514,121 @@ The following XML snippet shows an example of using the Shell Task. It runs the 
         <flowable:field name="outputVariable" stringValue="resultVar" />
       </extensionElements>
     </serviceTask>
+
+### External Worker Task
+
+#### Description
+
+The External Worker Task allows you to create jobs that should be acquired and executed by External Workers.
+An External Worker can acquire jobs over the Java API or REST API.
+This is similar to an async Service Task.
+The difference is that instead of Flowable executing the logic,
+an External Worker, which can be implemented in any language, queries Flowable for jobs, executes them and sends the result to Flowable.
+Note that the External Worker task is **not** an 'official' task of BPMN 2.0 spec (and doesn’t have a dedicated icon as a consequence).
+
+#### Defining an External Worker Task
+
+The External Worker task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Constructs.md#java-service-task) and is defined by setting *'external-worker'* for the *type* of the service task.
+
+```xml
+<serviceTask id="externalWorkerOrder" flowable:type="external-worker">
+```
+
+The External Worker task is configured by se setting the `topic` (can be an EL expression) which the External Worker uses to query for jobs to execute.
+
+#### Example usage
+
+The following XML snippet shows an example of using the External Worker Task.
+The External Worker is a wait state.
+When the execution reaches the task it will create an External Worker Job, which can be acquired by an External Worker.
+Once the External Worker is done with the job and notifies Flowable of the completion the execution of the process will continue.
+
+
+```xml
+<serviceTask id="externalWorkerOrder" flowable:type="external-worker" flowable:topic="orderService" />
+```
+
+#### Acquiring External Worker Job
+
+External Worker Jobs are acquired via the `ManagementService#createExternalWorkerJobAcquireBuilder` by using a `ExternalWorkerJobAcquireBuilder`
+
+```java
+List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("orderService", Duration.ofMinutes(30))
+                .acquireAndLock(5, "orderWorker-1");
+```
+
+By using the above Java snippet External Worker jobs can be acquired.
+With the snippet we did the following:
+
+* Query for External Worker Jobs with the topic *orderService*.
+* Acquire and lock the jobs for 30 minutes waiting for the completion signal from the External Worker.
+* Acquire maximum of 5 jobs
+* The owner of the jobs is the worker with id *orderWorker-1*
+
+An `AcquiredExternalWorkerJob` also has access to the Process variables.
+When the External Worker Task is exclusive, acquiring the job will lock the Process Instance.
+
+#### Completing an External Worker Job
+
+External Worker Jobs are completed via the `ManagementService#createExternalWorkerCompletionBuilder(String, String)` by using an `ExternalWorkerCompletionBuilder`
+
+```java
+managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
+                .variable("orderStatus", "COMPLETED")
+                .complete();
+```
+
+A Job can be completed only by the worker that acquired it. Otherwise a `FlowableIllegalArgumentException` will be thrown.
+
+Using the snippet above the task is completed and the process execution will continue.
+The continuation of the execution is done asynchronously in a new transaction.
+This means that completing an external worker task will only create an asynchronous (new) job to execute the completion (and the current thread returns after doing that).
+Any steps in the model that follow after the external worker task will be executed in that transaction, similar to a regular async service task.
+
+
+#### Error handling for an External Worker Job
+
+There are 2 ways of handling errors for an external worker job:
+
+* Business error via `ManagementService#createExternalWorkerCompletionBuilder(String, String)` by using an `ExternalWorkerCompletionBuilder`
+
+
+```java
+managementService.createExternalWorkerCompletionBuilder(acquiredJob.getId(), "orderWorker-1")
+                .variable("orderStatus", "FAILED")
+                .bpmnError("orderFailed");
+```
+
+With this snippet the *orderStatus* variable will be set on the process and a BPMN Error with the code *orderFailed* will be thrown.
+A BPMN Error can only be thrown by the worker that acquired the job.
+
+* Technical error via `ManagementService#createExternalWorkerJobFailureBuilder(String, String)` by using an `ExternalWorkerJobFailureBuilder`
+
+
+```java
+managementService.createExternalWorkerJobFailureBuilder(acquiredJob.getId(), "orderWorker-1")
+                .errorMessage("Failed to run job. Database not accessible")
+                .errorDetails("Some complex and long error details")
+                .retries(4)
+                .retryTimeout(Duration.ofHours(1))
+                .fail();
+```
+
+With this snippet the following will be done:
+
+* The error message and error details will be set on the job
+* The retry count for the job will be set to 4
+* The job will be available for acquiring after 1 hour
+
+The Job can only be failed by the worker that acquired it.
+If no retries have been set, flowable will automatically decrease the number of retries for a job by 1.
+When the number of retries is 0 the job will be moved to the DeadLetter table job and will no longer be available for acquiring.
+
+#### Querying External Worker Jobs
+
+External Worker Jobs are queried by using the `ExternalWorkerJobQuery` by creating it via `ManagementService#createExternalWorkerJobQuery`.
+
 
 ### Execution listener
 

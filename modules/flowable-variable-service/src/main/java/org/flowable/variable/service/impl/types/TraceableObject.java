@@ -12,9 +12,17 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
  * @param <O> The type of the original object
@@ -30,7 +38,9 @@ public class TraceableObject<O, C> {
     protected C tracedObjectOriginalValue;
     protected VariableInstanceEntity variableInstanceEntity;
 
-    public TraceableObject(MutableVariableType<O, C> type, O tracedObject, C tracedObjectOriginalValue, VariableInstanceEntity variableInstanceEntity) {
+    public TraceableObject(MutableVariableType<O, C> type, O tracedObject, C tracedObjectOriginalValue, 
+                    VariableInstanceEntity variableInstanceEntity) {
+        
         this.type = type;
         this.tracedObject = tracedObject;
         this.tracedObjectOriginalValue = tracedObjectOriginalValue;
@@ -38,12 +48,43 @@ public class TraceableObject<O, C> {
     }
 
     public void updateIfValueChanged() {
-        if (tracedObject == variableInstanceEntity.getCachedValue() && !variableInstanceEntity.isDeleted()) {
+        if (tracedObject == variableInstanceEntity.getCachedValue()) {
             if (type.updateValueIfChanged(tracedObject, tracedObjectOriginalValue, variableInstanceEntity)) {
-                VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
-                variableServiceConfiguration.getInternalHistoryVariableManager()
-                    .recordVariableUpdate(variableInstanceEntity, variableServiceConfiguration.getClock().getCurrentTime());
+                VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(
+                        variableInstanceEntity, variableServiceConfiguration.getClock().getCurrentTime());
             }
+        }
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        String engineType = getEngineType(variableInstanceEntity.getScopeType());
+        Map<String, AbstractEngineConfiguration> engineConfigurationMap = Context.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = engineConfigurationMap.get(engineType);
+        if (engineConfiguration == null) {
+            for (AbstractEngineConfiguration possibleEngineConfiguration : engineConfigurationMap.values()) {
+                if (possibleEngineConfiguration instanceof HasVariableServiceConfiguration) {
+                    engineConfiguration = possibleEngineConfiguration;
+                }
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            throw new FlowableException("Could not find engine configuration with variable service configuration");
+        }
+        
+        if (!(engineConfiguration instanceof HasVariableServiceConfiguration)) {
+            throw new FlowableException("Variable entity engine scope has no variable service configuration " + engineType);
+        }
+        
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    protected String getEngineType(String scopeType) {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
         }
     }
 }

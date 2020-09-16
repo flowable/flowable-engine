@@ -12,14 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.Map;
-
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityWithMigrationContextBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -29,7 +29,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
 
     protected String entryCriterionId;
-    protected Map<String, Object> variables;
+    protected ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo;
+    protected MigrationContext migrationContext;
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId) {
         super(commandContext, planItemInstanceEntity);
@@ -37,19 +38,26 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     }
     
     public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
-                    String entryCriterionId, Map<String, Object> variables) {
+                    String entryCriterionId, ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo) {
         
         this(commandContext, planItemInstanceEntity, entryCriterionId);
-        this.variables = variables;
+        this.childTaskVariableInfo = childTaskVariableInfo;
+    }
+    
+    public StartPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
+            String entryCriterionId, MigrationContext migrationContext) {
+        
+        this(commandContext, planItemInstanceEntity, entryCriterionId);
+        this.migrationContext = migrationContext;
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.ACTIVE;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.START;
     }
     
@@ -66,8 +74,11 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
 
     protected void executeActivityBehavior() {
         CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        if (activityBehavior instanceof ChildTaskActivityBehavior) {
-            ((ChildTaskActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, variables);
+        if (migrationContext != null && activityBehavior instanceof CmmnActivityWithMigrationContextBehavior) {
+            ((CmmnActivityWithMigrationContextBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, migrationContext);
+            
+        } else if (activityBehavior instanceof ChildTaskActivityBehavior) {
+            ((ChildTaskActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity, childTaskVariableInfo);
             
         } else if (activityBehavior instanceof CoreCmmnActivityBehavior) {
             ((CoreCmmnActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity);
@@ -78,7 +89,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Start plan item]";
     }
     

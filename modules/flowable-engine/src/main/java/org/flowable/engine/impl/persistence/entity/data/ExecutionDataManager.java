@@ -65,10 +65,12 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
 
-    void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime);
-
     void updateAllExecutionRelatedEntityCountFlags(boolean newValue);
 
+    void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, String lockOwner, Date expirationTime);
+
     void clearProcessInstanceLockTime(String processInstanceId);
+
+    void clearAllProcessInstanceLockTimes(String lockOwner);
 
 }

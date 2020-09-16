@@ -13,6 +13,8 @@
 
 package org.flowable.examples.bpmn.expression;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -32,14 +34,14 @@ public class UelExpressionTest extends PluggableFlowableTestCase {
         UelExpressionTestOrder order = new UelExpressionTestOrder(150);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions", CollectionUtil.singletonMap("order", order));
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("Standard service", task.getName());
+        assertThat(task.getName()).isEqualTo("Standard service");
 
         // While an order of 300, gives us a premium service (goes through an
         // UEL method expression)
         order = new UelExpressionTestOrder(300);
         processInstance = runtimeService.startProcessInstanceByKey("uelExpressions", CollectionUtil.singletonMap("order", order));
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("Premium service", task.getName());
+        assertThat(task.getName()).isEqualTo("Premium service");
 
     }
 

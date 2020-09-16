@@ -27,6 +27,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -152,7 +153,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
                 continue;
 
-            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timer = timerJobService.createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setProcessDefinitionId(processDefinition.getId());
@@ -201,13 +202,13 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     }
 
     protected List<ProcessInstance> fetchProcessInstancesPage(CommandContext commandContext, ProcessDefinition processDefinition, int currentPageStartIndex) {
-
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (SuspensionState.ACTIVE.equals(getProcessDefinitionSuspensionState())) {
-            return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).suspended()
-                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
+            return new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinition.getId()).suspended()
+                    .listPage(currentPageStartIndex, processEngineConfiguration.getBatchSizeProcessInstances());
         } else {
-            return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).active()
-                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
+            return new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinition.getId()).active()
+                    .listPage(currentPageStartIndex, processEngineConfiguration.getBatchSizeProcessInstances());
         }
     }
 

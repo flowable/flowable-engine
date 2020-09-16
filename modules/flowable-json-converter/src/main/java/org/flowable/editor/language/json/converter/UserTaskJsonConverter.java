@@ -12,10 +12,6 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,15 +23,15 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.editor.language.json.model.ModelInfo;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
-public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
-
-    protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+public class UserTaskJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
 
@@ -57,7 +53,8 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         UserTask userTask = (UserTask) baseElement;
         String assignee = userTask.getAssignee();
 
@@ -165,12 +162,12 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         setPropertyValue(PROPERTY_SKIP_EXPRESSION, userTask.getSkipExpression(), propertiesNode);
 
         if (StringUtils.isNotEmpty(userTask.getFormKey())) {
-            if (formKeyMap != null && formKeyMap.containsKey(userTask.getFormKey())) {
+            Map<String, String> modelInfo = converterContext.getFormModelInfoForFormModelKey(userTask.getFormKey());
+            if (modelInfo != null) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                ModelInfo modelInfo = formKeyMap.get(userTask.getFormKey());
-                formRefNode.put("id", modelInfo.getId());
-                formRefNode.put("name", modelInfo.getName());
-                formRefNode.put("key", modelInfo.getKey());
+                formRefNode.put("id", modelInfo.get("id"));
+                formRefNode.put("name", modelInfo.get("name"));
+                formRefNode.put("key", modelInfo.get("key"));
                 propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
 
             } else {
@@ -182,6 +179,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         setPropertyValue(PROPERTY_USERTASK_DUEDATE, userTask.getDueDate(), propertiesNode);
         setPropertyValue(PROPERTY_CALENDAR_NAME, userTask.getBusinessCalendarName(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, userTask.getCategory(), propertiesNode);
+        setPropertyValue(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, userTask.getTaskIdVariableName(), propertiesNode);
 
         addFormProperties(userTask.getFormProperties(), propertiesNode);
     }
@@ -205,7 +203,8 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         UserTask task = new UserTask();
 
         task.setPriority(getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
@@ -216,8 +215,15 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
             JsonNode formReferenceNode = getProperty(PROPERTY_FORM_REFERENCE, elementNode);
             if (formReferenceNode != null && formReferenceNode.get("id") != null) {
 
-                if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
-                    task.setFormKey(formMap.get(formReferenceNode.get("id").asText()));
+                String formModelId = formReferenceNode.get("id").asText();
+                String formModelKey = converterContext.getFormModelKeyForFormModelId(formModelId);
+                if (formModelKey != null) {
+                    task.setFormKey(formModelKey);
+                } else {
+                    String key = formReferenceNode.get("key").asText();
+                    if (StringUtils.isNotEmpty(key)) {
+                        task.setFormKey(key);
+                    }
                 }
             }
         }
@@ -226,6 +232,7 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setBusinessCalendarName(getPropertyValueAsString(PROPERTY_CALENDAR_NAME, elementNode));
         task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
+        task.setTaskIdVariableName(getPropertyValueAsString(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, elementNode));
 
         JsonNode assignmentNode = getProperty(PROPERTY_USERTASK_ASSIGNMENT, elementNode);
         if (assignmentNode != null) {
@@ -438,13 +445,4 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter implements Form
         }
     }
 
-    @Override
-    public void setFormMap(Map<String, String> formMap) {
-        this.formMap = formMap;
-    }
-
-    @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
-        this.formKeyMap = formKeyMap;
-    }
 }

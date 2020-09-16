@@ -32,5 +32,6 @@ public interface InternalHistoryVariableManager {
      * Record a variable has been deleted, if audit history is enabled.
      */
     void recordVariableRemoved(VariableInstanceEntity variable, Date removeTime);
-
+    
+    void initAsyncHistoryCommandContextCloseListener();
 }

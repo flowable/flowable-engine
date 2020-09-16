@@ -37,6 +37,7 @@ public class ChannelDefinitionResponse {
     protected String tenantId;
     protected String deploymentId;
     protected String deploymentUrl;
+    protected String resourceName;
     protected String resource;
     protected String category;
 
@@ -132,6 +133,15 @@ public class ChannelDefinitionResponse {
 
     public void setResource(String resource) {
         this.resource = resource;
+    }
+    
+    @ApiModelProperty(example = "oneChannel.channel")
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     @ApiModelProperty(example = "http://localhost:8182/event-registry-repository/deployments/2/resources/oneChannel.channel", value = "Contains the actual deployed channel definition JSON.")

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -44,23 +45,27 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     
     protected void deleteCaseInstance() {
         updateChildPlanItemInstancesState();
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
         
-        if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+        String newState = getNewState();
+        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
+                caseInstanceEntity, caseInstanceEntity.getState(), newState);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordCaseInstanceEnd(caseInstanceEntity, newState, cmmnEngineConfiguration.getClock().getCurrentTime());
+
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
             String loggingType = null;
             if (CaseInstanceState.TERMINATED.equals(getNewState())) {
                 loggingType = CmmnLoggingSessionConstants.TYPE_CASE_TERMINATED;
             } else {
                 loggingType = CmmnLoggingSessionConstants.TYPE_CASE_COMPLETED;
             }
-            CmmnLoggingSessionUtil.addLoggingData(loggingType, "Completed case instance with id " + caseInstanceEntity.getId(), caseInstanceEntity);
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, "Completed case instance with id " + caseInstanceEntity.getId(), 
+                    caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
-        
-        String newState = getNewState();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
-                caseInstanceEntity, caseInstanceEntity.getState(), newState);
-        CommandContextUtil.getCmmnHistoryManager(commandContext)
-            .recordCaseInstanceEnd(caseInstanceEntity, newState, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
+
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
     }
 
     protected void updateChildPlanItemInstancesState() {
@@ -74,7 +79,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
             }
         }
     }
-    
-    protected abstract String getDeleteReason();
+
+    public abstract String getDeleteReason();
     
 }

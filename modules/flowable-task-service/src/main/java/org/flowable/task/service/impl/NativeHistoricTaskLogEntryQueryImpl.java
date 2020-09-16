@@ -15,39 +15,43 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
-import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
+import org.flowable.task.service.TaskServiceConfiguration;
 
 /**
  * @author martin.grofcik
  */
 public class NativeHistoricTaskLogEntryQueryImpl extends AbstractNativeQuery<NativeHistoricTaskLogEntryQuery, HistoricTaskLogEntry> implements
-    NativeHistoricTaskLogEntryQuery {
+        NativeHistoricTaskLogEntryQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected TaskServiceConfiguration taskServiceConfiguration;
 
-    public NativeHistoricTaskLogEntryQueryImpl(CommandContext commandContext) {
+    public NativeHistoricTaskLogEntryQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandContext);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
-    public NativeHistoricTaskLogEntryQueryImpl(CommandExecutor commandExecutor) {
+    public NativeHistoricTaskLogEntryQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandExecutor);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
     // results ////////////////////////////////////////////////////////////////
 
     @Override
     public List<HistoricTaskLogEntry> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesByNativeQueryCriteria(parameterMap);
+        return taskServiceConfiguration.getHistoricTaskLogEntryEntityManager().findHistoricTaskLogEntriesByNativeQueryCriteria(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricTaskLogEntryEntityManager(commandContext).findHistoricTaskLogEntriesCountByNativeQueryCriteria(parameterMap);
+        return taskServiceConfiguration.getHistoricTaskLogEntryEntityManager().findHistoricTaskLogEntriesCountByNativeQueryCriteria(parameterMap);
     }
 
 }

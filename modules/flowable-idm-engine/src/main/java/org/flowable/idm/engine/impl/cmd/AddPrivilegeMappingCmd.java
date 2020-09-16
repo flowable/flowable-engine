@@ -17,27 +17,30 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntity;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManager;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 public class AddPrivilegeMappingCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
     protected String privilegeId;
     protected String userId;
     protected String groupId;
 
-    public AddPrivilegeMappingCmd(String privilegeId, String userId, String groupId) {
+    public AddPrivilegeMappingCmd(String privilegeId, String userId, String groupId, IdmEngineConfiguration idmEngineConfiguration) {
         this.privilegeId = privilegeId;
         this.userId = userId;
         this.groupId = groupId;
+        this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        PrivilegeMappingEntityManager privilegeMappingEntityManager = CommandContextUtil.getPrivilegeMappingEntityManager(commandContext);
+        PrivilegeMappingEntityManager privilegeMappingEntityManager = idmEngineConfiguration.getPrivilegeMappingEntityManager();
         PrivilegeMappingEntity entity = privilegeMappingEntityManager.create();
         entity.setPrivilegeId(privilegeId);
         if (userId != null) {

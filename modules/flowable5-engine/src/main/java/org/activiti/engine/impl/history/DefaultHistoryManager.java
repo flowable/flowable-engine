@@ -44,6 +44,7 @@ import org.activiti.engine.task.Event;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +113,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
                 ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
                 if (config != null && config.getEventDispatcher().isEnabled()) {
                     config.getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
             }
         }
@@ -147,7 +149,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
             ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
             if (config != null && config.getEventDispatcher().isEnabled()) {
                 config.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
             // Also record the start-event manually, as there is no "start" activity history listener for this
@@ -178,7 +181,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
             // Fire event
             if (config != null && config.getEventDispatcher().isEnabled()) {
                 config.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
         }
@@ -208,7 +212,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
             ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
             if (config != null && config.getEventDispatcher().isEnabled()) {
                 config.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
             HistoricActivityInstanceEntity activityInstance = findActivityInstance(parentExecution);
@@ -236,7 +241,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
             // Fire event
             if (config != null && config.getEventDispatcher().isEnabled()) {
                 config.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
 
         }
@@ -280,7 +286,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
                 ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
                 if (config != null && config.getEventDispatcher().isEnabled()) {
                     config.getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstance),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
             }
@@ -309,7 +316,8 @@ public class DefaultHistoryManager extends AbstractManager implements HistoryMan
         ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
         if (config != null && config.getEventDispatcher().isEnabled()) {
             config.getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 

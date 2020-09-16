@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -45,7 +47,7 @@ public class ImportExportTest extends ResourceFlowableTestCase {
         String processInstanceKey = runtimeService.startProcessInstanceByKey("process").getId();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceKey).messageEventSubscriptionName("InterruptMessage").singleResult();
 
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
     }
 
     @AfterEach

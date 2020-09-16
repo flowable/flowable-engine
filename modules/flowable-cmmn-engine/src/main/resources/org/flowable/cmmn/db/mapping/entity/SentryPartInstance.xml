@@ -8,8 +8,7 @@
         insert into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_)
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{caseDefinitionId ,jdbcType=VARCHAR},
+            1, #{caseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{planItemInstanceId ,jdbcType=VARCHAR},
             #{onPartId ,jdbcType=VARCHAR},
@@ -25,8 +24,7 @@
         <foreach collection="list" item="sentryPartInstance" index="index" separator=",">
             (
                 #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
@@ -42,8 +40,7 @@
             into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_) VALUES
             (
                 #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},

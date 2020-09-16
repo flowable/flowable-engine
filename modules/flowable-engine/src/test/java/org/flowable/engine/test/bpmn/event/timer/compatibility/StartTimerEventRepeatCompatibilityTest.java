@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.event.TestFlowableEntityEventListener;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,12 +70,12 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
 
         // deploy the process
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventRepeatWithoutEndDateTest.testCycleDateStartTimerEvent.bpmn20.xml").deploy();
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(1);
 
         // AFTER DEPLOYMENT
         // when the process is deployed there will be created a timerStartEvent job which will wait to be executed.
         List<Job> jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // dueDate should be after 24 hours from the process deployment
         Instant dueDateInstant = instant.plus(1, ChronoUnit.DAYS);
@@ -84,11 +85,11 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
 
         // No process instances
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
 
         // No tasks
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
 
         // ADVANCE THE CLOCK
         // advance the clock after 9 days from starting the process ->
@@ -98,19 +99,19 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
 
         // there must be a pending job because the endDate is not reached yet
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // After time advanced 9 days there should be 9 process instance started
         processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(9, processInstances.size());
+        assertThat(processInstances).hasSize(9);
 
         // 9 task to be executed (the userTask "Task A")
         tasks = taskService.createTaskQuery().list();
-        assertEquals(9, tasks.size());
+        assertThat(tasks).hasSize(9);
 
         // one new job will be created (and the old one will be deleted after execution)
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(1, jobs.size());
+        assertThat(jobs).hasSize(1);
 
         // check if the last job to be executed has the dueDate set correctly
         // (10'th repeat after 10 dec. => dueDate must have DueDate = 20 dec.)
@@ -124,17 +125,17 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
         // After the 10nth startEvent Execution should have 10 process instances started
         // (since the first one was not completed)
         processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(10, processInstances.size());
+        assertThat(processInstances).hasSize(10);
 
         // the current job will be deleted after execution and a new one will
         // not be created. (all 10 has already executed)
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         // 10 tasks to be executed (the userTask "Task A")
         // one task for each process instance
         tasks = taskService.createTaskQuery().list();
-        assertEquals(10, tasks.size());
+        assertThat(tasks).hasSize(10);
 
         // FINAL CHECK
         // count "timer fired" events
@@ -161,34 +162,34 @@ public class StartTimerEventRepeatCompatibilityTest extends TimerEventCompatibil
                 eventDeletedCount++;
             }
         }
-        assertEquals(10, timerFiredCount); // 10 timers fired
-        assertEquals(20, eventCreatedCount); // 20 job entities created, 2 per job (timer and executable job)
-        assertEquals(20, eventDeletedCount); // 20 jobs entities deleted, 2 per job (timer and executable job)
+        assertThat(timerFiredCount).isEqualTo(10); // 10 timers fired
+        assertThat(eventCreatedCount); // 20 job entities created).isCloseTo(20, within(2 per job (timer and executable job))
+        assertThat(eventDeletedCount); // 20 jobs entities deleted).isCloseTo(20, within(2 per job (timer and executable job))
 
         // for each processInstance
         // let's complete the userTasks where the process is hanging in order to complete the processes.
         for (ProcessInstance processInstance : processInstances) {
             tasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
-            org.flowable.task.api.Task task = tasks.get(0);
-            assertEquals("Task A", task.getName());
-            assertEquals(1, tasks.size());
-            taskService.complete(task.getId());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsOnly("Task A");
+            taskService.complete(tasks.get(0).getId());
         }
 
         // now All the process instances should be completed
         processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
 
         // no jobs
         jobs = managementService.createJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         jobs = managementService.createTimerJobQuery().list();
-        assertEquals(0, jobs.size());
+        assertThat(jobs).isEmpty();
 
         // no tasks
         tasks = taskService.createTaskQuery().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
 
         listener.clearEventsReceived();
         processEngineConfiguration.setClock(previousClock);

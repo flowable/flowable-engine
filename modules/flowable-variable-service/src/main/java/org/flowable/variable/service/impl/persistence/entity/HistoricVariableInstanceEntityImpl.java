@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.VariableType;
 
 /**
@@ -45,7 +47,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     protected Double doubleValue;
     protected String textValue;
     protected String textValue2;
-    protected VariableByteArrayRef byteArrayRef;
+    protected ByteArrayRef byteArrayRef;
 
     protected Object cachedValue;
 
@@ -93,7 +95,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public byte[] getBytes() {
         if (byteArrayRef != null) {
-            return byteArrayRef.getBytes();
+            return byteArrayRef.getBytes(getEngineType());
         }
         return null;
     }
@@ -101,9 +103,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public void setBytes(byte[] bytes) {
         if (byteArrayRef == null) {
-            byteArrayRef = new VariableByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
-        byteArrayRef.setValue("hist.var-" + name, bytes);
+        byteArrayRef.setValue("hist.var-" + name, bytes, getEngineType());
     }
 
     // getters and setters //////////////////////////////////////////////////////
@@ -274,12 +276,20 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     }
 
     @Override
-    public VariableByteArrayRef getByteArrayRef() {
+    public ByteArrayRef getByteArrayRef() {
         return byteArrayRef;
     }
 
     // common methods //////////////////////////////////////////////////////////
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

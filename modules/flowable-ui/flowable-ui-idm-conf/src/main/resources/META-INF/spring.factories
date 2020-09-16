@@ -1,0 +1,4 @@
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    org.flowable.ui.idm.conf.ApplicationConfiguration,\
+    org.flowable.ui.idm.conf.KeycloakIdmAutoConfiguration

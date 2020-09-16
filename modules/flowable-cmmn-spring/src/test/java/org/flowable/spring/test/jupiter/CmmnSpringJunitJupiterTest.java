@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -65,13 +66,13 @@ public class CmmnSpringJunitJupiterTest {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("junitJupiterCase").start();
 
         assertThat(flowableTestHelper.getDeploymentIdFromDeploymentAnnotation())
-            .isEqualTo(deploymentId)
-            .isNotNull();
+                .isEqualTo(deploymentId)
+                .isNotNull();
         assertThat(flowableTestHelper.getCmmnEngine())
-            .as("Spring injected process engine")
-            .isSameAs(cmmnEngine)
-            .as("Extension injected process engine")
-            .isSameAs(extensionCmmnEngine);
+                .as("Spring injected process engine")
+                .isSameAs(cmmnEngine)
+                .as("Extension injected process engine")
+                .isSameAs(extensionCmmnEngine);
 
         CaseDefinition deployedCaseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deploymentId).singleResult();
         assertThat(deployedCaseDefinition).isNotNull();
@@ -116,6 +117,11 @@ public class CmmnSpringJunitJupiterTest {
         @Bean
         public CmmnRepositoryService cmmnRepositoryService(CmmnEngine cmmnEngine) {
             return cmmnEngine.getCmmnRepositoryService();
+        }
+
+        @Bean
+        public CmmnMigrationService cmmnMigrationService(CmmnEngine cmmnEngine) {
+            return cmmnEngine.getCmmnMigrationService();
         }
 
         @Bean

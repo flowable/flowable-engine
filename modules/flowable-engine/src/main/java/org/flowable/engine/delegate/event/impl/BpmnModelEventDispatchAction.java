@@ -58,7 +58,7 @@ public class BpmnModelEventDispatchAction implements EventDispatchAction {
     protected BpmnModel extractBpmnModelFromEvent(FlowableEvent event) {
         BpmnModel result = null;
 
-        if (result == null && event instanceof FlowableEngineEvent && ((FlowableEngineEvent) event).getProcessDefinitionId() != null) {
+        if (event instanceof FlowableEngineEvent && ((FlowableEngineEvent) event).getProcessDefinitionId() != null) {
             ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(
                     ((FlowableEngineEvent) event).getProcessDefinitionId(), true);
 

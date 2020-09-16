@@ -60,14 +60,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
     }
 
     @Override
-    public void dispatchEvent(FlowableEvent event) {
+    public void dispatchEvent(FlowableEvent event, String engineType) {
         if (enabled) {
             eventSupport.dispatchEvent(event);
         }
 
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
             if (engineConfiguration != null && engineConfiguration.getAdditionalEventDispatchActions() != null) {
                 for (EventDispatchAction eventDispatchAction : engineConfiguration.getAdditionalEventDispatchActions()) {
                     eventDispatchAction.dispatchEvent(commandContext, eventSupport, event);

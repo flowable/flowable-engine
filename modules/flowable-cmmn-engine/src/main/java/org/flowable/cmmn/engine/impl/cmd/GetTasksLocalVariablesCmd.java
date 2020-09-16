@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -31,6 +32,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected Set<String> taskIds;
 
     public GetTasksLocalVariablesCmd(Set<String> taskIds) {
@@ -46,8 +48,10 @@ public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>
             throw new FlowableIllegalArgumentException("Set of taskIds is empty");
         }
 
-        List<VariableInstance> instances = new ArrayList<>();
-        List<VariableInstanceEntity> entities = CommandContextUtil.getVariableService().findVariableInstancesByTaskIds(taskIds);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        List<VariableInstanceEntity> entities = cmmnEngineConfiguration.getVariableServiceConfiguration()
+                .getVariableService().createInternalVariableInstanceQuery().taskIds(taskIds).list();
+        List<VariableInstance> instances = new ArrayList<>(entities.size());
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();
             instances.add(entity);

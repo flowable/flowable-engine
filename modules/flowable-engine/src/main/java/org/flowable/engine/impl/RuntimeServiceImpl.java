@@ -49,6 +49,7 @@ import org.flowable.engine.impl.cmd.GetDataObjectsCmd;
 import org.flowable.engine.impl.cmd.GetEnabledActivitiesForAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkChildrenForTaskCmd;
+import org.flowable.engine.impl.cmd.GetEntityLinkChildrenWithSameRootAsProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkParentsForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.GetEntityLinkParentsForTaskCmd;
 import org.flowable.engine.impl.cmd.GetExecutionVariableCmd;
@@ -100,6 +101,10 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Daniel Meyer
  */
 public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RuntimeService {
+
+    public RuntimeServiceImpl(ProcessEngineConfigurationImpl configuration) {
+        super(configuration);
+    }
 
     @Override
     public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
@@ -183,7 +188,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ExecutionQuery createExecutionQuery() {
-        return new ExecutionQueryImpl(commandExecutor);
+        return new ExecutionQueryImpl(commandExecutor, configuration);
     }
 
     @Override
@@ -203,7 +208,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(commandExecutor);
+        return new EventSubscriptionQueryImpl(commandExecutor, configuration.getEventSubscriptionServiceConfiguration());
     }
 
     @Override
@@ -504,6 +509,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public List<EntityLink> getEntityLinkChildrenWithSameRootAsProcessInstance(String processInstanceId) {
+        return commandExecutor.execute(new GetEntityLinkChildrenWithSameRootAsProcessInstanceCmd(processInstanceId));
+    }
+
+    @Override
     public List<EntityLink> getEntityLinkChildrenForTask(String taskId) {
         return commandExecutor.execute(new GetEntityLinkChildrenForTaskCmd(taskId));
     }
@@ -520,7 +530,7 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
 
     @Override
     public ProcessInstanceQuery createProcessInstanceQuery() {
-        return new ProcessInstanceQueryImpl(commandExecutor);
+        return new ProcessInstanceQueryImpl(commandExecutor, configuration);
     }
 
     @Override
@@ -748,5 +758,4 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         commandExecutor.execute(new ChangeActivityStateCmd(changeActivityStateBuilder));
     }
-
 }

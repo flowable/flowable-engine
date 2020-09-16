@@ -39,22 +39,25 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
  */
 public class PlanItemInstanceEntityManagerImpl
-    extends AbstractEngineEntityManager<CmmnEngineConfiguration, PlanItemInstanceEntity, PlanItemInstanceDataManager>
-    implements PlanItemInstanceEntityManager {
+        extends AbstractEngineEntityManager<CmmnEngineConfiguration, PlanItemInstanceEntity, PlanItemInstanceDataManager>
+        implements PlanItemInstanceEntityManager {
     
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
         super(cmmnEngineConfiguration, planItemInstanceDataManager);
@@ -66,8 +69,6 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     public PlanItemInstanceEntity createChildPlanItemInstance(PlanItemInstanceEntityBuilderImpl builder) {
-
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
         ExpressionManager expressionManager = engineConfiguration.getExpressionManager();
 
         PlanItemInstanceEntity planItemInstanceEntity = create();
@@ -75,7 +76,7 @@ public class PlanItemInstanceEntityManagerImpl
         planItemInstanceEntity.setDerivedCaseDefinitionId(builder.getDerivedCaseDefinitionId());
         planItemInstanceEntity.setCaseInstanceId(builder.getCaseInstanceId());
 
-        planItemInstanceEntity.setCreateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+        planItemInstanceEntity.setCreateTime(engineConfiguration.getClock().getCurrentTime());
         planItemInstanceEntity.setElementId(builder.getPlanItem().getId());
         PlanItemDefinition planItemDefinition = builder.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition != null) {
@@ -132,37 +133,36 @@ public class PlanItemInstanceEntityManagerImpl
         }
 
         if (builder.addToParent) {
-            addPlanItemInstanceToParent(commandContext, planItemInstanceEntity);
+            addPlanItemInstanceToParent(planItemInstanceEntity);
         }
 
         return planItemInstanceEntity;
     }
     
-    protected void addPlanItemInstanceToParent(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected void addPlanItemInstanceToParent(PlanItemInstanceEntity planItemInstanceEntity) {
         if (planItemInstanceEntity.getStageInstanceId() != null) {
-            PlanItemInstanceEntity stagePlanItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+            PlanItemInstanceEntity stagePlanItemInstanceEntity = engineConfiguration.getPlanItemInstanceEntityManager()
                     .findById(planItemInstanceEntity.getStageInstanceId());
             stagePlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
         } else {
-            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+            CaseInstanceEntity caseInstanceEntity = engineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceEntity.getCaseInstanceId());
             caseInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
         }
     }
 
     @Override
     public void deleteSentryRelatedData(String planItemId) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
         PlanItemInstanceEntity planItemInstanceEntity = dataManager.findById(planItemId);
 
-        deleteSentryPartInstances(commandContext, planItemInstanceEntity);
-        deleteOrphanEventListeners(commandContext, planItemInstanceEntity);
+        deleteSentryPartInstances(planItemInstanceEntity);
+        deleteOrphanEventListeners(planItemInstanceEntity);
     }
 
     /**
      * Deletes any part instance of a sentry that was satisfied before to clean it up for further evaluation cycles.
      */
-    protected void deleteSentryPartInstances(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
+    protected void deleteSentryPartInstances(PlanItemInstanceEntity planItemInstanceEntity) {
+        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = engineConfiguration.getSentryPartInstanceEntityManager();
         if (planItemInstanceEntity.getPlanItem() != null
             && (!planItemInstanceEntity.getPlanItem().getEntryCriteria().isEmpty()
             || !planItemInstanceEntity.getPlanItem().getExitCriteria().isEmpty())) {
@@ -181,7 +181,7 @@ public class PlanItemInstanceEntityManagerImpl
      * that have moved to a terminal state, they would occur without anything listening to them
      * (and block completion of the parent stage). In that situation, they need to be removed.
      */
-    protected void deleteOrphanEventListeners(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected void deleteOrphanEventListeners(PlanItemInstanceEntity planItemInstanceEntity) {
 
         /*
          * 'Orphan' event listeners are event listeners that are no longer referenced by any plan item instance that is not in a terminal state.
@@ -207,17 +207,17 @@ public class PlanItemInstanceEntityManagerImpl
         if (planItem != null) {
 
             // Step 1 and 2 (gather and filter)
-            List<PlanItem> eventListenerDependencies = gatherEventListenerDependencies(commandContext, planItem, planItemInstanceEntity);
+            List<PlanItem> eventListenerDependencies = gatherEventListenerDependencies(planItem, planItemInstanceEntity);
 
             // Step 3 and 4 (determine dependent plan items for the event listener and check if it's orphaned)
             if (!eventListenerDependencies.isEmpty()) {
-                terminateOrphanedEventListeners(commandContext, planItemInstanceEntity, eventListenerDependencies);
+                terminateOrphanedEventListeners(planItemInstanceEntity, eventListenerDependencies);
             }
         }
     }
 
 
-    protected List<PlanItem> gatherEventListenerDependencies(CommandContext commandContext, PlanItem planItem, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected List<PlanItem> gatherEventListenerDependencies(PlanItem planItem, PlanItemInstanceEntity planItemInstanceEntity) {
         // first collect the event listeners
         List<PlanItem> eventListenerDependencies;
 
@@ -244,8 +244,8 @@ public class PlanItemInstanceEntityManagerImpl
 
             List<PlanItem> childPlanItemsWithDependencies = getChildPlanItemsWithDependencies((PlanFragment) planItem.getPlanItemDefinition());
 
-            CaseInstanceEntity caseInstanceEntity = CommandContextUtil
-                .getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+            CaseInstanceEntity caseInstanceEntity = engineConfiguration.getCaseInstanceEntityManager()
+                    .findById(planItemInstanceEntity.getCaseInstanceId());
             Map<String, List<PlanItemInstanceEntity>> childPlanItemInstancesMap = CaseInstanceUtil
                 .findChildPlanItemInstancesMap(caseInstanceEntity, childPlanItemsWithDependencies);
 
@@ -262,10 +262,10 @@ public class PlanItemInstanceEntityManagerImpl
         return eventListenerDependencies;
     }
 
-    protected void terminateOrphanedEventListeners(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,  List<PlanItem> eventListenerDependencies) {
+    protected void terminateOrphanedEventListeners(PlanItemInstanceEntity planItemInstanceEntity,  List<PlanItem> eventListenerDependencies) {
 
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil
-            .getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+        CaseInstanceEntity caseInstanceEntity = engineConfiguration.getCaseInstanceEntityManager()
+                .findById(planItemInstanceEntity.getCaseInstanceId());
 
         for (PlanItem eventListenerPlanItem : eventListenerDependencies) {
 
@@ -329,7 +329,7 @@ public class PlanItemInstanceEntityManagerImpl
                 if (isOrphan) {
                     for (PlanItemInstanceEntity eventListenerPlanItemInstanceEntity : eventListenerPlanItemInstance) {
                         // don't propagate the exit event type and exit type, if used on orphaned child plan items
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(eventListenerPlanItemInstanceEntity,
+                        CommandContextUtil.getAgenda().planTerminatePlanItemInstanceOperation(eventListenerPlanItemInstanceEntity,
                             null, null);
                     }
                 }
@@ -373,7 +373,7 @@ public class PlanItemInstanceEntityManagerImpl
     
     @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
-        return new PlanItemInstanceQueryImpl(engineConfiguration.getCommandExecutor());
+        return new PlanItemInstanceQueryImpl(engineConfiguration.getCommandExecutor(), engineConfiguration);
     }
 
     @Override
@@ -403,18 +403,19 @@ public class PlanItemInstanceEntityManagerImpl
 
     @Override
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
         CountingPlanItemInstanceEntity countingPlanItemInstanceEntity = (CountingPlanItemInstanceEntity) planItemInstanceEntity;
         
         // Variables
         if (countingPlanItemInstanceEntity.getVariableCount() > 0) {
-            VariableInstanceEntityManager variableInstanceEntityManager 
-                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-            List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), ScopeTypes.CMMN);
+
+            VariableService variableService = engineConfiguration.getVariableServiceConfiguration().getVariableService();
+            List<VariableInstanceEntity> variableInstanceEntities = variableService
+                    .createInternalVariableInstanceQuery()
+                    .subScopeId(planItemInstanceEntity.getId())
+                    .scopeTypes(ScopeTypes.CMMN_DEPENDENT)
+                    .list();
             for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-                variableInstanceEntityManager.delete(variableInstanceEntity);
+                variableService.deleteVariableInstance(variableInstanceEntity);
             }
         }
         
@@ -427,7 +428,7 @@ public class PlanItemInstanceEntityManagerImpl
         }
         
         if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.TIMER_EVENT_LISTENER)) {
-            TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
+            TimerJobEntityManager timerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
             List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
                 .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
             for (TimerJobEntity timerJobEntity : timerJobsEntities) {
@@ -436,15 +437,42 @@ public class PlanItemInstanceEntityManagerImpl
         }
 
         if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.CASE_PAGE_TASK)) {
-            IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+            IdentityLinkEntityManager identityLinkEntityManager = engineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
             List<IdentityLinkEntity> identityLinkEntities = identityLinkEntityManager
                 .findIdentityLinksBySubScopeIdAndType(planItemInstanceEntity.getId(), ScopeTypes.PLAN_ITEM);
             for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
                 identityLinkEntityManager.delete(identityLinkEntity);
             }
         }
+
+        if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.EXTERNAL_WORKER_TASK)) {
+            ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration
+                    .getJobServiceConfiguration().getExternalWorkerJobEntityManager();
+            List<ExternalWorkerJobEntity> externalWorkerJobEntities = externalWorkerJobEntityManager
+                    .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+
+            for (ExternalWorkerJobEntity externalWorkerJobEntity : externalWorkerJobEntities) {
+                externalWorkerJobEntityManager.delete(externalWorkerJobEntity);
+            }
+        }
         
         getDataManager().delete(planItemInstanceEntity);
+    }
+
+    @Override
+    public void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        CommandContext commandContext = Context.getCommandContext();
+        PlanItemInstanceQuery planItemQuery = new PlanItemInstanceQueryImpl(commandContext, engineConfiguration)
+                .caseInstanceId(caseInstanceId)
+                .includeEnded();
+        List<PlanItemInstance> planItemInstances = findByCriteria(planItemQuery);
+        if (planItemInstances != null) {
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+                planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(planItemInstanceEntity);
+            }
+        }
     }
 
     protected CaseInstanceEntityManager getCaseInstanceEntityManager() {

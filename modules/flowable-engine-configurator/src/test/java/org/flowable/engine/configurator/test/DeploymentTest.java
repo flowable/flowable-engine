@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.configurator.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
@@ -49,35 +48,35 @@ public class DeploymentTest extends FlowableAppTestCase {
         
         try {
             AppDeployment queryAppDeployment = appRepositoryService.createDeploymentQuery().singleResult();
-            assertNotNull(queryAppDeployment);
-            assertEquals(appDeployment.getId(), queryAppDeployment.getId());
+            assertThat(queryAppDeployment).isNotNull();
+            assertThat(queryAppDeployment.getId()).isEqualTo(appDeployment.getId());
             
             AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
-            assertNotNull(appDefinition.getId());
-            assertNotNull(appDeployment.getId(), appDefinition.getDeploymentId());
-            assertEquals("testApp", appDefinition.getKey());
-            assertEquals("Test app", appDefinition.getName());
-            assertEquals(1, appDefinition.getVersion());
+            assertThat(appDefinition.getId()).isNotNull();
+            assertThat(appDefinition.getDeploymentId()).isNotNull();
+            assertThat(appDefinition.getKey()).isEqualTo("testApp");
+            assertThat(appDefinition.getName()).isEqualTo("Test app");
+            assertThat(appDefinition.getVersion()).isEqualTo(1);
             
             processEngineConfiguration = (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
                             .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             RepositoryService repositoryService = processEngineConfiguration.getRepositoryService();
             deployment = repositoryService.createDeploymentQuery().parentDeploymentId(appDeployment.getId()).singleResult();
-            assertNotNull(deployment);
-            assertEquals(appDeployment.getId(), deployment.getParentDeploymentId());
+            assertThat(deployment).isNotNull();
+            assertThat(deployment.getParentDeploymentId()).isEqualTo(appDeployment.getId());
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult();
-            assertNotNull(processDefinition);
-            assertEquals("oneTask", processDefinition.getKey());
+            assertThat(processDefinition).isNotNull();
+            assertThat(processDefinition.getKey()).isEqualTo("oneTask");
             
             cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
                             .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
             CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
             cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().parentDeploymentId(appDeployment.getId()).singleResult();
-            assertNotNull(cmmnDeployment);
-            assertEquals(appDeployment.getId(), cmmnDeployment.getParentDeploymentId());
+            assertThat(cmmnDeployment).isNotNull();
+            assertThat(cmmnDeployment.getParentDeploymentId()).isEqualTo(appDeployment.getId());
             CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
-            assertNotNull(caseDefinition);
-            assertEquals("oneTaskCase", caseDefinition.getKey());
+            assertThat(caseDefinition).isNotNull();
+            assertThat(caseDefinition.getKey()).isEqualTo("oneTaskCase");
             
             
         } finally {

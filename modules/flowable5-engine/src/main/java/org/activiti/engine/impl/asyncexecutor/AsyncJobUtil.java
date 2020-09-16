@@ -25,6 +25,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,7 @@ public class AsyncJobUtil {
                 if (commandContext.getEventDispatcher().isEnabled()) {
                     try {
                         commandContext.getEventDispatcher().dispatchEvent(ActivitiEventBuilder.createEntityExceptionEvent(
-                                FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception));
+                                FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, exception), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                     } catch (Throwable ignore) {
                         LOGGER.warn("Exception occurred while dispatching job failure event, ignoring.", ignore);
                     }

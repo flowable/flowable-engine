@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -21,12 +25,6 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Joram Barrez
@@ -40,39 +38,39 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleStageCompletion() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNotNull(taskC);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskC.getState());
+        assertThat(taskC).isNotNull();
+        assertThat(taskC.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         //Trigger the test
         assertCaseInstanceNotEnded(caseInstance);
         cmmnRuntimeService.triggerPlanItemInstance(taskC.getId());
 
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNull(stageOne);
+        assertThat(stageOne).isNull();
         taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNull(taskB);
+        assertThat(taskB).isNull();
         taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNull(taskC);
+        assertThat(taskC).isNull();
 
         assertCaseInstanceNotEnded(caseInstance);
 
@@ -84,39 +82,40 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testStagedEventListenerBypassed() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
-        PlanItemInstance listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        assertNotNull(listener);
-        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
+        PlanItemInstance listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .singleResult();
+        assertThat(listener).isNotNull();
+        assertThat(listener.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Trigger the test
         cmmnRuntimeService.triggerPlanItemInstance(taskB.getId());
         assertCaseInstanceNotEnded(caseInstance);
 
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNull(stageOne);
+        assertThat(stageOne).isNull();
         taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNull(taskB);
+        assertThat(taskB).isNull();
         listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        assertNull(listener);
+        assertThat(listener).isNull();
 
         //End the case
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
@@ -127,33 +126,34 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testEventListenerBypassed() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(3);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
-        PlanItemInstance listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        assertNotNull(listener);
-        assertEquals(PlanItemInstanceState.AVAILABLE, listener.getState());
+        PlanItemInstance listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .singleResult();
+        assertThat(listener).isNotNull();
+        assertThat(listener.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Trigger the test
         cmmnRuntimeService.triggerPlanItemInstance(taskB.getId());
         assertCaseInstanceNotEnded(caseInstance);
 
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNull(taskB);
+        assertThat(taskB).isNull();
         listener = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).singleResult();
-        assertNull(listener);
+        assertThat(listener).isNull();
 
         //End the case
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
@@ -164,41 +164,41 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testEmbeddedStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(6, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(6);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance stageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("completionNeutralStage").singleResult();
-        assertNotNull(stageTwo);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageTwo.getState());
+        assertThat(stageTwo).isNotNull();
+        assertThat(stageTwo.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNotNull(taskC);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskC.getState());
+        assertThat(taskC).isNotNull();
+        assertThat(taskC.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance taskD = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskD").singleResult();
-        assertNotNull(taskD);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskD.getState());
+        assertThat(taskD).isNotNull();
+        assertThat(taskD.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         //Trigger the test
         cmmnRuntimeService.triggerPlanItemInstance(taskD.getId());
         assertCaseInstanceNotEnded(caseInstance);
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(1);
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
         assertCaseInstanceEnded(caseInstance);
     }
@@ -207,44 +207,44 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testRequiredPrecedence() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         PlanItemInstance taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNotNull(taskC);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskC.getState());
+        assertThat(taskC).isNotNull();
+        assertThat(taskC.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         //Trigger the test
         cmmnRuntimeService.triggerPlanItemInstance(taskC.getId());
         assertCaseInstanceNotEnded(caseInstance);
-        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(3);
 
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
+        assertThat(stageOne).isNotNull();
         taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
+        assertThat(taskB).isNotNull();
         taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNull(taskC);
+        assertThat(taskC).isNull();
 
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
         assertCaseInstanceNotEnded(caseInstance);
-        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(2);
         cmmnRuntimeService.triggerPlanItemInstance(taskB.getId());
         assertCaseInstanceEnded(caseInstance);
     }
@@ -253,24 +253,25 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         List<PlanItemInstance> list = cmmnRuntimeService.createPlanItemInstanceQuery().list();
 
         //Check case setup
-        assertEquals(5, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.AVAILABLE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
-        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(3, listeners.size());
-        listeners.forEach(l -> assertEquals(PlanItemInstanceState.AVAILABLE,l.getState()));
+        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .list();
+        assertThat(listeners).hasSize(3);
+        listeners.forEach(l -> assertThat(l.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE));
 
         //Trigger the test
         //Triggering Listener One will Activate StageOne which will complete as nothing ties it
@@ -279,11 +280,11 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
                 .planItemDefinitionId("userEventOne").singleResult();
         cmmnRuntimeService.triggerPlanItemInstance(userEventOne.getId());
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNull(stageOne);
+        assertThat(stageOne).isNull();
 
         // The listeners should all be removed
         listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(0, listeners.size());
+        assertThat(listeners).isEmpty();
         assertCaseInstanceNotEnded(caseInstance);
 
         //The only thing keeping the case from ending is TaskA even with a deep nested required task, because its not AVAILABLE yet
@@ -295,22 +296,23 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest2() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(5, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.AVAILABLE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
-        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(3, listeners.size());
-        listeners.forEach(l -> assertEquals(PlanItemInstanceState.AVAILABLE,l.getState()));
+        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .list();
+        assertThat(listeners).hasSize(3);
+        listeners.forEach(l -> assertThat(l.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE));
 
         //Trigger the test
         //This time a task inside StageOne is required, thus it will not complete once activated
@@ -320,21 +322,21 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
         assertCaseInstanceNotEnded(caseInstance);
 
-        assertEquals(6, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(6);
         listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(2, listeners.size());
+        assertThat(listeners).hasSize(2);
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         PlanItemInstance stageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageTwo").singleResult();
-        assertNotNull(stageTwo);
-        assertEquals(PlanItemInstanceState.AVAILABLE, stageTwo.getState());
+        assertThat(stageTwo).isNotNull();
+        assertThat(stageTwo.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Completing taskB and then taskA should end the case
         //Order is important since required taskC nested in StageTwo is not yet available
@@ -354,23 +356,23 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest3() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Check case setup
-        assertEquals(5, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
 
         PlanItemInstance stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.AVAILABLE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
-        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(3, listeners.size());
-        listeners.forEach(l -> assertEquals(PlanItemInstanceState.AVAILABLE,l.getState()));
-
+        List<PlanItemInstance> listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
+                .list();
+        assertThat(listeners).hasSize(3);
+        listeners.forEach(l -> assertThat(l.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE));
 
         //Trigger the test
         //This time a task inside StageOne is required, thus it will not complete once activated
@@ -380,21 +382,21 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(userEvent.getId());
         assertCaseInstanceNotEnded(caseInstance);
 
-        assertEquals(6, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(6);
         listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(2, listeners.size());
+        assertThat(listeners).hasSize(2);
         taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskA").singleResult();
-        assertNotNull(taskA);
-        assertEquals(PlanItemInstanceState.ACTIVE, taskA.getState());
+        assertThat(taskA).isNotNull();
+        assertThat(taskA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         PlanItemInstance stageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageTwo").singleResult();
-        assertNotNull(stageTwo);
-        assertEquals(PlanItemInstanceState.AVAILABLE, stageTwo.getState());
+        assertThat(stageTwo).isNotNull();
+        assertThat(stageTwo.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
         PlanItemInstance taskB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").singleResult();
-        assertNotNull(taskB);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskB.getState());
+        assertThat(taskB).isNotNull();
+        assertThat(taskB.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //This time we complete taskA first, making stageTwo Active,
         //making available the required taskC
@@ -407,18 +409,18 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
         assertCaseInstanceNotEnded(caseInstance);
 
         List<PlanItemInstance> list = cmmnRuntimeService.createPlanItemInstanceQuery().list();
-        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
         listeners = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
-        assertEquals(1, listeners.size());
+        assertThat(listeners).hasSize(1);
         stageOne = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageOne").singleResult();
-        assertNotNull(stageOne);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageOne.getState());
+        assertThat(stageOne).isNotNull();
+        assertThat(stageOne.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         stageTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("stageTwo").singleResult();
-        assertNotNull(stageTwo);
-        assertEquals(PlanItemInstanceState.ACTIVE, stageTwo.getState());
+        assertThat(stageTwo).isNotNull();
+        assertThat(stageTwo.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
         PlanItemInstance taskC = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").singleResult();
-        assertNotNull(taskC);
-        assertEquals(PlanItemInstanceState.AVAILABLE, taskC.getState());
+        assertThat(taskC).isNotNull();
+        assertThat(taskC.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Now we need to activate TaskC and complete it to end the case
         userEvent = cmmnRuntimeService.createPlanItemInstanceQuery()

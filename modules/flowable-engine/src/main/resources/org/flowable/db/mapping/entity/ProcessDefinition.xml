@@ -9,8 +9,7 @@
   <insert id="insertProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
     insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -33,8 +32,7 @@
     VALUES 
       <foreach collection="list" item="processDefinition" index="index" separator=","> 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -59,8 +57,7 @@
       INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_) VALUES 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -291,6 +288,23 @@
     select * 
     from ${prefix}ACT_RE_PROCDEF 
     where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{processDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
+
+    <!-- TODO when deploying cmmn from the Process engine then the BPMN resources do not have a parent deployment, they are the parent deployment   -->
+    <select id="selectProcessDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+    <select id="selectProcessDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
       and KEY_ = #{processDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>

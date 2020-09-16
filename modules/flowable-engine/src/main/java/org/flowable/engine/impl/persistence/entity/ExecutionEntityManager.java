@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -104,8 +105,10 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     
     void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason);
 
-    void updateProcessInstanceLockTime(String processInstanceId);
+    void updateProcessInstanceLockTime(String processInstanceId, String lockOwner, Date lockTime);
 
     void clearProcessInstanceLockTime(String processInstanceId);
+
+    void clearAllProcessInstanceLockTimes(String lockOwner);
 
 }

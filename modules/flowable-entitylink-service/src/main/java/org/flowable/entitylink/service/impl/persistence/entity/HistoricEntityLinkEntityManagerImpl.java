@@ -27,8 +27,8 @@ public class HistoricEntityLinkEntityManagerImpl
     extends AbstractServiceEngineEntityManager<EntityLinkServiceConfiguration, HistoricEntityLinkEntity, HistoricEntityLinkDataManager>
     implements HistoricEntityLinkEntityManager {
 
-    public HistoricEntityLinkEntityManagerImpl(EntityLinkServiceConfiguration identityLinkServiceConfiguration, HistoricEntityLinkDataManager historicEntityLinkDataManager) {
-        super(identityLinkServiceConfiguration, historicEntityLinkDataManager);
+    public HistoricEntityLinkEntityManagerImpl(EntityLinkServiceConfiguration entityLinkServiceConfiguration, HistoricEntityLinkDataManager historicEntityLinkDataManager) {
+        super(entityLinkServiceConfiguration, entityLinkServiceConfiguration.getEngineName(), historicEntityLinkDataManager);
     }
 
     @Override
@@ -42,6 +42,12 @@ public class HistoricEntityLinkEntityManagerImpl
     public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
+
+    @Override
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        return dataManager.findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
+    }
+
     @Override
     public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
         return dataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);

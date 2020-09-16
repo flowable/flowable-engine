@@ -12,9 +12,9 @@
  */
 package org.flowable.app.engine.test.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,59 +82,59 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
 
     @Test
     public void testQueryNoParams() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByDeploymentId() {
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).count()).isEqualTo(1);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId2).count()).isEqualTo(1);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId3).count()).isEqualTo(1);
         
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId4).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentId() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentId("invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByDeploymentIds() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3, deploymentId4))).list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3, deploymentId4))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery()
+            .deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3, deploymentId4))).list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery()
+            .deploymentIds(new HashSet<>(Arrays.asList(deploymentId1, deploymentId2, deploymentId3, deploymentId4))).count()).isEqualTo(4);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId1))).count()).isEqualTo(1);
 
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).list().size());
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).list()).hasSize(2);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Arrays.asList(deploymentId2, deploymentId3))).count())
+            .isEqualTo(2);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList(deploymentId3))).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidDeploymentIds() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isZero();
     }
 
     @Test
     public void testQueryByEmptyDeploymentIds() {
-        try {
-            appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>()).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> appRepositoryService.createAppDefinitionQuery().deploymentIds(new HashSet<>()).list())
+            .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -143,23 +143,23 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         List<String> appDefinitionIdsDeployment2 = getAppDefinitionIds(deploymentId2);
         List<String> appDefinitionIdsDeployment3 = getAppDefinitionIds(deploymentId3);
 
-        assertNotNull(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).singleResult());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).singleResult()).isNotNull();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment1.get(0)).count()).isEqualTo(1);
 
-        assertNotNull(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).singleResult());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).singleResult()).isNotNull();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment2.get(0)).count()).isEqualTo(1);
 
-        assertNotNull(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).singleResult());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).singleResult()).isNotNull();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId(appDefinitionIdsDeployment3.get(0)).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionId() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionId("invalid").count()).isZero();
     }
 
     @Test
@@ -167,301 +167,294 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
         List<String> appDefinitionIdsDeployment1 = getAppDefinitionIds(deploymentId1);
         List<String> appDefinitionIdsDeployment2 = getAppDefinitionIds(deploymentId2);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment1)).count()).isEqualTo(1);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment2)).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment2)).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment2)).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(appDefinitionIdsDeployment2)).count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByEmptyAppDefinitionIds() {
-        try {
-            appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>()).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>()).list())
+            .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionIds() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionIds(new HashSet<>(Arrays.asList("invalid1", "invalid2"))).count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionCategory() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("http://flowable.org/app").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("http://flowable.org/app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("http://flowable.org/app").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("http://flowable.org/app").count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionCategory() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategory("invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionCategoryLike() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("http%").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("http%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("http%").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("http%").count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionCategoryLike() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%n").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryLike("invalid%n").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionCategoryNotEquals() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("another").count()).isEqualTo(4);
 
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionCategoryNotEquals("http://flowable.org/app").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionName() {
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").list().size());
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Test app").count()).isEqualTo(3);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").count()).isEqualTo(1);
 
-        assertEquals(deploymentId2, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").singleResult().getDeploymentId());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Full info app").singleResult().getDeploymentId())
+            .isEqualTo(deploymentId2);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionName() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionName("Case 3").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionNameLike() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("%app").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("%app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("%app").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("%app").count()).isEqualTo(4);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("Full%").count()).isEqualTo(1);
 
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionNameLike("invalid%").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionKey() {
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").list().size());
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").count()).isEqualTo(3);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("fullInfoApp").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("fullInfoApp").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("fullInfoApp").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("fullInfoApp").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionKey() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionKeyLike() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%App").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%App").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%App").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%App").count()).isEqualTo(4);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("full%").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("full%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("full%").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("full%").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionKeyLike() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKeyLike("%invalid").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionVersion() {
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(1).list().size());
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(1).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(1).list()).hasSize(2);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(1).count()).isEqualTo(2);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(2).count()).isEqualTo(1);
 
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersion(4).count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionVersionGreaterThan() {
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(2).count()).isEqualTo(1);
 
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThan(3).count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionVersionGreaterThanOrEquals() {
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(2).list().size());
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(2).list()).hasSize(2);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(2).count()).isEqualTo(2);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(3).count()).isEqualTo(1);
 
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionGreaterThanOrEquals(4).count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionVersionLowerThan() {
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(2).list().size());
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(2).list()).hasSize(2);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(2).count()).isEqualTo(2);
 
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(3).list().size());
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(3).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(3).list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThan(3).count()).isEqualTo(3);
     }
 
     @Test
     public void testQueryByAppDefinitionVersionLowerThanOrEquals() {
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(2).list().size());
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(2).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(2).list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(2).count()).isEqualTo(3);
 
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(3).list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(3).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(3).list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(3).count()).isEqualTo(4);
 
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(4).list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(4).count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(4).list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionVersionLowerThanOrEquals(4).count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryByLatestVersion() {
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().latestVersion().list().size());
-        assertEquals(2, appRepositoryService.createAppDefinitionQuery().latestVersion().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().latestVersion().list()).hasSize(2);
+        assertThat(appRepositoryService.createAppDefinitionQuery().latestVersion().count()).isEqualTo(2);
     }
 
     @Test
     public void testQueryByLatestVersionAndKey() {
         AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").latestVersion().singleResult();
-        assertNotNull(appDefinition);
-        assertEquals(3, appDefinition.getVersion());
-        assertEquals(deploymentId4, appDefinition.getDeploymentId());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").latestVersion().list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").latestVersion().count());
+        assertThat(appDefinition).isNotNull();
+        assertThat(appDefinition.getVersion()).isEqualTo(3);
+        assertThat(appDefinition.getDeploymentId()).isEqualTo(deploymentId4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").latestVersion().list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionKey("testApp").latestVersion().count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByAppDefinitionResourceName() {
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").list().size());
-        assertEquals(3, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").list()).hasSize(3);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").count()).isEqualTo(3);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/fullinfo.app").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/fullinfo.app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/fullinfo.app").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/fullinfo.app").count()).isEqualTo(1);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").latestVersion().list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").latestVersion().count());
+        assertThat(
+            appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").latestVersion().list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("org/flowable/app/engine/test/test.app").latestVersion().count())
+            .isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionResourceName() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceName("invalid.app").count()).isZero();
     }
 
     @Test
     public void testQueryByAppDefinitionResourceNameLike() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%.app").list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%.app").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%.app").list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%.app").count()).isEqualTo(4);
 
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%full%").list().size());
-        assertEquals(1, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%full%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%full%").list()).hasSize(1);
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%full%").count()).isEqualTo(1);
     }
 
     @Test
     public void testQueryByInvalidAppDefinitionResourceNameLike() {
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").list().size());
-        assertEquals(0, appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").list()).isEmpty();
+        assertThat(appRepositoryService.createAppDefinitionQuery().appDefinitionResourceNameLike("%invalid%").count()).isZero();
     }
 
     @Test
     public void testQueryOrderByAppDefinitionCategory() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().asc().count());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().asc().count()).isEqualTo(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionCategory().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByCaseDefinitionKey() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().count()).isEqualTo(4);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list();
-        for (int i = 0; i < appDefinitions.size(); i++) {
-            if (i > 0) {
-                assertEquals("testApp", appDefinitions.get(i).getKey());
-            } else {
-                assertEquals("fullInfoApp", appDefinitions.get(i).getKey());
-            }
-        }
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey)
+            .containsExactly("fullInfoApp", "testApp", "testApp", "testApp");
 
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().count()).isEqualTo(4);
         appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().desc().list();
-        for (int i = 0; i < appDefinitions.size(); i++) {
-            if (i <= 2) {
-                assertEquals("testApp", appDefinitions.get(i).getKey());
-            } else {
-                assertEquals("fullInfoApp", appDefinitions.get(i).getKey());
-            }
-        }
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey)
+            .containsExactly("testApp", "testApp", "testApp", "fullInfoApp");
     }
 
     @Test
     public void testQueryOrderByAppDefinitionId() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().asc().count());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().asc().count()).isEqualTo(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionId().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByAppDefinitionName() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().asc().count());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().asc().count()).isEqualTo(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionName().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByAppDefinitionDeploymentId() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().asc().count());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().asc().count()).isEqualTo(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByDeploymentId().desc().count()).isEqualTo(4);
     }
 
     @Test
     public void testQueryOrderByAppDefinitionVersion() {
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().asc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().asc().count());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().list().size());
-        assertEquals(4, appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().count());
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().asc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().asc().count()).isEqualTo(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().list()).hasSize(4);
+        assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().count()).isEqualTo(4);
 
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionVersion().desc().list();
-        assertEquals(3, appDefinitions.get(0).getVersion());
-        assertEquals(2, appDefinitions.get(1).getVersion());
-        assertEquals(1, appDefinitions.get(2).getVersion());
-        assertEquals(1, appDefinitions.get(3).getVersion());
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getVersion)
+            .containsExactly(3, 2, 1, 1);
 
         appDefinitions = appRepositoryService.createAppDefinitionQuery().latestVersion().orderByAppDefinitionVersion().asc().list();
-        assertEquals(1, appDefinitions.get(0).getVersion());
-        assertEquals("fullInfoApp", appDefinitions.get(0).getKey());
-        assertEquals(3, appDefinitions.get(1).getVersion());
-        assertEquals("testApp", appDefinitions.get(1).getKey());
+        assertThat(appDefinitions)
+            .extracting(AppDefinition::getKey, AppDefinition::getVersion)
+            .containsExactly(
+                tuple("fullInfoApp", 1),
+                tuple("testApp", 3)
+            );
     }
 
     private List<String> getAppDefinitionIds(String deploymentId) {

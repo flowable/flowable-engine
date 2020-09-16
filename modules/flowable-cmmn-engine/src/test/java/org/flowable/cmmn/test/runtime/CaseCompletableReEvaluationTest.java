@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.UNAVAILABLE;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
@@ -24,6 +24,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.Test;
 
 /**
@@ -40,7 +42,7 @@ public class CaseCompletableReEvaluationTest extends FlowableCmmnTestCase {
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ENABLED);
 
@@ -49,15 +51,18 @@ public class CaseCompletableReEvaluationTest extends FlowableCmmnTestCase {
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
 
-        assertEquals(2, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(2);
         assertPlanItemInstanceState(planItemInstances, "Complete case if completable", UNAVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
 
         // complete task A which will complete the case
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
 }

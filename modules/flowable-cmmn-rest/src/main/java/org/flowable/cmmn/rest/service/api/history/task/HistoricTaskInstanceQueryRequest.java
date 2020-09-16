@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history.task;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,10 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceId;
     private String caseInstanceIdWithChildren;
     private String caseDefinitionId;
+    private String caseDefinitionKey;
+    private String caseDefinitionKeyLike;
+    private String caseDefinitionKeyLikeIgnoreCase;
+    private Collection<String> caseDefinitionKeys;
     private String taskName;
     private String taskNameLike;
     private String taskDescription;
@@ -67,6 +72,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     private String tenantIdLike;
     private Boolean withoutTenantId;
     private String taskCandidateGroup;
+    private boolean ignoreTaskAssignee;
 
     public String getTaskId() {
         return taskId;
@@ -100,6 +106,35 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
         this.caseDefinitionId = caseDefinitionId;
     }
 
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public void setCaseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public void setCaseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+    }
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+    public void setCaseDefinitionKeys(Collection<String> caseDefinitionKeys) {
+        this.caseDefinitionKeys = caseDefinitionKeys;
+    }
     public String getTaskName() {
         return taskName;
     }
@@ -387,6 +422,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskCandidateGroup(String taskCandidateGroup) {
         this.taskCandidateGroup = taskCandidateGroup;
+    }
+
+    public boolean isIgnoreTaskAssignee() {
+        return ignoreTaskAssignee;
+    }
+
+    public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
+        this.ignoreTaskAssignee = ignoreTaskAssignee;
     }
 
 }

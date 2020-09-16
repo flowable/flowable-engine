@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
@@ -29,6 +29,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public EntityLinkCreatedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_ENTITY_LINK_CREATED);
@@ -41,17 +45,21 @@ public class EntityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJson
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
         HistoricEntityLinkEntity historicEntityLinkEntity = (HistoricEntityLinkEntity) historicEntityLinkService.createHistoricEntityLink();
         historicEntityLinkEntity.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         historicEntityLinkEntity.setLinkType(getStringFromJson(historicalData, HistoryJsonConstants.ENTITY_LINK_TYPE));
         historicEntityLinkEntity.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME));
         historicEntityLinkEntity.setScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_ID));
+        historicEntityLinkEntity.setSubScopeId(getStringFromJson(historicalData, HistoryJsonConstants.SUB_SCOPE_ID));
         historicEntityLinkEntity.setScopeType(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_TYPE));
         historicEntityLinkEntity.setScopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.SCOPE_DEFINITION_ID));
+        historicEntityLinkEntity.setParentElementId(getStringFromJson(historicalData, HistoryJsonConstants.PARENT_ELEMENT_ID));
         historicEntityLinkEntity.setReferenceScopeId(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_ID));
         historicEntityLinkEntity.setReferenceScopeType(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_TYPE));
         historicEntityLinkEntity.setReferenceScopeDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.REF_SCOPE_DEFINITION_ID));
+        historicEntityLinkEntity.setRootScopeId(getStringFromJson(historicalData, HistoryJsonConstants.ROOT_SCOPE_ID));
+        historicEntityLinkEntity.setRootScopeType(getStringFromJson(historicalData, HistoryJsonConstants.ROOT_SCOPE_TYPE));
         historicEntityLinkEntity.setHierarchyType(getStringFromJson(historicalData, HistoryJsonConstants.HIERARCHY_TYPE));
         historicEntityLinkService.insertHistoricEntityLink(historicEntityLinkEntity, false);
     }

@@ -30,9 +30,4 @@ public class VariableGetExpressionFunction extends AbstractFlowableVariableExpre
         return getVariableValue(variableContainer, variableName);
     }
     
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-
 }

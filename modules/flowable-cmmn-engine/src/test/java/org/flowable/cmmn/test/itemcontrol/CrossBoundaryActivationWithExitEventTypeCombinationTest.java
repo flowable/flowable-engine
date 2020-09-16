@@ -12,12 +12,12 @@
  */
 package org.flowable.cmmn.test.itemcontrol;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ENABLED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.UNAVAILABLE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
@@ -25,7 +25,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -43,7 +42,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
             .start();
 
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", AVAILABLE);
@@ -57,7 +56,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "complete stage", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
 
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Decision", ACTIVE);
@@ -69,7 +68,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
             .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", WAITING_FOR_REPETITION);
@@ -84,7 +83,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "complete stage", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
 
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Decision", ACTIVE);
@@ -96,7 +95,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
             .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(6, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(6);
 
         assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Stage B", WAITING_FOR_REPETITION);
@@ -110,7 +109,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "complete stage", AVAILABLE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(4, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(4);
 
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Decision", ACTIVE);
@@ -122,7 +121,7 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
             .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(3, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(3);
 
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Follow-up", ACTIVE);
@@ -130,10 +129,10 @@ public class CrossBoundaryActivationWithExitEventTypeCombinationTest extends Flo
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByNameAndState(planItemInstances, "Follow-up", ACTIVE));
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
-        assertEquals(0, planItemInstances.size());
+        assertThat(planItemInstances).isEmpty();
 
         assertCaseInstanceEnded(caseInstance);
-        Assert.assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        Assert.assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 }

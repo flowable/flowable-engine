@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.interceptor;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -27,6 +27,12 @@ import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInterceptor {
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public DefaultCmmnIdentityLinkInterceptor(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     @Override
     public void handleCompleteTask(TaskEntity task) {
@@ -55,15 +61,15 @@ public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInter
     public void handleCreateCaseInstance(CaseInstanceEntity caseInstance) {
         String authenticatedUserId = Authentication.getAuthenticatedUserId();
         if (authenticatedUserId != null) {
-            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.STARTER);
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.STARTER, cmmnEngineConfiguration);
         }
     }
     
     protected void addUserIdentityLinkToParent(Task task, String userId) {
         if (userId != null && ScopeTypes.CMMN.equals(task.getScopeType()) && StringUtils.isNotEmpty(task.getScopeId())) {
-            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
+            CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(task.getScopeId());
             if (caseInstanceEntity != null) {
-                List<IdentityLinkEntity> identityLinks = CommandContextUtil.getIdentityLinkService()
+                List<IdentityLinkEntity> identityLinks = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                     .findIdentityLinksByScopeIdAndType(caseInstanceEntity.getId(), ScopeTypes.CMMN);
                 for (IdentityLinkEntity identityLink : identityLinks) {
                     if (identityLink.isUser() && identityLink.getUserId().equals(userId) && IdentityLinkType.PARTICIPANT.equals(identityLink.getType())) {
@@ -71,7 +77,7 @@ public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInter
                     }
                 }
 
-                IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, IdentityLinkType.PARTICIPANT);
+                IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, IdentityLinkType.PARTICIPANT, cmmnEngineConfiguration);
             }
         }
     }

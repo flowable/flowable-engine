@@ -22,6 +22,6 @@ public interface FlowableConditionalEvent extends FlowableActivityEvent {
     /**
      * @return the condition expression of the conditional event.
      */
-    public String getConditionExpression();
+    String getConditionExpression();
 
 }

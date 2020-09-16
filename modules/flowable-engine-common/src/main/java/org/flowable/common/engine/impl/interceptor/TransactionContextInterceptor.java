@@ -33,7 +33,7 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
     }
 
     @Override
-    public <T> T execute(CommandConfig config, Command<T> command) {
+    public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
 
         CommandContext commandContext = Context.getCommandContext();
         // Storing it in a variable, to reference later (it can change during command execution)
@@ -44,13 +44,13 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
         try {
 
             if (openTransaction) {
-                TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
+                TransactionContext transactionContext = transactionContextFactory.openTransactionContext(commandContext);
                 Context.setTransactionContext(transactionContext);
                 isContextSet = true;
                 commandContext.addCloseListener(new TransactionCommandContextCloseListener(transactionContext));
             }
 
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
 
         } finally {
             if (openTransaction && isContextSet) {

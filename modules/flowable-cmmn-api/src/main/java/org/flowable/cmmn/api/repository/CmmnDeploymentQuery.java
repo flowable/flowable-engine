@@ -124,7 +124,7 @@ public interface CmmnDeploymentQuery extends Query<CmmnDeploymentQuery, CmmnDepl
     /**
      * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
-    CmmnDeploymentQuery orderByDeploymenTime();
+    CmmnDeploymentQuery orderByDeploymentTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

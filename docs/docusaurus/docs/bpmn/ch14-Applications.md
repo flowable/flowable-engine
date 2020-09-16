@@ -417,25 +417,31 @@ If setting the query alone is insufficient for your specific LDAP setup, you can
 <td><p>The port of the mail server.</p></td>
 </tr>
 <tr class="odd">
+<td><p>flowable.mail.server.ssl-port</p></td>
+<td><p>email.ssl-port</p></td>
+<td><p>1465</p></td>
+<td><p>The SSL port of the mail server.</p></td>
+</tr>
+<tr class="even">
 <td><p>flowable.mail.server.use-ssl</p></td>
 <td><p>email.use-ssl</p></td>
 <td><p>false</p></td>
 <td><p>Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p>flowable.mail.server.use-tls</p></td>
 <td><p>email.use-tls</p></td>
 <td><p>false</p></td>
 <td><p>Set or disable the STARTTLS encryption.</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><p>flowable.mail.server.username</p></td>
 <td><p>email.username</p></td>
 <td><p>-</p></td>
 <td><p>The username that needs to be used for the mail server authentication.
 If empty no authentication would be used.</p></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><p>flowable.process.definition-cache-limit</p></td>
 <td><p>flowable.process-definitions.cache.max</p></td>
 <td><p>-1</p></td>
@@ -817,7 +823,10 @@ A process model can be selected by clicking on the model thumbnail. When one or 
 From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
 download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
 
-From the app definition details view, you can also *Publish* the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the application.properties file with the *flowable.modeler.app.deployment-api-url* property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it’s running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the *Publish* button. The app definition is now deployed as a BAR file to the Flowable Task application.
+From the app definition details view, you can also *Publish* the app definition directly to the Flowable engine. 
+The Flowable Modeler can only deploy if it is part of the single UI app (i.e. the engines are present during the runtime).
+The Standalone UI Modeler cannot deploy to a remote Flowable Task Application.
+Once you click on the *Publish* button. The app definition is now deployed as a BAR file to the Flowable Task application.
 
 This are the Modeler UI App specific properties.
 
@@ -845,13 +854,6 @@ This are the Modeler UI App specific properties.
 <td><p>The prefix for the database tables.</p></td>
 </tr>
 <tr class="even">
-<td><p>flowable.modeler.app.deployment-api-url</p></td>
-<td><p>deployment.api.url</p></td>
-<td><p><a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
-<td><p>The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
-Default url for the Flowable Task application is <a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
-</tr>
-<tr class="odd">
 <td><p>flowable.modeler.app.rest-enabled</p></td>
 <td><p>rest.modeler-app.enabled</p></td>
 <td><p>true</p></td>

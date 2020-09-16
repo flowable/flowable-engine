@@ -30,7 +30,12 @@ public class SuspendedJobEntityManagerImpl
     implements SuspendedJobEntityManager {
 
     public SuspendedJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, SuspendedJobDataManager jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
+    }
+
+    @Override
+    public SuspendedJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
@@ -65,6 +70,9 @@ public class SuspendedJobEntityManagerImpl
         }
 
         jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
     }
 
@@ -86,7 +94,8 @@ public class SuspendedJobEntityManagerImpl
 
         // Send event
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
 

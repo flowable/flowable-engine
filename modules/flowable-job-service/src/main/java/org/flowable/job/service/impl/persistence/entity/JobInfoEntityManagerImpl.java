@@ -29,12 +29,12 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     implements JobInfoEntityManager<T> {
 
     public JobInfoEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DM jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
-    public List<T> findJobsToExecute(Page page) {
-        return dataManager.findJobsToExecute(page);
+    public List<T> findJobsToExecute(List<String> enabledCategories, Page page) {
+        return dataManager.findJobsToExecute(enabledCategories, page);
     }
 
     @Override
@@ -48,8 +48,8 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     }
 
     @Override
-    public List<T> findExpiredJobs(Page page) {
-        return dataManager.findExpiredJobs(page);
+    public List<T> findExpiredJobs(List<String> enabledCategories, Page page) {
+        return dataManager.findExpiredJobs(enabledCategories, page);
     }
 
     @Override
@@ -60,6 +60,12 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
         dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    }
+
+    @Override
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

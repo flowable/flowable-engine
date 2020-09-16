@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.ManualTask;
@@ -73,9 +74,11 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventAc
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
@@ -89,6 +92,7 @@ import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ReceiveEventTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SendEventTaskActivityBehavior;
@@ -127,140 +131,146 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public interface ActivityBehaviorFactory {
 
-    public abstract NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent);
+    NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent);
 
-    public abstract TaskActivityBehavior createTaskActivityBehavior(Task task);
+    TaskActivityBehavior createTaskActivityBehavior(Task task);
 
-    public abstract ManualTaskActivityBehavior createManualTaskActivityBehavior(ManualTask manualTask);
+    ManualTaskActivityBehavior createManualTaskActivityBehavior(ManualTask manualTask);
 
-    public abstract ReceiveTaskActivityBehavior createReceiveTaskActivityBehavior(ReceiveTask receiveTask);
+    ReceiveTaskActivityBehavior createReceiveTaskActivityBehavior(ReceiveTask receiveTask);
 
-    public abstract UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask);
+    ReceiveEventTaskActivityBehavior createReceiveEventTaskActivityBehavior(ReceiveTask receiveTask, String eventDefinitionKey);
 
-    public abstract ClassDelegate createClassDelegateServiceTask(ServiceTask serviceTask);
+    UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask);
 
-    public abstract ServiceTaskDelegateExpressionActivityBehavior createServiceTaskDelegateExpressionActivityBehavior(ServiceTask serviceTask);
+    ClassDelegate createClassDelegateServiceTask(ServiceTask serviceTask);
 
-    public abstract ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask);
+    ServiceTaskDelegateExpressionActivityBehavior createServiceTaskDelegateExpressionActivityBehavior(ServiceTask serviceTask);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
+    ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
+    WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
 
-    public abstract MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
+    WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
 
-    public abstract MailActivityBehavior createMailActivityBehavior(SendTask sendTask);
+    MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
+
+    MailActivityBehavior createMailActivityBehavior(SendTask sendTask);
 
     // We do not want a hard dependency on the Mule module, hence we return
     // ActivityBehavior and instantiate the delegate instance using a string instead of the Class itself.
-    public abstract ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask);
+    ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask);
 
-    public abstract ActivityBehavior createMuleActivityBehavior(SendTask sendTask);
+    ActivityBehavior createMuleActivityBehavior(SendTask sendTask);
 
-    public abstract ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask);
+    ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask);
 
-    public abstract ActivityBehavior createCamelActivityBehavior(SendTask sendTask);
+    ActivityBehavior createCamelActivityBehavior(SendTask sendTask);
 
-    public abstract ActivityBehavior createDmnActivityBehavior(ServiceTask serviceTask);
+    ActivityBehavior createDmnActivityBehavior(ServiceTask serviceTask);
 
-    public abstract ActivityBehavior createDmnActivityBehavior(SendTask sendTask);
+    ActivityBehavior createDmnActivityBehavior(SendTask sendTask);
 
-    public abstract ActivityBehavior createHttpActivityBehavior(ServiceTask serviceTask);
+    ActivityBehavior createHttpActivityBehavior(ServiceTask serviceTask);
 
-    public abstract ShellActivityBehavior createShellActivityBehavior(ServiceTask serviceTask);
+    ShellActivityBehavior createShellActivityBehavior(ServiceTask serviceTask);
 
-    public abstract ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask);
+    ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask);
 
-    public abstract ScriptTaskActivityBehavior createScriptTaskActivityBehavior(ScriptTask scriptTask);
+    ScriptTaskActivityBehavior createScriptTaskActivityBehavior(ScriptTask scriptTask);
     
-    public abstract SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask);
+    SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask);
 
-    public abstract ExclusiveGatewayActivityBehavior createExclusiveGatewayActivityBehavior(ExclusiveGateway exclusiveGateway);
+    ExternalWorkerTaskActivityBehavior createExternalWorkerTaskBehavior(ExternalWorkerServiceTask externalWorkerServiceTask);
 
-    public abstract ParallelGatewayActivityBehavior createParallelGatewayActivityBehavior(ParallelGateway parallelGateway);
+    ExclusiveGatewayActivityBehavior createExclusiveGatewayActivityBehavior(ExclusiveGateway exclusiveGateway);
 
-    public abstract InclusiveGatewayActivityBehavior createInclusiveGatewayActivityBehavior(InclusiveGateway inclusiveGateway);
+    ParallelGatewayActivityBehavior createParallelGatewayActivityBehavior(ParallelGateway parallelGateway);
 
-    public abstract EventBasedGatewayActivityBehavior createEventBasedGatewayActivityBehavior(EventGateway eventGateway);
+    InclusiveGatewayActivityBehavior createInclusiveGatewayActivityBehavior(InclusiveGateway inclusiveGateway);
 
-    public abstract SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+    EventBasedGatewayActivityBehavior createEventBasedGatewayActivityBehavior(EventGateway eventGateway);
 
-    public abstract ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+    SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
 
-    public abstract SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess);
+    ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(Activity activity, AbstractBpmnActivityBehavior innerActivityBehavior);
 
-    public abstract EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess); 
+    SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess);
+
+    EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess);
     
-    public abstract EventSubProcessConditionalStartEventActivityBehavior createEventSubProcessConditionalStartEventActivityBehavior(StartEvent startEvent,
-                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
+    EventSubProcessConditionalStartEventActivityBehavior createEventSubProcessConditionalStartEventActivityBehavior(StartEvent startEvent,
+                                                                                                                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
 
-    public abstract EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent);
+    EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent);
     
-    public abstract EventSubProcessEscalationStartEventActivityBehavior createEventSubProcessEscalationStartEventActivityBehavior(StartEvent startEvent);
+    EventSubProcessEscalationStartEventActivityBehavior createEventSubProcessEscalationStartEventActivityBehavior(StartEvent startEvent);
 
-    public abstract EventSubProcessMessageStartEventActivityBehavior createEventSubProcessMessageStartEventActivityBehavior(StartEvent startEvent, MessageEventDefinition messageEventDefinition);
+    EventSubProcessMessageStartEventActivityBehavior createEventSubProcessMessageStartEventActivityBehavior(StartEvent startEvent, MessageEventDefinition messageEventDefinition);
 
-    public abstract EventSubProcessSignalStartEventActivityBehavior createEventSubProcessSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal);
+    EventSubProcessSignalStartEventActivityBehavior createEventSubProcessSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal);
 
-    public abstract EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition);
+    EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition);
     
-    public abstract EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey);
+    EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey);
 
-    public abstract AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess);
+    AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess);
 
-    public abstract CallActivityBehavior createCallActivityBehavior(CallActivity callActivity);
+    CallActivityBehavior createCallActivityBehavior(CallActivity callActivity);
     
-    public abstract CaseTaskActivityBehavior createCaseTaskBehavior(CaseServiceTask caseServiceTask);
+    CaseTaskActivityBehavior createCaseTaskBehavior(CaseServiceTask caseServiceTask);
 
-    public abstract TransactionActivityBehavior createTransactionActivityBehavior(Transaction transaction);
+    TransactionActivityBehavior createTransactionActivityBehavior(Transaction transaction);
 
-    public abstract IntermediateCatchEventActivityBehavior createIntermediateCatchEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent);
+    IntermediateCatchEventActivityBehavior createIntermediateCatchEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent);
 
-    public abstract IntermediateCatchMessageEventActivityBehavior createIntermediateCatchMessageEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-            MessageEventDefinition messageEventDefinition);
+    IntermediateCatchMessageEventActivityBehavior createIntermediateCatchMessageEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
+                                                                                                      MessageEventDefinition messageEventDefinition);
     
-    public abstract IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
+    IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
+                                                                                                              ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
 
-    public abstract IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition);
+    IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition);
 
-    public abstract IntermediateCatchSignalEventActivityBehavior createIntermediateCatchSignalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-            SignalEventDefinition signalEventDefinition, Signal signal);
+    IntermediateCatchEventRegistryEventActivityBehavior createIntermediateCatchEventRegistryEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, String eventDefinitionKey);
+
+    IntermediateCatchSignalEventActivityBehavior createIntermediateCatchSignalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
+                                                                                                    SignalEventDefinition signalEventDefinition, Signal signal);
     
-    public abstract IntermediateThrowNoneEventActivityBehavior createIntermediateThrowNoneEventActivityBehavior(ThrowEvent throwEvent);
+    IntermediateThrowNoneEventActivityBehavior createIntermediateThrowNoneEventActivityBehavior(ThrowEvent throwEvent);
 
-    public abstract IntermediateThrowSignalEventActivityBehavior createIntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, SignalEventDefinition signalEventDefinition, Signal signal);
+    IntermediateThrowSignalEventActivityBehavior createIntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, SignalEventDefinition signalEventDefinition, Signal signal);
     
-    public abstract IntermediateThrowEscalationEventActivityBehavior createIntermediateThrowEscalationEventActivityBehavior(ThrowEvent throwEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation);
+    IntermediateThrowEscalationEventActivityBehavior createIntermediateThrowEscalationEventActivityBehavior(ThrowEvent throwEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation);
 
-    public abstract IntermediateThrowCompensationEventActivityBehavior createIntermediateThrowCompensationEventActivityBehavior(ThrowEvent throwEvent, CompensateEventDefinition compensateEventDefinition);
+    IntermediateThrowCompensationEventActivityBehavior createIntermediateThrowCompensationEventActivityBehavior(ThrowEvent throwEvent, CompensateEventDefinition compensateEventDefinition);
 
-    public abstract NoneEndEventActivityBehavior createNoneEndEventActivityBehavior(EndEvent endEvent);
+    NoneEndEventActivityBehavior createNoneEndEventActivityBehavior(EndEvent endEvent);
 
-    public abstract ErrorEndEventActivityBehavior createErrorEndEventActivityBehavior(EndEvent endEvent, ErrorEventDefinition errorEventDefinition);
+    ErrorEndEventActivityBehavior createErrorEndEventActivityBehavior(EndEvent endEvent, ErrorEventDefinition errorEventDefinition);
     
-    public abstract EscalationEndEventActivityBehavior createEscalationEndEventActivityBehavior(EndEvent endEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation);
+    EscalationEndEventActivityBehavior createEscalationEndEventActivityBehavior(EndEvent endEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation);
 
-    public abstract CancelEndEventActivityBehavior createCancelEndEventActivityBehavior(EndEvent endEvent);
+    CancelEndEventActivityBehavior createCancelEndEventActivityBehavior(EndEvent endEvent);
 
-    public abstract TerminateEndEventActivityBehavior createTerminateEndEventActivityBehavior(EndEvent endEvent);
+    TerminateEndEventActivityBehavior createTerminateEndEventActivityBehavior(EndEvent endEvent);
 
-    public abstract BoundaryEventActivityBehavior createBoundaryEventActivityBehavior(BoundaryEvent boundaryEvent, boolean interrupting);
+    BoundaryEventActivityBehavior createBoundaryEventActivityBehavior(BoundaryEvent boundaryEvent, boolean interrupting);
 
-    public abstract BoundaryCancelEventActivityBehavior createBoundaryCancelEventActivityBehavior(CancelEventDefinition cancelEventDefinition);
+    BoundaryCancelEventActivityBehavior createBoundaryCancelEventActivityBehavior(CancelEventDefinition cancelEventDefinition);
 
-    public abstract BoundaryTimerEventActivityBehavior createBoundaryTimerEventActivityBehavior(BoundaryEvent boundaryEvent, TimerEventDefinition timerEventDefinition, boolean interrupting);
+    BoundaryTimerEventActivityBehavior createBoundaryTimerEventActivityBehavior(BoundaryEvent boundaryEvent, TimerEventDefinition timerEventDefinition, boolean interrupting);
 
-    public abstract BoundarySignalEventActivityBehavior createBoundarySignalEventActivityBehavior(BoundaryEvent boundaryEvent, SignalEventDefinition signalEventDefinition, Signal signal, boolean interrupting);
+    BoundarySignalEventActivityBehavior createBoundarySignalEventActivityBehavior(BoundaryEvent boundaryEvent, SignalEventDefinition signalEventDefinition, Signal signal, boolean interrupting);
 
-    public abstract BoundaryMessageEventActivityBehavior createBoundaryMessageEventActivityBehavior(BoundaryEvent boundaryEvent, MessageEventDefinition messageEventDefinition, boolean interrupting);
+    BoundaryMessageEventActivityBehavior createBoundaryMessageEventActivityBehavior(BoundaryEvent boundaryEvent, MessageEventDefinition messageEventDefinition, boolean interrupting);
     
-    public abstract BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent, ConditionalEventDefinition conditionalEventDefinition, 
-                    String conditionExpression, boolean interrupting);
+    BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent, ConditionalEventDefinition conditionalEventDefinition,
+                                                                                            String conditionExpression, boolean interrupting);
     
-    public abstract BoundaryEscalationEventActivityBehavior createBoundaryEscalationEventActivityBehavior(BoundaryEvent boundaryEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation, boolean interrupting);
+    BoundaryEscalationEventActivityBehavior createBoundaryEscalationEventActivityBehavior(BoundaryEvent boundaryEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation, boolean interrupting);
 
-    public abstract BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting);
+    BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting);
     
-    public abstract BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting);
+    BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting);
 }

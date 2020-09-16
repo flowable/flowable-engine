@@ -20,11 +20,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -32,6 +32,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskAssigneeChangedHistoryJsonTransformer extends AbstractNeedsTaskHistoryJsonTransformer {
 
+    public TaskAssigneeChangedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_TASK_ASSIGNEE_CHANGED);
@@ -71,7 +75,7 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends AbstractNeedsTask
                 if (StringUtils.isEmpty(runtimeActivityInstanceId)) {
                     historicActivityInstanceEntity = findHistoricActivityInstance(commandContext, executionId, activityId);
                 } else {
-                    historicActivityInstanceEntity = CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findById(runtimeActivityInstanceId);
+                    historicActivityInstanceEntity = processEngineConfiguration.getHistoricActivityInstanceEntityManager().findById(runtimeActivityInstanceId);
                 }
                 
                 if (historicActivityInstanceEntity == null) {
@@ -85,7 +89,7 @@ public class TaskAssigneeChangedHistoryJsonTransformer extends AbstractNeedsTask
         
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         if (StringUtils.isNotEmpty(taskId)) {
-            HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+            HistoricIdentityLinkService historicIdentityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
             HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
             historicIdentityLinkEntity.setTaskId(taskId);
             historicIdentityLinkEntity.setType(IdentityLinkType.ASSIGNEE);

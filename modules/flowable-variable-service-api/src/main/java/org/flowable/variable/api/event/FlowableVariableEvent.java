@@ -44,13 +44,4 @@ public interface FlowableVariableEvent extends FlowableEngineEvent {
      */
     String getTaskId();
 
-    /**
-     * @return the id of the scope the variable has been set on.
-     */
-    String getScopeId();
-
-    /**
-     * @return the type of the scope the variable has been set on.
-     */
-    String getScopeType();
 }

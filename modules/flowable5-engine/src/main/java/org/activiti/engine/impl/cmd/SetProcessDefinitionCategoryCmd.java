@@ -19,6 +19,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -62,7 +63,8 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
 
         if (commandContext.getEventDispatcher().isEnabled()) {
             commandContext.getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return null;

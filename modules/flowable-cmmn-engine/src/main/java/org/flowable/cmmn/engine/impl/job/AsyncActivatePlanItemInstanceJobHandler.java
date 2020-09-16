@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.job;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -38,9 +39,11 @@ public class AsyncActivatePlanItemInstanceJobHandler implements JobHandler {
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         if (variableScope instanceof PlanItemInstanceEntity) {
             PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
-            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Executing async job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
-                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB, job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+                        CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_EXECUTE_ASYNC_JOB, job, planItemInstanceEntity.getPlanItemDefinition(), 
+                        planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
             
             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation((PlanItemInstanceEntity) variableScope, configuration); // configuration == entryCriterionId

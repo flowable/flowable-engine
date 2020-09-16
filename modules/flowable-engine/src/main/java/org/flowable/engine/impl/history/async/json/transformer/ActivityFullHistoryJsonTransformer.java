@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.history.async.json.transformer;
 
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getIntegerFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 import java.util.Collections;
@@ -22,16 +23,20 @@ import java.util.List;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ActivityFullHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public ActivityFullHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_ACTIVITY_FULL);
@@ -44,7 +49,7 @@ public class ActivityFullHistoryJsonTransformer extends AbstractHistoryJsonTrans
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricActivityInstanceEntityManager();
+        HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = processEngineConfiguration.getHistoricActivityInstanceEntityManager();
         
         HistoricActivityInstanceEntity historicActivityInstanceEntity = createHistoricActivityInstanceEntity(historicalData, commandContext, historicActivityInstanceEntityManager);
 
@@ -56,6 +61,7 @@ public class ActivityFullHistoryJsonTransformer extends AbstractHistoryJsonTrans
         historicActivityInstanceEntity.setActivityType(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_TYPE));
         historicActivityInstanceEntity.setStartTime(getDateFromJson(historicalData, HistoryJsonConstants.START_TIME));
         historicActivityInstanceEntity.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
+        historicActivityInstanceEntity.setTransactionOrder(getIntegerFromJson(historicalData, HistoryJsonConstants.TRANSACTION_ORDER));
         
         Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);
         historicActivityInstanceEntity.setEndTime(endTime);

@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.5.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.6.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="target.docs.root" value="${target.distro.root}/docs" />
 	<property name="target.newsite.root" value="target/website" />
@@ -40,19 +40,7 @@
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
 			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-idm" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
-		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-modeler" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
-		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-task" failonerror="true">
-			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
-		</exec>
-		<exec executable="${mvn.executable}" dir="../modules/flowable-ui-admin" failonerror="true">
+		<exec executable="${mvn.executable}" dir="../modules/flowable-ui" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
 			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
@@ -330,47 +318,13 @@
 			<fileset dir="../modules/flowable-spring-boot/flowable-spring-boot-starters/">
 				<include name="**/flowable-spring-boot-*.jar" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui-common/target">
-				<include name="flowable-ui-common-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-edge/target">
-				<include name="flowable-ui-edge-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-conf/target">
-                <include name="flowable-ui-admin-conf-*.jar" />
-            </fileset>
-            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-logic/target">
-                <include name="flowable-ui-admin-logic-*.jar" />
-            </fileset>
-            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-rest/target">
-                <include name="flowable-ui-admin-rest-*.jar" />
-            </fileset>
-			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-conf/target">
-				<include name="flowable-ui-idm-conf-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-logic/target">
-				<include name="flowable-ui-idm-logic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-rest/target">
-				<include name="flowable-ui-idm-rest-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-conf/target">
-				<include name="flowable-ui-modeler-conf-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-logic/target">
-				<include name="flowable-ui-modeler-logic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-rest/target">
-				<include name="flowable-ui-modeler-rest-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-conf/target">
-				<include name="flowable-ui-task-conf-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-logic/target">
-				<include name="flowable-ui-task-logic-*.jar" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-rest/target">
-				<include name="flowable-ui-task-rest-*.jar" />
+			<fileset dir="../modules/flowable-ui/">
+				<include name="**/flowable-spring-boot-starter-ui-*.jar" />
+				<include name="**/flowable-ui-common-*.jar" />
+				<include name="**/flowable-ui-*-conf-*.jar" />
+				<include name="**/flowable-ui-*-frontend-*.jar" />
+				<include name="**/flowable-ui-*-logic-*.jar" />
+				<include name="**/flowable-ui-*-rest-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-osgi/target">
 				<include name="flowable-osgi-*.jar" />
@@ -388,26 +342,14 @@
 	<target name="copy.webapps">
 		<mkdir dir="${target.distro.root}/wars" />
 		<copy todir="${target.distro.root}/wars">
-			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-app/target">
-				<include name="flowable-idm.war" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-modeler/flowable-ui-modeler-app/target">
-				<include name="flowable-modeler.war" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-app/target">
-				<include name="flowable-task.war" />
-			</fileset>
-			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-app/target">
-				<include name="flowable-admin.war" />
+			<fileset dir="../modules/flowable-ui/flowable-ui-app/target">
+				<include name="flowable-ui.war" />
 			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">
 				<include name="flowable-rest*.war" />
 			</fileset>
 		</copy>
-		<move file="${target.distro.root}/wars/flowable-idm.war" tofile="${target.distro.root}/wars/flowable-idm.war"/>
-		<move file="${target.distro.root}/wars/flowable-modeler.war" tofile="${target.distro.root}/wars/flowable-modeler.war"/>
-		<move file="${target.distro.root}/wars/flowable-task.war" tofile="${target.distro.root}/wars/flowable-task.war"/>
-		<move file="${target.distro.root}/wars/flowable-admin.war" tofile="${target.distro.root}/wars/flowable-admin.war"/>
+		<move file="${target.distro.root}/wars/flowable-ui.war" tofile="${target.distro.root}/wars/flowable-ui.war"/>
 		<move file="${target.distro.root}/wars/flowable-rest.war" tofile="${target.distro.root}/wars/flowable-rest.war"/>
 	</target>
 

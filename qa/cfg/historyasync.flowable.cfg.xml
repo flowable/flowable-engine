@@ -9,7 +9,7 @@
       <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
         <constructor-arg>
           <bean class="com.zaxxer.hikari.HikariConfig">
-            <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}"/>
+            <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}"/>
             <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}"/>
             <property name="username" value="${jdbc.username:sa}"/>
             <property name="password" value="${jdbc.password:}"/>
@@ -30,16 +30,18 @@
     </property>
   
     <property name="history" value="full" />
-    <property name="asyncHistoryEnabled" value="true" />
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
-    
+
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
-    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
     <property name="asyncExecutorActivate" value="false" />
-    
+
+    <property name="asyncHistoryEnabled" value="true" />
+    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
+    <property name="asyncHistoryExecutorNumberOfRetries" value="100" />
+
     <property name="defaultFailedJobWaitTime" value="1" />
     <property name="asyncFailedJobWaitTime" value="1" />
     

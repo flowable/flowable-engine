@@ -66,7 +66,7 @@ public class EventDefinitionParse {
 
     public EventDefinitionParse execute(EventRegistryEngineConfiguration eventEngineConfig) {
         String encoding = eventEngineConfig.getXmlEncoding();
-        EventJsonConverter converter = new EventJsonConverter();
+        EventJsonConverter converter = eventEngineConfig.getEventJsonConverter();
 
         try (InputStreamReader in = newInputStreamReaderForSource(encoding)) {
             String eventJson = IOUtils.toString(in);

@@ -13,6 +13,10 @@
 
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +44,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
 
         String taskId = task.getId();
         taskService.setVariable(taskId, "instrument", "trumpet");
-        assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
+        assertThat(taskService.getVariable(taskId, "instrument")).isEqualTo("trumpet");
 
         taskService.deleteTask(taskId, true);
     }
@@ -51,49 +55,72 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
-        Map<String, Object> expectedVariables = new HashMap<>();
-        assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
-        assertEquals(expectedVariables, taskService.getVariables(taskId));
-        assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
-        assertEquals(expectedVariables, taskService.getVariablesLocal(taskId));
+        assertThat(runtimeService.getVariables(processInstanceId)).isEmpty();
+        assertThat(taskService.getVariables(taskId)).isEmpty();
+        assertThat(runtimeService.getVariablesLocal(processInstanceId)).isEmpty();
+        assertThat(taskService.getVariablesLocal(taskId)).isEmpty();
 
         runtimeService.setVariable(processInstanceId, "instrument", "trumpet");
 
-        expectedVariables = new HashMap<>();
-        assertEquals(expectedVariables, taskService.getVariablesLocal(taskId));
-        expectedVariables.put("instrument", "trumpet");
-        assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
-        assertEquals(expectedVariables, taskService.getVariables(taskId));
-        assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
+        assertThat(taskService.getVariablesLocal(taskId)).isEmpty();
+        assertThat(runtimeService.getVariables(processInstanceId))
+                .containsOnly(
+                        entry("instrument", "trumpet")
+                );
+        assertThat(taskService.getVariables(taskId))
+                .containsOnly(
+                        entry("instrument", "trumpet")
+                );
+        assertThat(runtimeService.getVariablesLocal(processInstanceId))
+                .containsOnly(
+                        entry("instrument", "trumpet")
+                );
 
         taskService.setVariable(taskId, "player", "gonzo");
-        assertTrue(taskService.hasVariable(taskId, "player"));
-        assertFalse(taskService.hasVariableLocal(taskId, "budget"));
+        assertThat(taskService.hasVariable(taskId, "player")).isTrue();
+        assertThat(taskService.hasVariableLocal(taskId, "budget")).isFalse();
 
-        expectedVariables = new HashMap<>();
-        assertEquals(expectedVariables, taskService.getVariablesLocal(taskId));
-        expectedVariables.put("player", "gonzo");
-        expectedVariables.put("instrument", "trumpet");
-        assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
-        assertEquals(expectedVariables, taskService.getVariables(taskId));
-        assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
+        assertThat(runtimeService.getVariables(processInstanceId))
+                .containsOnly(
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
+        assertThat(taskService.getVariables(taskId))
+                .containsOnly(
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
+        assertThat(runtimeService.getVariablesLocal(processInstanceId))
+                .containsOnly(
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
 
         taskService.setVariableLocal(taskId, "budget", "unlimited");
-        assertTrue(taskService.hasVariableLocal(taskId, "budget"));
-        assertTrue(taskService.hasVariable(taskId, "budget"));
+        assertThat(taskService.hasVariableLocal(taskId, "budget")).isTrue();
+        assertThat(taskService.hasVariable(taskId, "budget")).isTrue();
 
-        expectedVariables = new HashMap<>();
-        expectedVariables.put("budget", "unlimited");
-        assertEquals(expectedVariables, taskService.getVariablesLocal(taskId));
-        expectedVariables.put("player", "gonzo");
-        expectedVariables.put("instrument", "trumpet");
-        assertEquals(expectedVariables, taskService.getVariables(taskId));
+        assertThat(taskService.getVariablesLocal(taskId))
+                .containsOnly(
+                        entry("budget", "unlimited")
+                );
+        assertThat(taskService.getVariables(taskId))
+                .containsOnly(
+                        entry("budget", "unlimited"),
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
 
-        expectedVariables = new HashMap<>();
-        expectedVariables.put("player", "gonzo");
-        expectedVariables.put("instrument", "trumpet");
-        assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
-        assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
+        assertThat(runtimeService.getVariables(processInstanceId))
+                .containsOnly(
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
+        assertThat(runtimeService.getVariablesLocal(processInstanceId))
+                .containsOnly(
+                        entry("player", "gonzo"),
+                        entry("instrument", "trumpet")
+                );
     }
 
     @Test
@@ -110,7 +137,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
 
         // Fetch variable
         MyVariable variable = (MyVariable) taskService.getVariable(task.getId(), "theVar");
-        assertEquals("Hello world", variable.getValue());
+        assertThat(variable.getValue()).isEqualTo("Hello world");
 
         // Cleanup
         taskService.deleteTask(task.getId(), true);
@@ -150,7 +177,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         taskIds.add(taskList1.get(0).getId());
         taskIds.add(taskList1.get(1).getId());
         List<VariableInstance> variables = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-        assertEquals(2, variables.size());
+        assertThat(variables).hasSize(2);
         checkVariable(taskList1.get(0).getId(), "taskVar1", "sayHello1", variables);
         checkVariable(taskList1.get(1).getId(), "taskVar2", "sayHello2", variables);
 
@@ -161,7 +188,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         taskIds.add(taskList2.get(0).getId());
         taskIds.add(taskList2.get(1).getId());
         variables = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-        assertEquals(4, variables.size());
+        assertThat(variables).hasSize(4);
         checkVariable(taskList1.get(0).getId(), "taskVar1", "sayHello1", variables);
         checkVariable(taskList1.get(1).getId(), "taskVar2", "sayHello2", variables);
         checkVariable(taskList2.get(0).getId(), "taskVar3", "sayHello3", variables);
@@ -172,7 +199,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         taskIds.add(taskList1.get(0).getId());
         taskIds.add(taskList2.get(1).getId());
         variables = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-        assertEquals(2, variables.size());
+        assertThat(variables).hasSize(2);
         checkVariable(taskList1.get(0).getId(), "taskVar1", "sayHello1", variables);
         checkVariable(taskList2.get(1).getId(), "taskVar4", "sayHello4", variables);
     }
@@ -180,12 +207,12 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
     private void checkVariable(String taskId, String name, String value, List<VariableInstance> variables) {
         for (VariableInstance variable : variables) {
             if (taskId.equals(variable.getTaskId())) {
-                assertEquals(name, variable.getName());
-                assertEquals(value, variable.getValue());
+                assertThat(variable.getName()).isEqualTo(name);
+                assertThat(variable.getValue()).isEqualTo(value);
                 return;
             }
         }
-        fail();
+        fail("checkVariable failed");
     }
 
     @Test
@@ -208,7 +235,7 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         Set<String> taskIds = new HashSet<>();
         taskIds.add(taskId);
         List<VariableInstance> variables = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-        assertEquals(serializableTypeVar, variables.get(0).getValue());
+        assertThat(variables.get(0).getValue()).isEqualTo(serializableTypeVar);
     }
 
     @Test
@@ -235,11 +262,11 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         }
 
         List<VariableInstance> variableInstances = taskService.getVariableInstancesLocalByTaskIds(taskIds);
-        assertEquals(2, variableInstances.size());
-        assertEquals("taskVar", variableInstances.get(0).getName());
-        assertEquals("taskVar", variableInstances.get(0).getValue());
-        assertEquals("taskVar", variableInstances.get(1).getName());
-        assertEquals("taskVar", variableInstances.get(1).getValue());
+        assertThat(variableInstances).hasSize(2);
+        assertThat(variableInstances.get(0).getName()).isEqualTo("taskVar");
+        assertThat(variableInstances.get(0).getValue()).isEqualTo("taskVar");
+        assertThat(variableInstances.get(1).getName()).isEqualTo("taskVar");
+        assertThat(variableInstances.get(1).getValue()).isEqualTo("taskVar");
     }
 
     public static class MyVariable implements Serializable {

@@ -28,6 +28,23 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.5.1</h3>
+
+<h4>GENERAL</h4>
+<ul>
+    <li>
+        When deploying via the BPMN, CMMN or DMN repository service
+        the created deployment will have the parent deployment id set from its id.
+    </li>
+    <li>
+        The FlowableExpressionEnhancer has been removed.
+        We have adapted the Expression parsing, so now functions are enhanced during the
+        expression tree building. This is a lower level api and uses the new FlowableAstFunctionCreator.
+    </li>
+</ul>
+<h4>BPMN</h4>
+<h4>CMMN</h4>
+
 <h3>Release Notes - Flowable - 6.5.0</h3>
     
 <h4>GENERAL</h4>

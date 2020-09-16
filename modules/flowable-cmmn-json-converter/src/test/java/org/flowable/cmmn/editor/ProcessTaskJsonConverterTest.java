@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -27,6 +25,7 @@ import org.flowable.cmmn.model.Stage;
  * @author martin.grofcik
  */
 public class ProcessTaskJsonConverterTest extends AbstractConverterTest {
+
     @Override
     protected String getResource() {
         return "test.processTaskModel.json";
@@ -35,23 +34,22 @@ public class ProcessTaskJsonConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("processTaskModelId", caseModel.getId());
-        assertEquals("processTaskModelName", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("processTaskModelId");
+        assertThat(caseModel.getName()).isEqualTo("processTaskModelName");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
-        assertEquals("casePlanModel", planModelStage.getId());
+        assertThat(planModelStage).isNotNull();
+        assertThat(planModelStage.getId()).isEqualTo("casePlanModel");
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("processTaskName", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("processTaskName");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof ProcessTask);
+        assertThat(planItemDefinition).isInstanceOf(ProcessTask.class);
         ProcessTask processTask = (ProcessTask) planItemDefinition;
-        assertEquals("sid-5E1BEB30-72F7-463C-A1CB-77F000CA7E0F", processTask.getId());
-        assertEquals("processTaskName", processTask.getName());
-        assertTrue(processTask.getFallbackToDefaultTenant());
+        assertThat(processTask.getId()).isEqualTo("sid-5E1BEB30-72F7-463C-A1CB-77F000CA7E0F");
+        assertThat(processTask.getName()).isEqualTo("processTaskName");
+        assertThat(processTask.getFallbackToDefaultTenant()).isTrue();
     }
 }

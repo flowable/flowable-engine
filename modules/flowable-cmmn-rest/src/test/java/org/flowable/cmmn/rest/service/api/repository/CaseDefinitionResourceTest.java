@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -29,9 +29,14 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to single a Process Definition resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
@@ -48,21 +53,29 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(caseDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(caseDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(caseDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(caseDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(caseDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(caseDefinition.getName(), responseNode.get("name").textValue());
-        assertFalse(responseNode.get("graphicalNotationDefined").booleanValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: '" + caseDefinition.getId() + "',"
+                        + " key: '" + caseDefinition.getKey() + "',"
+                        + " category: '" + caseDefinition.getCategory() + "',"
+                        + " version: " + caseDefinition.getVersion() + ","
+                        + " description: '" + caseDefinition.getDescription() + "',"
+                        + " name: '" + caseDefinition.getName() + "',"
+                        + " diagramResource: null,"
+                        + " deploymentId: '" + caseDefinition.getDeploymentId() + "',"
+                        + " deploymentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()) + "',"
+                        + " url: '" + httpGet.getURI().toString() + "'"
+                        + "}");
+
+        assertThat(responseNode.get("graphicalNotationDefined").booleanValue()).isFalse();
 
         // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(caseDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
-        assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
-        assertTrue(responseNode.get("diagramResource").isNull());
+        assertThat(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
+                CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())))
+                .isTrue();
     }
 
     /**
@@ -77,22 +90,27 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(caseDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(caseDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(caseDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(caseDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(caseDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(caseDefinition.getName(), responseNode.get("name").textValue());
-        assertTrue(responseNode.get("graphicalNotationDefined").booleanValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(caseDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId())));
-        assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())));
-        assertTrue(URLDecoder.decode(responseNode.get("diagramResource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getDiagramResourceName())));
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: '" + caseDefinition.getId() + "',"
+                        + " key: '" + caseDefinition.getKey() + "',"
+                        + " category: '" + caseDefinition.getCategory() + "',"
+                        + " version: " + caseDefinition.getVersion() + ","
+                        + " description: null,"
+                        + " name: '" + caseDefinition.getName() + "',"
+                        + " deploymentId: '" + caseDefinition.getDeploymentId() + "',"
+                        + " graphicalNotationDefined: true,"
+                        + " deploymentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, caseDefinition.getDeploymentId()) + "',"
+                        + " url: '" + httpGet.getURI().toString() + "',"
+                        + " resource: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())
+                        + "',"
+                        + " diagramResource: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(),
+                                caseDefinition.getDiagramResourceName()) + "'"
+                        + "}");
     }
 
     /**
@@ -108,21 +126,23 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessDefinitionResourceData() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, caseDefinition.getId()));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, caseDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
-        assertTrue(content.contains("This is a test documentation"));
+        assertThat(content).isNotNull();
+        assertThat(content).contains("This is a test documentation");
     }
 
     /**
      * Test getting resource content for an unexisting case definition .
      */
     public void testGetResourceContentForUnexistingCaseDefinition() throws Exception {
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, "unexisting"));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
@@ -130,7 +150,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateProcessDefinitionCategory() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
-        assertEquals(1, repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").count());
+        assertThat(repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("http://flowable.org/cmmn").count()).isEqualTo(1);
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("category", "updatedcategory");
@@ -142,10 +162,10 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals("updatedcategory", responseNode.get("category").textValue());
+        assertThat(responseNode.get("category").textValue()).isEqualTo("updatedcategory");
 
         // Check actual entry in DB
-        assertEquals(1, repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("updatedcategory").count());
+        assertThat(repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("updatedcategory").count()).isEqualTo(1);
 
     }
 

@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -41,9 +43,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.eclipse.jetty.server.Server;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
@@ -52,7 +54,6 @@ import org.flowable.dmn.engine.test.DmnTestHelper;
 import org.flowable.dmn.rest.conf.ApplicationConfiguration;
 import org.flowable.dmn.rest.util.TestServerUtil;
 import org.flowable.dmn.rest.util.TestServerUtil.TestServer;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -80,7 +81,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
     protected static DmnEngineConfiguration dmnEngineConfiguration;
     protected static DmnRepositoryService dmnRepositoryService;
-    protected static DmnRuleService dmnRuleService;
+    protected static DmnDecisionService dmnRuleService;
     protected static DmnHistoryService dmnHistoryService;
 
     protected static CloseableHttpClient client;
@@ -98,7 +99,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
         dmnEngine = DmnEngines.getDefaultDmnEngine();
         dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
         dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
 
         // Create http client for all tests
@@ -180,7 +181,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
@@ -188,14 +189,14 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                 LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
         } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
         return null;
     }
@@ -246,7 +247,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -255,7 +256,9 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound)
+                .as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                .isEmpty();
     }
 
     protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
@@ -273,7 +276,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -283,7 +286,9 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                     String id = it.next().get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound)
+                        .as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                        .isEmpty();
             }
         }
 

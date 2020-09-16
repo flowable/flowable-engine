@@ -16,6 +16,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,7 +38,7 @@ public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
     }
 
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 
 
@@ -48,12 +49,12 @@ public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
 
         int transactionPropagation = getPropagation(config);
         if (transactionPropagation == TransactionTemplate.PROPAGATION_REQUIRED && TransactionSynchronizationManager.isActualTransactionActive()) {
-            return next.execute(config, command);
+            return next.execute(config, command, commandExecutor);
 
         } else {
             TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
             transactionTemplate.setPropagationBehavior(transactionPropagation);
-            return transactionTemplate.execute(status -> next.execute(config, command));
+            return transactionTemplate.execute(status -> next.execute(config, command, commandExecutor));
 
         }
 

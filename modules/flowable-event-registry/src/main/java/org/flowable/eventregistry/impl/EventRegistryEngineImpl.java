@@ -76,6 +76,11 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
     @Override
     public void close() {
         EventRegistryEngines.unregister(this);
+
+        if (engineConfiguration.getEventRegistryChangeDetectionExecutor() != null) {
+            engineConfiguration.getEventRegistryChangeDetectionExecutor().shutdown();
+        }
+
         engineConfiguration.close();
 
         if (engineConfiguration.getEngineLifecycleListeners() != null) {

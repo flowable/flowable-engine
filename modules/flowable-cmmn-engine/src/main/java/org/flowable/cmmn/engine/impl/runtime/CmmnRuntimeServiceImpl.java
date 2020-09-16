@@ -40,6 +40,7 @@ import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCaseVariableInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCaseVariableInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenForCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetEntityLinkParentsForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForPlanItemInstanceCmd;
@@ -275,22 +276,22 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     @Override
     public GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery() {
-        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
     
     @Override
     public SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery() {
-        return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
 
     @Override
     public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
-        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
     
     @Override
     public EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(configuration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(configuration.getCommandExecutor(), configuration.getEventSubscriptionServiceConfiguration());
     }
 
     @Override
@@ -334,6 +335,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     @Override
+    public List<EntityLink> getEntityLinkChildrenWithSameRootAsCaseInstance(String instanceId) {
+        return commandExecutor.execute(new GetEntityLinkChildrenWithSameRootAsCaseInstanceCmd(instanceId));
+    }
+
+    @Override
     public List<EntityLink> getEntityLinkParentsForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetEntityLinkParentsForCaseInstanceCmd(caseInstanceId));
     }
@@ -349,6 +355,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     public void changePlanItemState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
-        commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
+        commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder, configuration));
     }
+
 }

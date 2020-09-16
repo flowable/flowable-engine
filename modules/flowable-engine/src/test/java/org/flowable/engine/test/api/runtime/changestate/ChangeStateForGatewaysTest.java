@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.runtime.changestate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,7 +62,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityToMultipleActivitiesForParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         List<String> newActivityIds = new ArrayList<>();
         newActivityIds.add("task1");
@@ -69,19 +71,18 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertFalse(executionsByActivity.containsKey("parallelJoin"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
+        assertThat(executionsByActivity).doesNotContainKey("parallelJoin");
 
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -91,40 +92,39 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         // Verify events
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
 
         FlowableEvent event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("taskBefore", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskBefore");
 
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("task1", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("task1");
 
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("task2", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("task2");
 
-        assertTrue(!iterator.hasNext());
+        assertThat(iterator.hasNext()).isFalse();
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertFalse(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertTrue(executionsByActivity.containsKey("parallelJoin"));
+        assertThat(executionsByActivity).doesNotContainKey("task1");
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
 
-        assertFalse(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive());
+        assertThat(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -135,15 +135,15 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetMultipleActivitiesToSingleActivityAfterParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("task1");
@@ -152,36 +152,36 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
+                .changeState();
 
         // Verify events
         Iterator<FlowableEvent> iterator = changeStateEventListener.iterator();
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
 
         FlowableEvent event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("task1", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("task1");
 
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-        assertEquals("task2", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_CANCELLED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("task2");
 
-        assertTrue(iterator.hasNext());
+        assertThat(iterator.hasNext()).isTrue();
         event = iterator.next();
-        assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, event.getType());
-        assertEquals("taskAfter", ((FlowableActivityEvent) event).getActivityId());
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
+        assertThat(((FlowableActivityEvent) event).getActivityId()).isEqualTo("taskAfter");
 
-        assertTrue(!iterator.hasNext());
+        assertThat(iterator.hasNext()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -194,29 +194,28 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all parallelGateway activities to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsOnlyKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "parallelJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "parallelJoin")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -229,18 +228,17 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all parallelGateway activities to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         //Complete task1
         for (Task t : tasks) {
@@ -250,23 +248,23 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(classifiedExecutions.get("task2"));
-        assertEquals(1, classifiedExecutions.get("task2").size());
-        assertNotNull(classifiedExecutions.get("parallelJoin"));
-        assertEquals(1, classifiedExecutions.get("parallelJoin").size());
+        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions.get("task2")).hasSize(1);
+        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "parallelJoin"), "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "parallelJoin"), "taskAfter")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -279,38 +277,37 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move one task to the synchronizing gateway, then complete the remaining task
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdTo("task1", "parallelJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("task1", "parallelJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("parallelJoin"));
+        assertThat(executionsByActivity).doesNotContainKey("task1");
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -323,15 +320,15 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task and then move the last remaining task to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -340,26 +337,25 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("parallelJoin"));
+        assertThat(executionsByActivity).doesNotContainKey("task1");
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         //Move task2
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdTo("task2", "parallelJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("task2", "parallelJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -370,7 +366,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionToMultipleActivitiesForParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         Execution taskBeforeExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
 
@@ -381,19 +377,18 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         changeStateEventListener.clear();
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleExecutionToActivityIds(taskBeforeExecution.getId(), newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleExecutionToActivityIds(taskBeforeExecution.getId(), newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNull(executionsByActivity.get("parallelJoin"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
+        assertThat(executionsByActivity).doesNotContainKey("parallelJoin");
 
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -402,21 +397,20 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertFalse(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertTrue(executionsByActivity.containsKey("parallelJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
-        assertFalse(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive());
+        assertThat(((ExecutionEntity) executionsByActivity.get("parallelJoin").get(0)).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -427,29 +421,29 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetMultipleExecutionsToSingleActivityAfterParallelGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         List<String> currentExecutionIds = new ArrayList<>();
         currentExecutionIds.add(executions.get(0).getId());
         currentExecutionIds.add(executions.get(1).getId());
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(currentExecutionIds, "taskAfter")
-            .changeState();
+                .moveExecutionsToSingleActivityId(currentExecutionIds, "taskAfter")
+                .changeState();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -462,30 +456,29 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all gateway executions to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
 
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(executionIds, "parallelJoin")
-            .changeState();
+                .moveExecutionsToSingleActivityId(executionIds, "parallelJoin")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -498,18 +491,17 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all gateway executions to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         //Complete task1
         for (Task t : tasks) {
@@ -519,24 +511,24 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(classifiedExecutions.get("task2"));
-        assertEquals(1, classifiedExecutions.get("task2").size());
-        assertNotNull(classifiedExecutions.get("parallelJoin"));
-        assertEquals(1, classifiedExecutions.get("parallelJoin").size());
+        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions.get("task2")).hasSize(1);
+        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
 
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
-            .changeState();
+                .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -549,38 +541,37 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move one task to the synchronizing gateway, then complete the remaining task
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         String executionId = executions.stream().filter(e -> "task1".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionToActivityId(executionId, "parallelJoin")
-            .changeState();
+                .moveExecutionToActivityId(executionId, "parallelJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("parallelJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -593,15 +584,15 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task and then move the last remaining task to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -610,27 +601,26 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("parallelJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "parallelJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         //Move task2 execution
         String executionId = executions.stream().filter(e -> "task2".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
 
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionToActivityId(executionId, "parallelJoin")
-            .changeState();
+                .moveExecutionToActivityId(executionId, "parallelJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -641,51 +631,48 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityToMultipleActivitiesForInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         List<String> newActivityIds = new ArrayList<>();
         newActivityIds.add("task1");
         newActivityIds.add("task2");
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertFalse(executionsByActivity.containsKey("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
+        assertThat(executionsByActivity).doesNotContainKey("gwJoin");
 
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
-
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertFalse(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertTrue(executionsByActivity.containsKey("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
-        assertFalse(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive());
+        assertThat(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -696,31 +683,31 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetMultipleActivitiesToSingleActivityAfterInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("task1");
         currentActivityIds.add("task2");
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
+                .changeState();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
 
@@ -734,29 +721,28 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all parallelGateway activities to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "gwJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(Arrays.asList("task1", "task2"), "gwJoin")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -769,18 +755,17 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all parallelGateway activities to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         //Complete task1
         for (Task t : tasks) {
@@ -790,23 +775,23 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(classifiedExecutions.get("task2"));
-        assertEquals(1, classifiedExecutions.get("task2").size());
-        assertNotNull(classifiedExecutions.get("gwJoin"));
-        assertEquals(1, classifiedExecutions.get("gwJoin").size());
+        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions.get("task2")).hasSize(1);
+        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "gwJoin"), "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(Arrays.asList("task2", "gwJoin"), "taskAfter")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -819,39 +804,38 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move one task to the synchronizing gateway, then complete the remaining task
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdTo("task1", "gwJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("task1", "gwJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -864,15 +848,15 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task and then move the last remaining task to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -881,26 +865,25 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         //Move task2
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdTo("task2", "gwJoin")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("task2", "gwJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -911,7 +894,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentExecutionToMultipleActivitiesForInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         Execution taskBeforeExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
 
@@ -919,19 +902,18 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         newActivityIds.add("task1");
         newActivityIds.add("task2");
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleExecutionToActivityIds(taskBeforeExecution.getId(), newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleExecutionToActivityIds(taskBeforeExecution.getId(), newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNull(executionsByActivity.get("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
+        assertThat(executionsByActivity).doesNotContainKey("gwJoin");
 
         //Complete one task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -940,21 +922,20 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertFalse(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
-        assertTrue(executionsByActivity.containsKey("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
-        assertFalse(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive());
+        assertThat(((ExecutionEntity) executionsByActivity.get("gwJoin").get(0)).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -965,29 +946,29 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetMultipleExecutionsToSingleActivityAfterInclusiveGateway() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         List<String> currentExecutionIds = new ArrayList<>();
         currentExecutionIds.add(executions.get(0).getId());
         currentExecutionIds.add(executions.get(1).getId());
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(currentExecutionIds, "taskAfter")
-            .changeState();
+                .moveExecutionsToSingleActivityId(currentExecutionIds, "taskAfter")
+                .changeState();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1000,30 +981,29 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all gateway executions to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
 
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(executionIds, "gwJoin")
-            .changeState();
+                .moveExecutionsToSingleActivityId(executionIds, "gwJoin")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -1036,18 +1016,17 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move all gateway executions to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertTrue(executionsByActivity.containsKey("task1"));
-        assertTrue(executionsByActivity.containsKey("task2"));
+        assertThat(executionsByActivity).containsKeys("task1", "task2");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         //Complete task1
         for (Task t : tasks) {
@@ -1057,24 +1036,24 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertNotNull(classifiedExecutions.get("task2"));
-        assertEquals(1, classifiedExecutions.get("task2").size());
-        assertNotNull(classifiedExecutions.get("gwJoin"));
-        assertEquals(1, classifiedExecutions.get("gwJoin").size());
+        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions.get("task2")).hasSize(1);
+        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
 
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
-            .changeState();
+                .moveExecutionsToSingleActivityId(executionIds, "taskAfter")
+                .changeState();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
-        assertEquals("taskAfter", execution.getActivityId());
+        assertThat(execution.getActivityId()).isEqualTo("taskAfter");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -1087,38 +1066,37 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Move one task to the synchronizing gateway, then complete the remaining task
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         String executionId = executions.stream().filter(e -> "task1".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionToActivityId(executionId, "gwJoin")
-            .changeState();
+                .moveExecutionToActivityId(executionId, "gwJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -1131,15 +1109,15 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         //Complete one task and then move the last remaining task to the synchronizing gateway
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startInclusiveGwProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         //Complete task1
         Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
@@ -1148,26 +1126,25 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         }
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Map<String, List<Execution>> executionsByActivity = groupListContentBy(executions, Execution::getActivityId);
-        assertNull(executionsByActivity.get("task1"));
-        assertNotNull(executionsByActivity.get("task2"));
-        assertNotNull(executionsByActivity.get("gwJoin"));
+        assertThat(executionsByActivity).containsKeys("task2", "gwJoin");
+        assertThat(executionsByActivity).doesNotContainKey("task1");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("task2", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task2");
 
         //Move task2 execution
         String executionId = executions.stream().filter(e -> "task2".equals(e.getActivityId())).findFirst().map(Execution::getId).get();
         runtimeService.createChangeActivityStateBuilder()
-            .moveExecutionToActivityId(executionId, "gwJoin")
-            .changeState();
+                .moveExecutionToActivityId(executionId, "gwJoin")
+                .changeState();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
 
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -1178,41 +1155,41 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityToMultipleActivitiesForParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         List<String> newActivityIds = new ArrayList<>();
         newActivityIds.add("subtask");
         newActivityIds.add("subtask2");
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertFalse(parallelJoinExecution.isPresent());
+        assertThat(parallelJoinExecution).isNotPresent();
 
         taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executions.size());
+        assertThat(executions).hasSize(3);
 
         parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertTrue(parallelJoinExecution.isPresent());
-        assertFalse(((ExecutionEntity) parallelJoinExecution.get()).isActive());
+        assertThat(parallelJoinExecution).isPresent();
+        assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1223,30 +1200,30 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetMultipleActivitiesToSingleActivityAfterParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("subtask");
         currentActivityIds.add("subtask2");
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
+                .changeState();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1257,48 +1234,48 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testMoveCurrentActivityInParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess1")
-            .singleResult();
+                .singleResult();
         String subProcessExecutionId = subProcessExecution.getId();
         runtimeService.setVariableLocal(subProcessExecutionId, "subProcessVar", "test");
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdTo("subtask", "subtask2")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("subtask", "subtask2")
+                .changeState();
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         subProcessExecution = runtimeService.createExecutionQuery().executionId(subProcessExecutionId).singleResult();
-        assertNotNull(subProcessExecution);
-        assertEquals("test", runtimeService.getVariableLocal(subProcessExecutionId, "subProcessVar"));
+        assertThat(subProcessExecution).isNotNull();
+        assertThat(runtimeService.getVariableLocal(subProcessExecutionId, "subProcessVar")).isEqualTo("test");
 
         taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(3, executions.size());
+        assertThat(executions).hasSize(3);
 
         taskService.complete(tasks.get(0).getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1309,59 +1286,59 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
     public void testSetCurrentActivityToMultipleActivitiesForInclusiveAndParallelSubProcesses() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", Collections.singletonMap("var1", "test2"));
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         List<String> newActivityIds = new ArrayList<>();
         newActivityIds.add("taskInclusive3");
         newActivityIds.add("subtask");
         newActivityIds.add("subtask3");
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveSingleActivityIdToActivityIds("taskBefore", newActivityIds)
+                .changeState();
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(5, executions.size());
+        assertThat(executions).hasSize(5);
 
         Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertFalse(parallelJoinExecution.isPresent());
+        assertThat(parallelJoinExecution).isNotPresent();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
         taskService.complete(task.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask2").singleResult();
         taskService.complete(task.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
-        assertTrue(parallelJoinExecution.isPresent());
-        assertFalse(((ExecutionEntity) parallelJoinExecution.get()).isActive());
+        assertThat(parallelJoinExecution).isPresent();
+        assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1374,23 +1351,23 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         variableMap.put("var1", "test2");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", variableMap);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").count());
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").count());
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").count()).isEqualTo(1);
 
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("taskInclusive3");
@@ -1398,18 +1375,18 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         currentActivityIds.add("subtask3");
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskAfter")
+                .changeState();
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(1, executions.size());
+        assertThat(executions).hasSize(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -1422,38 +1399,38 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         variableMap.put("var1", "test2");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startParallelProcess", variableMap);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskBefore", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
 
         taskService.complete(task.getId());
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive1").singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").count());
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").count());
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").count()).isEqualTo(1);
 
         List<String> currentActivityIds = new ArrayList<>();
         currentActivityIds.add("subtask");
         currentActivityIds.add("subtask3");
 
         runtimeService.createChangeActivityStateBuilder()
-            .processInstanceId(processInstance.getId())
-            .moveActivityIdsToSingleActivityId(currentActivityIds, "taskInclusive1")
-            .changeState();
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskInclusive1")
+                .changeState();
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskInclusive3").singleResult();
         taskService.complete(task.getId());
@@ -1462,11 +1439,11 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
-        assertEquals(5, executions.size());
+        assertThat(executions).hasSize(5);
 
         Optional<Execution> inclusiveJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("inclusiveJoin")).findFirst();
-        assertTrue(inclusiveJoinExecution.isPresent());
-        assertFalse(((ExecutionEntity) inclusiveJoinExecution.get()).isActive());
+        assertThat(inclusiveJoinExecution).isPresent();
+        assertThat(((ExecutionEntity) inclusiveJoinExecution.get()).isActive()).isFalse();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask3").singleResult();
         taskService.complete(task.getId());
@@ -1478,7 +1455,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());

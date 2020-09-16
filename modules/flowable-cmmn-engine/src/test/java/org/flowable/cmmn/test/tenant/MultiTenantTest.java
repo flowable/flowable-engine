@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,10 @@
  */
 package org.flowable.cmmn.test.tenant;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +24,10 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class MultiTenantTest extends FlowableCmmnTestCase {
-    
+
     protected String deploymentIdWithTenant;
     protected String deploymentIdWithoutTenant;
-    
+
     @Before
     public void deployTestCaseModels() {
         this.deploymentIdWithTenant = cmmnRepositoryService.createDeployment()
@@ -34,34 +35,34 @@ public class MultiTenantTest extends FlowableCmmnTestCase {
         this.deploymentIdWithoutTenant = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn").deploy().getId();
     }
-    
+
     @After
     public void deleteTestCaseModels() {
-        cmmnRepositoryService.deleteDeployment(deploymentIdWithTenant, true);
-        cmmnRepositoryService.deleteDeployment(deploymentIdWithoutTenant, true);
+        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentIdWithTenant);
+        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentIdWithoutTenant);
     }
-    
+
     @Test
     public void testDeployments() {
-        assertEquals(2, cmmnRepositoryService.createDeploymentQuery().count());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentWithoutTenantId().count());
-        assertEquals(1, cmmnRepositoryService.createDeploymentQuery().deploymentTenantId("test-tenant").count());
+        assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(2);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId("test-tenant").count()).isEqualTo(1);
     }
-    
+
     @Test
     public void testCaseInstances() {
-        for (int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         }
-        for (int i=0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").tenantId("test-tenant").start();
         }
-        
-        assertEquals(3, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceWithoutTenantId().count());
-        assertEquals(5, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId("test-tenant").count());
-        
-        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceWithoutTenantId().count());
-        assertEquals(5, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceTenantId("test-tenant").count());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceWithoutTenantId().count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId("test-tenant").count()).isEqualTo(5);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceWithoutTenantId().count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceTenantId("test-tenant").count()).isEqualTo(5);
     }
 
 }

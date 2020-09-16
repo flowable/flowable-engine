@@ -26,8 +26,8 @@ public abstract class AbstractServiceEngineEntityManager<T extends AbstractServi
 
     protected T serviceConfiguration;
 
-    public AbstractServiceEngineEntityManager(T serviceConfiguration, DM dataManager) {
-        super(dataManager);
+    public AbstractServiceEngineEntityManager(T serviceConfiguration, String engineType, DM dataManager) {
+        super(dataManager, engineType);
         this.serviceConfiguration = serviceConfiguration;
     }
 

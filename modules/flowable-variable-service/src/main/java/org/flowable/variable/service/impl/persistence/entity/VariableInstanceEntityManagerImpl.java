@@ -14,12 +14,13 @@
 package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 
 /**
@@ -32,7 +33,7 @@ public class VariableInstanceEntityManagerImpl
     implements VariableInstanceEntityManager {
 
     public VariableInstanceEntityManagerImpl(VariableServiceConfiguration variableServiceConfiguration, VariableInstanceDataManager variableInstanceDataManager) {
-        super(variableServiceConfiguration, variableInstanceDataManager);
+        super(variableServiceConfiguration, variableServiceConfiguration.getEngineName(), variableInstanceDataManager);
     }
 
     @Override
@@ -52,81 +53,16 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-        return dataManager.findVariableInstancesByTaskId(taskId);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds) {
-        return dataManager.findVariableInstancesByTaskIds(taskIds);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByExecutionId(final String executionId) {
-        return dataManager.findVariableInstancesByExecutionId(executionId);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds) {
-        return dataManager.findVariableInstancesByExecutionIds(executionIds);
-    }
-
-    @Override
-    public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName) {
-        return dataManager.findVariableInstanceByExecutionAndName(executionId, variableName);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names) {
-        return dataManager.findVariableInstancesByExecutionAndNames(executionId, names);
-    }
-
-    @Override
-    public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName) {
-        return dataManager.findVariableInstanceByTaskAndName(taskId, variableName);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
-        return dataManager.findVariableInstancesByTaskAndNames(taskId, names);
-    }
-    
-    @Override
-    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
-        return dataManager.findVariableInstanceByScopeIdAndScopeType(scopeId, scopeType);
-    }
-    
-    @Override
-    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName) {
-        return dataManager.findVariableInstanceByScopeIdAndScopeTypeAndName(scopeId, scopeType, variableName);
-    }
-    
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
-        return dataManager.findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
-    }
-    
-    @Override
-    public List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
-        return dataManager.findVariableInstanceBySubScopeIdAndScopeType(subScopeId, scopeType);
-    }
-
-    @Override
-    public VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName) {
-        return dataManager.findVariableInstanceBySubScopeIdAndScopeTypeAndName(subScopeId, scopeType, variableName);
-    }
-
-    @Override
-    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames) {
-        return dataManager.findVariableInstancesBySubScopeIdAndScopeTypeAndNames(subScopeId, scopeType, variableNames);
+    public InternalVariableInstanceQuery createInternalVariableInstanceQuery() {
+        return new InternalVariableInstanceQueryImpl(dataManager);
     }
 
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, false);
-        VariableByteArrayRef byteArrayRef = entity.getByteArrayRef();
+        ByteArrayRef byteArrayRef = entity.getByteArrayRef();
         if (byteArrayRef != null) {
-            byteArrayRef.delete();
+            byteArrayRef.delete(serviceConfiguration.getEngineName());
         }
         entity.setDeleted(true);
     }
@@ -146,4 +82,13 @@ public class VariableInstanceEntityManagerImpl
         dataManager.deleteByScopeIdAndScopeType(scopeId, scopeType);
     }
 
+    @Override
+    public void deleteByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        dataManager.deleteByScopeIdAndScopeTypes(scopeId, scopeTypes);
+    }
+
+    @Override
+    public void deleteBySubScopeIdAndScopeTypes(String subScopeId, Collection<String> scopeTypes) {
+        dataManager.deleteBySubScopeIdAndScopeTypes(subScopeId, scopeTypes);
+    }
 }

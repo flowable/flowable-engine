@@ -13,6 +13,8 @@
 
 package org.flowable.examples.bpmn.receivetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,7 +31,7 @@ public class ReceiveTaskTest extends PluggableFlowableTestCase {
     public void testWaitStateBehavior() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         runtimeService.trigger(execution.getId());
         assertProcessEnded(pi.getId());

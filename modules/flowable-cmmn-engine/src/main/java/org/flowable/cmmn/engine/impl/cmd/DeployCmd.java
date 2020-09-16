@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
@@ -31,7 +32,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class DeployCmd implements Command<CmmnDeployment> {
-
+    
     protected CmmnDeploymentBuilderImpl deploymentBuilder;
 
     public DeployCmd(CmmnDeploymentBuilderImpl deploymentBuilder) {
@@ -40,43 +41,52 @@ public class DeployCmd implements Command<CmmnDeployment> {
 
     @Override
     public CmmnDeployment execute(CommandContext commandContext) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CmmnDeploymentEntity deployment = deploymentBuilder.getDeployment();
         
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
             List<CmmnDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<CmmnDeployment> deploymentEntities = new CmmnDeploymentQueryImpl(cmmnEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
-                        .orderByDeploymenTime().desc()
+                        .orderByDeploymentTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
                 
             } else {
-                List<CmmnDeployment> deploymentList = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<CmmnDeployment> deploymentList = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            CmmnDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (CmmnDeploymentEntity) existingDeployments.get(0);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                CmmnDeploymentEntity existingDeployment = (CmmnDeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
         
         deployment.setDeploymentTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
-        CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).insert(deployment);
+        cmmnEngineConfiguration.getCmmnDeploymentEntityManager().insert(deployment);
+
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
+
         cmmnEngineConfiguration.getDeploymentManager().deploy(deployment, null);
         return deployment;
     }

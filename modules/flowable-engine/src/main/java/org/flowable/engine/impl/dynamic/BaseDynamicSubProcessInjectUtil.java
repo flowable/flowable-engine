@@ -34,9 +34,10 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.IoUtil;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -224,11 +225,11 @@ public class BaseDynamicSubProcessInjectUtil {
                             List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
                             
                             if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                                DmnDecisionTable dmnDecisionTable = dmnRepositoryService.createDecisionTableQuery()
-                                        .decisionTableKey(decisionTableReferenceKey).deploymentId(dmnDeployments.get(0).getId()).latestVersion().singleResult();
-                                if (dmnDecisionTable != null) {
-                                    String name = dmnDecisionTable.getResourceName();
-                                    InputStream inputStream = dmnRepositoryService.getDmnResource(dmnDecisionTable.getId());
+                                DmnDecision definition = dmnRepositoryService.createDecisionQuery()
+                                        .decisionKey(decisionTableReferenceKey).deploymentId(dmnDeployments.get(0).getId()).latestVersion().singleResult();
+                                if (definition != null) {
+                                    String name = definition.getResourceName();
+                                    InputStream inputStream = dmnRepositoryService.getDmnResource(definition.getId());
                                     addResource(commandContext, newDeploymentEntity, name, IoUtil.readInputStream(inputStream, name));
                                     IoUtil.closeSilently(inputStream);
                                 }
@@ -242,7 +243,8 @@ public class BaseDynamicSubProcessInjectUtil {
     
     public static void addResource(CommandContext commandContext, DeploymentEntity deploymentEntity, String resourceName, byte[] bytes) {
         if (!deploymentEntity.getResources().containsKey(resourceName)) { 
-            ResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager(commandContext);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            ResourceEntityManager resourceEntityManager = processEngineConfiguration.getResourceEntityManager();
             ResourceEntity resourceEntity = resourceEntityManager.create();
             resourceEntity.setDeploymentId(deploymentEntity.getId());
             resourceEntity.setName(resourceName);

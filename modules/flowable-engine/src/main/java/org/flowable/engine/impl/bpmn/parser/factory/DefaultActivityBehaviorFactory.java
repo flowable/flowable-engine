@@ -31,7 +31,9 @@ import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.ManualTask;
@@ -86,9 +88,11 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventAc
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchConditionalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
@@ -102,6 +106,7 @@ import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ReceiveEventTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SendEventTaskActivityBehavior;
@@ -118,6 +123,7 @@ import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegate;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DefaultClassDelegateFactory;
+import org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -164,6 +170,11 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     }
 
     @Override
+    public ReceiveEventTaskActivityBehavior createReceiveEventTaskActivityBehavior(ReceiveTask receiveTask, String eventDefinitionKey) {
+        return new ReceiveEventTaskActivityBehavior(eventDefinitionKey);
+    }
+
+    @Override
     public UserTaskActivityBehavior createUserTaskActivityBehavior(UserTask userTask) {
         return new UserTaskActivityBehavior(userTask);
     }
@@ -171,11 +182,16 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     // Service task
 
     protected Expression getSkipExpressionFromServiceTask(ServiceTask serviceTask) {
-        Expression result = null;
-        if (StringUtils.isNotEmpty(serviceTask.getSkipExpression())) {
-            result = expressionManager.createExpression(serviceTask.getSkipExpression());
+        return createExpression(serviceTask.getSkipExpression());
+    }
+
+    protected Expression createExpression(String expressionValue) {
+        Expression expression = null;
+        if (StringUtils.isNotEmpty(expressionValue)) {
+            expression = expressionManager.createExpression(expressionValue);
         }
-        return result;
+
+        return expression;
     }
 
     @Override
@@ -339,16 +355,29 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
             }
 
             if (theClass == null) {
-                // Default Http behavior class
-                theClass = Class.forName("org.flowable.http.bpmn.impl.HttpActivityBehaviorImpl");
+                return createDefaultActivityBehaviour(serviceTask);
             }
 
-            List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
-            addExceptionMapAsFieldDeclaration(fieldDeclarations, serviceTask.getMapExceptions());
-            return (ActivityBehavior) ClassDelegate.defaultInstantiateDelegate(theClass, fieldDeclarations, serviceTask);
+            return classDelegateFactory.create(serviceTask.getId(), theClass.getName(),
+                    createFieldDeclarations(serviceTask.getFieldExtensions()),
+                    serviceTask.isTriggerable(),
+                    getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
+    protected ActivityBehavior createDefaultActivityBehaviour(ServiceTask serviceTask) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+            return createClassDelegateServiceTask(serviceTask);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+            return createServiceTaskDelegateExpressionActivityBehavior(serviceTask);
+        } else {
+            return classDelegateFactory.create(serviceTask.getId(), DefaultBpmnHttpActivityDelegate.class.getName(),
+                    createFieldDeclarations(serviceTask.getFieldExtensions()),
+                    serviceTask.isTriggerable(),
+                    getSkipExpressionFromServiceTask(serviceTask), serviceTask.getMapExceptions());
         }
     }
 
@@ -400,6 +429,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public SendEventTaskActivityBehavior createSendEventTaskBehavior(SendEventServiceTask sendEventServiceTask) {
         return new SendEventTaskActivityBehavior(sendEventServiceTask);
+    }
+
+    @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerTaskBehavior(ExternalWorkerServiceTask externalWorkerServiceTask) {
+        Expression topicExpression = createExpression(externalWorkerServiceTask.getTopic());
+        Expression skipExpression = getSkipExpressionFromServiceTask(externalWorkerServiceTask);
+        return new ExternalWorkerTaskActivityBehavior(externalWorkerServiceTask, topicExpression, skipExpression);
     }
 
     // Gateways
@@ -531,6 +567,11 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition) {
         return new IntermediateCatchTimerEventActivityBehavior(timerEventDefinition);
+    }
+
+    @Override
+    public IntermediateCatchEventRegistryEventActivityBehavior createIntermediateCatchEventRegistryEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, String eventDefinitionKey) {
+        return new IntermediateCatchEventRegistryEventActivityBehavior(eventDefinitionKey);
     }
 
     @Override

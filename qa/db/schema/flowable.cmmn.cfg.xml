@@ -29,7 +29,7 @@
                 <ref bean="dataSource" />
             </list>
         </property>
-        <property name="databaseSchemaUpdate" value="drop-create" />
+        <property name="databaseSchemaUpdate" value="true" />
         
         <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />

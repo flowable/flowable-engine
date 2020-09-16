@@ -157,4 +157,28 @@
 
     </changeSet>
 
+    <changeSet id="7" author="flowable">
+
+        <dropIndex tableName="ACT_DMN_DECISION_TABLE" indexName="ACT_IDX_DEC_TBL_UNIQ"/>
+
+        <renameTable
+                newTableName="ACT_DMN_DECISION"
+                oldTableName="ACT_DMN_DECISION_TABLE"/>
+
+        <createIndex tableName="ACT_DMN_DECISION" indexName="ACT_IDX_DMN_DEC_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="8" author="flowable">
+
+        <addColumn tableName="ACT_DMN_DECISION">
+            <column name="DECISION_TYPE_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

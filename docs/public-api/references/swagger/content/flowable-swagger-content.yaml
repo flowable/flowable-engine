@@ -1,22 +1,22 @@
 ---
 swagger: "2.0"
 info:
-  description: "# flowable / flow??b(??)l /\n\n- a compact and highly efficient workflow\
-    \ and Business Process Management (BPM) platform for developers, system admins\
-    \ and business users.\n- a lightning fast, tried and tested BPMN 2 process engine\
-    \ written in Java. It is Apache 2.0 licensed open source, with a committed community.\n\
-    - can run embedded in a Java application, or as a service on a server, a cluster,\
-    \ and in the cloud. It integrates perfectly with Spring. With a rich Java and\
-    \ REST API, it is the ideal engine for orchestrating human or system activities."
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
   version: "v1"
-  title: "Flowable Content REST API"
+  title: "Flowable CONTENT REST API"
   contact:
     name: "Flowable"
     url: "http://www.flowable.org/"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:8080"
 basePath: "/flowable-rest/content-api"
 tags:
 - name: "Content item"
@@ -243,10 +243,13 @@ paths:
         \ attached file"
       description: "This endpoint can be used in 2 ways: By passing a JSON Body (ContentItemRequest)\
         \ to link an external resource or by passing a multipart/form-data Object\
-        \ to attach a file.\n NB: The multipart/form-data approach is not documented for this endpoint due to design restriction."
+        \ to attach a file.\nNB: Swagger V2 specification doesn't support this use\
+        \ case that is why this endpoint might be buggy/incomplete if used with other\
+        \ tools."
       operationId: "createContentItem"
       consumes:
       - "application/json"
+      - "multipart/form-data"
       produces:
       - "application/json"
       parameters:
@@ -255,7 +258,73 @@ paths:
         description: "Create a new content item, with content item information"
         required: false
         schema:
-          $ref: "#/definitions/ContentItemRequest"
+          $ref: "#/definitions/ContentItemCollectionResource"
+      - name: "file"
+        in: "formData"
+        description: "Attachment file"
+        required: false
+        type: "file"
+      - name: "name"
+        in: "formData"
+        description: "Required name of the variable"
+        required: false
+        type: "string"
+        x-example: "Simple content item"
+      - name: "mimeType"
+        in: "formData"
+        description: "Mime type of the content item, optional"
+        required: false
+        type: "string"
+        x-example: "application/pdf"
+      - name: "taskId"
+        in: "formData"
+        description: "Task identifier for the content item, optional"
+        required: false
+        type: "string"
+        x-example: "12345"
+      - name: "processInstanceId"
+        in: "formData"
+        description: "Process instance identifier for the content item, optional"
+        required: false
+        type: "string"
+        x-example: "1234"
+      - name: "contentStoreId"
+        in: "formData"
+        description: "The identifier of the content item in an external content store,\
+          \ optional"
+        required: false
+        type: "string"
+        x-example: "5678"
+      - name: "contentStoreName"
+        in: "formData"
+        description: "The name of an external content store, optional"
+        required: false
+        type: "string"
+        x-example: "myFileStore"
+      - name: "field"
+        in: "formData"
+        description: "The form field for the content item, optional"
+        required: false
+        type: "string"
+        x-example: "uploadField"
+      - name: "createdBy"
+        in: "formData"
+        description: "The user identifier that created the content item, optional"
+        required: false
+        type: "string"
+        x-example: "johndoe"
+      - name: "lastModifiedBy"
+        in: "formData"
+        description: "The user identifier that last modified the content item, optional"
+        required: false
+        type: "string"
+        x-example: "johndoe"
+      - name: "tenantId"
+        in: "formData"
+        description: "The tenant identifier of the content item, optional"
+        required: false
+        type: "string"
+        x-example: "myTenantId"
       responses:
         200:
           description: "successful operation"
@@ -368,9 +437,9 @@ paths:
       tags:
       - "Content item"
       summary: "Save the content item data"
-      description: "Save the content item data with an attached fileThe request should\
-        \ be of type multipart/form-data. There should be a single file-part included\
-        \ with the binary value of the content item."
+      description: "Save the content item data with an attached file. The request\
+        \ should be of type multipart/form-data. There should be a single file-part\
+        \ included with the binary value of the content item."
       operationId: "saveContentItemData"
       consumes:
       - "multipart/form-data"
@@ -406,7 +475,7 @@ paths:
       description: "All supported JSON parameter fields allowed are exactly the same\
         \ as the parameters found for getting a collection of content items, but passed\
         \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
-        \ querying and preventing errors with request-uri?s that are too long."
+        \ querying and preventing errors with request-uri’s that are too long."
       operationId: "getQueryResult"
       produces:
       - "application/json"
@@ -446,6 +515,8 @@ definitions:
       version:
         type: "string"
         example: "6.2.0"
+  ContentItemCollectionResource:
+    type: "object"
   ContentItemQueryRequest:
     type: "object"
     properties:

@@ -506,4 +506,24 @@
 
     </changeSet>
 
+    <changeSet id="12" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="LOCK_OWNER_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="13" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="LAST_UNAVAILABLE_TIME_" type="datetime(3)" />
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="LAST_UNAVAILABLE_TIME_" type="datetime(3)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

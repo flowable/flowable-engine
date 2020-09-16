@@ -11,8 +11,7 @@
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
         values (
             #{id, jdbcType=VARCHAR},
-            1,
-            #{type, jdbcType=VARCHAR},
+            1, #{type, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
@@ -34,8 +33,7 @@
         <foreach collection="list" item="variable" index="index" separator=",">
             (
                 #{variable.id, jdbcType=VARCHAR},
-                1,
-                #{variable.typeName, jdbcType=VARCHAR },
+                1, #{variable.typeName, jdbcType=VARCHAR },
                 #{variable.name, jdbcType=VARCHAR},
                 #{variable.processInstanceId, jdbcType=VARCHAR},
                 #{variable.executionId, jdbcType=VARCHAR},
@@ -59,8 +57,7 @@
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
             (
                 #{variable.id, jdbcType=VARCHAR},
-                1,
-                #{variable.typeName, jdbcType=VARCHAR },
+                1, #{variable.typeName, jdbcType=VARCHAR },
                 #{variable.name, jdbcType=VARCHAR},
                 #{variable.processInstanceId, jdbcType=VARCHAR},
                 #{variable.executionId, jdbcType=VARCHAR},
@@ -99,7 +96,7 @@
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
-            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef != null and  originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="(originalPersistentState.typeName == null and type != null) or (originalPersistentState.typeName != null and type == null) or (originalPersistentState.typeName != type.typeName)">
@@ -140,6 +137,23 @@
         delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
     </delete>
 
+    <delete id="deleteVariablesByScopeIdAndScopeTypes" parameterType="java.util.Map">
+        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+         and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+            #{scopeType}
+        </foreach>
+    </delete>
+
+    <delete id="deleteVariablesBySubScopeIdAndScopeTypes" parameterType="java.util.Map">
+        delete from ${prefix}ACT_RU_VARIABLE
+        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+         and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+            #{scopeType}
+        </foreach>
+    </delete>
+
     <!-- VARIABLE INSTANCE RESULTMAP -->
     <resultMap id="variableInstanceResultMap" type="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -165,118 +179,66 @@
         select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectVariablesByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
-        and TASK_ID_ is null
-    </select>
-
-    <select id="selectVariablesByExecutionIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where TASK_ID_ is null
-        and EXECUTION_ID_ in
-        <foreach item="item" index="index" collection="parameter" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
-
-    <select id="selectVariableInstanceByExecutionAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR} and NAME_= #{name, jdbcType=VARCHAR} and TASK_ID_ is null
-    </select>
-
-    <select id="selectVariableInstancesByExecutionAndNames" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and TASK_ID_ is null
-        <if test="parameter.names != null and parameter.names.size > 0">
-            and (
-            <foreach collection="parameter.names" index="index" item="name" separator=" or ">
-                NAME_= #{name, jdbcType=VARCHAR}
-            </foreach>
-            )
-        </if>
-    </select>
-
-    <select id="selectVariablesByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE where
-        TASK_ID_ = #{parameter, jdbcType=VARCHAR}
-    </select>
-
-    <select id="selectVariablesByTaskIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where TASK_ID_ in
-        <foreach item="item" index="index" collection="parameter" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-    </select>
-
-    <select id="selectVariableInstanceByTaskAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where TASK_ID_ = #{taskId, jdbcType=VARCHAR} and NAME_= #{name, jdbcType=VARCHAR}
-    </select>
-
-    <select id="selectVariableInstancesByTaskAndNames" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
-        <if test="parameter.names != null and parameter.names.size > 0">
-            and (
-            <foreach collection="parameter.names" index="index" item="name" separator=" or ">
-                NAME_= #{name, jdbcType=VARCHAR}
-            </foreach>
-            )
-        </if>
-    </select>
-    
-    <select id="selectVariableInstancesByScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
-    </select> 
-    
-    <select id="selectVariableInstanceByScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} 
-        and SUB_SCOPE_ID_ is null
-        and SCOPE_TYPE_ =  #{scopeType, jdbcType=VARCHAR}
-        and NAME_ = #{variableName, jdbcType=VARCHAR}
-    </select> 
-    
-    <select id="selectVariableInstanceByScopeIdAndScopeTypeAndNames"  parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} 
-        and SUB_SCOPE_ID_ is null
-        and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
-        <if test="parameter.variableNames != null and parameter.variableNames.size > 0">
-            and (
-            <foreach collection="parameter.variableNames" index="index" item="name" separator=" or ">
-                NAME_= #{name, jdbcType=VARCHAR}
-            </foreach>
-            )
-        </if>
-    </select>
-    
-     <select id="selectVariableInstancesBySubScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
-    </select> 
-    
-    <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR} 
-        and SCOPE_TYPE_ =  #{scopeType, jdbcType=VARCHAR}
-        and NAME_ = #{variableName, jdbcType=VARCHAR}
-    </select> 
-    
-    <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndNames"  parameterType="java.util.Map" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE
-        where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} 
-        and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
-        <if test="parameter.variableNames != null and parameter.variableNames.size > 0">
-            and (
-            <foreach collection="parameter.variableNames" index="index" item="name" separator=" or ">
-                NAME_= #{name, jdbcType=VARCHAR}
-            </foreach>
-            )
-        </if>
+    <select id="selectVariablesByQuery" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+        select *
+        from ${prefix}ACT_RU_VARIABLE
+        <where>
+            <if test="parameter.id != null">
+                AND ID_ = #{parameter.id, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.taskId != null">
+                AND TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.taskIds != null">
+                AND TASK_ID_ in
+                <foreach collection="parameter.taskIds" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="parameter.processInstanceId != null">
+                AND PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.executionId != null">
+                AND EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.executionIds != null">
+                AND EXECUTION_ID_ in
+                <foreach collection="parameter.executionIds" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="parameter.withoutTaskId">
+                AND TASK_ID_ is null
+            </if>
+            <if test="parameter.scopeId != null">
+                AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.subScopeId != null">
+                AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.withoutSubScopeId">
+                AND SUB_SCOPE_ID_ is null
+            </if>
+            <if test="parameter.scopeType != null">
+                AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.scopeTypes != null and !parameter.scopeTypes.isEmpty()">
+                AND SCOPE_TYPE_ in
+                <foreach collection="parameter.scopeTypes" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="parameter.name != null">
+                AND NAME_ = #{parameter.name, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.names != null and !parameter.names.isEmpty()">
+                AND (
+                <foreach collection="parameter.names" item="item" separator=" or ">
+                    NAME_= #{item, jdbcType=VARCHAR}
+                </foreach>
+                )
+            </if>
+        </where>
     </select>
     
 </mapper>

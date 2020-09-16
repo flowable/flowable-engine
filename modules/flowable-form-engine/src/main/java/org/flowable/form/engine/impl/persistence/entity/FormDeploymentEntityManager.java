@@ -34,6 +34,6 @@ public interface FormDeploymentEntityManager extends EntityManager<FormDeploymen
 
     long findDeploymentCountByQueryCriteria(FormDeploymentQueryImpl deploymentQuery);
 
-    void deleteDeployment(String deploymentId);
+    void deleteDeployment(String deploymentId, boolean cascade);
 
 }

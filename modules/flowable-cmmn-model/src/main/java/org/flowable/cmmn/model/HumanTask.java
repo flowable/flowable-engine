@@ -24,9 +24,11 @@ public class HumanTask extends Task {
     protected String owner;
     protected String priority;
     protected String formKey;
+    protected boolean sameDeployment = true;
     protected String validateFormFields;
     protected String dueDate;
     protected String category;
+    protected String taskIdVariableName;
     protected List<String> candidateUsers = new ArrayList<>();
     protected List<String> candidateGroups = new ArrayList<>();
     protected List<FlowableListener> taskListeners = new ArrayList<>();
@@ -63,6 +65,14 @@ public class HumanTask extends Task {
         this.formKey = formKey;
     }
 
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
+    }
+
     public String getValidateFormFields() {
         return validateFormFields;
     }
@@ -85,6 +95,14 @@ public class HumanTask extends Task {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getTaskIdVariableName() {
+        return taskIdVariableName;
+    }
+
+    public void setTaskIdVariableName(String taskIdVariableName) {
+        this.taskIdVariableName = taskIdVariableName;
     }
 
     public List<String> getCandidateUsers() {
@@ -123,11 +141,13 @@ public class HumanTask extends Task {
         setAssignee(otherElement.getAssignee());
         setOwner(otherElement.getOwner());
         setFormKey(otherElement.getFormKey());
+        setSameDeployment(otherElement.isSameDeployment());
         setValidateFormFields(otherElement.getValidateFormFields());
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
-        
+        setTaskIdVariableName(otherElement.getTaskIdVariableName());
+
         setCandidateGroups(new ArrayList<>(otherElement.getCandidateGroups()));
         setCandidateUsers(new ArrayList<>(otherElement.getCandidateUsers()));
     }

@@ -15,35 +15,39 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 
 public class NativeHistoricTaskInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricTaskInstanceQuery, HistoricTaskInstance> implements NativeHistoricTaskInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected TaskServiceConfiguration taskServiceConfiguration;
 
-    public NativeHistoricTaskInstanceQueryImpl(CommandContext commandContext) {
+    public NativeHistoricTaskInstanceQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandContext);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
-    public NativeHistoricTaskInstanceQueryImpl(CommandExecutor commandExecutor) {
+    public NativeHistoricTaskInstanceQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandExecutor);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
     // results ////////////////////////////////////////////////////////////////
 
     @Override
     public List<HistoricTaskInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByNativeQuery(parameterMap);
+        return taskServiceConfiguration.getHistoricTaskInstanceEntityManager().findHistoricTaskInstancesByNativeQuery(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstanceCountByNativeQuery(parameterMap);
+        return taskServiceConfiguration.getHistoricTaskInstanceEntityManager().findHistoricTaskInstanceCountByNativeQuery(parameterMap);
     }
 
 }

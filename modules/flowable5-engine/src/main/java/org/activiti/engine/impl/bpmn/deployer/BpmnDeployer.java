@@ -68,6 +68,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.job.api.Job;
@@ -224,7 +225,8 @@ public class BpmnDeployer implements Deployer {
 
                 if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
                 removeObsoleteTimers(processDefinition);
@@ -241,7 +243,8 @@ public class BpmnDeployer implements Deployer {
 
                 if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinition));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinition),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
                 scheduleTimers(timers);

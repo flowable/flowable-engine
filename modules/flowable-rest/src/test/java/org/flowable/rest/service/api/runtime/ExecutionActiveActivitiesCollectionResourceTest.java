@@ -13,12 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashSet;
-import java.util.Set;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,6 +27,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * @author Frederik Heremans
  */
@@ -41,21 +39,19 @@ public class ExecutionActiveActivitiesCollectionResourceTest extends BaseSpringR
     public void testGetActivities() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_ACTIVITIES_COLLECTION, processInstance.getId())),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_ACTIVITIES_COLLECTION, processInstance.getId())),
                 HttpStatus.SC_OK);
 
         // Check resulting instance
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(2, responseNode.size());
-
-        Set<String> states = new HashSet<>();
-        states.add(responseNode.get(0).textValue());
-        states.add(responseNode.get(1).textValue());
-
-        assertTrue(states.contains("waitState"));
-        assertTrue(states.contains("anotherWaitState"));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + "'waitState', 'anotherWaitState'"
+                        + "]");
     }
 }

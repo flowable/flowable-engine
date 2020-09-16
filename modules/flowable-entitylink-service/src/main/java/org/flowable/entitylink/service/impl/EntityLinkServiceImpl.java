@@ -31,23 +31,23 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     }
     
     @Override
-    public EntityLinkEntity getEntityLink(String id) {
-        return getEntityLinkEntityManager().findById(id);
-    }
-    
-    @Override
     public List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
         return getEntityLinkEntityManager().findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
+    }
+
+    @Override
+    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        return getEntityLinkEntityManager().findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
+    }
+
+    @Override
+    public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        return getEntityLinkEntityManager().findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
     
     @Override
     public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
         return getEntityLinkEntityManager().findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
-    }
-    
-    @Override
-    public List<EntityLink> findEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType, String linkType) {
-        return getEntityLinkEntityManager().findEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType, linkType);
     }
     
     @Override
@@ -61,30 +61,15 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     }
     
     @Override
-    public void deleteEntityLink(EntityLink entityLink) {
-        getEntityLinkEntityManager().delete((EntityLinkEntity) entityLink);
-    }
-    
-    @Override
-    public List<EntityLink> deleteScopeEntityLink(String scopeId, String scopeType, String linkType) {
-        return getEntityLinkEntityManager().deleteScopeEntityLink(scopeId, scopeType, linkType);
-    }
-    
-    @Override
-    public List<EntityLink> deleteScopeDefinitionEntityLink(String scopeDefinitionId, String scopeType, String linkType) {
-        return getEntityLinkEntityManager().deleteScopeDefinitionEntityLink(scopeDefinitionId, scopeType, linkType);
-    }
-    
-    @Override
     public void deleteEntityLinksByScopeIdAndType(String scopeId, String scopeType) {
         getEntityLinkEntityManager().deleteEntityLinksByScopeIdAndScopeType(scopeId, scopeType);
     }
-    
+
     @Override
-    public void deleteEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
-        getEntityLinkEntityManager().deleteEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
+    public void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType) {
+        getEntityLinkEntityManager().deleteEntityLinksByRootScopeIdAndType(scopeId, scopeType);
     }
-    
+
     public EntityLinkEntityManager getEntityLinkEntityManager() {
         return configuration.getEntityLinkEntityManager();
     }

@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     START_TIME_ datetime,
     START_USER_ID_ nvarchar(255),
     LOCK_TIME_ datetime,
+    LOCK_OWNER_ nvarchar(255),
     IS_COUNT_ENABLED_ tinyint,
     EVT_SUBSCR_COUNT_ int, 
     TASK_COUNT_ int, 
@@ -59,6 +60,7 @@ create table ACT_RU_EXECUTION (
     TIMER_JOB_COUNT_ int,
     SUSP_JOB_COUNT_ int,
     DEADLETTER_JOB_COUNT_ int,
+    EXTERNAL_WORKER_JOB_COUNT_ int,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
     CALLBACK_ID_ nvarchar(255),
@@ -130,6 +132,7 @@ create table ACT_RU_ACTINST (
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
+    TRANSACTION_ORDER_ int,
     DELETE_REASON_ nvarchar(4000),
     TENANT_ID_ nvarchar(255) default '',
     primary key (ID_)
@@ -331,7 +334,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.1.0', 1);
+values ('schema.version', '6.5.1.6', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.1.0)', 1);
+values ('schema.history', 'create(6.5.1.6)', 1);

@@ -58,6 +58,16 @@ public class ActivityInstanceEntityManagerImpl
     public List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId) {
         return dataManager.findActivityInstancesByExecutionIdAndActivityId(executionId, activityId);
     }
+    
+    @Override
+    public List<ActivityInstanceEntity> findActivityInstancesByProcessInstanceId(String processInstanceId, boolean includeDeleted) {
+        return dataManager.findActivityInstancesByProcessInstanceId(processInstanceId, includeDeleted);
+    }
+
+    @Override
+    public ActivityInstanceEntity findActivityInstanceByTaskId(String taskId) {
+        return dataManager.findActivityInstanceByTaskId(taskId);
+    }
 
     @Override
     public void deleteActivityInstancesByProcessInstanceId(String processInstanceId) {
@@ -95,9 +105,15 @@ public class ActivityInstanceEntityManagerImpl
     @Override
     public void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason) {
         ActivityInstance activityInstance = recordActivityInstanceEnd(executionEntity, deleteReason);
-        if (activityInstance == null) {
-            getHistoryManager().recordActivityEnd(executionEntity, deleteReason, getClock().getCurrentTime());
-        } else {
+
+        // If the activity instance is null, this means that no runtime activity instance nor historic activity instance exists.
+        // In the DefaultHistoryManager implementation, the end is ignored (which it needs to be, this is for example when an execution
+        // has reached a certain step, but hasn't gone into the behavior yet. When the execution is deleted, this method is called,
+        // but no historic activity instance should be created for this use case).
+        // However, in the async history manager, this leads to the creation of an activity-end history job.
+        // To have this consistent, the recordActivityEnd is thus only called when there is a runtime activity available.
+
+        if (activityInstance != null) {
             getHistoryManager().recordActivityEnd(activityInstance);
         }
     }
@@ -179,7 +195,7 @@ public class ActivityInstanceEntityManagerImpl
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
             if (!Objects.equals(getOriginalAssignee(taskEntity), taskEntity.getAssignee())) {
-                activityInstance = findUnfinishedActivityInstance(executionEntity);
+                activityInstance = findActivityInstanceByTaskId(taskEntity.getId());
                 if (activityInstance == null) {
                     HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
                     if (historicActivityInstance != null) {
@@ -235,23 +251,43 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     protected ActivityInstance recordActivityInstanceEnd(ExecutionEntity executionEntity, String deleteReason) {
-        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(executionEntity);
+
+        // It is possible that we record the activity instance end twice,
+        // which could lead to having no finished activity instance in the DB.
+        // if there is a finished runtime one, we should use the runtime one.
+        //
+        // It is also OK for pre 6.4.1.2 activity instances (when the runtime activities were added).
+        // Since the first time we go through here we won't find anything in the cache and the DB,
+        // so we will create one from the history (this will add one to the cache).
+        //
+        // The second time we go through here, there will be nothing in the DB, but one finished one in the cache.
+        // This one should be used, in order to avoid going to the historic tables again.
+
+        ActivityInstanceEntity activityInstance = findUnfinishedActivityInstance(executionEntity, true);
         if (activityInstance != null) {
-            activityInstance.markEnded(deleteReason);
+            if (activityInstance.getEndTime() == null) {
+                activityInstance.markEnded(deleteReason);
+            }
+
         } else {
-            // in the case of upgrade from 6.4.1.1 to 6.4.1.2 we have to create activityInstance for all already unfinished historicActivities
-            // which are going to be ended
+            // in the case of upgrade from 6.4.1.1 to 6.4.1.2 we have to create the runtime activityInstance (when a matching historicActivityInstance is found)
             HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
             if (historicActivityInstance != null) {
                 activityInstance = createActivityInstance(historicActivityInstance);
                 activityInstance.markEnded(deleteReason);
             }
+
         }
+
         return activityInstance;
     }
 
     @Override
     public ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution) {
+        return findUnfinishedActivityInstance(execution, false);
+    }
+
+    protected ActivityInstanceEntity findUnfinishedActivityInstance(ExecutionEntity execution, boolean returnNotFinishedFromCacheIfNothingInDb) {
         String activityId = getActivityIdForExecution(execution);
         if (activityId != null) {
             // No use looking for the ActivityInstance when no activityId is provided.
@@ -277,6 +313,8 @@ public class ActivityInstanceEntityManagerImpl
                 }
                 if (activityInstances.size() > 0) {
                     return activityInstances.get(0);
+                } else if (returnNotFinishedFromCacheIfNothingInDb) {
+                    return activityFromCache;
                 }
 
             }
@@ -317,6 +355,8 @@ public class ActivityInstanceEntityManagerImpl
         }
         Date now = getClock().getCurrentTime();
         activityInstanceEntity.setStartTime(now);
+        
+        activityInstanceEntity.setTransactionOrder(getTransactionOrderFromCache(processInstanceId));
 
         if (execution.getTenantId() != null) {
             activityInstanceEntity.setTenantId(execution.getTenantId());
@@ -339,6 +379,23 @@ public class ActivityInstanceEntityManagerImpl
         }
 
         return null;
+    }
+    
+    protected int getTransactionOrderFromCache(String processInstanceId) {
+        int transactionOrder = 1;
+        List<ActivityInstanceEntity> cachedActivityInstances = getEntityCache().findInCache(ActivityInstanceEntity.class);
+        for (ActivityInstanceEntity cachedActivityInstance : cachedActivityInstances) {
+            if (processInstanceId.equals(cachedActivityInstance.getProcessInstanceId())) {
+                
+                if (cachedActivityInstance.isInserted() && cachedActivityInstance.getTransactionOrder() != null && 
+                        cachedActivityInstance.getTransactionOrder() >= transactionOrder) {
+                    
+                    transactionOrder = cachedActivityInstance.getTransactionOrder() + 1;
+                }
+            }
+        }
+
+        return transactionOrder;
     }
 
     protected String parseActivityType(FlowElement element) {
@@ -373,6 +430,7 @@ public class ActivityInstanceEntityManagerImpl
         activityInstanceEntity.setAssignee(historicActivityInstance.getAssignee());
         activityInstanceEntity.setStartTime(historicActivityInstance.getStartTime());
         activityInstanceEntity.setEndTime(historicActivityInstance.getEndTime());
+        activityInstanceEntity.setTransactionOrder(historicActivityInstance.getTransactionOrder());
         activityInstanceEntity.setDeleteReason(historicActivityInstance.getDeleteReason());
         activityInstanceEntity.setDurationInMillis(historicActivityInstance.getDurationInMillis());
         activityInstanceEntity.setTenantId(historicActivityInstance.getTenantId());

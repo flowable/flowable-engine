@@ -16,14 +16,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.flowable.batch.service.impl.persistence.entity.BatchByteArrayEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
@@ -49,15 +48,14 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
@@ -103,6 +101,7 @@ public class EntityDependencyOrder {
          * FK to ByteArray
          */
         DELETE_ORDER.add(JobEntityImpl.class);
+        DELETE_ORDER.add(ExternalWorkerJobEntityImpl.class);
         DELETE_ORDER.add(TimerJobEntityImpl.class);
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
@@ -128,9 +127,6 @@ public class EntityDependencyOrder {
          * FK to DeploymentEntity
          */
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
-        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
-        DELETE_ORDER.add(JobByteArrayEntityImpl.class);
-        DELETE_ORDER.add(BatchByteArrayEntityImpl.class);
 
         /*
          * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity

@@ -16,12 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
+import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricEntityLinksByScopeIdAndTypeMatcher;
 
 /**
@@ -30,7 +33,14 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachema
 public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<HistoricEntityLinkEntity> implements HistoricEntityLinkDataManager {
 
     protected CachedEntityMatcher<HistoricEntityLinkEntity> historicEntityLinksByScopeIdAndTypeMatcher = new HistoricEntityLinksByScopeIdAndTypeMatcher();
+    protected CachedEntityMatcher<HistoricEntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
 
+    protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
+    
+    public MybatisHistoricEntityLinkDataManager(EntityLinkServiceConfiguration entityLinkServiceConfiguration) {
+        this.entityLinkServiceConfiguration = entityLinkServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricEntityLinkEntity> getManagedEntityClass() {
         return HistoricEntityLinkEntityImpl.class;
@@ -49,6 +59,16 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
         return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
+    }
+
+    @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
+        parameters.put("linkType", linkType);
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -96,4 +116,10 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     public void deleteHistoricEntityLinksForNonExistingCaseInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricCaseEntityLinks", null, HistoricEntityLinkEntityImpl.class);
     }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return entityLinkServiceConfiguration.getIdGenerator();
+    }
+    
 }

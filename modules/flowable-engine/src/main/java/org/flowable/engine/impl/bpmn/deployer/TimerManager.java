@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -40,23 +41,24 @@ public class TimerManager {
     protected void removeObsoleteTimers(ProcessDefinitionEntity processDefinition) {
         List<TimerJobEntity> jobsToDelete = null;
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processDefinition.getTenantId() != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
-            jobsToDelete = CommandContextUtil.getTimerJobService().findJobsByTypeAndProcessDefinitionKeyAndTenantId(
+            jobsToDelete = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().findJobsByTypeAndProcessDefinitionKeyAndTenantId(
                     TimerStartEventJobHandler.TYPE, processDefinition.getKey(), processDefinition.getTenantId());
         } else {
-            jobsToDelete = CommandContextUtil.getTimerJobService()
+            jobsToDelete = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService()
                     .findJobsByTypeAndProcessDefinitionKeyNoTenantId(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
         }
 
         if (jobsToDelete != null) {
             for (TimerJobEntity job : jobsToDelete) {
-                new CancelJobsCmd(job.getId()).execute(Context.getCommandContext());
+                new CancelJobsCmd(job.getId(), processEngineConfiguration.getJobServiceConfiguration()).execute(Context.getCommandContext());
             }
         }
     }
 
     protected void scheduleTimers(ProcessDefinitionEntity processDefinition, Process process) {
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
+        TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService();
         List<TimerJobEntity> timers = getTimerDeclarations(processDefinition, process);
         for (TimerJobEntity timer : timers) {
             timerJobService.scheduleTimerJob(timer);
@@ -73,8 +75,9 @@ public class TimerManager {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                         if (eventDefinition instanceof TimerEventDefinition) {
                             TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, null, TimerStartEventJobHandler.TYPE,
-                                    TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+                            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                                    false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
+                                            timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
                             if (timerJob != null) {
                                 timerJob.setProcessDefinitionId(processDefinition.getId());

@@ -36,6 +36,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import flowable.Application;
 
 /**
@@ -124,7 +126,7 @@ public class RestApiApplicationTest {
         assertThat(contentItems).isNotNull();
         assertThat(contentItems.getData())
             .isEmpty();
-        assertThat(contentItems.getTotal()).isEqualTo(0);
+        assertThat(contentItems.getTotal()).isZero();
     }
     @Test
     public void testDmnRestApiIntegration() {
@@ -141,7 +143,7 @@ public class RestApiApplicationTest {
         assertThat(deployments).isNotNull();
         assertThat(deployments.getData())
             .isEmpty();
-        assertThat(deployments.getTotal()).isEqualTo(0);
+        assertThat(deployments.getTotal()).isZero();
     }
     @Test
     public void testFormRestApiIntegration() {
@@ -158,7 +160,7 @@ public class RestApiApplicationTest {
         assertThat(formDefinitions).isNotNull();
         assertThat(formDefinitions.getData())
             .isEmpty();
-        assertThat(formDefinitions.getTotal()).isEqualTo(0);
+        assertThat(formDefinitions.getTotal()).isZero();
     }
     @Test
     public void testIdmRestApiIntegration() {
@@ -175,9 +177,43 @@ public class RestApiApplicationTest {
         assertThat(groups).isNotNull();
         assertThat(groups.getData())
             .extracting(GroupResponse::getId, GroupResponse::getType, GroupResponse::getName, GroupResponse::getUrl)
-            .containsExactlyInAnyOrder(
+            .containsExactly(
                 tuple("user", "security-role", "users", null)
             );
         assertThat(groups.getTotal()).isEqualTo(1);
+    }
+
+    @Test
+    public void testExternalJobRestApiIntegration() {
+        String url = "http://localhost:" + serverPort + "/external-job-api/jobs";
+
+        ResponseEntity<DataResponse<JsonNode>> response = restTemplate
+                .exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<DataResponse<JsonNode>>() {
+                });
+
+        assertThat(response.getStatusCode())
+                .as("Status code")
+                .isEqualTo(HttpStatus.OK);
+        DataResponse<JsonNode> jobs = response.getBody();
+        assertThat(jobs).isNotNull();
+        assertThat(jobs.getTotal()).isZero();
+        assertThat(jobs.getData()).isEmpty();
+    }
+
+    @Test
+    public void testExternalJobRestApiIntegrationNotFound() {
+        String url = "http://localhost:" + serverPort + "/external-job-api/jobs/does-not-exist";
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        BasicJsonTester jsonTester = new BasicJsonTester(getClass());
+
+        assertThat(jsonTester.from(response.getBody())).isEqualToJson("{"
+                + "\"message\": \"Not found\","
+                + "\"exception\": \"Could not find external worker job with id 'does-not-exist'.\""
+                + "}");
+        assertThat(response.getStatusCode())
+                .as("Status code")
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

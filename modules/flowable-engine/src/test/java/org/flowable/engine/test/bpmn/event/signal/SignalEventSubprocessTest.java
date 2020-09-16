@@ -56,30 +56,30 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         // the process instance must have a message event subscription:
         Execution execution = runtimeService.createExecutionQuery().signalEventSubscriptionName("newSignal").singleResult();
-        assertNotNull(execution);
-        assertEquals(expectedNumberOfEventSubscriptions, createEventSubscriptionQuery().count());
-        assertEquals(numberOfExecutions, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(execution).isNotNull();
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(expectedNumberOfEventSubscriptions);
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(numberOfExecutions);
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("task", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
         taskService.complete(task.getId());
-        assertEquals(0, createEventSubscriptionQuery().count());
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertProcessEnded(processInstance.getId());
 
         // now we start a new instance but this time we trigger the event subprocess:
         processInstance = runtimeService.startProcessInstanceByKey("process");
         execution = runtimeService.createExecutionQuery().signalEventSubscriptionName("newSignal").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         runtimeService.signalEventReceived("newSignal");
 
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("eventSubProcessTask");
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, createEventSubscriptionQuery().count());
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -94,16 +94,16 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
                 .signalEventSubscriptionName("newSignal")
                 .singleResult();
 
-        assertNotNull(execution);
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(execution).isNotNull();
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("task", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
         taskService.complete(task.getId());
-        assertEquals(0, createEventSubscriptionQuery().count());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
         // now we start a new instance but this time we trigger the event subprocess:
         processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -114,21 +114,21 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         runtimeService.signalEventReceived("newSignal");
 
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // now let's first complete the task in the main flow:
         task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
         // we still have 3 executions:
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         // now let's complete the task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         // #################### again, the other way around:
 
@@ -137,32 +137,32 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
                 .processInstanceId(processInstance.getId())
                 .signalEventSubscriptionName("newSignal")
                 .singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         runtimeService.signalEventReceived("newSignal");
 
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // we still have 3 executions:
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
     @Deployment
     public void testNonInterruptingMultipleInstances() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -170,45 +170,45 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         runtimeService.signalEventReceived("newSignal", execution.getId());
-        assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
-        assertEquals(2, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         runtimeService.signalEventReceived("newSignal", execution.getId());
-        assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
 
-        assertEquals(3, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
         // we still have 6 executions:
-        assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
         // now let's complete the first task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
         taskService.complete(task.getId());
 
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         // complete the second task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
     @Deployment
     public void testNonInterruptingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -216,45 +216,45 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         runtimeService.signalEventReceived("newSignal", execution.getId());
-        assertEquals(6, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(6);
 
-        assertEquals(2, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         runtimeService.signalEventReceived("newSignal", execution.getId());
-        assertEquals(9, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(9);
 
-        assertEquals(3, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
         // we still have 7 executions:
-        assertEquals(7, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
 
         // now let's complete the first task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
         taskService.complete(task.getId());
 
-        assertEquals(4, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(4);
 
         // complete the second task in the event subprocess
         task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
     @Deployment
     public void testInterruptingSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -262,40 +262,40 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         runtimeService.signalEventReceived("eventSignal", execution.getId());
-        assertEquals(5, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
         // now let's complete the task in the event subprocess
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Test
     @Deployment
     public void testStartingAdditionalTasks() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .signalEventSubscriptionName("Start another task")
                 .singleResult();
         
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
 
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -304,7 +304,7 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         runtimeService.signalEventReceived("Start another sub task", execution.getId());
         
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -313,64 +313,64 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
         
         runtimeService.signalEventReceived("Start another task", execution.getId());
         
-        assertEquals(3, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/event/signal/SignalEventSubprocessTest.testStartingAdditionalTasks.bpmn20.xml")
     public void testStartingAdditionalTasksNoNestedEventSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .signalEventSubscriptionName("Start another task")
                 .singleResult();
         
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, createEventSubscriptionQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Test
@@ -378,15 +378,15 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
     public void testStartingAdditionalTasksWithNestedEventSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
         
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, createEventSubscriptionQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -395,20 +395,20 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         runtimeService.signalEventReceived("Start another sub task", execution.getId());
         
-        assertEquals(2, createEventSubscriptionQuery().count());
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         task = taskService.createTaskQuery().taskDefinitionKey("subTask1").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -417,8 +417,8 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
         
         runtimeService.signalEventReceived("Start another task", execution.getId());
         
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
         
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -427,49 +427,49 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
         
         runtimeService.signalEventReceived("Start another task", execution.getId());
         
-        assertEquals(1, createEventSubscriptionQuery().count());
-        assertEquals(3, taskService.createTaskQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
         
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskDefinitionKey("additionalTask").list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         
         taskService.complete(tasks.get(0).getId());
         
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Test
     @Deployment
     public void testStartingAdditionalTasksInterrupting() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .signalEventSubscriptionName("Start another task")
                 .singleResult();
         
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
 
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -478,41 +478,41 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         runtimeService.signalEventReceived("Start another sub task", execution.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalSubTask").singleResult();
         taskService.complete(task.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/event/signal/SignalEventSubprocessTest.testStartingAdditionalTasksInterrupting.bpmn20.xml")
     public void testStartingAdditionalTasksInterruptingWithMainEventSubProcessInterrupt() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startingAdditionalTasks");
-        assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
 
         Execution execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
                 .signalEventSubscriptionName("Start another task")
                 .singleResult();
         
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, createEventSubscriptionQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(1);
 
         // now let's first complete the task in the main flow:
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(2, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isEqualTo(2);
 
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -521,7 +521,7 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
 
         runtimeService.signalEventReceived("Start another sub task", execution.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         execution = runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
@@ -530,13 +530,13 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
         
         runtimeService.signalEventReceived("Start another task", execution.getId());
         
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         
         task = taskService.createTaskQuery().taskDefinitionKey("additionalTask").singleResult();
         taskService.complete(task.getId());
 
         // done!
-        assertEquals(0, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     @Test
@@ -663,7 +663,7 @@ public class SignalEventSubprocessTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

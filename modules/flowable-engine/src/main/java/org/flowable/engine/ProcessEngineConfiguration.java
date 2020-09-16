@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -93,6 +95,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String mailServerUsername; // by default no name and password are provided, which
     protected String mailServerPassword; // means no authentication for mail server
     protected int mailServerPort = 25;
+    protected int mailServerSSLPort = 465;
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
@@ -113,7 +116,13 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean jpaCloseEntityManager;
 
     protected AsyncExecutor asyncExecutor;
+    protected AsyncTaskExecutor asyncTaskExecutor;
+    protected boolean shutdownAsyncTaskExecutor;
+    protected AsyncTaskInvoker asyncTaskInvoker;
+
     protected AsyncExecutor asyncHistoryExecutor;
+    protected AsyncTaskExecutor asyncHistoryTaskExecutor;
+    protected boolean shutdownAsyncHistoryTaskExecutor;
     /**
      * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
      * retried again.
@@ -130,6 +139,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     protected boolean isCreateDiagramOnDeploy = true;
+
+    protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
     
     /**
      *  include the sequence flow name in case there's no Label DI, 
@@ -283,6 +294,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public int getMailServerSSLPort() {
+        return mailServerSSLPort;
+    }
+
+    public ProcessEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
+        this.mailServerSSLPort = mailServerSSLPort;
         return this;
     }
 
@@ -701,12 +721,39 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
     
+    public AsyncTaskExecutor getAsyncTaskExecutor() {
+        return asyncTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+        this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
+    public AsyncTaskInvoker getAsyncTaskInvoker() {
+        return asyncTaskInvoker;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskInvoker(AsyncTaskInvoker asyncTaskInvoker) {
+        this.asyncTaskInvoker = asyncTaskInvoker;
+        return this;
+    }
+
     public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
 
     public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
+        return this;
+    }
+
+    public AsyncTaskExecutor getAsyncHistoryTaskExecutor() {
+        return asyncHistoryTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
+        this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
         return this;
     }
 
@@ -788,6 +835,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
         this.historyCleaningManager = historyCleaningManager;
+        return this;
+    }
+
+    public boolean isAlwaysUseArraysForDmnMultiHitPolicies() {
+        return alwaysUseArraysForDmnMultiHitPolicies;
+    }
+
+    public ProcessEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
+        this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
         return this;
     }
 }

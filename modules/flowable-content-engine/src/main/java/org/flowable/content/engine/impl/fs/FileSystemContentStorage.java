@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.flowable.content.api.ContentNotFoundException;
 import org.flowable.content.api.ContentObject;
+import org.flowable.content.api.ContentObjectStorageMetadata;
 import org.flowable.content.api.ContentStorage;
 import org.flowable.content.api.ContentStorageException;
 import org.slf4j.Logger;
@@ -72,7 +73,17 @@ public class FileSystemContentStorage implements ContentStorage {
     }
 
     @Override
+    @Deprecated
     public ContentObject createContentObject(InputStream contentStream, Map<String, Object> metaData) {
+        return createContentObject(contentStream);
+    }
+
+    @Override
+    public ContentObject createContentObject(InputStream contentStream, ContentObjectStorageMetadata metaData) {
+        return createContentObject(contentStream);
+    }
+
+    protected ContentObject createContentObject(InputStream contentStream) {
         // Get hold of the next free ID to use
         BigInteger id = fetchNewId();
         File contentFile = new File(rootFolder, converter.getPathForId(id).getPath());
@@ -107,7 +118,17 @@ public class FileSystemContentStorage implements ContentStorage {
     }
 
     @Override
+    @Deprecated
     public ContentObject updateContentObject(String id, InputStream contentStream, Map<String, Object> metaData) {
+        return updateContentObject(id, contentStream);
+    }
+
+    @Override
+    public ContentObject updateContentObject(String id, InputStream contentStream, ContentObjectStorageMetadata metaData) {
+        return updateContentObject(id, contentStream);
+    }
+
+    protected ContentObject updateContentObject(String id, InputStream contentStream) {
 
         File contentFile = getFileForId(id, true);
 
@@ -305,22 +326,18 @@ public class FileSystemContentStorage implements ContentStorage {
                 if (newFolder.mkdirs()) {
                     return newFolder;
                 }
-
-                // File already existed, repeat the process again to find the next
-                // available folder
-                LOGGER.debug("Next folder already created, retrying...");
-                return getFirstAvailableFolder(--maxRetries);
             } else {
                 File newFolder = new File(currentMaxFolder.getParentFile(), String.valueOf(lastIndex + 1));
                 if (newFolder.mkdir()) {
                     return newFolder;
                 }
 
-                // File already existed, repeat the process again to find the next
-                // available folder
-                LOGGER.debug("Next folder already created, retrying...");
-                return getFirstAvailableFolder(--maxRetries);
             }
+
+            // File already existed, repeat the process again to find the next
+            // available folder
+            LOGGER.debug("Next folder already created, retrying...");
+            return getFirstAvailableFolder(--maxRetries);
         }
     }
 

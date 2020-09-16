@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -46,9 +46,11 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Joram Barrez
  */
 public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> 
-        implements HistoricProcessInstanceQuery, QueryCacheValues {
+        implements HistoricProcessInstanceQuery, CacheAwareQuery<HistoricProcessInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
     
     protected String processInstanceId;
     protected String processDefinitionId;
@@ -75,7 +77,9 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
     protected String involvedUser;
+    protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
     protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
@@ -98,12 +102,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public HistoricProcessInstanceQueryImpl() {
     }
 
-    public HistoricProcessInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public HistoricProcessInstanceQueryImpl(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandContext, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
-    public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandExecutor, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
     @Override
@@ -361,6 +367,38 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.involvedUser = involvedUser;
         } else {
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery involvedUser(String userId, String identityLinkType) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        } else {
+            this.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery involvedGroup(String groupId, String identityLinkType) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        } else {
+            this.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
         }
         return this;
     }
@@ -658,7 +696,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new HistoricProcessInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoricProcessInstanceQueryImpl(commandContext, processEngineConfiguration);
+        } else {
+            currentOrQueryObject = new HistoricProcessInstanceQueryImpl(commandExecutor, processEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -722,7 +764,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
@@ -735,20 +776,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
         
         if (includeProcessVariables) {
-            results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
 
             if (processInstanceId != null) {
                 addCachedVariableForQueryById(commandContext, results);
             }
 
         } else {
-            results = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByQueryCriteria(this);
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesByQueryCriteria(this);
         }
 
         if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
@@ -788,6 +828,15 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
                 }
 
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(HistoricProcessInstanceEntity processInstance) {
+        if (includeProcessVariables) {
+            processInstance.getQueryVariables()
+                    .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                            .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
         }
     }
 

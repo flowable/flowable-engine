@@ -12,24 +12,19 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -48,6 +43,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
@@ -63,37 +59,38 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
-    
+
     @Before
     public void deployOneTaskProcess() {
         if (processEngineRepositoryService.createDeploymentQuery().count() == 0) {
             processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
         }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testOneTaskProcessNonBlocking() {
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
         List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
-        assertEquals(1, processTasks.size());
-        
+        assertThat(processTasks).hasSize(1);
+
         // Non-blocking process task, plan item should have been completed
-        List<PlanItemInstance>  planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
-        assertEquals(1, planItemInstances.size());
-        assertEquals("Task Two", planItemInstances.get(0).getName());
-        
-        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
-        
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task Two");
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
+
         processEngine.getTaskService().complete(processTasks.get(0).getId());
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testOneCallActivityProcessBlocking() {
@@ -101,34 +98,35 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .addClasspathResource("org/flowable/cmmn/test/oneCallActivityProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
                 .deploy();
-        
+
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                            .caseDefinitionKey("myCase")
-                            .start();
-             
+                    .caseDefinitionKey("myCase")
+                    .start();
+
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-                            .caseInstanceId(caseInstance.getId())
-                            .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                            .list();
-             
-            assertEquals(1, planItemInstances.size());
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+
+            assertThat(planItemInstances).hasSize(1);
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
 
             List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
-            assertEquals(1, processTasks.size());
+            assertThat(processTasks).hasSize(1);
             Task processTask = processTasks.get(0);
             String subProcessInstanceId = processTask.getProcessInstanceId();
-            ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(subProcessInstanceId).singleResult();
-            
+            ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(subProcessInstanceId)
+                    .singleResult();
+
             Task task = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertEquals(processTask.getId(), task.getId());
-            
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
             task = cmmnTaskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
-            assertEquals(processTask.getId(), task.getId());
-            
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
             List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
-            assertEquals(3, entityLinks.size());
+            assertThat(entityLinks).hasSize(3);
             EntityLink processEntityLink = null;
             EntityLink subProcessEntityLink = null;
             EntityLink taskEntityLink = null;
@@ -139,86 +137,366 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                     } else {
                         subProcessEntityLink = entityLink;
                     }
-                    
+
                 } else if (ScopeTypes.TASK.equals(entityLink.getReferenceScopeType())) {
                     taskEntityLink = entityLink;
                 }
             }
-            
-            assertEquals(EntityLinkType.CHILD, processEntityLink.getLinkType());
-            assertNotNull(processEntityLink.getCreateTime());
-            assertEquals(caseInstance.getId(), processEntityLink.getScopeId());
-            assertEquals(ScopeTypes.CMMN, processEntityLink.getScopeType());
-            assertNull(processEntityLink.getScopeDefinitionId());
-            assertEquals(processInstance.getId(), processEntityLink.getReferenceScopeId());
-            assertEquals(ScopeTypes.BPMN, processEntityLink.getReferenceScopeType());
-            assertNull(processEntityLink.getReferenceScopeDefinitionId());
-            assertEquals(HierarchyType.ROOT, processEntityLink.getHierarchyType());
-            
-            assertEquals(EntityLinkType.CHILD, subProcessEntityLink.getLinkType());
-            assertNotNull(subProcessEntityLink.getCreateTime());
-            assertEquals(caseInstance.getId(), subProcessEntityLink.getScopeId());
-            assertEquals(ScopeTypes.CMMN, subProcessEntityLink.getScopeType());
-            assertNull(subProcessEntityLink.getScopeDefinitionId());
-            assertEquals(subProcessInstanceId, subProcessEntityLink.getReferenceScopeId());
-            assertEquals(ScopeTypes.BPMN, subProcessEntityLink.getReferenceScopeType());
-            assertNull(subProcessEntityLink.getReferenceScopeDefinitionId());
-            assertEquals(HierarchyType.ROOT, subProcessEntityLink.getHierarchyType());
-            
-            assertEquals(EntityLinkType.CHILD, taskEntityLink.getLinkType());
-            assertNotNull(taskEntityLink.getCreateTime());
-            assertEquals(caseInstance.getId(), taskEntityLink.getScopeId());
-            assertEquals(ScopeTypes.CMMN, taskEntityLink.getScopeType());
-            assertNull(taskEntityLink.getScopeDefinitionId());
-            assertEquals(processTasks.get(0).getId(), taskEntityLink.getReferenceScopeId());
-            assertEquals(ScopeTypes.TASK, taskEntityLink.getReferenceScopeType());
-            assertNull(taskEntityLink.getReferenceScopeDefinitionId());
-            assertEquals(HierarchyType.ROOT, taskEntityLink.getHierarchyType());
-            
+
+            assertThat(processEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(processEntityLink.getCreateTime()).isNotNull();
+            assertThat(processEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(processEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(processEntityLink.getScopeDefinitionId()).isNull();
+            assertThat(processEntityLink.getReferenceScopeId()).isEqualTo(processInstance.getId());
+            assertThat(processEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.BPMN);
+            assertThat(processEntityLink.getReferenceScopeDefinitionId()).isNull();
+            assertThat(processEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+
+            assertThat(subProcessEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(subProcessEntityLink.getCreateTime()).isNotNull();
+            assertThat(subProcessEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(subProcessEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(subProcessEntityLink.getScopeDefinitionId()).isNull();
+            assertThat(subProcessEntityLink.getReferenceScopeId()).isEqualTo(subProcessInstanceId);
+            assertThat(subProcessEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.BPMN);
+            assertThat(subProcessEntityLink.getReferenceScopeDefinitionId()).isNull();
+            assertThat(subProcessEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+
+            assertThat(taskEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(taskEntityLink.getCreateTime()).isNotNull();
+            assertThat(taskEntityLink.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(taskEntityLink.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(taskEntityLink.getScopeDefinitionId()).isNull();
+            assertThat(taskEntityLink.getReferenceScopeId()).isEqualTo(processTasks.get(0).getId());
+            assertThat(taskEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.TASK);
+            assertThat(taskEntityLink.getReferenceScopeDefinitionId()).isNull();
+            assertThat(taskEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+
             entityLinks = processEngine.getRuntimeService().getEntityLinkChildrenForProcessInstance(processInstance.getId());
-            assertEquals(2, entityLinks.size());
-            
+            assertThat(entityLinks).hasSize(2);
+
             entityLinks = processEngine.getRuntimeService().getEntityLinkChildrenForProcessInstance(subProcessInstanceId);
-            assertEquals(1, entityLinks.size());
+            assertThat(entityLinks).hasSize(1);
             EntityLink entityLink = entityLinks.get(0);
-            assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
-            assertNotNull(entityLink.getCreateTime());
-            assertEquals(subProcessInstanceId, entityLink.getScopeId());
-            assertEquals(ScopeTypes.BPMN, entityLink.getScopeType());
-            assertNull(entityLink.getScopeDefinitionId());
-            assertEquals(processTasks.get(0).getId(), entityLink.getReferenceScopeId());
-            assertEquals(ScopeTypes.TASK, entityLink.getReferenceScopeType());
-            assertNull(entityLink.getReferenceScopeDefinitionId());
-            assertEquals(HierarchyType.PARENT, entityLink.getHierarchyType());
+            assertThat(entityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(entityLink.getCreateTime()).isNotNull();
+            assertThat(entityLink.getScopeId()).isEqualTo(subProcessInstanceId);
+            assertThat(entityLink.getScopeType()).isEqualTo(ScopeTypes.BPMN);
+            assertThat(entityLink.getScopeDefinitionId()).isNull();
+            assertThat(entityLink.getReferenceScopeId()).isEqualTo(processTasks.get(0).getId());
+            assertThat(entityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.TASK);
+            assertThat(entityLink.getReferenceScopeDefinitionId()).isNull();
+            assertThat(entityLink.getHierarchyType()).isEqualTo(HierarchyType.PARENT);
 
             entityLinks = processEngine.getRuntimeService().getEntityLinkParentsForTask(processTask.getId());
-            assertEquals(3, entityLinks.size());
+            assertThat(entityLinks).hasSize(3);
             entityLink = entityLinks.get(0);
-            assertEquals(EntityLinkType.CHILD, entityLink.getLinkType());
-            assertNotNull(entityLink.getCreateTime());
+            assertThat(entityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
+            assertThat(entityLink.getCreateTime()).isNotNull();
 
             processEngine.getTaskService().complete(processTasks.get(0).getId());
-            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-            
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
             List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
-            assertEquals(3, historicEntityLinks.size());
-            
+            assertThat(historicEntityLinks).hasSize(3);
+
             historicEntityLinks = processEngine.getHistoryService().getHistoricEntityLinkChildrenForProcessInstance(processInstance.getId());
-            assertEquals(2, historicEntityLinks.size());
-            
+            assertThat(historicEntityLinks).hasSize(2);
+
             historicEntityLinks = processEngine.getHistoryService().getHistoricEntityLinkChildrenForProcessInstance(subProcessInstanceId);
-            assertEquals(1, historicEntityLinks.size());
-            assertEquals(HierarchyType.PARENT, historicEntityLinks.get(0).getHierarchyType());
+            assertThat(historicEntityLinks).hasSize(1);
+            assertThat(historicEntityLinks.get(0).getHierarchyType()).isEqualTo(HierarchyType.PARENT);
 
             historicEntityLinks = processEngine.getHistoryService().getHistoricEntityLinkParentsForTask(processTasks.get(0).getId());
-            assertEquals(3, historicEntityLinks.size());
-            
-            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertEquals(processTask.getId(), historicTask.getId());
-            
+            assertThat(historicEntityLinks).hasSize(3);
+
+            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceIdWithChildren(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
             historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(processInstance.getId()).singleResult();
-            assertEquals(processTask.getId(), historicTask.getId());
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedCallActivityProcessBlocking() {
+        Deployment deployment = processEngine.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneCallActivityProcess.bpmn20.xml")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+            String caseInstanceId = caseInstance.getId();
             
+            PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemDefinitionId("theProcess")
+                    .singleResult();
+
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+
+            assertThat(planItemInstances).hasSize(1);
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+
+            Task processTask = processEngine.getTaskService().createTaskQuery().singleResult();
+            String oneTaskProcessId = processTask.getProcessInstanceId();
+
+            ProcessInstance oneTaskProcess = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(oneTaskProcessId).singleResult();
+            assertThat(oneTaskProcess.getProcessDefinitionKey()).isEqualTo("oneTask");
+
+            ProcessInstance callActivityProcess = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(oneTaskProcessId).singleResult();
+            assertThat(callActivityProcess.getProcessDefinitionKey()).isEqualTo("oneCallActivity");
+            String callActivityProcessId = callActivityProcess.getId();
+            Execution callActivityExecution = processEngine.getRuntimeService().createExecutionQuery().processInstanceId(callActivityProcessId).onlyChildExecutions().singleResult();
+
+            ProcessInstance nestedCallActivityProcess = processEngine.getRuntimeService().createProcessInstanceQuery().subProcessInstanceId(callActivityProcessId).singleResult();
+            assertThat(nestedCallActivityProcess.getProcessDefinitionKey()).isEqualTo("nestedCallActivity");
+            String nestedCallActivityProcessId = nestedCallActivityProcess.getId();
+            Execution nestedCallActivityExecution = processEngine.getRuntimeService().createExecutionQuery().processInstanceId(nestedCallActivityProcessId).onlyChildExecutions().singleResult();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
+            task = cmmnTaskService.createTaskQuery().processInstanceIdWithChildren(nestedCallActivityProcessId).singleResult();
+            assertThat(task.getId()).isEqualTo(processTask.getId());
+
+            List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstanceId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getSubScopeId, EntityLink::getParentElementId, 
+                            EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, processTaskPlanItemInstance.getId(), "theProcess", ScopeTypes.CMMN, HierarchyType.ROOT, nestedCallActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, nestedCallActivityExecution.getId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, callActivityExecution.getId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, processTask.getExecutionId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(nestedCallActivityProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getSubScopeId, EntityLink::getParentElementId, 
+                            EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(nestedCallActivityProcessId, nestedCallActivityExecution.getId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, callActivityExecution.getId(), "theTask", ScopeTypes.BPMN, null, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(callActivityProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getSubScopeId, EntityLink::getParentElementId,
+                            EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(callActivityProcessId, callActivityExecution.getId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkChildrenForProcessInstance(oneTaskProcessId);
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getSubScopeId, EntityLink::getParentElementId,
+                            EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(oneTaskProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            entityLinks = processEngineRuntimeService.getEntityLinkParentsForTask(processTask.getId());
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getScopeId, EntityLink::getSubScopeId, EntityLink::getParentElementId,
+                            EntityLink::getScopeType, EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,
+                            EntityLink::getReferenceScopeType, EntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, processTask.getExecutionId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(oneTaskProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(entityLinks)
+                    .extracting(EntityLink::getRootScopeId, EntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            processEngineTaskService.complete(processTask.getId());
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
+            List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstanceId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getSubScopeId, HistoricEntityLink::getParentElementId,
+                            HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, processTaskPlanItemInstance.getId(), "theProcess", ScopeTypes.CMMN, HierarchyType.ROOT, nestedCallActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, nestedCallActivityExecution.getId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, callActivityExecution.getId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(caseInstanceId, processTask.getExecutionId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(nestedCallActivityProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getSubScopeId, HistoricEntityLink::getParentElementId,
+                            HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(nestedCallActivityProcessId, nestedCallActivityExecution.getId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, callActivityProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, callActivityExecution.getId(), "theTask", ScopeTypes.BPMN, null, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(callActivityProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getSubScopeId, HistoricEntityLink::getParentElementId,
+                            HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(callActivityProcessId, callActivityExecution.getId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, oneTaskProcessId, ScopeTypes.BPMN, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkChildrenForProcessInstance(oneTaskProcessId);
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getSubScopeId, HistoricEntityLink::getParentElementId,
+                            HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(oneTaskProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            historicEntityLinks = processEngineHistoryService.getHistoricEntityLinkParentsForTask(processTask.getId());
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getScopeId, HistoricEntityLink::getSubScopeId, HistoricEntityLink::getParentElementId,
+                            HistoricEntityLink::getScopeType, HistoricEntityLink::getHierarchyType,
+                            HistoricEntityLink::getReferenceScopeId, HistoricEntityLink::getReferenceScopeType, HistoricEntityLink::getLinkType)
+                    .as("scopeId, subScopeId, parentElementId, scopeType, hierarchyType, referenceScopeId, referenceScopeType, linkType")
+                    .containsExactlyInAnyOrder(
+                            tuple(caseInstanceId, processTask.getExecutionId(), "theTask", ScopeTypes.CMMN, HierarchyType.ROOT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(nestedCallActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, null, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(callActivityProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.GRAND_PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD),
+                            tuple(oneTaskProcessId, processTask.getExecutionId(), "theTask", ScopeTypes.BPMN, HierarchyType.PARENT, processTask.getId(), ScopeTypes.TASK, EntityLinkType.CHILD)
+                    );
+
+            assertThat(historicEntityLinks)
+                    .extracting(HistoricEntityLink::getRootScopeId, HistoricEntityLink::getRootScopeType)
+                    .containsOnly(
+                            tuple(caseInstanceId, ScopeTypes.CMMN)
+                    );
+
+            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery()
+                    .caseInstanceIdWithChildren(caseInstanceId)
+                    .singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+            historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(nestedCallActivityProcessId).singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+            historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().processInstanceIdWithChildren(oneTaskProcessId).singleResult();
+            assertThat(historicTask.getId()).isEqualTo(processTask.getId());
+
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+
+    @Test
+    @CmmnDeployment
+    public void testNestedCallActivityTerminate() {
+        Deployment deployment = processEngine.getRepositoryService().createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneCallActivityProcess.bpmn20.xml")
+            .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+            String caseInstanceId = caseInstance.getId();
+
+            cmmnRuntimeService.terminateCaseInstance(caseInstanceId);
+            HistoricPlanItemInstance processHistoricPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+            assertThat(processHistoricPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
         }
@@ -228,70 +506,72 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @CmmnDeployment
     public void testOneTaskProcessBlocking() {
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
-        
+
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-        
+
         // Blocking process task, plan item should be in state ACTIVE
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
-        assertEquals(1, planItemInstances.size());
-        assertEquals("The Process", planItemInstances.get(0).getName());
-        assertNotNull(planItemInstances.get(0).getReferenceId());
-        assertEquals(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
-        assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances.get(0).getName()).isEqualTo("The Process");
+        assertThat(planItemInstances.get(0).getReferenceId()).isNotNull();
+        assertThat(planItemInstances.get(0).getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
-        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult();
-        assertEquals(processTaskPlanItemInstance.getId(), processInstance.getCallbackId());
-        assertEquals(CallbackTypes.PLAN_ITEM_CHILD_PROCESS, processInstance.getCallbackType());
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult();
+        assertThat(processInstance.getCallbackId()).isEqualTo(processTaskPlanItemInstance.getId());
+        assertThat(processInstance.getCallbackType()).isEqualTo(CallbackTypes.PLAN_ITEM_CHILD_PROCESS);
 
-        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
-            .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId());
-        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
-            .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
-        assertEquals(processInstance.getId(), processEngine.getRuntimeService().createProcessInstanceQuery()
-            .processInstanceCallbackId(processTaskPlanItemInstance.getId())
-            .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery()
+                .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId()).isEqualTo(processInstance.getId());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery()
+                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
+        assertThat(processEngine.getRuntimeService().createProcessInstanceQuery()
+                .processInstanceCallbackId(processTaskPlanItemInstance.getId())
+                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
 
         if (processEngine.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricProcessInstance historicProcessInstance = processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstance.getId()).singleResult();
-            assertEquals(processInstance.getCallbackId(), historicProcessInstance.getCallbackId());
-            assertEquals(processInstance.getCallbackType(), historicProcessInstance.getCallbackType());
+            assertThat(historicProcessInstance.getCallbackId()).isEqualTo(processInstance.getCallbackId());
+            assertThat(historicProcessInstance.getCallbackType()).isEqualTo(processInstance.getCallbackType());
 
-            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
-                .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId());
-            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
-                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
-            assertEquals(processInstance.getId(), processEngine.getHistoryService().createHistoricProcessInstanceQuery()
-                .processInstanceCallbackId(processTaskPlanItemInstance.getId())
-                .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId());
+            assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .processInstanceCallbackId(processInstance.getCallbackId()).singleResult().getId()).isEqualTo(processInstance.getId());
+            assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
+            assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .processInstanceCallbackId(processTaskPlanItemInstance.getId())
+                    .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
         }
-        
+
         // Completing task will trigger completion of process task plan item
         processEngine.getTaskService().complete(task.getId());
-        
+
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
-        assertEquals(1, planItemInstances.size());
-        assertEquals("Task Two", planItemInstances.get(0).getName());
-        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task Two");
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
     }
 
     @Test
     @CmmnDeployment(tenantId = "flowable",
-    resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+            resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
     public void testOneTaskProcessBlockingWithTenant() {
         try {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             processEngineRepositoryService.createDeployment().
                     addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
@@ -301,19 +581,20 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("flowable");
 
             ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
-            assertEquals("flowable", processInstance.getTenantId());
+            assertThat(processInstance.getTenantId()).isEqualTo("flowable");
 
             Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-            assertEquals("flowable", task.getTenantId());
+            assertThat(task.getTenantId()).isEqualTo("flowable");
 
             this.cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         } finally {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             if (processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().count() == 1) {
-                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().singleResult();
+                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery()
+                        .singleResult();
                 processEngine.getProcessEngineConfiguration().getHistoryService().deleteHistoricTaskInstance(historicTaskInstance.getId());
             }
 
@@ -325,14 +606,14 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             }
         }
     }
-    
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
     public void testTwoTaskProcessBlocking() {
         try {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
-                processEngineRepositoryService.deleteDeployment(deployment.getId());
+                processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             processEngineRepositoryService.createDeployment().
                     addClasspathResource("org/flowable/cmmn/test/twoTaskProcess.bpmn20.xml").
@@ -341,8 +622,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
 
             Task task = processEngineTaskService.createTaskQuery().singleResult();
-            assertEquals("my task", task.getName());
-            
+            assertThat(task.getName()).isEqualTo("my task");
+
             EntityLink taskEntityLink = null;
             List<EntityLink> entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
             for (EntityLink entityLink : entityLinks) {
@@ -350,17 +631,17 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                     taskEntityLink = entityLink;
                 }
             }
-            
-            assertNotNull(taskEntityLink);
-            assertEquals(task.getId(), taskEntityLink.getReferenceScopeId());
-            assertEquals(ScopeTypes.TASK, taskEntityLink.getReferenceScopeType());
-            assertEquals(HierarchyType.ROOT, taskEntityLink.getHierarchyType());
-            
+
+            assertThat(taskEntityLink).isNotNull();
+            assertThat(taskEntityLink.getReferenceScopeId()).isEqualTo(task.getId());
+            assertThat(taskEntityLink.getReferenceScopeType()).isEqualTo(ScopeTypes.TASK);
+            assertThat(taskEntityLink.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+
             processEngineTaskService.complete(task.getId());
-            
+
             Task task2 = processEngineTaskService.createTaskQuery().singleResult();
-            assertEquals("my task2", task2.getName());
-            
+            assertThat(task2.getName()).isEqualTo("my task2");
+
             EntityLink taskEntityLink2 = null;
             entityLinks = cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId());
             for (EntityLink entityLink : entityLinks) {
@@ -368,26 +649,27 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                     taskEntityLink2 = entityLink;
                 }
             }
-            
-            assertNotNull(taskEntityLink2);
-            assertEquals(task2.getId(), taskEntityLink2.getReferenceScopeId());
-            assertEquals(ScopeTypes.TASK, taskEntityLink2.getReferenceScopeType());
-            assertEquals(HierarchyType.ROOT, taskEntityLink2.getHierarchyType());
-            
+
+            assertThat(taskEntityLink2).isNotNull();
+            assertThat(taskEntityLink2.getReferenceScopeId()).isEqualTo(task2.getId());
+            assertThat(taskEntityLink2.getReferenceScopeType()).isEqualTo(ScopeTypes.TASK);
+            assertThat(taskEntityLink2.getHierarchyType()).isEqualTo(HierarchyType.ROOT);
+
             processEngineTaskService.complete(task2.getId());
-            
+
             List<ProcessInstance> processInstances = processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").list();
-            assertEquals(0, processInstances.size());
+            assertThat(processInstances).isEmpty();
 
             this.cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-            
+
         } finally {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
                 Deployment deployment = processEngineRepositoryService.createDeploymentQuery().singleResult();
                 processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
             }
             if (processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().count() == 1) {
-                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery().singleResult();
+                HistoricTaskInstance historicTaskInstance = processEngine.getProcessEngineConfiguration().getHistoryService().createHistoricTaskInstanceQuery()
+                        .singleResult();
                 processEngine.getProcessEngineConfiguration().getHistoryService().deleteHistoricTaskInstance(historicTaskInstance.getId());
             }
         }
@@ -399,22 +681,23 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         Map<String, Object> variables = new HashMap<>();
         variables.put("processDefinitionKey", "oneTask");
         cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
-            .variables(variables)
-            .start();
-        
+                .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+                .variables(variables)
+                .start();
+
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-        assertNotNull(task);
-        
+        assertThat(task).isNotNull();
+
         // Completing task will trigger completion of process task plan item
         processEngine.getTaskService().complete(task.getId());
-        
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceStateActive()
                 .list();
-        assertEquals(1, planItemInstances.size());
-        assertEquals("Task Two", planItemInstances.get(0).getName());
-        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task Two");
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
     }
 
     @Test
@@ -429,7 +712,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .start();
 
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Completing task will trigger completion of process task plan item
         processEngine.getTaskService().complete(task.getId());
@@ -438,10 +721,11 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .planItemInstanceStateActive()
                 .list();
 
-        assertEquals(1, planItemInstances.size());
-        assertEquals("Task Two", planItemInstances.get(0).getName());
-        assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "num3"));
-        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("Task Two");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "num3")).isEqualTo(123);
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
 
     }
 
@@ -449,18 +733,18 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @CmmnDeployment
     public void testProcessIOParameterExpressions() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
-            .variable("processDefinitionKey", "oneTask")
-            .start();
+                .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+                .variable("processDefinitionKey", "oneTask")
+                .start();
 
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Completing task will trigger completion of process task plan item
-        assertEquals(2L, ((Number) processEngine.getRuntimeService().getVariable(task.getProcessInstanceId(), "numberVariable")).longValue());
+        assertThat(((Number) processEngine.getRuntimeService().getVariable(task.getProcessInstanceId(), "numberVariable")).longValue()).isEqualTo(2);
         processEngine.getTaskService().complete(task.getId(), Collections.singletonMap("processVariable", "Hello World"));
 
-        assertEquals("Hello World", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable"));
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVariable")).isEqualTo("Hello World");
 
     }
 
@@ -468,29 +752,29 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @CmmnDeployment
     public void testIOParameterCombinations() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testProcessTaskParameterExpressions")
-            .variable("caseVariableA", "variable A from the case instance")
-            .variable("caseVariableName1", "aCaseString1")
-            .variable("caseVariableName2", "aCaseString2")
-            .start();
+                .caseDefinitionKey("testProcessTaskParameterExpressions")
+                .variable("caseVariableA", "variable A from the case instance")
+                .variable("caseVariableName1", "aCaseString1")
+                .variable("caseVariableName2", "aCaseString2")
+                .start();
 
         PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
         String processInstanceId = processTaskPlanItemInstance.getReferenceId();
         ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        Assertions.assertThat(processInstance).isNotNull();
+        assertThat(processInstance).isNotNull();
 
         // In parameters
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isNull();
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName1")).isNull();
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName2")).isNull();
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isNull();
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName1")).isNull();
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableName2")).isNull();
 
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableA")).isEqualTo("variable A from the case instance");
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString1")).isEqualTo("variable A from the case instance");
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableB")).isEqualTo(2L);
-        Assertions.assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString2")).isEqualTo(4L);
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableA")).isEqualTo("variable A from the case instance");
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString1")).isEqualTo("variable A from the case instance");
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "processVariableB")).isEqualTo(2L);
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "aCaseString2")).isEqualTo(4L);
 
         // Out parameters
         Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
@@ -501,26 +785,28 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         variables.put("processVariableName2", "processString2");
         processEngineTaskService.complete(task.getId(), variables);
 
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableC")).isNull();
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableD")).isNull();
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName1")).isNull();
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName2")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableC")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableD")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName1")).isNull();
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processVariableName2")).isNull();
 
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableC")).isEqualTo("hello");
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString1")).isEqualTo("hello");
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableD")).isEqualTo(124L);
-        Assertions.assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString2")).isEqualTo(6L);
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableC")).isEqualTo("hello");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString1")).isEqualTo("hello");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "caseVariableD")).isEqualTo(124L);
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "processString2")).isEqualTo(6L);
 
-        Assertions.assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).hasSize(3 + 4); // 3 from start, 4 from out mapping
-        Assertions.assertThat(processEngineHistoryService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list()).hasSize(4 + 4); // 4 from in mapping, 4 from task complete
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).hasSize(3 + 4); // 3 from start, 4 from out mapping
+        assertThat(processEngineHistoryService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list())
+                .hasSize(4 + 4); // 4 from in mapping, 4 from task complete
     }
-    
+
     @Test
     @CmmnDeployment
     public void testProcessTaskWithSkipExpressions() {
         processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
 
-        ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("testSkipExpressionProcess").singleResult();
+        ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("testSkipExpressionProcess")
+                .singleResult();
         ObjectNode infoNode = processEngineDynamicBpmnService.enableSkipExpression();
 
         // skip test user task
@@ -529,116 +815,116 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("skipExpressionCaseTest").start();
 
-        assertTrue(processEngineTaskService.createTaskQuery().list().isEmpty());
-        assertTrue(processEngineRuntimeService.createProcessInstanceQuery().list().isEmpty());
+        assertThat(processEngineTaskService.createTaskQuery().list()).isEmpty();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().list()).isEmpty();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testProcessTaskWithInclusiveGateway() {
-        Deployment deployment = processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithInclusiveGateway.bpmn20.xml").deploy();
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processWithInclusiveGateway.bpmn20.xml").deploy();
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-            assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
-            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .planItemDefinitionId("theTask")
                     .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                     .list();
-            assertEquals(1, planItemInstances.size());
+            assertThat(planItemInstances).hasSize(1);
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-            assertEquals("No process instance started", 1L, processEngineRuntimeService.createProcessInstanceQuery().count());
-            
-            assertEquals(2, processEngineTaskService.createTaskQuery().count());
-            
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).as("No process instance started").isEqualTo(1);
+
+            assertThat(processEngineTaskService.createTaskQuery().count()).isEqualTo(2);
+
             List<Task> tasks = processEngineTaskService.createTaskQuery().list();
             processEngine.getTaskService().complete(tasks.get(0).getId());
             processEngine.getTaskService().complete(tasks.get(1).getId());
-            
-            assertEquals(0, processEngineTaskService.createTaskQuery().count());
-            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-            
+
+            assertThat(processEngineTaskService.createTaskQuery().count()).isZero();
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
             planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .planItemDefinitionId("theTask2")
                     .list();
-            assertEquals(1, planItemInstances.size());
-            assertEquals("Task Two", planItemInstances.get(0).getName());
-            assertEquals(PlanItemInstanceState.ENABLED, planItemInstances.get(0).getState());
-            
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                    .containsExactly(tuple("Task Two", PlanItemInstanceState.ENABLED));
+
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
         return startCaseInstanceWithOneTaskProcess(null);
     }
-    
+
     protected CaseInstance startCaseInstanceWithOneTaskProcess(String tenantId) {
         CaseDefinitionQuery caseDefinitionQuery = cmmnRepositoryService.createCaseDefinitionQuery();
         if (tenantId != null) {
             caseDefinitionQuery.caseDefinitionTenantId(tenantId);
         }
-        
+
         String caseDefinitionId = caseDefinitionQuery.singleResult().getId();
         CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder().
                 caseDefinitionId(caseDefinitionId);
         if (tenantId != null) {
             caseInstanceBuilder.tenantId(tenantId);
         }
-        
+
         CaseInstance caseInstance = caseInstanceBuilder.start();
 
-        assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
-        assertEquals(1, planItemInstances.size());
+        assertThat(planItemInstances).hasSize(1);
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertEquals("No process instance started", 1L, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).as("No process instance started").isEqualTo(1);
         return caseInstance;
     }
 
     @Test
     @CmmnDeployment
     public void testTransactionRollback() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId()).start();
-        
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId()).start();
+
+        final PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("Task One", planItemInstance.getName());
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-        
+        assertThat(planItemInstance.getName()).isEqualTo("Task One");
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
         /*
          * Triggering the plan item will lead to the plan item that starts the one task process in a non-blocking way.
          * Due to the non-blocking, the plan item completes and the new task, mile stone and service task are called.
-         * The service task throws an exception. The process should also roll back now and never have been inserted. 
+         * The service task throws an exception. The process should also roll back now and never have been inserted.
          */
-        try {
-            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-            fail();
-        } catch (Exception e) { }
-        
+        assertThatThrownBy(() -> cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId()))
+                .isInstanceOf(RuntimeException.class);
+
         // Without shared transaction, following would be 1
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-        
-        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
+        PlanItemInstance planItemInstance2 = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        
+
         // Both case and process should have rolled back
-        assertEquals("Task One", planItemInstance.getName());
+        assertThat(planItemInstance2.getName()).isEqualTo("Task One");
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTriggerUnfinishedProcessPlanItem() {
@@ -647,234 +933,230 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("The Process", planItemInstance.getName());
-        assertEquals("my task", processEngine.getTaskService().createTaskQuery().singleResult().getName());
-        
+        assertThat(planItemInstance.getName()).isEqualTo("The Process");
+        assertThat(processEngine.getTaskService().createTaskQuery().singleResult().getName()).isEqualTo("my task");
+
         // Triggering the process plan item should cancel the process instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        assertEquals(0, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
-        assertEquals("Process planitem done", historicMilestoneInstance.getName());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(historicMilestoneInstance.getName()).isEqualTo("Process planitem done");
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testStartProcessInstanceNonBlockingAndCaseInstanceFinished() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        
-        assertEquals(1, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
 
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(1);
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
-        assertEquals("Process planitem done", historicMilestoneInstance.getName());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(historicMilestoneInstance.getName()).isEqualTo("Process planitem done");
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testStartMultipleProcessInstancesBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        
+
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
-        assertEquals("Task One", planItemInstance.getName());
+        assertThat(planItemInstance.getName()).isEqualTo("Task One");
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        
-        assertEquals(4, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(4, processEngineRuntimeService.createProcessInstanceQuery().count());
-        
+
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(4);
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(4);
+
         // Completing all the tasks should lead to the milestone
         for (Task task : processEngineTaskService.createTaskQuery().list()) {
             processEngineTaskService.complete(task.getId());
         }
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
-        assertEquals("Processes done", historicMilestoneInstance.getName());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(historicMilestoneInstance.getName()).isEqualTo("Processes done");
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithBlockingProcessTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(3, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
-        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(8);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count()).isEqualTo(3);
+
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .planItemInstanceName("Task One")
                 .singleResult();
-        assertNotNull(planItemInstance);
-        
+        assertThat(planItemInstance).isNotNull();
+
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-        
-        assertEquals(4, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(4, processEngineRuntimeService.createProcessInstanceQuery().count());
-        
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(4);
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(4);
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isZero();
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, processEngine.getTaskService().createTaskQuery().count());
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/ProcessTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
-        "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml"
+            "org/flowable/cmmn/test/ProcessTaskTest.testParentStageTerminatedBeforeProcessStarted.cmmn",
+            "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml"
     })
     public void testParentStageTerminatedBeforeProcessStarted() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testProcessTask").start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("A", task.getName());
+        assertThat(task.getName()).isEqualTo("A");
 
-        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Complete stage", userEventListenerInstance.getName());
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(userEventListenerInstance.getName()).isEqualTo("Complete stage");
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenant.cmmn"},
-        tenantId = "flowable"
+            resources = { "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenant.cmmn" },
+            tenantId = "flowable"
     )
     public void testOneTaskProcessFallbackToDefaultTenant() {
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
-            deploy();
+                addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+                deploy();
         try {
             CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("flowable");
             List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
-            assertEquals(1, processTasks.size());
-            assertEquals("flowable", processTasks.get(0).getTenantId());
+            assertThat(processTasks).hasSize(1);
+            assertThat(processTasks.get(0).getTenantId()).isEqualTo("flowable");
             ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
-                            .processInstanceId(processTasks.get(0).getProcessInstanceId()).singleResult();
-            assertNotNull(processInstance);
-            assertEquals("flowable", processInstance.getTenantId());
+                    .processInstanceId(processTasks.get(0).getProcessInstanceId()).singleResult();
+            assertThat(processInstance).isNotNull();
+            assertThat(processInstance.getTenantId()).isEqualTo("flowable");
 
             // Non-blocking process task, plan item should have been completed
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                .list();
-            assertEquals(1, planItemInstances.size());
-            assertEquals("Task Two", planItemInstances.get(0).getName());
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactly("Task Two");
 
-            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
 
             processEngine.getTaskService().complete(processTasks.get(0).getId());
-            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessNonBlocking.cmmn"},
-        tenantId = "someTenant"
+            resources = { "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessNonBlocking.cmmn" },
+            tenantId = "someTenant"
     )
     public void testOneTaskProcessGlobalFallbackToDefaultTenant() {
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
-            tenantId("defaultFlowable").
-            deploy();
-        
+                addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+                tenantId("defaultFlowable").
+                deploy();
+
         DefaultTenantProvider originalDefaultTenantProvider = this.processEngineConfiguration.getDefaultTenantProvider();
         this.processEngineConfiguration.setFallbackToDefaultTenant(true);
         this.processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
-        
+
         try {
             CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess("someTenant");
             List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
-            assertEquals(1, processTasks.size());
-            assertEquals("someTenant", processTasks.get(0).getTenantId());
+            assertThat(processTasks)
+                    .extracting(Task::getTenantId)
+                    .containsExactly("someTenant");
             ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
-                            .processInstanceId(processTasks.get(0).getProcessInstanceId()).singleResult();
-            assertNotNull(processInstance);
-            assertEquals("someTenant", processInstance.getTenantId());
+                    .processInstanceId(processTasks.get(0).getProcessInstanceId()).singleResult();
+            assertThat(processInstance).isNotNull();
+            assertThat(processInstance.getTenantId()).isEqualTo("someTenant");
 
             // Non-blocking process task, plan item should have been completed
             List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                .list();
-            assertEquals(1, planItemInstances.size());
-            assertEquals("Task Two", planItemInstances.get(0).getName());
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances)
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactly("Task Two");
 
-            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
 
             processEngine.getTaskService().complete(processTasks.get(0).getId());
-            assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-            
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
         } finally {
             this.processEngineConfiguration.setFallbackToDefaultTenant(false);
             this.processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
-    
+
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessNonBlocking.cmmn"},
-        tenantId = "someTenant"
+            resources = { "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessNonBlocking.cmmn" },
+            tenantId = "someTenant"
     )
     public void testOneTaskProcessGlobalFallbackToDefaultTenantNoDefinition() {
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
-            tenantId("tenant1").
-            deploy();
-        
+                addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+                tenantId("tenant1").
+                deploy();
+
         DefaultTenantProvider originalDefaultTenantProvider = this.processEngineConfiguration.getDefaultTenantProvider();
         this.processEngineConfiguration.setFallbackToDefaultTenant(true);
         this.processEngineConfiguration.setDefaultTenantValue("defaultFlowable");
-        
-        try {
-            startCaseInstanceWithOneTaskProcess("someTenant");
-            fail();
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-            
-        } finally {
-            this.processEngineConfiguration.setFallbackToDefaultTenant(false);
-            this.processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
-            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
-        }
+
+        assertThatThrownBy(() -> startCaseInstanceWithOneTaskProcess("someTenant"))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+
+        this.processEngineConfiguration.setFallbackToDefaultTenant(false);
+        this.processEngineConfiguration.setDefaultTenantProvider(originalDefaultTenantProvider);
+        processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
     }
 
     @Test
     @CmmnDeployment(
-        resources = {"org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenantFalse.cmmn"},
-        tenantId = "flowable"
+            resources = { "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessFallbackToDefaultTenantFalse.cmmn" },
+            tenantId = "flowable"
     )
     public void testOneTaskProcessFallbackToDefaultTenantFalse() {
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
-            deploy();
-        try {
-            startCaseInstanceWithOneTaskProcess("flowable");
-            fail();
-        } catch (FlowableObjectNotFoundException e) {
-            assertThat(e.getMessage(), is("Process definition with key 'oneTask' and tenantId 'flowable' was not found"));
-        } finally {
-            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
-        }
+                addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").
+                deploy();
+
+        assertThatThrownBy(() -> startCaseInstanceWithOneTaskProcess("flowable"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("Process definition with key 'oneTask' and tenantId 'flowable' was not found");
+
+        processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
     }
 
     @Test
@@ -885,202 +1167,205 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
 
         assertThatThrownBy(() -> cmmnTaskService.deleteTask(task.getId()))
-            .isExactlyInstanceOf(FlowableException.class)
-            .hasMessageContaining("The task cannot be deleted")
-            .hasMessageContaining("running process");
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("The task cannot be deleted")
+                .hasMessageContaining("running process");
     }
-    
+
     @Test
     @CmmnDeployment
     public void testChangeActiveStagesWithProcessTasks() {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("activatePlanItemTest").start();
 
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage2", "available"),
-                tuple("oneexpandedstage1", "available"),
-                tuple("oneprocesstask1", "active")
-            );
-        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage2", "available"),
+                        tuple("oneexpandedstage1", "available"),
+                        tuple("oneprocesstask1", "active")
+                );
+
         Task task = processEngineTaskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
         processEngineTaskService.complete(task.getId());
-        
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "active"),
-                tuple("oneexpandedstage2", "available"),
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneprocesstask2", "active"),
-                tuple("oneprocesstask4", "active")
-            );
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "active"),
+                        tuple("oneexpandedstage2", "available"),
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneprocesstask2", "active"),
+                        tuple("oneprocesstask4", "active")
+                );
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
-            .changeState();
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("oneexpandedstage1")
+                .activatePlanItemDefinitionId("oneprocesstask3")
+                .changeState();
 
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneexpandedstage2", "active"),
-                tuple("oneexpandedstage2", "wait_repetition"),
-                tuple("oneprocesstask3", "active")
-            );
-        
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneexpandedstage2", "active"),
+                        tuple("oneexpandedstage2", "wait_repetition"),
+                        tuple("oneprocesstask3", "active")
+                );
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(1);
         task = processEngineTaskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
         processEngineTaskService.complete(task.getId());
-        
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "active"),
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneexpandedstage2", "wait_repetition"),
-                tuple("oneprocesstask2", "active"),
-                tuple("oneprocesstask4", "active")
-            );
-        
-        assertEquals(2, processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "active"),
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneexpandedstage2", "wait_repetition"),
+                        tuple("oneprocesstask2", "active"),
+                        tuple("oneprocesstask4", "active")
+                );
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(2);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testChangeActiveStagesWithManualProcessTasks() {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("activatePlanItemTest").start();
 
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage2", "available"),
-                tuple("oneexpandedstage1", "available"),
-                tuple("oneprocesstask1", "active")
-            );
-        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage2", "available"),
+                        tuple("oneexpandedstage1", "available"),
+                        tuple("oneprocesstask1", "active")
+                );
+
         Task task = processEngineTaskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
         processEngineTaskService.complete(task.getId());
-        
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "active"),
-                tuple("oneexpandedstage2", "available"),
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneprocesstask2", "enabled"),
-                tuple("oneprocesstask4", "enabled")
-            );
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "active"),
+                        tuple("oneexpandedstage2", "available"),
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneprocesstask2", "enabled"),
+                        tuple("oneprocesstask4", "enabled")
+                );
 
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
-            .changeState();
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("oneexpandedstage1")
+                .activatePlanItemDefinitionId("oneprocesstask3")
+                .changeState();
 
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneexpandedstage2", "active"),
-                tuple("oneexpandedstage2", "wait_repetition"),
-                tuple("oneprocesstask3", "active")
-            );
-        
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneexpandedstage2", "active"),
+                        tuple("oneexpandedstage2", "wait_repetition"),
+                        tuple("oneprocesstask3", "active")
+                );
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(1);
         task = processEngineTaskService.createTaskQuery().taskDefinitionKey("theTask").singleResult();
         processEngineTaskService.complete(task.getId());
-        
-        Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-            .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-            .containsExactlyInAnyOrder(
-                tuple("oneexpandedstage1", "active"),
-                tuple("oneexpandedstage1", "wait_repetition"),
-                tuple("oneexpandedstage2", "wait_repetition"),
-                tuple("oneprocesstask2", "enabled"),
-                tuple("oneprocesstask4", "enabled")
-            );
-        
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple("oneexpandedstage1", "active"),
+                        tuple("oneexpandedstage1", "wait_repetition"),
+                        tuple("oneexpandedstage2", "wait_repetition"),
+                        tuple("oneprocesstask2", "enabled"),
+                        tuple("oneprocesstask4", "enabled")
+                );
+
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processDefinitionKey("oneTask").count()).isZero();
     }
-    
+
     @Test
     @CmmnDeployment
     public void testChangeActiveStages() {
 
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/emptyProcess.bpmn20.xml").
-            deploy();
+                addClasspathResource("org/flowable/cmmn/test/emptyProcess.bpmn20.xml").
+                deploy();
 
         try {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("activatePlanItemTest").start();
-            
-            assertEquals(1, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").count());
-            assertEquals(0, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count());
-            
-            Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-                .containsExactlyInAnyOrder(
-                    tuple("oneprocesstask1", "active"),
-                    tuple("oneexpandedstage1", "available"),
-                    tuple("oneexpandedstage2", "available")
-                );
-            
+
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(1);
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count()).isZero();
+
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                    .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple("oneprocesstask1", "active"),
+                            tuple("oneexpandedstage1", "available"),
+                            tuple("oneexpandedstage2", "available")
+                    );
+
             Task task = processEngineTaskService.createTaskQuery().processDefinitionKey("oneTask").singleResult();
             processEngineTaskService.complete(task.getId());
-            
-            assertEquals(1, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count());
 
-            Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-                .containsExactlyInAnyOrder(
-                    tuple("oneexpandedstage1", "active"),
-                    tuple("oneexpandedstage2", "available"),
-                    tuple("oneexpandedstage1", "wait_repetition"),
-                    tuple("oneprocesstask2", "enabled"),
-                    tuple("oneprocesstask4", "enabled")
-                );
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count()).isEqualTo(1);
+
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                    .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple("oneexpandedstage1", "active"),
+                            tuple("oneexpandedstage2", "available"),
+                            tuple("oneexpandedstage1", "wait_repetition"),
+                            tuple("oneprocesstask2", "enabled"),
+                            tuple("oneprocesstask4", "enabled")
+                    );
 
             cmmnRuntimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstance.getId())
-                .movePlanItemDefinitionIdTo("oneexpandedstage1", "oneprocesstask3")
-                .changeState();
-            
-            assertEquals(2, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").count());
-            assertEquals(1, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count());
-            
+                    .caseInstanceId(caseInstance.getId())
+                    .terminatePlanItemDefinitionId("oneexpandedstage1")
+                    .activatePlanItemDefinitionId("oneprocesstask3")
+                    .changeState();
+
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").count()).isEqualTo(2);
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count()).isEqualTo(1);
+
             task = processEngineTaskService.createTaskQuery().processDefinitionKey("oneTask").singleResult();
             processEngineTaskService.complete(task.getId());
 
-            Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-                .containsExactlyInAnyOrder(
-                    tuple("oneexpandedstage1", "active"),
-                    tuple("oneexpandedstage1", "wait_repetition"),
-                    tuple("oneexpandedstage2", "wait_repetition"),
-                    tuple("oneprocesstask2", "enabled"),
-                    tuple("oneprocesstask4", "enabled")
-                );
-            
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                    .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple("oneexpandedstage1", "active"),
+                            tuple("oneexpandedstage1", "wait_repetition"),
+                            tuple("oneexpandedstage2", "wait_repetition"),
+                            tuple("oneprocesstask2", "enabled"),
+                            tuple("oneprocesstask4", "enabled")
+                    );
+
             PlanItemInstance deactivateInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-                            .planItemDefinitionId("oneprocesstask4")
-                            .planItemInstanceState("enabled")
-                            .singleResult();
+                    .planItemDefinitionId("oneprocesstask4")
+                    .planItemInstanceState("enabled")
+                    .singleResult();
             cmmnRuntimeService.startPlanItemInstance(deactivateInstance.getId());
-            
-            assertEquals(2, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count());
-            assertEquals(1, processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("emptyProcess").finished().count());
-            
-            Assertions.assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
-                .containsExactlyInAnyOrder(
-                    tuple("oneexpandedstage1", "wait_repetition"),
-                    tuple("oneexpandedstage2", "active"),
-                    tuple("oneexpandedstage2", "wait_repetition"),
-                    tuple("oneprocesstask3", "enabled")
-                );
+
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTask").finished().count()).isEqualTo(2);
+            assertThat(processEngineHistoryService.createHistoricProcessInstanceQuery().processDefinitionKey("emptyProcess").finished().count()).isEqualTo(1);
+
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                    .extracting(PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple("oneexpandedstage1", "wait_repetition"),
+                            tuple("oneexpandedstage2", "active"),
+                            tuple("oneexpandedstage2", "wait_repetition"),
+                            tuple("oneprocesstask3", "enabled")
+                    );
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
@@ -1090,137 +1375,260 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testPassChildTaskVariables() {
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("startChildProcess").start();
         PlanItemInstance processPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemInstanceStateEnabled()
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateEnabled()
+                .singleResult();
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(processPlanItemInstance.getId())
-            .variable("caseVar", "caseValue")
-            .childTaskVariable("processVar1", "processValue")
-            .childTaskVariables(CollectionUtil.map("processVar2", 123, "processVar3", 456))
-            .start();
+                .variable("caseVar", "caseValue")
+                .childTaskVariable("processVar1", "processValue")
+                .childTaskVariables(CollectionUtil.map("processVar2", 123, "processVar3", 456))
+                .start();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         // also includes initiator variable
-        assertEquals(2, variables.size());
-        assertEquals("caseValue", variables.get("caseVar"));
+        assertThat(variables).hasSize(2);
+        assertThat(variables).containsEntry("caseVar", "caseValue");
 
         ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
-            .processInstanceCallbackId(processPlanItemInstance.getId())
-            .singleResult();
+                .processInstanceCallbackId(processPlanItemInstance.getId())
+                .singleResult();
         Map<String, Object> processInstanceVariables = processEngineRuntimeService.getVariables(processInstance.getId());
-        assertEquals(3, processInstanceVariables.size());
-        assertEquals("processValue", processInstanceVariables.get("processVar1"));
-        assertEquals(123, processInstanceVariables.get("processVar2"));
-        assertEquals(456, processInstanceVariables.get("processVar3"));
+        assertThat(processInstanceVariables)
+                .containsOnly(
+                        entry("processVar1", "processValue"),
+                        entry("processVar2", 123),
+                        entry("processVar3", 456)
+                );
     }
 
     @Test
     @CmmnDeployment
     public void testExitAvailableProcessTaskThroughExitSentryOnStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testExitAvailableProcessTaskThroughExitSentryOnStage")
-            .start();
+                .caseDefinitionKey("testExitAvailableProcessTaskThroughExitSentryOnStage")
+                .start();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .planItemInstanceStateAvailable()
-            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
-            .singleResult();
-        assertEquals("theProcess", planItemInstance.getName());
+                .planItemInstanceStateAvailable()
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("theProcess");
 
-        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("task2").singleResult()).isNull();
 
         // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
         UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
-        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
-        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("task2").singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult()).isNull();
     }
 
     @Test
     @CmmnDeployment
     public void testExitActiveProcessTaskThroughExitSentryOnStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testExitActiveProcessTaskThroughExitSentryOnStage")
-            .variable("myVar", "test")
-            .start();
+                .caseDefinitionKey("testExitActiveProcessTaskThroughExitSentryOnStage")
+                .variable("myVar", "test")
+                .start();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-            .planItemInstanceStateActive()
-            .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
-            .singleResult();
-        assertEquals("theProcess", planItemInstance.getName());
+                .planItemInstanceStateActive()
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("theProcess");
 
-        assertNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
-        assertNotNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("task2").singleResult()).isNull();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult()).isNotNull();
 
         // When the event listener now occurs, the stage should be exited, also exiting the process task plan item
         UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .singleResult();
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
         cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
 
-        assertNotNull(cmmnTaskService.createTaskQuery().taskName("task2").singleResult());
-        assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK).singleResult());
-        assertNull(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult());
+        assertThat(cmmnTaskService.createTaskQuery().taskName("task2").singleResult()).isNotNull();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult()).isNull();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(planItemInstance.getReferenceId()).singleResult()).isNull();
     }
 
     @Test
     @CmmnDeployment
     public void testExitCaseInstanceOnProcessInstanceComplete() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
-            .start();
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
+                .start();
 
-        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
-        assertEquals(1, cmmnTaskService.createTaskQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(1);
 
         // Process task is manually activated
         cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateEnabled().singleResult().getId());
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
-        assertEquals(2, cmmnTaskService.createTaskQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
 
         // Completing the task from the process should terminate the case
         Task userTaskFromProcess = processEngineTaskService.createTaskQuery()
-            .processInstanceId(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId())
-            .singleResult();
+                .processInstanceId(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId())
+                .singleResult();
         processEngineTaskService.complete(userTaskFromProcess.getId());
 
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
     }
 
     @Test
     @CmmnDeployment
     public void testIdVariableName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testIdVariableName")
-            .start();
+                .caseDefinitionKey("testIdVariableName")
+                .start();
 
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "processIdVariable");
-        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
+        assertThat(processIdVariable).isEqualTo(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId());
     }
 
     @Test
     @CmmnDeployment
     public void testIdVariableNameExpression() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testIdVariableName")
-            .variable("testVar", "A")
-            .start();
+                .caseDefinitionKey("testIdVariableName")
+                .variable("testVar", "A")
+                .start();
 
-        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         String processIdVariable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "variableA");
-        assertEquals(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId(), processIdVariable);
+        assertThat(processIdVariable).isEqualTo(processEngineRuntimeService.createProcessInstanceQuery().singleResult().getId());
     }
 
+    @Test
+    public void testSameDeploymentTrue() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskSameDeploymentTrue.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+    }
+
+    @Test
+    public void testSameDeploymentTrueWithTenant() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskSameDeploymentTrue.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .tenantId("flowable")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .tenantId("flowable")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+        assertThat(processInstance.getTenantId()).isEqualTo("flowable");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .tenantId("flowable")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .tenantId("flowable")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+        assertThat(processInstance.getTenantId()).isEqualTo("flowable");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+    }
+
+    @Test
+    public void testWithoutSameDeployment() {
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processTaskWithoutSameDeployment.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task");
+
+        Task task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+
+        processEngineTaskService.complete(task.getId());
+
+        processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcessV2.bpmn20.xml")
+                .deploy();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneProcessTaskCase")
+                .start();
+
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionName()).isEqualTo("One Task V2");
+
+        task = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo("Task V2");
+    }
 }

@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -36,7 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
-
+    
     protected String businessKey;
     protected String name;
     protected String parentId;
@@ -52,12 +53,18 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
 
     protected Date lockTime;
+    protected String lockOwner;
 
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
 
     protected List<VariableInstanceEntity> queryVariables;
+
+    protected String caseDefinitionKey;
+    protected String caseDefinitionName;
+    protected Integer caseDefinitionVersion;
+    protected String caseDefinitionDeploymentId;
 
     @Override
     public Object getPersistentState() {
@@ -76,6 +83,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
+        persistentState.put("lockOwner", lockOwner);
         return persistentState;
     }
 
@@ -195,11 +203,25 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
+
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
+
+    @Override
     public void setLockTime(Date lockTime) {
         this.lockTime = lockTime;
+    }
+
+    @Override
+    public String getLockOwner() {
+        return lockOwner;
+    }
+
+    @Override
+    public void setLockOwner(String lockOwner) {
+        this.lockOwner = lockOwner;
     }
 
     @Override
@@ -240,7 +262,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, ScopeTypes.CMMN);
+        return getVariableServiceConfiguration().getVariableService()
+                .findVariableInstanceByScopeIdAndScopeType(id, ScopeTypes.CMMN);
     }
 
     @Override
@@ -263,17 +286,34 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, ScopeTypes.CMMN, variableName);
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .scopeId(id)
+                .withoutSubScopeId()
+                .scopeType(ScopeTypes.CMMN)
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, ScopeTypes.CMMN, variableNames);
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .scopeId(id)
+                .withoutSubScopeId()
+                .scopeType(ScopeTypes.CMMN)
+                .names(variableNames)
+                .list();
     }
 
     @Override
     protected boolean isPropagateToHistoricVariable() {
         return true;
+    }
+
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getVariableServiceConfiguration();
     }
 
     @Override
@@ -298,6 +338,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         return caseVariables;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();
@@ -307,5 +348,45 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
 
     public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
         this.queryVariables = queryVariables;
+    }
+
+    @Override
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    @Override
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    @Override
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    @Override
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    @Override
+    public Integer getCaseDefinitionVersion() {
+        return caseDefinitionVersion;
+    }
+
+    @Override
+    public void setCaseDefinitionVersion(Integer caseDefinitionVersion) {
+        this.caseDefinitionVersion = caseDefinitionVersion;
+    }
+
+    @Override
+    public String getCaseDefinitionDeploymentId() {
+        return caseDefinitionDeploymentId;
+    }
+
+    @Override
+    public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
+        this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
     }
 }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -40,14 +41,15 @@ public class GetIdentityLinksForPlanItemInstanceCmd implements Command<List<Iden
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
-        PlanItemInstance planItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        PlanItemInstance planItemInstance = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
 
         if (planItemInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find plan item instance with id " + planItemInstanceId, PlanItemInstanceEntity.class);
         }
 
-        return (List) CommandContextUtil.getIdentityLinkService(commandContext).findIdentityLinksBySubScopeIdAndType(
-                        planItemInstanceId, ScopeTypes.PLAN_ITEM);
+        return (List) cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                .findIdentityLinksBySubScopeIdAndType(planItemInstanceId, ScopeTypes.PLAN_ITEM);
     }
 
 }

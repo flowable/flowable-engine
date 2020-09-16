@@ -74,27 +74,15 @@ public class RestApiSecurityApplicationTest {
 
     @Test
     public void userDetailsService() {
-        assertThat(userDetailsService.loadUserByUsername("jlong"))
-            .as("jlong user")
-            .isNotNull()
-            .satisfies(user -> {
-                assertThat(user.getAuthorities())
-                    .as("jlong authorities")
-                    .hasSize(1)
-                    .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("user-privilege");
-            });
+        assertThat(userDetailsService.loadUserByUsername("jlong").getAuthorities())
+                .as("jlong user's authorities")
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactly("user-privilege");
 
-        assertThat(userDetailsService.loadUserByUsername("jbarrez"))
-            .as("jbarrez user")
-            .isNotNull()
-            .satisfies(user -> {
-                assertThat(user.getAuthorities())
-                    .as("jbarrez authorities")
-                    .hasSize(2)
-                    .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
-            });
+        assertThat(userDetailsService.loadUserByUsername("jbarrez").getAuthorities())
+                .as("jbarrez user's authorities")
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
     }
 
     @Test
@@ -121,7 +109,7 @@ public class RestApiSecurityApplicationTest {
         latch401.await(500, TimeUnit.MILLISECONDS);
         assertThat(latch401.getCount())
             .as("401 Latch")
-            .isEqualTo(0);
+            .isZero();
     }
 
     @Test
@@ -181,7 +169,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(contentItems).isNotNull();
         assertThat(contentItems.getData())
             .isEmpty();
-        assertThat(contentItems.getTotal()).isEqualTo(0);
+        assertThat(contentItems.getTotal()).isZero();
     }
     @Test
     public void testDmnRestApiIntegrationWithAuthentication() {
@@ -199,7 +187,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(deployments).isNotNull();
         assertThat(deployments.getData())
             .isEmpty();
-        assertThat(deployments.getTotal()).isEqualTo(0);
+        assertThat(deployments.getTotal()).isZero();
     }
     @Test
     public void testFormRestApiIntegrationWithAuthentication() {
@@ -217,7 +205,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(formDefinitions).isNotNull();
         assertThat(formDefinitions.getData())
             .isEmpty();
-        assertThat(formDefinitions.getTotal()).isEqualTo(0);
+        assertThat(formDefinitions.getTotal()).isZero();
     }
     @Test
     public void testIdmRestApiIntegrationWithAuthentication() {
@@ -244,11 +232,11 @@ public class RestApiSecurityApplicationTest {
 
     protected static HttpHeaders createHeaders(String username, String password) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, base64Auhentication(username, password));
+        headers.set(HttpHeaders.AUTHORIZATION, base64Authentication(username, password));
         return headers;
     }
 
-    protected static String base64Auhentication(String username, String password) {
+    protected static String base64Authentication(String username, String password) {
         String auth = username + ":" + password;
         return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }

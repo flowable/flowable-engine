@@ -13,14 +13,21 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Collections;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.form.api.FormInfo;
 import org.junit.Test;
 
 /**
@@ -36,9 +43,53 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .trigger();
+                .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidTrigger() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).trigger())
+            .isInstanceOf(FlowableIllegalStateException.class);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInvalidTriggerEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+            .planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).singleResult();
+        assertThat(eventListenerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(eventListenerPlanItemInstance.getId()).trigger())
+            .isInstanceOf(FlowableIllegalStateException.class);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testTrigger.cmmn")
+    public void testInvalidTriggerWithChildTaskInfo() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).childTaskVariable("testVar", "Test").trigger())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).childTaskVariables(Collections.singletonMap("testVar", "Test")).trigger())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).childTaskFormVariables(Collections.singletonMap("testVar", "Test"), new FormInfo(), "test").trigger())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child form variables can only be set when starting a plan item instance");
     }
 
     @Test
@@ -49,14 +100,15 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .variables(CollectionUtil.map("var1", 123, "var2", 456))
-            .trigger();
+                .variables(CollectionUtil.map("var1", 123, "var2", 456))
+                .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", 123),
-            entry("var2", 456)
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", 123),
+                        entry("var2", 456)
+                );
     }
 
     @Test
@@ -67,17 +119,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .variable("var1", 123)
-            .variable("var2", 456)
-            .trigger();
+                .variable("var1", 123)
+                .variable("var2", 456)
+                .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", 123),
-            entry("var2", 456)
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", 123),
+                        entry("var2", 456)
+                );
     }
-
 
     @Test
     @CmmnDeployment
@@ -87,8 +139,8 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", 123456))
-            .trigger();
+                .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", 123456))
+                .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
@@ -105,9 +157,9 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .transientVariable("sentryVar", true)
-            .transientVariable("otherVar", 123456)
-            .trigger();
+                .transientVariable("sentryVar", true)
+                .transientVariable("otherVar", 123456)
+                .trigger();
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("A").singleResult()).isNull();
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
@@ -130,22 +182,54 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
     @Test
     @CmmnDeployment
+    public void testInvalidEnable() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).enable())
+            .isInstanceOf(FlowableIllegalStateException.class);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testEnable.cmmn")
+    public void testInvalidEnableWithChildTaskInfo() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariable("testVar", "Test").enable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariables(Collections.singletonMap("testVar", "Test")).enable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskFormVariables(Collections.singletonMap("testVar", "Test"), new FormInfo(), "test").enable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child form variables can only be set when starting a plan item instance");
+    }
+
+    @Test
+    @CmmnDeployment
     public void testEnableWithVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .variable("var1", "hello")
-            .variable("var2", "world")
-            .enable();
+                .variable("var1", "hello")
+                .variable("var2", "world")
+                .enable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "hello"),
-            entry("var2", "world")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "hello"),
+                        entry("var2", "world")
+                );
     }
 
     @Test
@@ -155,16 +239,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .variables(CollectionUtil.map("var1", "hello", "var2", "world"))
-            .enable();
+                .variables(CollectionUtil.map("var1", "hello", "var2", "world"))
+                .enable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "hello"),
-            entry("var2", "world")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "hello"),
+                        entry("var2", "world")
+                );
     }
 
     @Test
@@ -174,16 +259,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .localVariable("localVariable", "hello")
-            .variable("caseInstanceVar", "world")
-            .enable();
+                .localVariable("localVariable", "hello")
+                .variable("caseInstanceVar", "world")
+                .enable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("caseInstanceVar", "world")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("caseInstanceVar", "world")
+                );
     }
 
     @Test
@@ -193,9 +279,9 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .transientVariable("sentryVar", true)
-            .transientVariable("otherVar", 123)
-            .enable();
+                .transientVariable("sentryVar", true)
+                .transientVariable("otherVar", 123)
+                .enable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -211,15 +297,15 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", 123))
-            .variable("persistentVar", 456)
-            .enable();
+                .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", 123))
+                .variable("persistentVar", 456)
+                .enable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("persistentVar", 456)
+                entry("persistentVar", 456)
         );
         assertThat(cmmnTaskService.createTaskQuery().taskName("D").singleResult()).isNotNull();
     }
@@ -241,6 +327,37 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
     @Test
     @CmmnDeployment
+    public void testInvalidDisable() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).disable())
+            .isInstanceOf(FlowableIllegalStateException.class);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testDisable.cmmn")
+    public void testInvalidDisableWithChildTaskInfo() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariable("testVar", "Test").disable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariables(Collections.singletonMap("testVar", "Test")).disable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskFormVariables(Collections.singletonMap("testVar", "Test"), new FormInfo(), "test").disable())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child form variables can only be set when starting a plan item instance");
+    }
+
+    @Test
+    @CmmnDeployment
     public void testDisableWithVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
 
@@ -249,14 +366,14 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).enable();
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .variable("var1", "test")
-            .disable();
+                .variable("var1", "test")
+                .disable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.DISABLED);
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "test")
+                entry("var1", "test")
         );
     }
 
@@ -270,16 +387,17 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).enable();
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .variables(CollectionUtil.map("var1", "test", "var2", "anotherTest"))
-            .disable();
+                .variables(CollectionUtil.map("var1", "test", "var2", "anotherTest"))
+                .disable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.DISABLED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "test"),
-            entry("var2", "anotherTest")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "test"),
+                        entry("var2", "anotherTest")
+                );
     }
 
     @Test
@@ -294,17 +412,18 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).enable();
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .variables(CollectionUtil.map("var1", "test", "var2", "anotherTest"))
-            .transientVariable("sentryVar", true)
-            .disable();
+                .variables(CollectionUtil.map("var1", "test", "var2", "anotherTest"))
+                .transientVariable("sentryVar", true)
+                .disable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.DISABLED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "test"),
-            entry("var2", "anotherTest")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "test"),
+                        entry("var2", "anotherTest")
+                );
 
         planItemInstanceD = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("D").singleResult();
         assertThat(planItemInstanceD.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
@@ -322,8 +441,8 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId()).enable();
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
-            .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", "test"))
-            .disable();
+                .transientVariables(CollectionUtil.map("sentryVar", true, "otherVar", "test"))
+                .disable();
 
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         assertThat(planItemInstanceB.getState()).isEqualTo(PlanItemInstanceState.DISABLED);
@@ -351,6 +470,26 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testTerminate.cmmn")
+    public void testInvalidTerminateWithChildTaskInfo() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
+
+        PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariable("testVar", "Test").terminate())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskVariables(Collections.singletonMap("testVar", "Test")).terminate())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child task variables can only be set when starting a plan item instance");
+
+        assertThatThrownBy(() ->  cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId()).childTaskFormVariables(Collections.singletonMap("testVar", "Test"), new FormInfo(), "test").terminate())
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Child form variables can only be set when starting a plan item instance");
+    }
+
+    @Test
     @CmmnDeployment
     public void testTerminateWithVariable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTransitionBuilder").start();
@@ -360,18 +499,19 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .variable("var1", "hello")
-            .variable("var2", "world")
-            .terminate();
+                .variable("var1", "hello")
+                .variable("var2", "world")
+                .terminate();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").includeEnded().singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "hello"),
-            entry("var2", "world")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "hello"),
+                        entry("var2", "world")
+                );
     }
 
     @Test
@@ -384,15 +524,15 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .variables(CollectionUtil.map("var1", "hello"))
-            .terminate();
+                .variables(CollectionUtil.map("var1", "hello"))
+                .terminate();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").includeEnded().singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
 
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "hello")
+                entry("var1", "hello")
         );
     }
 
@@ -407,19 +547,20 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .variable("var1", "hello")
-            .variable("var2", "world")
-            .transientVariable("sentryVar", true)
-            .terminate();
+                .variable("var1", "hello")
+                .variable("var2", "world")
+                .transientVariable("sentryVar", true)
+                .terminate();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").includeEnded().singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
 
-        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).containsOnly(
-            entry("var1", "hello"),
-            entry("var2", "world")
-        );
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        entry("var1", "hello"),
+                        entry("var2", "world")
+                );
 
         assertThat(cmmnTaskService.createTaskQuery().taskName("D").singleResult()).isNotNull();
     }
@@ -435,8 +576,8 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
-            .transientVariables(CollectionUtil.map("sentryVar", true))
-            .terminate();
+                .transientVariables(CollectionUtil.map("sentryVar", true))
+                .terminate();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(4);
 
         planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").includeEnded().singleResult();
@@ -448,8 +589,8 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
     })
     public void testStartCaseTask() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
@@ -464,8 +605,8 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
     })
     public void testStartCaseTaskWithVariable() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
@@ -475,20 +616,23 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())
-            .variable("someVar", "someValue")
-            .start();
+                .variable("someVar", "someValue")
+                .start();
 
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
         assertThat(childCaseInstance).isNotNull();
 
-        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).containsOnly(entry("someVar", "someValue"));
+        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId()))
+                .containsOnly(
+                        entry("someVar", "someValue")
+                );
         assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId())).isEmpty();
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
     })
     public void testStartCaseTaskWithVariables() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
@@ -498,23 +642,24 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())
-            .variables(CollectionUtil.map("someVar", "someValue", "otherVar", 123))
-            .start();
+                .variables(CollectionUtil.map("someVar", "someValue", "otherVar", 123))
+                .start();
 
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
         assertThat(childCaseInstance).isNotNull();
 
-        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).containsOnly(
-            entry("someVar", "someValue"),
-            entry("otherVar", 123)
-        );
+        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId()))
+                .containsOnly(
+                        entry("someVar", "someValue"),
+                        entry("otherVar", 123)
+                );
         assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId())).isEmpty();
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
     })
     public void testStartCaseTaskWithChildTaskVariable() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
@@ -524,29 +669,31 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())
-            .variable("parentVar1", 123)
-            .childTaskVariable("childVar1", 1)
-            .childTaskVariable("childVar2", 2)
-            .childTaskVariable("childVar3", 3)
-            .start();
+                .variable("parentVar1", 123)
+                .childTaskVariable("childVar1", 1)
+                .childTaskVariable("childVar2", 2)
+                .childTaskVariable("childVar3", 3)
+                .start();
 
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
         assertThat(childCaseInstance).isNotNull();
 
-        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).containsOnly(
-            entry("parentVar1", 123)
-        );
-        assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId())).containsOnly(
-            entry("childVar1", 1),
-            entry("childVar2", 2),
-            entry("childVar3", 3)
-        );
+        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId()))
+                .containsOnly(
+                        entry("parentVar1", 123)
+                );
+        assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId()))
+                .containsOnly(
+                        entry("childVar1", 1),
+                        entry("childVar2", 2),
+                        entry("childVar3", 3)
+                );
     }
 
     @Test
     @CmmnDeployment(resources = {
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
-        "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.testStartCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/PlanItemInstanceTransitionBuilderTest.childcase.cmmn"
     })
     public void testStartCaseTaskWithChildTaskVariables() {
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartChildCase").start();
@@ -556,20 +703,32 @@ public class PlanItemInstanceTransitionBuilderTest extends FlowableCmmnTestCase 
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())
-            .variable("parentVar1", 123)
-            .childTaskVariables(CollectionUtil.map("childVar1", 1, "childVar2", 2))
-            .start();
+                .variable("parentVar1", 123)
+                .childTaskVariables(CollectionUtil.map("childVar1", 1, "childVar2", 2))
+                .start();
 
         CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(parentCaseInstance.getId()).singleResult();
         assertThat(childCaseInstance).isNotNull();
 
-        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId())).containsOnly(
-            entry("parentVar1", 123)
-        );
-        assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId())).containsOnly(
-            entry("childVar1", 1),
-            entry("childVar2", 2)
-        );
+        assertThat(cmmnRuntimeService.getVariables(parentCaseInstance.getId()))
+                .containsOnly(
+                        entry("parentVar1", 123)
+                );
+        assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId()))
+                .containsOnly(
+                        entry("childVar1", 1),
+                        entry("childVar2", 2)
+                );
     }
 
+    @Test
+    public void testInvalidArguments() {
+        assertThatThrownBy(() -> cmmnRuntimeService.createPlanItemInstanceTransitionBuilder("dummy").childTaskFormVariables(Collections.emptyMap(), null, "test"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("formInfo is null");
+
+        assertThatThrownBy(() -> cmmnRuntimeService.createPlanItemInstanceTransitionBuilder("dummy").formVariables(Collections.emptyMap(), null, "test"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("formInfo is null");
+    }
 }

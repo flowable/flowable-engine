@@ -17,15 +17,24 @@ import java.util.Collection;
 import org.flowable.eventregistry.model.EventModel;
 
 /**
+ * Represents a runtime event (either received or sent).
+ *
+ * The event instance is based on an {@link EventModel} through an associated {@link org.flowable.eventregistry.api.EventDefinition},
+ * which typically is determined by the channel pipeline (key detection phase).
+ *
+ * The {@link org.flowable.eventregistry.model.ChannelModel} represents the channel (and pipeline)
+ * on which the event was received or, in the case of sending, needs to be sent out (can be multiple).
+ *
+ *
  * @author Joram Barrez
  */
 public interface EventInstance {
 
-    EventModel getEventModel();
+    String getEventKey();
 
     Collection<EventPayloadInstance> getPayloadInstances();
 
-    Collection<EventCorrelationParameterInstance> getCorrelationParameterInstances();
+    Collection<EventPayloadInstance> getCorrelationParameterInstances();
 
     String getTenantId();
 

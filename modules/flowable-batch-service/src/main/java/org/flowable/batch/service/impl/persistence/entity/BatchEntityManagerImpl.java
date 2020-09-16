@@ -22,13 +22,14 @@ import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchDataManager;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 
 public class BatchEntityManagerImpl
     extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchEntity, BatchDataManager>
     implements BatchEntityManager {
 
     public BatchEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchDataManager batchDataManager) {
-        super(batchServiceConfiguration, batchDataManager);
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), batchDataManager);
     }
     
     @Override
@@ -59,7 +60,7 @@ public class BatchEntityManagerImpl
         batchEntity.setBatchSearchKey2(batchBuilder.getSearchKey2());
         batchEntity.setCreateTime(getClock().getCurrentTime());
         batchEntity.setStatus(batchBuilder.getStatus());
-        batchEntity.setBatchDocumentJson(batchBuilder.getBatchDocumentJson());
+        batchEntity.setBatchDocumentJson(batchBuilder.getBatchDocumentJson(), serviceConfiguration.getEngineName());
         batchEntity.setTenantId(batchBuilder.getTenantId());
         
         dataManager.insert(batchEntity);
@@ -77,10 +78,10 @@ public class BatchEntityManagerImpl
             }
         }
 
-        BatchByteArrayRef batchDocRefId = batch.getBatchDocRefId();
+        ByteArrayRef batchDocRefId = batch.getBatchDocRefId();
 
         if (batchDocRefId != null && batchDocRefId.getId() != null) {
-            batchDocRefId.delete();
+            batchDocRefId.delete(serviceConfiguration.getEngineName());
         }
 
         delete(batch);

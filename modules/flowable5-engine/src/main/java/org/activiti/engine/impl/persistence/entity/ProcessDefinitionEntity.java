@@ -36,6 +36,7 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -123,7 +124,8 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstance));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstance),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         return processInstance;

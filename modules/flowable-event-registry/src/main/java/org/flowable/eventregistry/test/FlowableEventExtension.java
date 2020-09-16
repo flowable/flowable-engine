@@ -19,10 +19,17 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.util.CommandContextUtil;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -95,14 +102,8 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
     ));
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected final String configurationResource;
 
     public FlowableEventExtension() {
-        this("flowable.eventregistry.cfg.xml");
-    }
-
-    public FlowableEventExtension(String configurationResource) {
-        this.configurationResource = configurationResource;
     }
 
     @Override
@@ -143,8 +144,45 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
             flowableTestHelper.setDeploymentIdFromDeploymentAnnotation(null);
         }
 
-        eventRegistryEngine.getEventRegistryEngineConfiguration().getClock().reset();
+        try {
+            if (context.getTestInstanceLifecycle().orElse(TestInstance.Lifecycle.PER_METHOD) == TestInstance.Lifecycle.PER_METHOD) {
+                cleanTestAndAssertAndEnsureCleanDb(context, eventRegistryEngine);
+            }
+        } finally {
+            eventRegistryEngine.getEventRegistryEngineConfiguration().getClock().reset();
+        }
     }
+
+    protected void cleanTestAndAssertAndEnsureCleanDb(ExtensionContext context, EventRegistryEngine eventRegistryEngine) {
+        AnnotationSupport.findAnnotation(context.getRequiredTestClass(), EnsureCleanDb.class)
+                .ifPresent(ensureCleanDb -> assertAndEnsureCleanDb(eventRegistryEngine, context, ensureCleanDb));
+    }
+
+    /**
+     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
+     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
+     */
+    protected void assertAndEnsureCleanDb(EventRegistryEngine eventRegistryEngine, ExtensionContext context, EnsureCleanDb ensureCleanDb) {
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                context.getDisplayName(),
+                logger,
+                eventRegistryEngine.getEventRegistryEngineConfiguration(),
+                ensureCleanDb,
+                !context.getExecutionException().isPresent(),
+                new Command<Void>() {
+
+                    @Override
+                    public Void execute(CommandContext commandContext) {
+                        SchemaManager schemaManager = CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager();
+                        schemaManager.schemaDrop();
+                        schemaManager.schemaCreate();
+                        return null;
+                    }
+                }
+
+        );
+    }
+
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) {

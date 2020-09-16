@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -26,8 +27,8 @@ import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>>
     extends AbstractServiceEngineEntityManager<JobServiceConfiguration, EntityImpl, DM> {
 
-    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration variableServiceConfiguration, DM dataManager) {
-        super(variableServiceConfiguration, dataManager);
+    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration jobServiceConfiguration, String engineType, DM dataManager) {
+        super(jobServiceConfiguration, engineType, dataManager);
     }
 
     @Override
@@ -35,9 +36,9 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
         return FlowableJobEventBuilder.createEntityEvent(eventType, entity);
     }
 
-    protected void deleteByteArrayRef(JobByteArrayRef jobByteArrayRef) {
+    protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
         if(jobByteArrayRef != null) {
-            jobByteArrayRef.delete();
+            jobByteArrayRef.delete(serviceConfiguration.getEngineName());
         }
     }
 }

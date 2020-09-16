@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -29,7 +27,7 @@ import org.junit.Test;
 /**
  * @author shareniu
  */
-public class TaskJsonConverterTest  extends AbstractConverterTest{
+public class TaskJsonConverterTest extends AbstractConverterTest {
 
     @Override
     @Test
@@ -46,38 +44,36 @@ public class TaskJsonConverterTest  extends AbstractConverterTest{
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("shareniu_test", caseModel.getId());
-        assertEquals("shareniu_test", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("shareniu_test");
+        assertThat(caseModel.getName()).isEqualTo("shareniu_test");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
+        assertThat(planModelStage).isNotNull();
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("shareniu_task", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("shareniu_task");
 
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof Task);
+        assertThat(planItemDefinition).isInstanceOf(Task.class);
 
         Task task = (Task) planItemDefinition;
-        assertEquals("shareniu_task", task.getId());
-        assertEquals("shareniu_task", task.getName());
-        assertEquals("${shareniu_task}",task.getBlockingExpression());
+        assertThat(task.getId()).isEqualTo("shareniu_task");
+        assertThat(task.getName()).isEqualTo("shareniu_task");
+        assertThat(task.getBlockingExpression()).isEqualTo("${shareniu_task}");
 
         PlanItem planItem2 = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem2");
-        assertNotNull(planItem2);
-        assertEquals("planItem2", planItem2.getId());
-        assertEquals("shareniu_human_task", planItem2.getName());
+        assertThat(planItem2).isNotNull();
+        assertThat(planItem2.getId()).isEqualTo("planItem2");
+        assertThat(planItem2.getName()).isEqualTo("shareniu_human_task");
 
         PlanItemDefinition planItemDefinition2 = planItem2.getPlanItemDefinition();
-        assertNotNull(planItemDefinition2);
-        assertTrue(planItemDefinition2 instanceof HumanTask);
+        assertThat(planItemDefinition2).isInstanceOf(HumanTask.class);
 
         HumanTask humanTask = (HumanTask) planItemDefinition2;
-        assertEquals("shareniu_human_task", humanTask.getName());
-        assertEquals("${shareniu_human_task}",humanTask.getBlockingExpression());
+        assertThat(humanTask.getName()).isEqualTo("shareniu_human_task");
+        assertThat(humanTask.getBlockingExpression()).isEqualTo("${shareniu_human_task}");
 
     }
 

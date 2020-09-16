@@ -24,7 +24,19 @@ public interface FormRepositoryService {
 
     FormDeploymentBuilder createDeployment();
 
+    /**
+     * Deletes the given deployment.
+     *
+     * @param deploymentId id of the deployment, cannot be null.
+     */
     void deleteDeployment(String deploymentId);
+
+    /**
+     * Deletes the given deployment and cascade deletion to form instances
+     *
+     * @param deploymentId id of the deployment, cannot be null.
+     */
+    void deleteDeployment(String deploymentId, boolean cascade);
 
     FormDefinitionQuery createFormDefinitionQuery();
 

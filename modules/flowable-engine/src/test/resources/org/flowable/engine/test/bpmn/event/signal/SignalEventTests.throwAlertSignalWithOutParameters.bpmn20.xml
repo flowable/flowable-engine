@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+	
+	<signal id="alertSignal" name="alert" />
+
+	<process id="throwSignal">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="signalEvent" />
+
+		<intermediateThrowEvent id="signalEvent" name="Alert">
+			<extensionElements>
+				<flowable:out source="textVar" target="outTextVar" />
+				<flowable:out source="numberVar" target="outNumberVar" />
+			</extensionElements>
+			<signalEventDefinition signalRef="alertSignal" />			
+		</intermediateThrowEvent>
+
+		<sequenceFlow sourceRef="signalEvent" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+
+</definitions>

@@ -27,17 +27,17 @@ public class CreatePlanItemInstanceForRepetitionOperation extends CreatePlanItem
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.WAITING_FOR_REPETITION;
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Create plan item for repetition]";
     }
 

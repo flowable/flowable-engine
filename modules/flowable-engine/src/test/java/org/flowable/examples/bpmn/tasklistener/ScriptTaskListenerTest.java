@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -30,23 +32,23 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
     public void testScriptTaskListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Name does not match", "All your base are belong to us", task.getName());
+        assertThat(task.getName()).as("Name does not match").isEqualTo("All your base are belong to us");
 
         taskService.complete(task.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-            assertEquals("kermit", historicTask.getOwner());
+            assertThat(historicTask.getOwner()).isEqualTo("kermit");
 
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("Task name not set with 'bar' variable", "BAR", task.getName());
+            assertThat(task.getName()).as("Task name not set with 'bar' variable").isEqualTo("BAR");
         }
 
         Object bar = runtimeService.getVariable(processInstance.getId(), "bar");
-        assertNull("Expected 'bar' variable to be local to script", bar);
+        assertThat(bar).as("Expected 'bar' variable to be local to script").isNull();
 
         Object foo = runtimeService.getVariable(processInstance.getId(), "foo");
-        assertEquals("Could not find the 'foo' variable in variable scope", "FOO", foo);
+        assertThat(foo).as("Could not find the 'foo' variable in variable scope").isEqualTo("FOO");
     }
 
 }

@@ -20,6 +20,7 @@ import javax.jms.MessageListener;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
@@ -117,11 +118,15 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
         return new JmsChannelMessageListenerAdapter(eventRegistry, inboundChannelModel);
     }
 
-    protected void processOutboundDefinition(JmsOutboundChannelModel channelDefinition) {
-        String destination = channelDefinition.getDestination();
-        if (channelDefinition.getOutboundEventChannelAdapter() == null && StringUtils.hasText(destination)) {
-            channelDefinition.setOutboundEventChannelAdapter(new JmsOperationsOutboundEventChannelAdapter(jmsOperations, destination));
+    protected void processOutboundDefinition(JmsOutboundChannelModel channelModel) {
+        String destination = channelModel.getDestination();
+        if (channelModel.getOutboundEventChannelAdapter() == null && StringUtils.hasText(destination)) {
+            channelModel.setOutboundEventChannelAdapter(createOutboundEventChannelAdapter(channelModel));
         }
+    }
+
+    protected OutboundEventChannelAdapter createOutboundEventChannelAdapter(JmsOutboundChannelModel channelModel) {
+        return new JmsOperationsOutboundEventChannelAdapter(jmsOperations, channelModel.getDestination());
     }
 
     @Override

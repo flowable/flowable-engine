@@ -109,6 +109,13 @@ public interface DelegateExecution extends VariableScope {
      */
     void setCurrentFlowableListener(FlowableListener currentListener);
 
+    /**
+     * Create a snapshot read only delegate execution of this delegate execution.
+     *
+     * @return a {@link ReadOnlyDelegateExecution}
+     */
+    ReadOnlyDelegateExecution snapshotReadOnly();
+
     /* Execution management */
 
     /**

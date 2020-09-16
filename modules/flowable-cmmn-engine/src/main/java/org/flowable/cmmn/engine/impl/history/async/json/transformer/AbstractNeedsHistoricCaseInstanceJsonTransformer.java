@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -19,13 +22,15 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractNeedsHistoricCaseInstanceJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public AbstractNeedsHistoricCaseInstanceJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         HistoricCaseInstanceEntity historicCaseInstanceEntity = getHistoricCaseInstanceEntity(historicalData, commandContext);

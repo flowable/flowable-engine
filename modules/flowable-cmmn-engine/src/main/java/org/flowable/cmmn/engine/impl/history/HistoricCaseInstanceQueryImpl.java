@@ -20,14 +20,15 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.IdentityLinkQueryObject;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -42,9 +43,11 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
  * @author Tijs Rademakers
  */
 public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricCaseInstanceQuery, HistoricCaseInstance> 
-        implements HistoricCaseInstanceQuery, QueryCacheValues {
+        implements HistoricCaseInstanceQuery, CacheAwareQuery<HistoricCaseInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
@@ -76,7 +79,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeCaseVariables;
     protected Integer caseVariablesLimit;
     protected String involvedUser;
+    protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected List<HistoricCaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricCaseInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
@@ -84,12 +89,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricCaseInstanceQueryImpl() {
     }
 
-    public HistoricCaseInstanceQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public HistoricCaseInstanceQueryImpl(CommandContext commandContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandContext, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
-    public HistoricCaseInstanceQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public HistoricCaseInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(commandExecutor, cmmnEngineConfiguration.getVariableServiceConfiguration());
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
@@ -468,7 +475,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).countByCriteria(this);
+        return cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().countByCriteria(this);
     }
 
     @Override
@@ -476,14 +483,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         ensureVariablesInitialized();
         List<HistoricCaseInstance> results;
         if (includeCaseVariables) {
-            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findWithVariablesByQueryCriteria(this);
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
 
             if (caseInstanceId != null) {
                 addCachedVariableForQueryById(commandContext, results);
             }
 
         } else {
-            results = CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findByCriteria(this);
         }
 
         return results;
@@ -514,6 +521,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
                 }
 
             }
+        }
+    }
+
+    @Override
+    public void enhanceCachedValue(HistoricCaseInstanceEntity caseInstance) {
+        if (isIncludeCaseVariables()) {
+            caseInstance.getQueryVariables()
+                    .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                            .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
         }
     }
 
@@ -562,14 +578,46 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQuery involvedUser(String userId, String identityLinkType) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        } else {
+            this.involvedUserIdentityLink = new IdentityLinkQueryObject(userId, null, identityLinkType);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery involvedGroup(String groupId, String identityLinkType) {
+        if (groupId == null) {
+            throw new FlowableIllegalArgumentException("groupId is null");
+        }
+        if (identityLinkType == null) {
+            throw new FlowableIllegalArgumentException("identityLinkType is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        } else {
+            this.involvedGroupIdentityLink = new IdentityLinkQueryObject(null, groupId, identityLinkType);
+        }
+        return this;
+    }
 
     @Override
     public HistoricCaseInstanceQuery involvedGroups(Set<String> groupIds) {
         if (groupIds == null) {
-            throw new FlowableIllegalArgumentException("involvedGroups are null");
+            throw new FlowableIllegalArgumentException("groupIds are null");
         }
         if (groupIds.isEmpty()) {
-            throw new FlowableIllegalArgumentException("involvedGroups are empty");
+            throw new FlowableIllegalArgumentException("groupIds are empty");
         }
         if (inOrStatement) {
             this.currentOrQueryObject.involvedGroups = groupIds;
@@ -586,7 +634,11 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new HistoricCaseInstanceQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoricCaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration);
+        } else {
+            currentOrQueryObject = new HistoricCaseInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -848,8 +900,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return involvedUser;
     }
 
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return involvedUserIdentityLink;
+    }
+
     public Set<String> getInvolvedGroups() {
         return involvedGroups;
+    }
+    
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return involvedGroupIdentityLink;
     }
 
     public boolean isIncludeCaseVariables() {

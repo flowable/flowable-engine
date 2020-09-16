@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.junit.After;
@@ -43,36 +44,35 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
     @Before
     public void registerEventDefinition() {
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
-            .key("testEvent")
-            .resourceName("testEvent.event")
-            .payload("tenantACustomerId", EventPayloadTypes.STRING)
-            .deploymentTenantId(TENANT_A)
-            .deploy();
+                .key("testEvent")
+                .resourceName("testEvent.event")
+                .payload("tenantACustomerId", EventPayloadTypes.STRING)
+                .deploymentTenantId(TENANT_A)
+                .deploy();
 
         getEventRepositoryService().createEventModelBuilder()
-            .outboundChannelKey("out-channel")
-            .key("testEvent")
-            .resourceName("testEvent.event")
-            .payload("tenantBCustomerId", EventPayloadTypes.STRING)
-            .deploymentTenantId(TENANT_B)
-            .deploy();
+                .key("testEvent")
+                .resourceName("testEvent.event")
+                .payload("tenantBCustomerId", EventPayloadTypes.STRING)
+                .deploymentTenantId(TENANT_B)
+                .deploy();
     }
 
     protected TestOutboundEventChannelAdapter setupTestChannel() {
         TestOutboundEventChannelAdapter outboundEventChannelAdapter = new TestOutboundEventChannelAdapter();
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
-            .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
+                .put("outboundEventChannelAdapter", outboundEventChannelAdapter);
 
         getEventRepositoryService().createOutboundChannelModelBuilder()
-            .key("out-channel")
-            .resourceName("out.channel")
-            .channelAdapter("${outboundEventChannelAdapter}")
-            .jsonSerializer()
-            .deploy();
+                .key("out-channel")
+                .resourceName("out.channel")
+                .channelAdapter("${outboundEventChannelAdapter}")
+                .jsonSerializer()
+                .deploy();
 
         return outboundEventChannelAdapter;
     }
@@ -80,12 +80,14 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
     @After
     public void cleanup() {
         getEventRepositoryService().createDeploymentQuery().list()
-            .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
+                .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
         for (String cleanupDeploymentId : cleanupDeploymentIds) {
-            cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cleanupDeploymentId);
         }
         cleanupDeploymentIds.clear();
+
+        getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(false);
     }
 
     @Test
@@ -94,10 +96,10 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
         deployCaseModel("tenantB.cmmn", TENANT_B);
 
         cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testSendEvent")
-            .variable("myVariable", "Hello tenantA")
-            .tenantId(TENANT_A)
-            .start();
+                .caseDefinitionKey("testSendEvent")
+                .variable("myVariable", "Hello tenantA")
+                .tenantId(TENANT_A)
+                .start();
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
@@ -105,18 +107,19 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
         assertThat(jsonNode.get("tenantACustomerId").asText()).isEqualTo("Hello tenantA");
 
         cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testSendEvent")
-            .variable("myVariable", "Hello tenantB")
-            .tenantId(TENANT_B)
-            .start();
+                .caseDefinitionKey("testSendEvent")
+                .variable("myVariable", "Hello tenantB")
+                .tenantId(TENANT_B)
+                .start();
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(2);
 
         jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(1));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("tenantBCustomerId").asText()).isEqualTo("Hello tenantB"); // Note: a different json (different event definition for different tenant)
+        assertThat(jsonNode.get("tenantBCustomerId").asText())
+                .isEqualTo("Hello tenantB"); // Note: a different json (different event definition for different tenant)
     }
 
-    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter {
+    public static class TestOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
 
         public List<String> receivedEvents = new ArrayList<>();
 

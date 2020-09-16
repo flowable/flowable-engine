@@ -50,6 +50,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * Select the case instances with which the user with the given id is involved.
      */
     CaseInstanceQuery involvedUser(String userId);
+    
+    /**
+     * Select the case instances with which the user with the given id and identity link type are involved.
+     */
+    CaseInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /**
+     * Select the case instances with which the group with the given id and identity link type are involved.
+     */
+    CaseInstanceQuery involvedGroup(String groupId, String identityLinkType);
 
     /**
      * Select the case instances with which the groups with the given ids are involved.

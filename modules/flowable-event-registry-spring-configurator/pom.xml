@@ -11,7 +11,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.5.1-SNAPSHOT</version>
+		<version>6.6.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -29,11 +29,6 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-event-registry-configurator</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.flowable</groupId>
-			<artifactId>flowable-spring</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -148,26 +143,4 @@
 		</pluginManagement>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

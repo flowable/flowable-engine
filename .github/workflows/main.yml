@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [1.8, 11, 13]
+        java: [1.8, 11, 13, 14]
     steps:
     - uses: actions/checkout@v2-beta
       with:

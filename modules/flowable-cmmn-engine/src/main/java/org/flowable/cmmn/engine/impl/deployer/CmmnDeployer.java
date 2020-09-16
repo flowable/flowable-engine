@@ -60,10 +60,16 @@ public class CmmnDeployer implements EngineDeployer {
 
     public static final String[] CMMN_RESOURCE_SUFFIXES = new String[]{".cmmn", ".cmmn11", ".cmmn.xml", ".cmmn11.xml"};
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected IdGenerator idGenerator;
     protected CmmnParser cmmnParser;
     protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
     protected boolean usePrefixId;
+    
+    public CmmnDeployer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -171,7 +177,7 @@ public class CmmnDeployer implements EngineDeployer {
     }
 
     protected void persistCaseDefinitions(CmmnParseResult parseResult) {
-        CaseDefinitionEntityManager caseDefinitionManager = CommandContextUtil.getCaseDefinitionEntityManager();
+        CaseDefinitionEntityManager caseDefinitionManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
             caseDefinitionManager.insert(caseDefinition, false);
             addAuthorizationsForNewCaseDefinition(parseResult.getCmmnCaseForCaseDefinition(caseDefinition), caseDefinition);
@@ -179,8 +185,7 @@ public class CmmnDeployer implements EngineDeployer {
     }
 
     protected void updateEventSubscriptions(CmmnParseResult parseResult, Map<CaseDefinitionEntity, CaseDefinitionEntity> mapOfNewCaseDefinitionToPreviousVersion) {
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getCmmnEngineConfiguration()
-            .getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
 
             CaseDefinitionEntity previousCaseDefinition = mapOfNewCaseDefinitionToPreviousVersion.get(caseDefinition);
@@ -283,7 +288,7 @@ public class CmmnDeployer implements EngineDeployer {
             throw new IllegalStateException("Provided case definition must have a deployment id.");
         }
 
-        CaseDefinitionEntityManager caseDefinitionEntityManager = CommandContextUtil.getCaseDefinitionEntityManager();
+        CaseDefinitionEntityManager caseDefinitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
         CaseDefinitionEntity persistedCaseDefinitionEntity = null;
         if (caseDefinitionEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinitionEntity.getTenantId())) {
             persistedCaseDefinitionEntity = caseDefinitionEntityManager.findCaseDefinitionByDeploymentAndKey(deploymentId, caseDefinitionEntity.getKey());
@@ -294,7 +299,6 @@ public class CmmnDeployer implements EngineDeployer {
     }
 
     protected void updateCachingAndArtifacts(CmmnParseResult parseResult) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = cmmnEngineConfiguration.getCaseDefinitionCache();
         CmmnDeploymentEntity deployment = (CmmnDeploymentEntity) parseResult.getDeployment();
 
@@ -317,7 +321,7 @@ public class CmmnDeployer implements EngineDeployer {
                     CaseDefinitionEntity caseDefinition, String expressionType) {
 
         if (expressions != null) {
-            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
+            IdentityLinkService identityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService();
             for (String expression : expressions) {
                 IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
                 identityLink.setScopeDefinitionId(caseDefinition.getId());

@@ -38,39 +38,42 @@
         url = decodeURIComponent(url[1]);
         var api;
         switch (url) {
-          case "specfile/process/flowable.json":
+          case "specfile/process/flowable-swagger-process.json":
               api = "process";
               break;
-          case "specfile/idm/flowable.json":
+          case "specfile/idm/flowable-swagger-idm.json":
               api = "idm";
               break;    
-          case "specfile/dmn/flowable.json":
+          case "specfile/dmn/flowable-swagger-decision.json":
               api = "dmn";
               break;
-          case "specfile/cmmn/flowable.json":
+          case "specfile/cmmn/flowable-swagger-cmmn.json":
               api = "cmmn";
               break;
-          case "specfile/eventregistry/flowable.json":
+          case "specfile/eventregistry/flowable-swagger-eventregistry.json":
               api = "eventregistry";
               break;
-          case "specfile/form/flowable.json":
+          case "specfile/form/flowable-swagger-form.json":
               api = "form";
               break;
-          case "specfile/content/flowable.json":
+          case "specfile/content/flowable-swagger-content.json":
               api = "content";
               break;
-          case "specfile/app/flowable.json":
+          case "specfile/app/flowable-swagger-app.json":
               api = "app";
+              break;
+          case "specfile/external-worker/flowable-swagger-external-worker.json":
+              api = "external-worker";
               break;
       }
 
         if (!api) {
-            window.location.search = window.location.search.replace(url, "specfile/process/flowable.json");
+            window.location.search = window.location.search.replace(url, "specfile/process/flowable-swagger-process.json");
         }
 
         $("#api-select").val(api);
       } else {
-        window.location.search=window.location.search + '?url=specfile/process/flowable.json';
+        window.location.search=window.location.search + '?url=specfile/process/flowable-swagger-process.json';
         return;
       }
 
@@ -112,28 +115,31 @@
           var specFile;
           switch ($('#api-select :selected').val()) {
               case "process":
-                  specFile = "specfile/process/flowable.json";
+                  specFile = "specfile/process/flowable-swagger-process.json";
                   break;
               case "idm":
-                  specFile = "specfile/idm/flowable.json";
+                  specFile = "specfile/idm/flowable-swagger-idm.json";
                   break;    
               case "dmn":
-                  specFile = "specfile/dmn/flowable.json";
+                  specFile = "specfile/dmn/flowable-swagger-decision.json";
                   break;
               case "cmmn":
-                  specFile = "specfile/cmmn/flowable.json";
+                  specFile = "specfile/cmmn/flowable-swagger-cmmn.json";
                   break;
               case "eventregistry":
-                  specFile = "specfile/eventregistry/flowable.json";
+                  specFile = "specfile/eventregistry/flowable-swagger-eventregistry.json";
                   break;
               case "form":
-                  specFile = "specfile/form/flowable.json";
+                  specFile = "specfile/form/flowable-swagger-form.json";
                   break;
               case "content":
-                  specFile = "specfile/content/flowable.json";
+                  specFile = "specfile/content/flowable-swagger-content.json";
                   break;
               case "app":
-                  specFile = "specfile/app/flowable.json";
+                  specFile = "specfile/app/flowable-swagger-app.json";
+                  break;
+              case "external-worker":
+                  specFile = "specfile/external-worker/flowable-swagger-external-worker.json";
                   break;
           }
 
@@ -164,6 +170,7 @@
           <option value="form">Form</option>
           <option value="content">Content</option>
           <option value="app">App</option>
+          <option value="external-worker">External Worker</option>
         </select>
       </div>
   </div>

@@ -22,6 +22,7 @@ import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationPartResult;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
@@ -42,11 +43,12 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
 
     @Override
     public ProcessInstanceBatchMigrationResult execute(CommandContext commandContext) {
-        BatchService batchService = CommandContextUtil.getBatchService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         Batch batch = batchService.getBatch(batchId);
 
         if (batch != null) {
-            ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
+            ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
             ProcessInstanceBatchMigrationResult result = convertFromBatch(batch, objectMapper);
             List<BatchPart> batchParts = batchService.findBatchPartsByBatchId(batch.getId());
             if (batchParts != null && !batchParts.isEmpty()) {
@@ -84,9 +86,12 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
         }
         
         partResult.setResult(batchPart.getStatus());
-        if (ProcessInstanceBatchMigrationResult.RESULT_FAIL.equals(batchPart.getStatus()) && batchPart.getResultDocumentJson() != null) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (ProcessInstanceBatchMigrationResult.RESULT_FAIL.equals(batchPart.getStatus()) && 
+                batchPart.getResultDocumentJson(processEngineConfiguration.getEngineCfgKey()) != null) {
+            
             try {
-                JsonNode resultNode = objectMapper.readTree(batchPart.getResultDocumentJson());
+                JsonNode resultNode = objectMapper.readTree(batchPart.getResultDocumentJson(processEngineConfiguration.getEngineCfgKey()));
                 if (resultNode.has(BATCH_RESULT_MESSAGE_LABEL)) {
                     String resultMessage = resultNode.get(BATCH_RESULT_MESSAGE_LABEL).asText();
                     partResult.setMigrationMessage(resultMessage);

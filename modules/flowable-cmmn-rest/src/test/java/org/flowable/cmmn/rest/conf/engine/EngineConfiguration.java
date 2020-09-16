@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
@@ -44,7 +45,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
 
-    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE}")
+    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}")
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
@@ -144,6 +145,11 @@ public class EngineConfiguration {
     @Bean
     public CmmnManagementService managementService(CmmnEngine cmmnEngine) {
         return cmmnEngine.getCmmnManagementService();
+    }
+
+    @Bean
+    public CmmnMigrationService cmmnMigrationService(CmmnEngine cmmnEngine) {
+        return cmmnEngine.getCmmnMigrationService();
     }
     
     @Bean

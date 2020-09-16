@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 
 package org.flowable.cmmn.rest.service.api.history;
+
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,9 +39,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for REST-operation related to the historic case instance query resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
@@ -76,7 +81,8 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         assertResultsPresentInDataResponse(url + "?caseDefinitionKey=oneHumanTaskCase", caseInstance.getId(), caseInstance2.getId());
 
-        assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=false&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), new HashMap<>());
+        assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=false&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(),
+                new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=true&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), caseVariables);
 
         // Without tenant ID, before setting tenant
@@ -84,31 +90,37 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Set tenant on deployment
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
-        
+                "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+
         try {
             startTime.add(Calendar.DAY_OF_YEAR, 1);
             cmmnEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
             CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").tenantId("myTenant").start();
-    
+
             // Without tenant ID, after setting tenant
             assertResultsPresentInDataResponse(url + "?withoutTenantId=true", caseInstance.getId(), caseInstance2.getId());
-    
+
             // Tenant id
             assertResultsPresentInDataResponse(url + "?tenantId=myTenant", caseInstance3.getId());
             assertResultsPresentInDataResponse(url + "?tenantId=anotherTenant");
-    
+
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url + "?caseDefinitionKey=oneHumanTaskCase&sort=startTime"), 200);
-    
+
             // Check status and size
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(3, dataNode.size());
-            assertEquals(caseInstance.getId(), dataNode.get(0).get("id").asText());
-            assertEquals(caseInstance2.getId(), dataNode.get(1).get("id").asText());
-            assertEquals(caseInstance3.getId(), dataNode.get(2).get("id").asText());
-            
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("["
+                            + "{"
+                            + "   id: '" + caseInstance.getId() + "'"
+                            + "}, {"
+                            + "   id: '" + caseInstance2.getId() + "'"
+                            + "}, {"
+                            + "    id: '" + caseInstance3.getId() + "'"
+                            + "} ]");
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
@@ -122,10 +134,10 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), 200);
 
         // Check status and size
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -134,13 +146,14 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             JsonNode jsonNodeEntry = it.next();
             String id = jsonNodeEntry.get("id").textValue();
             String state = jsonNodeEntry.get("state").textValue();
-            assertTrue("state is missing on the historic case instance", StringUtils.isNotEmpty(state));
+            assertThat(state).as("state is missing on the historic case instance").isNotEmpty();
             toBeFound.remove(id);
         }
-        assertTrue("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
     }
 
-    private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables) throws IOException {
+    private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables)
+            throws IOException {
 
         HttpGet httpPost = new HttpGet(SERVER_URL_PREFIX + url + queryParameters);
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
@@ -148,22 +161,22 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(1, dataNode.size());
+        assertThat(dataNode).hasSize(1);
         JsonNode valueNode = dataNode.get(0);
-        assertEquals(caseInstanceId, valueNode.get("id").asText());
+        assertThat(valueNode.get("id").asText()).isEqualTo(caseInstanceId);
 
-        // Check expectec variables
-        assertEquals(expectedVariables.size(), valueNode.get("variables").size());
+        // Check expected variables
+        assertThat(valueNode.get("variables")).hasSize(expectedVariables.size());
 
-        for(JsonNode node: valueNode.get("variables")) {
+        for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
             String variableName = variableNode.get("name").textValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
-            assertTrue(expectedVariables.containsKey(variableName));
-            assertEquals(expectedVariables.get(variableName), variableValue);
-            assertEquals(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase(), variableNode.get("type").textValue());
-            assertEquals("local", variableNode.get("scope").textValue());
+            assertThat(expectedVariables.containsKey(variableName)).isTrue();
+            assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
+            assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
+            assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
         }
 
     }

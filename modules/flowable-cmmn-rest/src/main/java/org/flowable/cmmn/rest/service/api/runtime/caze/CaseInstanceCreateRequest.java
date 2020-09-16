@@ -36,6 +36,7 @@ public class CaseInstanceCreateRequest {
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
+    protected String name;
     protected String businessKey;
     protected List<RestVariable> variables;
     protected List<RestVariable> transientVariables;
@@ -62,6 +63,14 @@ public class CaseInstanceCreateRequest {
         this.caseDefinitionKey = caseDefinitionKey;
     }
 
+    @ApiModelProperty(example = "My case name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
     @ApiModelProperty(example = "myBusinessKey")
     public String getBusinessKey() {
         return businessKey;

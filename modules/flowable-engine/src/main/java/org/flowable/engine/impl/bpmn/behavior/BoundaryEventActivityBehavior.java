@@ -131,6 +131,9 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         ExecutionEntity nonInterruptingExecution = executionEntityManager.createChildExecution(scopeExecution);
         nonInterruptingExecution.setActive(false);
         nonInterruptingExecution.setCurrentFlowElement(executionEntity.getCurrentFlowElement());
+        
+        // create new start activity instance for the non interrupting boundary event
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(executionEntity);
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
     }

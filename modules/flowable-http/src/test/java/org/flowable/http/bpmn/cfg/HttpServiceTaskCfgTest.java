@@ -12,6 +12,8 @@
  */
 package org.flowable.http.bpmn.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import javax.net.ssl.SSLHandshakeException;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskCfgTest.class);
 
     public HttpServiceTaskCfgTest() {
@@ -42,12 +45,8 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
     @Test
     @Deployment
     public void testHttpsSelfSignedFail() {
-        try {
-            runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertTrue(e.getCause() instanceof SSLHandshakeException);
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId())
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasCauseInstanceOf(SSLHandshakeException.class);
     }
 }

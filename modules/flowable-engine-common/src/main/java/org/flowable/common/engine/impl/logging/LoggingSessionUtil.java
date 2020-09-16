@@ -20,10 +20,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -42,27 +39,29 @@ public class LoggingSessionUtil {
     protected static StrongUuidGenerator idGenerator = new StrongUuidGenerator();
     
     public static void addLoggingData(String type, String message, String scopeId, String subScopeId, String scopeType, 
-                    String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType) {
+            String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType, 
+            String engineType, ObjectMapper objectMapper) {
         
-        ObjectNode loggingNode = fillLoggingData(message, scopeId, subScopeId, scopeType, scopeDefinitionId, elementId, elementName, elementType, elementSubType);
-        addLoggingData(type, loggingNode);
+        ObjectNode loggingNode = fillLoggingData(message, scopeId, subScopeId, scopeType, scopeDefinitionId, elementId, 
+                elementName, elementType, elementSubType, objectMapper);
+        addLoggingData(type, loggingNode, engineType);
     }
     
-    public static void addErrorLoggingData(String type, ObjectNode loggingNode, Throwable t) {
+    public static void addErrorLoggingData(String type, ObjectNode loggingNode, Throwable t, String engineType) {
         ObjectNode exceptionNode = loggingNode.putObject("exception");
         exceptionNode.put("message", t.getMessage());
         exceptionNode.put("stackTrace", ExceptionUtils.getStackTrace(t));
-        addLoggingData(type, loggingNode);
+        addLoggingData(type, loggingNode, engineType);
     }
     
-    public static void addLoggingData(String type, String message) {
-        ObjectNode loggingNode = getObjectMapper().createObjectNode();
+    public static void addLoggingData(String type, String message, String engineType, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = objectMapper.createObjectNode();
         loggingNode.put("message", message);
-        addLoggingData(type, loggingNode);
+        addLoggingData(type, loggingNode, engineType);
     }
     
-    public static void addEngineLoggingData(String type, String message, String engineType) {
-        ObjectNode loggingNode = getObjectMapper().createObjectNode();
+    public static void addEngineLoggingData(String type, String message, String engineType, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = objectMapper.createObjectNode();
         loggingNode.put("message", message);
         loggingNode.put("engineType", engineType);
         
@@ -82,22 +81,22 @@ public class LoggingSessionUtil {
             }
         }
         
-        addLoggingData(type, loggingNode);
+        addLoggingData(type, loggingNode, engineType);
     }
     
-    public static void addLoggingData(String type, ObjectNode data) {
+    public static void addLoggingData(String type, ObjectNode data, String engineType) {
         data.put(ID, idGenerator.getNextId());
         data.put(TIMESTAMP, formatDate(new Date()));
         data.put("type", type);
         
         LoggingSession loggingSession = Context.getCommandContext().getSession(LoggingSession.class);
-        loggingSession.addLoggingData(type, data);
+        loggingSession.addLoggingData(type, data, engineType);
     }
     
     public static ObjectNode fillLoggingData(String message, String scopeId, String subScopeId, String scopeType, 
-                    String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType) {
+            String scopeDefinitionId, String elementId, String elementName, String elementType, String elementSubType, ObjectMapper objectMapper) {
         
-        ObjectNode loggingNode = fillLoggingData(message, scopeId, subScopeId, scopeType);
+        ObjectNode loggingNode = fillLoggingData(message, scopeId, subScopeId, scopeType, objectMapper);
         loggingNode.put("scopeDefinitionId", scopeDefinitionId);
         
         if (StringUtils.isNotEmpty(elementId)) {
@@ -119,8 +118,8 @@ public class LoggingSessionUtil {
         return loggingNode;
     }
     
-    public static ObjectNode fillLoggingData(String message, String scopeId, String subScopeId, String scopeType) {
-        ObjectNode loggingNode = getObjectMapper().createObjectNode();
+    public static ObjectNode fillLoggingData(String message, String scopeId, String subScopeId, String scopeType, ObjectMapper objectMapper) {
+        ObjectNode loggingNode = objectMapper.createObjectNode();
         loggingNode.put("message", message);
         loggingNode.put("scopeId", scopeId);
         
@@ -154,37 +153,5 @@ public class LoggingSessionUtil {
             return date.toString("yyyy-MM-dd");
         }
         return null;
-    }
-    
-    protected static String getEngineType(CommandContext commandContext) {
-        String engineName = null;
-        if (commandContext.getCurrentEngineConfiguration().getEngineName() != null) {
-            String engineConfigKey = commandContext.getCurrentEngineConfiguration().getEngineCfgKey();
-            if (EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "bpmn";
-            } else if (EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "cmmn";
-            } else if (EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "dmn";
-            } else if (EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "app";
-            } else if (EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "form";
-            } else if (EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "content";
-            } else if (EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG.equals(engineConfigKey)) {
-                engineName = "idm";
-            }
-        }
-        
-        return engineName;
-    }
-    
-    protected static ObjectMapper getObjectMapper() {
-        return getEngineConfiguration().getObjectMapper();
-    }
-    
-    protected static AbstractEngineConfiguration getEngineConfiguration() {
-        return Context.getCommandContext().getCurrentEngineConfiguration();
     }
 }

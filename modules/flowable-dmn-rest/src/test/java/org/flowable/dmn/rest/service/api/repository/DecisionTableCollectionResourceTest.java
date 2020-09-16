@@ -14,7 +14,7 @@ package org.flowable.dmn.rest.service.api.repository;
 
 import java.util.List;
 
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
@@ -36,14 +36,14 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
             DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn").category("cat two")
                     .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple-2.dmn").deploy();
 
-            DmnDecisionTable firstDecision = dmnRepositoryService.createDecisionTableQuery().decisionTableKey("decision").deploymentId(firstDeployment.getId()).singleResult();
+            DmnDecision firstDefinition = dmnRepositoryService.createDecisionQuery().decisionKey("decision").deploymentId(firstDeployment.getId()).singleResult();
 
-            DmnDecisionTable latestDecision = dmnRepositoryService.createDecisionTableQuery().decisionTableKey("decision").deploymentId(secondDeployment.getId()).singleResult();
+            DmnDecision latestDefinition = dmnRepositoryService.createDecisionQuery().decisionKey("decision").deploymentId(secondDeployment.getId()).singleResult();
 
-            DmnDecisionTable decisionTwo = dmnRepositoryService.createDecisionTableQuery().decisionTableKey("decisionTwo").deploymentId(secondDeployment.getId()).singleResult();
+            DmnDecision decisionTwo = dmnRepositoryService.createDecisionQuery().decisionKey("decisionTwo").deploymentId(secondDeployment.getId()).singleResult();
 
             String baseUrl = DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_COLLECTION);
-            assertResultsPresentInDataResponse(baseUrl, firstDecision.getId(), decisionTwo.getId(), latestDecision.getId());
+            assertResultsPresentInDataResponse(baseUrl, firstDefinition.getId(), decisionTwo.getId(), latestDefinition.getId());
 
             // Verify
 
@@ -61,7 +61,7 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
 
             // Test returning multiple versions for the same key
             url = baseUrl + "?key=decision";
-            assertResultsPresentInDataResponse(url, firstDecision.getId(), latestDecision.getId());
+            assertResultsPresentInDataResponse(url, firstDefinition.getId(), latestDefinition.getId());
 
             // Test keyLike filtering
             url = baseUrl + "?keyLike=" + encode("%Two");
@@ -77,17 +77,17 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
 
             // Test version filtering
             url = baseUrl + "?version=2";
-            assertResultsPresentInDataResponse(url, latestDecision.getId());
+            assertResultsPresentInDataResponse(url, latestDefinition.getId());
 
             // Test latest filtering
             url = baseUrl + "?latest=true";
-            assertResultsPresentInDataResponse(url, latestDecision.getId(), decisionTwo.getId());
+            assertResultsPresentInDataResponse(url, latestDefinition.getId(), decisionTwo.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, firstDecision.getId(), latestDecision.getId(), decisionTwo.getId());
+            assertResultsPresentInDataResponse(url, firstDefinition.getId(), latestDefinition.getId(), decisionTwo.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();
-            assertResultsPresentInDataResponse(url, latestDecision.getId(), decisionTwo.getId());
+            assertResultsPresentInDataResponse(url, latestDefinition.getId(), decisionTwo.getId());
         } finally {
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();

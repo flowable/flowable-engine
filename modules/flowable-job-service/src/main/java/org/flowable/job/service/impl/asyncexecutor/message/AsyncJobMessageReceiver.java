@@ -65,7 +65,7 @@ public class AsyncJobMessageReceiver {
             public Void execute(CommandContext commandContext) {
                 JobEntityManager jobEntityManager = jobServiceConfiguration.getJobEntityManager();
                 
-                JobQueryImpl query = new JobQueryImpl();
+                JobQueryImpl query = new JobQueryImpl(commandContext, jobServiceConfiguration);
                 query.jobId(jobId);
                 
                 List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(query);

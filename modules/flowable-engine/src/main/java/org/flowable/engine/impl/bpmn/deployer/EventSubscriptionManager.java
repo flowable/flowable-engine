@@ -20,7 +20,6 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
@@ -28,6 +27,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -64,8 +65,10 @@ public class EventSubscriptionManager {
     protected void removeObsoleteEventRegistryEventSubScription(ProcessDefinitionEntity previousProcessDefinition) {
         // remove all subscriptions for the previous version
         if (previousProcessDefinition != null) {
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
-            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(Context.getCommandContext());
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(Context.getCommandContext(), 
+                    processEngineConfiguration.getEventSubscriptionServiceConfiguration());
             eventSubscriptionQuery.processDefinitionId(previousProcessDefinition.getId()).scopeType(ScopeTypes.BPMN);
             if (previousProcessDefinition.getTenantId() != null) {
                 eventSubscriptionQuery.tenantId(previousProcessDefinition.getTenantId());
@@ -82,7 +85,8 @@ public class EventSubscriptionManager {
     
     protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
         // remove all subscriptions for the previous version
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService
                         .findEventSubscriptionsByTypeAndProcessDefinitionId(eventHandlerType, processDefinition.getId(), processDefinition.getTenantId());
 
@@ -92,7 +96,7 @@ public class EventSubscriptionManager {
         }
     }
 
-    protected void addEventSubscriptions(CommandContext commandContext, ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
+    protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
                 if (element instanceof StartEvent) {
@@ -124,43 +128,44 @@ public class EventSubscriptionManager {
     
     protected void insertSignalEvent(SignalEventDefinition signalEventDefinition, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
-        SignalEventSubscriptionEntity subscriptionEntity = CommandContextUtil.getEventSubscriptionService(commandContext).createSignalEventSubscription();
-        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-        if (signal != null) {
-            subscriptionEntity.setEventName(signal.getName());
-        } else {
-            subscriptionEntity.setEventName(signalEventDefinition.getSignalRef());
-        }
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        SignalEventSubscriptionEntity subscriptionEntity = eventSubscriptionService.createSignalEventSubscription();
+
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
+        subscriptionEntity.setEventName(signalName);
+
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(processDefinition.getId());
         if (processDefinition.getTenantId() != null) {
             subscriptionEntity.setTenantId(processDefinition.getTenantId());
         }
 
-        CommandContextUtil.getEventSubscriptionService(commandContext).insertEventSubscription(subscriptionEntity);
+        eventSubscriptionService.insertEventSubscription(subscriptionEntity);
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(subscriptionEntity);
     }
     
     protected void insertMessageEvent(MessageEventDefinition messageEventDefinition, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
 
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         // look for subscriptions for the same name in db:
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
-                .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getMessageRef(), processDefinition.getTenantId());
+                .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 
         for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsForSameMessageName) {
             // throw exception only if there's already a subscription as start event
-            if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) { // processInstanceId != null or not empty -> it's a message
-                                                                                                                                      // related to an execution
+            if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) { // processInstanceId != null or not empty -> it's a message related to an execution
                 // the event subscription has no instance-id, so it's a message start event
                 throw new FlowableException("Cannot deploy process definition '" + processDefinition.getResourceName()
-                        + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getMessageRef() + "'.");
+                        + "': there already is a message event subscription for the message with name '" + messageName + "'.");
             }
         }
 
         MessageEventSubscriptionEntity newSubscription = eventSubscriptionService.createMessageEventSubscription();
-        newSubscription.setEventName(messageEventDefinition.getMessageRef());
+        newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(processDefinition.getId());
         newSubscription.setProcessDefinitionId(processDefinition.getId());
@@ -175,7 +180,8 @@ public class EventSubscriptionManager {
     
     protected void insertEventRegistryEvent(String eventDefinitionKey, StartEvent startEvent, ProcessDefinitionEntity processDefinition, BpmnModel bpmnModel) {
         CommandContext commandContext = Context.getCommandContext();
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         EventSubscriptionBuilder eventSubscriptionBuilder = eventSubscriptionService.createEventSubscriptionBuilder()
                 .eventType(eventDefinitionKey)
                 .activityId(startEvent.getId())

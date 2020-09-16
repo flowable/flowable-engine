@@ -19,13 +19,14 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 
 public class BatchPartEntityManagerImpl
     extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchPartEntity, BatchPartDataManager>
     implements BatchPartEntityManager {
 
     public BatchPartEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchPartDataManager batchPartDataManager) {
-        super(batchServiceConfiguration, batchPartDataManager);
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), batchPartDataManager);
     }
 
     @Override
@@ -65,17 +66,17 @@ public class BatchPartEntityManagerImpl
         BatchPartEntity batchPartEntity = getBatchPartEntityManager().findById(batchPartId);
         batchPartEntity.setCompleteTime(getClock().getCurrentTime());
         batchPartEntity.setStatus(status);
-        batchPartEntity.setResultDocumentJson(resultJson);
+        batchPartEntity.setResultDocumentJson(resultJson, serviceConfiguration.getEngineName());
         
         return batchPartEntity;
     }
 
     @Override
     public void deleteBatchPartEntityAndResources(BatchPartEntity batchPartEntity) {
-        BatchByteArrayRef resultDocRefId = batchPartEntity.getResultDocRefId();
+        ByteArrayRef resultDocRefId = batchPartEntity.getResultDocRefId();
 
         if (resultDocRefId != null && resultDocRefId.getId() != null) {
-            resultDocRefId.delete();
+            resultDocRefId.delete(serviceConfiguration.getEngineName());
         }
 
         delete(batchPartEntity);

@@ -60,30 +60,29 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             return null;
         }
         
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskService taskService = processEngineConfiguration.getTaskServiceConfiguration().getTaskService();
 
         if (task.getRevision() == 0) {
             TaskHelper.insertTask(task, null, true, false);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task),
+                        processEngineConfiguration.getEngineCfgKey());
             }
             
             handleSubTaskCount(taskService, null);
 
         } else {
 
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-
             TaskInfo originalTaskEntity = taskService.getTask(task.getId());
             
             if (originalTaskEntity == null && processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
+                originalTaskEntity = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(task.getId());
             }
 
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext)
-                .recordTaskInfoChange(task, processEngineConfiguration.getClock().getCurrentTime());
+            processEngineConfiguration.getActivityInstanceEntityManager().recordTaskInfoChange(task, processEngineConfiguration.getClock().getCurrentTime());
             taskService.updateTask(task, true);
 
             // Special care needed to detect the assignee task has changed
@@ -101,13 +100,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         return null;
     }
 
-    protected void handleAssigneeChange(CommandContext commandContext,
-            ProcessEngineConfigurationImpl processEngineConfiguration) {
+    protected void handleAssigneeChange(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
         processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
+            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
 

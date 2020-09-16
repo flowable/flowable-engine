@@ -17,11 +17,13 @@ import java.util.Set;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,15 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(CmmnCommandInvoker.class);
 
+    protected AgendaOperationRunner agendaOperationRunner;
+
+    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, final CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         final CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         if (commandContext.isReused() && !agenda.isEmpty()) {
@@ -59,24 +67,34 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
+            executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+        }
+    }
+
+    protected void executeOperation(CommandContext commandContext, boolean isStoreCaseInstanceIdOfNoOperation, Runnable runnable) {
+
+        if (runnable instanceof CmmnOperation) {
+            CmmnOperation operation = (CmmnOperation) runnable;
+
             if (logger.isDebugEnabled()) {
                 logger.debug("Executing agenda operation {}", runnable);
             }
-            runnable.run();
+
+            agendaOperationRunner.executeOperation(commandContext, runnable);
 
             // If the operation caused changes, a new evaluation needs to be planned,
             // as the operations could have changed the state and/or variables.
-            if (runnable instanceof CmmnOperation) {
-                CmmnOperation operation = (CmmnOperation) runnable;
-                if (isStoreCaseInstanceIdOfNoOperation || !operation.isNoop()) {
+            if (isStoreCaseInstanceIdOfNoOperation || !operation.isNoop()) {
 
-                    String caseInstanceId = operation.getCaseInstanceId();
-                    if (caseInstanceId != null) {
-                        CommandContextUtil.addInvolvedCaseInstanceId(commandContext, caseInstanceId);
-                    }
-
+                String caseInstanceId = operation.getCaseInstanceId();
+                if (caseInstanceId != null) {
+                    CommandContextUtil.addInvolvedCaseInstanceId(commandContext, caseInstanceId);
                 }
+
             }
+
+        } else {
+            runnable.run();
 
         }
     }
@@ -104,5 +122,13 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     public void setNext(CommandInterceptor next) {
         throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
     }
-    
+
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+
+    public void setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
+
 }

@@ -48,12 +48,17 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         HttpServiceTask task = new HttpServiceTask();
 
         if (StringUtils.isNotEmpty(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {
             task.setImplementation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode));
+        }
+
+        String parallelInSameTransaction = getPropertyValueAsString(PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION, elementNode);
+        if (StringUtils.isNotEmpty(parallelInSameTransaction)) {
+            task.setParallelInSameTransaction(Boolean.parseBoolean(parallelInSameTransaction));
         }
 
         addField("requestMethod", PROPERTY_HTTPTASK_REQ_METHOD, "GET", elementNode, task);
@@ -79,7 +84,8 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
 
     }
 

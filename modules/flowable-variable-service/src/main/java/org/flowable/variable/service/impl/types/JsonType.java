@@ -14,12 +14,19 @@ package org.flowable.variable.service.impl.types;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +119,10 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             String textValue = value.toString();
             if (textValue.length() <= maxLength) {
                 valueFields.setTextValue(textValue);
+                valueFields.setBytes(null);
             } else {
                 valueFields.setBytes(textValue.getBytes(StandardCharsets.UTF_8));
+                valueFields.setTextValue(null);
             }
             valueFields.setCachedValue(jsonNode);
             traceValue(jsonNode, valueFields);
@@ -121,15 +130,14 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
     }
 
     @Override
-    public boolean updateValueIfChanged(JsonNode originalNode, JsonNode originalCopyNode,
-        VariableInstanceEntity variableInstanceEntity) {
+    public boolean updateValueIfChanged(JsonNode originalNode, JsonNode originalCopyNode, VariableInstanceEntity variableInstanceEntity) {
         boolean valueChanged = false;
         if (!Objects.equals(originalNode, originalCopyNode)) {
             String textValue = originalNode.toString();
             if (textValue.length() <= maxLength) {
                 variableInstanceEntity.setTextValue(textValue);
                 if (variableInstanceEntity.getByteArrayRef() != null) {
-                    variableInstanceEntity.getByteArrayRef().delete();
+                    variableInstanceEntity.getByteArrayRef().delete(getEngineType(variableInstanceEntity.getScopeType()));
                 }
             } else {
                 variableInstanceEntity.setTextValue(null);
@@ -144,10 +152,42 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         if (trackObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                    new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields)
-                ));
+                VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(valueFields);
+                if (variableServiceConfiguration != null) {
+                    commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
+                        new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields)
+                    ));
+                    
+                    variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
+                }
             }
+        }
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration(ValueFields valueFields) {
+        String engineType = getEngineType(valueFields.getScopeType());
+        Map<String, AbstractEngineConfiguration> engineConfigurationMap = Context.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = engineConfigurationMap.get(engineType);
+        if (engineConfiguration == null) {
+            for (AbstractEngineConfiguration possibleEngineConfiguration : engineConfigurationMap.values()) {
+                if (possibleEngineConfiguration instanceof HasVariableServiceConfiguration) {
+                    engineConfiguration = possibleEngineConfiguration;
+                }
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            return null;
+        }
+        
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    } 
+    
+    protected String getEngineType(String scopeType) {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
         }
     }
 

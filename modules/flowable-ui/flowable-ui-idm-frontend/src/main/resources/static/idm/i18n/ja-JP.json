@@ -1,0 +1,272 @@
+{
+  "GENERAL": {
+    "MAIN-TITLE": "Flowable",
+    "ERROR": {
+      "GENERIC": "申し訳ありませんが、エラーが発生しました。",
+      "UNKNOWN": "申し訳ありませんが、リクエストされた処理の実行中にエラーが発生しました。",
+      "BAD_REQUEST": "リクエストされた処理の実行中にエラーが発生",
+      "NOT_FOUND": "アクセスしようとしたリソースは存在しません",
+      "UNAUTHORIZED": "リクエストされた処理を実行するためにはサインインが必要です。",
+      "FORBIDDEN": "リクエストされた処理は許可されていません",
+      "INTERNAL_SERVER_ERROR": "申し訳ありませんが、リクエストされた処理の実行中に予期せぬエラーが発生しました。"
+    },
+    "ACTION": {
+      "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
+      "HELP": "クイックスタート",
+      "EDIT-PROFILE": "プロフィールの編集",
+      "SAVE": "保存",
+      "CANCEL": "キャンセル",
+      "CLOSE": "閉じる",
+      "DEPLOY": "デプロイ",
+      "ABOUT": "Flowableについて"
+    },
+    "MESSAGE": {
+      "SELECT-PEOPLE-HELP": "&uparrow;と&downarrow;で選択し、エンターで確認",
+      "SELECT-GROUP-HELP": "&uparrow;と&downarrow;で選択し、エンターで確認",
+      "SELECT-GROUP-SEARCH-PLACEHOLDER": "グループの検索",
+      "SELECT-GROUP-NO-MATCHING-RESULTS": "検索ボックスをつかってグループを検索。"
+    },
+    "TITLE": {
+      "MATCHING-PEOPLE": "条件にあう人",
+      "SELECT-GROUP": "グループの選択",
+      "MATCHING-GROUPS": "条件にあうグループ"
+    }
+  },
+  "LOGIN": {
+    "TITLE": "サインイン",
+    "USERNAME": "ユーザー名",
+    "USERNAME-PLACEHOLDER": "ユーザー名を入力",
+    "PASSWORD": "パスワード",
+    "PASSWORD-PLACEHOLDER": "パスワードを入力",
+    "INVALID-CREDENTIALS": "不正な認証情報",
+    "ACTION": {
+      "CONFIRM": "サインイン"
+    }
+  },
+  "ACCOUNT": {
+    "ACTIVATE": {
+      "TITLE": "アカウントの有効化",
+      "ACTIVATING-MESSAGE": "現在、{{userFullName}}さんのアカウントを有効化しています...",
+      "SUCCESS-MESSAGE": "アカウントが有効化されました。プロセスのデザイン/実行を開始するために、サインインしてください",
+      "FAILURE-MESSAGE": "アカウントが有効化できません。すでに有効化済であるか、リンクが期限切れしています。"
+    },
+    "RESET-PASSWORD-REQUEST": {
+      "MESSAGE": "パスワードを忘れましたか？メールアドレスを入力しパスワードリセットのメールを受信してください。",
+      "TITLE": "パスワードのリセット",
+      "EMAIL": "メールアドレス",
+      "EMAIL-PLACEHOLDER": "メールアドレスを入力してください",
+      "SECURITY-SECTION": "セキュリティチェック",
+      "CONFIRM": "パスワードリセットのリクエスト",
+      "SUCCESS-MESSAGE": "後ほどパスワードリセットのリンクを記載したメールが届きます。",
+      "ERROR": {
+        "UNEXISTING-USER": "入力されたメールアドレスは登録されていません。"
+      }
+    },
+    "RESET-PASSWORD": {
+      "TITLE": "パスワードのリセット",
+      "PASSWORD": "パスワード",
+      "PASSWORD-CONFIRM": "パスワードの確認",
+      "PASSWORD-PLACEHOLDER": "新しいパスワードを入力してください",
+      "PASSWORD-CONFIRM-PLACEHOLDER": "新しいパスワードの確認",
+      "CONFIRM": "パスワードの変更",
+      "LOADING": "パスワードをリセット中",
+      "SUCCESS-MESSAGE": "パスワードが変更されました。",
+      "LOGIN": "今すぐサインイン",
+      "FAILURE-MESSAGE": "パスワードをリセットできません。リセットリンクが不正か期限切れになっています。"
+    }
+  },
+  "IDM": {
+    "GENERAL": {
+      "MAIN-TITLE": "Flowable - ID管理",
+      "NAVIGATION": {
+        "PROFILE": "個人",
+        "USER-MGMT": "ユーザー",
+        "GROUP-MGMT": "グループ",
+        "PRIVILEGE-MGMT": "権限"
+      },
+      "ACTION": {
+        "CANCEL": "キャンセル",
+        "CREATE": "作成",
+        "SAVE": "保存",
+        "CLOSE": "閉じる",
+        "LOGOUT": "サインアウト",
+        "ABOUT": "Flowableについて"
+      },
+      "ERROR": {
+        "GENERIC": "申し訳ありませんが、エラーが発生しました。",
+        "UNKNOWN": "申し訳ありませんが、リクエストされた処理の実行中にエラーが発生しました。",
+        "BAD_REQUEST": "リクエストされた処理の実行中にエラーが発生",
+        "NOT_FOUND": "アクセスしようとしたリソースは存在しません",
+        "UNAUTHORIZED": "リクエストされた処理を実行するためにはサインインが必要です。",
+        "FORBIDDEN": "リクエストされた処理は許可されていません",
+        "INTERNAL_SERVER_ERROR": "申し訳ありませんが、リクエストされた処理の実行中に予期せぬエラーが発生しました。"
+      }
+    },
+    "USER-MGMT": {
+      "TITLE": "条件にあうユーザー",
+      "CREATE-USER": "ユーザの作成",
+      "NAME-SEARCH": "名前で検索",
+      "COMPANY": "会社",
+      "STATUS": "ステータス",
+      "ACCOUNT": "アカウントタイプ",
+      "ACTIONS": "アクションの選択",
+      "CHANGE-STATUS": "ステータスの変更",
+      "CHANGE-ACCOUNT-TYPE": "アカウントタイプの変更",
+      "CHANGE-PASSWORD": "パスワードの変更",
+      "EDIT-USER": "詳細の変更",
+      "DELETE-USERS": "削除",
+      "TOTAL-USERS": "合計",
+      "INACTIVE-USERS": "無効",
+      "ENTERPRISE-USERS": "エンタープライズ",
+      "ACTIVE-USERS": "アクティブ",
+      "DELETED-USERS": "削除済",
+      "ORDER-BY": "表示順",
+      "SHOW-NEXT": "次を表示",
+      "SHOW-PREVIOUS": "前を表示",
+      "NO-MATCHING-USERS": "条件にあうユーザーはいません",
+      "MATCHING-USERS": "{{total | number}}人のユーザが見つかりました。 {{start + 1}}番目から {{start + size}}番目までを表示しています",
+      "ID": "ID",
+      "EMAIL": "メールアドレス",
+      "NAME": "名前",
+      "TENANT": "テナント",
+      "CREATED": "作成",
+      "TYPE": "タイプ",
+      "EXTERNAL-ID": "外部ID",
+      "LAST-SYNC-TIME": "最終更新",
+      "FILTERS": {
+        "STATUS-ANY": "任意のステータス",
+        "STATUS-ACTIVE": "アクティブ",
+        "STATUS-INACTIVE": "無効",
+        "STATUS-PENDING": "保留中",
+        "STATUS-DELETED": "削除済",
+        "TYPE-ANY": "任意のタイプ",
+        "SORT-DATE-NEWEST": "作成日、最新",
+        "SORT-DATE-OLDEST": "作成日、最古",
+        "SORT-EMAIL-A": "メールアドレス、A-Z",
+        "SORT-EMAIL-Z": "メールアドレス、Z-A",
+        "SORT-ID-A": "ユーザーID、A-Z",
+        "SORT-ID-Z": "ユーザーID 降順"
+      },
+      "POPUP": {
+        "CREATE-TITLE": "ユーザの作成",
+        "EDIT-TITLE": "詳細情報の編集",
+        "CREATE-ID": "ユーザーID",
+        "CREATE-EMAIL": "メールアドレス",
+        "CREATE-INVALID-EMAIL": "不正",
+        "CREATE-PASSWORD": "パスワード",
+        "CREATE-FIRSTNAME": "名",
+        "CREATE-LASTNAME": "姓",
+        "CREATE-TENANT": "テナント",
+        "CREATE-COMPANY": "会社",
+        "CREATE-STATUS": "ステータス",
+        "CREATE-TYPE": "タイプ",
+        "BULK-UPDATE-TITLE": "ユーザーの一括更新",
+        "BULK-UPDATE-NEW-STATUS": "新ステータス:",
+        "BULK-UPDATE-NEW-TYPE": "新アカウントタイプ:",
+        "BULK-UPDATE-EMAIL-NOTIFICATIONS": "ステータス変更の際に通知メールを送信",
+        "BULK-UPDATE-STATUS-USERS": "これら{{length}}人のユーザーのステータスを更新しようとしています。",
+        "BULK-UPDATE-TYPE-USERS": "これら{{length}}人のユーザーのアカウントタイプを更新しようとしています。",
+        "BULK-UPDATE-CANCEL": "キャンセルして閉じる",
+        "BULK-UPDATE-CONFIRM": "ユーザの更新",
+        "BULK-UPDATE-PASSWORD-TITLE": "パスワードの変更",
+        "BULK-UPDATE-PASSWORD": "パスワード",
+        "BULK-UPDATE-PASSWORD-REPEAT": "パスワードの再確認",
+        "BULK-UPDATE-PASSWORD-CONFIRM": "変更"
+      }
+    },
+    "FUNCTIONAL-GROUP-MGMT": {
+      "CREATE": "グループの作成",
+      "NO-GROUPS": "グループがありません",
+      "NO-SELECTION": "リストからグループを選択",
+      "SYNC-DETAILS": "同期の詳細",
+      "EXTERNAL-ID": "外部ID:",
+      "LAST-SYNC-TIME": "最終更新:",
+      "MEMBERS": "グループメンバー",
+      "SUBGROUPS": "サブグループ",
+      "NO-MEMBERS": "ユーザーが見つかりません",
+      "ADD-USER": "ユーザの追加",
+      "ADD-SUBGROUP": "サブグループの追加",
+      "NO-SUBGROUPS": "サブグループが見つかりません",
+      "USER-ADDED": "ユーザーがグループに追加されました",
+      "INACTIVE": "無効",
+      "INACTIVE-DESCRIPTION": "このグループは無効化されています。ユーザーはこのグループに割当されているタスクを完了できますが新しいプロセス定義にこのグループを使うことはできません。",
+      "ADD-POPOVER-TITLE": "ユーザーを選択",
+      "POPUP": {
+        "CREATE-TITLE": "グループの作成",
+        "CREATE-ID": "グループID",
+        "CREATE-NAME": "名前",
+        "DELETE-TITLE": "グループの削除",
+        "DELETE-DESCRIPTION": "グループを削除しますか？",
+        "DELETE-CONFIRM": "確認",
+        "DEACTIVATE-TITLE": "グループを無効化",
+        "DEACTIVATE-DESCRIPTION": "グループを削除しますか？サブグループも同時に削除されます。グループはプロセスのタスクが完了できるように、まず無効化されます。削除ボタンをクリックすることで完全に削除されます。",
+        "DELETE-MEMBER-TITLE": "グループメンバーの削除",
+        "DELETE-MEMBER-DESCRIPTION": "グループからこのユーザを削除しますか？",
+        "ADD-MEMBER-TITLE": "ユーザの追加",
+        "ADD-MEMBER-NO-USERS": "ユーザーが見つかりません",
+        "ADD-MEMBER-CONFIRM": "追加（{{selectedUsers.length}}）",
+        "ACTIVATE-TITLE": "グループを有効化",
+        "ACTIVATE-DESCRIPTION": "グループを再有効化しますか？これによりタスク割当でもまた利用できるようになります。サブグループはデフォルトでは自動的に有効化されません。",
+        "ACTIVATE-CONFIRM": "有効",
+        "EDIT-TITLE": "グループの編集"
+      }
+    },
+    "PRIVILEGE-MGMT": {
+      "access-idm": "ID管理アプリケーションにアクセス",
+      "access-admin": "管理者アプリケーションにアクセス",
+      "access-modeler": "モデラーアプリケーションにアクセス",
+      "access-task": "ワークフローアプリケーションにアクセス",
+      "access-rest-api": "REST APIにアクセス",
+      "NO-SELECTION": "権限がありません",
+      "USERS": "ユーザー",
+      "GROUPS": "グループ",
+      "NO-USERS": "ユーザーがまだ登録されていません。クリックして追加してください。",
+      "NO-GROUPS": " here to add a groupグループがまだ登録されていません。クリックして追加してください。",
+      "ADD-USER": "ユーザの追加",
+      "ADD-GROUP": "グループの作成",
+      "POPOVER-SELECT-USER-TITLE": "ユーザーを選択",
+      "POPOVER-SELECT-GROUP-TITLE": "グループの選択",
+      "GROUP-ID": "グループID",
+      "GROUP-NAME": "グループ名"
+    },
+    "PROFILE-MGMT": {
+      "CREATED": "登録日",
+      "CHANGE-PASSWORD": "パスワードの変更",
+      "DETAILS": "詳細",
+      "DETAILS-DESCRIPTION": "フィールドをクリックして変更",
+      "FIRST-NAME": "名",
+      "NOTHING-SET": "設定されていません",
+      "LAST-NAME": "姓",
+      "EMAIL": "メールアドレス",
+      "COMPANY": "会社",
+      "GROUPS": "あなたのグループ",
+      "POPUP": {
+        "UPLOAD-PICTURE-TITLE": "写真の変更",
+        "UPLOAD-PICTURE-DESCRIPTION": "コンピュータ内の画像を選択するか下のエリアにドロップしてください",
+        "UPLOAD-PICTURE-CANCEL-UPLOAD": "アップロードのキャンセル",
+        "UPLOAD-PICTURE-DROPZONE": "ロゴ画像ファイルをドロップ",
+        "UPLOAD-PICTURE-NO-DROP": "ご使用のブラウザではドロップ機能はサポートされていません",
+        "UPLOAD-PICTURE-ERROR": "エラー",
+        "CHANGE-PASSWORD-TITLE": "パスワードの変更",
+        "CHANGE-PASSWORD-ORIGINAL": "元のパスワード",
+        "CHANGE-PASSWORD-NEW-PASSWORD": "新パスワード",
+        "CHANGE-PASSWORD-NEW-PASSWORD2": "新しいパスワードの再入力",
+        "CHANGE-PASSWORD-CONFIRM": "確認",
+        "CHANGE-PASSWORD-NOT-MATCHING": "パスワードが一致しません",
+        "CHANGE-PASSWORD-INVALID": "無効なパスワード"
+      }
+    },
+    "USERS": {
+      "TITLE": "ユーザー管理",
+      "ACTION": {
+        "CREATE": "ユーザの作成"
+      }
+    }
+  },
+  "INVOLVE-PEOPLE": {
+    "ACTION-SELECT": "選択",
+    "SEARCH-PLACEHOLDER": "名前で検索",
+    "NO-MATCHING-RESULTS": "検索ボックスをつかってユーザーを検索"
+  }
+}

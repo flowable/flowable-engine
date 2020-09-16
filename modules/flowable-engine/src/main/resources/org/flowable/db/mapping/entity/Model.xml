@@ -9,8 +9,7 @@
   <insert id="insertModel" parameterType="org.flowable.engine.impl.persistence.entity.ModelEntityImpl">
     insert into ${prefix}ACT_RE_MODEL(ID_, REV_, NAME_, KEY_, CATEGORY_, CREATE_TIME_, LAST_UPDATE_TIME_, VERSION_, META_INFO_, DEPLOYMENT_ID_, EDITOR_SOURCE_VALUE_ID_, EDITOR_SOURCE_EXTRA_VALUE_ID_, TENANT_ID_)
     values(#{id, jdbcType=VARCHAR}, 
-           1,
-           #{name, jdbcType=VARCHAR}, 
+           1, #{name, jdbcType=VARCHAR},
            #{key, jdbcType=VARCHAR}, 
            #{category, jdbcType=VARCHAR}, 
            #{createTime, jdbcType=TIMESTAMP},
@@ -28,8 +27,7 @@
     VALUES 
       <foreach collection="list" item="model" index="index" separator=","> 
         (#{model.id, jdbcType=VARCHAR}, 
-         1,
-         #{model.name, jdbcType=VARCHAR}, 
+         1, #{model.name, jdbcType=VARCHAR},
          #{model.key, jdbcType=VARCHAR}, 
          #{model.category, jdbcType=VARCHAR}, 
          #{model.createTime, jdbcType=TIMESTAMP},
@@ -49,8 +47,7 @@
         INTO ${prefix}ACT_RE_MODEL(ID_, REV_, NAME_, KEY_, CATEGORY_, CREATE_TIME_, LAST_UPDATE_TIME_,
         VERSION_, META_INFO_, DEPLOYMENT_ID_, EDITOR_SOURCE_VALUE_ID_, EDITOR_SOURCE_EXTRA_VALUE_ID_, TENANT_ID_) VALUES 
           (#{model.id, jdbcType=VARCHAR}, 
-           1,
-           #{model.name, jdbcType=VARCHAR}, 
+           1, #{model.name, jdbcType=VARCHAR},
            #{model.key, jdbcType=VARCHAR}, 
            #{model.category, jdbcType=VARCHAR}, 
            #{model.createTime, jdbcType=TIMESTAMP},

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.conditional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -35,22 +37,22 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         runtimeService.trigger(execution.getId());
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         runtimeService.setVariable(processInstance.getId(), "myVar", "test");
         
         runtimeService.trigger(execution.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("taskAfterConditionalCatch", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterConditionalCatch");
         
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -64,10 +66,10 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         taskService.complete(task.getId());
         
@@ -82,33 +84,33 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         runtimeService.trigger(execution.getId());
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         runtimeService.setVariable(processInstance.getId(), "myVar", "test");
         
         runtimeService.trigger(execution.getId());
 
-        assertEquals(2, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
         
         runtimeService.trigger(execution.getId());
         
-        assertEquals(3, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
         
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfterConditionalCatch").list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         taskService.complete(task.getId());
         
         assertProcessEnded(processInstance.getId());
@@ -122,10 +124,10 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         taskService.complete(task.getId());
         
@@ -140,35 +142,35 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
 
         // After process start, usertask in subprocess should exist
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("catchConditional").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
         
         runtimeService.trigger(execution.getId());
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         
         runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
 
-        assertEquals(2, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
         
         runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
         
-        assertEquals(3, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
         
         runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test2"));
         
-        assertEquals(3, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
         
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfterConditionalCatch").list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("subprocessTask", task.getName());
+        assertThat(task.getName()).isEqualTo("subprocessTask");
         taskService.complete(task.getId());
         
         assertProcessEnded(processInstance.getId());

@@ -49,34 +49,35 @@ public class DeployCmd implements Command<AppDeployment> {
             if (deployment.getTenantId() == null || AppEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<AppDeployment> deploymentEntities = new AppDeploymentQueryImpl(appEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
-                        .orderByDeploymenTime().desc()
+                        .orderByDeploymentTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
                 
             } else {
-                List<AppDeployment> deploymentList = appEngineConfiguration.getAppRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<AppDeployment> deploymentList = appEngineConfiguration.getAppRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            AppDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (AppDeploymentEntity) existingDeployments.get(0);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                AppDeploymentEntity existingDeployment = (AppDeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
         
         deployment.setDeploymentTime(appEngineConfiguration.getClock().getCurrentTime());
         deployment.setNew(true);
-        CommandContextUtil.getAppDeploymentEntityManager(commandContext).insert(deployment);
+        appEngineConfiguration.getAppDeploymentEntityManager().insert(deployment);
         appEngineConfiguration.getDeploymentManager().deploy(deployment, null);
         return deployment;
     }

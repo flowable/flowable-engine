@@ -12,13 +12,15 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
@@ -31,16 +33,16 @@ public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTest
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionTableResource() throws Exception {
 
-        DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();
+        DmnDecision definition = dmnRepositoryService.createDecisionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, decisionTable.getId()));
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, definition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
-        assertTrue(content.contains("Full Decision"));
+        assertThat(content).isNotNull();
+        assertThat(content.contains("Full Decision")).isTrue();
     }
 
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {

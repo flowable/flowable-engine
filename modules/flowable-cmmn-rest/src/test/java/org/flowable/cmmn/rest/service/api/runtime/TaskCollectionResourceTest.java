@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -21,9 +23,12 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
@@ -33,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
@@ -72,16 +77,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             // Check if task is created with right arguments
             Task task = taskService.createTaskQuery().taskId(createdTaskId).singleResult();
-            assertEquals("New task name", task.getName());
-            assertEquals("New task description", task.getDescription());
-            assertEquals("assignee", task.getAssignee());
-            assertEquals("owner", task.getOwner());
-            assertEquals(20, task.getPriority());
-            assertEquals(DelegationState.RESOLVED, task.getDelegationState());
-            assertEquals(longDateFormat.parse(dueDateString), task.getDueDate());
-            assertEquals(parentTask.getId(), task.getParentTaskId());
-            assertEquals("testKey", task.getFormKey());
-            assertEquals("test", task.getTenantId());
+            assertThat(task.getName()).isEqualTo("New task name");
+            assertThat(task.getDescription()).isEqualTo("New task description");
+            assertThat(task.getAssignee()).isEqualTo("assignee");
+            assertThat(task.getOwner()).isEqualTo("owner");
+            assertThat(task.getPriority()).isEqualTo(20);
+            assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
+            assertThat(task.getDueDate()).isEqualTo(longDateFormat.parse(dueDateString));
+            assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
+            assertThat(task.getFormKey()).isEqualTo("testKey");
+            assertThat(task.getTenantId()).isEqualTo("test");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -113,7 +118,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetTasks() throws Exception {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
         try {
@@ -141,12 +146,15 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             taskService.addUserIdentityLink(adhocTask.getId(), "misspiggy", IdentityLinkType.PARTICIPANT);
 
             cmmnEngineConfiguration.getClock().setCurrentTime(processTaskCreate.getTime());
-            
+
             deployment = repositoryService.createDeployment().addClasspathResource(
-                            "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
-            
+                    "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+
             CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
-                            .businessKey("myBusinessKey").tenantId("myTenant").start();
+                    .businessKey("myBusinessKey").tenantId("myTenant").start();
+            PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).singleResult();
+
             Task caseTask = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             caseTask.setParentTaskId(adhocTask.getId());
             caseTask.setPriority(50);
@@ -238,14 +246,44 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(caseTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales&ignoreAssignee=true";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting&ignoreAssignee";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Case instance filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceId=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
-            
+
             // Case instance with children filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceIdWithChildren=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
-            
+
+            // Plan item instance id filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?planItemInstanceId=" + planItemInstance.getId();
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            // Scope id filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?scopeId=" + caseInstance.getId();
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            // Sub scope id id filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?subScopeId=" + planItemInstance.getId();
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            // Scope type filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?scopeType=" + ScopeTypes.CMMN;
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            // Combination of the three above
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?scopeId=" + caseInstance.getId() + "&subScopeId=" + planItemInstance.getId() + "&scopeType=" + ScopeTypes.CMMN;
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
             // Case instance with children filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceIdWithChildren=notexisting";
             assertResultsPresentInDataResponse(url);
@@ -255,11 +293,13 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // CreatedAfter filtering
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(
+                    inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // CreatedBefore filtering
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getISODateString(inBetweenTaskCreation.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getISODateString(
+                    inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Subtask exclusion
@@ -293,6 +333,27 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionId=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKey=oneHumanTaskCase";
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKey=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLike=" + encode("%TaskCase");
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLike=" + encode("%notExisting");
+            assertEmptyResultsPresentInDataResponse(url);
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%taskcase");
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%notexisting");
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Tenant id filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?tenantId=myTenant";
             assertResultsPresentInDataResponse(url, caseTask.getId());
@@ -300,7 +361,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Category filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
-            
+
         } finally {
             // Clean adhoc-tasks even if test fails
             List<Task> tasks = taskService.createTaskQuery().list();
@@ -309,7 +370,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
                     taskService.deleteTask(task.getId(), true);
                 }
             }
-            
+
             if (deployment != null) {
                 repositoryService.deleteDeployment(deployment.getId(), true);
             }

@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface CompleteTask {
     /** the id of the task that has been completed */
-    public String value();
+    String value();
 }

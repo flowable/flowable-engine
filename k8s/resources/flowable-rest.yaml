@@ -20,12 +20,12 @@ spec:
           envFrom:
             - configMapRef:
                 name: flowable-rest-config
-          # resources:
-          #   requests:
-          #     memory: 400Mi
-          #   limits:
-          #     memory: 600Mi
-          #     cpu: 500m
+          resources:
+            requests:
+              memory: 400Mi
+            limits:
+              memory: 600Mi
+              cpu: 500m
       restartPolicy: Always
 ---
 apiVersion: v1
@@ -46,10 +46,3 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: flowable-rest-config
-data:
-  # SPRING_DATASOURCE_USERNAME: flowable
-  # SPRING_DATASOURCE_PASSWORD: flowable
-  FLOWABLE_REST_APP_ADMIN_USER-ID: rest-admin
-  FLOWABLE_REST_APP_ADMIN_PASSWORD: test
-  FLOWABLE_REST_APP_ADMIN_FIRST-NAME: Rest
-  FLOWABLE_REST_APP_ADMIN_LAST-NAME: Admin

@@ -55,7 +55,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
 
                 finalJob.setJobHandlerConfiguration(finalActivityId);
                 finalJob.setId(null);
-                session.insert(finalJob);
+                session.insert(finalJob, processEngineConfiguration.getJobServiceConfiguration().getIdGenerator());
 
                 session.flush();
                 session.commit();

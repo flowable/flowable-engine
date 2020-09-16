@@ -27,6 +27,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
+    protected String caseDefinitionParentDeploymentId;
     protected String predefinedCaseInstanceId;
     protected String name;
     protected String businessKey;
@@ -61,6 +62,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     @Override
     public CaseInstanceBuilder caseDefinitionKey(String caseDefinitionKey) {
         this.caseDefinitionKey = caseDefinitionKey;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceBuilder caseDefinitionParentDeploymentId(String parentDeploymentId) {
+        this.caseDefinitionParentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -209,6 +216,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         return caseDefinitionKey;
     }
     
+    @Override
+    public String getCaseDefinitionParentDeploymentId() {
+        return caseDefinitionParentDeploymentId;
+    }
+
     @Override
     public String getPredefinedCaseInstanceId() {
         return predefinedCaseInstanceId;

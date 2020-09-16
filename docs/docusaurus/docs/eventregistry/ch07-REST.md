@@ -277,7 +277,7 @@ Paging and order parameters can be added as query-string in the URL (for example
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Event Registry Deployments
 
@@ -951,9 +951,6 @@ The response body is a JSON representation of the org.flowable.eventregistry.mod
     {
        "key": "myEvent",
        "name": "My event",
-       "inboundChannelKeys": [
-          "test-channel"
-       ],
        "correlationParameters": [
           {
             "name": "customerId",

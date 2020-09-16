@@ -104,7 +104,6 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         getEventRepositoryService().createInboundChannelModelBuilder()
             .key("sharedChannel")
             .resourceName("sharedChannel.channel")
-            .deploymentTenantId(TENANT_A)
             .channelAdapter("${testInboundChannelAdapter2}")
             .jsonDeserializer()
             .fixedEventKey("sameKey")
@@ -152,7 +151,6 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
 
     private void deployEventDefinition(ChannelModel channelModel, String key, String tenantId, String ... optionalExtraPayload) {
         EventModelBuilder eventModelBuilder = getEventRepositoryService().createEventModelBuilder()
-            .inboundChannelKey(channelModel.getKey())
             .key(key)
             .resourceName("myEvent.event")
             .correlationParameter("customerId", EventPayloadTypes.STRING)
@@ -232,7 +230,7 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         deployProcessModel("startProcessInstanceTenantA.bpmn20.xml", TENANT_A);
         deployProcessModel("startProcessInstanceTenantB.bpmn20.xml", TENANT_B);
 
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
         assertThat(runtimeService.createEventSubscriptionQuery().tenantId(TENANT_A).list())
             .extracting(EventSubscription::getEventType, EventSubscription::getTenantId)
@@ -246,12 +244,12 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         for (int i = 0; i < 5; i++) {
             ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(i + 1);
-            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
         }
 
         ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("customerA");
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(5L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(5);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1);
 
         waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 6);
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
@@ -265,19 +263,18 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         deployProcessModel("startProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(2L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(2);
 
         waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 3);
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
             .extracting(Task::getName)
             .containsExactly("task tenant A", "task tenant B", "task tenant B");
-
     }
 
     @Test
@@ -286,13 +283,13 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         deployProcessModel("startUniqueProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_B);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1L); // unique instance for same correlation
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1); // unique instance for same correlation
 
         waitForJobExecutorOnCondition(10000L, 100L, () -> taskService.createTaskQuery().count() == 2);
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
@@ -305,22 +302,22 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         // Both the process model and the event definition are part of the default tenant
         deployProcessModel("startProcessInstanceDefaultTenant.bpmn20.xml", null);
 
-        assertThat(runtimeService.createEventSubscriptionQuery().singleResult())
-            .extracting(EventSubscription::getTenantId).isEqualTo(ProcessEngineConfiguration.NO_TENANT_ID);
+        String tenantId = runtimeService.createEventSubscriptionQuery().singleResult().getTenantId();
+        assertThat(tenantId).isNullOrEmpty();
 
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(0L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(0L);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).singleResult();
         assertThat(processInstance.getTenantId()).isEqualTo(TENANT_A);
 
         for (int i = 0; i < 4; i++) {
             ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerB", TENANT_B);
-            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1L);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(i + 1);
         }
     }
@@ -333,21 +330,32 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").fallbackToDefaultTenant().overrideProcessDefinitionTenantId(TENANT_B).start();
 
         // Event subscription should be for specific tenants
-        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getTenantId)
+                .containsOnly(TENANT_A, TENANT_B);
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("no_correlation", TENANT_A);
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("no_correlation", TENANT_B);
-        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_A, TENANT_B);
-        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task with boundary event", "Task with boundary event");
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getTenantId)
+                .containsOnly(TENANT_A, TENANT_B);
+        assertThat(taskService.createTaskQuery().list())
+                .extracting(Task::getName)
+                .containsOnly("Task with boundary event", "Task with boundary event");
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("abc", TENANT_A); // abc = correlation
-        assertThat(runtimeService.createEventSubscriptionQuery().list()).extracting(EventSubscription::getTenantId).containsOnly(TENANT_B);
-        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task with boundary event", "Task tenantA");
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getTenantId)
+                .containsOnly(TENANT_B);
+        assertThat(taskService.createTaskQuery().list())
+                .extracting(Task::getName)
+                .containsOnly("Task with boundary event", "Task tenantA");
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("abc", TENANT_B);
         assertThat(runtimeService.createEventSubscriptionQuery().list()).isEmpty();
-        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName).containsOnly("Task tenantA", "Task tenantB");
-
+        assertThat(taskService.createTaskQuery().list())
+                .extracting(Task::getName)
+                .containsOnly("Task tenantA", "Task tenantB");
     }
 
     @Test
@@ -361,17 +369,17 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
 
         // Triggering through the tenant A channel should only correlate
         ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("ABC");
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isZero();
 
         runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
         ((TestInboundChannelAdapter) tenantAChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("Doesn't correlate");
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isZero();
 
         ((TestInboundChannelAdapter) tenantBChannelModel.getInboundEventChannelAdapter()).triggerEventWithoutTenantId("ABC");
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1);
     }
 
     @Test
@@ -385,21 +393,21 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
 
         // Triggering through the tenant A channel should only correlate
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_A);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isZero();
 
         runtimeService.createProcessInstanceBuilder().processDefinitionKey("process").tenantId(TENANT_A).start();
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("Doesn't correlate", TENANT_A);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isZero();
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_A);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(0L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isZero();
 
         ((TestInboundChannelAdapter) sharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("ABC", TENANT_B);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2L);
-        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1L);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant A").count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().taskName("Task from tenant B").count()).isEqualTo(1);
     }
 
     private static class TestInboundChannelAdapter implements InboundEventChannelAdapter {

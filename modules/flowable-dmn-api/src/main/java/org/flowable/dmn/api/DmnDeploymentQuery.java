@@ -82,13 +82,13 @@ public interface DmnDeploymentQuery extends Query<DmnDeploymentQuery, DmnDeploym
      */
     DmnDeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
 
-    /** Only select deployments with the given decision table key. */
-    DmnDeploymentQuery decisionTableKey(String key);
+    /** Only select deployments with the given decision key. */
+    DmnDeploymentQuery decisionKey(String key);
 
     /**
-     * Only select deployments with a decision table key like the given string.
+     * Only select deployments with a decision key like the given string.
      */
-    DmnDeploymentQuery decisionTableKeyLike(String keyLike);
+    DmnDeploymentQuery decisionKeyLike(String keyLike);
 
     // sorting ////////////////////////////////////////////////////////
 
@@ -105,7 +105,7 @@ public interface DmnDeploymentQuery extends Query<DmnDeploymentQuery, DmnDeploym
     /**
      * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
-    DmnDeploymentQuery orderByDeploymenTime();
+    DmnDeploymentQuery orderByDeploymentTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

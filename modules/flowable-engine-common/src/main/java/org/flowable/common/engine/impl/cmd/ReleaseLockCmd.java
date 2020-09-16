@@ -24,15 +24,16 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 public class ReleaseLockCmd implements Command<Void> {
 
     protected String lockName;
+    protected String engineType;
 
-    public ReleaseLockCmd(String lockName) {
+    public ReleaseLockCmd(String lockName, String engineType) {
         this.lockName = lockName;
+        this.engineType = engineType;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-
-        PropertyEntityManager propertyEntityManager = commandContext.getCurrentEngineConfiguration().getPropertyEntityManager();
+        PropertyEntityManager propertyEntityManager = commandContext.getEngineConfigurations().get(engineType).getPropertyEntityManager();
         PropertyEntity property = propertyEntityManager.findById(lockName);
         if (property != null) {
             propertyEntityManager.delete(property);

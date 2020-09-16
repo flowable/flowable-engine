@@ -70,7 +70,8 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         ThrowEvent throwEvent = (ThrowEvent) baseElement;
         if (throwEvent.isAsynchronous()) {
             propertiesNode.put(PROPERTY_ASYNCHRONOUS, true);
@@ -79,7 +80,8 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         ThrowEvent throwEvent = new ThrowEvent();
         boolean isAsync = getPropertyValueAsBoolean(PROPERTY_ASYNCHRONOUS, elementNode);
         if (isAsync) {

@@ -12,10 +12,11 @@
  */
 package org.flowable.engine.test.bpmn.exclusive;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,13 +32,13 @@ public class ExclusiveTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("exclusive");
         // now there should be 1 non-exclusive job in the database:
         Job job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
-        assertFalse(((JobEntity) job).isExclusive());
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isFalse();
 
         waitForJobExecutorToProcessAllJobs(6000L, 100L);
 
         // all the jobs are done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
     @Test
@@ -47,13 +48,13 @@ public class ExclusiveTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("exclusive");
         // now there should be 1 exclusive job in the database:
         Job job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
-        assertTrue(((JobEntity) job).isExclusive());
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isTrue();
 
         waitForJobExecutorToProcessAllJobs(6000L, 100L);
 
         // all the jobs are done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
     @Test
@@ -62,12 +63,12 @@ public class ExclusiveTaskTest extends PluggableFlowableTestCase {
         // start process
         runtimeService.startProcessInstanceByKey("exclusive");
         // now there should be 3 exclusive jobs in the database:
-        assertEquals(3, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(3);
 
         waitForJobExecutorToProcessAllJobs(20000L, 400L);
 
         // all the jobs are done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
 }
