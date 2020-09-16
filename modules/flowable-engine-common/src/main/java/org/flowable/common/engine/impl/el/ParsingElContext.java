@@ -12,7 +12,7 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.util.List;
+import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -27,16 +27,15 @@ import org.flowable.common.engine.impl.javax.el.VariableMapper;
  * Currently this implementation does nothing, but a non-null implementation of the {@link ELContext} interface is required by the {@link ExpressionFactory} when create value- and methodexpressions.
  * 
  * @see ExpressionManager#createExpression(String)
- * @see ExpressionManager#createMethodExpression(String)
- * 
+ *
  * @author Joram Barrez
  */
 public class ParsingElContext extends ELContext {
 
-    protected List<FlowableFunctionDelegate> functionDelegates;
+    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver;
 
-    public ParsingElContext(List<FlowableFunctionDelegate> functionDelegates) {
-        this.functionDelegates = functionDelegates;
+    public ParsingElContext(BiFunction<String, String, FlowableFunctionDelegate> functionResolver) {
+        this.functionResolver = functionResolver;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class ParsingElContext extends ELContext {
 
     @Override
     public FunctionMapper getFunctionMapper() {
-        return new FlowableFunctionMapper(functionDelegates);
+        return new FlowableFunctionMapper(functionResolver);
     }
 
     @Override

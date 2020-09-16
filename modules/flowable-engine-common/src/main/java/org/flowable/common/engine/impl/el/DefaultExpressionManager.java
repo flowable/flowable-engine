@@ -13,8 +13,10 @@
 package org.flowable.common.engine.impl.el;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
@@ -44,6 +46,7 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
+    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver;
     protected List<FlowableAstFunctionCreator> astFunctionCreators;
 
     protected ELContext parsingElContext;
@@ -72,9 +75,9 @@ public class DefaultExpressionManager implements ExpressionManager {
         }
         
         if (parsingElContext == null) {
-            this.parsingElContext = new ParsingElContext(functionDelegates);
+            this.parsingElContext = new ParsingElContext(functionResolver);
         } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
-            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionDelegates(functionDelegates);
+            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionResolver(functionResolver);
         }
 
         String expressionText = text.trim();
@@ -104,7 +107,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
         ELResolver elResolver = createElResolver(variableContainer);
-        return new FlowableElContext(elResolver, functionDelegates);
+        return new FlowableElContext(elResolver, functionResolver);
     }
     
     protected ELResolver createElResolver(VariableContainer variableContainer) {
@@ -162,6 +165,29 @@ public class DefaultExpressionManager implements ExpressionManager {
     @Override
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
+
+        updateFunctionResolver();
+    }
+
+    protected void updateFunctionResolver() {
+        if (this.functionDelegates != null) {
+            Map<String, FlowableFunctionDelegate> functionDelegateMap = new LinkedHashMap<>();
+            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
+                for (String prefix : functionDelegate.prefixes()) {
+                    for (String localName : functionDelegate.localNames()) {
+                        functionDelegateMap.put(prefix + ":" + localName, functionDelegate);
+                    }
+
+                }
+
+            }
+
+            this.functionResolver = (prefix, localName) -> functionDelegateMap.get(prefix + ":" + localName);
+
+        } else {
+            this.functionResolver = null;
+
+        }
     }
     
     @Override
