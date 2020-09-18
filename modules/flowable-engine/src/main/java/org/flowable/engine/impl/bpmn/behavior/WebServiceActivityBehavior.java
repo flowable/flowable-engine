@@ -264,7 +264,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected void fillImporterInfo(Import theImport, String sourceSystemId) {
         if (!xmlImporterMap.containsKey(theImport.getNamespace())) {
 
-            if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
+            if ("http://schemas.xmlsoap.org/wsdl/".equals(theImport.getImportType())) {
                 try {
                     ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration();
                     XMLImporter importerInstance = processEngineConfig.getWsdlImporterFactory()
