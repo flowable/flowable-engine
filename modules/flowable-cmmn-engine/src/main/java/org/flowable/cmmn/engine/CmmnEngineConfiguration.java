@@ -1991,7 +1991,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
                     asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
                 }
-                asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
                 
             } else {
                 // In case an async history executor was injected, only the job handlers are set. 
@@ -2014,6 +2013,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
+            
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
     }
 
