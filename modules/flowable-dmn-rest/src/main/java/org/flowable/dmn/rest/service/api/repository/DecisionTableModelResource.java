@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Yvo Swillens
  *
- * @deprecated use {@link DecisionTableModelResource} instead.
+ * @deprecated use {@link DecisionModelResource} instead.
  */
 @Deprecated
 @RestController
