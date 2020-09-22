@@ -17,12 +17,10 @@ import org.flowable.engine.ProcessEngine;
 /**
  * Represents a strategy for building or looking up a {@link ProcessEngine}.
  * 
- * Deprecated since 5.9. Use {@link org.flowable.cdi.spi.ProcessEngineLookup}
- * 
- * 
  * @author Daniel Meyer
  * @see org.flowable.cdi.spi.ProcessEngineLookup
- * 
+ *
+ * @deprecated since 5.9. Use {@link org.flowable.cdi.spi.ProcessEngineLookup}
  */
 @Deprecated
 public interface ProcessEngineLookup extends org.flowable.cdi.spi.ProcessEngineLookup {

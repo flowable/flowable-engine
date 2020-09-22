@@ -52,6 +52,9 @@ public class CaseDefinitionDecisionCollectionResource extends BaseCaseDefinition
         return restResponseFactory.createDecisionResponseList(decisions, caseDefinitionId);
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     @ApiOperation(value = "List decision tables for a case definition", nickname = "listCaseDefinitionDecisionTables", tags = { "Case Definitions" })
     @ApiResponses(value = {

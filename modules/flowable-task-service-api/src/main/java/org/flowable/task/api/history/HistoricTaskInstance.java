@@ -35,7 +35,7 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
      * Time when the task created.
      *
      * @deprecated use {@link #getCreateTime()} instead
-     **/
+     */
     @Deprecated
     Date getStartTime();
 

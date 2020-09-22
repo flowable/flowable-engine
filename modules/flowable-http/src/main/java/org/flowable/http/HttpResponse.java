@@ -16,6 +16,8 @@ import org.flowable.http.common.api.HttpHeaders;
 
 /**
  * @author Harsha Teja Kanna.
+ *
+ * @deprecated
  */
 @Deprecated
 public class HttpResponse extends org.flowable.http.common.api.HttpResponse {
