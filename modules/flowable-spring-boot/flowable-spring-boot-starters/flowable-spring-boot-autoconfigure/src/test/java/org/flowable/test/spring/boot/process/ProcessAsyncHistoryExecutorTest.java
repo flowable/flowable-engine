@@ -72,6 +72,33 @@ public class ProcessAsyncHistoryExecutorTest {
 
             assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled()).isTrue();
 
+            assertThat(processAsyncExecutor.isAutoActivate()).isTrue();
+            assertThat(processAsyncHistoryExecutor.isAutoActivate()).isTrue();
+
+        }));
+    }
+
+    @Test
+    public void asyncHistoryExecutorBeanAvailableAndNotAutoActivate() {
+        contextRunner.withPropertyValues(
+            "flowable.process.async-history.enable=true",
+            "flowable.async-history-executor-activate=false").run((context -> {
+            assertThat(context)
+                .hasSingleBean(ProcessEngine.class)
+                .hasBean("taskExecutor")
+                .hasBean("processAsyncExecutor")
+                .hasBean("asyncHistoryExecutor");
+
+            AsyncExecutor processAsyncExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncExecutor();
+            assertThat(processAsyncExecutor).isNotNull();
+            AsyncExecutor processAsyncHistoryExecutor = context.getBean(ProcessEngine.class).getProcessEngineConfiguration().getAsyncHistoryExecutor();
+            assertThat(processAsyncHistoryExecutor).isNotNull();
+
+            assertThat(((ProcessEngineConfigurationImpl) context.getBean(ProcessEngine.class).getProcessEngineConfiguration()).isAsyncHistoryEnabled()).isTrue();
+
+            assertThat(processAsyncExecutor.isAutoActivate()).isTrue();
+            assertThat(processAsyncHistoryExecutor.isAutoActivate()).isFalse();
+
         }));
     }
 
