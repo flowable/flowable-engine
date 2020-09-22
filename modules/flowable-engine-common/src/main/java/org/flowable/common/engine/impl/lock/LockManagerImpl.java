@@ -52,9 +52,9 @@ public class LockManagerImpl implements LockManager {
 
     @Override
     public void waitForLock(Duration waitTime) {
-        long timeToGiveUp = new Date().getTime() + waitTime.toMillis();
+        long timeToGiveUp = System.currentTimeMillis()+ waitTime.toMillis();
         boolean locked = false;
-        while (!locked && (new Date().getTime() < timeToGiveUp)) {
+        while (!locked && (System.currentTimeMillis() < timeToGiveUp)) {
             locked = acquireLock();
             if (!locked) {
                 try {

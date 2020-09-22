@@ -121,7 +121,7 @@ public class ActivityInstanceEntityManagerImpl
     @Override
     public void recordSequenceFlowTaken(ExecutionEntity executionEntity) {
         ActivityInstanceEntity activityInstance = createActivityInstanceEntity(executionEntity);
-        activityInstance.setDurationInMillis(0l);
+        activityInstance.setDurationInMillis(0L);
         activityInstance.setEndTime(activityInstance.getStartTime());
         getHistoryManager().createHistoricActivityInstance(activityInstance);
     }
