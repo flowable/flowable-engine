@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <process id="ProcessDefinitionAssert-hasActiveInstances" name="Test Process" isExecutable="true">
+        <startEvent id="StartEvent_1">
+            <outgoing>SequenceFlow_1</outgoing>
+        </startEvent>
+        <userTask id="UserTask_1">
+            <incoming>SequenceFlow_1</incoming>
+            <outgoing>SequenceFlow_8</outgoing>
+        </userTask>
+        <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="UserTask_1"/>
+        <endEvent id="EndEvent_1">
+            <incoming>SequenceFlow_8</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_8" name="" sourceRef="UserTask_1" targetRef="EndEvent_1"/>
+    </process>
+</definitions>

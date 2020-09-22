@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <process id="ProcessInstanceAssert-hasPassedInOrder" name="Test Process" isExecutable="true">
+        <startEvent id="StartEvent_1">
+            <outgoing>SequenceFlow_1</outgoing>
+        </startEvent>
+        <userTask id="UserTask_1">
+            <incoming>SequenceFlow_1</incoming>
+            <outgoing>SequenceFlow_2</outgoing>
+        </userTask>
+        <parallelGateway id="ParallelGateway_1">
+            <incoming>SequenceFlow_2</incoming>
+            <outgoing>SequenceFlow_3</outgoing>
+            <outgoing>SequenceFlow_6</outgoing>
+        </parallelGateway>
+        <userTask id="UserTask_2">
+            <incoming>SequenceFlow_3</incoming>
+            <outgoing>SequenceFlow_4</outgoing>
+        </userTask>
+        <userTask id="UserTask_3">
+            <incoming>SequenceFlow_6</incoming>
+            <outgoing>SequenceFlow_7</outgoing>
+        </userTask>
+        <parallelGateway id="ParallelGateway_2">
+            <incoming>SequenceFlow_5</incoming>
+            <incoming>SequenceFlow_7</incoming>
+            <outgoing>SequenceFlow_8</outgoing>
+        </parallelGateway>
+        <userTask id="UserTask_4">
+            <incoming>SequenceFlow_4</incoming>
+            <outgoing>SequenceFlow_5</outgoing>
+        </userTask>
+        <userTask id="UserTask_5">
+            <incoming>SequenceFlow_8</incoming>
+            <outgoing>SequenceFlow_9</outgoing>
+        </userTask>
+        <endEvent id="EndEvent_1">
+            <incoming>SequenceFlow_9</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="UserTask_1" />
+        <sequenceFlow id="SequenceFlow_2" sourceRef="UserTask_1" targetRef="ParallelGateway_1" />
+        <sequenceFlow id="SequenceFlow_3" sourceRef="ParallelGateway_1" targetRef="UserTask_2" />
+        <sequenceFlow id="SequenceFlow_4" sourceRef="UserTask_2" targetRef="UserTask_4" />
+        <sequenceFlow id="SequenceFlow_5" sourceRef="UserTask_4" targetRef="ParallelGateway_2" />
+        <sequenceFlow id="SequenceFlow_6" sourceRef="ParallelGateway_1" targetRef="UserTask_3" />
+        <sequenceFlow id="SequenceFlow_7" sourceRef="UserTask_3" targetRef="ParallelGateway_2" />
+        <sequenceFlow id="SequenceFlow_8" sourceRef="ParallelGateway_2" targetRef="UserTask_5" />
+        <sequenceFlow id="SequenceFlow_9" sourceRef="UserTask_5" targetRef="EndEvent_1" />
+    </process>
+</definitions>

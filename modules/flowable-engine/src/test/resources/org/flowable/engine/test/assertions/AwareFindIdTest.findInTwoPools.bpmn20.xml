@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <collaboration id="Collaboration_0pdhadp">
+        <participant id="Participant_0z5jr04" name="super process" processRef="SuperProcess" />
+        <participant id="Participant_0we284w" name="sub process" processRef="SubProcess" />
+    </collaboration>
+    <process id="SuperProcess" name="super process name" isExecutable="true">
+        <startEvent id="SuperStarted_TestID" name="Super started">
+            <outgoing>SequenceFlow_0l6taa5</outgoing>
+        </startEvent>
+        <exclusiveGateway id="ExclusiveGateway_02te4rj" name="Gateway one">
+            <incoming>SequenceFlow_0e2n1kq</incoming>
+            <outgoing>SequenceFlow_1i6ai36</outgoing>
+            <outgoing>SequenceFlow_0r1geyp</outgoing>
+        </exclusiveGateway>
+        <task id="TaskTwo_TestID" name="Task two">
+            <incoming>SequenceFlow_1i6ai36</incoming>
+            <outgoing>SequenceFlow_0mc26ks</outgoing>
+        </task>
+        <task id="Task_0sldpux" name="Task three">
+            <incoming>SequenceFlow_0r1geyp</incoming>
+            <outgoing>SequenceFlow_0bns2mx</outgoing>
+        </task>
+        <endEvent id="EndEvent_1ajkyv2" name="End 1">
+            <incoming>SequenceFlow_0mc26ks</incoming>
+        </endEvent>
+        <endEvent id="EndEvent_19ph0dt" name="End 2">
+            <incoming>SequenceFlow_0bns2mx</incoming>
+        </endEvent>
+        <callActivity id="CallActivityOne_TestID" name="Call activity one" calledElement="SubProcess">
+            <incoming>SequenceFlow_0l6taa5</incoming>
+            <outgoing>SequenceFlow_0e2n1kq</outgoing>
+        </callActivity>
+        <sequenceFlow id="SequenceFlow_0l6taa5" sourceRef="SuperStarted_TestID" targetRef="CallActivityOne_TestID" />
+        <sequenceFlow id="SequenceFlow_0e2n1kq" sourceRef="CallActivityOne_TestID" targetRef="ExclusiveGateway_02te4rj" />
+        <sequenceFlow id="SequenceFlow_1i6ai36" name="Seq fl. 1" sourceRef="ExclusiveGateway_02te4rj" targetRef="TaskTwo_TestID">
+            <conditionExpression>${continue}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="SequenceFlow_0r1geyp" name="Seq.fl. 2" sourceRef="ExclusiveGateway_02te4rj" targetRef="Task_0sldpux">
+            <conditionExpression>${not continue}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="SequenceFlow_0mc26ks" sourceRef="TaskTwo_TestID" targetRef="EndEvent_1ajkyv2" />
+        <sequenceFlow id="SequenceFlow_0bns2mx" sourceRef="Task_0sldpux" targetRef="EndEvent_19ph0dt" />
+    </process>
+    <process id="SubProcess" name="sub process name" isExecutable="true">
+        <startEvent id="Proc2Started_TestID" name="Proc 2 started">
+            <outgoing>SequenceFlow_1hwivvd</outgoing>
+        </startEvent>
+        <task id="SubProcessTask_TestID" name="Subprocess task">
+            <incoming>SequenceFlow_1hwivvd</incoming>
+            <outgoing>SequenceFlow_1u7btoi</outgoing>
+        </task>
+        <endEvent id="EndEvent_1t08w1h" name="Proc 2 ended">
+            <incoming>SequenceFlow_1u7btoi</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_1hwivvd" sourceRef="Proc2Started_TestID" targetRef="SubProcessTask_TestID" />
+        <sequenceFlow id="SequenceFlow_1u7btoi" sourceRef="SubProcessTask_TestID" targetRef="EndEvent_1t08w1h" />
+    </process>
+</definitions>

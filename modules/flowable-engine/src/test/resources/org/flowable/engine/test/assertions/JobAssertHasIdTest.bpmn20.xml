@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <process id="JobAssert-hasId" name="Test Process" isExecutable="true">
+        <startEvent id="StartEvent_1">
+            <outgoing>SequenceFlow_2</outgoing>
+        </startEvent>
+        <sequenceFlow id="SequenceFlow_2" name="" sourceRef="StartEvent_1" targetRef="UserTask_1"/>
+        <sequenceFlow id="SequenceFlow_3" name="" sourceRef="UserTask_1" targetRef="EndEvent_1"/>
+        <userTask id="UserTask_1">
+            <incoming>SequenceFlow_2</incoming>
+            <outgoing>SequenceFlow_3</outgoing>
+        </userTask>
+        <endEvent id="EndEvent_2">
+            <incoming>SequenceFlow_1</incoming>
+        </endEvent>
+        <endEvent id="EndEvent_1">
+            <incoming>SequenceFlow_3</incoming>
+        </endEvent>
+        <boundaryEvent id="BoundaryEvent_1" name="" attachedToRef="UserTask_1">
+            <outgoing>SequenceFlow_4</outgoing>
+            <timerEventDefinition id="TimerEventDefinition_1">
+                <timeDate xsi:type="tFormalExpression">1970-01-01T00:00:01</timeDate>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="SequenceFlow_4" name="" sourceRef="BoundaryEvent_1" targetRef="ServiceTask_1"/>
+        <serviceTask id="ServiceTask_1" flowable:expression="#{someExpression}">
+            <incoming>SequenceFlow_4</incoming>
+            <outgoing>SequenceFlow_1</outgoing>
+        </serviceTask>
+        <sequenceFlow id="SequenceFlow_1" name="" sourceRef="ServiceTask_1" targetRef="EndEvent_2"/>
+    </process>
+</definitions>

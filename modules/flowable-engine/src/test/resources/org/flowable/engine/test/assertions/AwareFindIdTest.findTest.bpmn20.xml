@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <process id="Process_TestID" name="Find tasks process" isExecutable="true">
+        <startEvent id="Start_TestID" name="Start">
+            <outgoing>SequenceFlow_07jrjb2</outgoing>
+        </startEvent>
+        <task id="PlainTask_TestID" name="Plain task">
+            <incoming>SequenceFlow_07jrjb2</incoming>
+            <outgoing>SequenceFlow_1y4dmex</outgoing>
+        </task>
+        <sequenceFlow id="SequenceFlow_07jrjb2" sourceRef="Start_TestID" targetRef="PlainTask_TestID" />
+        <sequenceFlow id="SequenceFlow_1y4dmex" sourceRef="PlainTask_TestID" targetRef="UserTask_TestID" />
+        <userTask id="UserTask_TestID" name="User task">
+            <incoming>SequenceFlow_1y4dmex</incoming>
+            <outgoing>SequenceFlow_1j3bp7n</outgoing>
+        </userTask>
+        <sequenceFlow id="SequenceFlow_1j3bp7n" sourceRef="UserTask_TestID" targetRef="ReceiveTask_TestID" />
+        <receiveTask id="ReceiveTask_TestID" name="Receive task">
+            <incoming>SequenceFlow_1j3bp7n</incoming>
+            <outgoing>SequenceFlow_1dr1mbo</outgoing>
+        </receiveTask>
+        <boundaryEvent id="n2Days_TestID" name="2 days" attachedToRef="ReceiveTask_TestID">
+            <timerEventDefinition>
+                <timeDuration>P2D</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <endEvent id="End_TestID" name="End">
+            <incoming>SequenceFlow_0dntn20</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_1dr1mbo" sourceRef="ReceiveTask_TestID" targetRef="Continue_TestID" />
+        <exclusiveGateway id="Continue_TestID" name="Continue?" default="SequenceFlow_1pv5pmd">
+            <incoming>SequenceFlow_1dr1mbo</incoming>
+            <outgoing>SequenceFlow_0dntn20</outgoing>
+            <outgoing>SequenceFlow_1pv5pmd</outgoing>
+        </exclusiveGateway>
+        <sequenceFlow id="SequenceFlow_0dntn20" name="yes" sourceRef="Continue_TestID" targetRef="End_TestID">
+            <conditionExpression>${continue == true}</conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="SequenceFlow_1pv5pmd" name="no" sourceRef="Continue_TestID" targetRef="MessageEnd_TestID" />
+        <endEvent id="MessageEnd_TestID" name="Message End">
+            <incoming>SequenceFlow_1pv5pmd</incoming>
+            <messageEventDefinition messageRef="Message_08oz414" />
+        </endEvent>
+    </process>
+    <message id="Message_08oz414" name="Message_2k32ek0" />
+</definitions>

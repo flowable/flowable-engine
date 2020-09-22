@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+    <process id="TaskAssert-hasCandidateGroup" name="Test Process" isExecutable="true">
+        <startEvent id="StartEvent_1">
+            <outgoing>SequenceFlow_1</outgoing>
+        </startEvent>
+        <userTask id="UserTask_1" flowable:candidateGroups="candidateGroup">
+            <incoming>SequenceFlow_1</incoming>
+            <outgoing>SequenceFlow_3</outgoing>
+        </userTask>
+        <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="UserTask_1"/>
+        <endEvent id="EndEvent_1">
+            <incoming>SequenceFlow_4</incoming>
+        </endEvent>
+        <userTask id="UserTask_2">
+            <incoming>SequenceFlow_3</incoming>
+            <outgoing>SequenceFlow_4</outgoing>
+        </userTask>
+        <sequenceFlow id="SequenceFlow_3" name="" sourceRef="UserTask_1" targetRef="UserTask_2"/>
+        <sequenceFlow id="SequenceFlow_4" name="" sourceRef="UserTask_2" targetRef="EndEvent_1"/>
+    </process>
+</definitions>

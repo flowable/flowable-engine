@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+    
+    <process id="JobAssert-hasActivityId" name="Test Process" isExecutable="true">
+        <serviceTask id="ServiceTask_1" flowable:expression="#{serviceTask_1}" flowable:async="true">
+            <incoming>SequenceFlow_5</incoming>
+            <outgoing>SequenceFlow_6</outgoing>
+        </serviceTask>
+        <sequenceFlow id="SequenceFlow_6" name="" sourceRef="ServiceTask_1" targetRef="ParallelGateway_1"/>
+        <startEvent id="StartEvent_1">
+            <outgoing>SequenceFlow_5</outgoing>
+        </startEvent>
+        <sequenceFlow id="SequenceFlow_5" name="" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>
+        <parallelGateway id="ParallelGateway_1">
+            <incoming>SequenceFlow_6</incoming>
+            <outgoing>SequenceFlow_7</outgoing>
+            <outgoing>SequenceFlow_12</outgoing>
+        </parallelGateway>
+        <sequenceFlow id="SequenceFlow_7" name="" sourceRef="ParallelGateway_1" targetRef="ServiceTask_2"/>
+        <sequenceFlow id="SequenceFlow_12" name="" sourceRef="ParallelGateway_1" targetRef="ServiceTask_3"/>
+        <serviceTask id="ServiceTask_2" flowable:expression="#{serviceTask_2}" flowable:async="true">
+            <incoming>SequenceFlow_7</incoming>
+            <outgoing>SequenceFlow_1</outgoing>
+        </serviceTask>
+        <sequenceFlow id="SequenceFlow_1" name="" sourceRef="ServiceTask_2" targetRef="ExclusiveGateway_1"/>
+        <serviceTask id="ServiceTask_3" flowable:expression="#{serviceTask_3}" flowable:async="true">
+            <incoming>SequenceFlow_12</incoming>
+            <outgoing>SequenceFlow_2</outgoing>
+        </serviceTask>
+        <sequenceFlow id="SequenceFlow_2" name="" sourceRef="ServiceTask_3" targetRef="ExclusiveGateway_1"/>
+        <exclusiveGateway id="ExclusiveGateway_1">
+            <incoming>SequenceFlow_1</incoming>
+            <incoming>SequenceFlow_2</incoming>
+            <outgoing>SequenceFlow_3</outgoing>
+        </exclusiveGateway>
+        <sequenceFlow id="SequenceFlow_3" name="" sourceRef="ExclusiveGateway_1" targetRef="ServiceTask_4"/>
+        <serviceTask id="ServiceTask_4" flowable:async="true" flowable:expression="#{serviceTask_4}">
+            <incoming>SequenceFlow_3</incoming>
+            <outgoing>SequenceFlow_4</outgoing>
+        </serviceTask>
+        <sequenceFlow id="SequenceFlow_4" name="" sourceRef="ServiceTask_4" targetRef="EndEvent_1"/>
+        <endEvent id="EndEvent_1">
+            <incoming>SequenceFlow_4</incoming>
+        </endEvent>
+    </process>
+</definitions>

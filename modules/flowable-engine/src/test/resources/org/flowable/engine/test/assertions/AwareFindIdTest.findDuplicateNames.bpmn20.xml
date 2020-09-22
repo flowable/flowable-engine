@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+
+<process id="Process_06lwmx5" name="Duplicate task name process" isExecutable="true">
+        <startEvent id="Start_TestID" name="Start">
+            <outgoing>SequenceFlow_0f8kc5l</outgoing>
+        </startEvent>
+        <task id="TaskOne1_TestID" name="Task one">
+            <incoming>SequenceFlow_0f8kc5l</incoming>
+            <outgoing>SequenceFlow_0m4ic04</outgoing>
+        </task>
+        <sequenceFlow id="SequenceFlow_0f8kc5l" sourceRef="Start_TestID" targetRef="TaskOne1_TestID" />
+        <task id="TaskOne2_TestID" name="Task one">
+            <incoming>SequenceFlow_0m4ic04</incoming>
+            <outgoing>SequenceFlow_0ns18ll</outgoing>
+        </task>
+        <sequenceFlow id="SequenceFlow_0m4ic04" sourceRef="TaskOne1_TestID" targetRef="TaskOne2_TestID" />
+        <endEvent id="End_TestID" name="End">
+            <incoming>SequenceFlow_09ia13i</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_0ns18ll" sourceRef="TaskOne2_TestID" targetRef="EventOne1_TestID" />
+        <sequenceFlow id="SequenceFlow_1vicmuo" sourceRef="EventOne1_TestID" targetRef="EventOne2_TestID" />
+        <intermediateCatchEvent id="EventOne1_TestID" name="Event one">
+            <incoming>SequenceFlow_0ns18ll</incoming>
+            <outgoing>SequenceFlow_1vicmuo</outgoing>
+            <messageEventDefinition messageRef="Message_1vpivs3" />
+        </intermediateCatchEvent>
+        <sequenceFlow id="SequenceFlow_0x64sp9" sourceRef="EventOne2_TestID" targetRef="GatewayOne1_TestID" />
+        <intermediateCatchEvent id="EventOne2_TestID" name="Event one">
+            <incoming>SequenceFlow_1vicmuo</incoming>
+            <outgoing>SequenceFlow_0x64sp9</outgoing>
+            <timerEventDefinition>
+                <timeDuration>PT1M</timeDuration>
+            </timerEventDefinition>
+        </intermediateCatchEvent>
+        <sequenceFlow id="SequenceFlow_077023l" sourceRef="GatewayOne1_TestID" targetRef="GatewayOne2_TestID" />
+        <parallelGateway id="GatewayOne1_TestID" name="Gateway one">
+            <incoming>SequenceFlow_0x64sp9</incoming>
+            <outgoing>SequenceFlow_077023l</outgoing>
+        </parallelGateway>
+        <exclusiveGateway id="GatewayOne2_TestID" name="Gateway one">
+            <incoming>SequenceFlow_077023l</incoming>
+            <outgoing>SequenceFlow_09ia13i</outgoing>
+        </exclusiveGateway>
+        <sequenceFlow id="SequenceFlow_09ia13i" sourceRef="GatewayOne2_TestID" targetRef="End_TestID" />
+    </process>
+    <message id="Message_1vpivs3" name="Message_2cp1lkj" />
+</definitions>

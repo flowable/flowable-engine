@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/bpmn20">
+    
+    <collaboration id="Collaboration_0hl9h9z">
+        <participant id="Participant_16sv4jx" processRef="Process_1kkpg6o" />
+        <participant id="Participant_1gx6fkr" processRef="Process_1p8c2ba" />
+    </collaboration>
+    <process id="Process_1kkpg6o" isExecutable="true">
+        <startEvent id="StartOne_TestID" name="Start one">
+            <outgoing>SequenceFlow_1v6d66k</outgoing>
+        </startEvent>
+        <task id="Task_1wdh2im" name="Element one">
+            <incoming>SequenceFlow_1v6d66k</incoming>
+            <outgoing>SequenceFlow_1bbt77m</outgoing>
+        </task>
+        <exclusiveGateway id="ExclusiveGateway_13peuep" name="Element one">
+            <incoming>SequenceFlow_1bbt77m</incoming>
+            <outgoing>SequenceFlow_01ov2vx</outgoing>
+        </exclusiveGateway>
+        <endEvent id="EndEvent_1er7hbr" name="End one">
+            <incoming>SequenceFlow_01ov2vx</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_1v6d66k" sourceRef="StartOne_TestID" targetRef="Task_1wdh2im" />
+        <sequenceFlow id="SequenceFlow_1bbt77m" sourceRef="Task_1wdh2im" targetRef="ExclusiveGateway_13peuep" />
+        <sequenceFlow id="SequenceFlow_01ov2vx" sourceRef="ExclusiveGateway_13peuep" targetRef="EndEvent_1er7hbr" />
+    </process>
+    <process id="Process_1p8c2ba" isExecutable="true">
+        <startEvent id="StartTwo_TestID" name="Start two">
+            <outgoing>SequenceFlow_1e4kusi</outgoing>
+        </startEvent>
+        <task id="Task_10rvmlr" name="Element two">
+            <incoming>SequenceFlow_1e4kusi</incoming>
+            <outgoing>SequenceFlow_0s7d2je</outgoing>
+        </task>
+        <sequenceFlow id="SequenceFlow_1e4kusi" sourceRef="StartTwo_TestID" targetRef="Task_10rvmlr" />
+        <intermediateThrowEvent id="IntermediateThrowEvent_0mr0emc" name="Element two">
+            <incoming>SequenceFlow_0s7d2je</incoming>
+            <outgoing>SequenceFlow_09tg6de</outgoing>
+        </intermediateThrowEvent>
+        <sequenceFlow id="SequenceFlow_0s7d2je" sourceRef="Task_10rvmlr" targetRef="IntermediateThrowEvent_0mr0emc" />
+        <endEvent id="EndTwo_TestID" name="End two">
+            <incoming>SequenceFlow_09tg6de</incoming>
+        </endEvent>
+        <sequenceFlow id="SequenceFlow_09tg6de" sourceRef="IntermediateThrowEvent_0mr0emc" targetRef="EndTwo_TestID" />
+    </process>
+</definitions>
