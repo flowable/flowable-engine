@@ -287,7 +287,7 @@ public class JobResource extends JobBaseResource {
     })
     @PostMapping("/cmmn-management/deadletter-jobs/{jobId}")
     public void executeDeadLetterJobAction(@ApiParam(name = "jobId") @PathVariable String jobId, @RequestBody RestActionRequest actionRequest, HttpServletResponse response) {
-        if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction()) || !MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+        if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'move' or 'moveToHistoryJob' is supported.");
         }
         
