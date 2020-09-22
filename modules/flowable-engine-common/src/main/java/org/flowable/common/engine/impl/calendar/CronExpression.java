@@ -1659,6 +1659,9 @@ public class CronExpression implements Serializable, Cloneable {
         } // never happens
     }
 
+    /**
+     * @deprecated
+     */
     @Override
     @Deprecated
     public Object clone() {
