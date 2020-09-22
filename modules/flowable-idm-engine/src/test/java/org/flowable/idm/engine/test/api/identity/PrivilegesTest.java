@@ -34,6 +34,9 @@ import org.junit.jupiter.api.Test;
  */
 public class PrivilegesTest extends PluggableFlowableIdmTestCase {
 
+    private static final String adminPrivilegename = "access admin application";
+    private static final String modelerPrivilegeName = "access modeler application";
+
     @BeforeEach
     protected void setUp() throws Exception {
         createGroup("admins", "Admins", "user");
@@ -50,12 +53,10 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.createMembership("fozzie", "sales");
         idmIdentityService.createMembership("mispiggy", "engineering");
 
-        String adminPrivilegename = "access admin application";
         Privilege adminPrivilege = idmIdentityService.createPrivilege(adminPrivilegename);
         idmIdentityService.addGroupPrivilegeMapping(adminPrivilege.getId(), "admins");
         idmIdentityService.addUserPrivilegeMapping(adminPrivilege.getId(), "mispiggy");
 
-        String modelerPrivilegeName = "access modeler application";
         Privilege modelerPrivilege = idmIdentityService.createPrivilege(modelerPrivilegeName);
         idmIdentityService.addGroupPrivilegeMapping(modelerPrivilege.getId(), "admins");
         idmIdentityService.addGroupPrivilegeMapping(modelerPrivilege.getId(), "engineering");
@@ -72,14 +73,30 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
     }
 
     @Test
+    public void deleteUserPrivilegeMapping() {
+        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName(adminPrivilegename).singleResult().getId();
+        assertThat(idmIdentityService.getUsersWithPrivilege(privilegeId)).hasSize(1);
+        idmIdentityService.deleteUserPrivilegeMapping(privilegeId, "mispiggy");
+        assertThat(idmIdentityService.getUsersWithPrivilege(privilegeId)).isEmpty();
+    }
+
+    @Test
+    public void deleteGroupPrivilegeMapping() {
+        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName(adminPrivilegename).singleResult().getId();
+        assertThat(idmIdentityService.getGroupsWithPrivilege(privilegeId)).hasSize(1);
+        idmIdentityService.deleteGroupPrivilegeMapping(privilegeId, "admins");
+        assertThat(idmIdentityService.getGroupsWithPrivilege(privilegeId)).isEmpty();
+    }
+
+    @Test
     public void testCreateDuplicatePrivilege() {
-        assertThatThrownBy(() -> idmIdentityService.createPrivilege("access admin application"))
+        assertThatThrownBy(() -> idmIdentityService.createPrivilege(adminPrivilegename))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
     public void testGetUsers() {
-        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").singleResult().getId();
+        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName(adminPrivilegename).singleResult().getId();
         List<User> users = idmIdentityService.getUsersWithPrivilege(privilegeId);
         assertThat(users)
                 .extracting(User::getId)
@@ -93,7 +110,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
 
     @Test
     public void testGetGroups() {
-        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult().getId();
+        String privilegeId = idmIdentityService.createPrivilegeQuery().privilegeName(modelerPrivilegeName).singleResult().getId();
         List<Group> groups = idmIdentityService.getGroupsWithPrivilege(privilegeId);
         assertThat(groups)
                 .extracting(Group::getId)
@@ -114,7 +131,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
 
     @Test
     public void testQueryByName() {
-        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().privilegeName("access admin application").list();
+        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().privilegeName(adminPrivilegename).list();
         assertThat(privileges).hasSize(1);
 
         assertThat(idmIdentityService.getUsersWithPrivilege(privileges.get(0).getId())).hasSize(1);
@@ -132,7 +149,7 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         assertThat(privileges).hasSize(1);
 
         Privilege privilege = privileges.get(0);
-        assertThat(privilege.getName()).isEqualTo("access modeler application");
+        assertThat(privilege.getName()).isEqualTo(modelerPrivilegeName);
     }
 
     @Test
@@ -182,12 +199,12 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
         String tableName = idmManagementService.getTableName(PrivilegeEntity.class);
         String baseQuerySql = "SELECT * FROM " + tableName + " where NAME_ = #{name}";
 
-        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", "access admin application").list()).hasSize(1);
+        assertThat(idmIdentityService.createNativeUserQuery().sql(baseQuerySql).parameter("name", adminPrivilegename).list()).hasSize(1);
     }
 
     @Test
     public void testGetPrivilegeMappings() {
-        Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName("access modeler application").singleResult();
+        Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName(modelerPrivilegeName).singleResult();
         List<PrivilegeMapping> privilegeMappings = idmIdentityService.getPrivilegeMappingsByPrivilegeId(modelerPrivilege.getId());
         assertThat(privilegeMappings).hasSize(3);
         assertThat(privilegeMappings)
