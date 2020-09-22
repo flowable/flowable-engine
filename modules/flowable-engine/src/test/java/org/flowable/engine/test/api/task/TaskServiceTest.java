@@ -58,6 +58,7 @@ import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
@@ -1081,6 +1082,29 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithFormKeyProcess.bpmn20.xml" })
+    public void taskFormModelExceptions() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThatThrownBy(() -> taskService.getTaskFormModel(task.getId(), true))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Form engine is not initialized");
+        assertThatThrownBy(() -> taskService.getTaskFormModel(task.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Form engine is not initialized");
+
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, Collections.EMPTY_MAP))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, false))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+
+        taskService.complete(task.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithFormKeyProcess.bpmn20.xml" })
     public void testCompleteTaskWithFormKey() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess");
 
@@ -1925,6 +1949,26 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         String taskId = task.getId();
         taskService.resolveTask(taskId, null);
+
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            historyService.deleteHistoricTaskInstance(taskId);
+        }
+
+        // Fetch the task again
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
+
+        taskService.deleteTask(taskId, true);
+    }
+
+    @Test
+    public void resolveTaskWithParametersNullParametersEmptyTransientVariables() {
+        org.flowable.task.api.Task task = taskService.newTask();
+        task.setDelegationState(DelegationState.PENDING);
+        taskService.saveTask(task);
+
+        String taskId = task.getId();
+        taskService.resolveTask(taskId, null, Collections.EMPTY_MAP);
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);

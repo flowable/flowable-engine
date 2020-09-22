@@ -179,6 +179,16 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    public void getTableColumnsException() throws Exception {
+        // Only one of 'orderAscendingColumn' or 'orderDescendingColumn' can be supplied.
+        String tableName = managementService.getTableName(VariableInstanceEntity.class);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName)
+                        + "?orderAscendingColumn=LONG_&orderDescendingColumn=LONG_"),
+                HttpStatus.SC_BAD_REQUEST);
+    }
+
+    @Test
     public void testGetDataForUnexistingTable() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
