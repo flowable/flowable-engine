@@ -39,22 +39,22 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
         // Email, Mule, Http and Shell service tasks
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
-            if (serviceTask.getType().equalsIgnoreCase("mail")) {
+            if ("mail".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("mule")) {
+            } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("camel")) {
+            } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
+            } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
+            } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("http")) {
+            } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
 
             } else {
