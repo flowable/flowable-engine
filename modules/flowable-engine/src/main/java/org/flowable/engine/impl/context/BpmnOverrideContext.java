@@ -50,8 +50,7 @@ public class BpmnOverrideContext {
                         language, id, definitionInfoNode);
 
             } else {
-                HashSet<Locale> candidateLocales = new LinkedHashSet<>();
-                candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
+                HashSet<Locale> candidateLocales = new LinkedHashSet<>(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
                 for (Locale locale : candidateLocales) {
                     localizationProperties = CommandContextUtil.getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
                             locale.toLanguageTag(), id, definitionInfoNode);
