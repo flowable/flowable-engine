@@ -1056,7 +1056,7 @@ Only one of +caseDefinitionId+ or +caseDefinitionKey+  can be used in the reques
 |caseDefinitionId|No|String|Only return case instances with the given case definition id.|
 |businessKey|No|String|Only return case instances with the given businessKey.|
 |involvedUser|No|String|Only return case instances in which the given user is involved.|
-|includecaseVariables|No|Boolean|Indication to include case variables in the result.
+|includeCaseVariables|No|Boolean|Indication to include case variables in the result.
 |tenantId|No|String|Only return case instances with the given tenantId.
 |tenantIdLike|No|String|Only return case instances with a tenantId like the given value.
 |withoutTenantId|No|Boolean|If +true+, only returns case instances without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
