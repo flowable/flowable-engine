@@ -186,6 +186,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         caseInstance.setCaseDefinitionName(caseDefinitionToMigrateTo.getName());
         caseInstance.setCaseDefinitionVersion(caseDefinitionToMigrateTo.getVersion());
         caseInstance.setCaseDefinitionDeploymentId(caseDefinitionToMigrateTo.getDeploymentId());
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).update(caseInstance);
 
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
                 .setCaseInstanceId(caseInstance.getId())
