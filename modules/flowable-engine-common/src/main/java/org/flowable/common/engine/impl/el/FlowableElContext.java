@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.util.List;
 import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
