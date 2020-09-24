@@ -1135,7 +1135,6 @@
 		<module>modules/flowable-dmn-engine</module>
 		<module>modules/flowable-dmn-engine-configurator</module>
 		<module>modules/flowable-dmn-image-generator</module>
-		<module>modules/flowable-dmn-api</module>
 		<module>modules/flowable-content-api</module>
         <module>modules/flowable-cmmn-api</module>
         <module>modules/flowable-cmmn-model</module>
