@@ -133,7 +133,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
                         }
                     }
 
-                    if (errors == null || errors.isEmpty()) {
+                    if (errors.isEmpty()) {
                         assertDatabaseEmpty(method);
 
                         // Delete any remaining data after outputting the tables which weren't empty
