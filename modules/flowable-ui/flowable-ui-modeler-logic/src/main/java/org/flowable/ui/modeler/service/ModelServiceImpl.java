@@ -811,8 +811,7 @@ public class ModelServiceImpl implements ModelService {
                 handleAppModelProcessRelations(model, jsonNode);
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_SERVICE) {
                 // Thumbnail
-//                byte[] thumbnail = modelImageService.generateDrdThumbnailImage(model, jsonNode);
-                byte[] thumbnail = null;
+                byte[] thumbnail = modelImageService.generateDmnThumbnailImage(model, jsonNode);
                 if (thumbnail != null) {
                     model.setThumbnail(thumbnail);
                 }
