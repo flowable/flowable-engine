@@ -187,6 +187,8 @@ public abstract class AbstractFlowableEngineEventListener extends AbstractFlowab
                     case HISTORIC_PROCESS_INSTANCE_ENDED:
                         historicProcessInstanceEnded((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
+                    default:
+                        break;
                 }
             }
         }
