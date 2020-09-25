@@ -54,6 +54,7 @@ public abstract class BaseUserCache implements UserCache {
         userCache = CacheBuilder.newBuilder().maximumSize(userCacheMaxSize)
             .expireAfterAccess(userCacheMaxAge, TimeUnit.SECONDS).recordStats().build(new CacheLoader<String, CachedUser>() {
 
+                    @Override
                     public CachedUser load(final String userId) throws Exception {
                         return loadUser(userId);
                     }
@@ -63,14 +64,17 @@ public abstract class BaseUserCache implements UserCache {
 
     protected abstract CachedUser loadUser(String userId);
 
+    @Override
     public void putUser(String userId, CachedUser cachedUser) {
         userCache.put(userId, cachedUser);
     }
 
+    @Override
     public CachedUser getUser(String userId) {
         return getUser(userId, false, false, true); // always check validity by default
     }
 
+    @Override
     public CachedUser getUser(String userId, boolean throwExceptionOnNotFound, boolean throwExceptionOnInactive, boolean checkValidity) {
         try {
             // The cache is a LoadingCache and will fetch the value itself

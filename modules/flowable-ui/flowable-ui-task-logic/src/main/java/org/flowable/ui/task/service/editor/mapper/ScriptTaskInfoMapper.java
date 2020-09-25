@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.ScriptTask;
 
 public class ScriptTaskInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         ScriptTask scriptTask = (ScriptTask) element;
         if (StringUtils.isNotEmpty(scriptTask.getScriptFormat())) {

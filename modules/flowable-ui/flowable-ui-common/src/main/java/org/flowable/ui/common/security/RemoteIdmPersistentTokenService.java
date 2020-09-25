@@ -29,6 +29,7 @@ public class RemoteIdmPersistentTokenService extends BasePersistentTokenService 
         this.remoteIdmService = remoteIdmService;
     }
 
+    @Override
     protected Token loadToken(String tokenId) {
         RemoteToken token = remoteIdmService.getToken(tokenId);
         if (token != null) {

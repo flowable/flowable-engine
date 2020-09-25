@@ -36,6 +36,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
     protected ObjectMapper objectMapper = new ObjectMapper();
     protected ArrayNode propertiesNode;
 
+    @Override
     public ArrayNode map(Object element) {
         propertiesNode = objectMapper.createArrayNode();
         if (element instanceof FlowElement) {

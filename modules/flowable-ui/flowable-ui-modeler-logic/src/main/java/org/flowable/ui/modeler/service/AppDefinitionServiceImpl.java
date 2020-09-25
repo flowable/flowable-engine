@@ -64,11 +64,13 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Override
     public AppDefinitionRepresentation getAppDefinition(String modelId) {
         Model model = modelService.getModel(modelId);
         return createAppDefinitionRepresentation(model);
     }
 
+    @Override
     public AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId) {
         ModelHistory model = modelService.getModelHistory(modelId, modelHistoryId);
         return createAppDefinitionRepresentation(model);
@@ -124,6 +126,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
         return resultList;
     }
 
+    @Override
     public AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel) {
 
         AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();

@@ -52,6 +52,7 @@ public class TaskSecurityConfiguration {
             this.apiHttpSecurityCustomizer = apiHttpSecurityCustomizer;
         }
 
+        @Override
         protected void configure(HttpSecurity http) throws Exception {
 
             http.sessionManagement()
