@@ -120,7 +120,7 @@ public class BpmnLoggingSessionUtil {
         String message = null;
         FlowElement flowElement = execution.getCurrentFlowElement();
         SequenceFlow sequenceFlow = null;
-        if (flowElement != null && flowElement instanceof SequenceFlow) {
+        if (flowElement instanceof SequenceFlow) {
             sequenceFlow = (SequenceFlow) flowElement;
             String sequenceFlowId = "";
             if (sequenceFlow.getId() != null) {
