@@ -62,7 +62,7 @@ public class EventInstanceBpmnUtil {
                 for (ExtensionElement outParameter : outParameters) {
                     String payloadSourceName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
                     String variableName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                    Boolean isTransient = Boolean.valueOf(outParameter.getAttributeValue(null, "transient"));
+                    boolean isTransient = Boolean.parseBoolean(outParameter.getAttributeValue(null, "transient"));
                     setEventParameterVariable(payloadSourceName, variableName, isTransient, payloadInstances, variableScope);
                 }
             }

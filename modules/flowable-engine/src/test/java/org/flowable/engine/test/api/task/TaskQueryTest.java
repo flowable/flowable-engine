@@ -1840,8 +1840,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactly("taskKey1");
 
         // No task should be found with unexisting key
-        Long count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").count();
-        assertThat(count.longValue()).isZero();
+        long count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").count();
+        assertThat(count).isZero();
     }
 
     @Test
@@ -1859,8 +1859,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactly("taskKey1");
 
         // No task should be found with unexisting key
-        Long count = taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKey("unexistingKey").count();
-        assertThat(count.longValue()).isZero();
+        long count = taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKey("unexistingKey").count();
+        assertThat(count).isZero();
     }
 
     @Test
@@ -1939,8 +1939,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactly("taskKey123");
 
         // No task should be found with unexisting key
-        Long count = taskService.createTaskQuery().taskDefinitionKeyLike("%unexistingKey%").count();
-        assertThat(count.longValue()).isZero();
+        long count = taskService.createTaskQuery().taskDefinitionKeyLike("%unexistingKey%").count();
+        assertThat(count).isZero();
     }
 
     @Test
@@ -1973,8 +1973,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .containsExactly("taskKey123");
 
         // No task should be found with unexisting key
-        Long count = taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeyLike("%unexistingKey%").count();
-        assertThat(count.longValue()).isZero();
+        long count = taskService.createTaskQuery().or().taskId("invalid").taskDefinitionKeyLike("%unexistingKey%").count();
+        assertThat(count).isZero();
     }
 
     @Test
