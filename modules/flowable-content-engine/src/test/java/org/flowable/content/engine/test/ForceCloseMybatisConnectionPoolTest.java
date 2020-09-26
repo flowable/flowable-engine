@@ -18,7 +18,7 @@ import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.impl.cfg.StandaloneInMemContentEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji
