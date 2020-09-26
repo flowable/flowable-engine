@@ -36,6 +36,8 @@ public class XMLStreamReaderUtil {
                     return xtr.getLocalName();
                 case XMLStreamConstants.END_ELEMENT:
                     return null;
+                default:
+                    break;
                 }
             }
         } catch (Exception e) {
@@ -54,6 +56,8 @@ public class XMLStreamReaderUtil {
                 case XMLStreamConstants.END_ELEMENT:
                     if (xtr.getLocalName().equals(elementName))
                         return true;
+                    break;
+                default:
                     break;
                 }
             }
