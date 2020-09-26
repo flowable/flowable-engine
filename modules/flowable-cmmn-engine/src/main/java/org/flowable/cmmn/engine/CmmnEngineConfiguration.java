@@ -1991,7 +1991,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
                     asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
                 }
-                asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
                 
             } else {
                 // In case an async history executor was injected, only the job handlers are set. 
@@ -2014,6 +2013,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
+            
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
     }
 
@@ -2146,7 +2147,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+        IdmIdentityService idmIdentityService = null;
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+
+        return idmIdentityService;
     }
 
     public CmmnEngineAgendaFactory getCmmnEngineAgendaFactory() {

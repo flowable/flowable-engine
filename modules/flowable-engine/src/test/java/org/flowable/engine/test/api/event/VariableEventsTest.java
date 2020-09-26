@@ -13,12 +13,14 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -386,6 +388,10 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task newTask = taskService.newTask();
         try {
             taskService.saveTask(newTask);
+
+            assertThatThrownBy(() -> taskService.setVariable(null, null, null))
+                    .isInstanceOf(FlowableIllegalArgumentException.class)
+                    .hasMessage("variableName is null");
 
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);

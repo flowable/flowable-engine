@@ -436,6 +436,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
      * as the other model types are imported before them.
      */
 
+    @Override
     public void registerUnresolvedCaseModelReferenceForCaseModel(String unresolvedCaseModelKey, CmmnModel cmmnModel) {
         // The CmmnModel needs to be passed, as the actual key on the CmmnModel (stored as id) will be typically only be set later.
         unresolvedCaseModelKeyToCmmnModels.computeIfAbsent(unresolvedCaseModelKey, key -> new ArrayList<>()).add(cmmnModel);

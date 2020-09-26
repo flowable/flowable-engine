@@ -41,21 +41,25 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
+    @Override
     @GetMapping(value = "/rest/tasks/{taskId}/content")
     public ResultListDataRepresentation getContentItemsForTask(@PathVariable("taskId") String taskId) {
         return super.getContentItemsForTask(taskId);
     }
 
+    @Override
     @GetMapping(value = "/rest/process-instances/{processInstanceId}/content")
     public ResultListDataRepresentation getContentItemsForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
         return super.getContentItemsForProcessInstance(processInstanceId);
     }
 
+    @Override
     @GetMapping(value = "/rest/case-instances/{caseInstanceId}/content")
     public ResultListDataRepresentation getContentItemsForCase(@PathVariable("caseInstanceId") String caseInstanceId) {
         return super.getContentItemsForCase(caseInstanceId);
     }
 
+    @Override
     @PostMapping(value = "/rest/tasks/{taskId}/raw-content")
     public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnTask(taskId, file);
@@ -78,16 +82,19 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
+    @Override
     @PostMapping(value = "/rest/tasks/{taskId}/content")
     public ContentItemRepresentation createContentItemOnTask(@PathVariable("taskId") String taskId, @RequestBody ContentItemRepresentation contentItem) {
         return super.createContentItemOnTask(taskId, contentItem);
     }
 
+    @Override
     @PostMapping(value = "/rest/processes/{processInstanceId}/content")
     public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestBody ContentItemRepresentation contentItem) {
         return super.createContentItemOnProcessInstance(processInstanceId, contentItem);
     }
 
+    @Override
     @PostMapping(value = "/rest/process-instances/{processInstanceId}/raw-content")
     public ContentItemRepresentation createContentItemOnProcessInstance(@PathVariable("processInstanceId") String processInstanceId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnProcessInstance(processInstanceId, file);
@@ -111,6 +118,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
+    @Override
     @PostMapping(value = "/rest/case-instances/{caseId}/raw-content")
     public ContentItemRepresentation createContentItemOnCase(@PathVariable("caseId") String caseId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnCase(caseId, file);
@@ -134,6 +142,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
+    @Override
     @PostMapping(value = "/rest/content/raw")
     public ContentItemRepresentation createTemporaryRawContentItem(@RequestParam("file") MultipartFile file) {
         return super.createTemporaryRawContentItem(file);
@@ -161,16 +170,19 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return addContentItem(contentItem, null, null, false);
     }
 
+    @Override
     @DeleteMapping(value = "/rest/content/{contentId}")
     public void deleteContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.deleteContent(contentId, response);
     }
 
+    @Override
     @GetMapping(value = "/rest/content/{contentId}")
     public ContentItemRepresentation getContent(@PathVariable("contentId") String contentId) {
         return super.getContent(contentId);
     }
 
+    @Override
     @GetMapping(value = "/rest/content/{contentId}/raw")
     public void getRawContent(@PathVariable("contentId") String contentId, HttpServletResponse response) {
         super.getRawContent(contentId, response);

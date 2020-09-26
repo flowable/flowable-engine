@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -102,8 +104,13 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertThat((Boolean) task.getProcessVariables().get("processVar")).isTrue();
         assertThat(new String((byte[]) task.getProcessVariables().get("binaryVariable"))).isEqualTo("This is a binary process variable");
 
-        taskService.setVariable(task.getId(), "anotherProcessVar", 123);
-        taskService.setVariableLocal(task.getId(), "localVar", "test");
+        String taskId = task.getId();
+        taskService.setVariable(taskId, "anotherProcessVar", 123);
+        taskService.setVariableLocal(taskId, "localVar", "test");
+
+        assertThatThrownBy(() -> taskService.setVariableLocal(taskId, null, null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("variableName is null");
 
         task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("kermit").singleResult();
         assertThat(task.getProcessVariables()).isEmpty();

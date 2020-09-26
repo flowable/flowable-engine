@@ -206,8 +206,9 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         } catch (BpmnError error) {
             ErrorPropagation.propagateError(error, execution);
         } catch (RuntimeException e) {
-            if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions))
+            if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
                 throw e;
+            }
         }
     }
 

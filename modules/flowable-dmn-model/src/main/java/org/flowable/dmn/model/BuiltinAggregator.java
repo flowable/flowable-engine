@@ -29,8 +29,9 @@ public enum BuiltinAggregator {
     private static final Map<String, BuiltinAggregator> lookup = new HashMap<>();
 
     static {
-        for (BuiltinAggregator builtinAggregator : EnumSet.allOf(BuiltinAggregator.class))
+        for (BuiltinAggregator builtinAggregator : EnumSet.allOf(BuiltinAggregator.class)) {
             lookup.put(builtinAggregator.getValue(), builtinAggregator);
+        }
     }
 
     private final String value;

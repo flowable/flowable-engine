@@ -310,13 +310,13 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertThat(historicProcessVariable.getValue()).isEqualTo("one");
 
         Map<String, Object> variables3 = new HashMap<>();
-        variables3.put("long", 1000l);
+        variables3.put("long", 1000L);
         variables3.put("double", 25.43d);
         runtimeService.startProcessInstanceByKey("receiveTask", variables3);
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("waitState").singleResult().getId());
 
         assertThat(historyService.createHistoricVariableInstanceQuery().variableName("long").count()).isEqualTo(1);
-        assertThat(historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000l).count()).isEqualTo(1);
+        assertThat(historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000L).count()).isEqualTo(1);
         assertThat(historyService.createHistoricVariableInstanceQuery().variableName("double").count()).isEqualTo(1);
         assertThat(historyService.createHistoricVariableInstanceQuery().variableValueEquals("double", 25.43d).count()).isEqualTo(1);
     }
@@ -1405,7 +1405,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         for (int i = 0; i < details.size(); i++) {
             if (i != 3) {
                 assertThat(((HistoricVariableUpdate) details.get(i)).getValue()).isNotNull();
-            } else if (i == 3) {
+            } else {
                 assertThat(((HistoricVariableUpdate) details.get(i)).getValue()).isNull();
             }
         }

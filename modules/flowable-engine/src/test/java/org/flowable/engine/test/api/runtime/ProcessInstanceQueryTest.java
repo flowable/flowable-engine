@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -976,7 +975,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         processInstances = runtimeService.createProcessInstanceQuery().variableValueLessThan("doubleVar", 55555.5555).list();
         assertThat(processInstances).hasSize(2);
 
-        List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
         assertThat(processInstances)
                 .extracting(ProcessInstance::getId)
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());

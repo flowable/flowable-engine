@@ -30,6 +30,7 @@ public class IdmEnginePersistentTokenService extends BasePersistentTokenService 
         this.idmIdentityService = idmIdentityService;
     }
 
+    @Override
     protected Token loadToken(String tokenId) {
         Token token = idmIdentityService.createTokenQuery().tokenId(tokenId).singleResult();
         if (token != null) {

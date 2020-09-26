@@ -66,7 +66,7 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
             job = jobServiceConfiguration.getExternalWorkerJobEntityManager().findById(jobId);
             break;
          default:
-            break;
+             break;
         }
 
         if (job == null) {

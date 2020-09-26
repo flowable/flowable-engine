@@ -147,7 +147,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test executing an unexisting job.
+     * Test executing with bad action.
      */
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
@@ -184,11 +184,117 @@ public class JobResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test getting an unexisting job.
+     * Test deleting an unexisting job.
      */
     @Test
     public void testDeleteUnexistingJob() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB, "unexistingjob"));
+        CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    public void getUnexistingTimerJob() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, "unexistingjob")), HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeTimerJobBadAction() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "badAction");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeUnexistingTimerJob() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "move");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, "unexistingjob"));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    public void deleteUnexistingTimerJob() throws Exception {
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, "unexistingjob"));
+        CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    public void getUnexistingDeadLetterJob() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, "unexistingjob")), HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeDeadLetterJobBadAction() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "badAction");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, timerJob.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void executeUnexistingDeadLetterJob() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "move");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, "unexistingjob"));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    public void deleteUnexistingDeadLetterJob() throws Exception {
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, "unexistingjob"));
+        CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    public void getUnexistingSuspendedJob() throws Exception {
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, "unexistingjob")), HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
+    }
+
+    @Test
+    public void deleteUnexistingSuspendedJob() throws Exception {
+        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, "unexistingjob"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }

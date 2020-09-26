@@ -83,7 +83,7 @@ public class DurationHelper {
             isRepeat = true;
             times = expression.get(0).length() == 1 ? Integer.MAX_VALUE - 1 : Integer.parseInt(expression.get(0).substring(1));
 
-            if (expression.get(0).equals("R")) { // R without params
+            if ("R".equals(expression.get(0))) { // R without params
                 repeatWithNoBounds = true;
             }
 

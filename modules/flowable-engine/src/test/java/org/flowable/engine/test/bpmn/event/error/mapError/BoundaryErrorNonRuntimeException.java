@@ -10,19 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cdi.impl;
+package org.flowable.engine.test.bpmn.event.error.mapError;
 
-import org.flowable.engine.ProcessEngine;
+public class BoundaryErrorNonRuntimeException extends Exception {
 
-/**
- * Represents a strategy for building or looking up a {@link ProcessEngine}.
- * 
- * @author Daniel Meyer
- * @see org.flowable.cdi.spi.ProcessEngineLookup
- *
- * @deprecated since 5.9. Use {@link org.flowable.cdi.spi.ProcessEngineLookup}
- */
-@Deprecated
-public interface ProcessEngineLookup extends org.flowable.cdi.spi.ProcessEngineLookup {
+    private static final long serialVersionUID = 1L;
+
+    public BoundaryErrorNonRuntimeException() {
+    }
+
+    public BoundaryErrorNonRuntimeException(Throwable cause) {
+        super(cause);
+    }
 
 }

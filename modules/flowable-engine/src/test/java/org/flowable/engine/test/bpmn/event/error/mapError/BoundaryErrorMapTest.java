@@ -65,6 +65,17 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
         assertThat(FlagDelegate.isVisited()).isTrue();
     }
+    
+    @Test
+    @Deployment
+    public void testExpressionNonRuntimeException() {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorNonRuntimeException.class.getName());
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
 
     @Test
     @Deployment

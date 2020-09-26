@@ -19,7 +19,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

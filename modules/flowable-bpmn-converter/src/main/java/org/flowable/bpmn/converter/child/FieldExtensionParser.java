@@ -42,8 +42,9 @@ public class FieldExtensionParser extends BaseChildElementParser {
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-        if (!accepts(parentElement))
+        if (!accepts(parentElement)) {
             return;
+        }
 
         FieldExtension extension = new FieldExtension();
         BpmnXMLUtil.addXMLLocation(extension, xtr);

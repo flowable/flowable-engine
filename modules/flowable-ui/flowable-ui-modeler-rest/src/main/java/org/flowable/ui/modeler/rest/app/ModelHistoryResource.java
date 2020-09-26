@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ModelHistoryResource extends AbstractModelHistoryResource {
 
+    @Override
     @GetMapping(value = "/rest/models/{modelId}/history", produces = "application/json")
     public ResultListDataRepresentation getModelHistoryCollection(@PathVariable String modelId, @RequestParam(value = "includeLatestVersion", required = false) Boolean includeLatestVersion) {
         return super.getModelHistoryCollection(modelId, includeLatestVersion);
     }
 
+    @Override
     @GetMapping(value = "/rest/models/{modelId}/history/{modelHistoryId}", produces = "application/json")
     public ModelRepresentation getProcessModelHistory(@PathVariable String modelId, @PathVariable String modelHistoryId) {
         return super.getProcessModelHistory(modelId, modelHistoryId);

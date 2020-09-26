@@ -377,8 +377,9 @@ public class CronExpression implements Serializable, Cloneable {
         // the second immediately following it.
         while (difference == 1000) {
             newDate = getTimeAfter(lastDate);
-            if (newDate == null)
+            if (newDate == null) {
                 break;
+            }
 
             difference = newDate.getTime() - lastDate.getTime();
 
@@ -546,7 +547,7 @@ public class CronExpression implements Serializable, Cloneable {
             return i;
         }
         char c = s.charAt(i);
-        if ((c >= 'A') && (c <= 'Z') && !s.equals("L") && !s.equals("LW") && !s.matches("^L-[0-9]*[W]?")) {
+        if ((c >= 'A') && (c <= 'Z') && !"L".equals(s) && !"LW".equals(s) && !s.matches("^L-[0-9]*[W]?")) {
             String sub = s.substring(i, i + 3);
             int sval = -1;
             int eval = -1;
@@ -667,8 +668,9 @@ public class CronExpression implements Serializable, Cloneable {
                 if (c == '-') {
                     ValueSet vs = getValue(0, s, i + 1);
                     lastdayOffset = vs.value;
-                    if (lastdayOffset > 30)
+                    if (lastdayOffset > 30) {
                         throw new ParseException("Offset from last day must be <= 30", i + 1);
+                    }
                     i = vs.pos;
                 }
                 if (s.length() > i) {
@@ -730,8 +732,9 @@ public class CronExpression implements Serializable, Cloneable {
 
         if (c == 'L') {
             if (type == DAY_OF_WEEK) {
-                if (val < 1 || val > 7)
+                if (val < 1 || val > 7) {
                     throw new ParseException("Day-of-Week values must be between 1 and 7", -1);
+                }
                 lastdayOfWeek = true;
             } else {
                 throw new ParseException("'L' option is not valid here. (pos=" + i + ")", i);
@@ -748,10 +751,11 @@ public class CronExpression implements Serializable, Cloneable {
             } else {
                 throw new ParseException("'W' option is not valid here. (pos=" + i + ")", i);
             }
-            if (val > 31)
+            if (val > 31) {
                 throw new ParseException(
                         "The 'W' option does not make sense with values larger than 31 (max number of days in a month)",
                         i);
+            }
             TreeSet<Integer> set = getSet(type);
             set.add(val);
             i++;
@@ -1659,6 +1663,9 @@ public class CronExpression implements Serializable, Cloneable {
         } // never happens
     }
 
+    /**
+     * @deprecated
+     */
     @Override
     @Deprecated
     public Object clone() {

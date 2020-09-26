@@ -33,6 +33,7 @@ import java.io.InputStream;
 @Transactional
 public class ProfileServiceImpl extends AbstractIdmService implements ProfileService {
 
+    @Override
     public User updateProfile(String firstName, String lastName, String email) {
         String currentUserId = SecurityUtils.getCurrentUserId();
 
@@ -49,6 +50,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         return user;
     }
 
+    @Override
     public void changePassword(String originalPassword, String newPassword) {
         User user = identityService.createUserQuery().userId(SecurityUtils.getCurrentUserId()).singleResult();
         if (!user.getPassword().equals(originalPassword)) {
@@ -58,6 +60,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         identityService.updateUserPassword(user);
     }
 
+    @Override
     public Pair<String, InputStream> getProfilePicture() {
         Picture picture = identityService.getUserPicture(SecurityUtils.getCurrentUserId());
         if (picture != null) {
@@ -67,6 +70,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         return null;
     }
 
+    @Override
     public void uploadProfilePicture(String contentType, byte[] bytes) {
         Picture picture = new Picture(bytes, contentType);
         identityService.setUserPicture(SecurityUtils.getCurrentUserId(), picture);

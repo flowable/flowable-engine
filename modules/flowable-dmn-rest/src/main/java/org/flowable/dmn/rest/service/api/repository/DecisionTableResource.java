@@ -28,8 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Yvo Swillens
  *
- * @deprecated use {@link DecisionTableResource} instead.
+ * @deprecated use {@link DecisionResource} instead.
  */
+@Deprecated
 @RestController
 @Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableResource extends BaseDecisionResource {

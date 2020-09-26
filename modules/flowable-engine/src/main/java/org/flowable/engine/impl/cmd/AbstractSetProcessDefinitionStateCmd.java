@@ -90,8 +90,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             }
             return null;
         }
-
-        if (executionDate != null) { // Process definition state change is delayed
+        // Process definition state change is delayed
+        if (executionDate != null) {
             createTimerForDelayedExecution(commandContext, processDefinitions);
         } else { // Process definition state is changed now
             changeProcessDefinitionState(commandContext, processDefinitions);
@@ -150,8 +150,9 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     protected void createTimerForDelayedExecution(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
+            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
                 continue;
+            }
 
             TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timer = timerJobService.createTimerJob();
@@ -173,8 +174,9 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
+            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
                 continue;
+            }
 
             SuspensionStateUtil.setSuspensionState(processDefinition, getProcessDefinitionSuspensionState());
 

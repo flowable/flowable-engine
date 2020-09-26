@@ -54,6 +54,29 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION);
         assertResultsPresentInDataResponse(url, timerJob.getId());
 
+        // Fetch using id
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?id=" + timerJob.getId();
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?id=" + timerJob.getId() + "xyzzy";
+        assertResultsPresentInDataResponse(url);
+
+        // Fetch using processInstanceId
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?processInstanceId=" + processInstance.getId();
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?processInstanceId=" + processInstance.getId() + "xyzzy";
+        assertResultsPresentInDataResponse(url);
+
+        // Fetch using executionId
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?executionId=" + timerJob.getExecutionId();
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?executionId=" + timerJob.getExecutionId() + "xyzzy";
+        assertResultsPresentInDataResponse(url);
+
+        // Fetch using processDefinitionId
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?processDefinitionId=" + timerJob.getProcessDefinitionId();
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?processDefinitionId=" + timerJob.getProcessDefinitionId() + "xyzzy";
+        assertResultsPresentInDataResponse(url);
         // Fetch using dueBefore
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?dueBefore=" + getISODateString(inAnHour.getTime());
         assertResultsPresentInDataResponse(url, timerJob.getId());
@@ -80,8 +103,35 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?elementName=unknown";
         assertEmptyResultsPresentInDataResponse(url);
 
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?executable";
+        assertEmptyResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?tenantId=xyzzy";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?tenantIdLike=xyzzy";
+        assertResultsPresentInDataResponse(url);
+
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutTenantId=true";
         assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?timersOnly=true";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?messagesOnly=true";
+        assertResultsPresentInDataResponse(url);
+
+        // Combining messagesOnly with timersOnly should result in exception
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?timersOnly=true&messagesOnly=true"), HttpStatus.SC_BAD_REQUEST));
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withException=true";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?exceptionMessage=";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?exceptionMessage=FlowableException";
+        assertResultsPresentInDataResponse(url);
 
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
         for (int i = 0; i < timerJob2.getRetries(); i++) {
