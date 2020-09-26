@@ -61,8 +61,9 @@ public class BpmnModel {
         List<ExtensionAttribute> attributes = getDefinitionsAttributes().get(name);
         if (attributes != null && !attributes.isEmpty()) {
             for (ExtensionAttribute attribute : attributes) {
-                if (namespace.equals(attribute.getNamespace()))
+                if (namespace.equals(attribute.getNamespace())) {
                     return attribute.getValue();
+                }
             }
         }
         return null;

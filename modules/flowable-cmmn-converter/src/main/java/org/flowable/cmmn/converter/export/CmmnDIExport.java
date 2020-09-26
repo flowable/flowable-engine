@@ -57,7 +57,9 @@ public class CmmnDIExport implements CmmnXmlConstants {
             
             for (String elementId : model.getFlowLocationMap().keySet()) {
                 Association association = associationMap.get(elementId);
-                if (association == null) continue;
+                if (association == null) {
+                    continue;
+                }
                 
                 createCmmnEdge(model, association.getId(), association.getSourceRef(), association.getTargetRef(), xtw);
             }

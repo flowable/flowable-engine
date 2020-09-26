@@ -244,9 +244,9 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                 for (ExtensionAttribute attribute : attributeList) {
                     if (!isBlacklisted(attribute, blackLists)) {
                         if (attribute.getNamespacePrefix() == null) {
-                            if (attribute.getNamespace() == null)
+                            if (attribute.getNamespace() == null) {
                                 xtw.writeAttribute(attribute.getName(), attribute.getValue());
-                            else {
+                            } else {
                                 xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
                             }
                         } else {
