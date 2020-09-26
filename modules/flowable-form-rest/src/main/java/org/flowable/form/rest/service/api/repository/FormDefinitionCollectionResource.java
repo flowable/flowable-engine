@@ -151,13 +151,13 @@ public class FormDefinitionCollectionResource {
             formDefinitionQuery.formTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            Boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 formDefinitionQuery.formWithoutTenantId();
             }
         }
         if (allRequestParams.containsKey("latest")) {
-            Boolean latest = Boolean.valueOf(allRequestParams.get("latest"));
+            boolean latest = Boolean.parseBoolean(allRequestParams.get("latest"));
             if (latest) {
                 formDefinitionQuery.latestVersion();
             }

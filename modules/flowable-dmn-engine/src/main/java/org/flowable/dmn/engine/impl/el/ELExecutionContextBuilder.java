@@ -125,7 +125,7 @@ public class ELExecutionContextBuilder {
                     BigDecimal transformedNumber = new BigDecimal((Double) inputVariable.getValue());
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 } else if (inputVariable.getValue() instanceof Float) {
-                    Double doubleValue = Double.valueOf(inputVariable.getValue().toString());
+                    double doubleValue = Double.parseDouble(inputVariable.getValue().toString());
                     BigDecimal transformedNumber = new BigDecimal(doubleValue);
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 }
