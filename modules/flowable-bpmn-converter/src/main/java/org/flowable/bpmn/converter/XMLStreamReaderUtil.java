@@ -37,7 +37,7 @@ public class XMLStreamReaderUtil {
                 case XMLStreamConstants.END_ELEMENT:
                     return null;
                 default:
-                     break;
+                    break;
                 }
             }
         } catch (Exception e) {
