@@ -54,7 +54,7 @@ public class IntermediateCatchConditionalEventActivityBehavior extends Intermedi
         Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression);
         Object result = expression.getValue(execution);
         
-        if (result != null && result instanceof Boolean && (Boolean) result) {
+        if (result instanceof Boolean && (Boolean) result) {
             ExecutionEntity executionEntity = (ExecutionEntity) execution;
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
