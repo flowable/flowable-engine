@@ -128,7 +128,7 @@ public class GraphicInfo {
     	}
 
     	// only check for elements that support this value
-    	if (null != this.getExpanded() && null != ginfo.getExpanded() && this.getExpanded() != ginfo.getExpanded()) {
+    	if (null != this.getExpanded() && null != ginfo.getExpanded() && !this.getExpanded().equals(ginfo.getExpanded())) {
     		return false;
     	}
     	return true;
