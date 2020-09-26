@@ -333,8 +333,9 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
                 identityLinkType = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
             }
 
-            if (identityLinkType == null)
+            if (identityLinkType == null) {
                 return;
+            }
 
             String resourceElement = XMLStreamReaderUtil.moveDown(xtr);
             if (StringUtils.isNotEmpty(resourceElement) && ELEMENT_RESOURCE_ASSIGNMENT.equals(resourceElement)) {
