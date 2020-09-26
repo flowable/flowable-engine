@@ -68,6 +68,7 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
         return appEngine;
     }
 
+    @Override
     protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
         return new SpringEventRegistryConfigurator();
     }

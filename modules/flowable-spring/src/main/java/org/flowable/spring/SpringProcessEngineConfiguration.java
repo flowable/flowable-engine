@@ -78,6 +78,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         return processEngine;
     }
 
+    @Override
     protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
         return new SpringEventRegistryConfigurator();
     }
