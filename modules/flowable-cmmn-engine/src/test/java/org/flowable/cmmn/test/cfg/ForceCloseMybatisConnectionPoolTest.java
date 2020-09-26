@@ -18,7 +18,7 @@ import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji

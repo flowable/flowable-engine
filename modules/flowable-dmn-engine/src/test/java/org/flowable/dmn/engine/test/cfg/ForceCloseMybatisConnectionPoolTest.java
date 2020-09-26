@@ -18,7 +18,7 @@ import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji

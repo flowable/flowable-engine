@@ -13,7 +13,7 @@
 package org.flowable.app.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.db.EntityToTableMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
