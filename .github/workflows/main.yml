@@ -17,6 +17,12 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
+    - name: Cache Maven Repository
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
     - name: Install
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install -V -B --no-transfer-progress -DskipTests=true -Dmaven.javadoc.skip=true -B -V
