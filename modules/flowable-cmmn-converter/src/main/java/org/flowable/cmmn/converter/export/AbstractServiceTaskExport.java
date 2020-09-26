@@ -82,6 +82,8 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, "true");
                 }
                 break;
+            default:
+                break;
         }
     }
     

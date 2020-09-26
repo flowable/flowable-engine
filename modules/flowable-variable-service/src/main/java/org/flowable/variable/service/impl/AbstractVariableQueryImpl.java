@@ -209,6 +209,8 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
                     throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
                 case LESS_THAN_OR_EQUAL:
                     throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
+                default:
+                    break;
             }
 
             if (operator == QueryOperator.EQUALS_IGNORE_CASE && !(value instanceof String)) {
