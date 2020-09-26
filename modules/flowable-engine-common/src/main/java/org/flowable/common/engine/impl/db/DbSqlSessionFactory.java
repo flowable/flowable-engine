@@ -170,11 +170,11 @@ public class DbSqlSessionFactory implements SessionFactory {
     }
 
     public boolean isMysql() {
-        return getDatabaseType().equals("mysql");
+        return "mysql".equals(getDatabaseType());
     }
 
     public boolean isOracle() {
-        return getDatabaseType().equals("oracle");
+        return "oracle".equals(getDatabaseType());
     }
 
     public Boolean isBulkInsertable(Class<? extends Entity> entityClass) {

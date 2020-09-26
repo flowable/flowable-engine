@@ -278,9 +278,8 @@ public class FlowableAppDefinitionService {
     }
 
     protected List<String> convertToList(String commaSeperatedString) {
-        List<String> resultList = new ArrayList<>();
         String[] stringArray = commaSeperatedString.split(",");
-        resultList.addAll(Arrays.asList(stringArray));
+        List<String> resultList = new ArrayList<>(Arrays.asList(stringArray));
 
         return resultList;
     }

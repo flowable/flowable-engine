@@ -218,6 +218,9 @@ public class BusinessProcess implements Serializable {
         return processInstance;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public ProcessInstance startProcessByName(String string) {
 
@@ -236,6 +239,9 @@ public class BusinessProcess implements Serializable {
         return instance;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public ProcessInstance startProcessByName(String string, Map<String, Object> variables) {
 

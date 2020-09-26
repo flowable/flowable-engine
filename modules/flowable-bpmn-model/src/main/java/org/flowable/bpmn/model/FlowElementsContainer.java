@@ -41,4 +41,7 @@ public interface FlowElementsContainer {
     void addArtifact(Artifact artifact);
 
     void removeArtifact(String artifactId);
+
+    String getId();
+
 }

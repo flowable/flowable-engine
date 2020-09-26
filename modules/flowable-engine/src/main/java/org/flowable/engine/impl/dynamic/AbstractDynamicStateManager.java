@@ -993,7 +993,8 @@ public abstract class AbstractDynamicStateManager {
                 boolean isOnlyRemainingExecutionAtParentScope = isOnlyRemainingExecutionAtParentScope(eventSubProcessExecution, movingExecutionIds, commandContext);
 
                 // If its an interrupting eventSubProcess we don't register a subscription or startEvent executions and we make sure that they are removed if existed
-                if (startEvent.isInterrupting() || isOnlyRemainingExecutionAtParentScope) { //Current eventSubProcess plus its startEvent
+                //Current eventSubProcess plus its startEvent
+                if (startEvent.isInterrupting() || isOnlyRemainingExecutionAtParentScope) {
                     if (eventSubscriptions != null && !eventSubscriptions.isEmpty()) {
                         eventSubscriptions.forEach(eventSubscriptionService::deleteEventSubscription);
                     }

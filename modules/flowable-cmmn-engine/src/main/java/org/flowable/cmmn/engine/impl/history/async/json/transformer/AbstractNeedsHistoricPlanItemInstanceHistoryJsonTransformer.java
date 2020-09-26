@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
+ * @deprecated
  */
 @Deprecated
 public abstract class AbstractNeedsHistoricPlanItemInstanceHistoryJsonTransformer extends AbstractPlanItemInstanceHistoryJsonTransformer {

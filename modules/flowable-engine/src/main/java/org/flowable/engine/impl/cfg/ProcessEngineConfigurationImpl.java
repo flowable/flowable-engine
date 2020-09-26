@@ -2322,7 +2322,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
                     asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
                 }
-                asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
 
             } else {
                 // In case an async history executor was injected, only the job handlers are set. 
@@ -2349,6 +2348,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
+
+            asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
     }
 
@@ -3954,6 +3955,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setByteArrayDataManager(ByteArrayDataManager byteArrayDataManager) {
         this.byteArrayDataManager = byteArrayDataManager;
         return this;
@@ -4082,6 +4084,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setByteArrayEntityManager(ByteArrayEntityManager byteArrayEntityManager) {
         this.byteArrayEntityManager = byteArrayEntityManager;
         return this;
@@ -4201,6 +4204,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

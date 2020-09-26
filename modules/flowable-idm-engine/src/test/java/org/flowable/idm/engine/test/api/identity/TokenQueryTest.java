@@ -16,6 +16,7 @@ package org.flowable.idm.engine.test.api.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -92,6 +93,25 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
     }
 
     @Test
+    public void testQueryByIds() {
+        List<String> ids = new ArrayList<>();
+        ids.add("1111");
+        TokenQuery query = idmIdentityService.createTokenQuery().tokenIds(ids);
+        verifyQueryResults(query, 1);
+    }
+
+    @Test
+    public void testQueryByInvalidIds() {
+        List<String> ids = new ArrayList<>();
+        ids.add("invalid");
+        TokenQuery query = idmIdentityService.createTokenQuery().tokenIds(ids);
+        verifyQueryResults(query, 0);
+
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenIds(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
     public void testQueryByTokenValue() {
         TokenQuery query = idmIdentityService.createTokenQuery().tokenValue("aaaa");
         verifyQueryResults(query, 1);
@@ -110,6 +130,16 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
     }
 
     @Test
+    public void testQueryByTokenDate() {
+        Calendar queryCal = new GregorianCalendar(2099, 1, 1, 0, 0, 0);
+        TokenQuery query = idmIdentityService.createTokenQuery().tokenDate(queryCal.getTime());
+        verifyQueryResults(query, 0);
+
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenDate(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
     public void testQueryByTokenDateBefore() {
         Calendar queryCal = new GregorianCalendar(2015, 6, 1, 0, 0, 0);
         TokenQuery query = idmIdentityService.createTokenQuery().tokenDateBefore(queryCal.getTime());
@@ -120,6 +150,9 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         tokenCal.setTime(result.getTokenDate());
         assertThat(tokenCal.get(Calendar.YEAR)).isEqualTo(2015);
         assertThat(tokenCal.get(Calendar.MONTH)).isEqualTo(1);
+
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenDateBefore(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test
@@ -133,6 +166,9 @@ public class TokenQueryTest extends PluggableFlowableIdmTestCase {
         tokenCal.setTime(result.getTokenDate());
         assertThat(tokenCal.get(Calendar.YEAR)).isEqualTo(2017);
         assertThat(tokenCal.get(Calendar.MONTH)).isEqualTo(1);
+
+        assertThatThrownBy(() -> idmIdentityService.createTokenQuery().tokenDateAfter(null).singleResult())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test

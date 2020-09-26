@@ -789,6 +789,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         return this;
     }
 
+    @Override
     public EventRegistryEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

@@ -59,7 +59,7 @@ public class TypeConverterImpl implements TypeConverter {
 
 	protected BigDecimal coerceToBigDecimal(Object value) {
 		if (value == null || "".equals(value)) {
-			return BigDecimal.valueOf(0l);
+			return BigDecimal.valueOf(0L);
 		}
 		if (value instanceof BigDecimal) {
 			return (BigDecimal)value;
@@ -85,7 +85,7 @@ public class TypeConverterImpl implements TypeConverter {
 
 	protected BigInteger coerceToBigInteger(Object value) {
 		if (value == null || "".equals(value)) {
-			return BigInteger.valueOf(0l);
+			return BigInteger.valueOf(0L);
 		}
 		if (value instanceof BigInteger) {
 			return (BigInteger)value;
@@ -157,7 +157,7 @@ public class TypeConverterImpl implements TypeConverter {
 
 	protected Long coerceToLong(Object value) {
 		if (value == null || "".equals(value)) {
-			return Long.valueOf(0l);
+			return Long.valueOf(0L);
 		}
 		if (value instanceof Long) {
 			return (Long)value;

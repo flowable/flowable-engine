@@ -20,6 +20,8 @@ import org.flowable.http.HttpResponse;
 
 /**
  * @author Tijs Rademakers
+ *
+ * @deprecated
  */
 @Deprecated
 public interface HttpResponseHandler extends Serializable, org.flowable.http.common.api.delegate.HttpResponseHandler {

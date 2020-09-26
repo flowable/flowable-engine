@@ -53,6 +53,9 @@ public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefi
         return restResponseFactory.createDecisionResponseList(decisions, processDefinitionId);
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     @ApiOperation(value = "List decision tables for a process-definition", nickname = "listProcessDefinitionDecisionTables", tags = { "Process Definitions" })
     @ApiResponses(value = {

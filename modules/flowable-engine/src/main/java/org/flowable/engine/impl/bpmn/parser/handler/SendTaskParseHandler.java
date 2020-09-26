@@ -38,13 +38,13 @@ public class SendTaskParseHandler extends AbstractActivityBpmnParseHandler<SendT
 
         if (StringUtils.isNotEmpty(sendTask.getType())) {
 
-            if (sendTask.getType().equalsIgnoreCase("mail")) {
+            if ("mail".equalsIgnoreCase(sendTask.getType())) {
                 sendTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(sendTask));
-            } else if (sendTask.getType().equalsIgnoreCase("mule")) {
+            } else if ("mule".equalsIgnoreCase(sendTask.getType())) {
                 sendTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(sendTask));
-            } else if (sendTask.getType().equalsIgnoreCase("camel")) {
+            } else if ("camel".equalsIgnoreCase(sendTask.getType())) {
                 sendTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(sendTask));
-            } else if (sendTask.getType().equalsIgnoreCase("dmn")) {
+            } else if ("dmn".equalsIgnoreCase(sendTask.getType())) {
                 sendTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(sendTask));
             }
 

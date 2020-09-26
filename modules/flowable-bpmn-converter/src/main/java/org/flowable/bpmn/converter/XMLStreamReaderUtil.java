@@ -57,7 +57,6 @@ public class XMLStreamReaderUtil {
                     if (xtr.getLocalName().equals(elementName)) {
                         return true;
                     }
-                    break;
                 default:
                     break;
                 }

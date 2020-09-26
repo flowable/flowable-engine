@@ -26,7 +26,6 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

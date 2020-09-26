@@ -58,6 +58,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use @{link #allOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean contains(Object collection, Object value) {
         return allOf(collection, value);
@@ -97,6 +100,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use @{link #noneOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean notContains(Object collection, Object value) {
         return noneOf(collection, value);
@@ -136,6 +142,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use @{link #anyof(Object, Object)} instead
+     */
     @Deprecated
     public static boolean containsAny(Object collection, Object value) {
         return anyOf(collection, value);
@@ -175,6 +184,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use {@link #notAllOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean notContainsAny(Object collection, Object value) {
         return notAllOf(collection, value);
