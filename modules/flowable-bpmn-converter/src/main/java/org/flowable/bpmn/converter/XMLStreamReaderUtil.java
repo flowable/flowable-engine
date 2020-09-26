@@ -38,7 +38,6 @@ public class XMLStreamReaderUtil {
                     return null;
                 default:
                     break;
-
                 }
             }
         } catch (Exception e) {
