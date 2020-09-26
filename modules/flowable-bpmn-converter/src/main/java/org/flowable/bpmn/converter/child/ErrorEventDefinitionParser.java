@@ -32,8 +32,9 @@ public class ErrorEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         ErrorEventDefinition eventDefinition = new ErrorEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
