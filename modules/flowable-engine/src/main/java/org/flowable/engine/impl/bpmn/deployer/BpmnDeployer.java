@@ -350,8 +350,9 @@ public class BpmnDeployer implements EngineDeployer {
     }
 
     protected void createLocalizationValues(String processDefinitionId, Process process) {
-        if (process == null)
+        if (process == null) {
             return;
+        }
 
         CommandContext commandContext = Context.getCommandContext();
         DynamicBpmnService dynamicBpmnService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicBpmnService();
@@ -403,8 +404,9 @@ public class BpmnDeployer implements EngineDeployer {
     protected boolean localizeFlowElements(Collection<FlowElement> flowElements, ObjectNode infoNode) {
         boolean localizationValuesChanged = false;
 
-        if (flowElements == null)
+        if (flowElements == null) {
             return localizationValuesChanged;
+        }
 
         CommandContext commandContext = Context.getCommandContext();
         DynamicBpmnService dynamicBpmnService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicBpmnService();
