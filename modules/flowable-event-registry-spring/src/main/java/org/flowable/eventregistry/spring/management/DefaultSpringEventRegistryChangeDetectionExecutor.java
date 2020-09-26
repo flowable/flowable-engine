@@ -88,6 +88,7 @@ public class DefaultSpringEventRegistryChangeDetectionExecutor implements EventR
     public EventRegistryChangeDetectionManager getEventRegistryChangeDetectionManager() {
         return eventRegistryChangeDetectionManager;
     }
+    @Override
     public void setEventRegistryChangeDetectionManager(EventRegistryChangeDetectionManager eventRegistryChangeDetectionManager) {
         this.eventRegistryChangeDetectionManager = eventRegistryChangeDetectionManager;
     }

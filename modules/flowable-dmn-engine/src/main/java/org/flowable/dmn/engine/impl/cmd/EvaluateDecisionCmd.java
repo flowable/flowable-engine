@@ -68,6 +68,7 @@ public class EvaluateDecisionCmd extends AbstractExecuteDecisionCmd implements C
         return null;
     }
 
+    @Override
     protected void execute(CommandContext commandContext, DmnDefinition definition) {
         DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
 

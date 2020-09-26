@@ -46,6 +46,7 @@ public class HttpResponse extends org.flowable.http.common.api.HttpResponse {
         return delegate != null ? delegate.getStatusCode() : super.getStatusCode();
     }
 
+    @Override
     public void setStatusCode(int statusCode) {
         if (delegate != null) {
             delegate.setStatusCode(statusCode);
@@ -59,6 +60,7 @@ public class HttpResponse extends org.flowable.http.common.api.HttpResponse {
         return delegate != null ? delegate.getProtocol() : super.getProtocol();
     }
 
+    @Override
     public void setProtocol(String protocol) {
         if (delegate != null) {
             delegate.setProtocol(protocol);

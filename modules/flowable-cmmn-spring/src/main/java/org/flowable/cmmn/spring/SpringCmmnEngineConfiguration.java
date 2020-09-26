@@ -74,6 +74,7 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         return cmmnEngine;
     }
 
+    @Override
     protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
         return new SpringEventRegistryConfigurator();
     }

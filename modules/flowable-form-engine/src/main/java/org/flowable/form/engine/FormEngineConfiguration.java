@@ -584,6 +584,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
+    @Override
     public FormEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

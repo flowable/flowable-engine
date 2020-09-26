@@ -66,6 +66,7 @@ public interface FlowablePlanItemFutureJavaDelegate<Input, Output> extends PlanI
      * @param planItemInstance the planItemInstance to which data can be set
      * @param executionData the execution data
      */
+    @Override
     void afterExecution(DelegatePlanItemInstance planItemInstance, Output executionData);
 
 }

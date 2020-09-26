@@ -554,6 +554,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return idmIdentityService;
     }
 
+    @Override
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

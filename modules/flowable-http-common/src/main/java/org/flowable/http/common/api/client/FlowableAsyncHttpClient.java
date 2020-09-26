@@ -19,5 +19,6 @@ import org.flowable.http.common.api.HttpRequest;
  */
 public interface FlowableAsyncHttpClient extends FlowableHttpClient {
 
+    @Override
     AsyncExecutableHttpRequest prepareRequest(HttpRequest request);
 }

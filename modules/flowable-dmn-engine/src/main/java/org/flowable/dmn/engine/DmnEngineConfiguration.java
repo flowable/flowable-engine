@@ -896,10 +896,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
+    @Override
     public TableDataManager getTableDataManager() {
         return tableDataManager;
     }
 
+    @Override
     public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

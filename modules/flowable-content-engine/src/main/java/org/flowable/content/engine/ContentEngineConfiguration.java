@@ -432,6 +432,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return this;
     }
 
+    @Override
     public ContentEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

@@ -138,14 +138,17 @@ public class SendInternalEventTaskTest extends FlowableEventRegistryBpmnTestCase
 
     }
 
+    @Override
     protected EventRepositoryService getEventRepositoryService() {
         return getEventRegistryEngineConfiguration().getEventRepositoryService();
     }
 
+    @Override
     protected EventRegistry getEventRegistry() {
         return getEventRegistryEngineConfiguration().getEventRegistry();
     }
 
+    @Override
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
         return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
                 .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
