@@ -17,6 +17,7 @@ import org.flowable.ui.admin.rest.client.modelinfo.AbstractInfoMapper;
 
 public class UserTaskInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         UserTask userTask = (UserTask) element;
         createPropertyNode("Assignee", userTask.getAssignee());

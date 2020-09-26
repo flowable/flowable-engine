@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.ServiceTask;
 
 public class ServiceTaskInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         ServiceTask serviceTask = (ServiceTask) element;
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {

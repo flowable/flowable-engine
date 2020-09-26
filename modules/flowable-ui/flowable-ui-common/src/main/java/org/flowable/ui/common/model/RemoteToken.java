@@ -24,6 +24,7 @@ public class RemoteToken implements Token {
     protected Date date;
 
 
+    @Override
     public String getId() {
         return id;
     }
@@ -40,10 +41,12 @@ public class RemoteToken implements Token {
         this.value = value;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }

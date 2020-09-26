@@ -38,12 +38,14 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
 
     private static final int MAX_USER_SIZE = 100;
 
+    @Override
     public List<User> getUsers(String filter, String sort, Integer start) {
         Integer startValue = start != null ? start.intValue() : 0;
         Integer size = MAX_USER_SIZE; // TODO: pass actual size
         return createUserQuery(filter, sort).listPage(startValue, (size != null && size > 0) ? size : MAX_USER_SIZE);
     }
 
+    @Override
     public long getUserCount(String filter, String sort, Integer start, String groupId) {
         return createUserQuery(filter, sort).count();
     }
@@ -69,10 +71,12 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         return userQuery;
     }
 
+    @Override
     public void updateUserDetails(String userId, String firstName, String lastName, String email) {
         updateUserDetails(userId, firstName, lastName, email, null);
     }
 
+    @Override
     public void updateUserDetails(String userId, String firstName, String lastName, String email, String tenantId) {
         User user = identityService.createUserQuery().userId(userId).singleResult();
         if (user != null) {
@@ -84,6 +88,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         }
     }
 
+    @Override
     public void bulkUpdatePassword(List<String> userIds, String newPassword) {
         for (String userId : userIds) {
             User user = identityService.createUserQuery().userId(userId).singleResult();
@@ -94,6 +99,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         }
     }
 
+    @Override
     public void deleteUser(String userId) {
         List<Privilege> privileges = identityService.createPrivilegeQuery().userId(userId).list();
         for (Privilege privilege : privileges) {
@@ -109,6 +115,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         identityService.deleteUser(userId);
     }
 
+    @Override
     public User createNewUser(String id, String firstName, String lastName, String email, String password) {
         return createNewUser(id, firstName, lastName, email, password, null);
     }

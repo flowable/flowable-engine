@@ -119,6 +119,7 @@ public class ModelServiceImpl implements ModelService {
         return model;
     }
 
+    @Override
     public ModelRepresentation getModelRepresentation(String modelId) {
         Model model = getModel(modelId);
         return new ModelRepresentation(model);
@@ -175,6 +176,7 @@ public class ModelServiceImpl implements ModelService {
         return xmlBytes;
     }
 
+    @Override
     public ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key) {
         ModelKeyRepresentation modelKeyResponse = new ModelKeyRepresentation();
         modelKeyResponse.setKey(key);
@@ -434,6 +436,7 @@ public class ModelServiceImpl implements ModelService {
         return newModel;
     }
 
+    @Override
     public ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream) {
         Model processModel = getModel(modelId);
         String currentUserId = SecurityUtils.getCurrentUserId();
@@ -747,6 +750,7 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
+    @Override
     public Long getModelCountForUser(String userId, int modelType) {
         return modelRepository.countByModelTypeAndCreatedBy(modelType, userId);
     }
