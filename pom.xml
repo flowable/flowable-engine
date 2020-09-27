@@ -20,7 +20,7 @@
 		<spring.amqp.version>2.2.7.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.5.2.RELEASE</spring.kafka.version>
 		<reactor-netty.version>0.9.10.RELEASE</reactor-netty.version>
-		<jackson.version>2.11.0</jackson.version>
+		<jackson.version>2.11.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.25.0</camel.version>
