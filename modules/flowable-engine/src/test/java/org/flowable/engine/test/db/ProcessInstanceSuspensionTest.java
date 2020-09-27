@@ -104,7 +104,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // the acquire jobs command sees the job:
         List<TimerJobEntity> acquiredJobs = executeAcquireJobsCommand();
-        assertThat(acquiredJobs).hasSize(1);;
+        assertThat(acquiredJobs).hasSize(1);
 
         // suspend the process instance:
         repositoryService.suspendProcessDefinitionById(pd.getId());
