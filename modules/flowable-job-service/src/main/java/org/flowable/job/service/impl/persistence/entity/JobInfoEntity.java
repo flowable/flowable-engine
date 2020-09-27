@@ -37,8 +37,10 @@ public interface JobInfoEntity extends JobInfo, AbstractJobEntity, Entity, HasRe
      * should have the same type as the CMMN job executor.
      * @param scopeType the scope type for the job
      */
+    @Override
     void setScopeType(String scopeType);
 
+    @Override
     String getScopeType();
     
 }

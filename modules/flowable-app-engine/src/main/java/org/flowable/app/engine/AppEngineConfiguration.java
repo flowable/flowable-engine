@@ -548,6 +548,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
     }
 
+    @Override
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;
