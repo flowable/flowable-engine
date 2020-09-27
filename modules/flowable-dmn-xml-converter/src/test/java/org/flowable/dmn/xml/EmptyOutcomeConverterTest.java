@@ -19,7 +19,7 @@ import java.util.List;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EmptyOutcomeConverterTest extends AbstractConverterTest {
 

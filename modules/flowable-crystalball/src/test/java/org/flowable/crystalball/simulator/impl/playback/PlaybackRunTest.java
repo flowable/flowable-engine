@@ -49,7 +49,7 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
