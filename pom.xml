@@ -24,7 +24,7 @@
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
         <camel.version>2.25.0</camel.version>
-		<cxf.version>3.3.6</cxf.version>
+		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<jib-maven-plugin.version>1.6.1</jib-maven-plugin.version>
 
