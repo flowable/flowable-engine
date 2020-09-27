@@ -284,7 +284,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertEquals("Hello from sub process.", taskService.getVariable(taskAfterSubProcess.getId(), "superVariable"));
 
         vars.clear();
-        vars.put("x", 5l);
+        vars.put("x", 5L);
 
         // Completing this task ends the super process which leads to a task in the super process
         taskService.complete(taskAfterSubProcess.getId(), vars);
@@ -292,8 +292,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // now we are the second time in the sub process but passed variables via expressions
         org.flowable.task.api.Task taskInSecondSubProcess = taskQuery.singleResult();
         assertEquals("Task in subprocess", taskInSecondSubProcess.getName());
-        assertEquals(10l, runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y"));
-        assertEquals(10l, taskService.getVariable(taskInSecondSubProcess.getId(), "y"));
+        assertEquals(10L, runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y"));
+        assertEquals(10L, taskService.getVariable(taskInSecondSubProcess.getId(), "y"));
 
         // Completing this task ends the subprocess which leads to a task in the super process
         taskService.complete(taskInSecondSubProcess.getId());
@@ -301,8 +301,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // one task in the subprocess should be active after starting the process instance
         org.flowable.task.api.Task taskAfterSecondSubProcess = taskQuery.singleResult();
         assertEquals("Task in super process", taskAfterSecondSubProcess.getName());
-        assertEquals(15l, runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z"));
-        assertEquals(15l, taskService.getVariable(taskAfterSecondSubProcess.getId(), "z"));
+        assertEquals(15L, runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z"));
+        assertEquals(15L, taskService.getVariable(taskAfterSecondSubProcess.getId(), "z"));
 
         // and end last task in Super process
         taskService.complete(taskAfterSecondSubProcess.getId());

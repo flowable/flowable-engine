@@ -827,7 +827,7 @@ public class HistoryServiceTaskLogTest {
                 assertThat(logEntries).hasSize(1);
                 assertThat(logEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
 
-                assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1l);
+                assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1);
             }
 
         } finally {
@@ -1031,7 +1031,7 @@ public class HistoryServiceTaskLogTest {
                         allLogEntries.get(1).getLogNumber(), allLogEntries.get(2).getLogNumber(), allLogEntries.get(3).getLogNumber()
                 );
 
-                assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3l);
+                assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3);
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);

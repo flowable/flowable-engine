@@ -185,7 +185,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(variableMap)
                 .containsOnly(
                         entry("myNewTextVar", "John Doe"),
-                        entry("myNewNumberVar", 2l));
+                        entry("myNewNumberVar", 2L));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         try {
             processEngineConfiguration.getClock().setCurrentTime(new Date(System.currentTimeMillis() + 1000));
-            waitForJobExecutorToProcessAllJobs(10000, 100l);
+            waitForJobExecutorToProcessAllJobs(10000, 100L);
 
             assertThat(createEventSubscriptionQuery().count()).isZero();
             assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
@@ -239,7 +239,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         
         try {
             processEngineConfiguration.getClock().setCurrentTime(new Date(System.currentTimeMillis() + 1000));
-            waitForJobExecutorToProcessAllJobs(10000, 100l);
+            waitForJobExecutorToProcessAllJobs(10000, 100L);
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();

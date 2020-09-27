@@ -516,7 +516,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 "HistoricTaskLogEntryEntityImpl", 2L,
                     "CommentEntityImpl", 2L,
                     "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, 
-                    "IdentityLinkEntityImpl-bulk-with-2", 2l);
+                    "IdentityLinkEntityImpl-bulk-with-2", 2L);
             assertDatabaseSelects("AddIdentityLinkCmd", 
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, 
                     "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,

@@ -105,7 +105,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         try {
             clock.setCurrentTime(new Date(System.currentTimeMillis() + 1000));
             processEngineConfiguration.setClock(clock);
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000, 200l);
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000, 200L);
 
             assertEquals(0, createEventSubscriptionQuery().count());
             assertEquals(0, runtimeService.createProcessInstanceQuery().count());
