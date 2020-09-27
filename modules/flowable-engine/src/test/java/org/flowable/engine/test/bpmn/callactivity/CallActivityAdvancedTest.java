@@ -827,8 +827,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // via expressions
         Task taskInSecondSubProcess = taskQuery.singleResult();
         assertThat(taskInSecondSubProcess.getName()).isEqualTo("Task in subprocess");
-        assertThat(runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y")).isEqualTo(10);
-        assertThat(taskService.getVariable(taskInSecondSubProcess.getId(), "y")).isEqualTo(10);
+        assertThat(runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y")).isEqualTo(10L);
+        assertThat(taskService.getVariable(taskInSecondSubProcess.getId(), "y")).isEqualTo(10L);
 
         // Completing this task ends the subprocess which leads to a task in the super process
         taskService.complete(taskInSecondSubProcess.getId());
@@ -836,8 +836,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // one task in the subprocess should be active after starting the process instance
         Task taskAfterSecondSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSecondSubProcess.getName()).isEqualTo("Task in super process");
-        assertThat(runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z")).isEqualTo(15);
-        assertThat(taskService.getVariable(taskAfterSecondSubProcess.getId(), "z")).isEqualTo(15);
+        assertThat(runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z")).isEqualTo(15L);
+        assertThat(taskService.getVariable(taskAfterSecondSubProcess.getId(), "z")).isEqualTo(15L);
 
         // and end last task in Super process
         taskService.complete(taskAfterSecondSubProcess.getId());
