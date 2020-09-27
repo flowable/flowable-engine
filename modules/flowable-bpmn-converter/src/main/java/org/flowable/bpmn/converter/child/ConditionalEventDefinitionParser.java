@@ -32,8 +32,9 @@ public class ConditionalEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         ConditionalEventDefinition eventDefinition = new ConditionalEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);
