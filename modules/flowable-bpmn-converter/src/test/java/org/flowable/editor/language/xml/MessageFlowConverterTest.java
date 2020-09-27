@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DataStore;
 import org.flowable.bpmn.model.MessageFlow;
 import org.flowable.bpmn.model.Pool;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MessageFlowConverterTest extends AbstractConverterTest {
 

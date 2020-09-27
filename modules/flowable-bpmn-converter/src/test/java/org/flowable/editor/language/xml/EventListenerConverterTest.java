@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for ACT-1657

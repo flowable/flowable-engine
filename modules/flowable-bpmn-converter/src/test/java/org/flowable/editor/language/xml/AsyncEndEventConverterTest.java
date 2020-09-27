@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AsyncEndEventConverterTest extends AbstractConverterTest {
 

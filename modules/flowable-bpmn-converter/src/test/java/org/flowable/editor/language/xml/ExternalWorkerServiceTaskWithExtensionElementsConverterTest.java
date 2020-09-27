@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ExternalWorkerServiceTaskWithExtensionElementsConverterTest extends AbstractConverterTest {
 

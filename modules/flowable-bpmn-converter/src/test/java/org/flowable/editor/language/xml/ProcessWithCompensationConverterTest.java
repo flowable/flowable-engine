@@ -21,7 +21,7 @@ import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.io.InputStreamProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Vasile Dirla
