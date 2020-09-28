@@ -301,7 +301,7 @@ public class DefaultDecisionRequirementsDiagramCanvas {
         int y = (int) graphicInfo.getY();
         int width = (int) graphicInfo.getWidth();
         int height = (int) graphicInfo.getHeight();
-        g.drawRoundRect(x, y, width, height, 6, 6);
+        g.drawRoundRect(x, y, width, height, 48, 48);
 
         // Add diver line
         int dividerLeftX = (int) dividerGraphicInfos.get(0).getX();
@@ -314,11 +314,11 @@ public class DefaultDecisionRequirementsDiagramCanvas {
         // Add the name as text, horizontal top centered
         if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             // Include some padding
-            int availableTextSpace = width - 6;
+            int availableTextSpace = width - 48;
 
             String truncated = fitTextToWidth(name, availableTextSpace);
             int realWidth = fontMetrics.stringWidth(truncated);
-            g.drawString(truncated, x + 3 + (availableTextSpace - realWidth) / 2, 3 + y + fontMetrics.getHeight());
+            g.drawString(truncated, x + 24 + (availableTextSpace - realWidth) / 2, 6 + y + fontMetrics.getHeight());
         }
     }
 
