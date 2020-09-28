@@ -311,25 +311,14 @@ public class DefaultDecisionRequirementsDiagramCanvas {
 
         g.drawLine(dividerLeftX, dividerLeftY, dividerRightX, dividerRightY );
 
-        // Add the name as text, vertical
+        // Add the name as text, horizontal top centered
         if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             // Include some padding
-            int availableTextSpace = height - 6;
-
-            // Create rotation for derived font
-            AffineTransform transformation = new AffineTransform();
-            transformation.setToIdentity();
-            transformation.rotate(270 * Math.PI / 180);
-
-            Font currentFont = g.getFont();
-            Font theDerivedFont = currentFont.deriveFont(transformation);
-            g.setFont(theDerivedFont);
+            int availableTextSpace = width - 6;
 
             String truncated = fitTextToWidth(name, availableTextSpace);
             int realWidth = fontMetrics.stringWidth(truncated);
-
-            g.drawString(truncated, x + 2 + fontMetrics.getHeight(), 3 + y + availableTextSpace - (availableTextSpace - realWidth) / 2);
-            g.setFont(currentFont);
+            g.drawString(truncated, x + 3 + (availableTextSpace - realWidth) / 2, 3 + y + fontMetrics.getHeight());
         }
     }
 
