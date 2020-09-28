@@ -24,4 +24,5 @@ public interface DmnResourceEntity extends Entity, EngineResource {
     @Override
     Object getPersistentState();
 
+    void setGenerated(boolean generated);
 }

@@ -30,6 +30,7 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.dmn.engine.impl.cmd.DeployCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionCmd;
+import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionRequirementsDiagramCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentDmnResourceCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
@@ -129,4 +130,10 @@ public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineC
     public void setDecisionCategory(String decisionId, String category) {
         commandExecutor.execute(new SetDecisionTableCategoryCmd(decisionId, category));
     }
+
+    @Override
+    public InputStream getDecisionRequirementsDiagram(String decisionId) {
+        return commandExecutor.execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionId));
+    }
+
 }

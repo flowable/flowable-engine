@@ -14,6 +14,7 @@ package org.flowable.dmn.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
@@ -23,6 +24,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.h2.util.IOUtils;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractFlowableDmnTest {
@@ -496,6 +498,34 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         List<DmnDecision> decisionServices2 = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_SERVICE).list();
         assertThat(decisionServices2).hasSize(2);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/decision_service_1.dmn")
+    public void testDecisionServicesDI() {
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
+        assertThat(deployment).isNotNull();
+
+        List<String> resourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
+        assertThat(resourceNames).hasSize(2);
+
+        String resourceName = "org/flowable/dmn/engine/test/deployment/decision_service_1.dmn";
+        String diagramResourceName = "org/flowable/dmn/engine/test/deployment/decision_service_1.decisionServiceOne.png";
+        assertThat(resourceNames).contains(resourceName, diagramResourceName);
+
+        InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(), resourceName);
+        assertThat(inputStream).isNotNull();
+        IOUtils.closeSilently(inputStream);
+
+        InputStream diagramInputStream = repositoryService.getResourceAsStream(deployment.getId(), diagramResourceName);
+        assertThat(diagramInputStream).isNotNull();
+        IOUtils.closeSilently(diagramInputStream);
+
+        DmnDecision decision = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).singleResult();
+
+        InputStream caseDiagramInputStream = repositoryService.getDecisionRequirementsDiagram(deployment.getId());
+        assertThat(caseDiagramInputStream).isNotNull();
+        IOUtils.closeSilently(caseDiagramInputStream);
     }
 
     @Test

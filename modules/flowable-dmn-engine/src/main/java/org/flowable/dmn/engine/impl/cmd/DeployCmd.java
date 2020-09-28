@@ -129,12 +129,14 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
             if (savedResource == null)
                 return true;
 
-            EngineResource resource = resources.get(resourceName);
+            if (!savedResource.isGenerated()) {
+                EngineResource resource = resources.get(resourceName);
 
-            byte[] bytes = resource.getBytes();
-            byte[] savedBytes = savedResource.getBytes();
-            if (!Arrays.equals(bytes, savedBytes)) {
-                return true;
+                byte[] bytes = resource.getBytes();
+                byte[] savedBytes = savedResource.getBytes();
+                if (!Arrays.equals(bytes, savedBytes)) {
+                    return true;
+                }
             }
         }
         return false;
