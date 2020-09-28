@@ -523,7 +523,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         DmnDecision decision = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).singleResult();
 
-        InputStream caseDiagramInputStream = repositoryService.getDecisionRequirementsDiagram(deployment.getId());
+        InputStream caseDiagramInputStream = repositoryService.getDecisionRequirementsDiagram(decision.getId());
         assertThat(caseDiagramInputStream).isNotNull();
         IOUtils.closeSilently(caseDiagramInputStream);
     }
