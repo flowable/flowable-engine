@@ -777,7 +777,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>3.0.5</version>
+				<version>3.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
