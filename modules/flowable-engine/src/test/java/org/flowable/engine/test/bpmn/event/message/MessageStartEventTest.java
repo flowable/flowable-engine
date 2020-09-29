@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import java.util.Calendar;
 import java.util.List;
 
@@ -24,9 +27,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 /**
  * @author Tijs Rademakers

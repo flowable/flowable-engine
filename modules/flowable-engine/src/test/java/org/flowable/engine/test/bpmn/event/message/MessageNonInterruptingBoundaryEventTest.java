@@ -13,12 +13,12 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 /**
  * 

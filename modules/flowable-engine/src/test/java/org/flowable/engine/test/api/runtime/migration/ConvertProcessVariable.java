@@ -17,11 +17,10 @@ import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.context.Context;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import org.flowable.engine.impl.context.Context;
 
 /**
  * @author martin.grofcik
