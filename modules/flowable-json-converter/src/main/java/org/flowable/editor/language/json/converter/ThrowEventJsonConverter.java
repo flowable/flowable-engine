@@ -64,7 +64,7 @@ public class ThrowEventJsonConverter extends BaseBpmnJsonConverter {
             return STENCIL_EVENT_THROW_ESCALATION;
         } else if (eventDefinition instanceof CompensateEventDefinition) {
             return STENCIL_EVENT_THROW_COMPENSATION;
-        }else {
+        } else {
             return STENCIL_EVENT_THROW_NONE;
         }
     }

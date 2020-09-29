@@ -65,7 +65,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter {
         if (stage.getDisplayOrder() != null) {
             propertiesNode.put(PROPERTY_DISPLAY_ORDER, stage.getDisplayOrder());
         }
-        if ("true".equalsIgnoreCase(stage.getIncludeInStageOverview()))  {
+        if ("true".equalsIgnoreCase(stage.getIncludeInStageOverview())) {
             propertiesNode.put(PROPERTY_INCLUDE_IN_STAGE_OVERVIEW, true);
         }
 

@@ -62,8 +62,8 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
     // Seems not to be used anymore?
     //
     // protected CompensateEventDefinition createCompensateEventDefinition(BpmnParse bpmnParse, org.activiti.bpmn.model.CompensateEventDefinition eventDefinition, ScopeImpl scopeElement) {
-    // if(StringUtils.isNotEmpty(eventDefinition.getActivityRef())) {
-    // if(scopeElement.findActivity(eventDefinition.getActivityRef()) == null) {
+    // if (StringUtils.isNotEmpty(eventDefinition.getActivityRef())) {
+    // if (scopeElement.findActivity(eventDefinition.getActivityRef()) == null) {
     // bpmnParse.getBpmnModel().addProblem("Invalid attribute value for 'activityRef': no activity with id '" + eventDefinition.getActivityRef() +
     // "' in current scope " + scopeElement.getId(), eventDefinition);
     // }

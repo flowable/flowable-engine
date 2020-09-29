@@ -22,7 +22,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 /**
  * @author Joram Barrez
  */
-public class ProcessVariableScopeELResolver extends VariableContainerELResolver  {
+public class ProcessVariableScopeELResolver extends VariableContainerELResolver {
     
     public ProcessVariableScopeELResolver(VariableContainer variableContainer) {
         super(variableContainer);

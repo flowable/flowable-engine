@@ -281,7 +281,7 @@ public class BpmnLoggingSessionUtil {
     }
     
     protected static void fillScopeDefinitionInfo(String processDefinitionId, ObjectNode loggingNode) {
-        if(!loggingNode.has("scopeDefinitionId")) {
+        if (!loggingNode.has("scopeDefinitionId")) {
             loggingNode.put("scopeDefinitionId", processDefinitionId);
         }
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);

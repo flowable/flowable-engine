@@ -120,7 +120,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
             }
 
             String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget()))  {
+            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
                 variableName = outParameter.getTarget();
 
             } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {

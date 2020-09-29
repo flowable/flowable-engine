@@ -83,7 +83,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
-            if(completeConditionSatisfied) {
+            if (completeConditionSatisfied) {
                 sendCompletedWithConditionEvent(multiInstanceRootExecution);
             }
             else {

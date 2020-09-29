@@ -323,7 +323,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
 
     @Override
     public void setCustomValues(String customValues) {
-        if(customValuesByteArrayRef == null) {
+        if (customValuesByteArrayRef == null) {
             customValuesByteArrayRef = new ByteArrayRef();
         }
         customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());

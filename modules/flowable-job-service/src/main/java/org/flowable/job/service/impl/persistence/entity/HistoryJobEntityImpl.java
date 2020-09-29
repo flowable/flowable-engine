@@ -70,7 +70,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
     }
 
     private void putByteArrayRefIdToMap(String key, ByteArrayRef jobByteArrayRef, Map<String, Object> map) {
-        if(jobByteArrayRef != null) {
+        if (jobByteArrayRef != null) {
             map.put(key, jobByteArrayRef.getId());
         }
     }

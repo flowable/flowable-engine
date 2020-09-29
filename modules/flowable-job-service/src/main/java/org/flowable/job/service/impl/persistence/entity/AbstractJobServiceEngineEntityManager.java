@@ -37,7 +37,7 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
     }
 
     protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
-        if(jobByteArrayRef != null) {
+        if (jobByteArrayRef != null) {
             jobByteArrayRef.delete(serviceConfiguration.getEngineName());
         }
     }

@@ -215,7 +215,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             File subFolder=null;
             if (PROCESS_INSTANCE_PREFIX.equals(typePrefix)) {
                 subFolder = processInstanceFolder;
-            } else if(TASK_PREFIX.equals(typePrefix)) {
+            } else if (TASK_PREFIX.equals(typePrefix)) {
                 subFolder = taskFolder;
             } else if (CASE_PREFIX.equals(typePrefix)) {
                 subFolder = caseFolder;

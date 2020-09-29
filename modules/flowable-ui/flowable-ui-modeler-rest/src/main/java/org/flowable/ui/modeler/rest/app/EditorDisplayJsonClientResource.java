@@ -52,7 +52,7 @@ public class EditorDisplayJsonClientResource {
         Model model = modelService.getModel(modelId);
         if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
             cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
-        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType())  {
+        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
             dmnDisplayJsonConverter.processDefinitionElements(model, displayNode, new org.flowable.dmn.model.GraphicInfo());
         } else {
             bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
@@ -66,7 +66,7 @@ public class EditorDisplayJsonClientResource {
         ModelHistory model = modelService.getModelHistory(processModelId, processModelHistoryId);
         if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
             cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
-        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType())  {
+        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
             dmnDisplayJsonConverter.processDefinitionElements(model, displayNode, new org.flowable.dmn.model.GraphicInfo());
         } else {
             bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
