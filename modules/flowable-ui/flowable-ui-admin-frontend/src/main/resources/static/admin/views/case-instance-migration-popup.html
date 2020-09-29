@@ -1,0 +1,46 @@
+<div class="modal-header-wrapper">
+	<div class="modal-header">
+		<div class="pull-right">
+            <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CLOSE' | translate}}</a>
+        </div>
+		<h2>{{'CASE-DEFINITION.POPUP.MIGRATE.TITLE' | translate}} '{{definition.name && definition.name || definition.key}}'</h2>	
+	</div>
+</div>
+<div class="modal-body">
+	<p translate="CASE-DEFINITION.POPUP.MIGRATE.MESSAGE"></p>
+	<table class="edit-table">
+        <tr>
+            <td class="edit-label" translate="CASE-DEFINITION.POPUP.MIGRATE.CURRENT-DEFINITION"></td>
+            <td>
+                <input type="text" class="form-control" value="{{caseDefinition.name ? caseDefinition.name : caseDefinition.key}} (v{{caseDefinition.version}})" disabled>
+            </td>
+
+        </tr>
+        <tr>
+            <td class="edit-label" translate="CASE-DEFINITION.POPUP.MIGRATE.TARGET-DEFINITION"></td>
+            <td>
+                <select ui-select2
+                    data-placeholder="{{'CASE-INSTANCES.FILTER.ALL-CASE-DEFINITIONS' | translate}}"
+                    ng-model="model.newCaseDefinition"
+                    ng-change="targetCaseDefinitionChanged()"
+                    style="min-width:250px">
+                <option ng-title="123" ng-repeat="caseDefinition in filteredCaseDefinitions" value="{{caseDefinition.id}}">{{caseDefinition.name ? caseDefinition.name : caseDefinition.key}} (v{{caseDefinition.version}})</option>
+             </select>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="modal-footer-wrapper">
+	<div class="modal-footer">
+		<div class="pull-right">
+	       <button type="button" class="btn btn-sm btn-default" ng-click="cancel()" ng-disabled="status.loading"
+	       	translate="GENERAL.ACTION.CANCEL">
+	       	</button>
+	       <button type="button" class="btn btn-sm btn-default" ng-click="ok()" ng-disabled="status.loading || model.targetNotSelected"
+	        translate="GENERAL.ACTION.OK">
+	       </button>
+		</div>
+        <loading-indicator></loading-indicator>
+	</div>
+</div>

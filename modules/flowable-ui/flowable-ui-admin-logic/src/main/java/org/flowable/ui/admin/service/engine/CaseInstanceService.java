@@ -48,6 +48,9 @@ public class CaseInstanceService {
     public static final String RUNTIME_CASE_INSTANCE_URL = "cmmn-runtime/case-instances/{0}";
     public static final String RUNTIME_CASE_INSTANCE_VARIABLES = "cmmn-runtime/case-instances/{0}/variables";
     public static final String RUNTIME_CASE_INSTANCE_VARIABLE_URL = "cmmn-runtime/case-instances/{0}/variables/{1}";
+    public static final String CURRENT_PLAN_ITEM_INSTANCE_LIST_URL = "cmmn-runtime/plan-item-instances";
+    public static final String RUNTIME_CASE_INSTANCE_CHANGE_STATE_URL = "runtime/case-instances/{0}/change-state";
+    public static final String RUNTIME_CASE_INSTANCE_MIGRATE_URL = "runtime/case-instances/{0}/migrate";
     
     private static final String DEFAULT_SUBTASK_RESULT_SIZE = "1024";
     private static final String DEFAULT_CASEINSTANCE_SIZE = "100";
@@ -126,6 +129,32 @@ public class CaseInstanceService {
         HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
         return clientUtil.executeRequest(get, serverConfig);
     }
+    
+    public void changePlanItemState(ServerConfig serverConfig, String caseInstanceId, JsonNode changeActivityBody) throws FlowableServiceException {
+        try {
+            URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(RUNTIME_CASE_INSTANCE_CHANGE_STATE_URL, caseInstanceId));
+            HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
+
+            post.setEntity(clientUtil.createStringEntity(changeActivityBody.toString()));
+            clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            throw new FlowableServiceException(e.getMessage(), e);
+        }
+    }
+    
+    public void migrateCaseInstance(ServerConfig serverConfig, String caseInstanceId, String migrationDocument) throws FlowableServiceException {
+        try {
+            URIBuilder builder = clientUtil.createUriBuilder(MessageFormat.format(RUNTIME_CASE_INSTANCE_MIGRATE_URL, caseInstanceId));
+            HttpPost post = clientUtil.createPost(builder.build().toString(), serverConfig);
+
+            post.setEntity(clientUtil.createStringEntity(migrationDocument));
+            clientUtil.executeRequestNoResponseBody(post, serverConfig, HttpStatus.SC_OK);
+
+        } catch (Exception e) {
+            throw new FlowableServiceException(e.getMessage(), e);
+        }
+    }
 
     public JsonNode getVariables(ServerConfig serverConfig, String caseInstanceId) {
         URIBuilder builder = clientUtil.createUriBuilder(HISTORIC_VARIABLE_INSTANCE_LIST_URL);
@@ -194,5 +223,12 @@ public class CaseInstanceService {
 
     public JsonNode getJobs(ServerConfig serverConfig, String caseInstanceId) {
         return jobService.listJobs(serverConfig, Collections.singletonMap("caseInstanceId", new String[]{caseInstanceId}));
+    }
+    
+    public JsonNode getPlanItemInstancesForCaseInstance(ServerConfig serverConfig, String caseInstanceId) {
+        URIBuilder builder = clientUtil.createUriBuilder(CURRENT_PLAN_ITEM_INSTANCE_LIST_URL);
+        builder.addParameter("caseInstanceId", caseInstanceId);
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, builder));
+        return clientUtil.executeRequest(get, serverConfig);
     }
 }

@@ -82,7 +82,50 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                     }
                 }
             });
-        }
+        };
+        
+        $scope.showMigrateCaseDialog = function () {
+            $scope.migrationScope = {
+                targetCaseDefinition: undefined
+            };
+            var modalInstance = $modal.open({
+                templateUrl: 'views/case-instance-migration-popup.html', 
+                controller: 'ShowCaseInstanceMigrationPopupCtrl',
+                resolve: {
+                    caseInstance: function () {
+                        return $scope.caseInstance;
+                    },
+                    caseDefinition: function() {
+                        return $scope.definition;
+                    },
+                    migrationScope: function() {
+                        return $scope.migrationScope;
+                    }
+                }
+            });
+            
+            modalInstance.result.then(function (migrateCaseInstance) {
+                if (migrateCaseInstance) {
+                    var migrationModalInstance = $modal.open({
+                        templateUrl: 'views/case-instance-migration-diagram-popup.html',
+                        windowClass: 'modal modal-full-width',
+                        controller: 'ShowCaseInstanceMigrationDiagramPopupCtrl',
+                        resolve: {
+                            caseInstance: function () {
+                                return $scope.caseInstance;
+                            },
+                            migrationScope: function () {
+                                return $scope.migrationScope;
+                            }
+                        }
+                    });
+                    
+                    migrationModalInstance.result.then(function (result) {
+                        $scope.loadCaseInstance();
+                    });
+                }
+            });
+        };
 
         $scope.openDecisionTable = function (decisionTable) {
             if (decisionTable && decisionTable.getProperty('id')) {
@@ -109,7 +152,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
 
         $scope.loadCaseInstance = function () {
             $scope.caseInstance = undefined;
-            // Load process
+            // Load case instance
             $http({
                 method: 'GET',
                 url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-instances/' + $routeParams.caseInstanceId
@@ -525,6 +568,81 @@ flowableAdminApp.controller('ShowCaseInstanceDiagramPopupCtrl',
             if (caseInstance.endTime != undefined) {
                 $("#cmmnModel").attr("data-history-id", caseInstance.id);
             }
+            $("#cmmnModel").load("./display-cmmn/displaymodel.html?instanceId=" + caseInstance.id);
+        }, 200);
+
+
+    }]);
+    
+flowableAdminApp.controller('ShowCaseInstanceMigrationPopupCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'caseInstance', 'caseDefinition', 'migrationScope', 
+    function ($rootScope, $scope, $modalInstance, $http, caseInstance, caseDefinition, migrationScope) {
+
+        $scope.caseInstance = caseInstance;
+        $scope.caseDefinition = caseDefinition;
+        $scope.status = {loading: false};
+        $scope.model = {
+            targetNotSelected: true,
+            currentDefinitionId: caseDefinition.id
+        };
+        
+        $http({
+            method: 'GET',
+            url: FlowableAdmin.Config.adminContextRoot + 'rest/admin/case-definitions?key=' + $scope.caseDefinition.key + '&size=1000'
+        }).success(function (response, status, headers, config) {
+            var definitionList = response.data;
+            var finalResult = [];
+            for (var i = 0; i < definitionList.length; i++) {
+                if (definitionList[i].id !== caseDefinition.id) {
+                    finalResult.push(definitionList[i]);
+                }
+            }
+            $scope.filteredCaseDefinitions = finalResult;
+            
+        }).error(function (data, status, headers, config) {
+        });
+        
+        $scope.targetCaseDefinitionChanged = function () {
+            if ($scope.model.newCaseDefinition && $scope.model.newCaseDefinition.length > 0) {
+                migrationScope.targetCaseDefinition = $scope.model.newCaseDefinition;
+                $scope.model.targetNotSelected = false;
+            }
+        };
+        
+        $scope.ok = function () {
+            $modalInstance.close(true);
+        };
+
+        $scope.cancel = function () {
+            if (!$scope.status.loading) {
+                $modalInstance.dismiss('cancel');
+            }
+        };
+    }]);
+    
+flowableAdminApp.controller('ShowCaseInstanceMigrationDiagramPopupCtrl',
+    ['$rootScope', '$scope', '$modalInstance', '$http', 'caseInstance', 'migrationScope', '$timeout',
+    function ($rootScope, $scope, $modalInstance, $http, caseInstance, migrationScope, $timeout) {
+
+        $scope.model = {
+            id: caseInstance.id,
+            name: caseInstance.name
+        };
+
+        $scope.status = {loading: false};
+
+        $scope.cancel = function () {
+            if (!$scope.status.loading) {
+                $modalInstance.close(true);
+            }
+        };
+
+        $timeout(function () {
+            $("#cmmnModel").attr("data-instance-id", caseInstance.id);
+            $("#cmmnModel").attr("data-definition-id", caseInstance.caseDefinitionId);
+            $("#cmmnModel").attr("data-server-id", $rootScope.activeServers['cmmn'].id);
+            $("#targetModel").attr("data-migration-definition-id", migrationScope.targetCaseDefinition);
+            
             $("#cmmnModel").load("./display-cmmn/displaymodel.html?instanceId=" + caseInstance.id);
         }, 200);
 

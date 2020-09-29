@@ -60,6 +60,11 @@
                             <i class="glyphicon glyphicon-zoom-in"></i>{{'CASE-INSTANCE.ACTION.SHOW-DIAGRAM' | translate}}
                         </button>
                     </li>
+                    <li>
+                        <button type="button" class="btn btn-sm btn-default" ng-click="showMigrateCaseDialog()">
+                            <i class="glyphicon glyphicon-zoom-in"></i>{{'CASE-INSTANCE.ACTION.MIGRATE-CASEINSTANCE' | translate}}
+                        </button>
+                    </li>
                     <li ng-if="caseCompleted">
 					    <button type="button" class="btn btn-sm btn-default btn-danger" ng-click="deleteCaseInstance()">
 							<i class="glyphicon glyphicon-remove"></i>{{'CASE-INSTANCE.ACTION.DELETE' | translate}}

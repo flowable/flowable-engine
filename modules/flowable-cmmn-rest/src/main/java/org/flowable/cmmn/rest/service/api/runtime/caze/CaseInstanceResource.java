@@ -164,6 +164,40 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
         return runtimeService.getStageOverview(caseInstanceId);
     }
+    
+    @ApiOperation(value = "Change the state of a case instance", tags = { "Case Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and change state activity was executed."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
+    })
+    @PostMapping(value = "/runtime/case-instances/{caseInstanceId}/change-state", produces = "application/json")
+    public void changePlanItemState(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+            @RequestBody ChangePlanItemStateRequest planItemStateRequest, HttpServletRequest request) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.changePlanItemState(caseInstanceId, planItemStateRequest);
+        }
+
+        if (planItemStateRequest.getActivatePlanItemDefinitionIds() != null && !planItemStateRequest.getActivatePlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .activatePlanItemDefinitionIds(planItemStateRequest.getActivatePlanItemDefinitionIds())
+                .changeState();
+        
+        } else if (planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds() != null && !planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
+                .changeState();
+        
+        } else if (planItemStateRequest.getTerminatePlanItemDefinitionIds() != null && !planItemStateRequest.getTerminatePlanItemDefinitionIds().isEmpty()) {
+            runtimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstanceId)
+                .terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
+                .changeState();
+    }
+        
+    }
 
     @ApiOperation(value = "Migrate case instance", tags = { "Case Instances" }, notes = "")
     @ApiResponses(value = {

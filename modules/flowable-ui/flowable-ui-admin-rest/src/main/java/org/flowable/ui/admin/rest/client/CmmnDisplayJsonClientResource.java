@@ -12,7 +12,9 @@
  */
 package org.flowable.ui.admin.rest.client;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.Case;
@@ -28,6 +30,7 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.service.engine.CaseDefinitionService;
+import org.flowable.ui.admin.service.engine.CaseInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,9 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
 
     @Autowired
     protected CaseDefinitionService clientService;
+    
+    @Autowired
+    protected CaseInstanceService caseInstanceService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -61,7 +67,7 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
         if (!pojoModel.getLocationMap().isEmpty()) {
             try {
                 GraphicInfo diagramInfo = new GraphicInfo();
-                processCaseElements(config, pojoModel, displayNode, diagramInfo);
+                processCaseElements(pojoModel, displayNode, diagramInfo, null, null, null);
 
                 displayNode.put("diagramBeginX", diagramInfo.getX());
                 displayNode.put("diagramBeginY", diagramInfo.getY());
@@ -75,8 +81,79 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
 
         return displayNode;
     }
+    
+    @GetMapping(value = "/rest/admin/case-instances/{caseInstanceId}/model-json", produces = "application/json")
+    public JsonNode getCaseInstanceModelJSON(@PathVariable String caseInstanceId) {
+        ObjectNode displayNode = objectMapper.createObjectNode();
 
-    protected void processCaseElements(ServerConfig config, CmmnModel pojoModel, ObjectNode displayNode, GraphicInfo diagramInfo) throws Exception {
+        ServerConfig config = retrieveServerConfig(EndpointType.CMMN);
+        JsonNode caseInstanceNode = caseInstanceService.getCaseInstance(config, caseInstanceId);
+
+        if (caseInstanceNode == null) {
+            return displayNode;
+        }
+
+        String caseDefinitionId = caseInstanceNode.get("caseDefinitionId").asText();
+        CmmnModel pojoModel = clientService.getCaseDefinitionModel(config, caseDefinitionId);
+
+        if (!pojoModel.getLocationMap().isEmpty()) {
+            
+            JsonNode planitemsInstanceNodes = caseInstanceService.getPlanItemInstancesForCaseInstance(config, caseInstanceId);
+            
+            Set<String> completedPlanItemInstances = new HashSet<>();
+            Set<String> activePlanItemInstances = new HashSet<>();
+            Set<String> availablePlanItemInstances = new HashSet<>();
+            if (planitemsInstanceNodes != null && planitemsInstanceNodes.has("data") && planitemsInstanceNodes.get("data").isArray()) {
+                for (JsonNode planItemInstance : planitemsInstanceNodes.get("data")) {
+                    if ((planItemInstance.has("completedTime") && !planItemInstance.get("completedTime").isNull())
+                            || (planItemInstance.has("terminatedTime") && !planItemInstance.get("terminatedTime").isNull())
+                            || (planItemInstance.has("occurredTime") && !planItemInstance.get("occurredTime").isNull())) {
+                        
+                        completedPlanItemInstances.add(planItemInstance.get("planItemDefinitionId").asText());
+
+                    } else if ("active".equals(planItemInstance.get("state").asText())) {
+                        activePlanItemInstances.add(planItemInstance.get("planItemDefinitionId").asText());
+
+                    } else if ("available".equals(planItemInstance.get("state").asText())) {
+                        availablePlanItemInstances.add(planItemInstance.get("planItemDefinitionId").asText());
+                    }
+                }
+
+            }
+
+            GraphicInfo diagramInfo = new GraphicInfo();
+            try {
+                processCaseElements(pojoModel, displayNode, diagramInfo, completedPlanItemInstances, activePlanItemInstances, availablePlanItemInstances);
+                displayNode.put("diagramBeginX", diagramInfo.getX());
+                displayNode.put("diagramBeginY", diagramInfo.getY());
+                displayNode.put("diagramWidth", diagramInfo.getWidth());
+                displayNode.put("diagramHeight", diagramInfo.getHeight());
+                
+                ArrayNode completedActivities = displayNode.putArray("completedActivities");
+                for (String completed : completedPlanItemInstances) {
+                    completedActivities.add(completed);
+                }
+
+                ArrayNode currentActivities = displayNode.putArray("currentActivities");
+                for (String current : activePlanItemInstances) {
+                    currentActivities.add(current);
+                }
+
+                ArrayNode availableActivities = displayNode.putArray("availableActivities");
+                for (String available : availablePlanItemInstances) {
+                    availableActivities.add(available);
+                }
+                
+            } catch (Exception e) {
+                LOGGER.error("Error creating model JSON", e);
+            }
+        }
+
+        return displayNode;
+    }
+
+    protected void processCaseElements(CmmnModel pojoModel, ObjectNode displayNode, GraphicInfo diagramInfo,
+            Set<String> completedElements, Set<String> activeElements, Set<String> availableElements) throws Exception {
 
         if (pojoModel.getLocationMap().isEmpty()) {
             return;
@@ -105,7 +182,8 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
 
             processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray);
 
-            processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, flowArray, diagramInfo);
+            processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, flowArray, 
+                    completedElements, activeElements, availableElements, diagramInfo);
         }
 
         for (Association association : pojoModel.getAssociations()) {
@@ -138,7 +216,8 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
         displayNode.put("diagramHeight", diagramInfo.getHeight());
     }
 
-    protected void processElements(List<PlanItem> planItemList, CmmnModel model, ArrayNode elementArray, ArrayNode flowArray, GraphicInfo diagramInfo) {
+    protected void processElements(List<PlanItem> planItemList, CmmnModel model, ArrayNode elementArray, ArrayNode flowArray, 
+            Set<String> completedElements, Set<String> activeElements, Set<String> availableElements, GraphicInfo diagramInfo) {
 
         for (PlanItem planItem : planItemList) {
             ObjectNode elementNode = objectMapper.createObjectNode();
@@ -154,6 +233,19 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             String className = planItemDefinition.getClass().getSimpleName();
             elementNode.put("type", className);
+            elementNode.put("planItemDefinitionId", planItemDefinition.getId());
+            
+            if (completedElements != null) {
+                elementNode.put("completed", completedElements.contains(planItemDefinition.getId()));
+            }
+
+            if (activeElements != null) {
+                elementNode.put("current", activeElements.contains(planItemDefinition.getId()));
+            }
+
+            if (availableElements != null) {
+                elementNode.put("available", availableElements.contains(planItemDefinition.getId()));
+            }
 
             if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
@@ -170,7 +262,8 @@ public class CmmnDisplayJsonClientResource extends AbstractClientResource {
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
 
-                processElements(stage.getPlanItems(), model, elementArray, flowArray, diagramInfo);
+                processElements(stage.getPlanItems(), model, elementArray, flowArray, completedElements,
+                        activeElements, availableElements, diagramInfo);
             }
         }
     }

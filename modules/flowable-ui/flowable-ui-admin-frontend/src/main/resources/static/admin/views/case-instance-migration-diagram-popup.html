@@ -3,20 +3,22 @@
 		<div class="pull-right">
             <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
         </div>
-        <h2>{{'PROCESS-INSTANCE.POPUP.SHOW-PROCESS-MODEL.TITLE' | translate}} '{{definition.name &amp;&amp; model.name || model.id}}' 
-            <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_PROCESS')">Root</a></span>
+        <h2>{{'CASE-INSTANCE.POPUP.SHOW-CASE-MODEL.TITLE' | translate}} '{{definition.name &amp;&amp; model.name || model.id}}' 
+            <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_CASE')">Root</a></span>
         </h2>
 	</div>
 </div>
 <div class="modal-body modal-body-medium">
     <div class="text-center">
         <button type="button" id="executeMigrationDocument" class="btn btn-sm btn-default">Execute migration</button>
-        <button type="button" id="addMappingButton" class="btn btn-sm btn-default" style="display:none">Add mapping</button>
+        <button type="button" id="addActivatePlanItemDefinition" class="btn btn-sm btn-default">Add activate definition</button>
+        <button type="button" id="addAvailablePlanItemDefinition" class="btn btn-sm btn-default">Add move to available definition</button>
+        <button type="button" id="addTerminatePlanItemDefinition" class="btn btn-sm btn-default">Add terminate definition</button>
     </div>
     <div class="text-center">
         <span id="currentMappingValues"></span>
     </div>
-	<div id="bpmnModel" style="margin-left:auto;margin-right:auto"></div>
+	<div id="cmmnModel" style="margin-left:auto;margin-right:auto"></div>
 	<hr id="migrationDivider" />
 	<div id="targetModel" style="margin-left:auto;margin-right:auto"></div>
 </div>
