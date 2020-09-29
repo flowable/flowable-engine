@@ -1993,10 +1993,6 @@
 		<system>Github issues</system>
 		<url>https://github.com/flowable/flowable-engine/issues</url>
 	</issueManagement>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://qa.flowable.org</url>
-	</ciManagement>
 	<scm>
 		<url>git@github.com:flowable/flowable-engine.git</url>
 		<connection>scm:git:git@github.com:flowable/flowable-engine.git</connection>
