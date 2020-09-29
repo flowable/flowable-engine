@@ -40,8 +40,9 @@ public class DefinitionsRootExport implements CmmnXmlConstants {
         xtw.writeNamespace(OMGDC_PREFIX, OMGDC_NAMESPACE);
         xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
         for (String prefix : model.getNamespaces().keySet()) {
-            if (!defaultNamespaces.contains(prefix) && StringUtils.isNotEmpty(prefix))
+            if (!defaultNamespaces.contains(prefix) && StringUtils.isNotEmpty(prefix)) {
                 xtw.writeNamespace(prefix, model.getNamespaces().get(prefix));
+            }
         }
         if (StringUtils.isNotEmpty(model.getTargetNamespace())) {
             xtw.writeAttribute(ATTRIBUTE_TARGET_NAMESPACE, model.getTargetNamespace());

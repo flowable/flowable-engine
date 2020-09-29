@@ -305,13 +305,13 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals("one", historicProcessVariable.getValue());
 
         Map<String, Object> variables3 = new HashMap<String, Object>();
-        variables3.put("long", 1000l);
+        variables3.put("long", 1000L);
         variables3.put("double", 25.43d);
         ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("receiveTask", variables3);
         runtimeService.trigger(processInstance3.getProcessInstanceId());
 
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("long").count());
-        assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000l).count());
+        assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000L).count());
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("double").count());
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("double", 25.43d).count());
 

@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
 

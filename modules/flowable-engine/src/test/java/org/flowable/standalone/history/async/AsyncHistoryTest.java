@@ -602,7 +602,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         taskService.complete(task.getId());
 
         assertThat(historyService.createHistoricTaskLogEntryQuery().count()).isZero();
-        assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(12l);
+        assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(12);
 
         waitForHistoryJobExecutorToProcessAllJobs(7000, 200);
 

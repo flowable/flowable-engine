@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.DataStore;
 import org.flowable.bpmn.model.DataStoreReference;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Pool;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DataStoreConverterTest extends AbstractConverterTest {
 

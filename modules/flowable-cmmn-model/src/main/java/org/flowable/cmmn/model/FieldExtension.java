@@ -64,14 +64,21 @@ public class FieldExtension extends BaseElement {
     @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FieldExtension)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FieldExtension)) {
+            return false;
+        }
 
         FieldExtension that = (FieldExtension) o;
 
-        if (!getFieldName().equals(that.getFieldName())) return false;
-        if (getStringValue() != null ? !getStringValue().equals(that.getStringValue()) : that.getStringValue() != null)
+        if (!getFieldName().equals(that.getFieldName())) {
             return false;
+        }
+        if (getStringValue() != null ? !getStringValue().equals(that.getStringValue()) : that.getStringValue() != null) {
+            return false;
+        }
         return getExpression() != null ? getExpression().equals(that.getExpression()) : that.getExpression() == null;
     }
 

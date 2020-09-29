@@ -175,7 +175,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> expectedVariables = new HashMap<String, Object>();
         expectedVariables.put("room", "5b");
         expectedVariables.put("SpeakerName", "Mike");
-        expectedVariables.put("duration", 45l);
+        expectedVariables.put("duration", 45L);
         expectedVariables.put("free", Boolean.TRUE);
         expectedVariables.put("double", 45.5d);
 
@@ -241,7 +241,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         expectedVariables = new HashMap<String, Object>();
         expectedVariables.put("room", "5b");
         expectedVariables.put("SpeakerName", "Mike");
-        expectedVariables.put("duration", 45l);
+        expectedVariables.put("duration", 45L);
         expectedVariables.put("free", Boolean.TRUE);
         expectedVariables.put("double", 45.5d);
 

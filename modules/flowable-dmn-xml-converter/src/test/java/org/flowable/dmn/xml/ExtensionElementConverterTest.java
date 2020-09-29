@@ -27,7 +27,7 @@ import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ExtensionElementConverterTest extends AbstractConverterTest {
 

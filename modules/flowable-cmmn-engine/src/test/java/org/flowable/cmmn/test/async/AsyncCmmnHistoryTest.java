@@ -736,11 +736,11 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
         cmmnTaskService.complete(task.getId());
 
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().count()).isZero();
-        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(10l);
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(10);
 
         waitForAsyncHistoryExecutorToProcessAllJobs();
 
-        assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(11l);
+        assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(11);
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_CREATED.name()).count())
                 .isEqualTo(1);
         assertThat(

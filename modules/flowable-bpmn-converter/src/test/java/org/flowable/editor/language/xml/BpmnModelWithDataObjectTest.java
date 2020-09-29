@@ -27,7 +27,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
 

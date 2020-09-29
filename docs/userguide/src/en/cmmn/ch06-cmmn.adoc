@@ -615,7 +615,7 @@ Do note that the Groovy scripting engine is bundled with the groovy-jsr223 JAR. 
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy-jsr223</artifactId>
-    <version>2.x.x<version>
+    <version>3.x.x<version>
 </dependency>
 ----
 
