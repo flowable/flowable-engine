@@ -649,9 +649,10 @@ public class ExecutionEntityManagerImpl
 
                     } else {
                         if (cancel && (childExecutionEntity.isActive() || childExecutionEntity.isMultiInstanceRoot()) 
-                                && (executionIdsNotToSendCancelledEventFor == null || !executionIdsNotToSendCancelledEventFor.contains(childExecutionEntity.getId())))
-                            dispatchExecutionCancelled(childExecutionEntity, 
+                                && (executionIdsNotToSendCancelledEventFor == null || !executionIdsNotToSendCancelledEventFor.contains(childExecutionEntity.getId()))) {
+                            dispatchExecutionCancelled(childExecutionEntity,
                                     cancelActivity != null ? cancelActivity : childExecutionEntity.getCurrentFlowElement());
+                        }
                     }
                     deleteExecutionAndRelatedData(childExecutionEntity, deleteReason, false);
                 }
