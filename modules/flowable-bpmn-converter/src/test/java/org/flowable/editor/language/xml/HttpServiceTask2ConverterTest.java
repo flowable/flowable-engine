@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
 

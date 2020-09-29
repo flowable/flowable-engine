@@ -51,9 +51,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -79,12 +79,12 @@ public class SimpleSimulationRunTest {
 
     protected InMemoryRecordFlowableEventListener listener;
 
-    @Before
+    @BeforeEach
     public void initListener() {
         listener = new InMemoryRecordFlowableEventListener(getTransformers());
     }
 
-    @After
+    @AfterEach
     public void cleanupListener() {
         listener = null;
     }

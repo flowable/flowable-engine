@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class InCompleteSignalConverterTest extends AbstractConverterTest {
 

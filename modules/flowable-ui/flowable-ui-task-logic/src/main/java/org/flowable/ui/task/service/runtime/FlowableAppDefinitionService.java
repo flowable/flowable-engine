@@ -105,6 +105,16 @@ public class FlowableAppDefinitionService {
 
         SecurityScope currentSecurityScope = SecurityUtils.getAuthenticatedSecurityScope();
 
+        boolean hasAccessToTask = currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_TASK);
+
+        if (hasAccessToTask) {
+            resultList.add(taskAppDefinitionRepresentation);
+        }
+
+        if (modelerAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_MODELER)) {
+            resultList.add(modelerAppDefinitionRepresentation);
+        }
+
         if (adminAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_ADMIN)) {
             resultList.add(adminAppDefinitionRepresentation);
         }
@@ -113,11 +123,7 @@ public class FlowableAppDefinitionService {
             resultList.add(idmAppDefinitionRepresentation);
         }
 
-        if (modelerAppDefinitionRepresentation != null && currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_MODELER)) {
-            resultList.add(modelerAppDefinitionRepresentation);
-        }
-
-        if (currentSecurityScope.hasAuthority(DefaultPrivileges.ACCESS_TASK)) {
+        if (hasAccessToTask) {
             resultList.addAll(getTaskAppList(currentSecurityScope));
         }
 
@@ -127,9 +133,6 @@ public class FlowableAppDefinitionService {
 
     protected List<AppDefinitionRepresentation> getTaskAppList(SecurityScope currentUser) {
         List<AppDefinitionRepresentation> resultList = new ArrayList<>();
-
-        // Default app: tasks (available for all)
-        resultList.add(taskAppDefinitionRepresentation);
 
         // Custom apps
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().latestVersion().list();

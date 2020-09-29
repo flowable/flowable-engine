@@ -18,7 +18,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ConditionalConverterTest extends AbstractConverterTest {
 

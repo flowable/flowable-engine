@@ -20,20 +20,20 @@
 		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.5.6.RELEASE</spring.kafka.version>
 		<reactor-netty.version>0.9.12.RELEASE</reactor-netty.version>
-		<jackson.version>2.11.0</jackson.version>
+		<jackson.version>2.11.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-        <camel.version>2.25.0</camel.version>
-		<cxf.version>3.3.6</cxf.version>
+    <camel.version>2.25.0</camel.version>
+		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<jib-maven-plugin.version>1.6.1</jib-maven-plugin.version>
 
 		<junit.version>4.13</junit.version>
-		<junit.jupiter.version>5.6.2</junit.jupiter.version>
+		<junit.jupiter.version>5.7.0</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.3.3</mockito.version>
+		<mockito.version>3.5.13</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
@@ -114,17 +114,17 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.10</version>
+				<version>3.11</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.7</version>
+				<version>2.8.0</version>
 			</dependency>
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.14</version>
+			    <version>1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -1075,13 +1075,13 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.16.0</version>
+				<version>3.17.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.17.0</version>
+				<version>2.19.0</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>

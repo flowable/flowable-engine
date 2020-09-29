@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CompleteConverterTest extends AbstractConverterTest {
 

@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityConverterTest extends AbstractConverterTest {
 
