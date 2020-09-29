@@ -13,12 +13,13 @@
 
 package org.flowable.rest.service.api.history;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Date;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers

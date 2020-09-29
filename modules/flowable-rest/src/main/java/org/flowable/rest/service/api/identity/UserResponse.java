@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.identity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**

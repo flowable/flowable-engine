@@ -12,15 +12,24 @@
  */
 package org.flowable.ui.task.service.debugger;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.flowable.engine.impl.agenda.DebugContinueProcessOperation.HANDLER_TYPE_BREAK_POINT;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.RuntimeService;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Context;
@@ -29,22 +38,13 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.job.api.Job;
-import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.ui.task.model.debugger.BreakpointRepresentation;
 import org.flowable.ui.task.model.debugger.ExecutionRepresentation;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.flowable.engine.impl.agenda.DebugContinueProcessOperation.HANDLER_TYPE_BREAK_POINT;
 
 /**
  * This class implements basic methods for managing breakpoints

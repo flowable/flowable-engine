@@ -13,13 +13,15 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+
 import org.flowable.rest.service.api.RestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
