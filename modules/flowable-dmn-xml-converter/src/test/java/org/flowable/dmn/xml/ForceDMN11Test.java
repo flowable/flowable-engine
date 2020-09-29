@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ForceDMN11Test extends AbstractConverterTest {
 
