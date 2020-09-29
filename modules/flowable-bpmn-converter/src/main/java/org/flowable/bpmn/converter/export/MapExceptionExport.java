@@ -12,13 +12,14 @@
  */
 package org.flowable.bpmn.converter.export;
 
+import java.util.List;
+
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.MapExceptionEntry;
-
-import javax.xml.stream.XMLStreamWriter;
-import java.util.List;
 
 public class MapExceptionExport implements BpmnXMLConstants {
 

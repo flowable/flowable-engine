@@ -12,16 +12,16 @@
  */
 package org.flowable.bpmn;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.mxgraph.layout.mxGraphLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
 import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * BPMNLayout

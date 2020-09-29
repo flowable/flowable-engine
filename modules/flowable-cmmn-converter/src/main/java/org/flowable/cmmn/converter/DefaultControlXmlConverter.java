@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
-
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Dennis Federico

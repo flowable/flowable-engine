@@ -32,8 +32,8 @@ import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLin
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 

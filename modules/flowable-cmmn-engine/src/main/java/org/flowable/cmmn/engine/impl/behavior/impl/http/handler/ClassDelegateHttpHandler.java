@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.engine.impl.behavior.impl.http.handler;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -22,8 +24,6 @@ import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.api.delegate.HttpRequestHandler;
 import org.flowable.http.common.api.delegate.HttpResponseHandler;
-
-import java.util.List;
 
 /**
  * Helper class for HTTP handlers to allow class delegation.
