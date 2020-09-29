@@ -14,10 +14,10 @@ package org.flowable.dmn.engine;
 
 import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnDecisionService;
 
 public interface DmnEngine extends Engine {
 

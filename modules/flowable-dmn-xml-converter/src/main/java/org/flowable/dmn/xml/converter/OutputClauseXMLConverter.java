@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.xml.converter;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.OutputClause;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Yvo Swillens

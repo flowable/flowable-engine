@@ -13,10 +13,10 @@
 
 package org.flowable.dmn.engine.impl.el;
 
+import java.lang.reflect.Method;
+
 import org.flowable.common.engine.impl.el.AbstractFlowableFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.util.CollectionUtil;
-
-import java.lang.reflect.Method;
 
 /**
  * A collection function mapper that can be used in EL expressions
