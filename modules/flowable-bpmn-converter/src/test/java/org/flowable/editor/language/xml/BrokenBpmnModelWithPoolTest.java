@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
 

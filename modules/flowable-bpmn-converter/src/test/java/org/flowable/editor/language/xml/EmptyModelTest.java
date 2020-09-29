@@ -15,7 +15,7 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.bpmn.exceptions.XMLException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EmptyModelTest extends AbstractConverterTest {
 

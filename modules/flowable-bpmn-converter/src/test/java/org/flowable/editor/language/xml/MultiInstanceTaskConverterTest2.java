@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @see <a href="https://github.com/flowable/flowable-engine/issues/474">Issue 474</a>

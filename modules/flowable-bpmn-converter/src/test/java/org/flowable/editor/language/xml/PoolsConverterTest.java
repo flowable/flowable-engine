@@ -25,7 +25,7 @@ import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.util.io.InputStreamSource;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PoolsConverterTest extends AbstractConverterTest {
 

@@ -18,7 +18,7 @@ import java.util.Collection;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Signal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SignalConverterTest extends AbstractConverterTest {
 

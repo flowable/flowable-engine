@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TimerDefinitionConverterTest extends AbstractConverterTest {
 
