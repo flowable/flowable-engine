@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -20,8 +22,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-
-import java.io.Serializable;
 
 /**
  * {@link Command} that changes the business key of an existing case instance.

@@ -13,6 +13,19 @@
 
 package org.flowable.cmmn.rest.service.api.history.milestone;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,17 +34,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.common.rest.api.DataResponse;
-import org.flowable.common.rest.api.RequestUtil;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
 
 /**
  * @author Tijs Rademakers

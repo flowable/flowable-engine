@@ -12,13 +12,14 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import java.util.List;
+
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.IOParameter;
-
-import javax.xml.stream.XMLStreamWriter;
-import java.util.List;
 
 /**
  * @author Valentin Zickner

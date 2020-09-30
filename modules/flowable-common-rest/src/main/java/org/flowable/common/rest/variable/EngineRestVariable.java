@@ -13,6 +13,7 @@
 package org.flowable.common.rest.variable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**

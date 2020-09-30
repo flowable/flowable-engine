@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Date;
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Joram Barrez
