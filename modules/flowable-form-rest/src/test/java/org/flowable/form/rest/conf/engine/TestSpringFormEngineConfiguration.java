@@ -12,14 +12,14 @@
  */
 package org.flowable.form.rest.conf.engine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class TestSpringFormEngineConfiguration extends SpringFormEngineConfiguration {
 

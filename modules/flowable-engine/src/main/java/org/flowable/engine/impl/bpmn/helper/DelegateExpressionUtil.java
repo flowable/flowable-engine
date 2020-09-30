@@ -12,14 +12,14 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
+import java.util.List;
+
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.delegate.VariableScope;
-
-import java.util.List;
 
 /**
  * @author Joram Barrez

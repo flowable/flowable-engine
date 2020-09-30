@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.test.bpmn.event.timer;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class IntermediateTimerEventTestCounter implements JavaDelegate {
     static AtomicInteger counter = new AtomicInteger(0);

@@ -13,7 +13,6 @@
 package org.flowable.common.engine.impl.lock;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;

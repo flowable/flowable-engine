@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.persistence.deploy;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.Serializable;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
