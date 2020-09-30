@@ -962,7 +962,7 @@ public class DefaultProcessDiagramCanvas {
             g.setStroke(EVENT_SUBPROCESS_STROKE);
             g.draw(rect);
             g.setStroke(originalStroke);
-        }else{
+        } else {
             Paint originalPaint = g.getPaint();
             g.setPaint(SUBPROCESS_BOX_COLOR);
             g.fill(rect);

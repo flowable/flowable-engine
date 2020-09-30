@@ -221,7 +221,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-            if(triggerable) {
+            if (triggerable) {
                 leave(execution);
             }
         } else {

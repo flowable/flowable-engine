@@ -40,11 +40,11 @@ public abstract class AbstractFlowableEngineEventListener extends AbstractFlowab
 
     @Override
     public void onEvent(FlowableEvent flowableEvent) {
-        if(flowableEvent instanceof FlowableEngineEvent) {
+        if (flowableEvent instanceof FlowableEngineEvent) {
             FlowableEngineEvent flowableEngineEvent = (FlowableEngineEvent) flowableEvent;
             FlowableEngineEventType engineEventType = (FlowableEngineEventType) flowableEvent.getType();
 
-            if(types == null || types.contains(engineEventType)) {
+            if (types == null || types.contains(engineEventType)) {
                 switch (engineEventType) {
                     case ENTITY_CREATED:
                         entityCreated((FlowableEngineEntityEvent) flowableEngineEvent);

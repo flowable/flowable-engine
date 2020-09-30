@@ -827,7 +827,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 GraphicInfo labelGraphicInfo = bpmnModel.getLabelGraphicInfo(sequenceFlow.getId());
                 if (labelGraphicInfo != null) {
                     processDiagramCanvas.drawLabel(sequenceFlow.getName(), labelGraphicInfo, false);
-                }else {
+                } else {
                     if (drawSequenceFlowNameWithNoLabelDI) {
                         GraphicInfo lineCenter = getLineCenter(graphicInfoList);
                         processDiagramCanvas.drawLabel(sequenceFlow.getName(), lineCenter, false); 

@@ -88,7 +88,7 @@ public abstract class CdiCamelBehavior extends CamelBehavior {
     protected CamelContext get(String name) {
         BeanManager beanManager = BeanManagerLookup.getBeanManager();
         Set<Bean<?>> beans = beanManager.getBeans(name);
-        if(beans.isEmpty())
+        if (beans.isEmpty())
         	return null;
 		@SuppressWarnings("unchecked")
         Bean<CamelContext> bean = (Bean<CamelContext>) beans.iterator().next();

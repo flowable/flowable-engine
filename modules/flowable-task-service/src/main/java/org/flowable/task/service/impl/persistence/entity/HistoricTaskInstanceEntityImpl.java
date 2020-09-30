@@ -498,7 +498,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
 
     public List<HistoricIdentityLinkEntity> getQueryIdentityLinks() {
-        if(queryIdentityLinks == null) {
+        if (queryIdentityLinks == null) {
             queryIdentityLinks = new LinkedList<>();
         }
         return queryIdentityLinks;

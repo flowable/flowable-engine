@@ -17,7 +17,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public interface CmmnEngineAgendaFactory  {
+public interface CmmnEngineAgendaFactory {
 
     CmmnEngineAgenda createAgenda(CommandContext commandContext);
     

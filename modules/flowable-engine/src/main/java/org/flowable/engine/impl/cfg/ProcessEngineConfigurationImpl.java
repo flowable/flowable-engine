@@ -2773,7 +2773,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.setInternalProcessLocalizationManager(new DefaultProcessLocalizationManager(this));
         }
 
-        if(this.internalProcessDefinitionLocalizationManager == null) {
+        if (this.internalProcessDefinitionLocalizationManager == null) {
             this.setInternalProcessDefinitionLocalizationManager(new DefaultProcessDefinitionLocalizationManager(this));
         }
 

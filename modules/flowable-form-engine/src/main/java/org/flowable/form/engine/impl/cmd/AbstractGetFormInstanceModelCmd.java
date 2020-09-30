@@ -143,7 +143,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
             for (FormField field : allFields) {
                 if (field instanceof OptionFormField) {
                     OptionFormField optionFormField = (OptionFormField) field;
-                    if(optionFormField.getOptionsExpression() != null) {
+                    if (optionFormField.getOptionsExpression() != null) {
                         // Drop down options to be populated from an expression
                         Expression optionsExpression = formEngineConfiguration.getExpressionManager().createExpression(optionFormField.getOptionsExpression());
                         Object value = null;
@@ -152,11 +152,11 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                         } catch (Exception e) {
                             throw new FlowableException("Error getting value for optionsExpression: " + optionFormField.getOptionsExpression(), e);
                         }
-                        if(value instanceof List) {
+                        if (value instanceof List) {
                             @SuppressWarnings("unchecked")
                             List<Option> options = (List<Option>) value;
                             optionFormField.setOptions(options);
-                        } else if(value instanceof String) {
+                        } else if (value instanceof String) {
                             String json = (String) value;
                             try {
                                 List<Option> options = formEngineConfiguration.getObjectMapper().readValue(json, new TypeReference<List<Option>>(){});
@@ -171,7 +171,7 @@ public class AbstractGetFormInstanceModelCmd implements Command<FormInstanceInfo
                     Object variableValue = variables.get(field.getId());
                     optionFormField.setValue(variableValue);
                     
-                } else if(FormFieldTypes.HYPERLINK.equals(field.getType())) {
+                } else if (FormFieldTypes.HYPERLINK.equals(field.getType())) {
                     Object variableValue = variables.get(field.getId());
                     // process expression if there is no value, otherwise keep it
                     if (variableValue != null) {
