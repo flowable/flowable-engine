@@ -39,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ import org.slf4j.LoggerFactory;
  *
  * @see DefaultCaseDiagramGenerator
  * @author Tijs Rademakers
- * @author Zheng Ji
  */
 public class DefaultCaseDiagramCanvas {
 
@@ -315,7 +313,7 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
-    
+
     public void drawGenericEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, null, scaleFactor);
     }
@@ -327,7 +325,7 @@ public class DefaultCaseDiagramCanvas {
     public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
     }
-    
+
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();
         g.setPaint(EVENT_COLOR);
@@ -366,7 +364,7 @@ public class DefaultCaseDiagramCanvas {
         g.drawRoundRect(x, y, width, height, 6, 6);
 
         // Add the name as text, vertical
-        if (new BigDecimal(scaleFactor).compareTo(new BigDecimal("1.0"))==0  && name != null && name.length() > 0) {
+        if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             // Include some padding
             int availableTextSpace = height - 6;
 
@@ -418,7 +416,7 @@ public class DefaultCaseDiagramCanvas {
 
         g.setPaint(originalPaint);
         // text
-        if (new BigDecimal(scaleFactor).compareTo(new BigDecimal("1.0"))==0 && name != null && name.length() > 0) {
+        if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             int boxWidth = width - (2 * TEXT_PADDING);
             int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;
             int boxX = x + width / 2 - boxWidth / 2;
@@ -450,7 +448,7 @@ public class DefaultCaseDiagramCanvas {
         g.setPaint(originalPaint);
         // text
 
-        if ( new BigDecimal(scaleFactor).compareTo(new BigDecimal("1.0"))==0 && name != null && name.length() > 0) {
+        if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             int boxWidth = width - (2 * TEXT_PADDING);
             int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;
             int boxX = x + width / 2 - boxWidth / 2;
