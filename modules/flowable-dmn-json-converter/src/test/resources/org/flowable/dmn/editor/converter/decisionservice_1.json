@@ -11,27 +11,20 @@
     }
   },
   "properties": {
-    "name": "Decision Service 1",
-    "drd_id": "drd1"
+    "drd_id": "decisionServiceTestOne",
+    "name": "Decision Service Test One"
   },
   "childShapes": [
     {
       "resourceId": "expandedDecisionService",
-      "properties": {
-        "overrideid": "decisionService1",
-        "name": "Decision Service 1"
-      },
+      "properties": {},
       "stencil": {
         "id": "ExpandedDecisionService"
       },
       "childShapes": [
         {
           "resourceId": "outputDecisions",
-          "properties": {
-            "overrideid": "outputDecisions",
-            "name": "Decision Service 1",
-            "showcaption": true
-          },
+          "properties": {},
           "stencil": {
             "id": "OutputDecisionsDecisionServiceSection"
           },
@@ -108,11 +101,7 @@
         },
         {
           "resourceId": "encapsulatedDecisions",
-          "properties": {
-            "overrideid": "",
-            "name": "",
-            "showcaption": true
-          },
+          "properties": {},
           "stencil": {
             "id": "EncapsulatedDecisionsDecisionServiceSection"
           },

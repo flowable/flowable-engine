@@ -71,8 +71,8 @@
         </div>
 
         <div class="item fadein" ng-repeat="decision in model.decisions.data track by $index">
-            <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(decision.id, imageVersion) + '\')'}"
-                 ng-click="showDecisionTableDetails(decision);">
+            <div class="item-box" style="background-size: 90%" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(decision.id, imageVersion) + '\')'}"
+                 ng-click="showDecisionDetails(decision);">
                 <div class="actions">
                     <span class="badge">v{{decision.version}}</span>
                     <div class="btn-group pull-right">

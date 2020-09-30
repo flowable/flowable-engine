@@ -108,9 +108,14 @@ public class ModelResource {
                 modelNode.put("name", model.getName());
                 modelNode.put("key", model.getKey());
 
-                if (Model.MODEL_TYPE_BPMN == model.getModelType()) {
+                if (Model.MODEL_TYPE_BPMN == model.getModelType() || Model.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
                     ObjectNode propertiesNode = (ObjectNode) modelNode.get("properties");
-                    propertiesNode.put("process_id", model.getKey());
+
+                    if (Model.MODEL_TYPE_BPMN == model.getModelType()) {
+                        propertiesNode.put("process_id", model.getKey());
+                    } else if (Model.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
+                        propertiesNode.put("drd_id", model.getKey());
+                    }
                     propertiesNode.put("name", model.getName());
                     if (StringUtils.isNotEmpty(model.getDescription())) {
                         propertiesNode.put("documentation", model.getDescription());
@@ -288,8 +293,15 @@ public class ModelResource {
 			ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(json);
 
 			ObjectNode propertiesNode = (ObjectNode) editorJsonNode.get("properties");
-			String processId = key;
-			propertiesNode.put("process_id", processId);
+
+			if (Model.MODEL_TYPE_BPMN == model.getModelType()) {
+                propertiesNode.put("process_id", key);
+            } else if (Model.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
+                propertiesNode.put("drd_id", key);
+            } if (Model.MODEL_TYPE_CMMN == model.getModelType()) {
+			    propertiesNode.put("case_id", key);
+            }
+
 			propertiesNode.put("name", name);
 			if (StringUtils.isNotEmpty(description)) {
 				propertiesNode.put("documentation", description);
@@ -301,7 +313,7 @@ public class ModelResource {
 
         } catch (Exception e) {
             LOGGER.error("Error saving model {}", model.getId(), e);
-            throw new BadRequestException("Process model could not be saved " + model.getId());
+            throw new BadRequestException("Model could not be saved " + model.getId());
         }
     }
 
