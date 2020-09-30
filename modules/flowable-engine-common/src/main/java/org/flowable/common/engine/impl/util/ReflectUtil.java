@@ -333,7 +333,7 @@ public abstract class ReflectUtil {
     public static boolean isGetter(Method method) {
         String name = method.getName();
         Class<?> type = method.getReturnType();
-        Class<?> params[] = method.getParameterTypes();
+        Class<?>[] params = method.getParameterTypes();
 
         if (!GETTER_PATTERN.matcher(name).matches()) {
             return false;
@@ -350,7 +350,7 @@ public abstract class ReflectUtil {
     public static boolean isSetter(Method method, boolean allowBuilderPattern) {
         String name = method.getName();
         Class<?> type = method.getReturnType();
-        Class<?> params[] = method.getParameterTypes();
+        Class<?>[] params = method.getParameterTypes();
 
         if (!SETTER_PATTERN.matcher(name).matches()) {
             return false;
