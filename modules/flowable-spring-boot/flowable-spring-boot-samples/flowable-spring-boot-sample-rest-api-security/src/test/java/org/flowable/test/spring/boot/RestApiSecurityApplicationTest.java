@@ -12,7 +12,13 @@
  */
 package org.flowable.test.spring.boot;
 
-import flowable.Application;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.io.IOException;
+import java.util.Base64;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.common.rest.api.DataResponse;
@@ -42,13 +48,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
-import java.io.IOException;
-import java.util.Base64;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import flowable.Application;
 
 /**
  * @author Filip Hrisafov

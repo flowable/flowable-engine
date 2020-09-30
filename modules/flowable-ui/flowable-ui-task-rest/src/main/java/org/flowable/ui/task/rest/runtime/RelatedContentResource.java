@@ -12,7 +12,8 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.task.model.runtime.ContentItemRepresentation;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Frederik Heremans

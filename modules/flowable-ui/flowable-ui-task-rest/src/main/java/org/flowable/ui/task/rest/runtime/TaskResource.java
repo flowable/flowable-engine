@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import java.util.List;
+
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskUpdateRepresentation;
 import org.flowable.ui.task.service.runtime.FlowableTaskService;
@@ -22,8 +24,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/app")

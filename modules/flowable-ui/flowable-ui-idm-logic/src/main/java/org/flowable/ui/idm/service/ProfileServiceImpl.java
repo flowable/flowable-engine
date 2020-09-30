@@ -12,6 +12,10 @@
  */
 package org.flowable.ui.idm.service;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Picture;
@@ -21,10 +25,6 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 /**
  * @author Joram Barrez

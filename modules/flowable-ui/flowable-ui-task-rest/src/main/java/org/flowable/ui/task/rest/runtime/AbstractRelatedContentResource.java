@@ -12,6 +12,13 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
@@ -27,18 +34,12 @@ import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
+import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.model.component.SimpleContentTypeMapper;
 import org.flowable.ui.task.model.runtime.ContentItemRepresentation;
-import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractRelatedContentResource {
 

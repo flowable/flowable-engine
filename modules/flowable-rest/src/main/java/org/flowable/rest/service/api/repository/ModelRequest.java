@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.repository;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
