@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens

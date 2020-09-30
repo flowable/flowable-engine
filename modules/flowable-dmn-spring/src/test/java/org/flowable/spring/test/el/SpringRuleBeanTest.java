@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
