@@ -56,7 +56,9 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
         DmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            LOGGER.debug("Executing agenda operation {}", runnable);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing agenda operation {}", runnable);
+            }
             runnable.run();
         }
     }

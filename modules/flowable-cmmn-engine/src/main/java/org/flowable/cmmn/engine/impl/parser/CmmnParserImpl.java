@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CmmnParserImpl implements CmmnParser {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(CmmnParserImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
 
     protected CmmnParseHandlers cmmnParseHandlers;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -51,7 +51,7 @@ public class CmmnParserImpl implements CmmnParser {
             return cmmnParseResult;
 
         } catch (IOException e) {
-            LOGGER.error("Could not read bytes from CMMN resource", e);
+            logger.error("Could not read bytes from CMMN resource", e);
             return new CmmnParseResult();
         }
     }
@@ -119,7 +119,7 @@ public class CmmnParserImpl implements CmmnParser {
                 }
 
                 if (cmmnModel.findPlanItem(cmmnReference) == null && cmmnModel.getCriterion(cmmnReference) == null) {
-                    LOGGER.warn("Invalid reference in diagram interchange definition: could not find {}", cmmnReference);
+                    logger.warn("Invalid reference in diagram interchange definition: could not find {}", cmmnReference);
                 }
             }
 
