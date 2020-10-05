@@ -78,6 +78,9 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }
+        if (queryRequest.getCaseDefinitionCategory() != null) {
+            query.caseDefinitionCategory(queryRequest.getCaseDefinitionCategory());
+        }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }

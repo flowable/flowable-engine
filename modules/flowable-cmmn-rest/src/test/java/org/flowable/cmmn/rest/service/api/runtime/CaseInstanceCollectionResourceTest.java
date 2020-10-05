@@ -500,6 +500,35 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/CaseInstanceCollectionResourceTest.oneHumanTaskCaseTestCategory.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/CaseInstanceCollectionResourceTest.oneHumanTaskCaseExampleCategory.cmmn"
+    })
+    public void testGetCaseInstancesByCategory() throws Exception {
+        CaseInstance exampleCase = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCaseExampleCategory")
+                .businessKey("example")
+                .start();
+        CaseInstance testCase = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCaseTestCategory")
+                .businessKey("test")
+                .start();
+
+        String exampleCaseId = exampleCase.getId();
+        String testCaseId = testCase.getId();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsPresentInDataResponse(url, testCaseId, exampleCaseId);
+
+        // Case Definition Category
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionCategory=Example";
+        assertResultsPresentInDataResponse(url, exampleCaseId);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?caseDefinitionCategory=Unknown";
+        assertResultsPresentInDataResponse(url);
+    }
+
     /**
      * Test starting a process instance, covering all edge-cases.
      */

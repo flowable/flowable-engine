@@ -63,6 +63,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given businessKey.", paramType = "query"),
             @ApiImplicitParam(name = "superCaseInstanceId", dataType = "string", value = "Only return case instances which have the given super case instance id (for cases that have a case tasks).", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "Indication to include case variables in the result.", paramType = "query"),
@@ -90,6 +91,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("caseDefinitionId")) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
+        }
+
+        if (allRequestParams.containsKey("caseDefinitionCategory")) {
+            queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
         }
 
         if (allRequestParams.containsKey("businessKey")) {

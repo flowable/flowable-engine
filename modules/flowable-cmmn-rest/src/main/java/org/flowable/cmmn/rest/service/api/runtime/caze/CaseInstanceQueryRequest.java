@@ -30,6 +30,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseBusinessKey;
     private String caseDefinitionId;
     private String caseDefinitionKey;
+    private String caseDefinitionCategory;
     private String caseInstanceParentId;
     private String involvedUser;
     private Boolean includeCaseVariables;
@@ -68,6 +69,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseDefinitionKey(String caseDefinitionKey) {
         this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionCategory() {
+        return caseDefinitionCategory;
+    }
+
+    public void setCaseDefinitionCategory(String caseDefinitionCategory) {
+        this.caseDefinitionCategory = caseDefinitionCategory;
     }
 
     public String getCaseInstanceParentId() {
