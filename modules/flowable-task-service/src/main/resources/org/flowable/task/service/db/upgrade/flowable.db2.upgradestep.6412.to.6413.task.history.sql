@@ -15,5 +15,3 @@ create table ACT_HI_TSK_LOG (
   TENANT_ID_ varchar(255) default '',
   primary key (ID_)
 );
-
-update ACT_GE_PROPERTY set VALUE_ = '6.4.1.3' where NAME_ = 'task.schema.version';
