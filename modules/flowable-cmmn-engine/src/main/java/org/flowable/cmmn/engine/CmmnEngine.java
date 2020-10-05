@@ -33,7 +33,7 @@ public interface CmmnEngine extends Engine {
     String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * Starts the execuctors (async and async history), if they are configured to be auto-actived.
+     * Starts the execuctors (async and async history), if they are configured to be auto-activated.
      */
     void startExecutors();
 

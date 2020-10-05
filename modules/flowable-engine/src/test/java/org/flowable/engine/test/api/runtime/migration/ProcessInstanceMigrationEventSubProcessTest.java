@@ -2971,7 +2971,7 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .extracting(Task::getProcessDefinitionId)
                 .containsOnly(procWithSignal.getId());
 
-        //Behaves like interrupting since theres no execution in the parentScop
+        //Behaves like interrupting since theres no execution in the parentScope
         job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNull();
 

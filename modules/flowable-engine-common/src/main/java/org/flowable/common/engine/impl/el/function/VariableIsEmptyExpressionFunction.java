@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * - {@link ArrayNode}: if the json array has no elements.
  * 
  * When the variable value is null, true is returned in all cases.
- * When the variale value is not null, and the instance type is not one of the cases above, false will be returned.
+ * When the variable value is not null, and the instance type is not one of the cases above, false will be returned.
  * 
  * @author Joram Barrez
  */

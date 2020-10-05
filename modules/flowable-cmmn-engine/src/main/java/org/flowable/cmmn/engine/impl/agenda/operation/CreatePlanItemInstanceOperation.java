@@ -33,7 +33,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     protected void internalExecute() {
         if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
             //Increase repetition counter, value is kept from the previous instance of the repetition
-            //@see CmmOpertion.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
+            //@see CmmOperation.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
             //Or if its the first instance of the repetition, this call sets the counter to 1
             setRepetitionCounter(planItemInstanceEntity, getRepetitionCounter(planItemInstanceEntity) + 1);
         }

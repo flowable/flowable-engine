@@ -168,7 +168,7 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
-        // A plan item in state 'waiting for repetition' should exist for the yask
+        // A plan item in state 'waiting for repetition' should exist for the task
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
                 .planItemInstanceStateWaitingForRepetition()
@@ -227,7 +227,7 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
-        // A plan item in state 'waiting for repetition' should exist for the yask
+        // A plan item in state 'waiting for repetition' should exist for the task
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
                 .planItemInstanceStateWaitingForRepetition()
@@ -290,7 +290,7 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         cmmnManagementService.executeJob(job.getId());
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
-        // A plan item in state 'waiting for repetition' should exist for the yask
+        // A plan item in state 'waiting for repetition' should exist for the task
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
                 .planItemInstanceStateWaitingForRepetition()

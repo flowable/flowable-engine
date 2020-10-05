@@ -23,7 +23,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinition> implements CmmnXmlConstants {
 
     /**
-     * The class for which exporter subclasess works for
+     * The class for which exporter subclasses works for
      * @return a Class that extends PlanItemDefinition
      */
     protected abstract Class<? extends T> getExportablePlanItemDefinitionClass();
@@ -57,7 +57,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
     }
 
     /**
-     * Subclasses must override this method to provide the xml element tag value of this planItemDefintion
+     * Subclasses must override this method to provide the xml element tag value of this planItemDefinition
      *
      * @param planItemDefinition the plan item definition to write
      * @return the value of the xml element tag to write

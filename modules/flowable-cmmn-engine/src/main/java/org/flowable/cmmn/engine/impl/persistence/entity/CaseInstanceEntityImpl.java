@@ -269,7 +269,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     protected VariableScopeImpl getParentVariableScope() {
         // A case instance is the root of variables.
-        // In case of parent-child case instances, the variables needs to be defined explictely in input/outpur vars 
+        // In case of parent-child case instances, the variables needs to be defined explicitly in input/output vars
         return null;
     }
 

@@ -120,7 +120,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      *
      * @param planItemInstanceEntity the plan item instance to test for a repetition rule
      * @param satisfiedEntryCriterion the optional, satisfied entry criterion activating the plan item, might be null
-     * @param planItemInstanceContainer the parent container of the gievn plan item
+     * @param planItemInstanceContainer the parent container of the given plan item
      * @param evaluationResult the evaluation result used to collect information during the evaluation of a list of plan items, will be modified inside this
      *          method to reflect gained information about further evaluation as well as any newly created plan item instances for repetition
      * @return true, if the plan item must be activated, false otherwise

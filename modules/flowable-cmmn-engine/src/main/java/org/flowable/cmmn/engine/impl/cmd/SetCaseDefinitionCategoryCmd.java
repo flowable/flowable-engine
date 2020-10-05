@@ -51,7 +51,7 @@ public class SetCaseDefinitionCategoryCmd implements Command<Void> {
         // Update category
         caseDefinition.setCategory(category);
 
-        // Remove case definition from cache, it will be refetched later
+        // Remove case definition from cache, it will be refetch later
         DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseDefinitionCache();
         if (caseDefinitionCache != null) {
             caseDefinitionCache.remove(caseDefinitionId);

@@ -22,7 +22,7 @@ public interface InjectedPlanItemInstanceBuilder {
     /**
      * The explicit name for the new plan item to be created, if this is not set, the name of the referenced element is taken instead.
      *
-     * @param name the explicit name to be used for the new plan item, which superseeds the one from the referenced plan item model
+     * @param name the explicit name to be used for the new plan item, which supersedes the one from the referenced plan item model
      * @return the builder reference for method chaining
      */
     InjectedPlanItemInstanceBuilder name(String name);

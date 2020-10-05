@@ -50,7 +50,7 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
         if (!PlanItemDefinitionType.STAGE.equals(planItemInstanceEntity.getPlanItemDefinitionType())) {
             throw new FlowableIllegalArgumentException("Can only complete plan item instances of type stage. Type is " + planItemInstanceEntity.getPlanItemDefinitionType());
         }
-        if (!force && !planItemInstanceEntity.isCompletable()) { // if force is true, ignore the completeable flag
+        if (!force && !planItemInstanceEntity.isCompletable()) { // if force is true, ignore the completable flag
             throw new FlowableIllegalArgumentException("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);

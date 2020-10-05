@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(CmmnCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnCommandInvoker.class);
 
     protected AgendaOperationRunner agendaOperationRunner;
 
@@ -76,9 +76,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         if (runnable instanceof CmmnOperation) {
             CmmnOperation operation = (CmmnOperation) runnable;
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing agenda operation {}", runnable);
-            }
+            LOGGER.debug("Executing agenda operation {}", runnable);
 
             agendaOperationRunner.executeOperation(commandContext, runnable);
 

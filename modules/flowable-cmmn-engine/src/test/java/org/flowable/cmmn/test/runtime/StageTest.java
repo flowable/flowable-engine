@@ -152,7 +152,7 @@ public class StageTest extends FlowableCmmnTestCase {
                 .extracting(PlanItemInstance::getName)
                 .containsExactly(expectedNames);
 
-        // Commplete inner nested stage (2nd stage)
+        // Complete inner nested stage (2nd stage)
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)

@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * - {@link ArrayNode}: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
  * 
  * When the variable value is null, false is returned in all cases.
- * When the variale value is not null, and the instance type is not one of the cases above, false will be returned.
+ * When the variable value is not null, and the instance type is not one of the cases above, false will be returned.
  * 
  * @author Joram Barrez
  */

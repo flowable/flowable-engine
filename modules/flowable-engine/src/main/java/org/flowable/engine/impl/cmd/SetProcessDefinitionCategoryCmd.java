@@ -64,7 +64,7 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
         // Update category
         processDefinition.setCategory(category);
 
-        // Remove process definition from cache, it will be refetched later
+        // Remove process definition from cache, it will be refetch later
         DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = processEngineConfiguration.getProcessDefinitionCache();
         if (processDefinitionCache != null) {
             processDefinitionCache.remove(processDefinitionId);
