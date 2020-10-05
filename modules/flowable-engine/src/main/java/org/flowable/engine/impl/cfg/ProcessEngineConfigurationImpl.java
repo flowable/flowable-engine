@@ -1362,9 +1362,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initHistoryManager() {
         if (historyManager == null) {
             if (isAsyncHistoryEnabled) {
-                historyManager = new AsyncHistoryManager(this, historyLevel, usePrefixId);
+                historyManager = new AsyncHistoryManager(this);
             } else {
-                historyManager = new DefaultHistoryManager(this, historyLevel, usePrefixId);
+                historyManager = new DefaultHistoryManager(this);
             }
         }
     }

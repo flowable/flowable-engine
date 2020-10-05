@@ -26,7 +26,6 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.test.profiler.CommandStats;
@@ -66,7 +65,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         this.oldExecutionRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts();
         this.oldTaskRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
         this.oldenableProcessDefinitionInfoCacheValue = processEngineConfiguration.isEnableProcessDefinitionInfoCache();
-        oldHistoryLevel = ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).getHistoryLevel();
+        oldHistoryLevel = processEngineConfiguration.getHistoryLevel();
 
         processEngineConfiguration.setBulkInsertEnabled(true);
 
@@ -78,7 +77,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(true);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(false);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(HistoryLevel.AUDIT);
+        processEngineConfiguration.setHistoryLevel(HistoryLevel.AUDIT);
 
         // The time interceptor should be first
         CommandExecutorImpl commandExecutor = ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor());
@@ -118,7 +117,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(oldTaskRelationshipCountValue);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(oldenableProcessDefinitionInfoCacheValue);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(oldHistoryLevel);
+        processEngineConfiguration.setHistoryLevel(oldHistoryLevel);
 
         ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor()).setFirst(oldFirstCommandInterceptor);
 

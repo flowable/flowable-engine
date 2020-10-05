@@ -61,8 +61,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHistoryManager.class.getName());
 
-    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
-        super(processEngineConfiguration, historyLevel, usePrefixId);
+    public DefaultHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
 
     // Process related history
@@ -309,7 +309,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }
@@ -344,7 +344,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variableInstanceEntity.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variableInstanceEntity.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }
@@ -357,7 +357,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variableInstanceEntity.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variableInstanceEntity.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variableInstanceEntity.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }
