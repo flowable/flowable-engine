@@ -134,11 +134,17 @@ public class StateTransition {
     }
     
     protected static boolean isPlanItemTransitionPossible(String currentState, String transition) {
-        return PLAN_ITEM_TRANSITIONS.get(currentState).contains(transition);
+        if (PLAN_ITEM_TRANSITIONS.containsKey(currentState)) {
+            return PLAN_ITEM_TRANSITIONS.get(currentState).contains(transition);
+        }
+        return false;
     }
 
     protected static boolean isEventListenerTransitionPossible(String currentState, String transition) {
-        return EVENT_LISTENER_TRANSITIONS.get(currentState).contains(transition);
+        if (EVENT_LISTENER_TRANSITIONS.containsKey(currentState)) {
+            return EVENT_LISTENER_TRANSITIONS.get(currentState).contains(transition);
+        }
+        return false;
     }
 
 }
