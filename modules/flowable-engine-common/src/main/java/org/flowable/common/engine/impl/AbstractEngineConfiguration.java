@@ -208,11 +208,11 @@ public abstract class AbstractEngineConfiguration {
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
      * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
      * <p>
-     * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
+     * By default: 100 (55 for mssql server as it has a hard limit of 2000 parameters in a statement)
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
 
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
+    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 55; // currently Execution has most params (35). 2000 / 35 = 57.
 
     protected String mybatisMappingFile;
     protected Set<Class<?>> customMybatisMappers;
