@@ -248,8 +248,8 @@ public abstract class AbstractEngineConfiguration {
     protected boolean usingRelationalDatabase = true;
     
     /**
-     * Flag that can be set to configure whether or not a schema is used. This is usefil for custom implementations that do not use relational databases at all.
-     * Setting {@link #usingRelationalDatabase} to true will automotically imply using a schema.
+     * Flag that can be set to configure whether or not a schema is used. This is useful for custom implementations that do not use relational databases at all.
+     * Setting {@link #usingRelationalDatabase} to true will automatically imply using a schema.
      */
     protected boolean usingSchemaMgmt = true;
 

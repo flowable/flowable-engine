@@ -51,7 +51,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     public void testInvalidFlags() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidFlags"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("String value \"Accept application/json\" is not alloved in boolean expression");
+                .hasMessage("String value \"Accept application/json\" is not allowed in boolean expression");
     }
 
     @Test

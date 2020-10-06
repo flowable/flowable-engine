@@ -111,7 +111,7 @@ public class JobClientResource extends AbstractClientResource {
     }
 
     /**
-     * GET /rest/admin/jobs/{jobId}/exception-stracktrace -> return job stacktrace
+     * GET /rest/admin/jobs/{jobId}/exception-stacktrace -> return job stacktrace
      */
     @GetMapping(value = "/rest/admin/jobs/{jobId}/stacktrace", produces = "text/plain")
     public String getJobStacktrace(@PathVariable String jobId, HttpServletRequest request) throws BadRequestException {

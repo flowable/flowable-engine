@@ -247,7 +247,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertThat(jobQuery.count()).isEqualTo(2);
 
-        // After setting the clock to time '50minutes and 5 seconds', the bouth timers should fire in parralel
+        // After setting the clock to time '50minutes and 5 seconds', the both timers should fire in parallel
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
         try {
             JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(

@@ -231,7 +231,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             ((FlowableListener) currentCmmnElement).getFieldExtensions().add(extension);
 
         } else {
-            throw new FlowableException("Programmatic error: field added to unkown element '" + currentCmmnElement + "'");
+            throw new FlowableException("Programmatic error: field added to unknown element '" + currentCmmnElement + "'");
 
         }
     }

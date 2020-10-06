@@ -194,7 +194,7 @@ public class DefaultManagementAgent implements ManagementAgent {
             return;
         }
         if (registryPort == null) {
-            LOGGER.warn("Registery port is null. JMX connector creation skipped.");
+            LOGGER.warn("Registry port is null. JMX connector creation skipped.");
             return;
         }
 

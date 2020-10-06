@@ -110,7 +110,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter {
             subProcess.getFlowElements().addAll(dataObjects);
         }
         
-        //store correct convertion info...
+        //store correct conversion info...
         if (STENCIL_COLLAPSED_SUB_PROCESS.equals(BpmnJsonConverterUtil.getStencilId(elementNode))) {
             GraphicInfo graphicInfo = model.getGraphicInfo(BpmnJsonConverterUtil.getElementId(elementNode));
             graphicInfo.setExpanded(false); //default is null!

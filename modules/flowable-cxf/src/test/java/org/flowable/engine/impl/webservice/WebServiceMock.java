@@ -73,7 +73,7 @@ public interface WebServiceMock {
     void setTo(@WebParam(name = "value") int value);
 
     /**
-     * Returns a formated string composed of prefix + current count + suffix
+     * Returns a formatted string composed of prefix + current count + suffix
      *
      * @param prefix
      *            the prefix

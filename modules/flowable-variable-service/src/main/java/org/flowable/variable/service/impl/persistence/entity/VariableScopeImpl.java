@@ -1060,7 +1060,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     }
 
     /**
-     * Return whether changes to the variables are progagated to the history storage.
+     * Return whether changes to the variables are propagated to the history storage.
      */
     protected abstract boolean isPropagateToHistoricVariable();
     

@@ -144,7 +144,7 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     @Override
     public void changeState() {
         if (runtimeService == null) {
-            throw new FlowableException("CmmnRuntimeService cannot be null, Obtain your builder instance from the CmmnRuntimService to access this feature");
+            throw new FlowableException("CmmnRuntimeService cannot be null, Obtain your builder instance from the CmmnRuntimeService to access this feature");
         }
         runtimeService.changePlanItemState(this);
     }

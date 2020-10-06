@@ -117,7 +117,7 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
         CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceBuilder.getCaseInstanceId());
         if (caseInstanceEntity == null) {
             throw new FlowableIllegalArgumentException(
-                "The case instance with id " + planItemInstanceBuilder.getCaseInstanceId() + " could not be found or is no longer an ative case instance.");
+                "The case instance with id " + planItemInstanceBuilder.getCaseInstanceId() + " could not be found or is no longer an active case instance.");
         }
         return caseInstanceEntity;
     }
