@@ -395,7 +395,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     }
 
     /*
-     * Model JSON String retieval
+     * Model JSON String retrieval
      */
 
     public Map<String, String> getProcessKeyToJsonStringMap() {

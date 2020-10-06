@@ -139,7 +139,7 @@ public class ChannelDefinitionEntityImpl extends AbstractEventRegistryNoRevision
 
     @Override
     public String toString() {
-        return "ChannelDefitionEntity[" + id + "]";
+        return "ChannelDefinitionEntity[" + id + "]";
     }
 
 }

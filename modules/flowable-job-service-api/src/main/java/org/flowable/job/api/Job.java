@@ -31,7 +31,7 @@ public interface Job extends JobInfo {
 
     /**
      * Returns the correlation id of a job.
-     * The same job can be moved around and have its techinical id changed.
+     * The same job can be moved around and have its technical id changed.
      * This id allows tracking that job.
      */
     String getCorrelationId();

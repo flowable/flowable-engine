@@ -54,7 +54,7 @@ public abstract class ExpressionUtils {
                 if (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false")) {
                     return Boolean.parseBoolean(value.toString());
                 }
-                throw new FlowableException("String value \"" + value + "\" is not alloved in boolean expression");
+                throw new FlowableException("String value \"" + value + "\" is not allowed in boolean expression");
             }
             if (value instanceof Boolean) {
                 return (Boolean) value;

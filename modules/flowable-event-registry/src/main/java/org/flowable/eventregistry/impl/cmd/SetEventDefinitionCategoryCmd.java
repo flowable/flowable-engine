@@ -51,7 +51,7 @@ public class SetEventDefinitionCategoryCmd implements Command<Void> {
         // Update category
         eventDefinition.setCategory(category);
 
-        // Remove form from cache, it will be refetched later
+        // Remove form from cache, it will be refetch later
         DeploymentCache<EventDefinitionCacheEntry> eventDefinitionCache = CommandContextUtil.getEventRegistryConfiguration().getEventDefinitionCache();
         if (eventDefinitionCache != null) {
             eventDefinitionCache.remove(eventDefinitionId);

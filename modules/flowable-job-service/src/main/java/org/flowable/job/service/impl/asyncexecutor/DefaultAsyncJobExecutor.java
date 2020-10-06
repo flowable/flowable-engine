@@ -148,7 +148,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected void initAsyncJobExecutionThreadPool() {
         if (taskExecutor == null) {
             // This is for backwards compatibility
-            // If there is no task executor then use the Default one and start it immediatelly.
+            // If there is no task executor then use the Default one and start it immediately.
             DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
             defaultAsyncTaskExecutor.start();
             this.taskExecutor = defaultAsyncTaskExecutor;

@@ -238,7 +238,7 @@ public class FlowableIdmAppProperties {
     public static class Keycloak {
 
         /**
-         * Whether the keyloak idm service should be enabled
+         * Whether the keycloak idm service should be enabled
          */
         private boolean enabled = false;
 

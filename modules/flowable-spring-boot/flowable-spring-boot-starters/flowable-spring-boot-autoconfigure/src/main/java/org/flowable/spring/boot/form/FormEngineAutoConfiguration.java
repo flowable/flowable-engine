@@ -115,7 +115,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         }
 
         CommonAutoDeploymentProperties deploymentProperties = this.autoDeploymentProperties.deploymentPropertiesForEngine(ScopeTypes.FORM);
-        // Always add the out of the box auto deyment strategies as last
+        // Always add the out of the box auto deployment strategies as last
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));

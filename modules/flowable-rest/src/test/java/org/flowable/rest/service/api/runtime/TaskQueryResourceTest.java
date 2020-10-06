@@ -118,7 +118,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.put("priority", 100);
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
-            // Mininmum Priority filtering
+            // Minimum Priority filtering
             requestNode.removeAll();
             requestNode.put("minimumPriority", 70);
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());

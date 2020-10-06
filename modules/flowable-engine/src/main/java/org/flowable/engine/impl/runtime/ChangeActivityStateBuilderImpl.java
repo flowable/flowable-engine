@@ -220,7 +220,7 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
     @Override
     public void changeState() {
         if (runtimeService == null) {
-            throw new FlowableException("RuntimeService cannot be null, Obtain your builder instance from the RuntimService to access this feature");
+            throw new FlowableException("RuntimeService cannot be null, Obtain your builder instance from the RuntimeService to access this feature");
         }
         runtimeService.changeActivityState(this);
     }
