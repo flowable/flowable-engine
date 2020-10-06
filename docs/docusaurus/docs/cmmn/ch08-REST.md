@@ -1408,7 +1408,7 @@ The request should be of type +multipart/form-data+. There should be a single fi
 | - | - | - | - |
 |caseInstanceId|No|String|The case instance id for which the stage overview is retrieved.|    
 
-*Success reponse body* {
+*Success response body* {
 
 ```
 [
