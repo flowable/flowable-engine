@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Channel Definitions" }, description = "Manage Channel Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ChannelDefinitionModelResource extends BaseEventDefinitionResource {
 
-    @ApiOperation(value = "Get a channel definition JSPN model", tags = { "Channel Definitions" }, nickname = "getChannelModelResource")
+    @ApiOperation(value = "Get a channel definition JSON model", tags = { "Channel Definitions" }, nickname = "getChannelModelResource")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the event definition was found and the model is returned. The response contains the full event definition model."),
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
