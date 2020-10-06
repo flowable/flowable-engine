@@ -41,14 +41,16 @@ public class TransactionDependentExecutionListenerSpringTest extends SpringFlowa
         taskService.complete(task.getId());
 
         assertThat(listener.getCurrentActivities().get(0).getActivityId()).isEqualTo("task3");
-        assertThat(listener.getCurrentActivities().get(0).getCustomPropertiesMap().get("customProp1")).isEqualTo("task3");
+        assertThat(listener.getCurrentActivities().get(0).getCustomPropertiesMap())
+                .containsEntry("customProp1", "task3");
 
         // Completing second task will trigger the second closed listener (delegate expression custom properties resolver)
         task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertThat(listener.getCurrentActivities().get(1).getActivityId()).isEqualTo("task4");
-        assertThat(listener.getCurrentActivities().get(1).getCustomPropertiesMap().get("customProp1")).isEqualTo("task4");
+        assertThat(listener.getCurrentActivities().get(1).getCustomPropertiesMap())
+                .containsEntry("customProp1", "task4");
     }
 
 }

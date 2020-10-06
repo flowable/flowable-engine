@@ -140,7 +140,7 @@ public class DmnJsonConverterTest {
 
         List<DecisionRule> rules = decisionTable.getRules();
 
-        assertThat(rules.get(0).getInputEntries().size()).isEqualTo(2);
+        assertThat(rules.get(0).getInputEntries()).hasSize(2);
 
         // input expression 1
         RuleInputClauseContainer ruleClauseContainer11 = rules.get(0).getInputEntries().get(0);
@@ -157,7 +157,7 @@ public class DmnJsonConverterTest {
         assertThat(ruleClauseContainer12.getInputClause()).isSameAs(condition2);
 
         // output expression 1
-        assertThat(rules.get(0).getOutputEntries().size()).isEqualTo(1);
+        assertThat(rules.get(0).getOutputEntries()).hasSize(1);
         RuleOutputClauseContainer ruleClauseContainer13 = rules.get(0).getOutputEntries().get(0);
         LiteralExpression outputEntry13 = ruleClauseContainer13.getOutputEntry();
         assertThat(outputEntry13).isNotNull();
@@ -179,7 +179,7 @@ public class DmnJsonConverterTest {
         assertThat(ruleClauseContainer22.getInputClause()).isSameAs(condition2);
 
         // output expression 1
-        assertThat(rules.get(1).getOutputEntries().size()).isEqualTo(1);
+        assertThat(rules.get(1).getOutputEntries()).hasSize(1);
         RuleOutputClauseContainer ruleClauseContainer23 = rules.get(1).getOutputEntries().get(0);
         LiteralExpression outputEntry23 = ruleClauseContainer23.getOutputEntry();
         assertThat(outputEntry23).isNotNull();
@@ -203,7 +203,7 @@ public class DmnJsonConverterTest {
         assertThat(dmnDefinition.getTypeLanguage()).isEqualTo(DmnJsonConverter.URI_JSON);
 
         assertThat(dmnDefinition.getDecisions()).isNotNull();
-        assertThat(dmnDefinition.getDecisions().size()).isEqualTo(1);
+        assertThat(dmnDefinition.getDecisions()).hasSize(1);
 
         Decision decision = dmnDefinition.getDecisions().get(0);
         assertThat(decision).isNotNull();
@@ -217,7 +217,7 @@ public class DmnJsonConverterTest {
 
         List<InputClause> inputClauses = decisionTable.getInputs();
         assertThat(inputClauses).isNotNull();
-        assertThat(inputClauses.size()).isEqualTo(2);
+        assertThat(inputClauses).hasSize(2);
 
         LiteralExpression inputExpression11 = inputClauses.get(0).getInputExpression();
         assertThat(inputExpression11).isNotNull();
@@ -233,7 +233,7 @@ public class DmnJsonConverterTest {
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertThat(outputClauses).isNotNull();
-        assertThat(outputClauses.size()).isEqualTo(1);
+        assertThat(outputClauses).hasSize(1);
 
         // Condition 1
         OutputClause outputClause1 = outputClauses.get(0);
@@ -290,9 +290,9 @@ public class DmnJsonConverterTest {
 
         List<DecisionRule> rules = decisionTable.getRules();
         assertThat(rules).isNotNull();
-        assertThat(rules.size()).isEqualTo(1);
+        assertThat(rules).hasSize(1);
         assertThat(rules.get(0).getOutputEntries()).isNotNull();
-        assertThat(rules.get(0).getOutputEntries().size()).isEqualTo(3);
+        assertThat(rules.get(0).getOutputEntries()).hasSize(3);
         assertThat(rules.get(0).getOutputEntries().get(0).getOutputClause().getName()).isEqualTo("boolvarfield");
         assertThat(rules.get(0).getOutputEntries().get(1).getOutputClause().getName()).isEqualTo("datevarfield");
         assertThat(rules.get(0).getOutputEntries().get(2).getOutputClause().getName()).isEqualTo("stringvarfield");
@@ -354,7 +354,7 @@ public class DmnJsonConverterTest {
         assertThat(decisionTable.getRules().get(1).getInputEntries().get(1).getInputClause()).isNotNull();
 
         assertThat(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputEntry().getText()).isEqualTo("date:toDate('2017-06-03')");
-        assertThat(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText()).isEqualTo("");
+        assertThat(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputEntry().getText()).isEmpty();
         assertThat(decisionTable.getRules().get(0).getOutputEntries().get(0).getOutputClause()).isNotNull();
         assertThat(decisionTable.getRules().get(1).getOutputEntries().get(0).getOutputClause()).isNotNull();
 
@@ -392,10 +392,10 @@ public class DmnJsonConverterTest {
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
-        assertThat(decisionTable.getInputs().size()).isEqualTo(4);
-        assertThat(decisionTable.getOutputs().size()).isEqualTo(4);
-        assertThat(decisionTable.getRules().get(0).getInputEntries().size()).isEqualTo(4);
-        assertThat(decisionTable.getRules().get(0).getOutputEntries().size()).isEqualTo(4);
+        assertThat(decisionTable.getInputs()).hasSize(4);
+        assertThat(decisionTable.getOutputs()).hasSize(4);
+        assertThat(decisionTable.getRules().get(0).getInputEntries()).hasSize(4);
+        assertThat(decisionTable.getRules().get(0).getOutputEntries()).hasSize(4);
 
         DecisionRule rule1 = decisionTable.getRules().get(0);
         DecisionRule rule2 = decisionTable.getRules().get(1);
@@ -629,14 +629,14 @@ public class DmnJsonConverterTest {
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", converterContext);
 
-        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+        assertThat(dmnDefinition.getDecisionServices()).hasSize(1);
 
         DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
 
-        assertThat(decisionService.getOutputDecisions().size()).isEqualTo(2);
-        assertThat(decisionService.getEncapsulatedDecisions().size()).isEqualTo(2);
+        assertThat(decisionService.getOutputDecisions()).hasSize(2);
+        assertThat(decisionService.getEncapsulatedDecisions()).hasSize(2);
 
-        assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
+        assertThat(dmnDefinition.getDecisions()).hasSize(4);
 
         assertThat(decisionService.getOutputDecisions())
             .extracting(DmnElementReference::getParsedId)
@@ -669,14 +669,14 @@ public class DmnJsonConverterTest {
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc");
 
-        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+        assertThat(dmnDefinition.getDecisionServices()).hasSize(1);
 
         DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
 
-        assertThat(decisionService.getOutputDecisions().size()).isEqualTo(2);
-        assertThat(decisionService.getEncapsulatedDecisions().size()).isEqualTo(2);
+        assertThat(decisionService.getOutputDecisions()).hasSize(2);
+        assertThat(decisionService.getEncapsulatedDecisions()).hasSize(2);
 
-        assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
+        assertThat(dmnDefinition.getDecisions()).hasSize(4);
 
         decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
             assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
@@ -696,14 +696,14 @@ public class DmnJsonConverterTest {
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
 
-        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+        assertThat(dmnDefinition.getDecisionServices()).hasSize(1);
 
         DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
 
-        assertThat(decisionService.getOutputDecisions().size()).isEqualTo(2);
-        assertThat(decisionService.getEncapsulatedDecisions().size()).isEqualTo(2);
+        assertThat(decisionService.getOutputDecisions()).hasSize(2);
+        assertThat(decisionService.getEncapsulatedDecisions()).hasSize(2);
 
-        assertThat(dmnDefinition.getDecisions().size()).isEqualTo(4);
+        assertThat(dmnDefinition.getDecisions()).hasSize(4);
 
         decisionService.getOutputDecisions().forEach(outputDecisionRef -> {
             assertThat(dmnDefinition.getDecisionById(outputDecisionRef.getParsedId())).isNotNull();
@@ -725,7 +725,7 @@ public class DmnJsonConverterTest {
 
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource);
 
-        assertThat(dmnDefinition.getDecisionServices().size()).isEqualTo(1);
+        assertThat(dmnDefinition.getDecisionServices()).hasSize(1);
 
         DecisionService decisionService = dmnDefinition.getDecisionServices().get(0);
 
@@ -857,8 +857,8 @@ public class DmnJsonConverterTest {
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
 
-        assertThat(decisionTable.getRules().get(0).getOutputEntries().size()).isEqualTo(2);
-        assertThat(decisionTable.getRules().get(1).getOutputEntries().size()).isEqualTo(2);
+        assertThat(decisionTable.getRules().get(0).getOutputEntries()).hasSize(2);
+        assertThat(decisionTable.getRules().get(1).getOutputEntries()).hasSize(2);
     }
 
     /* Helper methods */

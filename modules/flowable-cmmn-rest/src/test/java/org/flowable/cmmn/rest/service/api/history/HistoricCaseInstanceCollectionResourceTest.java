@@ -173,7 +173,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
             String variableName = variableNode.get("name").textValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
-            assertThat(expectedVariables.containsKey(variableName)).isTrue();
+            assertThat(expectedVariables).containsKey(variableName);
             assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
             assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
             assertThat(variableNode.get("scope").textValue()).isEqualTo("local");

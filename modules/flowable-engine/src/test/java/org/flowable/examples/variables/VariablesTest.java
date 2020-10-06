@@ -1915,7 +1915,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
             newVariables.put("serializableVar", (short) 222);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
-            assertThat(variables.get("serializableVar")).isEqualTo((short) 222);
+            assertThat(variables)
+                    .containsEntry("serializableVar", (short) 222);
 
             String newSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
 
@@ -1926,7 +1927,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
             newVariables.put("longVar", (short) 123);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
-            assertThat(variables.get("longVar")).isEqualTo((short) 123);
+            assertThat(variables)
+                    .containsEntry("longVar", (short) 123);
 
             String newLongVar = getVariableInstanceId(processInstance.getId(), "longVar");
             assertThat(newLongVar).isEqualTo(oldLongVar);

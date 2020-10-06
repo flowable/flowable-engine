@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -116,7 +117,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.VALUE_STRING,
                                 Fields.TENANT_ID
                         );
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             // process instance start
@@ -139,11 +141,12 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.PROCESS_DEFINITION_ID,
                                 Fields.TENANT_ID
                         );
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-                assertThat(variableMap).hasSize(1);
-                assertThat(variableMap.get("testVar")).isEqualTo("helloWorld");
+                assertThat(variableMap)
+                        .containsOnly(entry("testVar", "helloWorld"));
 
                 assertThat(data).doesNotContainKey(Fields.NAME);
                 assertThat(data).doesNotContainKey(Fields.BUSINESS_KEY);
@@ -171,7 +174,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.ACTIVITY_TYPE,
                                 Fields.TENANT_ID
                         );
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             // Leaving start
@@ -197,8 +201,11 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.ACTIVITY_TYPE,
                                 Fields.TENANT_ID
                         );
-                assertThat(data.get(Fields.ACTIVITY_ID)).isEqualTo("startEvent1");
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .contains(
+                                entry(Fields.ACTIVITY_ID, "startEvent1"),
+                                entry(Fields.TENANT_ID, "testTenant")
+                        );
             }
 
             // Sequence flow taken
@@ -222,7 +229,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.SOURCE_ACTIVITY_TYPE,
                                 Fields.TENANT_ID
                         );
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             // Leaving parallel gateway
@@ -285,7 +293,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.USER_ID
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
 
             }
 
@@ -323,7 +332,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.USER_ID
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             lastLogNr = entry.getLogNumber();
@@ -372,8 +382,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                         );
 
                 Map<String, Object> variableMap = (Map<String, Object>) data.get(Fields.VARIABLES);
-                assertThat(variableMap).hasSize(1);
-                assertThat(variableMap.get("test")).isEqualTo("test");
+                assertThat(variableMap)
+                        .containsOnly(entry("test", "test"));
 
                 assertThat(data)
                         .doesNotContainKeys(
@@ -384,8 +394,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.FORM_KEY
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
-
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             // Activity Completed
@@ -412,16 +422,21 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.BEHAVIOR_CLASS
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
 
                 if (i == 2) {
-                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("userTask");
+                    assertThat(data)
+                            .containsEntry(Fields.ACTIVITY_TYPE, "userTask");
                 } else if (i == 7) {
-                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("userTask");
+                    assertThat(data)
+                            .containsEntry(Fields.ACTIVITY_TYPE, "userTask");
                 } else if (i == 10) {
-                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("parallelGateway");
+                    assertThat(data)
+                            .containsEntry(Fields.ACTIVITY_TYPE, "parallelGateway");
                 } else if (i == 13) {
-                    assertThat(data.get(Fields.ACTIVITY_TYPE)).isEqualTo("endEvent");
+                    assertThat(data)
+                            .containsEntry(Fields.ACTIVITY_TYPE, "endEvent");
                 }
 
             }
@@ -450,7 +465,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.TARGET_ACTIVITY_BEHAVIOR_CLASS
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
 
             if (i == 14 || i == 15) {
@@ -487,7 +503,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                                 Fields.BUSINESS_KEY
                         );
 
-                assertThat(data.get(Fields.TENANT_ID)).isEqualTo(testTenant);
+                assertThat(data)
+                        .containsEntry(Fields.TENANT_ID, testTenant);
             }
         }
 
@@ -533,7 +550,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // process instance start
@@ -542,7 +560,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // Activity started
@@ -551,7 +570,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // Leaving start
@@ -560,7 +580,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // Sequence flow taken
@@ -569,7 +590,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // Leaving parallel gateway
@@ -578,7 +600,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             // Tasks
@@ -587,7 +610,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
             if (i == 10 || i == 13) {
@@ -595,7 +619,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
                 Map<String, Object> data = objectMapper.readValue(entry.getData(), new TypeReference<HashMap<String, Object>>() {
 
                 });
-                assertThat(data.get(Fields.TENANT_ID)).isNull();
+                assertThat(data)
+                        .doesNotContainKey(Fields.TENANT_ID);
             }
 
         }
@@ -626,7 +651,8 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
             Map<String, Object> data = objectMapper.readValue(eventLogEntry.getData(), new TypeReference<HashMap<String, Object>>() {
 
             });
-            assertThat(data.get(Fields.TENANT_ID)).isEqualTo("myTenant");
+            assertThat(data)
+                    .containsEntry(Fields.TENANT_ID, "myTenant");
         }
 
         // Cleanup

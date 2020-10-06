@@ -55,7 +55,7 @@ public class TableResourceTest extends BaseSpringRestTestCase {
             ObjectNode table = (ObjectNode) responseNode.get(i);
             assertThat(table.get("name").textValue()).isNotNull();
             assertThat(table.get("count").longValue()).isNotNull();
-            assertThat(table.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, table.get("name").textValue()))).isTrue();
+            assertThat(table.get("url").textValue()).endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, table.get("name").textValue()));
             assertThat(table.get("count").longValue()).isEqualTo(tableCounts.get(table.get("name").textValue()).longValue());
         }
     }

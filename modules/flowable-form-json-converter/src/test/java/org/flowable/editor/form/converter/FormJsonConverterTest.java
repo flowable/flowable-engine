@@ -48,7 +48,7 @@ public class FormJsonConverterTest {
 
         assertThat(formModel).isNotNull();
         assertThat(formModel.getFields()).isNotNull();
-        assertThat(formModel.getFields().size()).isEqualTo(1);
+        assertThat(formModel.getFields()).hasSize(1);
 
         FormField formField = formModel.getFields().get(0);
         assertThat(formField.getId()).isEqualTo("input1");

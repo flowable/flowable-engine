@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
@@ -212,9 +213,9 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
         assertThat(waitingExecution).isNotNull();
 
         Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-        assertThat(vars).hasSize(1);
 
-        assertThat(vars.get("myVar")).isEqualTo("Variable set when signal event is received");
+        assertThat(vars)
+                .containsOnly(entry("myVar", "Variable set when signal event is received"));
     }
 
     /**
@@ -285,9 +286,9 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
         assertThat(waitingExecution).isNotNull();
 
         Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-        assertThat(vars).hasSize(1);
 
-        assertThat(vars.get("myVar")).isEqualTo("Variable set when signal event is received");
+        assertThat(vars)
+                .containsOnly(entry("myVar", "Variable set when signal event is received"));
     }
 
     /**

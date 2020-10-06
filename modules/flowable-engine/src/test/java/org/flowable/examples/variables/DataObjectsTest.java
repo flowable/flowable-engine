@@ -39,20 +39,17 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
         Execution subProcess2 = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess2").singleResult();
 
         Map<String, DataObject> dataObjects = runtimeService.getDataObjects(processInstance.getId());
-        assertThat(dataObjects).hasSize(2);
-        assertThat(dataObjects.get("VariableA")).isNotNull();
-        assertThat(dataObjects.get("VariableB")).isNotNull();
+        assertThat(dataObjects)
+                .containsOnlyKeys("VariableA", "VariableB");
 
         assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableA")).isNotNull();
         assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableB")).isNotNull();
         assertThat(runtimeService.getDataObject(processInstance.getId(), "VariableZ")).isNull();
 
         dataObjects = runtimeService.getDataObjects(subProcess1.getId());
-        assertThat(dataObjects).hasSize(3);
 
-        assertThat(dataObjects.get("VariableA")).isNotNull();
-        assertThat(dataObjects.get("VariableB")).isNotNull();
-        assertThat(dataObjects.get("VariableC")).isNotNull();
+        assertThat(dataObjects)
+                .containsOnlyKeys("VariableA", "VariableB", "VariableC");
 
         assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableA")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess1.getId(), "VariableB")).isNotNull();
@@ -71,12 +68,9 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
                 .hasMessage("executionId is null");
 
         dataObjects = runtimeService.getDataObjects(subProcess2.getId());
-        assertThat(dataObjects).hasSize(4);
 
-        assertThat(dataObjects.get("VariableA")).isNotNull();
-        assertThat(dataObjects.get("VariableB")).isNotNull();
-        assertThat(dataObjects.get("VariableC")).isNotNull();
-        assertThat(dataObjects.get("VariableD")).isNotNull();
+        assertThat(dataObjects)
+                .containsOnlyKeys("VariableA", "VariableB", "VariableC", "VariableD");
 
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableA")).isNotNull();
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableB")).isNotNull();
@@ -85,12 +79,9 @@ public class DataObjectsTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getDataObject(subProcess2.getId(), "VariableZ")).isNull();
 
         dataObjects = taskService.getDataObjects(task.getId());
-        assertThat(dataObjects).hasSize(4);
 
-        assertThat(dataObjects.get("VariableA")).isNotNull();
-        assertThat(dataObjects.get("VariableB")).isNotNull();
-        assertThat(dataObjects.get("VariableC")).isNotNull();
-        assertThat(dataObjects.get("VariableD")).isNotNull();
+        assertThat(dataObjects)
+                .containsOnlyKeys("VariableA", "VariableB", "VariableC", "VariableD");
 
         assertThat(taskService.getDataObject(task.getId(), "VariableA")).isNotNull();
         assertThat(taskService.getDataObject(task.getId(), "VariableB")).isNotNull();

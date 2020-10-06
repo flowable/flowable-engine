@@ -152,7 +152,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         String filePath = "org/flowable/spring/test/autodeployment/simple_1.dmn";
         String originalFormFileContent = IoUtil.readFileAsString(filePath);
         String updatedFormFileContent = originalFormFileContent.replace("Simple decision", "My simple decision");
-        assertThat(updatedFormFileContent.length()).isGreaterThan(originalFormFileContent.length());
+        assertThat(updatedFormFileContent).hasSizeGreaterThan(originalFormFileContent.length());
         IoUtil.writeStringToFile(updatedFormFileContent, filePath);
 
         // Classic produced/consumer problem here:

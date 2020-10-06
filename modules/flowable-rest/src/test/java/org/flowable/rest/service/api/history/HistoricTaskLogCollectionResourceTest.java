@@ -134,7 +134,7 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
     }
 
     protected void expectSequence(JsonNode list, List<String> ids, List<String> types) {
-        assertThat(list).hasSize(ids.size());
+        assertThat(list).hasSameSizeAs(ids);
         List<String> resultingIds = list.findValuesAsText("taskId");
         assertThat(resultingIds).isEqualTo(ids);
         List<String> resultingTypes = list.findValuesAsText("type");

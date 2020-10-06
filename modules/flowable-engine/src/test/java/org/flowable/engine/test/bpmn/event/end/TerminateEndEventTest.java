@@ -336,7 +336,8 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             }
         });
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateParallel");
-        assertThat(events.contains(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT)).isTrue();
+        assertThat(events)
+                .contains(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT);
         
         assertProcessEnded(pi.getId());
         assertHistoricProcessInstanceDetails(pi);
@@ -1093,7 +1094,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             for (String taskName : taskNames) {
                 List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
                         .processInstanceId(processInstance.getId()).taskName(taskName).list();
-                assertThat(historicTaskInstances).hasSizeGreaterThan(0);
+                assertThat(historicTaskInstances).isNotEmpty();
                 for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                     assertThat(historicTaskInstance.getEndTime()).isNotNull();
                     if (expectedDeleteReason == null) {
@@ -1112,7 +1113,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             for (String activityId : activityIds) {
                 List<HistoricActivityInstance> historicActiviyInstances = historyService.createHistoricActivityInstanceQuery()
                         .activityId(activityId).processInstanceId(processInstance.getId()).list();
-                assertThat(historicActiviyInstances).hasSizeGreaterThan(0);
+                assertThat(historicActiviyInstances).isNotEmpty();
                 for (HistoricActivityInstance historicActiviyInstance : historicActiviyInstances) {
                     assertThat(historicActiviyInstance.getEndTime()).isNotNull();
                     if (expectedDeleteReason == null) {

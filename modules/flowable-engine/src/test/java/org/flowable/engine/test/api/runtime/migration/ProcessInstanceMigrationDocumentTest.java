@@ -407,10 +407,12 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
         assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
-        assertThat(migrationDocument.getActivitiesLocalVariables()).containsKeys("newActivity1", "newActivity2");
-        assertThat(migrationDocument.getActivitiesLocalVariables().get("newActivity1"))
-                .isEqualTo((Collections.singletonMap("variableString", "variableValue")));
-        assertThat(migrationDocument.getActivitiesLocalVariables().get("newActivity2")).isEqualTo((Collections.singletonMap("variableDouble", 12345.6789)));
+        assertThat(migrationDocument.getActivitiesLocalVariables())
+                .containsKeys("newActivity1", "newActivity2");
+        assertThat(migrationDocument.getActivitiesLocalVariables())
+                .containsEntry("newActivity1", (Collections.singletonMap("variableString", "variableValue")));
+        assertThat(migrationDocument.getActivitiesLocalVariables())
+                .containsEntry("newActivity2", (Collections.singletonMap("variableDouble", 12345.6789)));
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVars);
     }
 

@@ -80,7 +80,7 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
 
         // Running the reset logic should now reset the lock
         expiredJobs = managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize,  jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
-        assertThat(expiredJobs).hasSizeGreaterThan(0);
+        assertThat(expiredJobs).isNotEmpty();
 
         List<String> jobIds = new ArrayList<>();
         for (JobInfoEntity jobEntity : expiredJobs) {
