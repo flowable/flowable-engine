@@ -290,7 +290,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult().getTenantId()).isNullOrEmpty();
 
         InboundChannelModel defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
-        // The chanel has a tenant detector that will use the correct tenant to start the case instance
+        // The channel has a tenant detector that will use the correct tenant to start the case instance
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1);

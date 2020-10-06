@@ -742,7 +742,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("One");
 
-        // Completing the task should trigger the event subprocess. This interupts the main flow.
+        // Completing the task should trigger the event subprocess. This interrupts the main flow.
         taskService.complete(task.getId());
         Task subOneTask = taskService.createTaskQuery().taskName("sub one").singleResult();
         assertThat(subOneTask).isNotNull();

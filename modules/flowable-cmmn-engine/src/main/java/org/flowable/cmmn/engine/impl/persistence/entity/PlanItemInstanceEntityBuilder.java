@@ -65,7 +65,7 @@ public interface PlanItemInstanceEntityBuilder {
     PlanItemInstanceEntityBuilder caseInstanceId(String caseInstanceId);
 
     /**
-     * Set the id of the stage plan item instace the new plan item instance is a direct child of.
+     * Set the id of the stage plan item instance the new plan item instance is a direct child of.
      * @param stagePlanItemInstance the parent stage instance for the new plan item instance
      * @return the builder instance for method chaining
      */

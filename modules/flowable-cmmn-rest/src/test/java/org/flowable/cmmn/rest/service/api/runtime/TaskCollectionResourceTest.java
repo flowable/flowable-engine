@@ -196,7 +196,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?priority=100";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            // Mininmum Priority filtering
+            // Minimum Priority filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?minimumPriority=70";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 

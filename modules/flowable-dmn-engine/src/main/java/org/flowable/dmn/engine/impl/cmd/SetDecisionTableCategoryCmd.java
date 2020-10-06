@@ -50,7 +50,7 @@ public class SetDecisionTableCategoryCmd implements Command<Void> {
         // Update category
         decisionTable.setCategory(category);
 
-        // Remove process definition from cache, it will be refetched later
+        // Remove process definition from cache, it will be refetch later
         DeploymentCache<DecisionCacheEntry> decisionTableCache = CommandContextUtil.getDmnEngineConfiguration().getDefinitionCache();
         if (decisionTableCache != null) {
             decisionTableCache.remove(decisionTableId);

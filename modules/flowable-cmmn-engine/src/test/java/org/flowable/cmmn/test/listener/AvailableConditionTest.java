@@ -36,7 +36,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
     public void testAvailableConditionInPlanModelPlanItemInstance() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableConditionInPlanModelPlanItemInstance").start();
 
-        // The plan item instance for the event listener should have been created in the unavailabe state, as the condition is not true.
+        // The plan item instance for the event listener should have been created in the unavailable state, as the condition is not true.
         PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
             .singleResult();
@@ -87,7 +87,7 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
     public void testAvailableConditionWithEventListenerInStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testAvailableCondition").start();
 
-        // The plan item instance for the event listener should have been created in the unavailabe state, as the condition is not true.
+        // The plan item instance for the event listener should have been created in the unavailable state, as the condition is not true.
         PlanItemInstance eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
             .singleResult();

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnCommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DmnCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnCommandInvoker.class);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -56,8 +56,8 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
         DmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing agenda operation {}", runnable);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing agenda operation {}", runnable);
             }
             runnable.run();
         }

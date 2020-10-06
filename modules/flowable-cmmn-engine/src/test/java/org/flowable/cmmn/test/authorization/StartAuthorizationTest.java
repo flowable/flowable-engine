@@ -138,7 +138,7 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             assertThat(extractProperty("getUserId").from(links))
                     .contains("user1");
 
-            // Case instance identity links should not have an impcat on the identityLinks query
+            // Case instance identity links should not have an impact on the identityLinks query
             Authentication.setAuthenticatedUserId("user1");
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(latestCaseDef.getId()).start();
             List<IdentityLink> identityLinksForCaseInstance = cmmnRuntimeService.getIdentityLinksForCaseInstance(caseInstance.getId());

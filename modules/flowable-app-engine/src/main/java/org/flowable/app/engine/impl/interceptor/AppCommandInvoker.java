@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AppCommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppCommandInvoker.class);
 
     @SuppressWarnings("unchecked")
     @Override

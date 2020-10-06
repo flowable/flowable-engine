@@ -85,7 +85,7 @@ public interface ProcessInstanceMigrationBuilder {
     /**
      * The java delegate expression executed before process instance migration
      *
-     * @param expressionString string which resolves into java delagate instance
+     * @param expressionString string which resolves into java delegate instance
      * @return process instance migration builder
      */
     ProcessInstanceMigrationBuilder preUpgradeJavaDelegateExpression(String expressionString);
@@ -109,7 +109,7 @@ public interface ProcessInstanceMigrationBuilder {
     /**
      * The java delegate expression executed after process instance migration
      *
-     * @param expressionString string which resolves into java delagate instance
+     * @param expressionString string which resolves into java delegate instance
      * @return process instance migration builder
      */
     ProcessInstanceMigrationBuilder postUpgradeJavaDelegateExpression(String expressionString);

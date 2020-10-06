@@ -25,7 +25,7 @@ public interface ProcessInstanceService {
 
     /**
      * @return A new id that will be used when starting a process instance.
-     *         This is for example needed to set the bidrectional relation
+     *         This is for example needed to set the bidirectional relation
      *         when a case instance starts a process instance through a process task.
      */
     String generateNewProcessInstanceId();
@@ -65,7 +65,7 @@ public interface ProcessInstanceService {
     Object resolveExpression(String executionId, String expression);
 
     /**
-     * Triggeres a case instance that was started by a process instance.
+     * Triggers a case instance that was started by a process instance.
      */
     void triggerCaseTask(String executionId, Map<String, Object> variables);
 

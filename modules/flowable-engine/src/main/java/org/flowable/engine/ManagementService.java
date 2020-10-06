@@ -199,7 +199,7 @@ public interface ManagementService {
     HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
 
     /**
-     * Moves a suspendend job from the suspended letter job table back to be an executable job. The retries are untouched.
+     * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.
      * 
      * @param jobId
      *            id of the job to move, cannot be null.

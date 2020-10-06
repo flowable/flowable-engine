@@ -87,7 +87,7 @@ public class CmmnEngineImpl implements CmmnEngine {
 
         // When running together with the bpmn engine, the asyncHistoryExecutor is shared by default.
         // However, calling multiple times .start() won't do anything (the method returns if already running),
-        // so no need to check this case specically here.
+        // so no need to check this case specifically here.
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
             asyncHistoryExecutor.start();
         }

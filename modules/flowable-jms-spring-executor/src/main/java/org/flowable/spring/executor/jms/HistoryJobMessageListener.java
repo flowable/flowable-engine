@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public class HistoryJobMessageListener implements javax.jms.MessageListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(HistoryJobMessageListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistoryJobMessageListener.class);
 
     protected JobServiceConfiguration jobServiceConfiguration;
     protected AsyncRunnableExecutionExceptionHandler exceptionHandler;
@@ -44,7 +44,7 @@ public class HistoryJobMessageListener implements javax.jms.MessageListener {
                 executeAsyncRunnable.run();
             }
         } catch (Exception e) {
-            logger.error("Exception when handling message from job queue", e);
+            LOGGER.error("Exception when handling message from job queue", e);
         }
     }
 

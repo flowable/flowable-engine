@@ -88,7 +88,7 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder referenceType(String referenceType);
 
     /**
-     * Set the optional instance id of the stage this process instance belongs to, if it runns in the context of a CMMN case.
+     * Set the optional instance id of the stage this process instance belongs to, if it runs in the context of a CMMN case.
      */
     ProcessInstanceBuilder stageInstanceId(String stageInstanceId);
 

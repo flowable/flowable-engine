@@ -469,7 +469,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task taskAfterSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcessInSubProcess.getName()).isEqualTo("Task after subprocess");
 
-        // Completing this task finishes the first subproces
+        // Completing this task finishes the first subprocess
         taskService.complete(taskAfterSubProcessInSubProcess.getId());
         Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
