@@ -188,12 +188,12 @@
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-annotations</artifactId>
-				<version>1.5.24</version>
+				<version>1.6.2</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-models</artifactId>
-				<version>1.5.24</version>
+				<version>1.6.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
