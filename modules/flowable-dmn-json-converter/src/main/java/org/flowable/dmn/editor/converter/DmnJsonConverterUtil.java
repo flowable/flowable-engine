@@ -213,7 +213,7 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         boolean wasMigrated = migrateModel(decisionTableNode, objectMapper);
 
         // migrate to v3
-        if (decisionTableNode.has("modelVersion") && decisionTableNode.get("modelVersion").asText().equals("2") && decisionTableNode.has("name")) {
+        if (decisionTableNode.has("modelVersion") && "2".equals(decisionTableNode.get("modelVersion").asText()) && decisionTableNode.has("name")) {
             wasMigrated = true;
 
             String modelName = decisionTableNode.get("name").asText();

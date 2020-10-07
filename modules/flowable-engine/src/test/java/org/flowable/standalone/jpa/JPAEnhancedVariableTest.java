@@ -121,9 +121,9 @@ public class JPAEnhancedVariableTest extends ResourceFlowableTestCase {
         for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
-            if (name.equals("fieldEntity")) {
+            if ("fieldEntity".equals(name)) {
                 assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
-            } else if (name.equals("propertyEntity")) {
+            } else if ("propertyEntity".equals(name)) {
                 assertThat(value).isInstanceOf(PropertyAccessJPAEntity.class);
             } else {
                 fail("Unknown 'name' field");

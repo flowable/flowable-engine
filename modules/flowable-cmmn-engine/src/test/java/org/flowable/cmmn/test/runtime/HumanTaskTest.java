@@ -242,7 +242,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                 assertThat(historicTaskInstance.getStartTime()).isNotNull();
                 assertThat(historicTaskInstance.getEndTime()).isNotNull();
-                if (!historicTaskInstance.getName().equals("A")) {
+                if (!"A".equals(historicTaskInstance.getName())) {
                     assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-terminate-case");
                 }
             }
@@ -267,7 +267,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                 assertThat(historicTaskInstance.getStartTime()).isNotNull();
                 assertThat(historicTaskInstance.getEndTime()).isNotNull();
-                if (historicTaskInstance.getName().equals("B")) {
+                if ("B".equals(historicTaskInstance.getName())) {
                     assertThat(historicTaskInstance.getDeleteReason()).isEqualTo("cmmn-state-transition-exit");
                 }
             }

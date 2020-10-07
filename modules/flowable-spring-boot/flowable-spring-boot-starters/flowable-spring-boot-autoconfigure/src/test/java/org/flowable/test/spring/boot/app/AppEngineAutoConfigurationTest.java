@@ -389,7 +389,7 @@ public class AppEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, AppEngine appEngine) {
         List<Method> methods = Stream.of(AppEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+            .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName()))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {

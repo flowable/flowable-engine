@@ -201,15 +201,15 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
                 nrOfCreated++;
 
-                if (event.getVariableName().equals("parentVar1")) {
+                if ("parentVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar1");
 
-                } else if (event.getVariableName().equals("subVar1")) {
+                } else if ("subVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("subVar1");
 
-                } else if (event.getVariableName().equals("parentVar2")) {
+                } else if ("parentVar2".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar2");
 
@@ -221,15 +221,15 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
                 nrOfDeleted++;
 
-                if (event.getVariableName().equals("parentVar1")) {
+                if ("parentVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar1");
 
-                } else if (event.getVariableName().equals("subVar1")) {
+                } else if ("subVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("subVar1");
 
-                } else if (event.getVariableName().equals("parentVar2")) {
+                } else if ("parentVar2".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar2");
 

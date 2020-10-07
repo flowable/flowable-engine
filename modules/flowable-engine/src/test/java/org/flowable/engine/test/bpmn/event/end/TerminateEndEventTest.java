@@ -1044,12 +1044,12 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
             for (Execution execution : executionList) {
                 activityId = execution.getActivityId();
                 if (activityId == null
-                        || activityId.equalsIgnoreCase("quality_control_passed_gateway")
-                        || activityId.equalsIgnoreCase("parallelgateway1")
-                        || activityId.equalsIgnoreCase("catch_bad_pixel_signal")
-                        || activityId.equalsIgnoreCase("throw_bad_pixel_signal")
-                        || activityId.equalsIgnoreCase("has_bad_pixel_pattern")
-                        || activityId.equalsIgnoreCase("")) {
+                        || "quality_control_passed_gateway".equalsIgnoreCase(activityId)
+                        || "parallelgateway1".equalsIgnoreCase(activityId)
+                        || "catch_bad_pixel_signal".equalsIgnoreCase(activityId)
+                        || "throw_bad_pixel_signal".equalsIgnoreCase(activityId)
+                        || "has_bad_pixel_pattern".equalsIgnoreCase(activityId)
+                        || "".equalsIgnoreCase(activityId)) {
                     continue;
                 }
                 runtimeService.trigger(execution.getId());

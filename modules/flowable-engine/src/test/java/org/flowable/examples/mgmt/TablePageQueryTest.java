@@ -75,7 +75,7 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
 
         // mybatis will return the correct case for postgres table columns from
         // version 3.0.6 on
-        if (processEngineConfiguration.getDatabaseType().equals("postgres")) {
+        if ("postgres".equals(processEngineConfiguration.getDatabaseType())) {
             columnKey = "name_";
         }
 

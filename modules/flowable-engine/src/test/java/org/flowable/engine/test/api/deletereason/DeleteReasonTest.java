@@ -52,7 +52,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
 
             // org.flowable.task.service.Task A is completed normally, the others are deleted
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                if (historicTaskInstance.getName().equals("A")) {
+                if ("A".equals(historicTaskInstance.getName())) {
                     assertThat(historicTaskInstance.getDeleteReason()).isNull();
                 } else {
                     assertThat(historicTaskInstance.getDeleteReason()).isEqualTo(DeleteReason.PROCESS_INSTANCE_DELETED);
@@ -87,7 +87,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
 
             // org.flowable.task.service.Task A is completed normally, the others are deleted
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                if (historicTaskInstance.getName().equals("A")) {
+                if ("A".equals(historicTaskInstance.getName())) {
                     assertThat(historicTaskInstance.getDeleteReason()).isNull();
                 } else {
                     assertThat(historicTaskInstance.getDeleteReason()).isEqualTo(customDeleteReason);

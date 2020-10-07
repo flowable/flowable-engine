@@ -162,7 +162,7 @@ public class ContentEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, ContentEngine contentEngine) {
         List<Method> methods = Stream.of(ContentEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName")))
+            .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName())))
             .collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {

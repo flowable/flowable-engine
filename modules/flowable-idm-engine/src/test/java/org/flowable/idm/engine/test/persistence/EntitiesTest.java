@@ -44,7 +44,7 @@ public class EntitiesTest {
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);
                 if (line.contains("1,")) {
-                    if (line.equals("1,")) {
+                    if ("1,".equals(line)) {
                         fail(mappingFilePath + " has '1,' on one line. This doesn't work with some databases. (line " + (i + 1) + ")");
                     }
                     if (!line.contains("1, ")) {

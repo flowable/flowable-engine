@@ -34,11 +34,11 @@ public class ScriptTaskConverterTest extends AbstractConverterTest {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(planModel.getPlanItemDefinitionMap()).hasSize(2);
 
-        PlanItem planItemA = planModel.getPlanItems().stream().filter(p -> p.getName().equals("A")).findFirst().get();
+        PlanItem planItemA = planModel.getPlanItems().stream().filter(p -> "A".equals(p.getName())).findFirst().get();
         assertThat(planItemA.getName()).isEqualTo("A");
         assertThat(planItemA.getItemControl()).isNull();
 
-        PlanItem planItemB = planModel.getPlanItems().stream().filter(p -> p.getName().equals("B")).findFirst().get();
+        PlanItem planItemB = planModel.getPlanItems().stream().filter(p -> "B".equals(p.getName())).findFirst().get();
         assertThat(planItemB.getName()).isEqualTo("B");
         PlanItemControl planItemControlB = planItemB.getItemControl();
         assertThat(planItemControlB.getRequiredRule()).isNotNull();

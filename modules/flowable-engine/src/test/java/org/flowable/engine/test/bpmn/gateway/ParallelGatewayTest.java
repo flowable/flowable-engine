@@ -163,7 +163,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> history = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).list();
             for (HistoricActivityInstance h : history) {
                 assertActivityInstancesAreSame(h, runtimeService.createActivityInstanceQuery().activityInstanceId(h.getId()).singleResult());
-                if (h.getActivityId().equals("parallelgateway2")) {
+                if ("parallelgateway2".equals(h.getActivityId())) {
                     assertThat(h.getEndTime()).isNotNull();
                 }
             }

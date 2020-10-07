@@ -218,7 +218,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 
         for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
-            if (subProcTask.getName().equals("Task in subprocess2")) {
+            if ("Task in subprocess2".equals(subProcTask.getName())) {
                 // get variables for execution id user task, should return the
                 // old value of variable test --> test3
                 assertThat(runtimeService.getVariable(subProcTask.getExecutionId(), "test")).isEqualTo("test3");
@@ -230,7 +230,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
                 assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("testY");
                 assertThat(runtimeService.getVariables(pi.getId()))
                         .containsEntry("test", "testY");
-            } else if (subProcTask.getName().equals("Task in subprocess3")) {
+            } else if ("Task in subprocess3".equals(subProcTask.getName())) {
                 // get variables for execution id user task, should return the
                 // old value of variable test --> test4
                 assertThat(runtimeService.getVariable(subProcTask.getExecutionId(), "test")).isEqualTo("test4");

@@ -324,7 +324,7 @@ public class DmnEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, DmnEngine dmnEngine) {
         List<Method> methods = Stream.of(DmnEngine.class.getDeclaredMethods())
-                        .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+                        .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName()))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {

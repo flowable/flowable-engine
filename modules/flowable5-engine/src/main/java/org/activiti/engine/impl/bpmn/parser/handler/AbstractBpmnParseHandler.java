@@ -142,9 +142,9 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
             scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
         } else {
             // if this is a message event, validate that it is the only one with the provided name for this scope
-            if (subscription.getEventType().equals("message")) {
+            if ("message".equals(subscription.getEventType())) {
                 for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-                    if (eventDefinition.getEventType().equals("message")
+                    if ("message".equals(eventDefinition.getEventType())
                             && eventDefinition.getEventName().equals(subscription.getEventName())
                             && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
 

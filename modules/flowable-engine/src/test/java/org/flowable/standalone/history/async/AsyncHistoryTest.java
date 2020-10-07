@@ -167,7 +167,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertThat(historicActivityInstance.getActivityId()).isNotNull();
                 assertThat(historicActivityInstance.getActivityType()).isNotNull();
-                if (!historicActivityInstance.getActivityType().equals("sequenceFlow")) {
+                if (!"sequenceFlow".equals(historicActivityInstance.getActivityType())) {
                     assertThat(historicActivityInstance.getActivityName()).isNotNull();
                 }
                 assertThat(historicActivityInstance.getProcessDefinitionId()).isNotNull();

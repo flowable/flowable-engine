@@ -284,7 +284,7 @@ public class IdmEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, IdmEngine idmEngine) {
         List<Method> methods = Stream.of(IdmEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName")))
+            .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName())))
             .collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {

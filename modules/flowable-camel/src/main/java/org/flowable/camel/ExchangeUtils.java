@@ -65,7 +65,7 @@ public class ExchangeUtils {
         }
 
         String lower = booleanString.toLowerCase();
-        return lower.equals("true") || lower.equals("false");
+        return "true".equals(lower) || "false".equals(lower);
     }
 
     public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint endpoint) {

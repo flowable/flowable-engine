@@ -306,7 +306,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
             String response = (String) execution.getTransientVariable("response");
             for (String s : response.split(";")) {
                 String[] data = s.split("=");
-                if (data[0].equals("message")) {
+                if ("message".equals(data[0])) {
                     execution.setVariable("message", data[1] + "!");
                 }
             }
@@ -356,7 +356,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
             // Sets the name of the variable as 'resultVar'
             for (String s : ((String) execution.getVariable(varName)).split(";")) {
                 String[] data = s.split("=");
-                if (data[0].equals("message")) {
+                if ("message".equals(data[0])) {
                     execution.setTransientVariable(resultVar, data[1]);
                 }
             }

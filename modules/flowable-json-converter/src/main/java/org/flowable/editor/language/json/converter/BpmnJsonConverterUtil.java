@@ -542,17 +542,17 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                         ItemDefinition itemSubjectRef = new ItemDefinition();
                         String dataType = dataNode.get(PROPERTY_DATA_TYPE).asText();
 
-                        if (dataType.equals("string")) {
+                        if ("string".equals(dataType)) {
                             dataObject = new StringDataObject();
-                        } else if (dataType.equals("int")) {
+                        } else if ("int".equals(dataType)) {
                             dataObject = new IntegerDataObject();
-                        } else if (dataType.equals("long")) {
+                        } else if ("long".equals(dataType)) {
                             dataObject = new LongDataObject();
-                        } else if (dataType.equals("double")) {
+                        } else if ("double".equals(dataType)) {
                             dataObject = new DoubleDataObject();
-                        } else if (dataType.equals("boolean")) {
+                        } else if ("boolean".equals(dataType)) {
                             dataObject = new BooleanDataObject();
-                        } else if (dataType.equals("datetime")) {
+                        } else if ("datetime".equals(dataType)) {
                             dataObject = new DateDataObject();
                         } else {
                             LOGGER.error("Error converting {}", dataIdNode.asText());

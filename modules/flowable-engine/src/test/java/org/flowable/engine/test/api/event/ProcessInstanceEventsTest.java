@@ -540,7 +540,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         for (FlowableEvent event : activityTerminatedEvents) {
 
             FlowableActivityCancelledEventImpl activityEvent = (FlowableActivityCancelledEventImpl) event;
-            if (activityEvent.getActivityId().equals("preNormalTerminateTask")) {
+            if ("preNormalTerminateTask".equals(activityEvent.getActivityId())) {
                 assertThat(activityEvent.getActivityId())
                         .as("The user task must be terminated")
                         .isEqualTo("preNormalTerminateTask");
@@ -618,7 +618,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
             FlowableActivityCancelledEventImpl activityEvent = (FlowableActivityCancelledEventImpl) event;
 
-            if (activityEvent.getActivityId().equals("theTask")) {
+            if ("theTask".equals(activityEvent.getActivityId())) {
 
                 assertThat(activityEvent.getActivityId())
                         .as("The user task must be terminated in the called sub process.")
@@ -627,7 +627,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
                         .as("The cause must be terminate end event")
                         .isEqualTo("EndEvent_3");
 
-            } else if (activityEvent.getActivityId().equals("CallActivity_1")) {
+            } else if ("CallActivity_1".equals(activityEvent.getActivityId())) {
 
                 assertThat(activityEvent.getActivityId())
                         .as("The call activity must be terminated")

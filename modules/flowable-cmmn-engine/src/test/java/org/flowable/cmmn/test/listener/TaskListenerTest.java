@@ -63,7 +63,7 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
         for (Task task : tasks) {
-            if (!task.getName().equals("Keepalive")) {
+            if (!"Keepalive".equals(task.getName())) {
                 cmmnTaskService.complete(task.getId());
             }
         }
@@ -79,7 +79,7 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTaskListeners").start();
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
         for (Task task : tasks) {
-            if (!task.getName().equals("Keepalive")) {
+            if (!"Keepalive".equals(task.getName())) {
                 cmmnTaskService.setAssignee(task.getId(), "testAssignee");
             }
         }

@@ -820,13 +820,13 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
                 assertThat(link.getGroupId()).isEqualTo("sales");
                 foundCandidateGroup = true;
             } else {
-                if (link.getType().equals("candidate")) {
+                if ("candidate".equals(link.getType())) {
                     assertThat(link.getUserId()).isEqualTo("fozzie");
                     foundCandidateUser = true;
-                } else if (link.getType().equals("assignee")) {
+                } else if ("assignee".equals(link.getType())) {
                     assertThat(link.getUserId()).isEqualTo("kermit");
                     foundAssignee = true;
-                } else if (link.getType().equals("customUseridentityLink")) {
+                } else if ("customUseridentityLink".equals(link.getType())) {
                     assertThat(link.getUserId()).isEqualTo("gonzo");
                     foundCustom = true;
                 }
