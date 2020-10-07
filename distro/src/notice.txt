@@ -110,14 +110,14 @@ commons-codec                   commons-codec               1.15            Apac
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
 commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
 commons-collections             commons-collections         3.2.2           The Apache Software License, Version 2.0
-commons-io                      commons-io                  2.8.0            The Apache Software License, Version 2.0
+commons-io                      commons-io                  2.8.0           The Apache Software License, Version 2.0
 commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
 commons-validator               commons-validator           1.4.0           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-impl                   2.2.7           The Apache Software License, Version 2.0
 de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
-io.swagger                      swagger-annotations         1.5.22          Apache License 2.0
-io.swagger                      swagger-models              1.5.22          Apache License 2.0
+io.swagger                      swagger-annotations         1.6.2           Apache License 2.0
+io.swagger                      swagger-models              1.6.2           Apache License 2.0
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 joda-time                       joda-time                   2.10.6          Apache 2
