@@ -75,7 +75,7 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
     ChannelDefinitionQuery channelDefinitionKeyLike(String channelDefinitionKeyLike);
     
     /**
-     * Only select channel definitions with a certain version. Particularly useful when used in combination with {@link #formDefinitionKey(String)}
+     * Only select channel definitions with a certain version. Particularly useful when used in combination with {@link #channelDefinitionKey(String)}
      */
     ChannelDefinitionQuery channelVersion(Integer channelVersion);
 
@@ -105,7 +105,7 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
      * Can also be used without any other criteria (ie. query.latestVersion().list()), which will then give all the latest versions of all the deployed channel definitions.
      * 
      * @throws FlowableIllegalArgumentException
-     *             if used in combination with {{@link #channelVersion(int)} or {@link #deploymentId(String)}
+     *             if used in combination with {{@link #channelVersion(Integer)} or {@link #deploymentId(String)}
      */
     ChannelDefinitionQuery latestVersion();
     

@@ -46,14 +46,14 @@ public interface FormDeploymentQuery extends Query<FormDeploymentQuery, FormDepl
     /**
      * Only select deployments with the given category.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see FormDeploymentBuilder#category(String)
      */
     FormDeploymentQuery deploymentCategory(String category);
 
     /**
      * Only select deployments that have a different category then the given one.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see FormDeploymentBuilder#category(String)
      */
     FormDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
 

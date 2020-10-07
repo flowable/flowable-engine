@@ -21,7 +21,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * Superclass for {@link CmmnTriggerableActivityBehavior} implementations that are part of the 
  * core CMMN behaviors of the CMMN Engine.
  *
- * More specifically, subclasses needed to implement {@link #trigger(CommandContext, DelegatePlanItemInstance)}
+ * More specifically, subclasses needed to implement {@link #trigger(CommandContext, PlanItemInstanceEntity)}
  * instead of {@link #trigger(DelegatePlanItemInstance)} and thus avoid an extra lookup of the thread-local {@link CommandContext}.
  * Instead of passing a {@link DelegatePlanItemInstance}, a 'raw' {@link PlanItemInstanceEntity} is also passed.
  * 

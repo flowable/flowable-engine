@@ -17,7 +17,7 @@ import java.io.InputStream;
 /**
  * Builder for creating new deployments.
  * 
- * A builder instance can be obtained through {@link org.flowable.EventRepositoryService.api.FormRepositoryService#createDeployment()}.
+ * A builder instance can be obtained through {@link org.flowable.eventregistry.api.EventRepositoryService#createDeployment()}.
  * 
  * Multiple resources can be added to one deployment before calling the {@link #deploy()} operation.
  * 

@@ -124,7 +124,7 @@ public interface CmmnManagementService {
      *            the number of retries (value greater than 0) which will be set on the job.
      * @throws FlowableObjectNotFoundException
      *             when there is no job with the given id.
-     * @throws FlowableIllegalArgumentException
+     * @throws org.flowable.common.engine.api.FlowableIllegalArgumentException
      *              when the job cannot be moved to be a history job (e.g. because it's not history job)
      */
     HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);

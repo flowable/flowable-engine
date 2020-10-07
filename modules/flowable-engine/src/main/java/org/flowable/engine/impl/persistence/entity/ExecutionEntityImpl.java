@@ -144,9 +144,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     /**
      * Persisted reference to the processDefinition.
      * 
-     * @see #processDefinition
-     * @see #setProcessDefinition(ProcessDefinitionImpl)
-     * @see #getProcessDefinition()
+     * @see #processDefinitionId
+     * @see #setProcessDefinitionId(String)
+     * @see #getProcessDefinitionId()
      */
     protected String processDefinitionId;
 
@@ -173,9 +173,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     /**
      * Persisted reference to the current position in the diagram within the {@link #processDefinition}.
      * 
-     * @see #activity
-     * @see #setActivity(ActivityImpl)
-     * @see #getActivity()
+     * @see #activityId
+     * @see #setActivityId(String)
+     * @see #getActivityId()
      */
     protected String activityId;
 
@@ -208,7 +208,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
      * Persisted reference to the super execution of this execution
      * 
      * @see #getSuperExecution()
-     * @see #setSuperExecution(ExecutionEntityImpl)
+     * @see #setSuperExecution(ExecutionEntity)
      */
     protected String superExecutionId;
 
