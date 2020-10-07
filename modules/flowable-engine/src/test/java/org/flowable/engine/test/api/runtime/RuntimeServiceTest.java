@@ -76,7 +76,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertThat(task.getProcessVariables()).isNotNull();
-        assertThat(task.getProcessVariables().get("longString")).isEqualTo(longString.toString());
+        assertThat(task.getProcessVariables())
+                .containsEntry("longString", longString.toString());
     }
 
     @Test

@@ -55,8 +55,8 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
         assertThat(names).isNotNull();
         assertThat(types).isNotNull();
 
-        assertThat(names).hasSize(metaData.getColumnNames().size());
-        assertThat(types).hasSize(metaData.getColumnTypes().size());
+        assertThat(names).hasSameSizeAs(metaData.getColumnNames());
+        assertThat(types).hasSameSizeAs(metaData.getColumnTypes());
 
         for (int i = 0; i < names.size(); i++) {
             assertThat(metaData.getColumnNames().get(i)).isEqualTo(names.get(i).textValue());

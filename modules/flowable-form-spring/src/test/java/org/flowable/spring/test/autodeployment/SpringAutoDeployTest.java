@@ -159,7 +159,7 @@ public class SpringAutoDeployTest {
         String filePath = "org/flowable/spring/test/autodeployment/simple.form";
         String originalFormFileContent = IoUtil.readFileAsString(filePath);
         String updatedFormFileContent = originalFormFileContent.replace("My first form", "My first forms");
-        assertThat(updatedFormFileContent.length() > originalFormFileContent.length()).isTrue();
+        assertThat(updatedFormFileContent).hasSizeGreaterThan(originalFormFileContent.length());
         IoUtil.writeStringToFile(updatedFormFileContent, filePath);
 
         // Classic produced/consumer problem here:

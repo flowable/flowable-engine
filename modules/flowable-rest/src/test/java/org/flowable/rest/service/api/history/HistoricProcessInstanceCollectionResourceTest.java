@@ -155,7 +155,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertThat(toBeFound.isEmpty()).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isTrue();
+        assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String processInstanceId, Map<String, Object> expectedVariables) throws IOException {

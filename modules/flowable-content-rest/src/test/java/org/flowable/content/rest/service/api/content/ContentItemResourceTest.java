@@ -182,7 +182,7 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
             closeResponse(response);
 
             ContentItem changedContentItem = contentService.createContentItemQuery().id(contentItemId).singleResult();
-            assertThat(origContentItem.getLastModified().getTime() < changedContentItem.getLastModified().getTime()).isTrue();
+            assertThat(origContentItem.getLastModified().getTime()).isLessThan(changedContentItem.getLastModified().getTime());
 
         } finally {
             contentService.deleteContentItem(contentItemId);

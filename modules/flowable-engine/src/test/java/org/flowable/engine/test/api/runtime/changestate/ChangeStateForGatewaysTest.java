@@ -250,9 +250,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("parallelJoin");
         assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
@@ -513,9 +513,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("parallelJoin");
         assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
@@ -777,9 +777,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("gwJoin");
         assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
@@ -1038,9 +1038,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("gwJoin");
         assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());

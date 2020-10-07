@@ -59,14 +59,16 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
                 .variable("input1", "John Doe")
                 .executeWithSingleResult();
 
-        assertThat(outputVariables.get("output1")).isEqualTo("test1");
+        assertThat(outputVariables)
+                .containsEntry("output1", "test1");
 
         outputVariables = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("springDecision")
                 .variable("input1", "test")
                 .executeWithSingleResult();
 
-        assertThat(outputVariables.get("output1")).isEqualTo("test2");
+        assertThat(outputVariables)
+                .containsEntry("output1", "test2");
     }
 
     // --Helper methods

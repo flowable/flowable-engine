@@ -186,7 +186,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Verify query and check form key
         task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertThat(task.getProcessVariables().size()).isEqualTo(vars.size());
+        assertThat(task.getProcessVariables()).hasSameSizeAs(vars);
 
         assertThat(task.getFormKey()).isEqualTo("test123");
     }

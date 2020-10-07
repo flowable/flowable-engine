@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -413,10 +414,11 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
 
         // Check if engine has correct variables set
         Map<String, Object> variables = runtimeService.getVariables(caseInstance.getId());
-        assertThat(variables).hasSize(2);
-
-        assertThat(variables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(variables.get("stringVariable2")).isEqualTo("another string value");
+        assertThat(variables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("stringVariable2", "another string value")
+                );
     }
 
     /**

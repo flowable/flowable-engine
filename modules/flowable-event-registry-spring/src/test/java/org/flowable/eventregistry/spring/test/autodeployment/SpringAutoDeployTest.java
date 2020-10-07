@@ -150,7 +150,7 @@ public class SpringAutoDeployTest {
         String filePath = "org/flowable/eventregistry/spring/test/autodeployment/simpleEvent.event";
         String originalEventFileContent = IoUtil.readFileAsString(filePath);
         String updatedEventFileContent = originalEventFileContent.replace("My event", "My event test");
-        assertThat(updatedEventFileContent.length()).isGreaterThan(originalEventFileContent.length());
+        assertThat(updatedEventFileContent).hasSizeGreaterThan(originalEventFileContent.length());
         IoUtil.writeStringToFile(updatedEventFileContent, filePath);
 
         // Classic produced/consumer problem here:

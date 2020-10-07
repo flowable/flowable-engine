@@ -155,7 +155,7 @@ public class SpringAutoDeployTest {
         String filePath = "org/flowable/app/spring/test/autodeployment/simple.app";
         String originalAppFileContent = IoUtil.readFileAsString(filePath);
         String updatedAppFileContent = originalAppFileContent.replace("Simple app", "My simple app");
-        assertThat(updatedAppFileContent.length() > originalAppFileContent.length()).isTrue();
+        assertThat(updatedAppFileContent).hasSizeGreaterThan(originalAppFileContent.length());
         IoUtil.writeStringToFile(updatedAppFileContent, filePath);
 
         // Classic produced/consumer problem here:
