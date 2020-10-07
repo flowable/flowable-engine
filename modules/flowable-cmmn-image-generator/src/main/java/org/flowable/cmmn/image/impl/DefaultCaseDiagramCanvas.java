@@ -264,7 +264,7 @@ public class DefaultCaseDiagramCanvas {
         Stroke originalStroke = g.getStroke();
 
         g.setPaint(CONNECTION_COLOR);
-        if (connectionType.equals("association")) {
+        if ("association".equals(connectionType)) {
             g.setStroke(ASSOCIATION_STROKE);
         }
 
