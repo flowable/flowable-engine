@@ -154,7 +154,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
                 continue;
             }
 
-            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
             TimerJobEntity timer = timerJobService.createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setProcessDefinitionId(processDefinition.getId());

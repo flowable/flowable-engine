@@ -885,7 +885,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureJobsInitialized() {
         if (jobs == null) {
-            jobs = CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getJobService().findJobsByExecutionId(id);
+            jobs = CommandContextUtil.getJobService().findJobsByExecutionId(id);
         }
     }
 
@@ -897,7 +897,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureTimerJobsInitialized() {
         if (timerJobs == null) {
-            timerJobs = CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService().findTimerJobsByExecutionId(id);
+            timerJobs = CommandContextUtil.getTimerJobService().findTimerJobsByExecutionId(id);
         }
     }
 

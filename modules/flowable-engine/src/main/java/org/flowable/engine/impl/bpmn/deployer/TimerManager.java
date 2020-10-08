@@ -58,7 +58,7 @@ public class TimerManager {
     }
 
     protected void scheduleTimers(ProcessDefinitionEntity processDefinition, Process process) {
-        TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService();
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
         List<TimerJobEntity> timers = getTimerDeclarations(processDefinition, process);
         for (TimerJobEntity timer : timers) {
             timerJobService.scheduleTimerJob(timer);

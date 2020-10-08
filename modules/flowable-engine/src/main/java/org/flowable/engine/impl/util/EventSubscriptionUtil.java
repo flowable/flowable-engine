@@ -114,7 +114,7 @@ public class EventSubscriptionUtil {
 
     protected static void scheduleEventAsync(EventSubscriptionEntity eventSubscriptionEntity, Object payload) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         JobEntity message = jobService.createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType(ProcessEventJobHandler.TYPE);

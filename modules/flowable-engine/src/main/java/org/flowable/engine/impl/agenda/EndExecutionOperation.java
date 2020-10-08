@@ -156,7 +156,7 @@ public class EndExecutionOperation extends AbstractOperation {
     }
     
     protected void scheduleAsyncCompleteCallActivity(ExecutionEntity superExecutionEntity, ExecutionEntity childProcessInstanceExecutionEntity) {
-        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         
         JobEntity job = jobService.createJob();
         

@@ -396,7 +396,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     void testFindJobByCorrelationId() {
         Job asyncJob = managementService.executeCommand(context -> {
-            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            JobService jobService = CommandContextUtil.getJobService(context);
             JobEntity job = jobService.createJob();
             job.setJobType("testAsync");
             jobService.insertJob(job);
@@ -404,7 +404,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         });
 
         Job timerJob = managementService.executeCommand(context -> {
-            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getTimerJobService();
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(context);
             TimerJobEntity job = timerJobService.createTimerJob();
             job.setJobType("testTimer");
             timerJobService.insertTimerJob(job);
@@ -412,7 +412,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         });
 
         Job deadLetterJob = managementService.executeCommand(context -> {
-            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            JobService jobService = CommandContextUtil.getJobService(context);
             DeadLetterJobEntity job = jobService.createDeadLetterJob();
             job.setJobType("testDeadLetter");
             jobService.insertDeadLetterJob(job);
@@ -430,7 +430,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
 
         Job externalWorkerJob = managementService.executeCommand(context -> {
-            JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+            JobService jobService = CommandContextUtil.getJobService(context);
             ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
             job.setJobType("testExternal");
             jobService.insertExternalWorkerJob(job);

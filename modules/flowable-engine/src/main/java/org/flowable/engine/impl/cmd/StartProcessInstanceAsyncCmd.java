@@ -61,7 +61,7 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
     }
 
     protected void executeAsynchronous(ExecutionEntity execution, Process process, CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
 
         JobEntity job = jobService.createJob();
         job.setExecutionId(execution.getId());

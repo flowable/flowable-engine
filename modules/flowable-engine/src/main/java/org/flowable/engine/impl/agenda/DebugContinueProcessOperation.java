@@ -53,7 +53,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void breakExecution(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         JobEntity brokenJob = jobService.createJob();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);

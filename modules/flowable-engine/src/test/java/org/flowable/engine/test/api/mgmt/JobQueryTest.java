@@ -106,7 +106,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public String execute(CommandContext commandContext) {
-                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
                 JobEntity message = jobService.createJob();
                 message.setJobType(Job.JOB_TYPE_MESSAGE);
                 message.setRetries(3);
@@ -201,7 +201,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
                 jobService.updateJob(job);
                 return null;
             }
@@ -567,7 +567,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
                 jobEntity = jobService.createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
@@ -595,7 +595,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
                 jobEntity = jobService.createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
@@ -620,7 +620,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
                 jobService.deleteJob(jobEntity.getId());
                 return null;
             }

@@ -46,16 +46,27 @@ import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
+import org.flowable.entitylink.api.EntityLinkService;
+import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.InternalTaskAssignmentManager;
+import org.flowable.task.service.TaskService;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableService;
 
 /**
  * @author Joram Barrez
@@ -329,6 +340,94 @@ public class CommandContextUtil {
         }
 
         return eventRepositoryService;
+    }
+    
+    public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getVariableServiceConfiguration().getVariableService();
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        return getHistoricVariableService(getCommandContext());
+    }
+    
+    public static HistoricVariableService getHistoricVariableService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getVariableServiceConfiguration().getHistoricVariableService();
+    }
+    
+    public static IdentityLinkService getIdentityLinkService() {
+        return getIdentityLinkService(getCommandContext());
+    }
+    
+    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getIdentityLinkService();
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        return getHistoricIdentityLinkService(getCommandContext());
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
+    }
+    
+    public static EntityLinkService getEntityLinkService() {
+        return getEntityLinkService(getCommandContext());
+    }
+    
+    public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getEntityLinkService();
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService() {
+        return getHistoricEntityLinkService(getCommandContext());
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+    }
+    
+    public static JobService getJobService() {
+        return getJobService(getCommandContext());
+    }
+    
+    public static JobService getJobService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+    }
+    
+    public static TimerJobService getTimerJobService() {
+        return getTimerJobService(getCommandContext());
+    }
+    
+    public static TimerJobService getTimerJobService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+    }
+    
+    public static TaskService getTaskService() {
+        return getTaskService(getCommandContext());
+    }
+    
+    public static TaskService getTaskService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getTaskService();
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+    
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getTaskServiceConfiguration().getHistoricTaskService();
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService() {
+        return getEventSubscriptionService(getCommandContext());
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
     }
     
     public static CmmnEngineAgenda getAgenda() {
