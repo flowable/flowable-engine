@@ -1847,7 +1847,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(processInstances).hasSize(5);
 
         for (ProcessInstance processInstance : processInstances) {
-            assertThat(processInstanceIds.contains(processInstance.getId())).isTrue();
+            assertThat(processInstanceIds).contains(processInstance.getId());
         }
     }
 

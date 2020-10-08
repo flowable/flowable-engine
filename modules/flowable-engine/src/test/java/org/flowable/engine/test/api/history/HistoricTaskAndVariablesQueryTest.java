@@ -115,8 +115,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             task = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().taskAssignee("kermit").singleResult();
             assertThat(task.getProcessVariables()).isEmpty();
-            assertThat(task.getTaskLocalVariables()).hasSize(1);
-            assertThat(task.getTaskLocalVariables().get("localVar")).isEqualTo("test");
+            assertThat(task.getTaskLocalVariables())
+                    .containsOnly(entry("localVar", "test"));
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
             assertThat(task.getTaskLocalVariables()).isEmpty();
@@ -337,8 +337,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .taskVariableValueEquals("localVar", "test")
                     .taskVariableValueEquals("localVar", "nonExisting").endOr().singleResult();
             assertThat(task.getProcessVariables()).isEmpty();
-            assertThat(task.getTaskLocalVariables()).hasSize(1);
-            assertThat(task.getTaskLocalVariables().get("localVar")).isEqualTo("test");
             assertThat(task.getTaskLocalVariables())
                     .containsOnly(entry("localVar", "test"));
 

@@ -74,8 +74,11 @@ public class ShellTaskConverterTest extends AbstractConverterTest {
         List<FieldExtension> fields = serviceTask.getFieldExtensions();
         Collection<String> expectedField = new HashSet<>(EXPECTED_FIELDS);
         for (FieldExtension field : fields) {
-            assertThat(expectedField.contains(field.getFieldName())).isTrue();
-            assertThat(expectedField.contains(field.getStringValue())).isTrue();
+            assertThat(expectedField)
+                    .contains(
+                            field.getFieldName(),
+                            field.getStringValue()
+                    );
             assertThat(field.getStringValue()).isEqualTo(field.getFieldName());
             expectedField.remove(field.getFieldName());
         }

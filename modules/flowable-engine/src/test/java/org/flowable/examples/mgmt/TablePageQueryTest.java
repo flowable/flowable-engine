@@ -80,7 +80,8 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
         }
 
         for (int i = 0; i < expectedTaskNames.length; i++) {
-            assertThat(rowData.get(i).get(columnKey)).isEqualTo(expectedTaskNames[i]);
+            assertThat(rowData.get(i))
+                    .containsEntry(columnKey, expectedTaskNames[i]);
         }
     }
 

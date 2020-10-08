@@ -1851,13 +1851,13 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             .start();
 
         List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
-        assertThat(jobs).hasSize(myCollection.size());
+        assertThat(jobs).hasSameSizeAs(myCollection);
         for (Job job : jobs) {
             managementService.executeJob(job.getId());
         }
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
-        assertThat(processInstances).hasSize(myCollection.size());
+        assertThat(processInstances).hasSameSizeAs(myCollection);
 
         List<Integer> loopCounters = new ArrayList<>();
         for (ProcessInstance instance : processInstances) {

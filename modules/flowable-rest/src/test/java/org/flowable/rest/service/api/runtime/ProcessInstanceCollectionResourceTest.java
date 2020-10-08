@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -503,10 +504,12 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
         // Check if engine has correct variables set
         Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
-        assertThat(processVariables).hasSize(2);
 
-        assertThat(processVariables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(processVariables.get("integerVariable")).isEqualTo(1234);
+        assertThat(processVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234)
+                );
     }
 
     @Test

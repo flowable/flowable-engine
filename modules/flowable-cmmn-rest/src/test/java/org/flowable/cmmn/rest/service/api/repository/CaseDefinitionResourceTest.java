@@ -72,10 +72,8 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThat(responseNode.get("graphicalNotationDefined").booleanValue()).isFalse();
 
         // Check URL's
-        assertThat(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                CmmnRestUrls
-                        .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName())))
-                .isTrue();
+        assertThat(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8")).endsWith(CmmnRestUrls
+                .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName()));
     }
 
     /**

@@ -15,6 +15,7 @@ package org.flowable.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -393,16 +394,22 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         List<String> processInstance = new ArrayList<>(2);
         processInstance.add(historicProcessInstances.get(0).getId());
         processInstance.add(historicProcessInstances.get(1).getId());
-        assertThat(processInstance.contains(processInstance1.getId())).isTrue();
-        assertThat(processInstance.contains(processInstance2.getId())).isTrue();
+        assertThat(processInstance)
+                .contains(
+                        processInstance1.getId(),
+                        processInstance2.getId()
+                );
 
         // Verify again, with variables included (bug reported on that)
         historicProcessInstances = historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceEndTime().desc().includeProcessVariables().list();
         processInstance = new ArrayList<>(4);
         processInstance.add(historicProcessInstances.get(0).getId());
         processInstance.add(historicProcessInstances.get(1).getId());
-        assertThat(processInstance.contains(processInstance1.getId())).isTrue();
-        assertThat(processInstance.contains(processInstance2.getId())).isTrue();
+        assertThat(processInstance)
+                .contains(
+                        processInstance1.getId(),
+                        processInstance2.getId()
+                );
     }
 
     @Test
@@ -536,9 +543,11 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getTenantId()).isEqualTo(tenantId);
 
         Map<String, Object> processInstanceVars = processInstance.getProcessVariables();
-        assertThat(processInstanceVars).hasSize(2);
-        assertThat(processInstanceVars.get("name")).isEqualTo("Kermit");
-        assertThat(processInstanceVars.get("age")).isEqualTo(60);
+        assertThat(processInstanceVars)
+                .containsOnly(
+                        entry("name", "Kermit"),
+                        entry("age", 60)
+                );
         
         waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
@@ -552,9 +561,11 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(historicProcessInstance.getTenantId()).isEqualTo(tenantId);
 
         Map<String, Object> historicProcessInstanceVars = historicProcessInstance.getProcessVariables();
-        assertThat(historicProcessInstanceVars).hasSize(2);
-        assertThat(historicProcessInstanceVars.get("name")).isEqualTo("Kermit");
-        assertThat(historicProcessInstanceVars.get("age")).isEqualTo(60);
+        assertThat(historicProcessInstanceVars)
+                .containsOnly(
+                        entry("name", "Kermit"),
+                        entry("age", 60)
+                );
         
         waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 

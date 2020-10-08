@@ -62,7 +62,7 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         List<FormProperty> formProperties = startEvent.getFormProperties();
 
         assertThat(formProperties).isNotNull();
-        assertThat(formProperties.size()).as("Invalid form properties list: ").isEqualTo(8);
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
             if (formProperty.getId().equals("new_property_1")) {
@@ -104,7 +104,7 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         formProperties = userTask.getFormProperties();
 
         assertThat(formProperties).isNotNull();
-        assertThat(formProperties.size()).as("Invalid form properties list: ").isEqualTo(8);
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
             if (formProperty.getId().equals("new_property_1")) {

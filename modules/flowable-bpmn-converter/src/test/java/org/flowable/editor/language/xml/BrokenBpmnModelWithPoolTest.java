@@ -97,7 +97,7 @@ public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
         Process mainProcess = parsedModel.getMainProcess();
 
         assertThat(mainProcess).isNotNull();
-        assertThat(mainProcess.getFlowElements().size()).isEqualTo(3);
+        assertThat(mainProcess.getFlowElements()).hasSize(3);
     }
 
     @Override

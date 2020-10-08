@@ -1154,13 +1154,13 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         List<Execution> childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(childExecutions).hasSize(13);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(childExecutions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("parallelSubProcess")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("parallelSubProcess");
         assertThat(classifiedExecutions.get("parallelSubProcess")).hasSize(4);
-        assertThat(classifiedExecutions.get("taskInclusive1")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("taskInclusive1");
         assertThat(classifiedExecutions.get("taskInclusive1")).hasSize(3);
-        assertThat(classifiedExecutions.get("taskInclusive2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("taskInclusive2");
         assertThat(classifiedExecutions.get("taskInclusive2")).hasSize(3);
-        assertThat(classifiedExecutions.get("taskInclusive3")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("taskInclusive3");
         assertThat(classifiedExecutions.get("taskInclusive3")).hasSize(3);
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();

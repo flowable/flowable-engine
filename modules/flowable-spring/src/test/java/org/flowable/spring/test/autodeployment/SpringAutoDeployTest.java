@@ -169,7 +169,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         String filePath = "org/flowable/spring/test/autodeployment/autodeploy.a.bpmn20.xml";
         String originalBpmnFileContent = IoUtil.readFileAsString(filePath);
         String updatedBpmnFileContent = originalBpmnFileContent.replace("flow1", "fromStartToEndFlow");
-        assertThat(updatedBpmnFileContent.length()).isGreaterThan(originalBpmnFileContent.length());
+        assertThat(updatedBpmnFileContent).hasSizeGreaterThan(originalBpmnFileContent.length());
         IoUtil.writeStringToFile(updatedBpmnFileContent, filePath);
 
         // Classic produced/consumer problem here:

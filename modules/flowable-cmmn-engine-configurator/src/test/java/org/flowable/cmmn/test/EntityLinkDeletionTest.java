@@ -77,10 +77,10 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
 
             // All case/process instances still need to have entity links
             for (String caseInstanceId : caseInstanceIds) {
-                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).isNotEmpty();
             }
             for (String processInstanceId : processInstanceIds) {
-                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).isNotEmpty();
             }
 
             // Completing the root instance, deletes all entity links
@@ -123,10 +123,10 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
 
             // All case/process instances still need to have entity links
             for (String caseInstanceId : caseInstanceIds) {
-                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).isNotEmpty();
             }
             for (String processInstanceId : processInstanceIds) {
-                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).isNotEmpty();
             }
 
             // Completing the root instance, deletes all entity links
