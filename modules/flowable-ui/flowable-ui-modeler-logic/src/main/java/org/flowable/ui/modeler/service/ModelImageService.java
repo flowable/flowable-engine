@@ -35,7 +35,6 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
-import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElementReference;

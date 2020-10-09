@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.ProcessEngineConfiguration;
 
 /**
  * Allows programmatic querying of {@link Execution}s.

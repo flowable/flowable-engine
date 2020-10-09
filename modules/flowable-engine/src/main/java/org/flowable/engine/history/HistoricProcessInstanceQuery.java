@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.query.DeleteQuery;
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 
 /**
