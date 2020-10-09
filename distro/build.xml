@@ -186,6 +186,9 @@
 			<fileset dir="../modules/flowable-dmn-api/target">
 				<include name="flowable-dmn-api-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-dmn-image-generator/target">
+				<include name="flowable-dmn-image-generator-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-dmn-engine/target">
 				<include name="flowable-dmn-engine-*.jar" />
 			</fileset>
@@ -294,6 +297,9 @@
 			<fileset dir="../modules/flowable-common-rest/target">
 				<include name="flowable-common-rest-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-external-job-rest/target">
+				<include name="flowable-external-job-rest-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-rest/target">
 				<include name="flowable-rest-*.jar" />
 			</fileset>
@@ -311,6 +317,9 @@
 			</fileset>
 			<fileset dir="../modules/flowable-mule/target">
 				<include name="flowable-mule-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-http-common/target">
+				<include name="flowable-http-common-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
