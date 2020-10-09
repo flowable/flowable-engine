@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.ProcessEngineConfiguration;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.

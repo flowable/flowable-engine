@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.agenda;
 
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
-import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
