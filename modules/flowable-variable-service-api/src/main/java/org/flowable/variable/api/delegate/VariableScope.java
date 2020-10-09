@@ -169,14 +169,14 @@ public interface VariableScope extends VariableContainer {
      * 
      * <p>
      * A variable is set according to the following algorithm:
-     * 
-     * <p>
+     *
+     * <ul>
      * <li>If variable name is an expression, resolve expression and set the value on the resolved object.</li>
      * <li>If this scope already contains a variable by the provided name as a <strong>local</strong> variable, its value is overwritten to the provided value.</li>
      * <li>If this scope does <strong>not</strong> contain a variable by the provided name as a local variable, the variable is set to this scope's parent scope, if there is one. If there is no parent
      * scope (meaning this scope is the root scope of the hierarchy it belongs to), this scope is used. This applies recursively up the parent scope chain until, if no scope contains a local variable
      * by the provided name, ultimately the root scope is reached and the variable value is set on that scope.</li>
-     * <p>
+     * </ul>
      * In practice for most cases, this algorithm will set variables to the scope of the execution at the process instance’s root level, if there is no execution-local variable by the provided name.
      * 
      * @param variableName

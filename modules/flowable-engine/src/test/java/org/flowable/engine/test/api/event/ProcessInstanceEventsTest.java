@@ -387,8 +387,9 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     }
 
     /**
+     * <p>
      * Test +-->End1 Start-<> +-->End2
-     * <p/>
+     * </p>
      * process on PROCESS_COMPLETED event
      */
     @Test

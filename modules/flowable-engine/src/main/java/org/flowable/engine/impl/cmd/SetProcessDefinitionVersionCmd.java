@@ -50,7 +50,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  * If the process instance is not currently waiting but actively running, then this would be a case for optimistic locking, meaning either the version update or the "real work" wins, i.e., this is a
  * race condition.
  * 
- * @see {http://forums.activiti.org/en/viewtopic.php?t=2918}
+ * @see <a href="http://forums.activiti.org/en/viewtopic.php?t=2918">http://forums.activiti.org/en/viewtopic.php?t=2918</a>
  * @author Falko Menge
  */
 public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializable {

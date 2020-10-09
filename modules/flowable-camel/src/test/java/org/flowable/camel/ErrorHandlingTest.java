@@ -42,8 +42,6 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Process instance should be removed after completion. Works as intended, if no exception interrupts the Camel route.
-     *
-     * @throws Exception
      */
     @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
@@ -64,8 +62,6 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Expected behavior, with default error handling in Camel: Roll-back to previous wait state. Fails with Activiti 5.12.
-     *
-     * @throws Exception
      */
     @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
@@ -82,8 +78,6 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Exception caught and processed by Camel dead letter queue handler. Process instance proceeds to ReceiveTask as expected.
-     *
-     * @throws Exception
      */
     @Test
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})

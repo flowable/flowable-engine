@@ -106,7 +106,7 @@ public interface ExecuteDecisionBuilder {
     /**
      * Executes a decision (table)
      *
-     * @returnon A List with one or more rule results mapped to variables
+     * @return A List with one or more rule results mapped to variables
      *
      **/
     List<Map<String, Object>> executeDecision();
