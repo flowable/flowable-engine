@@ -507,7 +507,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task parallelUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("ParallelUserTask")) {
+            if ("ParallelUserTask".equals(task.getName())) {
                 parallelUserTask = task;
             }
         }
@@ -527,7 +527,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task beforeErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("BeforeError")) {
+            if ("BeforeError".equals(task.getName())) {
                 beforeErrorUserTask = task;
             }
         }
@@ -543,7 +543,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task afterErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("AfterError")) {
+            if ("AfterError".equals(task.getName())) {
                 afterErrorUserTask = task;
             }
         }

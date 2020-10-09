@@ -130,7 +130,7 @@ public class HttpServiceTaskTestServer {
 
         @Override
         public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-            if (request.getMethod() != null && request.getMethod().equalsIgnoreCase("PATCH")) {
+            if (request.getMethod() != null && "PATCH".equalsIgnoreCase(request.getMethod())) {
                 doPatch(request, response);
             } else {
                 super.service(request, response);

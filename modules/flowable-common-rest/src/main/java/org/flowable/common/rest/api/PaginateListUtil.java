@@ -121,9 +121,9 @@ public interface PaginateListUtil {
             }
 
             query.orderBy(queryProperty);
-            if (order.equals("asc")) {
+            if ("asc".equals(order)) {
                 query.asc();
-            } else if (order.equals("desc")) {
+            } else if ("desc".equals(order)) {
                 query.desc();
             } else {
                 throw new FlowableIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");

@@ -174,37 +174,37 @@ public class ProcessDefinitionsTest {
         int counter = 0;
 
         for (MBeanOperationInfo op : beanInfo.getOperations()) {
-            if (op.getName().equals("deleteDeployment")) {
+            if ("deleteDeployment".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("delete deployment");
                 assertThat(op.getReturnType()).isEqualTo("void");
                 assertThat(op.getSignature()).hasSize(1);
                 assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
-            } else if (op.getName().equals("suspendProcessDefinitionById")) {
+            } else if ("suspendProcessDefinitionById".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("Suspend given process ID");
                 assertThat(op.getReturnType()).isEqualTo("void");
                 assertThat(op.getSignature()).hasSize(1);
                 assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
-            } else if (op.getName().equals("activatedProcessDefinitionById")) {
+            } else if ("activatedProcessDefinitionById".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("Activate given process ID");
                 assertThat(op.getReturnType()).isEqualTo("void");
                 assertThat(op.getSignature()).hasSize(1);
                 assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
-            } else if (op.getName().equals("suspendProcessDefinitionByKey")) {
+            } else if ("suspendProcessDefinitionByKey".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("Suspend given process ID");
                 assertThat(op.getReturnType()).isEqualTo("void");
                 assertThat(op.getSignature()).hasSize(1);
                 assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
-            } else if (op.getName().equals("activatedProcessDefinitionByKey")) {
+            } else if ("activatedProcessDefinitionByKey".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("Activate given process ID");
                 assertThat(op.getReturnType()).isEqualTo("void");
                 assertThat(op.getSignature()).hasSize(1);
                 assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.String");
-            } else if (op.getName().equals("deployProcessDefinition")) {
+            } else if ("deployProcessDefinition".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("Deploy Process Definition");
                 assertThat(op.getReturnType()).isEqualTo("void");
@@ -223,11 +223,11 @@ public class ProcessDefinitionsTest {
         counter = 0;
 
         for (MBeanAttributeInfo attr : beanInfo.getAttributes()) {
-            if (attr.getName().equals("ProcessDefinitions")) {
+            if ("ProcessDefinitions".equals(attr.getName())) {
                 counter++;
                 assertThat(attr.getDescription()).isEqualTo("List of Process definitions");
                 assertThat(attr.getType()).isEqualTo("java.util.List");
-            } else if (attr.getName().equals("Deployments")) {
+            } else if ("Deployments".equals(attr.getName())) {
                 counter++;
                 assertThat(attr.getDescription()).isEqualTo("List of deployed Processes");
                 assertThat(attr.getType()).isEqualTo("java.util.List");

@@ -39,7 +39,7 @@ public class PutAwareStandardServletMultiPartResolver extends StandardServletMul
      */
     public static final boolean isMultipartContent(HttpServletRequest request) {
         final String method = request.getMethod().toLowerCase();
-        if (!method.equalsIgnoreCase("post") && !method.equalsIgnoreCase("put")) {
+        if (!"post".equalsIgnoreCase(method) && !"put".equalsIgnoreCase(method)) {
             return false;
         }
 

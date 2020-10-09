@@ -3170,7 +3170,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         //Move both processes to the eventCatch
         ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
         allExecutions.stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .map(Execution::getId)
                 .forEach(id -> changeActivityStateBuilder.moveExecutionToActivityId(id, "intermediateCatchEvent"));
         changeActivityStateBuilder.changeState();
@@ -3308,7 +3308,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         //Move one execution to the event catch
         String executionId = executionsByProcessInstance.get(processInstance1.getId()).stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .findFirst()
                 .map(Execution::getId)
                 .get();
@@ -3350,7 +3350,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         //Move the second process to the eventCatch
         executionId = executionsByProcessInstance.get(processInstance2.getId()).stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .findFirst()
                 .map(Execution::getId)
                 .get();

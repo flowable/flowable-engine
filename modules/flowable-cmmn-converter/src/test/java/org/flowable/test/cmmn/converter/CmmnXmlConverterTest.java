@@ -127,7 +127,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
                 nrOfTasks++;
             }
 
-            if (!planItem.getId().equals("planItemTaskA")) {
+            if (!"planItemTaskA".equals(planItem.getId())) {
                 assertThat(planItem.getEntryCriteria())
                         .hasSize(1)
                         .extracting(Criterion::getSentry)
@@ -135,7 +135,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             }
 
             if (planItem.getPlanItemDefinition() instanceof Task) {
-                if (planItem.getId().equals("planItemTaskB")) {
+                if ("planItemTaskB".equals(planItem.getId())) {
                     assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isFalse();
                 } else {
                     assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isTrue();

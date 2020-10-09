@@ -205,7 +205,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
 
         String xForwardedProtoHeader = request.getHeader("X-Forwarded-Proto");
         if (xForwardedProtoHeader != null) {
-            cookie.setSecure(xForwardedProtoHeader.equals("https") || request.isSecure());
+            cookie.setSecure("https".equals(xForwardedProtoHeader) || request.isSecure());
         } else {
             cookie.setSecure(request.isSecure());
         }

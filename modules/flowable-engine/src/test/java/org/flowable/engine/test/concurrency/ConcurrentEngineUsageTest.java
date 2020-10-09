@@ -45,7 +45,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
     @Deployment
     public void testConcurrentUsage() throws Exception {
 
-        if (!processEngineConfiguration.getDatabaseType().equals("h2") && !processEngineConfiguration.getDatabaseType().equals("db2")) {
+        if (!"h2".equals(processEngineConfiguration.getDatabaseType()) && !"db2".equals(processEngineConfiguration.getDatabaseType())) {
             int numberOfThreads = 5;
             int numberOfProcessesPerThread = 5;
             int totalNumberOfTasks = 2 * numberOfThreads * numberOfProcessesPerThread;

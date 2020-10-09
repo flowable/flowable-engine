@@ -141,13 +141,13 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
         for (String parameterName : paramMap.keySet()) {
             if (paramMap.get(parameterName).length > 0) {
 
-                if (parameterName.equalsIgnoreCase("name")) {
+                if ("name".equalsIgnoreCase(parameterName)) {
                     name = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("description")) {
+                } else if ("description".equalsIgnoreCase(parameterName)) {
                     description = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("type")) {
+                } else if ("type".equalsIgnoreCase(parameterName)) {
                     type = paramMap.get(parameterName)[0];
                 }
             }

@@ -252,7 +252,7 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
             Map<String, Object> historicVariables = historicVariableInstances.stream()
-                .filter(variable -> !variable.getVariableName().equals("initiator"))
+                .filter(variable -> !"initiator".equals(variable.getVariableName()))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
             assertThat(historicVariables)
@@ -470,7 +470,7 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
             Map<String, Object> historicVariables = historicVariableInstances.stream()
-                .filter(variable -> !variable.getVariableName().equals("initiator"))
+                .filter(variable -> !"initiator".equals(variable.getVariableName()))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
             assertThat(historicVariables)
@@ -502,7 +502,7 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = cmmnHistoryService.createHistoricVariableInstanceQuery().list();
             Map<String, Object> historicVariables = historicVariableInstances.stream()
-                .filter(variable -> !variable.getVariableName().equals("initiator"))
+                .filter(variable -> !"initiator".equals(variable.getVariableName()))
                 .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
             assertThat(historicVariables)

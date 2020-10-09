@@ -952,7 +952,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(classifiedTasks.get("postForkTask")).hasSize(1);
 
         //Finish all gateWayTasks
-        tasks.stream().filter(t-> !t.getTaskDefinitionKey().equals("postForkTask")).forEach(this::completeTask);
+        tasks.stream().filter(t-> !"postForkTask".equals(t.getTaskDefinitionKey())).forEach(this::completeTask);
 
         childExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         //1x MultiInstance root, 3x parallel MultiInstance, 3x NestedSubProcess, 4x postFork task Execution
@@ -1227,7 +1227,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
             Map<String, Object> historicVariables = historicVariableInstances.stream()
-                    .filter(variable -> !variable.getVariableName().equals("initiator"))
+                    .filter(variable -> !"initiator".equals(variable.getVariableName()))
                     .collect(Collectors.toMap(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue));
 
             assertThat(historicVariables)

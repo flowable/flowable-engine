@@ -114,7 +114,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
             return getLanguageName();
         } else if (key.equals(ScriptEngine.LANGUAGE_VERSION)) {
             return getLanguageVersion();
-        } else if (key.equals("THREADING")) {
+        } else if ("THREADING".equals(key)) {
             return "MULTITHREADED";
         } else {
             return null;

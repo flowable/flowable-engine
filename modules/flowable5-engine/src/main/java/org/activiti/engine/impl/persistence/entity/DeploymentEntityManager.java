@@ -152,7 +152,7 @@ public class DeploymentEntityManager extends AbstractManager {
                     List<EventSubscriptionDeclaration> signalEventDefinitions = (List<EventSubscriptionDeclaration>) resolvedProcessDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
                     if (signalEventDefinitions != null) {
                         for (EventSubscriptionDeclaration eventDefinition : signalEventDefinitions) {
-                            if (eventDefinition.getEventType().equals("signal") && eventDefinition.isStartEvent()) {
+                            if ("signal".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                                 SignalEventSubscriptionEntity subscriptionEntity = new SignalEventSubscriptionEntity();
                                 subscriptionEntity.setEventName(eventDefinition.getEventName());
@@ -161,7 +161,7 @@ public class DeploymentEntityManager extends AbstractManager {
                                 subscriptionEntity.setTenantId(previousProcessDefinition.getTenantId());
                                 subscriptionEntity.insert();
 
-                            } else if (eventDefinition.getEventType().equals("message") && eventDefinition.isStartEvent()) {
+                            } else if ("message".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
                                 MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
                                 newSubscription.setEventName(eventDefinition.getEventName());
                                 newSubscription.setActivityId(eventDefinition.getActivityId());

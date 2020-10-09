@@ -1292,7 +1292,7 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         //Complete remaining task3, the next inline test needs the task to be completed too
         for (Task t : tasks) {
-            if (t.getTaskDefinitionKey().equals("taskInclusive3")) {
+            if ("taskInclusive3".equals(t.getTaskDefinitionKey())) {
                 taskService.complete(t.getId());
             }
         }

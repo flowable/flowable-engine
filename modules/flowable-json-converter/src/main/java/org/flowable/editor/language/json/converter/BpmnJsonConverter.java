@@ -580,7 +580,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         Signal signal = new Signal();
                         signal.setId(signalId);
                         signal.setName(signalName);
-                        signal.setScope(signalScope.toLowerCase().equals("processinstance") ? Signal.SCOPE_PROCESS_INSTANCE : Signal.SCOPE_GLOBAL);
+                        signal.setScope("processinstance".equals(signalScope.toLowerCase()) ? Signal.SCOPE_PROCESS_INSTANCE : Signal.SCOPE_GLOBAL);
                         bpmnModel.addSignal(signal);
                     }
                 }

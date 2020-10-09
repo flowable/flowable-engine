@@ -104,10 +104,10 @@ public class DeploymentsJMXClientTest {
         // 2, other attributed are the same
         String pidV2 = null;
         String pidV1 = null;
-        if (pdList.get(0).get(2).equals("1") && pdList.get(1).get(2).equals("2")) {
+        if ("1".equals(pdList.get(0).get(2)) && "2".equals(pdList.get(1).get(2))) {
             pidV2 = pdList.get(1).get(0);
             pidV1 = pdList.get(0).get(0);
-        } else if (pdList.get(1).get(2).equals("1") && pdList.get(0).get(2).equals("2")) {
+        } else if ("1".equals(pdList.get(1).get(2)) && "2".equals(pdList.get(0).get(2))) {
             pidV2 = pdList.get(0).get(0);
             pidV1 = pdList.get(1).get(0);
 

@@ -399,7 +399,7 @@ public class BpmnDeployer implements Deployer {
 
             Set<String> messageNames = new HashSet<>();
             for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-                if (eventDefinition.getEventType().equals("message") && eventDefinition.isStartEvent()) {
+                if ("message".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                     if (!messageNames.contains(eventDefinition.getEventName())) {
                         messageNames.add(eventDefinition.getEventName());
@@ -473,7 +473,7 @@ public class BpmnDeployer implements Deployer {
         List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
         if (eventDefinitions != null) {
             for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-                if (eventDefinition.getEventType().equals("signal") && eventDefinition.isStartEvent()) {
+                if ("signal".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                     SignalEventSubscriptionEntity subscriptionEntity = new SignalEventSubscriptionEntity();
                     subscriptionEntity.setEventName(eventDefinition.getEventName());

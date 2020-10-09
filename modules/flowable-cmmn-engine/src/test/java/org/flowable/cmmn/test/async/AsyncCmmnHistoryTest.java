@@ -1171,7 +1171,7 @@ public class AsyncCmmnHistoryTest extends CustomCmmnConfigurationFlowableTestCas
                     JsonNode historyJsonNode = objectMapper.readTree(historyJobEntity.getAdvancedJobHandlerConfiguration());
 
                     for (JsonNode jsonNode : historyJsonNode) {
-                        if (jsonNode.has("type") && jsonNode.get("type").asText().equals("cmmn-case-instance-start")) {
+                        if (jsonNode.has("type") && "cmmn-case-instance-start".equals(jsonNode.get("type").asText())) {
                             ((ObjectNode) jsonNode).put("type", "invalidType");
                         }
                     }

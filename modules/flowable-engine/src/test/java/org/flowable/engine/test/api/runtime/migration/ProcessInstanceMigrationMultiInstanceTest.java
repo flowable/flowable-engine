@@ -1416,16 +1416,16 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         //MI subProcess root execution, actual subProcess and 1 task
         assertThat(executions).hasSize(17);
-        assertThat(executions).haveExactly(3, new Condition<>(execution -> execution.getActivityId().equals("parallelMISubProcess"), "Outer MI SubProcess"));
+        assertThat(executions).haveExactly(3, new Condition<>(execution -> "parallelMISubProcess".equals(execution.getActivityId()), "Outer MI SubProcess"));
         assertThat(executions).haveExactly(1,
-                new Condition<>(execution -> execution.getActivityId().equals("parallelMISubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(),
+                new Condition<>(execution -> "parallelMISubProcess".equals(execution.getActivityId()) && ((ExecutionEntity) execution).isMultiInstanceRoot(),
                         "Outer MI SubProcess roots"));
         assertThat(executions)
-                .haveExactly(8, new Condition<>(execution -> execution.getActivityId().equals("nestedParallelMISubProcess"), "Nested MI SubProcess"));
+                .haveExactly(8, new Condition<>(execution -> "nestedParallelMISubProcess".equals(execution.getActivityId()), "Nested MI SubProcess"));
         assertThat(executions).haveExactly(2, new Condition<>(
-                execution -> execution.getActivityId().equals("nestedParallelMISubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(),
+                execution -> "nestedParallelMISubProcess".equals(execution.getActivityId()) && ((ExecutionEntity) execution).isMultiInstanceRoot(),
                 "Nested MI SubProcess roots"));
-        assertThat(executions).haveExactly(6, new Condition<>(execution -> execution.getActivityId().equals("nestedSubTask1"), "Task Executions"));
+        assertThat(executions).haveExactly(6, new Condition<>(execution -> "nestedSubTask1".equals(execution.getActivityId()), "Task Executions"));
         assertThat(executions)
                 .extracting("processDefinitionId")
                 .containsOnly(procNestedParallelMultiInst.getId());
@@ -1449,13 +1449,13 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(10);
         assertThat(executions)
-                .haveExactly(6, new Condition<>(execution -> execution.getActivityId().equals("parallelMISubProcess"), "Outer MI SubProcess"));
+                .haveExactly(6, new Condition<>(execution -> "parallelMISubProcess".equals(execution.getActivityId()), "Outer MI SubProcess"));
         assertThat(executions)
                 .haveExactly(2, new Condition<>(
-                        execution -> execution.getActivityId().equals("parallelMISubProcess") && ((ExecutionEntity) execution).isMultiInstanceRoot(),
+                        execution -> "parallelMISubProcess".equals(execution.getActivityId()) && ((ExecutionEntity) execution).isMultiInstanceRoot(),
                         "Outer MI SubProcess roots"));
         assertThat(executions)
-                .haveExactly(4, new Condition<>(execution -> execution.getActivityId().equals("subTask1"), "Task Executions"));
+                .haveExactly(4, new Condition<>(execution -> "subTask1".equals(execution.getActivityId()), "Task Executions"));
         assertThat(executions)
                 .extracting("processDefinitionId")
                 .containsOnly(procParallelMultiInst.getId());
@@ -1477,19 +1477,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
                     .list();
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getActivityId)
-                    .haveAtMost(1, new Condition<>((String s) -> s.equals("beforeMultiInstance"), "beforeMultiInstance completed task"));
+                    .haveAtMost(1, new Condition<>((String s) -> "beforeMultiInstance".equals(s), "beforeMultiInstance completed task"));
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getActivityId)
-                    .haveAtMost(6, new Condition<>((String s) -> s.equals("nestedSubTask1"), "nestedSubTask1 completed task"));
+                    .haveAtMost(6, new Condition<>((String s) -> "nestedSubTask1".equals(s), "nestedSubTask1 completed task"));
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getActivityId)
-                    .haveAtMost(6, new Condition<>((String s) -> s.equals("subTask1"), "subTask1 completed task"));
+                    .haveAtMost(6, new Condition<>((String s) -> "subTask1".equals(s), "subTask1 completed task"));
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getActivityId)
-                    .haveAtMost(4, new Condition<>((String s) -> s.equals("subTask2"), "subTask2 completed task"));
+                    .haveAtMost(4, new Condition<>((String s) -> "subTask2".equals(s), "subTask2 completed task"));
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getActivityId)
-                    .haveAtMost(2, new Condition<>((String s) -> s.equals("afterMultiInstance"), "afterMultiInstance completed task"));
+                    .haveAtMost(2, new Condition<>((String s) -> "afterMultiInstance".equals(s), "afterMultiInstance completed task"));
             assertThat(taskExecutions)
                     .extracting(HistoricActivityInstance::getProcessDefinitionId)
                     .containsOnly(procParallelMultiInst.getId());
@@ -1500,19 +1500,19 @@ public class ProcessInstanceMigrationMultiInstanceTest extends AbstractProcessIn
                         .list();
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getTaskDefinitionKey)
-                        .haveAtMost(1, new Condition<>((String s) -> s.equals("beforeMultiInstance"), "beforeMultiInstance completed task"));
+                        .haveAtMost(1, new Condition<>((String s) -> "beforeMultiInstance".equals(s), "beforeMultiInstance completed task"));
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getTaskDefinitionKey)
-                        .haveAtMost(6, new Condition<>((String s) -> s.equals("nestedSubTask1"), "nestedSubTask1 completed task"));
+                        .haveAtMost(6, new Condition<>((String s) -> "nestedSubTask1".equals(s), "nestedSubTask1 completed task"));
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getTaskDefinitionKey)
-                        .haveAtMost(6, new Condition<>((String s) -> s.equals("subTask1"), "subTask1 completed task"));
+                        .haveAtMost(6, new Condition<>((String s) -> "subTask1".equals(s), "subTask1 completed task"));
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getTaskDefinitionKey)
-                        .haveAtMost(4, new Condition<>((String s) -> s.equals("subTask2"), "subTask2 completed task"));
+                        .haveAtMost(4, new Condition<>((String s) -> "subTask2".equals(s), "subTask2 completed task"));
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getTaskDefinitionKey)
-                        .haveAtMost(2, new Condition<>((String s) -> s.equals("afterMultiInstance"), "afterMultiInstance completed task"));
+                        .haveAtMost(2, new Condition<>((String s) -> "afterMultiInstance".equals(s), "afterMultiInstance completed task"));
                 assertThat(historicTasks)
                         .extracting(HistoricTaskInstance::getProcessDefinitionId)
                         .containsOnly(procParallelMultiInst.getId());

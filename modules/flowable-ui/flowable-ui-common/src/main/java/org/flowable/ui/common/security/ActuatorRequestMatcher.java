@@ -90,7 +90,7 @@ public class ActuatorRequestMatcher extends ApplicationContextRequestMatcher<Web
         }
 
         public RequestMatcher antPath(String part) {
-            String pattern = (this.servletPath.equals("/") ? "" : this.servletPath);
+            String pattern = ("/".equals(this.servletPath) ? "" : this.servletPath);
             return new AntPathRequestMatcher(pattern + part);
         }
 
