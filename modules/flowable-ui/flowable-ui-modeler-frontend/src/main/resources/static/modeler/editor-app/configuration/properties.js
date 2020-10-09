@@ -16,6 +16,7 @@ var FLOWABLE = FLOWABLE || {};
 FLOWABLE.PROPERTY_CONFIG =
 {
     "string": {
+        "templateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/string-property-write-mode-template.html"
     },

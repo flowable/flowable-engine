@@ -38,6 +38,7 @@ public class DmnDeployer implements Deployer {
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
     protected DmnDeploymentHelper dmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
+    protected DecisionRequirementsDiagramHelper decisionRequirementsDiagramHelper;
     protected boolean usePrefixId;
 
     @Override
@@ -50,6 +51,9 @@ public class DmnDeployer implements Deployer {
 
         dmnDeploymentHelper.copyDeploymentValuesToDecisions(parsedDeployment.getDeployment(), parsedDeployment.getAllDecisions());
         dmnDeploymentHelper.setResourceNamesOnDecisions(parsedDeployment);
+
+        dmnDeploymentHelper.createAndPersistNewDiagramsIfNeeded(parsedDeployment, decisionRequirementsDiagramHelper);
+        dmnDeploymentHelper.setDecisionDefinitionDiagramNames(parsedDeployment);
 
         if (deployment.isNew()) {
             Map<DecisionEntity, DecisionEntity> mapOfNewDefinitionToPreviousVersion = getPreviousVersionsOfDecisions(parsedDeployment);
@@ -168,5 +172,13 @@ public class DmnDeployer implements Deployer {
 
     public void setUsePrefixId(boolean usePrefixId) {
         this.usePrefixId = usePrefixId;
+    }
+
+    public DecisionRequirementsDiagramHelper getDecisionRequirementsDiagramHelper() {
+        return decisionRequirementsDiagramHelper;
+    }
+
+    public void setDecisionRequirementsDiagramHelper(DecisionRequirementsDiagramHelper decisionRequirementsDiagramHelper) {
+        this.decisionRequirementsDiagramHelper = decisionRequirementsDiagramHelper;
     }
 }

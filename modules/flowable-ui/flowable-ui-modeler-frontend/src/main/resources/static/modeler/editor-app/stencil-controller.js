@@ -320,6 +320,7 @@ angular.module('flowableModeler')
                                 'description': property.description(),
                                 'type': property.type(),
                                 'mode': 'read',
+                                'readonly': property.readonly(),
                                 'hidden': property.isHidden(),
                                 'value': selectedShape.properties.get(key)
                             };
@@ -339,7 +340,8 @@ angular.module('flowableModeler')
                               currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl + '?version=' + $rootScope.staticIncludeVersion;
                             }
 
-                            if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
+                            if ((currentProperty.readonly && propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) ||
+                                (currentProperty.readonly === undefined && propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null)) {
                                 currentProperty.templateUrl = propertyConfig.templateUrl + '?version=' + $rootScope.staticIncludeVersion;
                                 currentProperty.hasReadWriteMode = false;
                             }

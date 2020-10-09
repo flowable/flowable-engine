@@ -273,7 +273,7 @@ public class ModelServiceImpl implements ModelService {
             editorNode.set("stencilset", stencilSetNode);
 
             ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("drd_id", "DMNDiagram_" + model.getKey());
+            propertiesNode.put("drd_id", model.getKey());
             propertiesNode.put("name", model.getName());
             if (StringUtils.isNotEmpty(model.getDescription())) {
                 propertiesNode.put("documentation", model.getDescription());
@@ -306,14 +306,6 @@ public class ModelServiceImpl implements ModelService {
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "ExpandedDecisionService");
-
-            ObjectNode decisionServicePropertiesNode = objectMapper.createObjectNode();
-            childNode.set("properties", decisionServicePropertiesNode);
-            decisionServicePropertiesNode.put("overrideid", model.getKey());
-            decisionServicePropertiesNode.put("name", model.getName());
-            if (StringUtils.isNotEmpty(model.getDescription())) {
-                decisionServicePropertiesNode.put("documentation", model.getDescription());
-            }
 
             ObjectNode outgoingDecisionsShape = objectMapper.createObjectNode();
             childShapes.add(outgoingDecisionsShape);
@@ -811,8 +803,7 @@ public class ModelServiceImpl implements ModelService {
                 handleAppModelProcessRelations(model, jsonNode);
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_SERVICE) {
                 // Thumbnail
-//                byte[] thumbnail = modelImageService.generateDrdThumbnailImage(model, jsonNode);
-                byte[] thumbnail = null;
+                byte[] thumbnail = modelImageService.generateDmnThumbnailImage(model, jsonNode);
                 if (thumbnail != null) {
                     model.setThumbnail(thumbnail);
                 }

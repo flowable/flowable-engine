@@ -10,19 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.flowable.dmn.engine.impl.persistence.entity;
-
-import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.Entity;
+package org.flowable.dmn.image.exception;
 
 /**
+ * Runtime exception for all image logic.
+ * 
  * @author Tijs Rademakers
  */
-public interface DmnResourceEntity extends Entity, EngineResource {
+public class FlowableImageException extends RuntimeException {
 
-    @Override
-    Object getPersistentState();
+    private static final long serialVersionUID = 1L;
 
-    void setGenerated(boolean generated);
+    public FlowableImageException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FlowableImageException(String message) {
+        super(message);
+    }
 }

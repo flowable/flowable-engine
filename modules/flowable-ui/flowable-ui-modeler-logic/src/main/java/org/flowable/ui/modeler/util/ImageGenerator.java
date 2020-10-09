@@ -22,6 +22,9 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
+import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
+import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -45,6 +48,13 @@ public class ImageGenerator {
         BufferedImage diagramImage = diagramGenerator.generatePngImage(cmmnModel, scaleFactor);
         return diagramImage;
     }
+
+    public static BufferedImage createDmnImage(DmnDefinition dmnDefinition, double scaleFactor) {
+        DecisionRequirementsDiagramGenerator diagramGenerator = new DefaultDecisionRequirementsDiagramGenerator(scaleFactor);
+        BufferedImage diagramImage = diagramGenerator.generatePngImage(dmnDefinition, scaleFactor);
+        return diagramImage;
+    }
+
 
     public static byte[] createByteArrayForImage(BufferedImage image, String imageType) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

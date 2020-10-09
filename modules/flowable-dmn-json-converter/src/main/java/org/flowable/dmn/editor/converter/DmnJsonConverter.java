@@ -153,11 +153,10 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         modelNode.set(EDITOR_CHILD_SHAPES, shapesArrayNode);
 
         // get first decision service
-        if (model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).isEmpty()) {
+        if (model.getDecisionServices().isEmpty()) {
             return modelNode;
         }
-        String decisionServiceId = model.getDecisionServiceDividerLocationMapByDiagramId(diDiagram.getId()).keySet().iterator().next();
-        DecisionService decisionService = model.getDecisionServiceById(decisionServiceId);
+        DecisionService decisionService = model.getDecisionServices().get(0);
 
         // create expanded decision service node
         ObjectNode expandedDecisionServiceNode = createExpandedDecisionServiceNode(decisionService, diDiagram.getId(), model);
@@ -176,7 +175,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         // create output decision nodes
         decisionService.getOutputDecisions()
             .forEach(decisionRef -> outputDecisionChildShapeNodes
-                .add(createOutputDecisionNode(decisionRef, decisionServiceId, diDiagram.getId(), sourceTargetRefMap, model, converterContext)));
+                .add(createOutputDecisionNode(decisionRef, decisionService.getId(), diDiagram.getId(), sourceTargetRefMap, model, converterContext)));
 
         // create encapsulated decisions section node
         ObjectNode encapsulatedDecisionsNode = createEncapsulatedDecisionsNode(decisionService, diDiagram.getId(), model);
@@ -188,7 +187,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
         // create encapsulated decision nodes
         decisionService.getEncapsulatedDecisions().forEach(
             decisionRef -> encapsulatedDecisionChildShapeNodes
-                .add(createEncapsulatedDecisionNode(decisionRef, decisionServiceId, diDiagram.getId(), sourceTargetRefMap, model, converterContext)));
+                .add(createEncapsulatedDecisionNode(decisionRef, decisionService.getId(), diDiagram.getId(), sourceTargetRefMap, model, converterContext)));
 
         // create information requirement nodes
         if (model.getFlowLocationMapByDiagramId(diDiagram.getId()) != null) {
@@ -517,7 +516,9 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             return;
         }
 
-        definition.setName(DmnJsonConverterUtil.getPropertyValueAsString("name", modelNode));
+        String decisionServiceId = DmnJsonConverterUtil.getPropertyValueAsString("drd_id", modelNode);
+        String decisionServiceName = DmnJsonConverterUtil.getPropertyValueAsString("name", modelNode);
+        definition.setName(decisionServiceName);
 
         // first create the (expanded) decision service
         shapesArrayNode.forEach(shapeNode -> {
@@ -526,9 +527,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                 DecisionService decisionService = new DecisionService();
                 definition.addDecisionService(decisionService);
 
-                String decisionServiceId = DmnJsonConverterUtil.getElementId(shapeNode);
                 decisionService.setId(decisionServiceId);
-                String decisionServiceName = DmnJsonConverterUtil.getPropertyValueAsString("name", shapeNode);
                 if (StringUtils.isNotEmpty(decisionServiceName)) {
                     decisionService.setName(decisionServiceName);
                 } else {
@@ -571,7 +570,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
 
         DmnDiDiagram diagram = new DmnDiDiagram();
         diagram.setName(DmnJsonConverterUtil.getValueAsString("name", objectNode));
-        diagram.setId(DmnJsonConverterUtil.getPropertyValueAsString(DmnStencilConstants.PROPERTY_DRD_ID, objectNode));
+        diagram.setId("DMNDiagram_" + DmnJsonConverterUtil.getPropertyValueAsString(DmnStencilConstants.PROPERTY_DRD_ID, objectNode));
         diagram.setGraphicInfo(graphicInfo);
 
         definition.addDiDiagram(diagram);
@@ -620,7 +619,11 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - upperLeftNode.get(EDITOR_BOUNDS_X).asDouble());
                         graphicInfo.setHeight(lowerRightNode.get(EDITOR_BOUNDS_Y).asDouble() - upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble());
 
+                        if (STENCIL_EXPANDED_DECISION_SERVICE.equals(stencilId) && !definition.getDecisionServices().isEmpty()) {
+                            currentElementId = definition.getDecisionServices().get(0).getId();
+                        }
                         definition.addGraphicInfoByDiagramId(currentDiagramId, currentElementId, graphicInfo);
+
                         readShapeDI(jsonChildNode, graphicInfo.getX(), graphicInfo.getY(), definition, currentDiagramId, currentElementId);
                     }
                 }
