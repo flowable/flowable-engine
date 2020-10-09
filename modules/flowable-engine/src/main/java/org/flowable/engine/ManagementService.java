@@ -381,7 +381,7 @@ public interface ManagementService {
     String getDeadLetterJobExceptionStacktrace(String jobId);
     
     /**
-     * Returns the full error details that were passed to the {@link ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
+     * Returns the full error details that were passed to the {@link org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
      *
      * @param jobId id of the job, cannot be null.
      * @throws FlowableObjectNotFoundException when no job exists with the given id.

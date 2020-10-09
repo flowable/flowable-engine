@@ -32,7 +32,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
- * Contains the possible properties that can be used in a {@link FormDeploymentQuery}.
+ * Contains the possible properties that can be used in a {@link EventDefinitionQueryImpl}.
  * 
  * @author Joram Barrez
  */

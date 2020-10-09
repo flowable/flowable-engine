@@ -76,7 +76,7 @@ public interface EventDefinitionQuery extends Query<EventDefinitionQuery, EventD
     EventDefinitionQuery eventDefinitionKeyLike(String eventDefinitionKeyLike);
     
     /**
-     * Only select event definitions with a certain version. Particularly useful when used in combination with {@link #formDefinitionKey(String)}
+     * Only select event definitions with a certain version. Particularly useful when used in combination with {@link #eventDefinitionKey(String)}
      */
     EventDefinitionQuery eventVersion(Integer eventVersion);
 
@@ -106,7 +106,7 @@ public interface EventDefinitionQuery extends Query<EventDefinitionQuery, EventD
      * Can also be used without any other criteria (ie. query.latestVersion().list()), which will then give all the latest versions of all the deployed event definitions.
      * 
      * @throws FlowableIllegalArgumentException
-     *             if used in combination with {{@link #eventVersion(int)} or {@link #deploymentId(String)}
+     *             if used in combination with {{@link #eventVersion(Integer)} or {@link #deploymentId(String)}
      */
     EventDefinitionQuery latestVersion();
 

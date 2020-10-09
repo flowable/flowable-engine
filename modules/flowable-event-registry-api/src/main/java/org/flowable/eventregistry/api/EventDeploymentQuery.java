@@ -46,14 +46,14 @@ public interface EventDeploymentQuery extends Query<EventDeploymentQuery, EventD
     /**
      * Only select deployments with the given category.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see EventDeploymentBuilder#category(String)
      */
     EventDeploymentQuery deploymentCategory(String category);
 
     /**
      * Only select deployments that have a different category then the given one.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see EventDeploymentBuilder#category(String)
      */
     EventDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
 

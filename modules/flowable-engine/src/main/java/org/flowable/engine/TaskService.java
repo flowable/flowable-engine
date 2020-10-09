@@ -217,7 +217,7 @@ public interface TaskService {
      * 
      * @param taskId
      * @param variables
-     * @throws ProcessEngineException
+     * @throws FlowableObjectNotFoundException
      *             When no task exists with the given id.
      */
     void resolveTask(String taskId, Map<String, Object> variables);

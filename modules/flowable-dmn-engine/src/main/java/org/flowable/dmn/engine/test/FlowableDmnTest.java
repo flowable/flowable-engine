@@ -60,7 +60,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * You can declare a deployment with the {@link DmnDeployment} or {@link DmnDeploymentAnnotation} annotation.
  * If both annotations are used then {@link DmnDeployment} takes precedence and {@link DmnDeploymentAnnotation} will be ignored.
  * The extension will make sure that this deployment gets deployed before the setUp and
- * {@link org.flowable.dmn.api.DmnRepositoryService#deleteDeployment(String)} cascade deleted} after the tearDown.
+ * {@link org.flowable.dmn.api.DmnRepositoryService#deleteDeployment(String)} cascade deleted after the tearDown.
  * The id of the deployment can be accessed by using {@link DmnDeploymentId} in a test method.
  * </p>
  *

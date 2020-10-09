@@ -62,7 +62,7 @@ public class ByteArrayRef implements Serializable {
     }
 
     /**
-     * Returns the byte array from the {@link #getBytes()} method as {@link StandardCharsets#UTF_8} {@link String}.
+     * Returns the byte array from the {@link #getBytes(String)} method as {@link StandardCharsets#UTF_8} {@link String}.
      *
      * @return the byte array as {@link StandardCharsets#UTF_8} {@link String}
      */
