@@ -415,7 +415,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
                 templateUrl: 'views/case-instance-delete-popup.html',
                 controller: 'DeleteCaseModalInstanceCtrl',
                 resolve: {
-                    process: function () {
+                    caseInstance: function () {
                         return $scope.caseInstance;
                     },
                     action: function () {
@@ -425,7 +425,7 @@ flowableAdminApp.controller('CaseInstanceController', ['$scope', '$rootScope', '
             });
 
             modalInstance.result.then(function (deleteCaseInstance) {
-                if (deleteProcessInstance) {
+                if (deleteCaseInstance) {
                     if (action == 'delete') {
                         $scope.addAlert($translate.instant('ALERT.CASE-INSTANCE.DELETED', $scope.caseInstance), 'info');
                         $scope.returnToList();
