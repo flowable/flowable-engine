@@ -14,6 +14,7 @@ package org.flowable.dmn.editor.converter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.filter.Filters.filter;
 import static org.assertj.core.data.Offset.offset;
 
 import java.io.IOException;
@@ -74,6 +75,7 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_23 = "org/flowable/dmn/editor/converter/decisionservice_1.json";
     private static final String JSON_RESOURCE_24 = "org/flowable/dmn/editor/converter/decisionservice_1_no_info_reqs.json";
     private static final String JSON_RESOURCE_25 = "org/flowable/dmn/editor/converter/decisionservice_1_no_decisions.json";
+    private static final String JSON_RESOURCE_26 = "org/flowable/dmn/editor/converter/decisionservice_2.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -859,6 +861,16 @@ public class DmnJsonConverterTest {
 
         assertThat(decisionTable.getRules().get(0).getOutputEntries()).hasSize(2);
         assertThat(decisionTable.getRules().get(1).getOutputEntries()).hasSize(2);
+    }
+    @Test
+    public void testConvertJsonToDMNMultipleRequiredDecisions() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_26);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+
+        assertThat(filter(dmnDefinition.getDecisions()).with("id").equalsTo("decision1").get())
+                .flatExtracting(Decision::getRequiredDecisions)
+                .extracting(informationRequirement -> informationRequirement.getRequiredDecision().getHref())
+                .containsExactlyInAnyOrder("#decision3", "#decision2");
     }
 
     /* Helper methods */

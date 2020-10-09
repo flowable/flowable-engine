@@ -503,7 +503,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     protected void processDRD(JsonNode modelNode, DmnDefinition definition, DmnJsonConverterContext converterContext) {
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
-        Map<String, JsonNode> targetRefMap = new HashMap<>();
+        Map<String, List<JsonNode>> targetRefMap = new HashMap<>();
         Map<String, JsonNode> edgeMap = new HashMap<>();
         Map<String, List<JsonNode>> sourceAndTargetMap = new HashMap<>();
 
@@ -741,7 +741,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void processDRDDecision(DmnDefinition definition, JsonNode decisionServiceChildNode, DmnJsonConverterContext converterContext,
-        Map<String, JsonNode> sourceRefMap, Map<String, JsonNode> targetRefMap, List<DmnElementReference> decisionServiceDecisions) {
+        Map<String, JsonNode> sourceRefMap, Map<String, List<JsonNode>> targetRefMap, List<DmnElementReference> decisionServiceDecisions) {
 
         ArrayNode decisionsArrayNode = (ArrayNode) decisionServiceChildNode.get(EDITOR_CHILD_SHAPES);
         if (decisionsArrayNode == null || decisionsArrayNode.size() == 0) {
@@ -778,18 +778,20 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             }
 
             if (targetRefMap.containsKey(decisionChildNode.get("resourceId").asText())) {
-                JsonNode informationRequirementNode = targetRefMap.get(decisionChildNode.get("resourceId").asText());
+                List<JsonNode> informationRequirementNodes = targetRefMap.get(decisionChildNode.get("resourceId").asText());
 
-                InformationRequirement informationRequirement = new InformationRequirement();
-                informationRequirement.setId(DmnJsonConverterUtil.getElementId(informationRequirementNode));
-                informationRequirement.setName(DmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, informationRequirementNode));
+                informationRequirementNodes.forEach(informationRequirementNode -> {
+                    InformationRequirement informationRequirement = new InformationRequirement();
+                    informationRequirement.setId(DmnJsonConverterUtil.getElementId(informationRequirementNode));
+                    informationRequirement.setName(DmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, informationRequirementNode));
 
-                JsonNode requiredDecisionNode = sourceRefMap.get(DmnJsonConverterUtil.getElementId(informationRequirementNode));
+                    JsonNode requiredDecisionNode = sourceRefMap.get(DmnJsonConverterUtil.getElementId(informationRequirementNode));
 
-                DmnElementReference requiredDecisionReference = createDmnElementReference(requiredDecisionNode);
+                    DmnElementReference requiredDecisionReference = createDmnElementReference(requiredDecisionNode);
 
-                informationRequirement.setRequiredDecision(requiredDecisionReference);
-                decision.addRequiredDecision(informationRequirement);
+                    informationRequirement.setRequiredDecision(requiredDecisionReference);
+                    decision.addRequiredDecision(informationRequirement);
+                });
             }
 
             decisionServiceDecisions.add(createDmnElementReference(decisionChildNode));
@@ -840,7 +842,7 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
     }
 
     protected void preProcessFlows(JsonNode objectNode, Map<String, JsonNode> edgeMap, Map<String, JsonNode> shapeMap, Map<String, JsonNode> sourceRefMap,
-        Map<String, List<JsonNode>> sourceAndTargetMap, Map<String, JsonNode> targetRefMap) {
+        Map<String, List<JsonNode>> sourceAndTargetMap, Map<String, List<JsonNode>> targetRefMap) {
 
         if (objectNode.get(EDITOR_CHILD_SHAPES) != null) {
             for (JsonNode jsonChildNode : objectNode.get(EDITOR_CHILD_SHAPES)) {
@@ -858,7 +860,12 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
                         sourceAndTargetList.add(shapeMap.get(targetRefId));
                         sourceAndTargetMap.put(childEdgeId, sourceAndTargetList);
 
-                        targetRefMap.put(targetRefId, jsonChildNode);
+                        if (targetRefMap.containsKey(targetRefId)) {
+                            LOGGER.debug("ALREADY CONTAINS");
+                        }
+
+                        targetRefMap.computeIfAbsent(targetRefId, k -> new ArrayList<>());
+                        targetRefMap.get(targetRefId).add(jsonChildNode);
                     }
                     edgeMap.put(childEdgeId, jsonChildNode);
                 }
