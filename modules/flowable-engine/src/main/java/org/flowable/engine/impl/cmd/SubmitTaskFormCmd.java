@@ -69,7 +69,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, false, commandContext);
+                TaskHelper.completeTask(task, null, null, null, null,  commandContext);
             }
         }
 

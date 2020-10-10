@@ -59,20 +59,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TaskHelper {
 
-    public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables,
-            Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
-
-        // Task complete logic
+    public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables, Map<String, Object> localVariables,
+            Map<String, Object> transientVariables, Map<String, Object> localTransientVariables, CommandContext commandContext) {
 
         if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {
             throw new FlowableException("A delegated task cannot be completed, but should be resolved instead.");
         }
 
-        if (variables != null) {
-            if (localScope) {
-                taskEntity.setVariablesLocal(variables);
+        if (localVariables != null && !localVariables.isEmpty()) {
+            taskEntity.setVariablesLocal(localVariables);
+        }
 
-            } else if (taskEntity.getExecutionId() != null) {
+        if (variables != null && !variables.isEmpty()) {
+            if (taskEntity.getExecutionId() != null) {
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
                 if (execution != null) {
                     execution.setVariables(variables);
@@ -80,20 +79,32 @@ public class TaskHelper {
 
             } else {
                 taskEntity.setVariables(variables);
+
             }
+
         }
 
-        if (transientVariables != null) {
-            if (localScope) {
-                taskEntity.setTransientVariablesLocal(transientVariables);
+        if (localTransientVariables != null && !localTransientVariables.isEmpty()) {
+            taskEntity.setTransientVariablesLocal(localTransientVariables);
+        }
+
+        if (transientVariables != null && !transientVariables.isEmpty()) {
+            if (taskEntity.getExecutionId() != null) {
+                ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                if (execution != null) {
+                    execution.setTransientVariables(transientVariables);
+                }
+
             } else {
                 taskEntity.setTransientVariables(transientVariables);
+
             }
+
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
-        
+
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
         }
@@ -103,14 +114,21 @@ public class TaskHelper {
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             if (variables != null) {
+
+                // The only way a task can be completed + event thrown is either with variables or with localvariables,
+                // where a boolean flag is passed through the API.
+                // This means that if the flag is set, local variables always have precedence in the event.
+
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
-                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope), processEngineConfiguration.getEngineCfgKey());
+                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables,
+                    localVariables != null && !localVariables.isEmpty()), processEngineConfiguration.getEngineCfgKey());
+
             } else {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity),
                         processEngineConfiguration.getEngineCfgKey());
             }
         }
-        
+
         if (processEngineConfiguration.isLoggingSessionEnabled() && taskEntity.getExecutionId() != null) {
             String taskLabel = null;
             if (StringUtils.isNotEmpty(taskEntity.getName())) {
@@ -118,11 +136,11 @@ public class TaskHelper {
             } else {
                 taskLabel = taskEntity.getId();
             }
-        
+
             ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
             if (execution != null) {
-                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE, 
-                                "User task '" + taskLabel + "' completed", taskEntity, execution);
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_COMPLETE,
+                        "User task '" + taskLabel + "' completed", taskEntity, execution);
             }
         }
 

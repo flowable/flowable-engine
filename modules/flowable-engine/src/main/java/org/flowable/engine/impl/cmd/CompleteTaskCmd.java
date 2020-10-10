@@ -26,9 +26,11 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
+
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
-    protected boolean localScope;
+    protected Map<String, Object> transientVariablesLocal;
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
         super(taskId);
@@ -37,12 +39,21 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
         this(taskId, variables);
-        this.localScope = localScope;
+        this.variablesLocal = variables;
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         this(taskId, variables);
         this.transientVariables = transientVariables;
+    }
+
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        super(taskId);
+        this.variables = variables;
+        this.variablesLocal = variablesLocal;
+        this.transientVariables = transientVariables;
+        this.transientVariablesLocal = transientVariablesLocal;
     }
 
     @Override
@@ -53,7 +64,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
 
                 if (transientVariables == null) {
-                    compatibilityHandler.completeTask(task, variables, localScope);
+                    compatibilityHandler.completeTask(task, variables, false);
                 } else {
                     compatibilityHandler.completeTask(task, variables, transientVariables);
                 }
@@ -61,7 +72,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
-        TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+        TaskHelper.completeTask(task, variables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
         return null;
     }
 
@@ -69,5 +80,4 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     protected String getSuspendedTaskException() {
         return "Cannot complete a suspended task";
     }
-
 }

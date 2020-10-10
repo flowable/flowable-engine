@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,12 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertThat(taskForm).isNotNull();
 
         // Rejecting the task should put the process back to first task
-        taskService.complete(task.getId(), CollectionUtil.singletonMap("vacationApproved", "false"));
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .variables(CollectionUtil.singletonMap("vacationApproved", "false"))
+                .complete();
+
         task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Adjust vacation request");
     }
