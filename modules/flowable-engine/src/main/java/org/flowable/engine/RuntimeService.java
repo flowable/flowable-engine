@@ -223,7 +223,6 @@ public interface RuntimeService {
      * <li>If the message name is associated with a message start event, a new process instance is started.</li>
      * <li>If no subscription to a message with the given name exists, {@link FlowableException} is thrown</li>
      * </ul>
-     * </p>
      *
      * @param messageName
      *     the 'name' of the message as specified as an attribute on the bpmn20 {@code <message name="messageName" />} element.
@@ -1099,8 +1098,9 @@ public interface RuntimeService {
     // ////////////////////////////////////////////////////////////////////////
 
     /**
+     * <p>
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
-     * <p/>
+     * </p>
      *
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
      *
@@ -1115,8 +1115,9 @@ public interface RuntimeService {
     void signalEventReceivedWithTenantId(String signalName, String tenantId);
 
     /**
+     * <p>
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
-     * <p/>
+     * </p>
      *
      * @param signalName
      *     the name of the signal event
@@ -1129,8 +1130,9 @@ public interface RuntimeService {
     void signalEventReceivedAsyncWithTenantId(String signalName, String tenantId);
 
     /**
+     * <p>
      * Notifies the process engine that a signal event of name 'signalName' has been received. This method delivers the signal to all executions waiting on the signal.
-     * <p/>
+     * </p>
      *
      * <strong>NOTE:</strong> The waiting executions are notified synchronously.
      *
@@ -1216,11 +1218,11 @@ public interface RuntimeService {
      *
      * <p>
      * Variables are set for the scope of the execution of the message event subscribed to the message name. For example:
-     * <p>
+     * <ul>
      * <li>The scope for an intermediate message event in the main process is that of the process instance</li>
      * <li>The scope for an intermediate message event in a subprocess is that of the subprocess</li>
      * <li>The scope for a boundary message event is that of the execution for the Activity the event is attached to</li>
-     * <p>
+     * </ul>
      * Variables are set according to the algorithm as documented for {@link VariableScope#setVariables(Map)}, applied separately to each variable.
      *
      * @param messageName

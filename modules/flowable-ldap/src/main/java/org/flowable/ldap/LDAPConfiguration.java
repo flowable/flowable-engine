@@ -24,7 +24,7 @@ import org.flowable.idm.api.User;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
 
 /**
- * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
+ * A {@link org.flowable.engine.configurator.ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
  * fetching groups of a user.
  * <p>
  * This class is extensible and many methods can be overridden when the default behavior is not fitting your use case.

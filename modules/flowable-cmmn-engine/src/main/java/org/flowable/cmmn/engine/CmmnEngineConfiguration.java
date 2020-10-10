@@ -629,7 +629,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * Default value = 1, as this lowers the potential on optimistic locking exceptions.
      * A larger value means more timer jobs will be fetched in one request.
      * Change this value if you know what you are doing.
-     * <p>
      */
     protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
 

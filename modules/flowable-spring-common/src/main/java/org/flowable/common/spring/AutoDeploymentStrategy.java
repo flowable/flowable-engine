@@ -17,7 +17,6 @@ import org.springframework.core.io.Resource;
 /**
  * Strategy interface for implementations of automatically deploying resources. A strategy may perform any amount of deployments for the {@link Resource}s it is provided with.
  * <p>
- * <p>
  * A strategy is capable of handling deployments corresponding to a certain indicated deployment mode. This applicability is verified using the {@link #handlesMode(String)} method.
  * 
  * @author Tiese Barrell

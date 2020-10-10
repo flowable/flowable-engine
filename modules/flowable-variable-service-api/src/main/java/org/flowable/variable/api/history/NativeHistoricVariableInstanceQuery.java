@@ -15,7 +15,7 @@ package org.flowable.variable.api.history;
 import org.flowable.common.engine.api.query.NativeQuery;
 
 /**
- * Allows querying of {@link org.flowable.engine.HistoricVariableInstance.HistoricVariableInstance}s via native (SQL) queries
+ * Allows querying of {@link org.flowable.variable.api.history.HistoricVariableInstance}s via native (SQL) queries
  * 
  * @author Henry Yan(http://www.kafeitu.me)
  */

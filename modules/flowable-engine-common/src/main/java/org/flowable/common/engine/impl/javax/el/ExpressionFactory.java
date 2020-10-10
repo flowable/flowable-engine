@@ -52,8 +52,8 @@ import java.util.Properties;
  * <li>Single expressions using the ${} delimiter (e.g. "${employee.lastName}").</li>
  * <li>Single expressions using the #{} delimiter (e.g. "#{employee.lastName}").</li>
  * <li>Literal text containing no ${} or #{} delimiters (e.g. "John Doe").</li>
- * <li>Multiple expressions using the same delimiter (e.g.</li>
- * "${employee.firstName}${employee.lastName}" or "#{employee.firstName}#{employee.lastName}").
+ * <li>Multiple expressions using the same delimiter (e.g.
+ * "${employee.firstName}${employee.lastName}" or "#{employee.firstName}#{employee.lastName}").</li>
  * <li>Mixed literal text and expressions using the same delimiter (e.g. "Name:
  * ${employee.firstName} ${employee.lastName}").</li>
  * </ul>
@@ -189,7 +189,6 @@ public abstract class ExpressionFactory {
 	 * 
 	 * @param properties
 	 *            Properties passed to the constructor of the implementation.
-	 * @return an instance of ExpressionFactory
 	 * @param className
 	 *            The name of the ExpressionFactory class.
 	 * @param classLoader

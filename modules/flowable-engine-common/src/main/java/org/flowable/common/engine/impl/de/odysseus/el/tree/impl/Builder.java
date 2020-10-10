@@ -48,7 +48,7 @@ public class Builder implements TreeBuilder {
 		 * Method invocations as in <code>${foo.bar(1)}</code> as specified in JSR 245,
 		 * maintenance release 2.
 		 * The method to be invoked is resolved at evaluation time by calling
-		 * {@link ELResolver#invoke(javax.el.ELContext, Object, Object, Class[], Object[])}.
+		 * {@link ELResolver#invoke(org.flowable.common.engine.impl.javax.el, Object, Object, Class[], Object[])}.
 		 */
 		METHOD_INVOCATIONS,
 		/**
