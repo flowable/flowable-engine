@@ -12,11 +12,10 @@
  */
 package org.flowable.engine.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableCollectionsContainer;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.task.api.TaskCompletionBuilder;
@@ -26,66 +25,78 @@ import org.flowable.task.api.TaskCompletionBuilder;
  * @author Ievgenii Bespal
  */
 public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
-    protected final VariableCollectionsContainer variableCollectionsContainer;
+
     protected CommandExecutor commandExecutor;
     protected String taskId;
     protected String formDefinitionId;
     protected String outcome;
 
-    protected TaskCompletionBuilderImpl() {
-        this.variableCollectionsContainer = new VariableCollectionsContainerImpl();
-    }
+    protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
+    protected Map<String, Object> transientVariables;
+    protected Map<String, Object> transientVariablesLocal;
 
     public TaskCompletionBuilderImpl(CommandExecutor commandExecutor) {
-        this();
         this.commandExecutor = commandExecutor;
     }
 
     @Override
     public TaskCompletionBuilder variables(Map<String, Object> variables) {
-        this.variableCollectionsContainer.setVariables(variables);
+        this.variables = variables;
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variablesLocal(Map<String, Object> variablesLocal) {
-        this.variableCollectionsContainer.setLocalVariables(variablesLocal);
+        this.variablesLocal = variablesLocal;
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariables(Map<String, Object> transientVariables) {
-        this.variableCollectionsContainer.setTransientVariables(transientVariables);
+        this.transientVariables = transientVariables;
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariablesLocal(Map<String, Object> transientVariablesLocal) {
-        this.variableCollectionsContainer.setTransientLocalVariables(transientVariablesLocal);
+        this.transientVariablesLocal = transientVariablesLocal;
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variable(String variableName, Object variableValue) {
-        this.variableCollectionsContainer.setVariable(variableName, variableValue);
+        if (this.variables == null) {
+            this.variables = new HashMap<>();
+        }
+        this.variables.put(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder variableLocal(String variableName, Object variableValue) {
-        this.variableCollectionsContainer.setVariableLocal(variableName, variableValue);
+        if (this.variablesLocal == null) {
+            this.variablesLocal = new HashMap<>();
+        }
+        this.variablesLocal.put(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariable(String variableName, Object variableValue) {
-        this.variableCollectionsContainer.setTransientVariable(variableName, variableValue);
+        if (this.transientVariables == null) {
+            this.transientVariables = new HashMap<>();
+        }
+        this.transientVariables.put(variableName, variableValue);
         return this;
     }
 
     @Override
     public TaskCompletionBuilder transientVariableLocal(String variableName, Object variableValue) {
-        this.variableCollectionsContainer.setTransientVariableLocal(variableName, variableValue);
+        if (this.transientVariablesLocal == null) {
+            this.transientVariablesLocal = new HashMap<>();
+        }
+        this.transientVariablesLocal.put(variableName, variableValue);
         return this;
     }
 
@@ -108,11 +119,12 @@ public class TaskCompletionBuilderImpl implements TaskCompletionBuilder {
     }
 
     protected void completeTask() {
-        this.commandExecutor.execute(new CompleteTaskCmd(this.taskId, this.variableCollectionsContainer));
+        this.commandExecutor.execute(new CompleteTaskCmd(this.taskId, variables, variablesLocal, transientVariables, transientVariablesLocal));
     }
 
     protected void completeTaskWithForm() {
-        this.commandExecutor.execute(new CompleteTaskWithFormCmd(this.taskId, formDefinitionId, outcome, this.variableCollectionsContainer));
+        this.commandExecutor.execute(new CompleteTaskWithFormCmd(this.taskId, formDefinitionId, outcome,
+            variables, variablesLocal, transientVariables, transientVariablesLocal));
     }
 
     @Override

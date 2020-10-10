@@ -15,7 +15,6 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.common.engine.impl.variable.VariableCollectionsContainerImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -70,7 +69,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, new VariableCollectionsContainerImpl(),  commandContext);
+                TaskHelper.completeTask(task, null, null, null, null,  commandContext);
             }
         }
 
