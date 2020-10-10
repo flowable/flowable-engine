@@ -6,6 +6,12 @@ on:
       - master
       - 'flowable-release-*'
 
+env:
+  MAVEN_ARGS: >-
+    -Dmaven.javadoc.skip=true
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
 # We explicitly don't use a container for running the job since there is some connectivity issues to MySQL if that is done
 jobs:
   test_mysql:
@@ -42,7 +48,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -PcleanDb,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
@@ -83,7 +89,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -Pdmn,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
@@ -125,7 +131,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -Pcontent,mysql
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable

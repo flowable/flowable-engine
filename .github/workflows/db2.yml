@@ -5,6 +5,11 @@ on:
     branches:
       - master
       - 'flowable-release-*'
+env:
+  MAVEN_ARGS: >-
+    -Dmaven.javadoc.skip=true
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
 jobs:
   test_db2:
@@ -46,7 +51,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -PcleanDb,db2
           -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
@@ -92,7 +97,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -Pdmn,db2
           -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
@@ -139,7 +144,7 @@ jobs:
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
-          -Dmaven.javadoc.skip=true -B -V --no-transfer-progress
+          ${MAVEN_ARGS}
           -Pcontent,db2
           -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
