@@ -30,12 +30,12 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     SuspendedJobEntity findJobByCorrelationId(String correlationId);
 
     /**
-     * Returns all {@link SuspendedJobEntity} instances related to on {@link ExecutionEntity}.
+     * Returns all {@link SuspendedJobEntity} instances related to an execution id.
      */
     List<SuspendedJobEntity> findJobsByExecutionId(String id);
 
     /**
-     * Returns all {@link SuspendedJobEntity} instances related to on {@link ExecutionEntity}.
+     * Returns all {@link SuspendedJobEntity} instances related to an execution id.
      */
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String id);
 
@@ -50,7 +50,7 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
+     * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     

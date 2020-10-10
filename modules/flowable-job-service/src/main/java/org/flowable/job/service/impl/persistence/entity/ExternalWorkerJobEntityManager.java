@@ -27,7 +27,7 @@ import org.flowable.job.service.impl.ExternalWorkerJobQueryImpl;
 public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWorkerJobEntity>, JobInfoEntityManager<ExternalWorkerJobEntity> {
 
     /**
-     * Insert the {@link ExternalWorkerJobEntity}, similar to {@link #insert(ExternalWorkerJobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the
+     * Insert the {@link ExternalWorkerJobEntity}, similar to insert(ExternalWorkerJobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the
      * {@link ExternalWorkerJobEntity} has been removed.
      */
     boolean insertExternalWorkerJobEntity(ExternalWorkerJobEntity externalWorkerJobEntity);

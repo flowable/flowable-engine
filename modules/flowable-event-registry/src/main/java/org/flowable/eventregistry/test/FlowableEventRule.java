@@ -51,7 +51,7 @@ import org.junit.runners.model.Statement;
  * 
  * <p>
  * You can declare a deployment with the {@link EventDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
- * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
+ * {@link EventRepositoryService#deleteDeployment(String)} after the tearDown.
  * </p>
  *
  * @author Tijs Rademakers

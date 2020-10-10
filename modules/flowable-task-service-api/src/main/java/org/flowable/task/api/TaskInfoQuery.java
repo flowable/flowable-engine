@@ -693,7 +693,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * {@code  .<conditionD>.<conditionE>}
      * {@code  .or().<conditionF>.<conditionG>.endOr()}
      * <p>
-     * will result in: conditionA & (conditionB | conditionC) & conditionD & conditionE & (conditionF | conditionG)
+     * will result in: conditionA &amp; (conditionB | conditionC) &amp; conditionD &amp; conditionE &amp; (conditionF | conditionG)
      */
     T or();
 

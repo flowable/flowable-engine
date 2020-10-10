@@ -98,8 +98,7 @@ public class EventDefinitionDeploymentHelper {
     }
 
     /**
-     * Gets the persisted version of the already-deployed event definition. Note that this is different from {@link #getExistingEventDefinition} as it looks specifically for a form that is already persisted and
-     * attached to a particular deployment, rather than the event definition across all deployments.
+     * Gets the persisted version of the already-deployed event definition.
      */
     public EventDefinitionEntity getPersistedInstanceOfEventDefinition(EventDefinitionEntity eventDefinition) {
         String deploymentId = eventDefinition.getDeploymentId();

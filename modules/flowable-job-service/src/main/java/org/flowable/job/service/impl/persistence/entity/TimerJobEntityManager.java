@@ -29,7 +29,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEntity> {
 
     /**
-     * Insert the {@link TimerJobEntity}, similar to {@link #insert(TimerJobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the
+     * Insert the {@link TimerJobEntity}, similar to insert(TimerJobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the
      * {@link TimerJobEntity} has been removed (for example due to a task complete for a timer boundary on that task).
      */
     boolean insertTimerJobEntity(TimerJobEntity timerJobEntity);
