@@ -28,7 +28,7 @@ public interface Agenda extends Session {
      * Get next operation from agenda and remove operation from the queue.
      *
      * @return next operation from the queue
-     * @throws {@link  org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
+     * throws {@link org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
      */
     Runnable getNextOperation();
 

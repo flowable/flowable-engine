@@ -53,10 +53,10 @@ public interface VariableScope extends VariableContainer {
     Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames);
 
     /**
-     * Similar to {@link #getVariables(Collection))}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
+     * Similar to {@link #getVariables(Collection)}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
      * 
      * If set to false, only the specific variables will be fetched. Depending on the use case, this can be better for performance, as it avoids fetching and processing the other variables. However,
-     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one {@link Command} execution).
+     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one Command execution).
      */
     Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables);
 
@@ -206,7 +206,7 @@ public interface VariableScope extends VariableContainer {
     Object setVariableLocal(String variableName, Object value);
 
     /**
-     * Similar to {@link #setVariableLocal(String, Object, value)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
+     * Similar to {@link #setVariableLocal(String, Object)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
      */
     Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
 
@@ -248,32 +248,32 @@ public interface VariableScope extends VariableContainer {
     boolean hasVariableLocal(String variableName);
 
     /**
-     * Removes the variable and creates a new;@link HistoricVariableUpdateEntity}
+     * Removes the variable and creates a new HistoricVariableUpdate.
      */
     void removeVariable(String variableName);
 
     /**
-     * Removes the local variable and creates a new {@link HistoricVariableUpdate}.
+     * Removes the local variable and creates a new HistoricVariableUpdate.
      */
     void removeVariableLocal(String variableName);
 
     /**
-     * Removes the variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables(Collection<String> variableNames);
 
     /**
-     * Removes the local variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the local variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal(Collection<String> variableNames);
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables();
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal();
 

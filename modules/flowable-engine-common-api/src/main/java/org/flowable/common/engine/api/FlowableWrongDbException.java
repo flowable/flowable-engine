@@ -15,7 +15,7 @@ package org.flowable.common.engine.api;
 /**
  * Exception that is thrown when the Flowable engine discovers a mismatch between the database schema version and the engine version.
  * 
- * The check is done when the engine is created in {@link ProcessEngineBuilder#buildProcessEngine()}.
+ * The check is done when the engine is created.
  * 
  * @author Tom Baeyens
  */

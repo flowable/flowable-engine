@@ -451,14 +451,6 @@
         <copy todir="${target.docs.root}/batch-javadocs">
             <fileset dir="../modules/flowable-batch-service-api/target/site/apidocs" />
         </copy>
-		
-		<!-- USERGUIDE -->
-		<exec executable="yarn" dir="../docs/docusaurus/website">
-			<arg line="run build" />
-		</exec>
-		<move todir="${target.newsite.root}">
-            <fileset dir="../docs/docusaurus/website/build/flowable-userguide" />
-        </move>
 	</target>
 
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
@@ -474,22 +466,6 @@
 		<mkdir dir="${flowable.website}/javadocs" />
 		<copy todir="${flowable.website}/javadocs" overwrite="true">
 			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide" />
-		<copy todir="${flowable.website}/userguide" overwrite="true">
-			<fileset dir="../userguide/target/html/en" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide-cmmn" />
-        <copy todir="${flowable.website}/userguide-cmmn" overwrite="true">
-            <fileset dir="../userguide-cmmn/target/html/en" />
-        </copy>
-		<mkdir dir="${flowable.website}/userguide-dmn" />
-		<copy todir="${flowable.website}/userguide-dmn" overwrite="true">
-			<fileset dir="../userguide-dmn/target/html/en" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide-form" />
-		<copy todir="${flowable.website}/userguide-form" overwrite="true">
-			<fileset dir="../userguide-form/target/html/en" />
 		</copy>
 		<copy todir="${flowable.website}" overwrite="true">
 			<fileset dir="src">

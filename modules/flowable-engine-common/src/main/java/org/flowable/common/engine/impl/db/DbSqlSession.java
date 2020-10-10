@@ -112,7 +112,7 @@ public class DbSqlSession implements Session {
 
     /**
      * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter.
-     * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the {@link org.flowable.engine.impl.db.EntityDependencyOrder}.
+     * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the EntityDependencyOrder.
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
         if (!bulkDeleteOperations.containsKey(entityClass)) {

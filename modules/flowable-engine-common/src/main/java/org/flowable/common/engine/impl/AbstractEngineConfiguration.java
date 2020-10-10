@@ -257,7 +257,7 @@ public abstract class AbstractEngineConfiguration {
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', Flowable will query for executions
      * in a table named 'PRE1.ACT_RU_EXECUTION_'.
      *
-     * <p />
+     * <p>
      * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
      * {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, Flowable will create the database tables using the default names, regardless of the prefix configured here.</strong>
      */
