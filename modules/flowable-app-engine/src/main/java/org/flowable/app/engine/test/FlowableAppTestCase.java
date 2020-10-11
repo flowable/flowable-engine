@@ -54,14 +54,14 @@ public abstract class FlowableAppTestCase {
 
     protected static void initAppEngine() {
         try (InputStream inputStream = FlowableAppTestCase.class.getClassLoader().getResourceAsStream(FLOWABLE_APP_CFG_XML)) {
-            AppEngine cmmnEngine = null;
+            AppEngine appEngine = null;
             if (inputStream != null) {
-                cmmnEngine = AppEngineConfiguration.createAppEngineConfigurationFromInputStream(inputStream).buildAppEngine();
+                appEngine = AppEngineConfiguration.createAppEngineConfigurationFromInputStream(inputStream).buildAppEngine();
             } else {
                 LOGGER.info("No {} configuration found. Using default in-memory standalone configuration.", FLOWABLE_APP_CFG_XML);
-                cmmnEngine = new StandaloneInMemAppEngineConfiguration().buildAppEngine();
+                appEngine = new StandaloneInMemAppEngineConfiguration().buildAppEngine();
             }
-            AppTestRunner.setAppEngineConfiguration(cmmnEngine.getAppEngineConfiguration());
+            AppTestRunner.setAppEngineConfiguration(appEngine.getAppEngineConfiguration());
         } catch (IOException e) {
             LOGGER.error("Could not create App engine", e);
         }

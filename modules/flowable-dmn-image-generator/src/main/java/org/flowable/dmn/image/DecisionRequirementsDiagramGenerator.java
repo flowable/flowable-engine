@@ -25,7 +25,7 @@ import java.io.InputStream;
 public interface DecisionRequirementsDiagramGenerator {
 
     /**
-     * Generates a diagram of the given case definition, using the diagram interchange information of the case.
+     * Generates a diagram of the given decision definition, using the diagram interchange information of the decision.
      * 
      * @param dmnDefinition
      *            dmn model to get diagram for

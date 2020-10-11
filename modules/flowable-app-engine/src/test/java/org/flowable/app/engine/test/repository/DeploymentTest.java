@@ -33,15 +33,7 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class DeploymentTest extends FlowableAppTestCase {
-    
-    /**
-     * Simplest test possible: deploy the simple-case.cmmn (from the cmmn-converter module) and see if 
-     * - a deployment exists
-     * - a resource exists
-     * - a case definition was created 
-     * - that case definition is in the cache
-     * - case definition properties set
-     */
+
     @Test
     @AppDeployment
     public void testAppDefinitionDeployed() throws Exception {
