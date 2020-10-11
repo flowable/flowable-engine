@@ -38,8 +38,12 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, boolean localScope) {
-        this(taskId, variables);
-        this.variablesLocal = variables;
+        super(taskId);
+        if (localScope) {
+            this.variablesLocal = variables;
+        } else {
+            this.variables = variables;
+        }
     }
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
@@ -49,6 +53,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
             Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
         super(taskId);
         this.variables = variables;
         this.variablesLocal = variablesLocal;
@@ -64,7 +69,12 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
 
                 if (transientVariables == null) {
-                    compatibilityHandler.completeTask(task, variables, false);
+                    if (variablesLocal != null) {
+                        compatibilityHandler.completeTask(task, variablesLocal, true);
+                    } else {
+                        compatibilityHandler.completeTask(task, variables, false);
+                    }
+                    
                 } else {
                     compatibilityHandler.completeTask(task, variables, transientVariables);
                 }
