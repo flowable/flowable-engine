@@ -31,7 +31,7 @@ public interface AppDefinitionEntityManager extends EntityManager<AppDefinitionE
 
     AppDefinitionEntity findAppDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String appDefinitionKey, String tenantId);
 
-    AppDefinition findAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer caseDefinitionVersion, String tenantId);
+    AppDefinition findAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer appDefinitionVersion, String tenantId);
     
     void deleteAppDefinitionAndRelatedData(String appDefinitionId);
     

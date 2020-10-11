@@ -70,7 +70,7 @@ public class AppDefinitionResource {
         return appRestResponseFactory.createAppDefinitionResponse(appDefinition);
     }
     
-    @ApiOperation(value = "Execute actions for an app definition", tags = { "Case Definitions" },
+    @ApiOperation(value = "Execute actions for an app definition", tags = { "App Definitions" },
             notes = "Execute actions for an app definition (Update category)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates action has been executed for the specified app definition. (category altered)"),

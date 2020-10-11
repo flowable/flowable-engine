@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author Tijs Rademakers
  */
-public class CaseDefinitionQueryTest extends FlowableAppTestCase {
+public class AppDefinitionQueryTest extends FlowableAppTestCase {
 
     private String deploymentId1;
     private String deploymentId2;
@@ -396,7 +396,7 @@ public class CaseDefinitionQueryTest extends FlowableAppTestCase {
     }
 
     @Test
-    public void testQueryOrderByCaseDefinitionKey() {
+    public void testQueryOrderByAppDefinitionKey() {
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list()).hasSize(4);
         assertThat(appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().count()).isEqualTo(4);
         List<AppDefinition> appDefinitions = appRepositoryService.createAppDefinitionQuery().orderByAppDefinitionKey().asc().list();
