@@ -27,7 +27,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for DmnEngine and services initialization in the form of a JUnit rule.
+ * Convenience for FormEngine and services initialization in the form of a JUnit rule.
  * 
  * <p>
  * Usage:
@@ -44,14 +44,14 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The DmnEngine and the services will be made available to the test class through the getters of the FlowableRule. The dmnEngine will be initialized by default with the activiti.dmn.cfg.xml resource
+ * The FormEngine and the services will be made available to the test class through the getters of the FlowableRule. The formEngine will be initialized by default with the activiti.dmn.cfg.xml resource
  * on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableFormRule(String) the appropriate constructor}. Process engines will be cached statically.
- * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
+ * Right before the first time the setUp is called for a given configuration resource, the form engine will be constructed.
  * </p>
  * 
  * <p>
  * You can declare a deployment with the {@link FormDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
- * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
+ * {@link FormRepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
  * </p>
  * 
  * @author Tijs Rademakers

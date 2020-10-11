@@ -19,9 +19,9 @@ import org.junit.Before;
 import org.junit.Rule;
 
 /**
- * Parent class for internal Flowable Form tests.
+ * Parent class for internal Flowable Content tests.
  * 
- * Boots up a dmn engine and caches it.
+ * Boots up a content engine and caches it.
  * 
  * When using H2 and the default schema name, it will also boot the H2 webapp (reachable with browser on http://localhost:8082/)
  * 

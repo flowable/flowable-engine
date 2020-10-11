@@ -20,7 +20,7 @@ import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
  * <ul>
  * <li>{@link org.flowable.engine.delegate.JavaDelegate}</li>
  * <li>{@link org.flowable.engine.delegate.ExecutionListener}</li>
- * <li>{@link org.flowable.engine.delegate.Expression}</li>
+ * <li>{@link org.flowable.common.engine.api.delegate.Expression}</li>
  * <li>{@link org.flowable.engine.delegate.TaskListener}</li>
  * </ul>
  * 

@@ -26,8 +26,8 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for DmnEngine and services initialization in the form of a JUnit rule.
- * 
+ * Convenience for ContentEngine and services initialization in the form of a JUnit rule.
+ *
  * <p>
  * Usage:
  * </p>
@@ -43,14 +43,9 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The DmnEngine and the services will be made available to the test class through the getters of the FlowableContentRule. The dmnEngine will be initialized by default with the flowable.dmn.cfg.xml
+ * The ContentEngine and the services will be made available to the test class through the getters of the FlowableContentRule. The contentEngine will be initialized by default with the flowable.content.cfg.xml
  * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableContentRule(String) the appropriate constructor}. Process engines will be cached
- * statically. Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
- * </p>
- * 
- * <p>
- * You can declare a deployment with the {@link FormDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
- * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
+ * statically. Right before the first time the setUp is called for a given configuration resource, the content engine will be constructed.
  * </p>
  *
  * @author Tijs Rademakers
