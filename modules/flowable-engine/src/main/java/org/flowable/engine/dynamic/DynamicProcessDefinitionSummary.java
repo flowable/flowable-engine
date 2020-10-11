@@ -71,7 +71,6 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
      * Null values should be avoided in JSON. Depending on the {@link ObjectMapper} configuration keys with a null value could even be removed when writing to json.
      * </p>
      *
-     * <span style="color:red">
      * Currently supported flow elements are:
      * <ul>
      * <li>
@@ -81,7 +80,6 @@ public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
      * ScriptTask
      * </li>
      * </ul> No summary will field will be created for other elements. ElementId, and elementType will be available.
-     * </span>
      * 
      * @param elementId
      *            the id of the {@link org.flowable.bpmn.model.FlowElement}.

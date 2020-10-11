@@ -279,7 +279,7 @@ public interface RuntimeService {
     ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
 
     /**
-     * Similar to {@link RuntimeService#startProcessInstanceByMessage(String, Map<String, Object>)}, but with tenant context.
+     * Similar to {@link #startProcessInstanceByMessage(String, Map)}, but with tenant context.
      */
     ProcessInstance startProcessInstanceByMessageAndTenantId(String messageName, Map<String, Object> processVariables, String tenantId);
 
@@ -304,7 +304,7 @@ public interface RuntimeService {
     ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, Map<String, Object> processVariables);
 
     /**
-     * Similar to {@link RuntimeService#startProcessInstanceByMessage(String, String, Map<String, Object>)}, but with tenant context.
+     * Similar to {@link #startProcessInstanceByMessage(String, String, Map)}, but with tenant context.
      */
     ProcessInstance startProcessInstanceByMessageAndTenantId(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId);
 
@@ -1144,7 +1144,7 @@ public interface RuntimeService {
     void signalEventReceived(String signalName, Map<String, Object> processVariables);
 
     /**
-     * Similar to {@link #signalEventReceived(String, Map<String, Object>)}, but within the context of one tenant.
+     * Similar to {@link #signalEventReceived(String, Map)}, but within the context of one tenant.
      */
     void signalEventReceivedWithTenantId(String signalName, Map<String, Object> processVariables, String tenantId);
 

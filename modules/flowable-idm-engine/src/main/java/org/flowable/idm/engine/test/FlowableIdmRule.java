@@ -48,11 +48,6 @@ import org.junit.runners.model.Statement;
  * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>
  * 
- * <p>
- * You can declare a deployment with the {@link FormDeploymentAnnotation} annotation. This base class will make sure that this deployment gets deployed before the setUp and
- * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
- * </p>
- * 
  * @author Tijs Rademakers
  */
 public class FlowableIdmRule implements TestRule {

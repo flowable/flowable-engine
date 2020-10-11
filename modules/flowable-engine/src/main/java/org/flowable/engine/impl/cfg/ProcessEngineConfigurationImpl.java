@@ -593,7 +593,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncExecutorMaxPoolSize = 8;
 
     /**
-     * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many
+     * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 5 seconds. Having a setting &gt; 0 takes resources, but in the case of many
      * job executions it avoids creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
      * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).

@@ -33,12 +33,12 @@ import org.flowable.engine.runtime.ProcessInstanceQuery;
 public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInstanceQuery, HistoricProcessInstance>, DeleteQuery<HistoricProcessInstanceQuery, HistoricProcessInstance> {
 
     /**
-     * Only select historic process instances with the given process instance. {@link org.flowable.engine.runtime.ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+     * Only select historic process instances with the given process instance. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
      */
     HistoricProcessInstanceQuery processInstanceId(String processInstanceId);
 
     /**
-     * Only select historic process instances whose id is in the given set of ids. {@link org.flowable.engine.runtime.ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+     * Only select historic process instances whose id is in the given set of ids. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
      */
     HistoricProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds);
 
@@ -311,7 +311,7 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery orderByTenantId();
 
     /**
-     * Only select historic process instances started by the given process instance. {@link org.flowable.engine.runtime.ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+     * Only select historic process instances started by the given process instance. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
      */
     HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId);
 

@@ -171,7 +171,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String deploymentId;
 
     /**
-     * Persisted reference to the current position in the diagram within the {@link #processDefinition}.
+     * Persisted reference to the current position in the diagram within the {@link #processDefinitionId}.
      * 
      * @see #activityId
      * @see #setActivityId(String)

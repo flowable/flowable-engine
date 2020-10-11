@@ -114,7 +114,7 @@ public interface DmnDecisionQuery extends Query<DmnDecisionQuery, DmnDecision> {
      * <p>
      * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed decisions.
      *
-     * @throws FlowableIllegalArgumentException if used in combination with {@link #groupId(String)}, {@link #decisionVersion(int)} or {@link #deploymentId(String)}
+     * @throws FlowableIllegalArgumentException if used in combination with {@link #decisionVersion(Integer)} or {@link #deploymentId(String)}
      */
     DmnDecisionQuery latestVersion();
 

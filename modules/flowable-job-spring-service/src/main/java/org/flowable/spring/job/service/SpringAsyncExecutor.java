@@ -39,7 +39,7 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     }
 
     /**
-     * {@link RejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
+     * {@link SpringRejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
      * 
      * @param rejectedJobsHandler
      */

@@ -20,8 +20,8 @@ import org.flowable.common.engine.api.query.Query;
  * 
  * Note that it is impossible to retrieve the deployment resources through the results of this operation, since that would cause a huge transfer of (possibly) unneeded bytes over the wire.
  * 
- * To retrieve the actual bytes of a deployment resource use the operations on the {@link RepositoryService#getDeploymentResourceNames(String)} and
- * {@link RepositoryService#getResourceAsStream(String, String)}
+ * To retrieve the actual bytes of a deployment resource use the operations on the {@link FormRepositoryService#getDeploymentResourceNames(String)} and
+ * {@link FormRepositoryService#getResourceAsStream(String, String)}
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
