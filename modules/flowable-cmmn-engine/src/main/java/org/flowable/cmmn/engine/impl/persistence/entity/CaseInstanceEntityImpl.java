@@ -152,13 +152,13 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         this.completable = completable;
     }
     /**
-     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     * Only here due to MyBatis and the old typo can be removed, if we would do a DB update
      */
     public boolean isCompleteable() {
         return completable;
     }
     /**
-     * Only here due to MyBatis and the old typo -> can be removed, if we would do a DB update
+     * Only here due to MyBatis and the old typo can be removed, if we would do a DB update
      */
     public void setCompleteable(boolean completable) {
         this.completable = completable;

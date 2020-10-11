@@ -41,7 +41,7 @@ public class EventInstanceCmmnUtil {
     /**
      * Processes the 'out parameters' of an {@link EventInstance} and stores the corresponding variables on the {@link VariableScope}.
      *
-     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope)}.
+     * Typically used when mapping incoming event payload into a runtime instance.
      */
     public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
         List<ExtensionElement> outParameters = baseElement.getExtensionElements()
