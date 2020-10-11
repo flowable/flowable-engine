@@ -1350,7 +1350,7 @@ Returns a read-only view of the Event Registry engine that is used in this REST-
 
     {
        "name":"default",
-       "version":"6.5.0.event-SNAPSHOT"
+       "version":"6.6.0"
     }
 
 <table>

@@ -66,7 +66,7 @@ Add the following to your *pom.xml* file:
       <dependency>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-engine</artifactId>
-        <version>6.5.0.event-SNAPSHOT</version>
+        <version>6.6.0</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
@@ -137,12 +137,12 @@ Flowable uses [SLF4J](http://www.slf4j.org/) as its logging framework internally
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.21</version>
+      <version>1.7.30</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.21</version>
+      <version>1.7.30</version>
     </dependency>
 
 Log4j needs a properties file for configuration. Add a *log4j.properties* file to the *src/main/resources* folder with the following content:
