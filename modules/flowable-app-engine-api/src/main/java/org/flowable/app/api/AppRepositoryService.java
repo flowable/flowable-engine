@@ -63,7 +63,7 @@ public interface AppRepositoryService {
     AppDefinition getAppDefinition(String appDefinitionId);
 
     /**
-     * Deletes the given deployment and cascade deletion to case instances, history case instances and jobs.
+     * Deletes the given deployment and cascade deletion to app instances, history case instances and jobs.
      * 
      * @param deploymentId
      *            id of the deployment, cannot be null.
@@ -73,11 +73,11 @@ public interface AppRepositoryService {
     /** Query deployments */
     AppDeploymentQuery createDeploymentQuery();
     
-    /** Query case definitions */
+    /** Query app definitions */
     AppDefinitionQuery createAppDefinitionQuery();
     
     /**
-     * Sets the category of the case definition. App definitions can be queried by category: see {@link AppDefinitionQuery#appDefinitionCategory(String)}.
+     * Sets the category of the app definition. App definitions can be queried by category: see {@link AppDefinitionQuery#appDefinitionCategory(String)}.
      * 
      * @throws FlowableObjectNotFoundException
      *             if no app definition with the provided id can be found.

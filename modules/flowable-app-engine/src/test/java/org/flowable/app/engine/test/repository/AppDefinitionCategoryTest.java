@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * @author Tijs Rademakers
  */
-public class CaseDefinitionCategoryTest extends FlowableAppTestCase {
+public class AppDefinitionCategoryTest extends FlowableAppTestCase {
 
     private String deploymentId1;
 
