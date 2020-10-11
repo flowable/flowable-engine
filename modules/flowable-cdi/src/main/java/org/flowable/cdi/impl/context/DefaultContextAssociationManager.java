@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the business process association manager. Uses a fallback-strategy to associate the process instance with the "broadest" active scope, starting with the conversation.
- * <p/>
+ * <p>
  * Subclass in order to implement custom association schemes and association with custom scopes.
  *
  * @author Daniel Meyer
