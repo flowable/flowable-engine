@@ -82,30 +82,47 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
+        Map<String, Object> formVariables;
+        boolean local = variablesLocal != null && !variablesLocal.isEmpty();
+        if (local) {
+            formVariables = variablesLocal;
+        } else {
+            formVariables = variables;
+        }
+        Map<String, Object> taskVariables = null;
+
         if (formInfo != null) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formService.validateFormFields(formInfo, variables);
+                formService.validateFormFields(formInfo, formVariables);
             }
 
             // Extract raw variables and complete the task
-            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+            taskVariables = formService.getVariablesFromFormSubmission(formInfo, formVariables, outcome);
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances
             if (task.getProcessInstanceId() != null) {
-                formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
+                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), task.getTenantId(), outcome);
             } else {
-                formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
+                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
                                 task.getScopeDefinitionId(), task.getTenantId(), outcome);
             }
 
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
         }
-        TaskHelper.completeTask(task, variables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+
+        // Only one set of variables can be used as form submission.
+        // When variablesLocal are present then they have precedence and those are used for the completion
+        if (local) {
+            TaskHelper.completeTask(task, variables, taskVariables, transientVariables, transientVariablesLocal, commandContext);
+        } else {
+            TaskHelper.completeTask(task, taskVariables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+        }
+
 
 
         return null;
