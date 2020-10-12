@@ -14,6 +14,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -74,7 +76,8 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             throw new FlowableIllegalArgumentException("A dynamically created plan item can only be injected into a running stage instance or case instance.");
         }
 
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
             .createPlanItemInstanceEntityBuilder()
             .caseDefinitionId(runningCaseDefinitionId)
             .derivedCaseDefinitionId(planItemInstanceBuilder.getCaseDefinitionId())
@@ -87,14 +90,16 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
             .create();
 
         // after adding the plan item to the stage, add it to the agenda for creation and afterwards for activation processing
-        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstanceEntity);
-        CommandContextUtil.getAgenda(commandContext).planEvaluateToActivatePlanItemInstanceOperation(planItemInstanceEntity);
+        CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+        agenda.planCreatePlanItemInstanceOperation(planItemInstanceEntity);
+        agenda.planEvaluateToActivatePlanItemInstanceOperation(planItemInstanceEntity);
 
         return planItemInstanceEntity;
     }
 
     protected PlanItemInstanceEntity getStageInstanceEntity(CommandContext commandContext) {
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
             .findById(planItemInstanceBuilder.getStagePlanItemInstanceId());
 
         if (planItemInstanceEntity == null) {
@@ -108,10 +113,11 @@ public class CreateInjectedPlanItemInstanceCmd implements Command<PlanItemInstan
     }
 
     protected CaseInstanceEntity getCaseInstanceEntity(CommandContext commandContext) {
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceBuilder.getCaseInstanceId());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(planItemInstanceBuilder.getCaseInstanceId());
         if (caseInstanceEntity == null) {
             throw new FlowableIllegalArgumentException(
-                "The case instance with id " + planItemInstanceBuilder.getCaseInstanceId() + " could not be found or is no longer an ative case instance.");
+                "The case instance with id " + planItemInstanceBuilder.getCaseInstanceId() + " could not be found or is no longer an active case instance.");
         }
         return caseInstanceEntity;
     }

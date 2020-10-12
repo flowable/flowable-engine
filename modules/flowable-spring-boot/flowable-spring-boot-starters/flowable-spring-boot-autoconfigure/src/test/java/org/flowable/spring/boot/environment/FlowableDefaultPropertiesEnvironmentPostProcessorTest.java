@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,7 +33,7 @@ public class FlowableDefaultPropertiesEnvironmentPostProcessorTest {
 
     private ConfigurableApplicationContext context;
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (context != null) {
             context.close();

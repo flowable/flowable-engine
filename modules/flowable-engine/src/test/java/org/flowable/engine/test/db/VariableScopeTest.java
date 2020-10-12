@@ -14,6 +14,7 @@
 package org.flowable.engine.test.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,36 +56,42 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // get variables for execution id user task, should return the new value
         // of variable test --> test2
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("test2");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("test2");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "test2");
 
         // get variables for process instance id, should return the initial
         // value of variable test --> test
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("test");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("test");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "test");
 
         runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "test", "test3");
 
         // get variables for execution id user task, should return the new value
         // of variable test --> test3
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("test3");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("test3");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "test3");
 
         // get variables for process instance id, should still return the
         // initial value of variable test --> test
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("test");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("test");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "test");
 
         runtimeService.setVariable(pi.getId(), "test", "test4");
 
         // get variables for execution id user task, should return the old value
         // of variable test --> test3
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("test3");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("test3");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "test3");
 
         // get variables for process instance id, should also return the initial
         // value of variable test --> test4
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("test4");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("test4");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "test4");
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends
@@ -167,36 +174,42 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // get variables for execution id user task, should return the new value of
         // variable test --> test2
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("test2");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("test2");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "test2");
 
         // get variables for process instance id, should return the initial
         // value of variable test --> test
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("test");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("test");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "test");
 
         runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "test", "testX");
 
         // get variables for execution id user task, should return the new value
         // of variable test --> test3
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("testX");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("testX");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "testX");
 
         // get variables for process instance id, should still return the
         // initial value of variable test --> test
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("test");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("test");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "test");
 
         runtimeService.setVariable(pi.getId(), "test", "testY");
 
         // get variables for execution id user task, should return the old value
         // of variable test --> test3
         assertThat(runtimeService.getVariable(subProcessTask.getExecutionId(), "test")).isEqualTo("testX");
-        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()).get("test")).isEqualTo("testX");
+        assertThat(runtimeService.getVariables(subProcessTask.getExecutionId()))
+                .containsEntry("test", "testX");
 
         // get variables for process instance id, should also return the initial
         // value of variable test --> test4
         assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("testY");
-        assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("testY");
+        assertThat(runtimeService.getVariables(pi.getId()))
+                .containsEntry("test", "testY");
 
         // After completing the task in the subprocess,
         // the subprocess scope is destroyed and the complete process ends
@@ -205,26 +218,30 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 
         for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
-            if (subProcTask.getName().equals("Task in subprocess2")) {
+            if ("Task in subprocess2".equals(subProcTask.getName())) {
                 // get variables for execution id user task, should return the
                 // old value of variable test --> test3
                 assertThat(runtimeService.getVariable(subProcTask.getExecutionId(), "test")).isEqualTo("test3");
-                assertThat(runtimeService.getVariables(subProcTask.getExecutionId()).get("test")).isEqualTo("test3");
+                assertThat(runtimeService.getVariables(subProcTask.getExecutionId()))
+                        .containsEntry("test", "test3");
 
                 // get variables for process instance id, should also return the
                 // initial value of variable test --> testY
                 assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("testY");
-                assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("testY");
-            } else if (subProcTask.getName().equals("Task in subprocess3")) {
+                assertThat(runtimeService.getVariables(pi.getId()))
+                        .containsEntry("test", "testY");
+            } else if ("Task in subprocess3".equals(subProcTask.getName())) {
                 // get variables for execution id user task, should return the
                 // old value of variable test --> test4
                 assertThat(runtimeService.getVariable(subProcTask.getExecutionId(), "test")).isEqualTo("test4");
-                assertThat(runtimeService.getVariables(subProcTask.getExecutionId()).get("test")).isEqualTo("test4");
+                assertThat(runtimeService.getVariables(subProcTask.getExecutionId()))
+                        .containsEntry("test", "test4");
 
                 // get variables for process instance id, should also return the
                 // initial value of variable test --> testY
                 assertThat(runtimeService.getVariable(pi.getId(), "test")).isEqualTo("testY");
-                assertThat(runtimeService.getVariables(pi.getId()).get("test")).isEqualTo("testY");
+                assertThat(runtimeService.getVariables(pi.getId()))
+                        .containsEntry("test", "testY");
             } else {
                 fail("Unexpected subProcessTask: " + subProcTask);
             }

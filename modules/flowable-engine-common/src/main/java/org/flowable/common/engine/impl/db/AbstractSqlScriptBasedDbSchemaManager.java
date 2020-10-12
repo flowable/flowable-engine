@@ -184,11 +184,9 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
         }
-        PreparedStatement statement = null;
-        try {
-            
-            statement = getDbSqlSession().getSqlSession().getConnection()
-                    .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?");
+        try (PreparedStatement statement = getDbSqlSession().getSqlSession().getConnection()
+                .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?")) {
+
             statement.setString(1, propertyName);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -199,13 +197,6 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         } catch (SQLException e) {
             logger.error("Could not get property from table {}", tableName, e);
             return null;
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                }
-            }
         }
     }
     
@@ -357,15 +348,15 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
      * MySQL is funny when it comes to timestamps and dates.
      * 
      * More specifically, for a DDL statement like 'MYCOLUMN timestamp(3)': - MySQL 5.6.4+ has support for timestamps/dates with millisecond (or smaller) precision. The DDL above works and the data in
-     * the table will have millisecond precision - MySQL < 5.5.3 allows the DDL statement, but ignores it. The DDL above works but the data won't have millisecond precision - MySQL 5.5.3 < [version] <
-     * 5.6.4 gives and exception when using the DDL above.
+     * the table will have millisecond precision - MySQL before 5.5.3 allows the DDL statement, but ignores it. The DDL above works but the data won't have millisecond precision - 
+     * MySQL 5.5.3 before [version] after 5.6.4 gives and exception when using the DDL above.
      * 
      * Also, the 5.5 and 5.6 branches of MySQL are both actively developed and patched.
      * 
      * Hence, when doing auto-upgrade/creation of the Flowable tables, the default MySQL DDL file is used and all timestamps/datetimes are converted to not use the millisecond precision by string
      * replacement done in the method below.
      * 
-     * If using the DDL files directly (which is a sane choice in production env.), there is a distinction between MySQL version < 5.6.
+     * If using the DDL files directly (which is a sane choice in production env.), there is a distinction between MySQL version before 5.6.
      */
     protected String updateDdlForMySqlVersionLowerThan56(String ddlStatements) {
         return ddlStatements.replace("timestamp(3)", "timestamp").replace("datetime(3)", "datetime").replace("TIMESTAMP(3)", "TIMESTAMP").replace("DATETIME(3)", "DATETIME");

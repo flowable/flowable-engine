@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Esteban Robles Luna
@@ -37,7 +37,7 @@ public class WSDLImporterTest {
 
     private CxfWSDLImporter importer;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importer = new CxfWSDLImporter();
     }

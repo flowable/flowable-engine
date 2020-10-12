@@ -94,7 +94,7 @@ public class HistoricDetailEntityManagerImpl
         if (entity instanceof HistoricDetailVariableInstanceUpdateEntity) {
             HistoricDetailVariableInstanceUpdateEntity historicDetailVariableInstanceUpdateEntity = ((HistoricDetailVariableInstanceUpdateEntity) entity);
             if (historicDetailVariableInstanceUpdateEntity.getByteArrayRef() != null) {
-                historicDetailVariableInstanceUpdateEntity.getByteArrayRef().delete();
+                historicDetailVariableInstanceUpdateEntity.getByteArrayRef().delete(engineConfiguration.getEngineCfgKey());
             }
         }
     }

@@ -27,9 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.editor.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverterUtil;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
@@ -51,6 +52,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
@@ -72,6 +74,7 @@ public class AppDefinitionImportService {
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
     protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+    protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
 
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, MultipartFile file) {
         try {
@@ -106,11 +109,15 @@ public class AppDefinitionImportService {
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                             converterContext.addFormModel(childModel);
-
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
                             converterContext.addDecisionServiceModel(childModel);
+
+                            List<Model> referencedDecisionTableChildModels = modelRepository.findByParentModelId(childModel.getId());
+                            for (Model decisionTableChildModel : referencedDecisionTableChildModels) {
+                                converterContext.addDecisionTableModel(decisionTableChildModel);
+                            }
                         }
                     }
 
@@ -126,11 +133,15 @@ public class AppDefinitionImportService {
                     for (Model childModel : referencedModels) {
                         if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
                             converterContext.addFormModel(childModel);
-
                         } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                             converterContext.addDecisionTableModel(childModel);
                         } else if (Model.MODEL_TYPE_DECISION_SERVICE == childModel.getModelType()) {
                             converterContext.addDecisionServiceModel(childModel);
+
+                            List<Model> referencedDecisionTableChildModels = modelRepository.findByParentModelId(childModel.getId());
+                            for (Model decisionTableChildModel : referencedDecisionTableChildModels) {
+                                converterContext.addDecisionTableModel(decisionTableChildModel);
+                            }
                         }
                     }
 
@@ -171,7 +182,7 @@ public class AppDefinitionImportService {
 
     public AppDefinitionUpdateResultRepresentation publishAppDefinition(String modelId, AppDefinitionPublishRepresentation publishModel) {
 
-        User user = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
         Model appModel = modelService.getModel(modelId);
 
         // Create pojo representation of the model and the json
@@ -179,7 +190,7 @@ public class AppDefinitionImportService {
         AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
 
         // Actual publication
-        appDefinitionPublishService.publishAppDefinition(publishModel.getComment(), appModel, user);
+        appDefinitionPublishService.publishAppDefinition(publishModel.getComment(), appModel, currentUserId);
 
         result.setAppDefinition(appDefinitionRepresentation);
         return result;
@@ -285,11 +296,11 @@ public class AppDefinitionImportService {
                     imageBytes = thumbnailMap.get(formKey);
                 }
                 updatedFormModel = modelService.saveModel(existingModel, formModel.getModelEditorJson(), imageBytes,
-                        true, "App definition import", SecurityUtils.getCurrentUserObject());
+                        true, "App definition import", SecurityUtils.getCurrentUserId());
 
             } else {
                 formModel.setId(null);
-                updatedFormModel = modelService.createModel(formModel, SecurityUtils.getCurrentUserObject());
+                updatedFormModel = modelService.createModel(formModel, SecurityUtils.getCurrentUserId());
 
                 if (thumbnailMap.containsKey(formKey)) {
                     updatedFormModel.setThumbnail(thumbnailMap.get(formKey));
@@ -305,6 +316,8 @@ public class AppDefinitionImportService {
 
         Map<String, String> decisionTableMap = converterContext.getDecisionTableKeyToJsonStringMap();
         Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         for (String decisionTableKey : decisionTableMap.keySet()) {
 
@@ -323,11 +336,11 @@ public class AppDefinitionImportService {
                     imageBytes = thumbnailMap.get(decisionTableKey);
                 }
                 updatedDecisionTableModel = modelService.saveModel(existingModel, decisionTableModel.getModelEditorJson(), imageBytes,
-                        true, "App definition import", SecurityUtils.getCurrentUserObject());
+                        true, "App definition import", currentUserId);
 
             } else {
                 decisionTableModel.setId(null);
-                updatedDecisionTableModel = modelService.createModel(decisionTableModel, SecurityUtils.getCurrentUserObject());
+                updatedDecisionTableModel = modelService.createModel(decisionTableModel, currentUserId);
 
                 if (thumbnailMap.containsKey(decisionTableKey)) {
                     updatedDecisionTableModel.setThumbnail(thumbnailMap.get(decisionTableKey));
@@ -344,26 +357,41 @@ public class AppDefinitionImportService {
         Map<String, String> decisionServicesMap = converterContext.getDecisionServiceKeyToJsonStringMap();
         Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
 
+        String currentUserId = SecurityUtils.getCurrentUserId();
         for (String decisionServiceKey : decisionServicesMap.keySet()) {
-
             Model decisionServiceModel = createModelObject(decisionServicesMap.get(decisionServiceKey), Model.MODEL_TYPE_DECISION_SERVICE);
 
-            // migrate to new version
             String oldDecisionServiceId = decisionServiceModel.getId();
+            ObjectNode decisionServiceModelNode;
+            try {
+                decisionServiceModelNode = (ObjectNode) objectMapper.readTree(decisionServiceModel.getModelEditorJson());
+            } catch (Exception e) {
+                LOGGER.error("Error reading decision service json for {}", decisionServiceKey, e);
+                throw new InternalServerErrorException("Error reading decision service json for " + decisionServiceKey);
+            }
+
+            // remove modelId from import json
+            // and update decision table references
+            decisionServiceModelNode.remove("modelId");
+            DmnJsonConverterUtil.updateDecisionTableModelReferences(decisionServiceModelNode, converterContext);
+            String updatedDecisionServiceJson = decisionServiceModelNode.toString();
 
             Model existingModel = converterContext.getDecisionServiceModelByKey(decisionServiceModel.getKey());
-            Model updatedDecisionServiceModel = null;
+            Model updatedDecisionServiceModel;
             if (existingModel != null) {
                 byte[] imageBytes = null;
                 if (thumbnailMap.containsKey(decisionServiceKey)) {
                     imageBytes = thumbnailMap.get(decisionServiceKey);
                 }
-                updatedDecisionServiceModel = modelService.saveModel(existingModel, decisionServiceModel.getModelEditorJson(), imageBytes,
-                    true, "App definition import", SecurityUtils.getCurrentUserObject());
+                existingModel.setModelEditorJson(updatedDecisionServiceJson);
+                updatedDecisionServiceModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes,
+                    true, "App definition import", currentUserId);
 
             } else {
                 decisionServiceModel.setId(null);
-                updatedDecisionServiceModel = modelService.createModel(decisionServiceModel, SecurityUtils.getCurrentUserObject());
+                decisionServiceModel.setModelEditorJson(updatedDecisionServiceJson);
+
+                updatedDecisionServiceModel = modelService.createModel(decisionServiceModel, currentUserId);
 
                 if (thumbnailMap.containsKey(decisionServiceKey)) {
                     updatedDecisionServiceModel.setThumbnail(thumbnailMap.get(decisionServiceKey));
@@ -379,6 +407,8 @@ public class AppDefinitionImportService {
 
         Map<String, String> bpmnModelMap = converterContext.getProcessKeyToJsonStringMap();
         Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         for (String bpmnModelKey : bpmnModelMap.keySet()) {
 
@@ -407,12 +437,13 @@ public class AppDefinitionImportService {
 
                 existingModel.setModelEditorJson(updatedBpmnJson);
 
-                updatedProcessModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes, true, "App definition import", SecurityUtils.getCurrentUserObject());
+                updatedProcessModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes, true, "App definition import",
+                        currentUserId);
 
             } else {
                 bpmnModelObject.setId(null);
                 bpmnModelObject.setModelEditorJson(updatedBpmnJson);
-                updatedProcessModel = modelService.createModel(bpmnModelObject, SecurityUtils.getCurrentUserObject());
+                updatedProcessModel = modelService.createModel(bpmnModelObject, currentUserId);
 
                 if (thumbnailMap.containsKey(bpmnModelKey)) {
                     updatedProcessModel.setThumbnail(thumbnailMap.get(bpmnModelKey));
@@ -428,6 +459,8 @@ public class AppDefinitionImportService {
 
         Map<String, String> cmmnModelMap = converterContext.getCaseKeyToJsonStringMap();
         Map<String, byte[]> thumbnailMap = converterContext.getModelKeyToThumbnailMap();
+
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         for (String cmmnModelKey : cmmnModelMap.keySet()) {
 
@@ -456,12 +489,13 @@ public class AppDefinitionImportService {
 
                 existingModel.setModelEditorJson(updatedCmmnJson);
 
-                updatedCaseModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes, true, "App definition import", SecurityUtils.getCurrentUserObject());
+                updatedCaseModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes, true, "App definition import",
+                        currentUserId);
 
             } else {
                 cmmnModelObject.setId(null);
                 cmmnModelObject.setModelEditorJson(updatedCmmnJson);
-                updatedCaseModel = modelService.createModel(cmmnModelObject, SecurityUtils.getCurrentUserObject());
+                updatedCaseModel = modelService.createModel(cmmnModelObject, currentUserId);
 
                 if (thumbnailMap.containsKey(cmmnModelKey)) {
                     updatedCaseModel.setThumbnail(thumbnailMap.get(cmmnModelKey));
@@ -512,15 +546,18 @@ public class AppDefinitionImportService {
             }
         }
 
+        String currentUserId = SecurityUtils.getCurrentUserId();
+
         try {
             String updatedAppDefinitionJson = objectMapper.writeValueAsString(appDefinition);
 
             if (existingAppModel != null) {
-                appDefinitionModel = modelService.saveModel(existingAppModel, updatedAppDefinitionJson, null, true, "App definition import", SecurityUtils.getCurrentUserObject());
+                appDefinitionModel = modelService.saveModel(existingAppModel, updatedAppDefinitionJson, null, true, "App definition import",
+                        currentUserId);
             } else {
                 appDefinitionModel.setId(null);
                 appDefinitionModel.setModelEditorJson(updatedAppDefinitionJson);
-                appDefinitionModel = modelService.createModel(appDefinitionModel, SecurityUtils.getCurrentUserObject());
+                appDefinitionModel = modelService.createModel(appDefinitionModel, currentUserId);
             }
 
             AppDefinitionRepresentation result = new AppDefinitionRepresentation(appDefinitionModel);

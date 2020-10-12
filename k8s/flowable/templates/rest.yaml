@@ -31,7 +31,7 @@ spec:
         - containerPort: 8080
         readinessProbe:
           httpGet:
-            path: /actuator/health
+            path: {{ .Values.rest.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
@@ -43,7 +43,7 @@ spec:
           timeoutSeconds: 5
         livenessProbe:
           httpGet:
-            path: /actuator/health
+            path: {{ .Values.rest.contextPath }}/actuator/health
             port: 8080
             httpHeaders:
             - name: Authorization
@@ -105,7 +105,7 @@ metadata:
   name: {{ include "flowable.template" . }}-configmap
 data:
   JAVA_OPTS: "{{ .Values.rest.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
-  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.rest.contextUrl | quote }}
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.rest.contextPath | quote }}
   SERVER_SERVLET_SESSION_TIMEOUT: 1h
   {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
   SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
@@ -121,6 +121,4 @@ data:
   SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
   FLOWABLE_REST_APP_ADMIN_USER-ID: {{ .Values.rest.admin.username }}
   FLOWABLE_REST_APP_ADMIN_PASSWORD: {{ .Values.rest.admin.password }}
-  FLOWABLE_REST_APP_ADMIN_FIRST-NAME: Rest
-  FLOWABLE_REST_APP_ADMIN_LAST-NAME: Admin
 {{- end }}

@@ -45,49 +45,56 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
 
     @Override
     public FormDeployment execute(CommandContext commandContext) {
-
         FormDeploymentEntity deployment = deploymentBuilder.getDeployment();
 
-        deployment.setDeploymentTime(CommandContextUtil.getFormEngineConfiguration().getClock().getCurrentTime());
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
+        deployment.setDeploymentTime(formEngineConfiguration.getClock().getCurrentTime());
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
             List<FormDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(CommandContextUtil.getFormEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(formEngineConfiguration.getCommandExecutor())
+                        .deploymentName(deployment.getName())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
+                
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
+                
             } else {
-                List<FormDeployment> deploymentList = CommandContextUtil.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<FormDeployment> deploymentList = formEngineConfiguration.getFormRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            FormDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
+                FormDeploymentEntity existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
 
                 Map<String, FormResourceEntity> resourceMap = new HashMap<>();
-                List<FormResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+                List<FormResourceEntity> resourceList = formEngineConfiguration.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
                 for (FormResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
                 }
                 existingDeployment.setResources(resourceMap);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 
         deployment.setNew(true);
 
         // Save the data
-        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+        formEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent
@@ -97,7 +104,7 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
         }
 
         // Actually deploy
-        CommandContextUtil.getFormEngineConfiguration().getDeploymentManager().deploy(deployment);
+        formEngineConfiguration.getDeploymentManager().deploy(deployment);
 
         return deployment;
     }

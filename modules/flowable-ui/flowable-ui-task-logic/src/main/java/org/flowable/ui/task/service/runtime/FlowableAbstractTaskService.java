@@ -12,6 +12,7 @@
  */
 package org.flowable.ui.task.service.runtime;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -29,23 +29,13 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.idm.api.Group;
-import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.TaskInfo;
-import org.flowable.ui.common.service.idm.RemoteIdmService;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class FlowableAbstractTaskService implements InitializingBean {
-
-    @Autowired(required = false)
-    protected RemoteIdmService remoteIdmService;
-
-    @Autowired(required = false)
-    protected IdmIdentityService identityService;
+public abstract class FlowableAbstractTaskService {
 
     @Autowired
     protected RepositoryService repositoryService;
@@ -68,14 +58,7 @@ public abstract class FlowableAbstractTaskService implements InitializingBean {
     @Autowired
     protected PermissionService permissionService;
 
-    @Override
-    public void afterPropertiesSet() {
-        if (remoteIdmService == null && identityService == null) {
-            throw new FlowableIllegalStateException("No remoteIdmService or identityService have been provided");
-        }
-    }
-
-    public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser) {
+    public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, SecurityScope currentUser) {
         verifyProcessInstanceStartUser(taskRepresentation, task);
 
         List<HistoricIdentityLink> taskIdentityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
@@ -104,22 +87,17 @@ public abstract class FlowableAbstractTaskService implements InitializingBean {
         }
     }
     
-    protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
-        List<? extends Group> userGroups;
-        if (remoteIdmService != null) {
-            userGroups = remoteIdmService.getUser(currentUser.getId()).getGroups();
-        } else {
-            userGroups = identityService.createGroupQuery().groupMember(currentUser.getId()).list();
-        }
+    protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, SecurityScope currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+        Collection<String> userGroups = currentUser.getGroupIds();
         taskRepresentation.setMemberOfCandidateGroup(userGroupsMatchTaskCandidateGroups(userGroups, taskIdentityLinks));
     }
     
-    protected boolean userGroupsMatchTaskCandidateGroups(List<? extends Group> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
-        for (Group group : userGroups) {
+    protected boolean userGroupsMatchTaskCandidateGroups(Collection<String> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
+        for (String group : userGroups) {
             for (HistoricIdentityLink identityLink : taskIdentityLinks) {
                 if (identityLink.getGroupId() != null 
                         && identityLink.getType().equals(IdentityLinkType.CANDIDATE) 
-                        && group.getId().equals(identityLink.getGroupId())) {
+                        && group.equals(identityLink.getGroupId())) {
                     return true;
                 }
             }
@@ -127,15 +105,15 @@ public abstract class FlowableAbstractTaskService implements InitializingBean {
         return false;
     }
     
-    protected void verifyCandidateUsers(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+    protected void verifyCandidateUsers(TaskRepresentation taskRepresentation, SecurityScope currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
         taskRepresentation.setMemberOfCandidateUsers(currentUserMatchesTaskCandidateUsers(currentUser, taskIdentityLinks));
     }
     
-    protected boolean currentUserMatchesTaskCandidateUsers(User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+    protected boolean currentUserMatchesTaskCandidateUsers(SecurityScope currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
         for (HistoricIdentityLink identityLink : taskIdentityLinks) {
             if (identityLink.getUserId() != null
                     && identityLink.getType().equals(IdentityLinkType.CANDIDATE)
-                    && identityLink.getUserId().equals(currentUser.getId())) {
+                    && identityLink.getUserId().equals(currentUser.getUserId())) {
                 return true;
             }
         }

@@ -39,13 +39,9 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
     }
     
     @Override
-    protected boolean isEvaluateRepetitionRule() {
-        if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
-            // Only event listeners can be repeating on occur
-            return true;
-        } else {
-            return false;
-        }
+    public boolean isEvaluateRepetitionRule() {
+        // Only event listeners can be repeating on occur
+        return planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener;
     }
     
     @Override
@@ -56,7 +52,7 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
     }
 
     @Override
-    protected String getOperationName() {
+    public String getOperationName() {
         return "[Occur plan item]";
     }
     

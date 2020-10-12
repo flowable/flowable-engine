@@ -192,6 +192,18 @@ public class TaskBaseResource {
         if (request.getCaseInstanceIdWithChildren() != null) {
             taskQuery.caseInstanceIdWithChildren(request.getCaseInstanceIdWithChildren());
         }
+        if (request.getPlanItemInstanceId() != null) {
+            taskQuery.planItemInstanceId(request.getPlanItemInstanceId());
+        }
+        if (request.getScopeId() != null) {
+            taskQuery.scopeId(request.getScopeId());
+        }
+        if (request.getSubScopeId() != null) {
+            taskQuery.subScopeId(request.getSubScopeId());
+        }
+        if (request.getScopeType() != null) {
+            taskQuery.scopeType(request.getScopeType());
+        }
         if (request.getCreatedOn() != null) {
             taskQuery.taskCreatedOn(request.getCreatedOn());
         }

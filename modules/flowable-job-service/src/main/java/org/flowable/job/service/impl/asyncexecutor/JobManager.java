@@ -45,7 +45,7 @@ public interface JobManager {
     /**
      * Unacquires a job, meaning that this job was previously locked, and it is now freed to be acquired by other executor nodes.
      */
-    void unacquireWithDecrementRetries(JobInfo job);
+    void unacquireWithDecrementRetries(JobInfo job, Throwable exception);
     
     /**
      * Creates an async job so that it can be continued later in a background thread.
@@ -108,6 +108,12 @@ public interface JobManager {
      * because of it failed and retries became 0.
      */
     Job moveDeadLetterJobToExecutableJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
+
+    /**
+     * Transforms a {@link DeadLetterJobEntity} to a {@link org.flowable.job.api.HistoryJob}, thus making it executable again (by the async history executor).
+     * Note that a 'retries' parameter needs to be passed, as the job got into the deadletter table because of it failed and retries became 0.
+     */
+    HistoryJobEntity moveDeadLetterJobToHistoryJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
     
     /**
      * schedules a {@link HistoryJobEntity}, meaning it will be scheduled (inserted in the database/put on a queue/...) to be executed at a later point in time.
@@ -138,6 +144,13 @@ public interface JobManager {
      * Create a dead letter job from another job
      */
     DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob);
+
+    /**
+     * Create a dead letter job from a history job.
+     * This is different from {@link #createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity)},
+     * because history jobs have different data and cannot become timer/suspended/executable jobs.
+     */
+    DeadLetterJobEntity createDeadLetterJobFromHistoryJob(HistoryJobEntity historyJobEntity);
 
     /**
      * Create an external worker job from another job

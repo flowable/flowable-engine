@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
@@ -23,7 +24,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -59,9 +59,13 @@ public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnTriggera
             PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
             behavior.execute(planItemInstanceEntity);
 
+        } else if (delegate instanceof PlanItemFutureJavaDelegate) {
+            PlanItemFutureJavaDelegateActivityBehavior behavior = new PlanItemFutureJavaDelegateActivityBehavior((PlanItemFutureJavaDelegate<?>) delegate);
+            behavior.execute(planItemInstanceEntity);
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " +
-                    PlanItemActivityBehavior.class + ", " + CmmnActivityBehavior.class + " nor " + PlanItemJavaDelegate.class);
+                    PlanItemActivityBehavior.class + ", " + CmmnActivityBehavior.class + ", " + PlanItemJavaDelegate.class + " nor "
+                    + PlanItemFutureJavaDelegate.class);
         }
     }
 

@@ -42,7 +42,7 @@ public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTest
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
         assertThat(content).isNotNull();
-        assertThat(content.contains("Full Decision")).isTrue();
+        assertThat(content).contains("Full Decision");
     }
 
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {

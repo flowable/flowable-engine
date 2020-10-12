@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
@@ -89,11 +90,8 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
                 .list();
 
         for (Job job : jobList) {
-            try {
-                managementService.executeJob(job.getId());
-                fail("RuntimeException");
-            } catch (RuntimeException re) {
-            }
+            assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                    .isInstanceOf(RuntimeException.class);
         }
         return processInstance;
     }

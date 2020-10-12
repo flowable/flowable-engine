@@ -155,8 +155,8 @@ public class ProcessDiagramLayoutFactory {
         NodeList waypoints = bpmnModel.getElementsByTagNameNS(BpmnParser.OMG_DI_NS, "waypoint");
         for (int i = 0; i < waypoints.getLength(); i++) {
             Element waypoint = (Element) waypoints.item(i);
-            Double x = Double.valueOf(waypoint.getAttribute("x"));
-            Double y = Double.valueOf(waypoint.getAttribute("y"));
+            double x = Double.parseDouble(waypoint.getAttribute("x"));
+            double y = Double.parseDouble(waypoint.getAttribute("y"));
 
             if (minX == null || x < minX) {
                 minX = x;

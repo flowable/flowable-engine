@@ -37,7 +37,7 @@ public class HandleHistoryCleanupTimerJobCmd implements Command<Object>, Seriali
     public Object execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ManagementService managementService = processEngineConfiguration.getManagementService();
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
         List<Job> cleanupJobs = managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).list();
         
         if (cleanupJobs.isEmpty()) {

@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.AcquireExternalWorkerJobsCmd;
 
 /**
@@ -31,6 +32,7 @@ import org.flowable.job.service.impl.cmd.AcquireExternalWorkerJobsCmd;
 public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcquireBuilder {
 
     protected final CommandExecutor commandExecutor;
+    protected final JobServiceConfiguration jobServiceConfiguration;
 
     protected String topic;
     protected Duration lockDuration;
@@ -39,8 +41,9 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
     protected String authorizedUser;
     protected Collection<String> authorizedGroups;
 
-    public ExternalWorkerJobAcquireBuilderImpl(CommandExecutor commandExecutor) {
+    public ExternalWorkerJobAcquireBuilderImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         this.commandExecutor = commandExecutor;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -110,7 +113,7 @@ public class ExternalWorkerJobAcquireBuilderImpl implements ExternalWorkerJobAcq
     public List<AcquiredExternalWorkerJob> acquireAndLock(int numberOfTasks, String workerId, int numberOfRetries) {
         while (numberOfRetries > 0) {
             try {
-                return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, numberOfTasks, this));
+                return commandExecutor.execute(new AcquireExternalWorkerJobsCmd(workerId, numberOfTasks, this, jobServiceConfiguration));
             } catch (FlowableOptimisticLockingException ignored) {
                 // Query for jobs until there is no FlowableOptimisticLockingException
                 // It is potentially possible multiple workers to query in the exact same time

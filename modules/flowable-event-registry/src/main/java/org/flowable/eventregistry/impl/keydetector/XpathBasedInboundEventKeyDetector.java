@@ -36,7 +36,7 @@ public class XpathBasedInboundEventKeyDetector implements InboundEventKeyDetecto
     public String detectEventDefinitionKey(Document document) {
         try {
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Node result = (Node) xPath.compile(xpathExpression).evaluate(document, XPathConstants.NODESET);
+            Node result = (Node) xPath.compile(xpathExpression).evaluate(document, XPathConstants.NODE);
             return result.getTextContent();
         } catch (Exception e) {
             throw new FlowableException("Could not evaluate xpath expression ", e);

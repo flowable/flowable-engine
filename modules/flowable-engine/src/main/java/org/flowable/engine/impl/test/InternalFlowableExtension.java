@@ -78,7 +78,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
         AnnotationSupport.findAnnotation(context.getTestMethod(), Deployment.class)
             .ifPresent(deployment -> {
                 String deploymentIdFromDeploymentAnnotation = TestHelper
-                    .annotationDeploymentSetUp(processEngine, context.getRequiredTestClass(), context.getRequiredTestMethod(), deployment);
+                    .annotationDeploymentSetUp(processEngine, context.getRequiredTestMethod(), deployment);
                 getStore(context).put(context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY, deploymentIdFromDeploymentAnnotation);
             });
     }
@@ -121,8 +121,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 processEngineConfiguration.setAsyncHistoryEnabled(false);
                 asyncHistoryManager = processEngineConfiguration.getHistoryManager();
                 processEngineConfiguration
-                    .setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, 
-                            processEngineConfiguration.getHistoryLevel(), processEngineConfiguration.isUsePrefixId()));
+                    .setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
             }
 
             String annotationDeploymentKey = context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY;

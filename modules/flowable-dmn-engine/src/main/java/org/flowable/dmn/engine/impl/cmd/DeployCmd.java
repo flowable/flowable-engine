@@ -50,50 +50,52 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
 
         DmnDeploymentEntity deployment = deploymentBuilder.getDeployment();
 
-        deployment.setDeploymentTime(CommandContextUtil.getDmnEngineConfiguration().getClock().getCurrentTime());
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration(commandContext);
+        deployment.setDeploymentTime(dmnEngineConfiguration.getClock().getCurrentTime());
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
             List<DmnDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || DmnEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(CommandContextUtil.getDmnEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                List<DmnDeployment> deploymentEntities = new DmnDeploymentQueryImpl(dmnEngineConfiguration.getCommandExecutor())
+                        .deploymentName(deployment.getName())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
             } else {
-                List<DmnDeployment> deploymentList = CommandContextUtil.getDmnEngineConfiguration().getDmnRepositoryService().createDeploymentQuery()
+                List<DmnDeployment> deploymentList = dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery()
                         .deploymentName(deployment.getName())
                         .deploymentTenantId(deployment.getTenantId())
-                        .orderByDeploymentId()
-                        .desc()
-                        .list();
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            DmnDeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
+                DmnDeploymentEntity existingDeployment = (DmnDeploymentEntity) existingDeployments.get(0);
 
                 Map<String, EngineResource> resourceMap = new HashMap<>();
-                List<DmnResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+                List<DmnResourceEntity> resourceList = dmnEngineConfiguration.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
                 for (DmnResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
                 }
                 existingDeployment.setResources(resourceMap);
-            }
-
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 
         deployment.setNew(true);
 
         // Save the data
-        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+        dmnEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent
@@ -107,7 +109,7 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
         deploymentSettings.put(DeploymentSettings.IS_DMN_XSD_VALIDATION_ENABLED, deploymentBuilder.isDmnXsdValidationEnabled());
 
         // Actually deploy
-        CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().deploy(deployment, deploymentSettings);
+        dmnEngineConfiguration.getDeploymentManager().deploy(deployment, deploymentSettings);
 
         return deployment;
     }
@@ -127,12 +129,14 @@ public class DeployCmd<T> implements Command<DmnDeployment>, Serializable {
             if (savedResource == null)
                 return true;
 
-            EngineResource resource = resources.get(resourceName);
+            if (!savedResource.isGenerated()) {
+                EngineResource resource = resources.get(resourceName);
 
-            byte[] bytes = resource.getBytes();
-            byte[] savedBytes = savedResource.getBytes();
-            if (!Arrays.equals(bytes, savedBytes)) {
-                return true;
+                byte[] bytes = resource.getBytes();
+                byte[] savedBytes = savedResource.getBytes();
+                if (!Arrays.equals(bytes, savedBytes)) {
+                    return true;
+                }
             }
         }
         return false;

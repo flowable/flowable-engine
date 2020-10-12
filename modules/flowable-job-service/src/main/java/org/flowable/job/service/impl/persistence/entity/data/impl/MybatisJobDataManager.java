@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
@@ -42,10 +43,6 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
     protected SingleCachedEntityMatcher<JobEntity> jobByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
-    public MybatisJobDataManager() {
-        
-    }
-    
     public MybatisJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
@@ -149,4 +146,8 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         }
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return jobServiceConfiguration.getIdGenerator();
+    }
 }

@@ -23,7 +23,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -261,7 +260,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
                 }
                 historyService.deleteHistoricTaskInstance(taskId);
                 managementService.executeCommand(commandContext -> {
-                    CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+                    processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
                     return null;
                 });
             }
@@ -418,7 +417,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
                 }
                 historyService.deleteHistoricTaskInstance(taskId);
                 managementService.executeCommand(commandContext -> {
-                    CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+                    processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
                     return null;
                 });
             }

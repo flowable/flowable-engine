@@ -16,6 +16,7 @@
         },
         "ACTION": {
             "LOGOUT": "Sign out",
+            "DASHBOARD": "Dashboard",
             "RETURN-TO-LIST": "Show all definitions",
             "CANCEL": "Cancel",
             "CLOSE": "Close",
@@ -199,6 +200,12 @@
           "PRIORITYDEFINITION" : {
             "TITLE" : "Priority",
             "DESCRIPTION" : "Priority of the user task."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the id of the task will be stored in this variable"
           }
         },
         "SERVICETASKCLASSPACKAGE" : {
@@ -507,6 +514,12 @@
             "DESCRIPTION" : "Flag indicating to store the response variable as a JSON variable instead of a String"
           }
         },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
+          }
+        },
         "SKIPEXPRESSIONPACKAGE" : {
           "SKIPEXPRESSION" : {
             "TITLE" : "Skip expression",
@@ -693,10 +706,22 @@
             "DESCRIPTION" : "Define the message name."
           }
         },
+        "MESSAGEEXPRESSIONPACKAGE" : {
+          "MESSAGEEXPRESSION" : {
+            "TITLE" : "Message expression",
+            "DESCRIPTION" : "Resolves the message event at runtime based on an expression."
+          }
+        },
         "SIGNALREFPACKAGE" : {
           "SIGNALREF" : {
             "TITLE" : "Signal reference",
             "DESCRIPTION" : "Define the signal name."
+          }
+        },
+        "SIGNALEXPRESSIONPACKAGE" : {
+          "SIGNALEXPRESSION" : {
+            "TITLE" : "Signal expression",
+            "DESCRIPTION" : "Resolves the signal event at runtime based on an expression."
           }
         },
         "ERRORREFPACKAGE" : {
@@ -1321,6 +1346,12 @@
             "DESCRIPTION": "Priority of the user task."
           }
         },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "ID variable",
+            "DESCRIPTION": "If set, the id of the task will be stored in this variable"
+          }
+        },
         "SERVICETASKCLASSPACKAGE": {
           "SERVICETASKCLASS": {
             "TITLE": "Class",
@@ -1553,6 +1584,12 @@
           "HTTPTASKSAVERESPONSEASJSON": {
             "TITLE": "Save response as JSON",
             "DESCRIPTION": "Flag indicating to store the response variable as a JSON variable instead of a String"
+          }
+        },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
           }
         },
         "EVENTREGISTRYPACKAGE" : {
@@ -2000,14 +2037,16 @@
         }
     },
 
-    "DECISION-TABLES-LIST": {
+    "DECISIONS-LIST": {
         "TITLE": "Decisions",
         "SEARCH-PLACEHOLDER": "Search",
         "ACTION": {
             "CREATE-DECISION-SERVICE": "Create Decision Service",
             "CREATE": "Create Decision Table",
-            "IMPORT": "Import Decision Table",
-            "CREATE-INLINE": "Create a new decision table now!",
+            "IMPORT-DECISION-TABLE": "Import Decision Table",
+            "IMPORT-DECISION-SERVICE": "Import Decision Service",
+            "CREATE-DECISION-TABLES-INLINE": "Create a new decision table now!",
+            "CREATE-DECISION-SERVICES-INLINE": "Create a new decision service now!",
             "SHOW-MORE": "Show more..."
         },
 
@@ -2248,9 +2287,42 @@
       "NAME": "Decision service name",
       "KEY": "Decision service key",
       "DESCRIPTION": "Description",
+      "ACTION": {
+        "DETAILS": "Show details",
+        "EDIT": "Modify model properties",
+        "SHARE": "Share this decision service",
+        "DELETE": "Delete this decision service",
+        "ADD-COMMENT": "+ Add comment",
+        "CREATE-CONFIRM": "Create new decision service",
+        "OPEN-IN-EDITOR": "Decision Service Editor",
+        "EXPORT": "Export decision service",
+        "DELETE-CONFIRM": "Delete decision service",
+        "USE-AS-NEW-VERSION": "Use as new version",
+        "FAVORITE": "Favorite this decision service",
+        "DUPLICATE": "Duplicate this decision service",
+        "DUPLICATE-CONFIRM": "Duplicate the decision service"
+      },
+      "DETAILS": {
+        "HISTORY-TITLE": "History",
+        "COMMENTS-TITLE": "Comments",
+        "LAST-UPDATED-BY": "Last updated by {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+        "CREATED-BY": "Created by {{createdBy}}"
+      },
       "POPUP": {
         "CREATE-TITLE": "Create a new decision service",
-        "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time."
+        "CREATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time.",
+        "DUPLICATE-TITLE": "Duplicate decision service",
+        "DUPLICATE-DESCRIPTION": "You need to give a name for the new decision service and you may want to add a description at the same time.",
+        "DELETE-TITLE": "Delete decision service",
+        "DELETE-DESCRIPTION": "Are you sure you want to delete the decision service \"{{name}}\"?",
+        "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
+        "IMPORT-TITLE": "Import a DMN decision service model",
+        "IMPORT": {
+          "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
+          "CANCEL-UPLOAD": "Cancel the upload",
+          "ERROR": "Error while processing the DMN XML file",
+          "NO-DROP": "Drag and drop not supported"
+        }
       }
     },
     "DECISION-TABLE": {
@@ -2304,7 +2376,7 @@
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
             "SAVE-DECISION-TABLE-TITLE": "Save decision table",
             "IMPORT-DESCRIPTION": "Please browse for or drop a DMN XML definition with an .dmn or .dmn.xml extension",
-          	"IMPORT-TITLE": "Import a DMN model",
+          	"IMPORT-TITLE": "Import a DMN decision table model",
 	        "IMPORT": {
 	            "DROPZONE": "Drop a .dmn or .dmn.xml DMN XML file",
 	            "CANCEL-UPLOAD": "Cancel the upload",

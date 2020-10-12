@@ -81,9 +81,8 @@ public interface ExecuteDecisionBuilder {
     /**
      * Executes a decision returning one or more output results with variables
      *
-     * Deprecated:
-     * Use {@link #executeDecision()} to execute a Decision (table)
-     **/
+     * @deprecated Use {@link #executeDecision()} to execute a Decision (table)
+     */
     @Deprecated
     List<Map<String, Object>> execute();
 
@@ -107,7 +106,7 @@ public interface ExecuteDecisionBuilder {
     /**
      * Executes a decision (table)
      *
-     * @returnon A List with one or more rule results mapped to variables
+     * @return A List with one or more rule results mapped to variables
      *
      **/
     List<Map<String, Object>> executeDecision();

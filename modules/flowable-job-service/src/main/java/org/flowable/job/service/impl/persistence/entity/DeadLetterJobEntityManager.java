@@ -30,7 +30,7 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
     DeadLetterJobEntity findJobByCorrelationId(String correlationId);
 
     /**
-     * Returns all {@link DeadLetterJobEntity} instances related to an {@link ExecutionEntity}.
+     * Returns all {@link DeadLetterJobEntity} instances related to an execution id.
      */
     List<DeadLetterJobEntity> findJobsByExecutionId(String id);
     
@@ -50,7 +50,7 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
+     * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     

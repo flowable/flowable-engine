@@ -1,26 +1,14 @@
 #!/bin/bash
 echo "Building all Java artifacts"
 cd ..
-mvn -Pdistro clean install -DskipTests
+mvn clean install -Pdistro -DskipTests -T 2C
 
 echo "Building and pushing REST app image"
 cd modules/flowable-app-rest
-mvn -Pdocker,swagger clean deploy
+mvn clean package -PdockerPublish,swagger -DskipTests 
 
-echo "Building and pushing ADMIN app image"
-cd ../flowable-ui-admin
-mvn -Pdocker clean deploy
-
-echo "Building and pushing IDM app image"
-cd ../flowable-ui-idm
-mvn -Pdocker clean deploy
-
-echo "Building and pushing MODELER app image"
-cd ../flowable-ui-modeler
-mvn -Pdocker clean deploy
-
-echo "Building and pushing TASK app image"
-cd ../flowable-ui-task
-mvn -Pdocker clean deploy
+echo "Building and pushing UI app image"
+cd ../flowable-ui
+mvn clean package -PdockerPublish -DskipTests
 
 echo "Done..."

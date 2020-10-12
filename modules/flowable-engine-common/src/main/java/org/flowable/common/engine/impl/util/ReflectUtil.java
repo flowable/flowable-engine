@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import org.flowable.common.engine.api.FlowableClassLoadingException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
@@ -281,7 +280,7 @@ public abstract class ReflectUtil {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
+    protected static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
         for (Constructor constructor : clazz.getDeclaredConstructors()) { // cannot use <?> or <T> due to JDK 5/6 incompatibility
             if (matches(constructor.getParameterTypes(), args)) {
                 return constructor;
@@ -290,7 +289,7 @@ public abstract class ReflectUtil {
         return null;
     }
 
-    private static boolean matches(Class<?>[] parameterTypes, Object[] args) {
+    protected static boolean matches(Class<?>[] parameterTypes, Object[] args) {
         if ((parameterTypes == null) || (parameterTypes.length == 0)) {
             return ((args == null) || (args.length == 0));
         }
@@ -305,7 +304,7 @@ public abstract class ReflectUtil {
         return true;
     }
     
-    private static boolean fieldTypeCompatible(Object value, Field field) {
+    protected static boolean fieldTypeCompatible(Object value, Field field) {
         if (value != null) {
             return field.getType().isAssignableFrom(value.getClass());
         } else {
@@ -314,34 +313,27 @@ public abstract class ReflectUtil {
         }
     }
 
-    private static ClassLoader getCustomClassLoader() {
+    protected static ClassLoader getCustomClassLoader() {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
-            if (engineConfiguration != null) {
-                final ClassLoader classLoader = engineConfiguration.getClassLoader();
-                if (classLoader != null) {
-                    return classLoader;
-                }
+            final ClassLoader classLoader = commandContext.getClassLoader();
+            if (classLoader != null) {
+                return classLoader;
             }
         }
         return null;
     }
 
-    private static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
+    protected static Class loadClass(ClassLoader classLoader, String className) throws ClassNotFoundException {
         CommandContext commandContext = Context.getCommandContext();
-        AbstractEngineConfiguration engineConfiguration = null;
-        if (commandContext != null) {
-            engineConfiguration = Context.getCommandContext().getCurrentEngineConfiguration();
-        }
-        boolean useClassForName = engineConfiguration == null || engineConfiguration.isUseClassForNameClassLoading();
+        boolean useClassForName = commandContext == null || commandContext.isUseClassForNameClassLoading();
         return useClassForName ? Class.forName(className, true, classLoader) : classLoader.loadClass(className);
     }
 
     public static boolean isGetter(Method method) {
         String name = method.getName();
         Class<?> type = method.getReturnType();
-        Class<?> params[] = method.getParameterTypes();
+        Class<?>[] params = method.getParameterTypes();
 
         if (!GETTER_PATTERN.matcher(name).matches()) {
             return false;
@@ -349,7 +341,7 @@ public abstract class ReflectUtil {
 
         // special for isXXX boolean
         if (name.startsWith("is")) {
-            return params.length == 0 && type.getSimpleName().equalsIgnoreCase("boolean");
+            return params.length == 0 && "boolean".equalsIgnoreCase(type.getSimpleName());
         }
 
         return params.length == 0 && !type.equals(Void.TYPE);
@@ -358,7 +350,7 @@ public abstract class ReflectUtil {
     public static boolean isSetter(Method method, boolean allowBuilderPattern) {
         String name = method.getName();
         Class<?> type = method.getReturnType();
-        Class<?> params[] = method.getParameterTypes();
+        Class<?>[] params = method.getParameterTypes();
 
         if (!SETTER_PATTERN.matcher(name).matches()) {
             return false;

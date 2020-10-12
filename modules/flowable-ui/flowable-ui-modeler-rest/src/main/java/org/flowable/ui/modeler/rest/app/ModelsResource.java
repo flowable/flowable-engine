@@ -120,6 +120,28 @@ public class ModelsResource {
         return modelRepresentationJson;
     }
 
+    @PostMapping(value = "/rest/import-decision-service-model", produces = "application/json")
+    public ModelRepresentation importDecisionServiceModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importDecisionServiceModel(request, file);
+    }
+
+    /*
+     * specific endpoint for IE9 flash upload component
+     */
+    @PostMapping(value = "/rest/import-decision-service-model/text")
+    public String importDecisionServiceModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        ModelRepresentation modelRepresentation = modelQueryService.importDecisionServiceModel(request, file);
+        String modelRepresentationJson = null;
+        try {
+            modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);
+        } catch (Exception e) {
+            LOGGER.error("Error while processing Model representation json", e);
+            throw new InternalServerErrorException("Model Representation could not be saved");
+        }
+
+        return modelRepresentationJson;
+    }
+
     @PostMapping(value = "/rest/models", produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
@@ -127,7 +149,7 @@ public class ModelsResource {
 
         String json = modelService.createModelJson(modelRepresentation);
 
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserId());
         return new ModelRepresentation(newModel);
     }
 
@@ -179,12 +201,13 @@ public class ModelsResource {
             }
         }
 
+        String currentUserId = SecurityUtils.getCurrentUserId();
         // create the new model
-        Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation, json, currentUserId);
 
         // copy also the thumbnail
         byte[] imageBytes = model.getThumbnail();
-        newModel = modelService.saveModel(newModel, newModel.getModelEditorJson(), imageBytes, false, newModel.getComment(), SecurityUtils.getCurrentUserObject());
+        newModel = modelService.saveModel(newModel, newModel.getModelEditorJson(), imageBytes, false, newModel.getComment(), currentUserId);
 
         return new ModelRepresentation(newModel);
     }

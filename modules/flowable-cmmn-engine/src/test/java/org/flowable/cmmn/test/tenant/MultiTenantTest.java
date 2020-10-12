@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.tenant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +38,8 @@ public class MultiTenantTest extends FlowableCmmnTestCase {
 
     @After
     public void deleteTestCaseModels() {
-        cmmnRepositoryService.deleteDeployment(deploymentIdWithTenant, true);
-        cmmnRepositoryService.deleteDeployment(deploymentIdWithoutTenant, true);
+        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentIdWithTenant);
+        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentIdWithoutTenant);
     }
 
     @Test

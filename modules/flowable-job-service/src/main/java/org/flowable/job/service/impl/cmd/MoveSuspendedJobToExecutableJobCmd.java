@@ -12,15 +12,15 @@
  */
 package org.flowable.job.service.impl.cmd;
 
+import java.io.Serializable;
+
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
-
-import java.io.Serializable;
 
 /**
  * @author martin.grofcik
@@ -30,9 +30,11 @@ public class MoveSuspendedJobToExecutableJobCmd implements Command<Job>, Seriali
     private static final long serialVersionUID = 1L;
 
     protected String jobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public MoveSuspendedJobToExecutableJobCmd(String jobId) {
+    public MoveSuspendedJobToExecutableJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -42,11 +44,11 @@ public class MoveSuspendedJobToExecutableJobCmd implements Command<Job>, Seriali
             throw new FlowableIllegalArgumentException("jobId and job is null");
         }
 
-        SuspendedJobEntity job = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findById(jobId);
+        SuspendedJobEntity job = jobServiceConfiguration.getSuspendedJobEntityManager().findById(jobId);
         if (job == null) {
             throw new JobNotFoundException(jobId);
         }
-        return CommandContextUtil.getJobServiceConfiguration().getJobService().activateSuspendedJob(job);
+        return jobServiceConfiguration.getJobService().activateSuspendedJob(job);
     }
 
     public String getJobId() {

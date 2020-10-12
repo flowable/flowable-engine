@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -79,7 +80,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
             }
         }
 
-        AttachmentEntity attachment = CommandContextUtil.getAttachmentEntityManager().create();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        AttachmentEntity attachment = processEngineConfiguration.getAttachmentEntityManager().create();
         attachment.setName(attachmentName);
         attachment.setProcessInstanceId(processInstanceId);
         attachment.setTaskId(taskId);
@@ -87,54 +89,55 @@ public class CreateAttachmentCmd implements Command<Attachment> {
         attachment.setType(attachmentType);
         attachment.setUrl(url);
         attachment.setUserId(Authentication.getAuthenticatedUserId());
-        attachment.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
+        attachment.setTime(processEngineConfiguration.getClock().getCurrentTime());
 
-        CommandContextUtil.getAttachmentEntityManager().insert(attachment, false);
+        processEngineConfiguration.getAttachmentEntityManager().insert(attachment, false);
 
         if (content != null) {
             byte[] bytes = IoUtil.readInputStream(content, attachmentName);
-            ByteArrayEntity byteArray = CommandContextUtil.getByteArrayEntityManager().create();
+            ByteArrayEntity byteArray = processEngineConfiguration.getByteArrayEntityManager().create();
             byteArray.setBytes(bytes);
-            CommandContextUtil.getByteArrayEntityManager().insert(byteArray);
+            processEngineConfiguration.getByteArrayEntityManager().insert(byteArray);
             attachment.setContentId(byteArray.getId());
             attachment.setContent(byteArray);
         }
 
         ExecutionEntity processInstance = null;
         if (processInstanceId != null) {
-            processInstance = CommandContextUtil.getExecutionEntityManager().findById(processInstanceId);
+            processInstance = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
         }
         
         TaskEntity task = null;
         if (taskId != null) {
-            task = CommandContextUtil.getTaskService().getTask(taskId);
+            task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         }
         
-        CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(task, processInstance, attachmentName, true);
+        processEngineConfiguration.getHistoryManager().createAttachmentComment(task, processInstance, attachmentName, true);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
             if (attachment.getProcessInstanceId() != null) {
-                ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+                ExecutionEntity process = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
                 if (process != null) {
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
 
-            eventDispatcher
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-            eventDispatcher
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, 
+                    processInstanceId, processInstanceId, processDefinitionId), processEngineConfiguration.getEngineCfgKey());
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, 
+                    processInstanceId, processInstanceId, processDefinitionId), processEngineConfiguration.getEngineCfgKey());
         }
 
         return attachment;
     }
 
     protected TaskEntity verifyTaskParameters(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);

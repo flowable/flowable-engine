@@ -14,10 +14,10 @@
 package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -180,13 +179,10 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
             List<HistoricTaskInstance> childHistoricTasks = historyService.createHistoricTaskInstanceQuery()
                             .processInstanceIdWithChildren(processInstance.getId())
                             .list();
-            assertThat(childHistoricTasks).hasSize(2);
-            List<String> taskIds = new ArrayList<>();
-            for (HistoricTaskInstance task : childHistoricTasks) {
-                taskIds.add(task.getId());
-            }
-            assertThat(taskIds).contains(taskBeforeSubProcess.getId());
-            assertThat(taskIds).contains(taskInSubProcess.getId());
+
+            assertThat(childHistoricTasks)
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsOnly(taskBeforeSubProcess.getId(), taskInSubProcess.getId());
         }
         
         childTask = taskService.createTaskQuery().processInstanceIdWithChildren(execution.getProcessInstanceId()).singleResult();
@@ -473,7 +469,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         Task taskAfterSubProcessInSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcessInSubProcess.getName()).isEqualTo("Task after subprocess");
 
-        // Completing this task finishes the first subproces
+        // Completing this task finishes the first subprocess
         taskService.complete(taskAfterSubProcessInSubProcess.getId());
         Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
         assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
@@ -821,7 +817,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(taskAfterSubProcess.getId(), "superVariable")).isEqualTo("Hello from sub process.");
 
         vars.clear();
-        vars.put("x", 5l);
+        vars.put("x", 5L);
 
         // Completing this task ends the super process which leads to a task in
         // the super process
@@ -831,8 +827,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // via expressions
         Task taskInSecondSubProcess = taskQuery.singleResult();
         assertThat(taskInSecondSubProcess.getName()).isEqualTo("Task in subprocess");
-        assertThat(runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y")).isEqualTo(10l);
-        assertThat(taskService.getVariable(taskInSecondSubProcess.getId(), "y")).isEqualTo(10l);
+        assertThat(runtimeService.getVariable(taskInSecondSubProcess.getProcessInstanceId(), "y")).isEqualTo(10L);
+        assertThat(taskService.getVariable(taskInSecondSubProcess.getId(), "y")).isEqualTo(10L);
 
         // Completing this task ends the subprocess which leads to a task in the super process
         taskService.complete(taskInSecondSubProcess.getId());
@@ -840,8 +836,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         // one task in the subprocess should be active after starting the process instance
         Task taskAfterSecondSubProcess = taskQuery.singleResult();
         assertThat(taskAfterSecondSubProcess.getName()).isEqualTo("Task in super process");
-        assertThat(runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z")).isEqualTo(15l);
-        assertThat(taskService.getVariable(taskAfterSecondSubProcess.getId(), "z")).isEqualTo(15l);
+        assertThat(runtimeService.getVariable(taskAfterSecondSubProcess.getProcessInstanceId(), "z")).isEqualTo(15L);
+        assertThat(taskService.getVariable(taskAfterSecondSubProcess.getId(), "z")).isEqualTo(15L);
 
         // and end last task in Super process
         taskService.complete(taskAfterSecondSubProcess.getId());
@@ -1198,7 +1194,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         });
         processEngineConfiguration.setFallbackToDefaultTenant(true);
         try {
-            Assertions.assertThatThrownBy(() -> {
+            assertThatThrownBy(() -> {
                     runtimeService.createProcessInstanceBuilder()
                             .processDefinitionKey("callSimpleSubProcess")
                             .tenantId("someOtherTenant")
@@ -1220,17 +1216,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         tenantId = "defaultFlowable"
     )
     public void testCallSimpleSubProcessWithDefaultTenantFallbackAndEmptyDefaultTenant() {
-        try {
-            runtimeService.createProcessInstanceBuilder()
-                            .processDefinitionKey("callSimpleSubProcess")
-                            .tenantId("someTenant")
-                            .fallbackToDefaultTenant()
-                            .start();
-            fail("Expected process definition not found");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected exception
-        }
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("callSimpleSubProcess")
+                .tenantId("someTenant")
+                .fallbackToDefaultTenant()
+                .start())
+                .as("Expected process definition not found")
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
     
     @Test
@@ -1241,15 +1233,13 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     public void testCallSimpleSubProcessWithGlobalDefaultTenantFallbackAndEmptyDefaultTenant() {
         processEngineConfiguration.setFallbackToDefaultTenant(true);
         try {
-            runtimeService.createProcessInstanceBuilder()
-                            .processDefinitionKey("callSimpleSubProcess")
-                            .tenantId("someTenant")
-                            .fallbackToDefaultTenant()
-                            .start();
-            fail("Expected process definition not found");
-            
-        } catch (FlowableObjectNotFoundException e) {
-            // expected exception
+            assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("callSimpleSubProcess")
+                    .tenantId("someTenant")
+                    .fallbackToDefaultTenant()
+                    .start())
+                    .as("Expected process definition not found")
+                    .isInstanceOf(FlowableObjectNotFoundException.class);
         } finally {
             processEngineConfiguration.setFallbackToDefaultTenant(false);
         }

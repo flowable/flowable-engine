@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -22,7 +23,6 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
@@ -54,18 +54,19 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
             // Part of the same transaction to avoid a race condition with the
             // potentially new jobs (wrt process instance locking) that are created
             // during the execution of the original job
-            new UnlockExclusiveJobCmd(externalWorkerJob).execute(commandContext);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            new UnlockExclusiveJobCmd(externalWorkerJob, cmmnEngineConfiguration.getJobServiceConfiguration()).execute(commandContext);
         }
         return null;
     }
 
     protected abstract void runJobLogic(ExternalWorkerJobEntity externalWorkerJob, CommandContext commandContext);
 
-    protected void moveExternalWorkerJobToExecutableJob(JobServiceConfiguration jobServiceConfiguration, ExternalWorkerJobEntity externalWorkerJob,
-            CommandContext commandContext) {
-        jobServiceConfiguration.getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
+    protected void moveExternalWorkerJobToExecutableJob(ExternalWorkerJobEntity externalWorkerJob, CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        cmmnEngineConfiguration.getJobServiceConfiguration().getJobManager().moveExternalWorkerJobToExecutableJob(externalWorkerJob);
 
-        CommandContextUtil.getIdentityLinkService(commandContext)
+        cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                 .deleteIdentityLinksByScopeIdAndType(externalWorkerJob.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER);
     }
 
@@ -78,8 +79,8 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("workerId must not be empty");
         }
 
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = jobServiceConfiguration.getExternalWorkerJobEntityManager();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        ExternalWorkerJobEntityManager externalWorkerJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getExternalWorkerJobEntityManager();
 
         ExternalWorkerJobEntity job = externalWorkerJobEntityManager.findById(externalJobId);
 

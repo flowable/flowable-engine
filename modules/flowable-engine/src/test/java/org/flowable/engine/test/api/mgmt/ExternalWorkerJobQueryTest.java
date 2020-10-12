@@ -22,7 +22,6 @@ import java.util.List;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -320,7 +319,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(job.getId()).isEqualTo(workerJob.getId());
         assertThat(job.getCorrelationId()).isEqualTo(workerJob.getCorrelationId());
 
-        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult());
+        assertThat(managementService.createExternalWorkerJobQuery().correlationId("invalid").singleResult()).isNull();
     }
 
     @Test
@@ -387,7 +386,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
 
     protected void addUserIdentityLinkToJob(Job job, String userId) {
         managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getIdentityLinkService(commandContext)
+            processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                     .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, userId, null, IdentityLinkType.PARTICIPANT);
 
             return null;
@@ -396,7 +395,7 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
 
     protected void addGroupIdentityLinkToJob(Job job, String groupId) {
         managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getIdentityLinkService(commandContext)
+            processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
                     .createScopeIdentityLink(null, job.getCorrelationId(), ScopeTypes.EXTERNAL_WORKER, null, groupId, IdentityLinkType.PARTICIPANT);
             return null;
         });

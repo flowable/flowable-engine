@@ -21,9 +21,9 @@ import org.flowable.engine.TaskService;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
@@ -71,7 +71,7 @@ public class FlowableTaskFormService {
     protected ObjectMapper objectMapper;
 
     public FormInfo getTaskForm(String taskId) {
-        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
+        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getAuthenticatedSecurityScope(), taskId);
         if (task.getProcessInstanceId() != null) {
             return taskService.getTaskFormModel(task.getId());
         } else {
@@ -125,7 +125,7 @@ public class FlowableTaskFormService {
     }
 
     protected void checkCurrentUserCanModifyTask(Task task) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         if (!permissionService.isTaskOwnerOrAssignee(currentUser, task.getId())) {
             if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
                 throw new NotPermittedException();

@@ -48,7 +48,7 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
 
     @Override
     protected List<EngineDeployer> getCustomDeployers() {
-        return Collections.<EngineDeployer>singletonList(new BpmnDeployer());
+        return Collections.singletonList(new BpmnDeployer());
     }
 
     @Override

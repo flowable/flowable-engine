@@ -20,8 +20,8 @@ import org.flowable.common.engine.api.query.Query;
  * 
  * Note that it is impossible to retrieve the deployment resources through the results of this operation, since that would cause a huge transfer of (possibly) unneeded bytes over the wire.
  * 
- * To retrieve the actual bytes of a deployment resource use the operations on the {@link RepositoryService#getDeploymentResourceNames(String)} and
- * {@link RepositoryService#getResourceAsStream(String, String)}
+ * To retrieve the actual bytes of a deployment resource use the operations on the {@link FormRepositoryService#getDeploymentResourceNames(String)} and
+ * {@link FormRepositoryService#getResourceAsStream(String, String)}
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
@@ -46,14 +46,14 @@ public interface FormDeploymentQuery extends Query<FormDeploymentQuery, FormDepl
     /**
      * Only select deployments with the given category.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see FormDeploymentBuilder#category(String)
      */
     FormDeploymentQuery deploymentCategory(String category);
 
     /**
      * Only select deployments that have a different category then the given one.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see FormDeploymentBuilder#category(String)
      */
     FormDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
 

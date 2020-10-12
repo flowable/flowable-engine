@@ -49,6 +49,10 @@
     box-shadow: 2px 2px 2px 0px rgba(220,220,220,0.50);
 }
 
+.proc-def-list > .list-wrapper {
+    height: calc(100% - 9rem);
+}
+
 .proc-inst-list > .list-header {
     height: 4rem;
 }

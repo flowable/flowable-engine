@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -69,7 +70,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
     }
 
     private void putByteArrayRefIdToMap(String key, ByteArrayRef jobByteArrayRef, Map<String, Object> map) {
-        if(jobByteArrayRef != null) {
+        if (jobByteArrayRef != null) {
             map.put(key, jobByteArrayRef.getId());
         }
     }
@@ -117,7 +118,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
         if (customValuesByteArrayRef == null) {
             customValuesByteArrayRef = new ByteArrayRef();
         }
-        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());
     }
 
     @Override
@@ -150,7 +151,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
         }
-        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", jobHandlerConfiguration);
+        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", jobHandlerConfiguration, getEngineType());
     }
 
     @Override
@@ -158,7 +159,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
         }
-        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes);
+        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes, getEngineType());
     }
 
     @Override
@@ -181,7 +182,7 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new ByteArrayRef();
         }
-        exceptionByteArrayRef.setValue("stacktrace", exception);
+        exceptionByteArrayRef.setValue("stacktrace", exception, getEngineType());
     }
 
     @Override
@@ -244,11 +245,19 @@ public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements Hi
         this.scopeType = scopeType;
     }
 
-    private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
+    protected String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }
-        return jobByteArrayRef.asString();
+        return jobByteArrayRef.asString(getEngineType());
+    }
+    
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
     }
 
     @Override

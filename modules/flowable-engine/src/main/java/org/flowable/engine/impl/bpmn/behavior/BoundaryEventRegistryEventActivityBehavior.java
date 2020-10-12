@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -53,8 +54,10 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        String eventDefinitionKey = getEventDefinitionKey(executionEntity, processEngineConfiguration);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
                         .eventType(eventDefinitionKey)
                         .executionId(executionEntity.getId())
                         .processInstanceId(executionEntity.getProcessInstanceId())
@@ -80,11 +83,11 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         }
 
         if (boundaryEvent.isCancelActivity()) {
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             
-            CommandContext commandContext = Context.getCommandContext();
-            String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
+            String eventDefinitionKey = getEventDefinitionKey(executionEntity, processEngineConfiguration);
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
@@ -96,11 +99,11 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
         super.trigger(executionEntity, triggerName, triggerData);
     }
 
-    protected String getEventDefinitionKey(CommandContext commandContext, ExecutionEntity executionEntity) {
+    protected String getEventDefinitionKey(ExecutionEntity executionEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
         Object key = null;
 
         if (StringUtils.isNotEmpty(eventDefinitionKey)) {
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager()
+            Expression expression = processEngineConfiguration.getExpressionManager()
                     .createExpression(eventDefinitionKey);
             key = expression.getValue(executionEntity);
         }

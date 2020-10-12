@@ -16,7 +16,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
 
     @Override
     public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
-        ObjectMapper objectMapper = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper();
+        ObjectMapper objectMapper = commandContext.getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
 
@@ -74,7 +73,7 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
     }
 
     protected byte[] getJobBytes(HistoryJobEntity job) {
-        return job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
+        return job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes(job.getScopeType());
     }
 
     protected abstract void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode);

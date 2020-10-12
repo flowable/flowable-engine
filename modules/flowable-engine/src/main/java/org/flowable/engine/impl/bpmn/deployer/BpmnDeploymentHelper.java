@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -48,8 +49,7 @@ public class BpmnDeploymentHelper {
      * @throws FlowableException
      *             if any two processes have the same key
      */
-    public void verifyProcessDefinitionsDoNotShareKeys(
-            Collection<ProcessDefinitionEntity> processDefinitions) {
+    public void verifyProcessDefinitionsDoNotShareKeys(Collection<ProcessDefinitionEntity> processDefinitions) {
         Set<String> keySet = new LinkedHashSet<>();
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keySet.contains(processDefinition.getKey())) {
@@ -192,7 +192,8 @@ public class BpmnDeploymentHelper {
             ProcessDefinitionEntity processDefinition, ExpressionType expressionType) {
 
         if (expressions != null) {
-            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            IdentityLinkService identityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService();
             Iterator<String> iterator = expressions.iterator();
             while (iterator.hasNext()) {
                 @SuppressWarnings("cast")

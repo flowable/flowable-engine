@@ -46,6 +46,14 @@ public interface DmnDecision {
      */
     String getResourceName();
 
+    /**
+     * Does this decision have a graphical notation defined (such that a diagram can be generated)?
+     */
+    boolean hasGraphicalNotation();
+
+    /** The resource name in the deployment of the diagram image (if any). */
+    String getDiagramResourceName();
+
     /** The deployment in which this definition is contained. */
     String getDeploymentId();
 

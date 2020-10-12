@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-parent</artifactId>
-        <version>6.5.1-SNAPSHOT</version>
+        <version>6.6.0-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-app</artifactId>
     <packaging>war</packaging>
@@ -40,6 +40,15 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         
         <dependency>
@@ -139,6 +148,39 @@
             </plugin>
 
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.google.cloud.tools</groupId>
+                    <artifactId>jib-maven-plugin</artifactId>
+                    <configuration>
+                        <container>
+                            <appRoot>/app</appRoot>
+                            <ports>
+                                <port>8080</port>
+                            </ports>
+                            <environment>
+                                <JAVA_OPTS>-Xmx1024M</JAVA_OPTS>
+                                <SERVER_PORT>8080</SERVER_PORT>
+                            </environment>
+                            <entrypoint>
+                                <entrypoint>/flowable-entrypoint.sh</entrypoint>
+                            </entrypoint>
+                            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        </container>
+                        <extraDirectories>
+                            <paths>src/main/jib</paths>
+                            <permissions>
+                                <permission>
+                                    <file>/flowable-entrypoint.sh</file>
+                                    <mode>544</mode> <!-- Read/execute for owner, read for group/other -->
+                                </permission>
+                            </permissions>
+                        </extraDirectories>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
     </build>
     <profiles>
@@ -231,7 +273,7 @@
                 </dependency>
             </dependencies>
         </profile>
-        <!-- docker image build and push -->
+        <!-- docker image build -->
         <profile>
             <id>docker</id>
             <dependencies>
@@ -240,84 +282,121 @@
                     <artifactId>postgresql</artifactId>
                     <scope>compile</scope>
                 </dependency>
+                <!-- Add the starter-tomcat as a compile dependency, in order to be in the libs for jib -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>compile</scope>
+                </dependency>
             </dependencies>
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-deploy-plugin</artifactId>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
-                            <skip>true</skip>
+                            <from>
+                                <image>flowable/flowable-jre:11.0.7</image>
+                            </from>
+                            <to>
+                                <image>flowable/flowable-ui</image>
+                            </to>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>docker-resources</id>
-                                <phase>validate</phase>
+                                <phase>package</phase>
                                 <goals>
-                                    <goal>copy-resources</goal>
+                                    <goal>dockerBuild</goal>
                                 </goals>
-                                <configuration>
-                                    <outputDirectory>target/</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/main/docker/</directory>
-                                            <filtering>false</filtering>
-                                            <excludes>
-                                                <exclude>**/*.yml</exclude>
-                                            </excludes>
-                                        </resource>
-                                    </resources>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- docker image build and push with version tag -->
+        <profile>
+            <id>dockerPublish</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <!-- Add the starter-tomcat as a compile dependency, in order to be in the libs for jib -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
                     <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <configuration>
+                            <from>
+                                <image>flowable/flowable-jre:11.0.7</image>
+                            </from>
+                            <to>
+                                <image>flowable/flowable-ui:${project.version}</image>
+                            </to>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>build</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                                <configuration>
-                                    <tag>latest</tag>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>push-latest</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>push</goal>
-                                </goals>
-                                <configuration>
-                                    <tag>latest</tag>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>push-version</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                    <goal>push</goal>
-                                </goals>
-                                <configuration>
-                                    <tag>${project.version}</tag>
-                                </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- docker image build and push with version and latest tag -->
+        <profile>
+            <id>dockerPublishWithLatest</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+                <!-- Add the starter-tomcat as a compile dependency, in order to be in the libs for jib -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
-                            <repository>flowable/flowable-ui</repository>
-                            <buildArgs>
-                                <WAR_FILE>${project.build.finalName}.war</WAR_FILE>
-                            </buildArgs>
-                            <contextDirectory>${project.build.directory}</contextDirectory>
-                            <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                            <from>
+                                <image>flowable/flowable-jre:11.0.7</image>
+                            </from>
+                            <to>
+                                <image>flowable/flowable-ui:${project.version}</image>
+                                <tags>
+                                    <tag>flowable/flowable-ui:latest</tag>
+                                </tags>
+                            </to>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

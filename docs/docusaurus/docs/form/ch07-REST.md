@@ -463,7 +463,7 @@ It’s possible to support additional variable-types with a custom JSON represen
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Deployments
 
@@ -1491,7 +1491,7 @@ Returns a read-only view of the engine that is used in this REST-service.
 
     {
        "name":"default",
-       "version":"6.5.0.event-SNAPSHOT",
+       "version":"6.6.0",
        "resourceUrl":"file://flowable/flowable.form.cfg.xml",
        "exception":null
     }

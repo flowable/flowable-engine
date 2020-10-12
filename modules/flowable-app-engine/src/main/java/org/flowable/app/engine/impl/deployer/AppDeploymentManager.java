@@ -86,11 +86,11 @@ public class AppDeploymentManager {
         return appDefinition;
     }
 
-    public AppDefinition findDeployedAppDefinitionByKeyAndVersionAndTenantId(String caseDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
+    public AppDefinition findDeployedAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer appDefinitionVersion, String tenantId) {
         AppDefinition appDefinition = (AppDefinitionEntity) appDefinitionEntityManager
-                .findAppDefinitionByKeyAndVersionAndTenantId(caseDefinitionKey, caseDefinitionVersion, tenantId);
+                .findAppDefinitionByKeyAndVersionAndTenantId(appDefinitionKey, appDefinitionVersion, tenantId);
         if (appDefinition == null) {
-            throw new FlowableObjectNotFoundException("no cases deployed with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'", AppDefinition.class);
+            throw new FlowableObjectNotFoundException("no apps deployed with key = '" + appDefinitionKey + "' and version = '" + appDefinitionVersion + "'", AppDefinition.class);
         }
         appDefinition = resolveAppDefinition(appDefinition).getAppDefinition();
         return appDefinition;

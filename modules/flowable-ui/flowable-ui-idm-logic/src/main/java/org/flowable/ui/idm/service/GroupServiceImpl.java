@@ -46,10 +46,12 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         return groupQuery.orderByGroupName().asc().list();
     }
 
+    @Override
     public Group getGroup(String groupId) {
         return identityService.createGroupQuery().groupId(groupId).singleResult();
     }
 
+    @Override
     public List<User> getGroupUsers(String groupId, String filter, Integer page, Integer pageSize) {
         int pageValue = page != null ? page.intValue() : 0;
         int pageSizeValue = pageSize != null ? pageSize.intValue() : 50;
@@ -58,6 +60,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         return userQuery.listPage(pageValue, pageSizeValue);
     }
 
+    @Override
     public long countTotalGroupUsers(String groupId, String filter, Integer page, Integer pageSize) {
         return createUsersForGroupQuery(groupId, filter).count();
     }
@@ -70,6 +73,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         return userQuery;
     }
 
+    @Override
     public Group createNewGroup(String id, String name, String type) {
         if (StringUtils.isBlank(name)) {
             throw new BadRequestException("Group name required");
@@ -88,6 +92,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         return newGroup;
     }
 
+    @Override
     public Group updateGroupName(String groupId, String name) {
         if (StringUtils.isBlank(name)) {
             throw new BadRequestException("Group name required");
@@ -104,6 +109,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         return group;
     }
 
+    @Override
     public void deleteGroup(String groupId) {
         Group group = identityService.createGroupQuery().groupId(groupId).singleResult();
         if (group == null) {
@@ -113,6 +119,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         identityService.deleteGroup(groupId);
     }
 
+    @Override
     public void addGroupMember(String groupId, String userId) {
         verifyGroupMemberExists(groupId, userId);
         Group group = identityService.createGroupQuery().groupId(groupId).singleResult();
@@ -128,6 +135,7 @@ public class GroupServiceImpl extends AbstractIdmService implements GroupService
         identityService.createMembership(userId, groupId);
     }
 
+    @Override
     public void deleteGroupMember(String groupId, String userId) {
         verifyGroupMemberExists(groupId, userId);
         Group group = identityService.createGroupQuery().groupId(groupId).singleResult();

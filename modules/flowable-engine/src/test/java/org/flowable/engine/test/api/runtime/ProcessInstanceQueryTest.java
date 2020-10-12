@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -144,7 +143,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.<String>emptySet()))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.emptySet()))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
@@ -342,7 +341,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
-        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(Collections.<String>emptySet()))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionIds(Collections.emptySet()))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
@@ -976,7 +975,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         processInstances = runtimeService.createProcessInstanceQuery().variableValueLessThan("doubleVar", 55555.5555).list();
         assertThat(processInstances).hasSize(2);
 
-        List<String> expectedIds = Arrays.asList(processInstance1.getId(), processInstance2.getId());
         assertThat(processInstances)
                 .extracting(ProcessInstance::getId)
                 .containsExactlyInAnyOrder(processInstance1.getId(), processInstance2.getId());
@@ -1849,7 +1847,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(processInstances).hasSize(5);
 
         for (ProcessInstance processInstance : processInstances) {
-            assertThat(processInstanceIds.contains(processInstance.getId())).isTrue();
+            assertThat(processInstanceIds).contains(processInstance.getId());
         }
     }
 
@@ -2147,5 +2145,102 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .list())
                 .extracting(ProcessInstance::getId)
                 .containsExactly(processInstanceIds);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryVariableValueEqualsAndNotEquals() {
+        ProcessInstance processWithStringValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With string value")
+                .variable("var", "TEST")
+                .start();
+
+        ProcessInstance processWithNullValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With null value")
+                .variable("var", null)
+                .start();
+
+        ProcessInstance processWithLongValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With long value")
+                .variable("var", 100L)
+                .start();
+
+        ProcessInstance processWithDoubleValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With double value")
+                .variable("var", 45.55)
+                .start();
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", "TEST").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", processWithNullValue.getId()),
+                        tuple("With long value", processWithLongValue.getId()),
+                        tuple("With double value", processWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("var", "TEST").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", processWithStringValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", 100L).list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", processWithStringValue.getId()),
+                        tuple("With null value", processWithNullValue.getId()),
+                        tuple("With double value", processWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("var", 100L).list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With long value", processWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", 45.55).list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", processWithStringValue.getId()),
+                        tuple("With null value", processWithNullValue.getId()),
+                        tuple("With long value", processWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("var", 45.55).list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With double value", processWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueNotEquals("var", "test").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", processWithStringValue.getId()),
+                        tuple("With null value", processWithNullValue.getId()),
+                        tuple("With long value", processWithLongValue.getId()),
+                        tuple("With double value", processWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", processWithNullValue.getId()),
+                        tuple("With long value", processWithLongValue.getId()),
+                        tuple("With double value", processWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("var", "test").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .isEmpty();
+
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(ProcessInstance::getName, ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", processWithStringValue.getId())
+                );
     }
 }

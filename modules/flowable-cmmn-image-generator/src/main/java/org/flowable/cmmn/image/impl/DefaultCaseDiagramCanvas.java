@@ -264,7 +264,7 @@ public class DefaultCaseDiagramCanvas {
         Stroke originalStroke = g.getStroke();
 
         g.setPaint(CONNECTION_COLOR);
-        if (connectionType.equals("association")) {
+        if ("association".equals(connectionType)) {
             g.setStroke(ASSOCIATION_STROKE);
         }
 
@@ -313,7 +313,7 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
-    
+
     public void drawGenericEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, null, scaleFactor);
     }
@@ -325,7 +325,7 @@ public class DefaultCaseDiagramCanvas {
     public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
     }
-    
+
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();
         g.setPaint(EVENT_COLOR);
@@ -447,6 +447,7 @@ public class DefaultCaseDiagramCanvas {
 
         g.setPaint(originalPaint);
         // text
+
         if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             int boxWidth = width - (2 * TEXT_PADDING);
             int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;

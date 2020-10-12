@@ -29,6 +29,13 @@ public class GatewayAsncAndExclusiveConverterTest extends AbstractConverterTest 
         BpmnModel bpmnModel = readJsonFile();
         validateModel(bpmnModel);
     }
+    
+    @Test
+    public void doubleConversionValidation() throws Exception {
+        BpmnModel bpmnModel = readJsonFile();
+        bpmnModel = convertToJsonAndBack(bpmnModel);
+        validateModel(bpmnModel);
+    }
 
     @Override
     protected String getResource() {

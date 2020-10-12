@@ -218,7 +218,6 @@ function _zoom(zoomIn)
 }
 
 var modelUrl;
-
 if (modelType == 'runtime') {
 	if (historyModelId) {
     	modelUrl = FLOWABLE.APP_URL.getProcessInstanceModelJsonHistoryUrl(historyModelId);

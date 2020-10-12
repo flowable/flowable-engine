@@ -34,7 +34,7 @@ public class IdentityLinkEntityManagerImpl
         implements IdentityLinkEntityManager {
 
     public IdentityLinkEntityManagerImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration, IdentityLinkDataManager identityLinkDataManager) {
-        super(identityLinkServiceConfiguration, identityLinkDataManager);
+        super(identityLinkServiceConfiguration, identityLinkServiceConfiguration.getEngineName(), identityLinkDataManager);
     }
 
     @Override

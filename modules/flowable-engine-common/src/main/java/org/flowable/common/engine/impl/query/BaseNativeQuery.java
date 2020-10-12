@@ -22,7 +22,7 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
 
     private static final long serialVersionUID = 1L;
 
-    protected static enum ResultType {
+    protected enum ResultType {
         LIST, LIST_PAGE, SINGLE_RESULT, COUNT
     }
 

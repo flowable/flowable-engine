@@ -20,8 +20,8 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Frederik Heremans
@@ -30,12 +30,16 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class GetJobExceptionStacktraceCmd implements Command<String>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    private String jobId;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
+    protected String jobId;
     protected JobType jobType;
 
-    public GetJobExceptionStacktraceCmd(String jobId, JobType jobType) {
+    public GetJobExceptionStacktraceCmd(String jobId, JobType jobType, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
         this.jobType = jobType;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -47,20 +51,22 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
         AbstractRuntimeJobEntity job = null;
         switch (jobType) {
         case ASYNC:
-            job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getJobEntityManager().findById(jobId);
             break;
         case TIMER:
-            job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getTimerJobEntityManager().findById(jobId);
             break;
         case SUSPENDED:
-            job = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getSuspendedJobEntityManager().findById(jobId);
             break;
         case DEADLETTER:
-            job = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getDeadLetterJobEntityManager().findById(jobId);
             break;
         case EXTERNAL_WORKER:
-            job = CommandContextUtil.getExternalWorkerJobEntityManager(commandContext).findById(jobId);
+            job = jobServiceConfiguration.getExternalWorkerJobEntityManager().findById(jobId);
             break;
+         default:
+             break;
         }
 
         if (job == null) {

@@ -12,6 +12,13 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
@@ -19,26 +26,20 @@ import org.flowable.content.api.ContentService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
+import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.model.component.SimpleContentTypeMapper;
 import org.flowable.ui.task.model.runtime.ContentItemRepresentation;
-import org.flowable.ui.common.service.idm.cache.UserCache;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractRelatedContentResource {
 
@@ -64,25 +65,25 @@ public abstract class AbstractRelatedContentResource {
     protected UserCache userCache;
 
     public ResultListDataRepresentation getContentItemsForTask(String taskId) {
-        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getAuthenticatedSecurityScope(), taskId);
         return createResultRepresentation(contentService.createContentItemQuery().taskId(taskId).list());
     }
 
     public ResultListDataRepresentation getContentItemsForCase(String caseInstanceId) {
-        permissionService.hasReadPermissionOnCase(SecurityUtils.getCurrentUserObject(), caseInstanceId);
+        permissionService.hasReadPermissionOnCase(SecurityUtils.getAuthenticatedSecurityScope(), caseInstanceId);
         return createResultRepresentation(contentService.createContentItemQuery().scopeType("cmmn").scopeId(caseInstanceId).list());
     }
 
     public ResultListDataRepresentation getContentItemsForProcessInstance(String processInstanceId) {
         // TODO: check if process exists
-        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstanceId)) {
+        if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getAuthenticatedSecurityScope(), processInstanceId)) {
             throw new NotPermittedException("You are not allowed to read the process with id: " + processInstanceId);
         }
         return createResultRepresentation(contentService.createContentItemQuery().processInstanceId(processInstanceId).list());
     }
 
     public ContentItemRepresentation createContentItemOnTask(String taskId, MultipartFile file) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
@@ -96,7 +97,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     public ContentItemRepresentation createContentItemOnTask(String taskId, ContentItemRepresentation contentItem) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
@@ -111,7 +112,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     public ContentItemRepresentation createContentItemOnProcessInstance(String processInstanceId, ContentItemRepresentation contentItem) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         if (!permissionService.canAddRelatedContentToProcessInstance(user, processInstanceId)) {
             throw new NotPermittedException("You are not allowed to read the process with id: " + processInstanceId);
@@ -121,7 +122,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     public ContentItemRepresentation createContentItemOnProcessInstance(String processInstanceId, MultipartFile file) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         if (!permissionService.canAddRelatedContentToProcessInstance(user, processInstanceId)) {
             throw new NotPermittedException("You are not allowed to read the process with id: " + processInstanceId);
@@ -130,7 +131,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     public ContentItemRepresentation createContentItemOnCase(String caseId, MultipartFile file) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         if (!permissionService.canAddRelatedContentToCase(user, caseId)) {
             throw new NotPermittedException("You are not allowed to read the case with id: " + caseId);
@@ -139,7 +140,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     public ContentItemRepresentation createTemporaryRawContentItem(MultipartFile file) {
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
         return uploadFile(user, file, null, null, null);
     }
 
@@ -154,7 +155,7 @@ public abstract class AbstractRelatedContentResource {
             throw new NotFoundException("No content found with id: " + contentId);
         }
 
-        if (!permissionService.hasWritePermissionOnRelatedContent(SecurityUtils.getCurrentUserObject(), contentItem)) {
+        if (!permissionService.hasWritePermissionOnRelatedContent(SecurityUtils.getAuthenticatedSecurityScope(), contentItem)) {
             throw new NotPermittedException("You are not allowed to delete the content with id: " + contentId);
         }
 
@@ -173,7 +174,7 @@ public abstract class AbstractRelatedContentResource {
             throw new NotFoundException("No content found with id: " + contentId);
         }
 
-        if (!permissionService.canDownloadContent(SecurityUtils.getCurrentUserObject(), contentItem)) {
+        if (!permissionService.canDownloadContent(SecurityUtils.getAuthenticatedSecurityScope(), contentItem)) {
             throw new NotPermittedException("You are not allowed to view the content with id: " + contentId);
         }
 
@@ -190,7 +191,7 @@ public abstract class AbstractRelatedContentResource {
             throw new NotFoundException("Raw content not yet available for id: " + contentId);
         }
 
-        if (!permissionService.canDownloadContent(SecurityUtils.getCurrentUserObject(), contentItem)) {
+        if (!permissionService.canDownloadContent(SecurityUtils.getAuthenticatedSecurityScope(), contentItem)) {
             throw new NotPermittedException("You are not allowed to read the content with id: " + contentId);
         }
 
@@ -208,7 +209,7 @@ public abstract class AbstractRelatedContentResource {
         }
     }
 
-    protected ContentItemRepresentation uploadFile(User user, MultipartFile file, String taskId, String processInstanceId, String caseId) {
+    protected ContentItemRepresentation uploadFile(SecurityScope user, MultipartFile file, String taskId, String processInstanceId, String caseId) {
         if (file != null && file.getName() != null) {
             try {
                 String contentType = file.getContentType();
@@ -227,8 +228,8 @@ public abstract class AbstractRelatedContentResource {
                     contentItem.setScopeId(caseId);
                 }
                 contentItem.setMimeType(contentType);
-                contentItem.setCreatedBy(user.getId());
-                contentItem.setLastModifiedBy(user.getId());
+                contentItem.setCreatedBy(user.getUserId());
+                contentItem.setLastModifiedBy(user.getUserId());
                 contentService.saveContentItem(contentItem, file.getInputStream());
 
                 return createContentItemResponse(contentItem);
@@ -248,7 +249,7 @@ public abstract class AbstractRelatedContentResource {
             throw new BadRequestException("Name, source and sourceId are required parameters");
         }
 
-        User user = SecurityUtils.getCurrentUserObject();
+        SecurityScope user = SecurityUtils.getAuthenticatedSecurityScope();
 
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setName(contentItemBody.getName());
@@ -257,8 +258,8 @@ public abstract class AbstractRelatedContentResource {
         contentItem.setContentStoreId(contentItemBody.getContentStoreId());
         contentItem.setContentStoreName(contentItemBody.getContentStoreName());
         contentItem.setMimeType(contentItemBody.getMimeType());
-        contentItem.setCreatedBy(user.getId());
-        contentItem.setLastModifiedBy(user.getId());
+        contentItem.setCreatedBy(user.getUserId());
+        contentItem.setLastModifiedBy(user.getUserId());
         contentService.saveContentItem(contentItem);
 
         return createContentItemResponse(contentItem);

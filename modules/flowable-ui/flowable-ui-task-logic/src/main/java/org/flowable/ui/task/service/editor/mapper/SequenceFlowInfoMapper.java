@@ -17,6 +17,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 
 public class SequenceFlowInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         SequenceFlow sequenceFlow = (SequenceFlow) element;
 

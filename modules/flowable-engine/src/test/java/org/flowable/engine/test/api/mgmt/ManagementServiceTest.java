@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -33,6 +34,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -40,6 +43,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -392,42 +396,44 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     void testFindJobByCorrelationId() {
         Job asyncJob = managementService.executeCommand(context -> {
-            JobEntity job = CommandContextUtil.getJobService(context).createJob();
+            JobService jobService = CommandContextUtil.getJobService(context);
+            JobEntity job = jobService.createJob();
             job.setJobType("testAsync");
-            CommandContextUtil.getJobService(context).insertJob(job);
+            jobService.insertJob(job);
             return job;
         });
 
         Job timerJob = managementService.executeCommand(context -> {
-            TimerJobEntity job = CommandContextUtil.getTimerJobService(context).createTimerJob();
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(context);
+            TimerJobEntity job = timerJobService.createTimerJob();
             job.setJobType("testTimer");
-            CommandContextUtil.getTimerJobService(context).insertTimerJob(job);
+            timerJobService.insertTimerJob(job);
             return job;
         });
 
         Job deadLetterJob = managementService.executeCommand(context -> {
-            DeadLetterJobEntity job = CommandContextUtil.getJobService(context).createDeadLetterJob();
+            JobService jobService = CommandContextUtil.getJobService(context);
+            DeadLetterJobEntity job = jobService.createDeadLetterJob();
             job.setJobType("testDeadLetter");
-            CommandContextUtil.getJobService(context).insertDeadLetterJob(job);
+            jobService.insertDeadLetterJob(job);
             return job;
         });
 
         Job suspendedJob = managementService.executeCommand(context -> {
-            SuspendedJobEntity job = CommandContextUtil.getJobServiceConfiguration(context)
+            SuspendedJobEntity job = processEngineConfiguration.getJobServiceConfiguration()
                     .getSuspendedJobEntityManager()
                     .create();
             job.setJobType("testSuspended");
-            CommandContextUtil.getJobServiceConfiguration(context)
-                    .getSuspendedJobEntityManager()
-                    .insert(job);
+            processEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().insert(job);
             return job;
         });
 
 
         Job externalWorkerJob = managementService.executeCommand(context -> {
-            ExternalWorkerJobEntity job = CommandContextUtil.getJobService(context).createExternalWorkerJob();
+            JobService jobService = CommandContextUtil.getJobService(context);
+            ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
             job.setJobType("testExternal");
-            CommandContextUtil.getJobService(context).insertExternalWorkerJob(job);
+            jobService.insertExternalWorkerJob(job);
             return job;
         });
 
@@ -465,4 +471,26 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         managementService.deleteSuspendedJob(suspendedJob.getId());
         managementService.deleteExternalWorkerJob(externalWorkerJob.getId());
     }
+
+    @Test
+    void testMoveDeadLetterJobToInvalidHistoryJob() {
+        for (String jobType : Arrays.asList(JobEntity.JOB_TYPE_MESSAGE, JobEntity.JOB_TYPE_TIMER, JobEntity.JOB_TYPE_EXTERNAL_WORKER)) {
+            Job deadLetterJob = managementService.executeCommand(context -> {
+                JobService jobService = CommandContextUtil.getProcessEngineConfiguration(context).getJobServiceConfiguration().getJobService();
+                DeadLetterJobEntity job = jobService.createDeadLetterJob();
+                job.setJobType(jobType);
+                jobService.insertDeadLetterJob(job);
+                return job;
+            });
+
+            try {
+                managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
+                Assert.fail();
+            } catch (FlowableIllegalArgumentException e) { }
+
+            managementService.deleteDeadLetterJob(deadLetterJob.getId());
+        }
+
+    }
+
 }

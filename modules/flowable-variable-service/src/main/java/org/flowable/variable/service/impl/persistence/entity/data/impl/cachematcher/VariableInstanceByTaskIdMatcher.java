@@ -23,7 +23,7 @@ public class VariableInstanceByTaskIdMatcher extends CachedEntityMatcherAdapter<
     @Override
     public boolean isRetained(VariableInstanceEntity variableInstanceEntity, Object parameter) {
         return variableInstanceEntity.getTaskId() != null
-                && variableInstanceEntity.getTaskId().equals((String) parameter);
+                && variableInstanceEntity.getTaskId().equals(parameter);
     }
 
 }

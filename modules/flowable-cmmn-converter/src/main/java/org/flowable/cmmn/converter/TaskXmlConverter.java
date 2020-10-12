@@ -54,7 +54,7 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
                 task = convertToJavaServiceTask(xtr, className);
 
             } else if (Objects.equals(type, HttpServiceTask.HTTP_TASK)) {
-                task = convertToHttpTask(className);
+                task = convertToHttpTask(xtr, className);
 
             } else if (Objects.equals(type, ServiceTask.MAIL_TASK)) {
                 task = convertToMailTask();
@@ -112,11 +112,18 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         return serviceTask;
     }
 
-    protected Task convertToHttpTask(String className) {
+    protected Task convertToHttpTask(XMLStreamReader xtr, String className) {
         HttpServiceTask httpServiceTask = new HttpServiceTask();
         if (StringUtils.isNotBlank(className)) {
             httpServiceTask.setImplementation(className);
         }
+
+        String parallelInSameTransaction = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION);
+
+        if (StringUtils.isNotEmpty(parallelInSameTransaction)) {
+            httpServiceTask.setParallelInSameTransaction(Boolean.parseBoolean(parallelInSameTransaction));
+        }
+
         return httpServiceTask;
     }
 

@@ -55,7 +55,7 @@ public class IdmBootstrapper implements ApplicationListener<ContextRefreshedEven
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (event.getApplicationContext().getParent() == null) { // Using Spring MVC, there are multiple child contexts. We only care about the root
 
-            if (ldapProperties == null || !ldapProperties.isEnabled()) {
+            if ((ldapProperties == null || !ldapProperties.isEnabled()) && !idmAppProperties.getKeycloak().isEnabled()) {
                 if (idmAppProperties.isBootstrap()) {
                     // First create the default IDM entities
                     createDefaultAdminUserAndPrivileges();

@@ -176,7 +176,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
      *            the name of the entity
      * @return
      * @throws FlowableIllegalArgumentException
-     *             when the given entity name
+     *             when the given entity type is not found
      */
     protected Class<?> getEntityType(String entityType) {
         if (entityType != null) {

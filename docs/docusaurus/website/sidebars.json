@@ -15,8 +15,6 @@
     	"bpmn/ch10-JPA",
     	"bpmn/ch11-History",
     	"bpmn/ch12-IDM",
-    	"bpmn/ch13-Designer",
-    	"bpmn/ch14-Applications",
     	"bpmn/ch15-REST",
     	"bpmn/ch16-Cdi",
     	"bpmn/ch17-Ldap",
@@ -55,6 +53,10 @@
 		"form/ch05-Deployment",
 		"form/ch06-Form-Introduction",
 		"form/ch07-REST"
+	],
+    "Applications Guide": [
+    	"bpmn/ch14-Applications",
+    	"bpmn/ch13-Designer"
 	],
     "Migration from v5": ["migration"],
     "Disclaimer": ["disclaimer"]

@@ -12,12 +12,11 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.concurrent.ManagedThreadFactory;
 
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,9 @@ import org.slf4j.LoggerFactory;
  * In Java EE 7, all application servers should provide access to a {@link ManagedThreadFactory}.
  * 
  * @author Dimitris Mandalidis
+ * @deprecated The factory should be configured in the engine configuration
  */
+@Deprecated
 public class ManagedAsyncJobExecutor extends DefaultAsyncJobExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManagedAsyncJobExecutor.class);
@@ -47,22 +48,15 @@ public class ManagedAsyncJobExecutor extends DefaultAsyncJobExecutor {
         if (threadFactory == null) {
             LOGGER.warn("A managed thread factory was not found, falling back to self-managed threads");
             super.initAsyncJobExecutionThreadPool();
-        } else {
-            if (threadPoolQueue == null) {
-                LOGGER.info("Creating thread pool queue of size {}", queueSize);
-                threadPoolQueue = new ArrayBlockingQueue<>(queueSize);
-            }
-
-            if (executorService == null) {
-                LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
-
-                ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
-                threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-                executorService = threadPoolExecutor;
-
-            }
-
-            startJobAcquisitionThread();
+        } else if (taskExecutor != null) {
+            // This is for backwards compatibility
+            // If there is no task executor then use the Default one and start it immediately.
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+            defaultAsyncTaskExecutor.setThreadFactory(threadFactory);
+            defaultAsyncTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+            defaultAsyncTaskExecutor.start();
+            this.taskExecutor = defaultAsyncTaskExecutor;
+            this.shutdownTaskExecutor = true;
         }
     }
 }

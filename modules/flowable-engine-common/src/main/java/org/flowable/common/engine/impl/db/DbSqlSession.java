@@ -29,7 +29,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.Page;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.Session;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -75,9 +75,9 @@ public class DbSqlSession implements Session {
 
     // insert ///////////////////////////////////////////////////////////////////
 
-    public void insert(Entity entity) {
+    public void insert(Entity entity, IdGenerator idGenerator) {
         if (entity.getId() == null) {
-            String id = Context.getCommandContext().getCurrentEngineConfiguration().getIdGenerator().getNextId();
+            String id = idGenerator.getNextId();
             if (dbSqlSessionFactory.isUsePrefixId()) {
                 id = entity.getIdPrefix() + id;
             }
@@ -112,7 +112,7 @@ public class DbSqlSession implements Session {
 
     /**
      * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter.
-     * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the {@link EntityDependencyOrder}.
+     * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the EntityDependencyOrder.
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
         if (!bulkDeleteOperations.containsKey(entityClass)) {

@@ -51,7 +51,7 @@ public class SetChannelDefinitionCategoryCmd implements Command<Void> {
         // Update category
         channelDefinition.setCategory(category);
 
-        // Remove channel from cache, it will be refetched later
+        // Remove channel from cache, it will be refetch later
         DeploymentCache<ChannelDefinitionCacheEntry> channelDefinitionCache = CommandContextUtil.getEventRegistryConfiguration().getChannelDefinitionCache();
         if (channelDefinitionCache != null) {
             channelDefinitionCache.remove(channelDefinitionId);

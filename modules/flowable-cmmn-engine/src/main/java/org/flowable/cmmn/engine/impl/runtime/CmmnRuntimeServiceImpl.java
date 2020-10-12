@@ -276,22 +276,22 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     
     @Override
     public GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery() {
-        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new GenericEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
     
     @Override
     public SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery() {
-        return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
 
     @Override
     public UserEventListenerInstanceQuery createUserEventListenerInstanceQuery() {
-        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor());
+        return new UserEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
     
     @Override
     public EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(configuration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(configuration.getCommandExecutor(), configuration.getEventSubscriptionServiceConfiguration());
     }
 
     @Override
@@ -355,7 +355,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     }
 
     public void changePlanItemState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
-        commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder));
+        commandExecutor.execute(new ChangePlanItemStateCmd(changePlanItemStateBuilder, configuration));
     }
 
 }

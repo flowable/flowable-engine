@@ -13,11 +13,14 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -186,7 +189,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testProcessInstanceVariableEventsOnCallActivity() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callVariableProcess",
-                Collections.<String, Object>singletonMap("parentVar1", "parentVar1Value"));
+                Collections.singletonMap("parentVar1", "parentVar1Value"));
         assertThat(processInstance).isNotNull();
 
         assertThat(listener.getEventsReceived()).hasSize(6);
@@ -198,15 +201,15 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
                 nrOfCreated++;
 
-                if (event.getVariableName().equals("parentVar1")) {
+                if ("parentVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar1");
 
-                } else if (event.getVariableName().equals("subVar1")) {
+                } else if ("subVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("subVar1");
 
-                } else if (event.getVariableName().equals("parentVar2")) {
+                } else if ("parentVar2".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_CREATED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar2");
 
@@ -218,15 +221,15 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
 
                 nrOfDeleted++;
 
-                if (event.getVariableName().equals("parentVar1")) {
+                if ("parentVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar1");
 
-                } else if (event.getVariableName().equals("subVar1")) {
+                } else if ("subVar1".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("subVar1");
 
-                } else if (event.getVariableName().equals("parentVar2")) {
+                } else if ("parentVar2".equals(event.getVariableName())) {
                     assertThat(event.getType()).isEqualTo(FlowableEngineEventType.VARIABLE_DELETED);
                     assertThat(event.getVariableName()).isEqualTo("parentVar2");
 
@@ -385,6 +388,10 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task newTask = taskService.newTask();
         try {
             taskService.saveTask(newTask);
+
+            assertThatThrownBy(() -> taskService.setVariable(null, null, null))
+                    .isInstanceOf(FlowableIllegalArgumentException.class)
+                    .hasMessage("variableName is null");
 
             taskService.setVariable(newTask.getId(), "testVariable", 123);
             taskService.setVariable(newTask.getId(), "testVariable", 456);

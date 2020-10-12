@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -163,6 +164,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -191,7 +193,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
-        initClock();
     }
 
     // services
@@ -334,6 +335,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG;
+    }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.FORM;
     }
 
     @Override
@@ -578,6 +584,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
+    @Override
     public FormEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

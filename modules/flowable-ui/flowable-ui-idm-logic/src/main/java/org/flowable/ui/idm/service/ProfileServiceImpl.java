@@ -12,6 +12,10 @@
  */
 package org.flowable.ui.idm.service;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.idm.api.Picture;
@@ -22,10 +26,6 @@ import org.flowable.ui.common.service.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 /**
  * @author Joram Barrez
  */
@@ -33,15 +33,16 @@ import java.io.InputStream;
 @Transactional
 public class ProfileServiceImpl extends AbstractIdmService implements ProfileService {
 
+    @Override
     public User updateProfile(String firstName, String lastName, String email) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         // If user is not externally managed, we need the email address for login, so an empty email is not allowed
         if (StringUtils.isEmpty(email)) {
             throw new BadRequestException("Empty email is not allowed");
         }
 
-        User user = identityService.createUserQuery().userId(currentUser.getId()).singleResult();
+        User user = identityService.createUserQuery().userId(currentUserId).singleResult();
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
@@ -49,6 +50,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         return user;
     }
 
+    @Override
     public void changePassword(String originalPassword, String newPassword) {
         User user = identityService.createUserQuery().userId(SecurityUtils.getCurrentUserId()).singleResult();
         if (!user.getPassword().equals(originalPassword)) {
@@ -58,6 +60,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         identityService.updateUserPassword(user);
     }
 
+    @Override
     public Pair<String, InputStream> getProfilePicture() {
         Picture picture = identityService.getUserPicture(SecurityUtils.getCurrentUserId());
         if (picture != null) {
@@ -67,6 +70,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
         return null;
     }
 
+    @Override
     public void uploadProfilePicture(String contentType, byte[] bytes) {
         Picture picture = new Picture(bytes, contentType);
         identityService.setUserPicture(SecurityUtils.getCurrentUserId(), picture);

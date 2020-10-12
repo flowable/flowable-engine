@@ -14,6 +14,8 @@ package org.flowable.form.rest.conf.engine;
 
 import java.sql.Driver;
 
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
@@ -29,8 +31,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.sql.DataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {

@@ -1,0 +1,72 @@
+version: '3.7'
+services:
+    flowable-ui-app:
+        image: flowable/flowable-ui
+        networks:
+            - flowable-net
+        depends_on:
+            - flowable-keycloak
+        environment:
+            - SERVER_PORT=8080
+            - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
+            - SPRING_DATASOURCE_USERNAME=flowable
+            - SPRING_DATASOURCE_PASSWORD=flowable
+            - SPRING.SECURITY.OAUTH2.RESOURCESERVER.JWT.ISSUER-URI=http://keycloak.flowable.org:8088/auth/realms/Flowable
+            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-ID=flowable-client
+            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-SECRET=5a63612b-c419-40fe-8d01-2f91689bb4c0
+            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-NAME=Flowable UI Keyclock
+            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.AUTHORIZATION-GRANT-TYPE=authorization_code
+            - SPRING.SECURITY.OAUTH2.CLIENT.PROVIDER.KEYCLOAK.ISSUER-URI=http://keycloak.flowable.org:8088/auth/realms/Flowable
+            - SPRING.SECURITY.OAUTH2.CLIENT.PROVIDER.KEYCLOAK.USER-NAME-ATTRIBUTE=preferred_username
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_USER=admin
+            - FLOWABLE_COMMON_APP_IDM-ADMIN_PASSWORD=test
+            - FLOWABLE_IDM_APP_KEYCLOAK_ENABLED=true
+            - FLOWABLE_IDM_APP_KEYCLOAK_SERVER=http://keycloak.flowable.org:8088
+            - FLOWABLE_IDM_APP_KEYCLOAK_AUTHENTICATION-REALM=master
+            - FLOWABLE_IDM_APP_KEYCLOAK_AUTHENTICATION-USER=admin
+            - FLOWABLE_IDM_APP_KEYCLOAK_AUTHENTICATION-PASSWORD=admin
+            - FLOWABLE_IDM_APP_KEYCLOAK_REALM=Flowable
+            - FLOWABLE.COMMON.APP.SECURITY.TYPE=OAUTH2
+            - FLOWABLE.COMMON.APP.SECURITY.OAUTH2.AUTHORITIES-ATTRIBUTE=groups
+            - FLOWABLE.COMMON.APP.SECURITY.OAUTH2.GROUPS-ATTRIBUTE=userGroups
+        ports:
+            - 8080:8080
+        entrypoint: ["./wait-for-something.sh", "flowable-keycloak", "8088", "Keycloak", "/flowable-entrypoint.sh"]
+    flowable-db:
+        image: postgres:9.6-alpine
+        networks:
+            - flowable-net
+        container_name: flowable-db
+        environment:
+            - POSTGRES_PASSWORD=flowable
+            - POSTGRES_USER=flowable
+            - POSTGRES_DB=flowable
+        ports:
+            - 5433:5432
+    flowable-keycloak:
+        image: quay.io/keycloak/keycloak:11.0.0
+        environment:
+            DB_VENDOR: POSTGRES
+            DB_ADDR: flowable-db
+            DB_DATABASE: flowable
+            DB_USER: flowable
+            DB_PASSWORD: flowable
+            KEYCLOAK_USER: admin
+            KEYCLOAK_PASSWORD: admin
+            KEYCLOCK_MIGRATION_ACTION: IMPORT
+            KEYCLOAK_IMPORT: /tmp/keycloak-flowable.json
+        command: ["-Djboss.http.port=8088"]
+        volumes: 
+            - ./keycloak-flowable.json:/tmp/keycloak-flowable.json
+        ports:
+            - 8088:8088
+        depends_on:
+            - flowable-db
+        networks:
+            flowable-net:
+                aliases:
+                    - keycloak.flowable.org
+            
+networks:
+  flowable-net:

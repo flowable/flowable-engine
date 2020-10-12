@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -56,18 +57,19 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
         CommandContextUtil.getHistoryManager(commandContext)
-            .recordFormPropertiesSubmitted(executionEntity, properties, taskId, commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
+            .recordFormPropertiesSubmitted(executionEntity, properties, taskId, processEngineConfiguration.getClock().getCurrentTime());
 
-        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
+        FormHandlerHelper formHandlerHelper = processEngineConfiguration.getFormHandlerHelper();
         TaskFormHandler taskFormHandler = formHandlerHelper.getTaskFormHandlder(task);
 
         if (taskFormHandler != null) {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, false, commandContext);
+                TaskHelper.completeTask(task, null, null, null, null,  commandContext);
             }
         }
 

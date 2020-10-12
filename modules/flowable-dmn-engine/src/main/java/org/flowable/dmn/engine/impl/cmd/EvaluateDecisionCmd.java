@@ -17,7 +17,6 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -69,6 +68,7 @@ public class EvaluateDecisionCmd extends AbstractExecuteDecisionCmd implements C
         return null;
     }
 
+    @Override
     protected void execute(CommandContext commandContext, DmnDefinition definition) {
         DecisionService decisionService = definition.getDecisionServiceById(executeDecisionContext.getDecisionKey());
 

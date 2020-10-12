@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.engine.test;
 
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.junit.Before;

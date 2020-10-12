@@ -30,8 +30,13 @@ public interface PlanItemInstance {
     String getElementId();
     String getPlanItemDefinitionId();
     String getPlanItemDefinitionType();
+    /**
+     * @deprecated use {@link #getCreateTime()} instead
+     */
     @Deprecated()
-    Date getStartTime();
+    default Date getStartTime() {
+        return getCreateTime();
+    }
     Date getCreateTime();
     Date getLastAvailableTime();
     Date getLastUnavailableTime();

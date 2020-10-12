@@ -15,6 +15,8 @@ package org.flowable.common.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -54,18 +56,18 @@ public class ByteArrayRef implements Serializable {
         return name;
     }
 
-    public byte[] getBytes() {
-        ensureInitialized();
+    public byte[] getBytes(String engineType) {
+        ensureInitialized(engineType);
         return (entity != null ? entity.getBytes() : null);
     }
 
     /**
-     * Returns the byte array from the {@link #getBytes()} method as {@link StandardCharsets#UTF_8} {@link String}.
+     * Returns the byte array from the {@link #getBytes(String)} method as {@link StandardCharsets#UTF_8} {@link String}.
      *
      * @return the byte array as {@link StandardCharsets#UTF_8} {@link String}
      */
-    public String asString() {
-        byte[] bytes = getBytes();
+    public String asString(String engineType) {
+        byte[] bytes = getBytes(engineType);
         if (bytes == null) {
             return null;
         }
@@ -73,9 +75,9 @@ public class ByteArrayRef implements Serializable {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    public void setValue(String name, byte[] bytes) {
+    public void setValue(String name, byte[] bytes, String engineType) {
         this.name = name;
-        setBytes(bytes);
+        setBytes(bytes, engineType);
     }
 
     /**
@@ -85,17 +87,18 @@ public class ByteArrayRef implements Serializable {
      * @param name the name of the byte array reference
      * @param value the value of the byte array reference
      */
-    public void setValue(String name, String value) {
+    public void setValue(String name, String value, String engineType) {
         this.name = name;
         if (value != null) {
-            setBytes(value.getBytes(StandardCharsets.UTF_8));
+            setBytes(value.getBytes(StandardCharsets.UTF_8), engineType);
         }
     }
 
-    private void setBytes(byte[] bytes) {
+    protected void setBytes(byte[] bytes, String engineType) {
         if (id == null) {
             if (bytes != null) {
-                ByteArrayEntityManager byteArrayEntityManager = Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager();
+                AbstractEngineConfiguration engineConfiguration = getEngineConfiguration(engineType);
+                ByteArrayEntityManager byteArrayEntityManager = engineConfiguration.getByteArrayEntityManager();
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -104,29 +107,29 @@ public class ByteArrayRef implements Serializable {
                 deleted = false;
             }
         } else {
-            ensureInitialized();
+            ensureInitialized(engineType);
             if (bytes != null) {
                 entity.setBytes(bytes);
             } else {
                 // If the bytes are null delete this
-                delete();
+                delete(engineType);
             }
         }
     }
 
-    public ByteArrayEntity getEntity() {
-        ensureInitialized();
+    public ByteArrayEntity getEntity(String engineType) {
+        ensureInitialized(engineType);
         return entity;
     }
 
-    public void delete() {
+    public void delete(String engineType) {
         if (!deleted && id != null) {
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager().delete(entity);
+                getEngineConfiguration(engineType).getByteArrayEntityManager().delete(entity);
             } else {
-                Context.getCommandContext().getCurrentEngineConfiguration().getByteArrayEntityManager().deleteByteArrayById(id);
+                getEngineConfiguration(engineType).getByteArrayEntityManager().deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -134,13 +137,13 @@ public class ByteArrayRef implements Serializable {
         }
     }
 
-    private void ensureInitialized() {
+    protected void ensureInitialized(String engineType) {
         if (id != null && entity == null) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                entity = commandContext.getCurrentEngineConfiguration().getByteArrayEntityManager().findById(id);
+                entity = getEngineConfiguration(engineType).getByteArrayEntityManager().findById(id);
             } else if (commandExecutor != null) {
-                entity = commandExecutor.execute(context -> context.getCurrentEngineConfiguration().getByteArrayEntityManager().findById(id));
+                entity = commandExecutor.execute(context -> getEngineConfiguration(engineType).getByteArrayEntityManager().findById(id));
             } else {
                 throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
             }
@@ -167,6 +170,71 @@ public class ByteArrayRef implements Serializable {
         copy.entity = entity;
         copy.deleted = deleted;
         return copy;
+    }
+    
+    protected AbstractEngineConfiguration getEngineConfiguration(String engineType) {
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null) {
+            return getEngineConfiguration(engineType, commandContext);
+
+        } else if (commandExecutor != null) {
+            return commandExecutor.execute(context -> {
+                return getEngineConfiguration(engineType, context);
+            });
+            
+        } else {
+            throw new IllegalStateException("Cannot initialize byte array. There is no command context and there is no command Executor");
+        }
+    }
+
+    protected AbstractEngineConfiguration getEngineConfiguration(String engineType, CommandContext commandContext) {
+        // Although 'engineType' is passed here, due to backwards compatibility, it also can be a scopeType value.
+        // For example, the scopeType of JobEntity determines which engine is used to retrieve the byteArrayEntityManager.
+        // The 'all' on the next line is exactly that, see JobServiceConfiguration#JOB_EXECUTION_SCOPE_ALL
+        if ("all".equalsIgnoreCase(engineType)) {
+            return getEngineConfigurationForAllType(commandContext);
+            
+        } else {
+            AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(engineType);
+            if (engineConfiguration == null) {
+                engineConfiguration = getFirstEngineConfigurationWithByteArrayEntityManager(commandContext);
+            }
+            
+            return engineConfiguration;
+        }
+    }
+
+    protected AbstractEngineConfiguration getEngineConfigurationForAllType(CommandContext commandContext) {
+        AbstractEngineConfiguration engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.BPMN);
+        if (engineConfiguration == null) {
+            engineConfiguration = commandContext.getEngineConfigurations().get(ScopeTypes.CMMN);
+            
+            if (engineConfiguration == null) {
+                engineConfiguration = getFirstEngineConfigurationWithByteArrayEntityManager(commandContext);
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            throw new IllegalStateException("Cannot initialize byte array. No engine configuration found");
+        }
+        
+        return engineConfiguration;
+    }
+    
+    protected AbstractEngineConfiguration getFirstEngineConfigurationWithByteArrayEntityManager(CommandContext commandContext) {
+        AbstractEngineConfiguration engineConfiguration = null;
+        for (AbstractEngineConfiguration possibleEngineConfiguration : commandContext.getEngineConfigurations().values()) {
+            if (possibleEngineConfiguration.getByteArrayEntityManager() != null) {
+                engineConfiguration = possibleEngineConfiguration;
+                break;
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            throw new IllegalStateException("Cannot initialize byte array. No engine configuration found");
+        }
+        
+        return engineConfiguration;
     }
 
     @Override

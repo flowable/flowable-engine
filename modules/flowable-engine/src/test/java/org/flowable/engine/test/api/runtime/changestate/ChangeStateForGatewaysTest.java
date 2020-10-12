@@ -85,7 +85,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executionsByActivity).doesNotContainKey("parallelJoin");
 
         //Complete one task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -242,7 +242,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         //Complete task1
         for (Task t : tasks) {
-            if (t.getTaskDefinitionKey().equals("task1")) {
+            if ("task1".equals(t.getTaskDefinitionKey())) {
                 taskService.complete(t.getId());
             }
         }
@@ -250,9 +250,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("parallelJoin");
         assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
@@ -331,7 +331,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         //Complete task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -391,7 +391,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executionsByActivity).doesNotContainKey("parallelJoin");
 
         //Complete one task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -505,7 +505,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         //Complete task1
         for (Task t : tasks) {
-            if (t.getTaskDefinitionKey().equals("task1")) {
+            if ("task1".equals(t.getTaskDefinitionKey())) {
                 taskService.complete(t.getId());
             }
         }
@@ -513,9 +513,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("parallelJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("parallelJoin");
         assertThat(classifiedExecutions.get("parallelJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
@@ -595,7 +595,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         //Complete task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -653,7 +653,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executionsByActivity).doesNotContainKey("gwJoin");
 
         //Complete one task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -769,7 +769,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         //Complete task1
         for (Task t : tasks) {
-            if (t.getTaskDefinitionKey().equals("task1")) {
+            if ("task1".equals(t.getTaskDefinitionKey())) {
                 taskService.complete(t.getId());
             }
         }
@@ -777,9 +777,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("gwJoin");
         assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         runtimeService.createChangeActivityStateBuilder()
@@ -859,7 +859,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         //Complete task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -916,7 +916,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executionsByActivity).doesNotContainKey("gwJoin");
 
         //Complete one task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -1030,7 +1030,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
 
         //Complete task1
         for (Task t : tasks) {
-            if (t.getTaskDefinitionKey().equals("task1")) {
+            if ("task1".equals(t.getTaskDefinitionKey())) {
                 taskService.complete(t.getId());
             }
         }
@@ -1038,9 +1038,9 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(2);
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions.get("task2")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("task2");
         assertThat(classifiedExecutions.get("task2")).hasSize(1);
-        assertThat(classifiedExecutions.get("gwJoin")).isNotNull();
+        assertThat(classifiedExecutions).containsKey("gwJoin");
         assertThat(classifiedExecutions.get("gwJoin")).hasSize(1);
 
         List<String> executionIds = executions.stream().map(Execution::getId).collect(Collectors.toList());
@@ -1120,7 +1120,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         //Complete task1
-        Optional<Task> task1 = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("task1")).findFirst();
+        Optional<Task> task1 = tasks.stream().filter(t -> "task1".equals(t.getTaskDefinitionKey())).findFirst();
         if (task1.isPresent()) {
             taskService.complete(task1.get().getId());
         }
@@ -1171,7 +1171,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(4);
 
-        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> "parallelJoin".equals(e.getActivityId())).findFirst();
         assertThat(parallelJoinExecution).isNotPresent();
 
         taskService.complete(tasks.get(0).getId());
@@ -1182,7 +1182,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(3);
 
-        parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        parallelJoinExecution = executions.stream().filter(e -> "parallelJoin".equals(e.getActivityId())).findFirst();
         assertThat(parallelJoinExecution).isPresent();
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
@@ -1303,7 +1303,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(5);
 
-        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        Optional<Execution> parallelJoinExecution = executions.stream().filter(e -> "parallelJoin".equals(e.getActivityId())).findFirst();
         assertThat(parallelJoinExecution).isNotPresent();
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subtask").singleResult();
@@ -1321,7 +1321,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(4);
 
-        parallelJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("parallelJoin")).findFirst();
+        parallelJoinExecution = executions.stream().filter(e -> "parallelJoin".equals(e.getActivityId())).findFirst();
         assertThat(parallelJoinExecution).isPresent();
         assertThat(((ExecutionEntity) parallelJoinExecution.get()).isActive()).isFalse();
 
@@ -1441,7 +1441,7 @@ public class ChangeStateForGatewaysTest extends PluggableFlowableTestCase {
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         assertThat(executions).hasSize(5);
 
-        Optional<Execution> inclusiveJoinExecution = executions.stream().filter(e -> e.getActivityId().equals("inclusiveJoin")).findFirst();
+        Optional<Execution> inclusiveJoinExecution = executions.stream().filter(e -> "inclusiveJoin".equals(e.getActivityId())).findFirst();
         assertThat(inclusiveJoinExecution).isPresent();
         assertThat(((ExecutionEntity) inclusiveJoinExecution.get()).isActive()).isFalse();
 

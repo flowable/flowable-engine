@@ -14,6 +14,7 @@ package org.flowable.ui.common.properties;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -250,6 +251,16 @@ public class FlowableCommonAppProperties {
          */
         private long userValidityPeriod = 30000L;
 
+        /**
+         * The type of the security for the UI Apps.
+         */
+        private String type = "idm";
+
+        /**
+         * The OAuth2 configuration.
+         */
+        private final OAuth2 oAuth2 = new OAuth2();
+
         public String getRememberMeKey() {
             return rememberMeKey;
         }
@@ -268,6 +279,128 @@ public class FlowableCommonAppProperties {
 
         public void setUserValidityPeriod(long userValidityPeriod) {
             this.userValidityPeriod = userValidityPeriod;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public OAuth2 getOAuth2() {
+            return oAuth2;
+        }
+    }
+
+    /**
+     * Security properties for the OAuth2 configuration.
+     */
+    public static class OAuth2 {
+
+        /**
+         * The attribute that contains the authorities that should be mapped for the authenticated user.
+         */
+        private String authoritiesAttribute;
+
+        /**
+         * The attribute that contains the groups for the authenticated user.
+         */
+        private String groupsAttribute;
+
+        /**
+         * The default authorities that should be added to every user.
+         */
+        private Collection<String> defaultAuthorities;
+
+        /**
+         * The default groups that should be added to every user.
+         */
+        private Collection<String> defaultGroups;
+
+        /**
+         * The key of the attribute that holds the first name of the user.
+         */
+        private String firstNameAttribute;
+
+        /**
+         * The key of the attribute that holds the last name of the user.
+         */
+        private String lastNameAttribute;
+
+        /**
+         * The key of the attribute that holds the full of the user.
+         */
+        private String fullNameAttribute;
+
+        /**
+         * The key of the attribute that holds the email of the user.
+         */
+        private String emailAttribute;
+
+        public String getAuthoritiesAttribute() {
+            return authoritiesAttribute;
+        }
+
+        public void setAuthoritiesAttribute(String authoritiesAttribute) {
+            this.authoritiesAttribute = authoritiesAttribute;
+        }
+
+        public String getGroupsAttribute() {
+            return groupsAttribute;
+        }
+
+        public void setGroupsAttribute(String groupsAttribute) {
+            this.groupsAttribute = groupsAttribute;
+        }
+
+        public Collection<String> getDefaultAuthorities() {
+            return defaultAuthorities;
+        }
+
+        public void setDefaultAuthorities(Collection<String> defaultAuthorities) {
+            this.defaultAuthorities = defaultAuthorities;
+        }
+
+        public Collection<String> getDefaultGroups() {
+            return defaultGroups;
+        }
+
+        public void setDefaultGroups(Collection<String> defaultGroups) {
+            this.defaultGroups = defaultGroups;
+        }
+
+        public String getFirstNameAttribute() {
+            return firstNameAttribute;
+        }
+
+        public void setFirstNameAttribute(String firstNameAttribute) {
+            this.firstNameAttribute = firstNameAttribute;
+        }
+
+        public String getLastNameAttribute() {
+            return lastNameAttribute;
+        }
+
+        public void setLastNameAttribute(String lastNameAttribute) {
+            this.lastNameAttribute = lastNameAttribute;
+        }
+
+        public String getFullNameAttribute() {
+            return fullNameAttribute;
+        }
+
+        public void setFullNameAttribute(String fullNameAttribute) {
+            this.fullNameAttribute = fullNameAttribute;
+        }
+
+        public String getEmailAttribute() {
+            return emailAttribute;
+        }
+
+        public void setEmailAttribute(String emailAttribute) {
+            this.emailAttribute = emailAttribute;
         }
     }
 

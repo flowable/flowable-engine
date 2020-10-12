@@ -120,7 +120,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      *
      * @param planItemInstanceEntity the plan item instance to test for a repetition rule
      * @param satisfiedEntryCriterion the optional, satisfied entry criterion activating the plan item, might be null
-     * @param planItemInstanceContainer the parent container of the gievn plan item
+     * @param planItemInstanceContainer the parent container of the given plan item
      * @param evaluationResult the evaluation result used to collect information during the evaluation of a list of plan items, will be modified inside this
      *          method to reflect gained information about further evaluation as well as any newly created plan item instances for repetition
      * @return true, if the plan item must be activated, false otherwise
@@ -257,6 +257,14 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      */
     protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer) {
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
+        
+        // needed because when doing case instance migration the child plan item instances can be null
+        if (planItemInstances == null && planItemInstanceContainer instanceof CaseInstanceEntity) {
+            PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+            CaseInstanceEntity caseInstance = (CaseInstanceEntity) planItemInstanceContainer;
+            planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
+            planItemInstanceContainer.setChildPlanItemInstances(planItemInstances);
+        }
 
         // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
         // modification, we add them at the end of the evaluation loop to the parent container
@@ -320,8 +328,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         for (PlanItem entryDependentPlanItem : entryDependentPlanItems) {
             // Only needed for sentries that cross the outer stage border
             if (!planItemsShareDirectParentStage(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem())
-                && CriterionUtil
-                .planItemHasOneEntryCriterionDependingOnPlanItem(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition())) {
+                && CriterionUtil.planItemHasOneEntryCriterionDependingOnPlanItem(entryDependentPlanItem, planItemLifeCycleEvent.getPlanItem(), planItemLifeCycleEvent.getTransition())) {
 
                 PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
                 List<PlanItemInstanceEntity> childPlanItemInstances = CaseInstanceUtil.findChildPlanItemInstances(caseInstanceEntity, entryDependentPlanItem);
@@ -523,7 +530,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         }
 
                         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances);
+                            CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                         }
 
                         return criterion;
@@ -534,7 +541,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getSentryIfPart(), entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (LOGGER.isDebugEnabled()) {
@@ -591,7 +598,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                     && (isDefaultTriggerMode || (sentry.isOnEventTriggerMode() && allOnPartsSatisfied) )) {
 
                     if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), entityWithSentryPartInstances);
+                        CmmnLoggingSessionUtil.addEvaluateSentryLoggingData(sentry.getOnParts(), sentry.getSentryIfPart(), 
+                                entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
                     }
 
                     if (evaluateSentryIfPart(entityWithSentryPartInstances, sentry, entityWithSentryPartInstances)) {
@@ -715,8 +723,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
-        try {
-            Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        try { 
+            Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
             Object result = conditionExpression.getValue(variableContainer);
 
             if (LOGGER.isDebugEnabled()) {
@@ -727,8 +736,9 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 return (Boolean) result;
             }
         } catch (RuntimeException e) {
-            if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
-                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, entityWithSentryPartInstances);
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addEvaluateSentryFailedLoggingData(sentry.getSentryIfPart(), e, 
+                        entityWithSentryPartInstances, cmmnEngineConfiguration.getObjectMapper());
             }
 
             throw e;

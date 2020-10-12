@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="myProcess" name="Process With Futures" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false"/>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="parallelGateway1"/>
+        <parallelGateway id="parallelGateway1"/>
+
+        <sequenceFlow id="sequenceFlow2" sourceRef="parallelGateway1" targetRef="serviceTask1"/>
+        <serviceTask id="serviceTask1" name="Service 1" flowable:expression="${bean1.invoke(counter)}" flowable:resultVariableName="service1_1Var"/>
+        <sequenceFlow id="sequenceFlow7" sourceRef="serviceTask1" targetRef="serviceTask1_2"/>
+        <serviceTask id="serviceTask1_2" name="Service 1.2" flowable:expression="${bean1.invoke(counter)}" flowable:resultVariableName="service1_2Var"/>
+        <sequenceFlow id="sequenceFlow6" sourceRef="serviceTask1_2" targetRef="parallelGateway2"/>
+
+
+        <sequenceFlow id="sequenceFlow3" sourceRef="parallelGateway1" targetRef="serviceTask2"/>
+        <serviceTask id="serviceTask2" name="Service 2" flowable:expression="${bean2.invoke(counter)}" flowable:resultVariableName="service2_1Var"/>
+        <sequenceFlow id="sequenceFlow8" sourceRef="serviceTask2" targetRef="serviceTask2_2"/>
+        <serviceTask id="serviceTask2_2" name="Service 2.2" flowable:expression="${counter.incrementAndGet()}" flowable:resultVariableName="service2_2Var"/>
+        <sequenceFlow id="sequenceFlow4" sourceRef="serviceTask2_2" targetRef="parallelGateway2"/>
+
+
+        <parallelGateway id="parallelGateway2"/>
+        <sequenceFlow id="sequenceFlow5" sourceRef="parallelGateway2" targetRef="endNoneEvent1"/>
+        <endEvent id="endNoneEvent1"/>
+    </process>
+</definitions>

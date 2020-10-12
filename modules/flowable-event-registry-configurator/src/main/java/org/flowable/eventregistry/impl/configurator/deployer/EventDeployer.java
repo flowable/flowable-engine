@@ -32,8 +32,9 @@ public class EventDeployer implements EngineDeployer {
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
-        if (!deployment.isNew())
+        if (!deployment.isNew()) {
             return;
+        }
 
         LOGGER.debug("EventDeployer: processing deployment {}", deployment.getName());
 

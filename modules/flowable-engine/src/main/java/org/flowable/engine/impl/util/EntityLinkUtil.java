@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
@@ -36,7 +37,8 @@ public class EntityLinkUtil {
         // scopeId is the process instance in which this is being created
         // referenceScopeId is CallActivity, CaseTask, User
 
-        EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        EntityLinkService entityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
         List<EntityLink> scopeParentEntityLinks = entityLinkService.findEntityLinksByReferenceScopeIdAndType(scopeId, ScopeTypes.BPMN, EntityLinkType.CHILD);
 
         Set<String> parentIds = new HashSet<>();

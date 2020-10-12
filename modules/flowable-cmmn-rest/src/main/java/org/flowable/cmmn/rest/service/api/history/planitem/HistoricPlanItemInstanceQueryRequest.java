@@ -13,9 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
-import org.flowable.common.rest.api.PaginateRequest;
-
 import java.util.Date;
+
+import org.flowable.common.rest.api.PaginateRequest;
 
 /**
  * @author Dennis Federico

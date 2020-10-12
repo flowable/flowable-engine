@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.junit.After;
@@ -82,7 +83,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
         for (String cleanupDeploymentId : cleanupDeploymentIds) {
-            cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cleanupDeploymentId);
         }
         cleanupDeploymentIds.clear();
 

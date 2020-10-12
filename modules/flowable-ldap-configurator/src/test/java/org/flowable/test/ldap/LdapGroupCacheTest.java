@@ -12,6 +12,8 @@
  */
 package org.flowable.test.ldap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 
 import org.flowable.engine.impl.util.EngineServiceUtil;
@@ -47,53 +49,53 @@ public class LdapGroupCacheTest extends LDAPTestCase {
         runtimeService.startProcessInstanceByKey("testLdapGroupCache");
 
         // First task is for Kermit -> cache miss
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals("kermit", cacheListener.getLastCacheMiss());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isEqualTo(1);
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("kermit");
 
         // Second task is for Pepe -> cache miss
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("pepe").count());
-        assertEquals("pepe", cacheListener.getLastCacheMiss());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("pepe").count()).isEqualTo(1);
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("pepe");
 
         // Third task is again for kermit -> cache hit
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals("kermit", cacheListener.getLastCacheHit());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isEqualTo(1);
+        assertThat(cacheListener.getLastCacheHit()).isEqualTo("kermit");
 
         // Fourth task is for fozzie -> cache miss + cache eviction of pepe
         // (LRU)
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-        assertEquals("fozzie", cacheListener.getLastCacheMiss());
-        assertEquals("pepe", cacheListener.getLastCacheEviction());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("fozzie").count()).isEqualTo(1);
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("fozzie");
+        assertThat(cacheListener.getLastCacheEviction()).isEqualTo("pepe");
     }
 
     @Test
     public void testLdapGroupCacheExpiration() {
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals("kermit", cacheListener.getLastCacheMiss());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isZero();
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("kermit");
 
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("pepe").count());
-        assertEquals("pepe", cacheListener.getLastCacheMiss());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("pepe").count()).isZero();
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("pepe");
 
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("kermit").count());
-        assertEquals("kermit", cacheListener.getLastCacheHit());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isZero();
+        assertThat(cacheListener.getLastCacheHit()).isEqualTo("kermit");
 
         // Test the expiration time of the cache
         Date now = new Date();
         processEngineConfiguration.getClock().setCurrentTime(now);
 
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-        assertEquals("fozzie", cacheListener.getLastCacheMiss());
-        assertEquals("pepe", cacheListener.getLastCacheEviction());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("fozzie").count()).isZero();
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("fozzie");
+        assertThat(cacheListener.getLastCacheEviction()).isEqualTo("pepe");
 
         // Moving the clock forward two 45 minutes should trigger cache eviction
         // (configured to 30 mins)
         processEngineConfiguration.getClock().setCurrentTime(new Date(now.getTime() + (45 * 60 * 1000)));
-        assertEquals(0, taskService.createTaskQuery().taskCandidateUser("fozzie").count());
-        assertEquals("fozzie", cacheListener.getLastCacheExpiration());
-        assertEquals("fozzie", cacheListener.getLastCacheEviction());
-        assertEquals("fozzie", cacheListener.getLastCacheMiss());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("fozzie").count()).isZero();
+        assertThat(cacheListener.getLastCacheExpiration()).isEqualTo("fozzie");
+        assertThat(cacheListener.getLastCacheEviction()).isEqualTo("fozzie");
+        assertThat(cacheListener.getLastCacheMiss()).isEqualTo("fozzie");
     }
 
     // Test cache listener

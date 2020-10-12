@@ -18,7 +18,7 @@ package org.flowable.common.engine.impl.interceptor;
  */
 public interface CommandInterceptor {
 
-    <T> T execute(CommandConfig config, Command<T> command);
+    <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor);
 
     CommandInterceptor getNext();
 

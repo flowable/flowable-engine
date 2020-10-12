@@ -197,6 +197,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -212,6 +213,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             initSchemaManagementCommand();
         }
 
+        configureVariableServiceConfiguration();
         initVariableTypes();
         initBeans();
         initTransactionFactory();
@@ -228,7 +230,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initAppDefinitionCache();
         initAppResourceConverter();
         initDeploymentManager();
-        initClock();
         initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
         configuratorsAfterInit();
@@ -380,6 +381,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.APP;
+    }
+
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -429,19 +435,22 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             }
         }
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = new VariableServiceConfiguration(ScopeTypes.APP);
 
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 
@@ -536,9 +545,16 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+        IdmIdentityService idmIdentityService = null;
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+
+        return idmIdentityService;
     }
 
+    @Override
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;

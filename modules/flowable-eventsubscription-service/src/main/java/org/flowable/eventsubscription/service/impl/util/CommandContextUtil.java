@@ -15,38 +15,15 @@ package org.flowable.eventsubscription.service.impl.util;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
-import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityManager;
 
 public class CommandContextUtil {
 
-    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
-        return getEventSubscriptionServiceConfiguration(getCommandContext());
-    }
-    
-    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration(CommandContext commandContext) {
-        if (commandContext != null) {
-            return (EventSubscriptionServiceConfiguration) commandContext.getCurrentEngineConfiguration()
-                            .getServiceConfigurations().get(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG);
-        }
-        return null;
-    }
-    
     public static DbSqlSession getDbSqlSession() {
         return getDbSqlSession(getCommandContext());
     }
     
     public static DbSqlSession getDbSqlSession(CommandContext commandContext) {
         return commandContext.getSession(DbSqlSession.class);
-    }
-    
-    public static EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-        return getEventSubscriptionEntityManager(getCommandContext());
-    }
-    
-    public static EventSubscriptionEntityManager getEventSubscriptionEntityManager(CommandContext commandContext) {
-        return getEventSubscriptionServiceConfiguration(commandContext).getEventSubscriptionEntityManager();
     }
     
     public static CommandContext getCommandContext() {

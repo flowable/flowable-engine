@@ -28,6 +28,8 @@ import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.cmd.GetPropertiesCmd;
+import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
+import org.flowable.common.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -50,8 +52,6 @@ import org.flowable.engine.impl.cmd.GetBatchDocumentCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartDocumentCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
-import org.flowable.engine.impl.cmd.GetTableCountCmd;
-import org.flowable.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
@@ -62,6 +62,7 @@ import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -83,10 +84,12 @@ import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
 import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
+import org.flowable.job.service.impl.cmd.GetHistoryJobAdvancedConfigurationCmd;
 import org.flowable.job.service.impl.cmd.GetJobByCorrelationIdCmd;
 import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
 import org.flowable.job.service.impl.cmd.JobType;
 import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
+import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToHistoryJobCmd;
 import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
 import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
@@ -107,7 +110,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override
@@ -122,13 +125,13 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
     }
 
     @Override
     public void executeJob(String jobId) {
         try {
-            commandExecutor.execute(new ExecuteJobCmd(jobId));
+            commandExecutor.execute(new ExecuteJobCmd(jobId, configuration.getJobServiceConfiguration()));
 
         } catch (RuntimeException e) {
             if (e instanceof FlowableException) {
@@ -141,67 +144,77 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     
     @Override
     public void executeHistoryJob(String historyJobId) {
-        commandExecutor.execute(new ExecuteHistoryJobCmd(historyJobId));
+        commandExecutor.execute(new ExecuteHistoryJobCmd(historyJobId, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public String getHistoryJobHistoryJson(String historyJobId) {
+        return commandExecutor.execute(new GetHistoryJobAdvancedConfigurationCmd(historyJobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveTimerToExecutableJob(String jobId) {
-        return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId));
+        return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveJobToDeadLetterJob(String jobId) {
-        return commandExecutor.execute(new MoveJobToDeadLetterJobCmd(jobId));
+        return commandExecutor.execute(new MoveJobToDeadLetterJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
-        return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries));
+        return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries) {
+        return commandExecutor.execute(new MoveDeadLetterJobToHistoryJobCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public Job moveSuspendedJobToExecutableJob(String jobId) {
-        return commandExecutor.execute(new MoveSuspendedJobToExecutableJobCmd(jobId));
+        return commandExecutor.execute(new MoveSuspendedJobToExecutableJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteJob(String jobId) {
-        commandExecutor.execute(new DeleteJobCmd(jobId));
+        commandExecutor.execute(new DeleteJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteTimerJob(String jobId) {
-        commandExecutor.execute(new DeleteTimerJobCmd(jobId));
+        commandExecutor.execute(new DeleteTimerJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public void deleteSuspendedJob(String jobId) {
-        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId));
+        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteDeadLetterJob(String jobId) {
-        commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
+        commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void deleteExternalWorkerJob(String jobId) {
-        commandExecutor.execute(new DeleteExternalWorkerJobCmd(jobId));
+        commandExecutor.execute(new DeleteExternalWorkerJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public void deleteHistoryJob(String jobId) {
-        commandExecutor.execute(new DeleteHistoryJobCmd(jobId));
+        commandExecutor.execute(new DeleteHistoryJobCmd(jobId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void setJobRetries(String jobId, int retries) {
-        commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+        commandExecutor.execute(new SetJobRetriesCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public void setTimerJobRetries(String jobId, int retries) {
-        commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries));
+        commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries, configuration.getJobServiceConfiguration()));
     }
 
     @Override
@@ -226,67 +239,67 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public TablePageQuery createTablePageQuery() {
-        return new TablePageQueryImpl(commandExecutor);
+        return new TablePageQueryImpl(commandExecutor, configuration);
     }
 
     @Override
     public JobQuery createJobQuery() {
-        return new JobQueryImpl(commandExecutor);
+        return new JobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public ExternalWorkerJobQuery createExternalWorkerJobQuery() {
-        return new ExternalWorkerJobQueryImpl(commandExecutor);
+        return new ExternalWorkerJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public TimerJobQuery createTimerJobQuery() {
-        return new TimerJobQueryImpl(commandExecutor);
+        return new TimerJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public SuspendedJobQuery createSuspendedJobQuery() {
-        return new SuspendedJobQueryImpl(commandExecutor);
+        return new SuspendedJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public DeadLetterJobQuery createDeadLetterJobQuery() {
-        return new DeadLetterJobQueryImpl(commandExecutor);
+        return new DeadLetterJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
     
     @Override
     public HistoryJobQuery createHistoryJobQuery() {
-        return new HistoryJobQueryImpl(commandExecutor);
+        return new HistoryJobQueryImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
     public Job findJobByCorrelationId(String jobCorrelationId) {
-        return commandExecutor.execute(new GetJobByCorrelationIdCmd(jobCorrelationId));
+        return commandExecutor.execute(new GetJobByCorrelationIdCmd(jobCorrelationId, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.ASYNC));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.ASYNC, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getTimerJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.TIMER));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.TIMER, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getSuspendedJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.SUSPENDED));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.SUSPENDED, configuration.getJobServiceConfiguration()));
     }
 
     @Override
     public String getDeadLetterJobExceptionStacktrace(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER, configuration.getJobServiceConfiguration()));
     }
     
     @Override
     public String getExternalWorkerJobErrorDetails(String jobId) {
-        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.EXTERNAL_WORKER));
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.EXTERNAL_WORKER, configuration.getJobServiceConfiguration()));
     }
 
     @Override
@@ -331,12 +344,12 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     
     @Override
     public BatchQuery createBatchQuery() {
-        return new BatchQueryImpl(commandExecutor);
+        return new BatchQueryImpl(commandExecutor, configuration.getBatchServiceConfiguration());
     }
     
     @Override
     public BatchBuilder createBatchBuilder() {
-        return new BatchBuilderImpl(commandExecutor);
+        return new BatchBuilderImpl(commandExecutor, configuration.getBatchServiceConfiguration());
     }
     
     @Override
@@ -346,7 +359,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public Map<String, String> getProperties() {
-        return commandExecutor.execute(new GetPropertiesCmd());
+        return commandExecutor.execute(new GetPropertiesCmd(configuration.getEngineCfgKey()));
     }
 
     @Override
@@ -384,7 +397,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public LockManager getLockManager(String lockName) {
-        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate());
+        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate(), configuration.getEngineCfgKey());
     }
 
     @Override
@@ -410,7 +423,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder() {
-        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor);
+        return new ExternalWorkerJobAcquireBuilderImpl(commandExecutor, configuration.getJobServiceConfiguration());
     }
 
     @Override
@@ -420,7 +433,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
-        return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId);
+        return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId, configuration.getJobServiceConfiguration());
     }
 
 }

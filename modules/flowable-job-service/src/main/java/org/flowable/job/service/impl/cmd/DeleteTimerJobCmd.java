@@ -22,9 +22,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +38,11 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected String timerJobId;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public DeleteTimerJobCmd(String timerJobId) {
+    public DeleteTimerJobCmd(String timerJobId, JobServiceConfiguration jobServiceConfiguration) {
         this.timerJobId = timerJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -49,15 +51,15 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(commandContext, jobToDelete);
 
-        CommandContextUtil.getTimerJobEntityManager(commandContext).delete(jobToDelete);
+        jobServiceConfiguration.getTimerJobEntityManager().delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(CommandContext commandContext, TimerJobEntity jobToDelete) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getJobServiceConfiguration(commandContext).getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -69,7 +71,7 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", timerJobId);
         }
 
-        TimerJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(timerJobId);
+        TimerJobEntity job = jobServiceConfiguration.getTimerJobEntityManager().findById(timerJobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No timer job found with id '" + timerJobId + "'", Job.class);
         }

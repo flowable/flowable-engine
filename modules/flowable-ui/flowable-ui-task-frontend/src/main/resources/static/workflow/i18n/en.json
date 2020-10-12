@@ -33,6 +33,7 @@
         },
         "ACTION": {
             "LOGOUT": "Sign out",
+            "DASHBOARD": "Dashboard",
             "ADD-COMMENT": "Add comment",
             "SAVE": "Save",
             "CANCEL": "Cancel",

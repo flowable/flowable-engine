@@ -1,6 +1,6 @@
 ---
 id: ch09-ProcessInstanceMigration
-title: Process Instance Migration (Experimental)
+title: Process Instance Migration
 ---
 
 When process definitions are updated with new versions, the question arises what should be done with already running process instances that are using older versions of the process definition.
@@ -72,21 +72,21 @@ If the case you are looking for is not yet supported have a look at next section
 
 -   migrating a wait state to an activity in an (nested) event sub process, both interrupting and non-interrupting.
 
+-   migrating multiple executions when using a parallel or inclusive gateway, to one execution outside of the gateway scope.
+
+-   migrating from a single execution to multiple executions within a parallel or inclusive gateway.
+
+-   migrating a wait state to an activity in the parent process.
+
 ## Upcoming process instance migration support
 
 With this version of the Flowable Engine the first step with process instance migration support is added. In the next version the focus is on adding support for the following migration cases:
-
--   Support moving multiple executions when using a parallel or inclusive gateway, to one execution outside of the gateway scope.
-
--   Support moving from a single execution to multiple executions within a parallel or inclusive gateway.
 
 -   Support to move a collection of multi instance executions to another activity.
 
 -   Support to move a wait state to a multi instance activity.
 
 -   Support to move a wait state to an activity in a sub process, when one or more call activities are present in the process definition.
-
--   Support to move a wait state to an activity in the parent process.
 
 -   Support to add and remove variables in the process instance or local execution scope.
 

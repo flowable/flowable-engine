@@ -2,6 +2,11 @@ name: Flowable Main Build
 
 on: [push, pull_request]
 
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
 jobs:
   test_jdk:
     name: Linux (JDK ${{ matrix.java }})
@@ -17,8 +22,14 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
+    - name: Cache Maven Repository
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
     - name: Install
       # Need to do install first in order for the OSGi tests to work
-      run: ./mvnw install -V -B --no-transfer-progress -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+      run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging,includeDockerTests -B --no-transfer-progress -V -Dmaven.test.redirectTestOutputToFile=false
+      run: ./mvnw verify -Pdistro,errorLogging,includeDockerTests ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false

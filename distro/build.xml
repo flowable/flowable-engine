@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.5.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.6.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="target.docs.root" value="${target.distro.root}/docs" />
 	<property name="target.newsite.root" value="target/website" />
@@ -42,7 +42,7 @@
 		</exec>
 		<exec executable="${mvn.executable}" dir="../modules/flowable-ui" failonerror="true">
 			<env key="MAVEN_OPTS" value="-Xmx1024m -Xms512m" />
-			<arg line="-Pdistro,deploy${nodocs.profile} -Dgpg.skip=true -DskipTests clean install" />
+			<arg line="-Pdistro${nodocs.profile} -DskipTests clean install" />
 		</exec>
 	</target>
 
@@ -186,6 +186,9 @@
 			<fileset dir="../modules/flowable-dmn-api/target">
 				<include name="flowable-dmn-api-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-dmn-image-generator/target">
+				<include name="flowable-dmn-image-generator-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-dmn-engine/target">
 				<include name="flowable-dmn-engine-*.jar" />
 			</fileset>
@@ -294,6 +297,9 @@
 			<fileset dir="../modules/flowable-common-rest/target">
 				<include name="flowable-common-rest-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-external-job-rest/target">
+				<include name="flowable-external-job-rest-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-rest/target">
 				<include name="flowable-rest-*.jar" />
 			</fileset>
@@ -311,6 +317,9 @@
 			</fileset>
 			<fileset dir="../modules/flowable-mule/target">
 				<include name="flowable-mule-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-http-common/target">
+				<include name="flowable-http-common-*.jar" />
 			</fileset>
 			<fileset dir="../modules/flowable-http/target">
 				<include name="flowable-http-*.jar" />
@@ -442,14 +451,6 @@
         <copy todir="${target.docs.root}/batch-javadocs">
             <fileset dir="../modules/flowable-batch-service-api/target/site/apidocs" />
         </copy>
-		
-		<!-- USERGUIDE -->
-		<exec executable="yarn" dir="../docs/docusaurus/website">
-			<arg line="run build" />
-		</exec>
-		<move todir="${target.newsite.root}">
-            <fileset dir="../docs/docusaurus/website/build/flowable-userguide" />
-        </move>
 	</target>
 
 	<target name="copy.docs" depends="build.docs" unless="nodocs">
@@ -465,22 +466,6 @@
 		<mkdir dir="${flowable.website}/javadocs" />
 		<copy todir="${flowable.website}/javadocs" overwrite="true">
 			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide" />
-		<copy todir="${flowable.website}/userguide" overwrite="true">
-			<fileset dir="../userguide/target/html/en" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide-cmmn" />
-        <copy todir="${flowable.website}/userguide-cmmn" overwrite="true">
-            <fileset dir="../userguide-cmmn/target/html/en" />
-        </copy>
-		<mkdir dir="${flowable.website}/userguide-dmn" />
-		<copy todir="${flowable.website}/userguide-dmn" overwrite="true">
-			<fileset dir="../userguide-dmn/target/html/en" />
-		</copy>
-		<mkdir dir="${flowable.website}/userguide-form" />
-		<copy todir="${flowable.website}/userguide-form" overwrite="true">
-			<fileset dir="../userguide-form/target/html/en" />
 		</copy>
 		<copy todir="${flowable.website}" overwrite="true">
 			<fileset dir="src">

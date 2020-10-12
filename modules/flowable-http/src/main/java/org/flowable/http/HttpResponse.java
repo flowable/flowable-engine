@@ -12,19 +12,20 @@
  */
 package org.flowable.http;
 
+import org.flowable.http.common.api.HttpHeaders;
+
 /**
  * @author Harsha Teja Kanna.
+ *
+ * @deprecated
  */
-public class HttpResponse {
-    
-    protected int statusCode;
-    protected String protocol;
-    protected String reason;
-    protected String headers;
-    protected String body;
-    protected boolean bodyResponseHandled;
+@Deprecated
+public class HttpResponse extends org.flowable.http.common.api.HttpResponse {
+
+    protected final org.flowable.http.common.api.HttpResponse delegate;
 
     public HttpResponse() {
+        this.delegate = null;
     }
 
     public HttpResponse(int statusCode) {
@@ -32,55 +33,125 @@ public class HttpResponse {
     }
 
     public HttpResponse(int statusCode, String headers) {
-        this.statusCode = statusCode;
-        this.headers = headers;
+        super(statusCode, headers);
+        this.delegate = null;
     }
 
+    protected HttpResponse(org.flowable.http.common.api.HttpResponse delegate) {
+        this.delegate = delegate;
+    }
+
+    @Override
     public int getStatusCode() {
-        return statusCode;
+        return delegate != null ? delegate.getStatusCode() : super.getStatusCode();
     }
 
+    @Override
     public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+        if (delegate != null) {
+            delegate.setStatusCode(statusCode);
+        } else {
+            super.setStatusCode(statusCode);
+        }
     }
 
+    @Override
     public String getProtocol() {
-        return protocol;
+        return delegate != null ? delegate.getProtocol() : super.getProtocol();
     }
 
+    @Override
     public void setProtocol(String protocol) {
-        this.protocol = protocol;
+        if (delegate != null) {
+            delegate.setProtocol(protocol);
+        } else {
+            super.setProtocol(protocol);
+        }
     }
 
+    @Override
     public String getReason() {
-        return reason;
+        return delegate != null ? delegate.getReason() : super.getReason();
     }
 
+    @Override
     public void setReason(String reason) {
-        this.reason = reason;
+        if (delegate != null) {
+            delegate.setReason(reason);
+        } else {
+            super.setReason(reason);
+        }
     }
 
+    /**
+     * @deprecated use {@link #getHttpHeadersAsString()} instead
+     */
+    @Deprecated
     public String getHeaders() {
-        return headers;
+        return getHttpHeadersAsString();
     }
 
+    /**
+     * @deprecated use {@link #setHttpHeaders(HttpHeaders)} instead
+     */
+    @Deprecated
     public void setHeaders(String headers) {
-        this.headers = headers;
+        HttpHeaders parsedHeaders = HttpHeaders.parseFromString(headers);
+        if (delegate != null) {
+            delegate.setHttpHeaders(parsedHeaders);
+        } else {
+            super.setHttpHeaders(parsedHeaders);
+        }
     }
 
+    @Override
+    public HttpHeaders getHttpHeaders() {
+        return delegate != null ? delegate.getHttpHeaders() : super.getHttpHeaders();
+    }
+
+    @Override
+    public String getHttpHeadersAsString() {
+        return delegate != null ? delegate.getHttpHeadersAsString() : super.getHttpHeadersAsString();
+    }
+
+    @Override
+    public void setHttpHeaders(HttpHeaders httpHeaders) {
+        if (delegate != null) {
+            delegate.setHttpHeaders(httpHeaders);
+        } else {
+            super.setHttpHeaders(httpHeaders);
+        }
+    }
+
+    @Override
     public String getBody() {
-        return body;
+        return delegate != null ? delegate.getBody() : super.getBody();
     }
 
+    @Override
     public void setBody(String body) {
-        this.body = body;
+        if (delegate != null) {
+            delegate.setBody(body);
+        } else {
+            super.setBody(body);
+        }
     }
 
+    @Override
     public boolean isBodyResponseHandled() {
-        return bodyResponseHandled;
+        return delegate != null ? delegate.isBodyResponseHandled() : super.isBodyResponseHandled();
     }
 
+    @Override
     public void setBodyResponseHandled(boolean bodyResponseHandled) {
-        this.bodyResponseHandled = bodyResponseHandled;
+        if (delegate != null) {
+            delegate.setBodyResponseHandled(bodyResponseHandled);
+        } else {
+            super.setBodyResponseHandled(bodyResponseHandled);
+        }
+    }
+    
+    public static HttpResponse fromApiHttpResponse(org.flowable.http.common.api.HttpResponse response) {
+        return new HttpResponse(response);
     }
 }

@@ -110,13 +110,22 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
     protected void unlockOwnedJobs() {
         for (String tenantId : timerJobAcquisitionThreads.keySet()) {
             tenantInfoHolder.setCurrentTenantId(tenantId);
-            jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId));
+            jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId, jobServiceConfiguration));
             tenantInfoHolder.clearCurrentTenantId();
         }
     }
 
     @Override
     public void start() {
+        if (isActive) {
+            return;
+        }
+
+        isActive = true;
+        
+        initializeJobEntityManager();
+        initAsyncJobExecutionThreadPool();
+
         for (String tenantId : timerJobAcquisitionRunnables.keySet()) {
             startTimerJobAcquisitionForTenant(tenantId);
             startAsyncJobAcquisitionForTenant(tenantId);

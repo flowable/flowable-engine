@@ -41,8 +41,7 @@
         TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{processDefinitionId, jdbcType=VARCHAR},
+        1, #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
@@ -82,8 +81,7 @@
       ) values 
       <foreach collection="list" item="historicActivityInstance" index="index" separator=",">
          (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-          1,
-          #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+          1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
           #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
           #{historicActivityInstance.executionId, jdbcType=VARCHAR},
           #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
@@ -124,8 +122,7 @@
           TENANT_ID_
         ) VALUES 
            (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+            1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
             #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
             #{historicActivityInstance.executionId, jdbcType=VARCHAR},
             #{historicActivityInstance.activityId ,jdbcType=VARCHAR},

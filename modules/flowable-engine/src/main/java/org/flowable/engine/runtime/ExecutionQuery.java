@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.ProcessEngineConfiguration;
 
 /**
  * Allows programmatic querying of {@link Execution}s.
@@ -122,7 +121,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /**
      * Only select executions which have a local variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      * 
      * @param name
      *            name of the variable, cannot be null.
@@ -145,7 +144,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /**
      * Only select executions which have at least one local variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()} . Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      */
     ExecutionQuery variableValueEquals(Object value);
 

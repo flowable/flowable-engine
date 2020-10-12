@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -63,8 +64,8 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
                 FlowableEngineEventType.ENTITY_CREATED);
 
         // Dispatch events
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event2, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(newListener.getEventsReceived()).hasSize(2);
         assertThat(newListener.getEventsReceived().get(0)).isEqualTo(event1);
@@ -74,8 +75,8 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // invoked
         dispatcher.removeEventListener(newListener);
         newListener.clearEventsReceived();
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event2, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(newListener.getEventsReceived()).isEmpty();
     }
@@ -101,9 +102,9 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
                 FlowableEngineEventType.ENTITY_UPDATED);
 
         // Dispatch events, only 2 out of 3 should have entered the listener
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
-        dispatcher.dispatchEvent(event3);
+        dispatcher.dispatchEvent(event1, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event2, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event3, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(newListener.getEventsReceived()).hasSize(2);
         assertThat(newListener.getEventsReceived().get(0)).isEqualTo(event1);
@@ -113,8 +114,8 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // invoked
         dispatcher.removeEventListener(newListener);
         newListener.clearEventsReceived();
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event2, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(newListener.getEventsReceived()).isEmpty();
     }
@@ -139,8 +140,8 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
                 FlowableEngineEventType.ENTITY_DELETED);
 
         // Dispatch events, all should have entered the listener
-        dispatcher.dispatchEvent(event1);
-        dispatcher.dispatchEvent(event2);
+        dispatcher.dispatchEvent(event1, processEngineConfiguration.getEngineCfgKey());
+        dispatcher.dispatchEvent(event2, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(newListener.getEventsReceived()).isEmpty();
     }
@@ -166,7 +167,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
                 FlowableEngineEventType.CUSTOM);
 
         // Dispatch create event
-        dispatcher.dispatchEvent(createEvent);
+        dispatcher.dispatchEvent(createEvent, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.isCreateReceived()).isTrue();
         assertThat(listener.isUpdateReceived()).isFalse();
         assertThat(listener.isCustomReceived()).isFalse();
@@ -175,7 +176,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         listener.reset();
 
         // Dispatch update event
-        dispatcher.dispatchEvent(updateEvent);
+        dispatcher.dispatchEvent(updateEvent, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.isUpdateReceived()).isTrue();
         assertThat(listener.isCreateReceived()).isFalse();
         assertThat(listener.isCustomReceived()).isFalse();
@@ -183,7 +184,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         listener.reset();
 
         // Dispatch delete event
-        dispatcher.dispatchEvent(deleteEvent);
+        dispatcher.dispatchEvent(deleteEvent, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.isDeleteReceived()).isTrue();
         assertThat(listener.isCreateReceived()).isFalse();
         assertThat(listener.isCustomReceived()).isFalse();
@@ -191,7 +192,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         listener.reset();
 
         // Dispatch other event
-        dispatcher.dispatchEvent(otherEvent);
+        dispatcher.dispatchEvent(otherEvent, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.isCustomReceived()).isTrue();
         assertThat(listener.isCreateReceived()).isFalse();
         assertThat(listener.isUpdateReceived()).isFalse();
@@ -203,7 +204,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
 
         // Dispatch event for a task, should be received
         dispatcher.addEventListener(listener);
-        dispatcher.dispatchEvent(createEvent);
+        dispatcher.dispatchEvent(createEvent, processEngineConfiguration.getEngineCfgKey());
 
         assertThat(listener.isCreateReceived()).isTrue();
         listener.reset();
@@ -211,7 +212,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // Dispatch event for a execution, should NOT be received
         FlowableEntityEventImpl createEventForExecution = new FlowableEntityEventImpl(new ExecutionEntityImpl(), FlowableEngineEventType.ENTITY_CREATED);
 
-        dispatcher.dispatchEvent(createEventForExecution);
+        dispatcher.dispatchEvent(createEventForExecution, processEngineConfiguration.getEngineCfgKey());
         assertThat(listener.isCreateReceived()).isFalse();
     }
 
@@ -228,12 +229,10 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         dispatcher.addEventListener(secondListener);
 
         FlowableEngineEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
-        try {
-            dispatcher.dispatchEvent(event);
-            assertThat(secondListener.getEventsReceived()).hasSize(1);
-        } catch (Throwable t) {
-            fail("No exception expected");
-        }
+        assertThatCode(() -> {
+            dispatcher.dispatchEvent(event, processEngineConfiguration.getEngineCfgKey());
+        }).doesNotThrowAnyException();
+        assertThat(secondListener.getEventsReceived()).hasSize(1);
 
         // Remove listeners
         dispatcher.removeEventListener(listener);
@@ -245,7 +244,7 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         dispatcher.addEventListener(listener);
         dispatcher.addEventListener(secondListener);
 
-        assertThatThrownBy(() -> dispatcher.dispatchEvent(event))
+        assertThatThrownBy(() -> dispatcher.dispatchEvent(event, processEngineConfiguration.getEngineCfgKey()))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Test exception");
 
@@ -262,30 +261,30 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
         // Check with empty null
         FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
         assertThat(types).isNotNull();
-        assertThat(types.length).isZero();
+        assertThat(types).isEmpty();
 
         // Check with empty string
         types = FlowableEngineEventType.getTypesFromString("");
         assertThat(types).isNotNull();
-        assertThat(types.length).isZero();
+        assertThat(types).isEmpty();
 
         // Single value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(1);
+        assertThat(types).hasSize(1);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
 
         // Multiple value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED,ENTITY_DELETED");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(2);
+        assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
 
         // Additional separators should be ignored
         types = FlowableEngineEventType.getTypesFromString(",ENTITY_CREATED,,ENTITY_DELETED,,,");
         assertThat(types).isNotNull();
-        assertThat(types.length).isEqualTo(2);
+        assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
 

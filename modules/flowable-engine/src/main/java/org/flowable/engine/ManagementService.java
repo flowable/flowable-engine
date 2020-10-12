@@ -20,6 +20,7 @@ import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchBuilder;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
@@ -34,6 +35,7 @@ import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -136,6 +138,17 @@ public interface ManagementService {
     void executeHistoryJob(String historyJobId);
 
     /**
+     * Get the advanced configuration (storing the history json data) of a {@link HistoryJob}.
+     *
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     *
+     */
+    String getHistoryJobHistoryJson(String historyJobId);
+
+    /**
      * Moves a timer job to the executable job table (eg. for administration or testing). The timer job will be moved, even if the process definition and/or the process instance is in suspended state.
      * 
      * @param jobId
@@ -156,19 +169,37 @@ public interface ManagementService {
     Job moveJobToDeadLetterJob(String jobId);
 
     /**
-     * Moves a job that is in the dead letter job table back to be an executable job, and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
-     * 
+     * Moves a job that is in the dead letter job table back to be an executable job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
      * @param jobId
      *            id of the job to move, cannot be null.
      * @param retries
      *            the number of retries (value greater than 0) which will be set on the job.
      * @throws FlowableObjectNotFoundException
      *             when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException
+     *              when the job cannot be moved to be an executable job (e.g. because it's a history job)
      */
     Job moveDeadLetterJobToExecutableJob(String jobId, int retries);
 
     /**
-     * Moves a suspendend job from the suspended letter job table back to be an executable job. The retries are untouched.
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @param retries
+     *            the number of retries (value greater than 0) which will be set on the job.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException
+     *              when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
+
+    /**
+     * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.
      * 
      * @param jobId
      *            id of the job to move, cannot be null.
@@ -350,7 +381,7 @@ public interface ManagementService {
     String getDeadLetterJobExceptionStacktrace(String jobId);
     
     /**
-     * Returns the full error details that were passed to the {@link ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
+     * Returns the full error details that were passed to the {@link org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
      *
      * @param jobId id of the job, cannot be null.
      * @throws FlowableObjectNotFoundException when no job exists with the given id.

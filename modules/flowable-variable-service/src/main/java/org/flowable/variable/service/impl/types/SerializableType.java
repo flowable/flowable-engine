@@ -22,11 +22,16 @@ import java.io.ObjectStreamClass;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.variable.api.types.ValueFields;
@@ -49,7 +54,6 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     }
 
     public SerializableType() {
-
     }
 
     public SerializableType(boolean trackDeserializedObjects) {
@@ -90,12 +94,10 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
         if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
-                if (commandContext.getCurrentEngineConfiguration() instanceof HasVariableServiceConfiguration) {
-                    HasVariableServiceConfiguration engineConfiguration = (HasVariableServiceConfiguration)
-                                    commandContext.getCurrentEngineConfiguration();
-                    VariableServiceConfiguration variableServiceConfiguration = (VariableServiceConfiguration) engineConfiguration.getVariableServiceConfiguration();
+                VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(valueFields);
+                if (variableServiceConfiguration != null) {
                     commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                        new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields, variableServiceConfiguration)
+                        new TraceableObject<>(this, value, valueBytes, (VariableInstanceEntity) valueFields)
                     ));
                     variableServiceConfiguration.getInternalHistoryVariableManager().initAsyncHistoryCommandContextCloseListener();
                 }
@@ -152,6 +154,33 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
             throw new FlowableException("Couldn't deserialize object in variable '" + valueFields.getName() + "'", e);
         } finally {
             IoUtil.closeSilently(bais);
+        }
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration(ValueFields valueFields) {
+        String engineType = getEngineType(valueFields.getScopeType());
+        Map<String, AbstractEngineConfiguration> engineConfigurationMap = Context.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = engineConfigurationMap.get(engineType);
+        if (engineConfiguration == null) {
+            for (AbstractEngineConfiguration possibleEngineConfiguration : engineConfigurationMap.values()) {
+                if (possibleEngineConfiguration instanceof HasVariableServiceConfiguration) {
+                    engineConfiguration = possibleEngineConfiguration;
+                }
+            }
+        }
+        
+        if (engineConfiguration == null) {
+            return null;
+        }
+        
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    } 
+    
+    protected String getEngineType(String scopeType) {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
         }
     }
 

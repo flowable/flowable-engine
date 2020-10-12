@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
@@ -37,6 +38,7 @@ public class DmnDeployer implements Deployer {
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
     protected DmnDeploymentHelper dmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
+    protected DecisionRequirementsDiagramHelper decisionRequirementsDiagramHelper;
     protected boolean usePrefixId;
 
     @Override
@@ -49,6 +51,9 @@ public class DmnDeployer implements Deployer {
 
         dmnDeploymentHelper.copyDeploymentValuesToDecisions(parsedDeployment.getDeployment(), parsedDeployment.getAllDecisions());
         dmnDeploymentHelper.setResourceNamesOnDecisions(parsedDeployment);
+
+        dmnDeploymentHelper.createAndPersistNewDiagramsIfNeeded(parsedDeployment, decisionRequirementsDiagramHelper);
+        dmnDeploymentHelper.setDecisionDefinitionDiagramNames(parsedDeployment);
 
         if (deployment.isNew()) {
             Map<DecisionEntity, DecisionEntity> mapOfNewDefinitionToPreviousVersion = getPreviousVersionsOfDecisions(parsedDeployment);
@@ -107,7 +112,8 @@ public class DmnDeployer implements Deployer {
      * Saves each decision. It is assumed that the deployment is new, the decisions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistDecisions(ParsedDeployment parsedDeployment) {
-        DecisionEntityManager decisionEntityManager = CommandContextUtil.getDecisionEntityManager();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
+        DecisionEntityManager decisionEntityManager = dmnEngineConfiguration.getDecisionEntityManager();
 
         for (DecisionEntity decision : parsedDeployment.getAllDecisions()) {
             decisionEntityManager.insert(decision);
@@ -166,5 +172,13 @@ public class DmnDeployer implements Deployer {
 
     public void setUsePrefixId(boolean usePrefixId) {
         this.usePrefixId = usePrefixId;
+    }
+
+    public DecisionRequirementsDiagramHelper getDecisionRequirementsDiagramHelper() {
+        return decisionRequirementsDiagramHelper;
+    }
+
+    public void setDecisionRequirementsDiagramHelper(DecisionRequirementsDiagramHelper decisionRequirementsDiagramHelper) {
+        this.decisionRequirementsDiagramHelper = decisionRequirementsDiagramHelper;
     }
 }

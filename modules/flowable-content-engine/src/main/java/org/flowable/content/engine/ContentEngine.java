@@ -21,7 +21,7 @@ public interface ContentEngine {
     /**
      * the version of the flowable content library
      */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
      * The name as specified in 'content-engine-name' in the flowable.content.cfg.xml configuration file. The default name for a process engine is 'default

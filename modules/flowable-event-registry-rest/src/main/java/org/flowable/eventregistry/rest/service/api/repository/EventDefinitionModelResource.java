@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Event Definitions" }, description = "Manage Event Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class EventDefinitionModelResource extends BaseEventDefinitionResource {
 
-    @ApiOperation(value = "Get an event definition JSPN model", tags = { "Event Definitions" }, nickname = "getEventModelResource")
+    @ApiOperation(value = "Get an event definition JSON model", tags = { "Event Definitions" }, nickname = "getEventModelResource")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the event definition was found and the model is returned. The response contains the full event definition model."),
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")

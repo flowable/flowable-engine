@@ -70,7 +70,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         return false;
     }
 
-    protected boolean isAsync() {
+    public boolean isAsync() {
         if (planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Task) {
             Task task = (Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
             if (task.isAsync()) {

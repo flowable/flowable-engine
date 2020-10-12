@@ -270,7 +270,7 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
             assertThat(model.getCategory()).isNull();
             assertThat(model.getMetaInfo()).isNull();
             assertThat(model.getDeploymentId()).isNull();
-            assertThat(model.getTenantId()).isEqualTo("");
+            assertThat(model.getTenantId()).isEmpty();
 
         } finally {
             try {

@@ -12,7 +12,10 @@
  */
 package org.flowable.test.spring.boot;
 
-import flowable.Application;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.idm.api.IdmIdentityService;
@@ -22,9 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import flowable.Application;
 
 /**
  * @author Filip Hrisafov

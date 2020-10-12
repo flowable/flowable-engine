@@ -570,6 +570,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void init() {
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initProcessDiagramGenerator();
         initHistoryLevel();
         initExpressionManager();
@@ -578,7 +579,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFormEngines();
         initFormTypes();
         initScriptingEngines();
-        initClock();
         initBusinessCalendarManager();
         initCommandContextFactory();
         initTransactionContextFactory();

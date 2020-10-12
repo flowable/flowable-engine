@@ -14,6 +14,7 @@ package org.flowable.editor.language.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.HttpServiceTask;
@@ -55,6 +56,10 @@ public class HttpTaskJsonConverter extends BaseBpmnJsonConverter {
         BpmnJsonConverterContext converterContext) {
         HttpServiceTask task = new HttpServiceTask();
         task.setType("http");
+        String parallelInSameTransaction = getPropertyValueAsString(PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION, elementNode);
+        if (StringUtils.isNotEmpty(parallelInSameTransaction)) {
+            task.setParallelInSameTransaction(Boolean.parseBoolean(parallelInSameTransaction));
+        }
         addField("requestMethod", PROPERTY_HTTPTASK_REQ_METHOD, "GET", elementNode, task);
         addField("requestUrl", PROPERTY_HTTPTASK_REQ_URL, elementNode, task);
         addField("requestHeaders", PROPERTY_HTTPTASK_REQ_HEADERS, elementNode, task);

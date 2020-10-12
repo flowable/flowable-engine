@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 public class InjectedPlanItemInstanceBuilderImpl implements InjectedPlanItemInstanceBuilder {
 
     protected final CommandExecutor commandExecutor;
+    
     protected String stagePlanItemInstanceId;
     protected String caseInstanceId;
     protected String caseDefinitionId;

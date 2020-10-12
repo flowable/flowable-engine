@@ -32,8 +32,9 @@ public class EscalationEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         EscalationEventDefinition eventDefinition = new EscalationEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);

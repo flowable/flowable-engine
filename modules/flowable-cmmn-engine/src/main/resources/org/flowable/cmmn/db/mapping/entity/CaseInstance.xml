@@ -7,8 +7,7 @@
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{parentId ,jdbcType=VARCHAR},
+            1, #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{businessKey ,jdbcType=VARCHAR},
             #{name ,jdbcType=VARCHAR},
@@ -30,8 +29,7 @@
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
                 #{caseInstance.name ,jdbcType=VARCHAR},
@@ -54,8 +52,7 @@
             into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
                 #{caseInstance.name ,jdbcType=VARCHAR},
@@ -190,12 +187,14 @@
                     ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
             <id property="id" column="VAR_ID_"/>
             <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR"/>
-            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType"
-                    jdbcType="VARCHAR"/>
+            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR"/>
             <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
             <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR"/>
             <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR"/>
             <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+            <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
             <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
             <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
             <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR"/>
@@ -306,7 +305,7 @@
             <if test="includeCaseVariables">,
                 VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
                 VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
-                VAR_TASK_ID_,
+                VAR_TASK_ID_, VAR.SCOPE_ID_ as VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_, VAR.SCOPE_TYPE_ as VAR_SCOPE_TYPE_, 
                 VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
                 VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
             </if>
@@ -341,6 +340,9 @@
                 TEMPVAR_PROC_INST_ID_ as VAR_PROC_INST_ID_,
                 TEMPVAR_EXECUTION_ID_ as VAR_EXECUTION_ID_,
                 TEMPVAR_TASK_ID_ as VAR_TASK_ID_,
+                TEMPVAR_SCOPE_ID_ as VAR_SCOPE_ID_,
+                TEMPVAR_SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_,
+                TEMPVAR_SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
                 TEMPVAR_BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_,
                 TEMPVAR_DOUBLE_ as VAR_DOUBLE_,
                 TEMPVAR_TEXT_ as VAR_TEXT_,
@@ -375,6 +377,9 @@
                 VAR.PROC_INST_ID_ as TEMPVAR_PROC_INST_ID_,
                 VAR.EXECUTION_ID_ as TEMPVAR_EXECUTION_ID_,
                 VAR.TASK_ID_ as TEMPVAR_TASK_ID_,
+                VAR.SCOPE_ID_ as TEMPVAR_SCOPE_ID_,
+                VAR.SUB_SCOPE_ID_ as TEMPVAR_SUB_SCOPE_ID_,
+                VAR.SCOPE_TYPE_ as TEMPVAR_SCOPE_TYPE_,
                 VAR.BYTEARRAY_ID_ as TEMPVAR_BYTEARRAY_ID_,
                 VAR.DOUBLE_ as TEMPVAR_DOUBLE_,
                 VAR.TEXT_ as TEMPVAR_TEXT_,
@@ -522,17 +527,16 @@
                           <!-- Match-all variable-names when name is null -->
                           and A${index}.NAME_= #{queryVariableValue.name}
                         </if>
-                        <if test="!queryVariableValue.type.equals('null')">
-                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                        <if test="queryVariableValue.needsTypeCheck()">
                           and A${index}.TYPE_ = #{queryVariableValue.type}
                         </if>
                         <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                           <choose>
                             <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                              and lower(A${index}.TEXT_)
+                              and (lower(A${index}.TEXT_)
                             </when>
                             <otherwise>
-                              and A${index}.TEXT_
+                              and (A${index}.TEXT_
                             </otherwise>
                           </choose>
                           <choose>
@@ -543,6 +547,10 @@
                           <choose>
                             <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                           </choose>
+                          <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                              or A${index}.TEXT_ is null
+                          </if>
+                          )
                         </if>
                         <if test="queryVariableValue.textValue2 != null">
                         and A${index}.TEXT2_
@@ -556,14 +564,22 @@
                           </choose>
                         </if>
                         <if test="queryVariableValue.longValue != null">
-                            and A${index}.LONG_
+                            and (A${index}.LONG_
                             <include refid="variableOperator" />
                             #{queryVariableValue.longValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or A${index}.LONG_ is null
+                            </if>
+                            )
                         </if>
                         <if test="queryVariableValue.doubleValue != null">
-                            and A${index}.DOUBLE_
+                            and (A${index}.DOUBLE_
                             <include refid="variableOperator" />
                             #{queryVariableValue.doubleValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or A${index}.DOUBLE_ is null
+                            </if>
+                            )
                         </if>
                         <!-- Null variable type -->
                         <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
@@ -699,17 +715,16 @@
                                         <!-- Match-all variable-names when name is null -->
                                         and A_OR${orIndex}.NAME_= #{queryVariableValue.name}
                                     </if>
-                                    <if test="!queryVariableValue.type.equals('null')">
-                                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                                    <if test="queryVariableValue.needsTypeCheck()">
                                         and A_OR${orIndex}.TYPE_ = #{queryVariableValue.type}
                                     </if>
                                     <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                                         <choose>
                                             <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                                                and lower(A_OR${orIndex}.TEXT_)
+                                                and (lower(A_OR${orIndex}.TEXT_)
                                             </when>
                                             <otherwise>
-                                                and A_OR${orIndex}.TEXT_
+                                                and (A_OR${orIndex}.TEXT_
                                             </otherwise>
                                         </choose>
                                         <choose>
@@ -726,6 +741,10 @@
                                                 ${wildcardEscapeClause}
                                             </when>
                                         </choose>
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.TEXT_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <if test="queryVariableValue.textValue2 != null">
                                         and A_OR${orIndex}.TEXT2_
@@ -741,14 +760,22 @@
                                         </choose>
                                     </if>
                                     <if test="queryVariableValue.longValue != null">
-                                        and A_OR${orIndex}.LONG_
+                                        and (A_OR${orIndex}.LONG_
                                         <include refid="variableOperator"/>
                                         #{queryVariableValue.longValue}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.LONG_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <if test="queryVariableValue.doubleValue != null">
-                                        and A_OR${orIndex}.DOUBLE_
+                                        and (A_OR${orIndex}.DOUBLE_
                                         <include refid="variableOperator"/>
                                         #{queryVariableValue.doubleValue}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or A_OR${index}.DOUBLE_ is null
+                                        </if>
+                                        )
                                     </if>
                                     <!-- Null variable type -->
                                     <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">

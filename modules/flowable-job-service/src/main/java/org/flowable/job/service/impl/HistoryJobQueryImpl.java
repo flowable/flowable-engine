@@ -18,12 +18,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -33,6 +33,9 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJob> implements HistoryJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String handlerType;
     protected boolean withException;
@@ -48,12 +51,14 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     public HistoryJobQueryImpl() {
     }
 
-    public HistoryJobQueryImpl(CommandContext commandContext) {
+    public HistoryJobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public HistoryJobQueryImpl(CommandExecutor commandExecutor) {
+    public HistoryJobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -143,23 +148,8 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     // sorting //////////////////////////////////////////
 
     @Override
-    public HistoryJobQuery orderByJobDuedate() {
-        return orderBy(JobQueryProperty.DUEDATE);
-    }
-
-    @Override
-    public HistoryJobQuery orderByExecutionId() {
-        return orderBy(JobQueryProperty.EXECUTION_ID);
-    }
-
-    @Override
     public HistoryJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
-    }
-
-    @Override
-    public HistoryJobQuery orderByProcessInstanceId() {
-        return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
     @Override
@@ -176,12 +166,12 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getHistoryJobEntityManager().findHistoryJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoryJob> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -191,7 +181,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {

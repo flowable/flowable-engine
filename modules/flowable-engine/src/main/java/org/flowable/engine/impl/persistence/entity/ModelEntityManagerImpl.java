@@ -66,7 +66,7 @@ public class ModelEntityManagerImpl
         ModelEntity model = findById(modelId);
         if (model != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-            ref.setValue("source", modelSource);
+            ref.setValue("source", modelSource, engineConfiguration.getEngineCfgKey());
 
             if (model.getEditorSourceValueId() == null) {
                 model.setEditorSourceValueId(ref.getId());
@@ -79,7 +79,7 @@ public class ModelEntityManagerImpl
     public void deleteEditorSource(ModelEntity model) {
         if (model.getEditorSourceValueId() != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-            ref.delete();
+            ref.delete(engineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -87,7 +87,7 @@ public class ModelEntityManagerImpl
     public void deleteEditorSourceExtra(ModelEntity model) {
         if (model.getEditorSourceExtraValueId() != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-            ref.delete();
+            ref.delete(engineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -96,7 +96,7 @@ public class ModelEntityManagerImpl
         ModelEntity model = findById(modelId);
         if (model != null) {
             ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-            ref.setValue("source-extra", modelSource);
+            ref.setValue("source-extra", modelSource, engineConfiguration.getEngineCfgKey());
 
             if (model.getEditorSourceExtraValueId() == null) {
                 model.setEditorSourceExtraValueId(ref.getId());
@@ -123,7 +123,7 @@ public class ModelEntityManagerImpl
         }
 
         ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceValueId(), null);
-        return ref.getBytes();
+        return ref.getBytes(engineConfiguration.getEngineCfgKey());
     }
 
     @Override
@@ -134,7 +134,7 @@ public class ModelEntityManagerImpl
         }
 
         ByteArrayRef ref = new ByteArrayRef(model.getEditorSourceExtraValueId(), null);
-        return ref.getBytes();
+        return ref.getBytes(engineConfiguration.getEngineCfgKey());
     }
 
     @Override

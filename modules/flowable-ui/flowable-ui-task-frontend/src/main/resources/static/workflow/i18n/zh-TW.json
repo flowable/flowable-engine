@@ -33,6 +33,7 @@
         },
         "ACTION": {
             "LOGOUT": "退出", 
+            "DASHBOARD": "Dashboard",
             "ADD-COMMENT": "添加评论", 
             "SAVE": "保存", 
             "CANCEL": "取消", 

@@ -13,6 +13,7 @@
 package org.flowable.crystalball.simulator.impl.playback;
 
 import static org.apache.commons.lang3.StringUtils.startsWith;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,14 +46,14 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
 
     public void demoCheckStatus() {
         final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().singleResult();
-        assertNotNull(historicProcessInstance);
+        assertThat(historicProcessInstance).isNotNull();
         RepositoryService repositoryService = processEngine.getRepositoryService();
         final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
-        assertEquals(SIMPLEST_PROCESS, processDefinition.getKey());
+        assertThat(processDefinition.getKey()).isEqualTo(SIMPLEST_PROCESS);
 
-        assertEquals(1, historicProcessInstance.getProcessVariables().size());
-        assertEquals(TEST_VALUE, historicProcessInstance.getProcessVariables().get(TEST_VARIABLE));
-        assertEquals(BUSINESS_KEY, historicProcessInstance.getBusinessKey());
+        assertThat(historicProcessInstance.getProcessVariables()).hasSize(1);
+        assertThat(historicProcessInstance.getProcessVariables()).containsEntry(TEST_VARIABLE, TEST_VALUE);
+        assertThat(historicProcessInstance.getBusinessKey()).isEqualTo(BUSINESS_KEY);
     }
 
     @CheckStatus(methodName = "messageProcessStartCheckStatus")
@@ -64,8 +65,8 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
 
     public void messageProcessStartCheckStatus() {
         final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().singleResult();
-        assertNotNull(historicProcessInstance);
-        assertTrue(startsWith(historicProcessInstance.getProcessDefinitionId(), "messageStartEventProcess"));
+        assertThat(historicProcessInstance).isNotNull();
+        assertThat(startsWith(historicProcessInstance.getProcessDefinitionId(), "messageStartEventProcess")).isTrue();
     }
 
     @Deployment
@@ -78,8 +79,8 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
 
     public void checkStatus() {
         final List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().finished().list();
-        assertNotNull(historicProcessInstances);
-        assertEquals(2, historicProcessInstances.size());
+        assertThat(historicProcessInstances).isNotNull();
+        assertThat(historicProcessInstances).hasSize(2);
     }
 
     @Deployment
@@ -93,9 +94,9 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
 
     public void userTaskCheckStatus() {
         final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().singleResult();
-        assertNotNull(historicProcessInstance);
-        assertEquals("oneTaskProcessBusinessKey", historicProcessInstance.getBusinessKey());
+        assertThat(historicProcessInstance).isNotNull();
+        assertThat(historicProcessInstance.getBusinessKey()).isEqualTo("oneTaskProcessBusinessKey");
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("userTask").singleResult();
-        assertEquals("user1", historicTaskInstance.getAssignee());
+        assertThat(historicTaskInstance.getAssignee()).isEqualTo("user1");
     }
 }

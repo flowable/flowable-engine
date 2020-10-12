@@ -47,7 +47,7 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
     }
 
     protected org.flowable.task.api.Task copy(org.flowable.task.api.Task aTask) {
-        TaskEntity ent = CommandContextUtil.getTaskService().createTask();
+        TaskEntity ent = CommandContextUtil.getProcessEngineConfiguration().getTaskServiceConfiguration().getTaskService().createTask();
         ent.setId(aTask.getId());
         ent.setName(aTask.getName());
         ent.setDescription(aTask.getDescription());

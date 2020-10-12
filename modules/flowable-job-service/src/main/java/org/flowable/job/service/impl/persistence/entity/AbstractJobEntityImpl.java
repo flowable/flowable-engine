@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -311,16 +312,21 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
     }
 
     @Override
+    public void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef) {
+        this.customValuesByteArrayRef = customValuesByteArrayRef;
+    }
+
+    @Override
     public String getCustomValues() {
         return getJobByteArrayRefAsString(customValuesByteArrayRef);
     }
 
     @Override
     public void setCustomValues(String customValues) {
-        if(customValuesByteArrayRef == null) {
+        if (customValuesByteArrayRef == null) {
             customValuesByteArrayRef = new ByteArrayRef();
         }
-        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());
     }
 
     @Override
@@ -344,7 +350,7 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
             exceptionByteArrayRef = new ByteArrayRef();
         }
 
-        exceptionByteArrayRef.setValue("stacktrace", exception);
+        exceptionByteArrayRef.setValue("stacktrace", exception, getEngineType());
     }
 
     @Override
@@ -362,13 +368,26 @@ public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity imp
         return exceptionByteArrayRef;
     }
 
+    @Override
+    public void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef) {
+        this.exceptionByteArrayRef = exceptionByteArrayRef;
+    }
+
     private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }
-        return jobByteArrayRef.asString();
+        return jobByteArrayRef.asString(getEngineType());
     }
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         return getClass().getName() + " [id=" + id + "]";

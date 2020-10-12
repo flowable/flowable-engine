@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.flowable.engine.impl.test.HistoryTestHelper.isHistoryLevelAtLeast;
 
@@ -50,7 +51,6 @@ import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -65,6 +65,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -833,7 +834,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         String taskId = task.getId();
-        taskService.complete(taskId, null);
+        taskService.complete(taskId, (Map<String, Object>) null);
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);
@@ -844,7 +845,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(task).isNull();
 
         managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
             return null;
         });
     }
@@ -867,7 +868,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         assertThat(task).isNull();
 
         managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForTaskId(taskId);
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
             return null;
         });
     }
@@ -1063,10 +1064,12 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Complete first task
-        Map<String, Object> taskParams = new HashMap<>();
-        taskParams.put("a", 1);
-        taskParams.put("b", 1);
-        taskService.complete(task.getId(), taskParams, true);
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .variableLocal("a", 1)
+                .variableLocal("b", 1)
+                .complete();
 
         // Verify vars are not stored process instance wide
         assertThat(runtimeService.getVariable(processInstance.getId(), "a")).isNull();
@@ -1077,6 +1080,29 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         // Fetch second task
         taskService.createTaskQuery().singleResult();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskWithFormKeyProcess.bpmn20.xml" })
+    public void taskFormModelExceptions() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithFormProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThatThrownBy(() -> taskService.getTaskFormModel(task.getId(), true))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Form engine is not initialized");
+        assertThatThrownBy(() -> taskService.getTaskFormModel(task.getId()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Form engine is not initialized");
+
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, Collections.EMPTY_MAP))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefinitionId", "outcome", Collections.EMPTY_MAP, false))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+
+        taskService.complete(task.getId());
     }
 
     @Test
@@ -1925,6 +1951,26 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         String taskId = task.getId();
         taskService.resolveTask(taskId, null);
+
+        if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            historyService.deleteHistoricTaskInstance(taskId);
+        }
+
+        // Fetch the task again
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
+
+        taskService.deleteTask(taskId, true);
+    }
+
+    @Test
+    public void resolveTaskWithParametersNullParametersEmptyTransientVariables() {
+        org.flowable.task.api.Task task = taskService.newTask();
+        task.setDelegationState(DelegationState.PENDING);
+        taskService.saveTask(task);
+
+        String taskId = task.getId();
+        taskService.resolveTask(taskId, null, Collections.EMPTY_MAP);
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(taskId);

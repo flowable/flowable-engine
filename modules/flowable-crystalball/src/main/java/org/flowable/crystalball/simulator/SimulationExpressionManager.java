@@ -26,7 +26,7 @@ import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 
 /**
- * {@link org.flowable.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
+ * {@link org.flowable.common.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
  *
  * @author martin.grofcik
  */

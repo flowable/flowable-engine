@@ -43,11 +43,14 @@
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href="#engine" translate="GENERAL.MENU.CONFIGURATION"></a></li>
+                        <li><a href="" ng-click="backToLanding()" translate>GENERAL.ACTION.DASHBOARD</a></li>
                         <li><a href="" ng-click="logout()" translate="GENERAL.ACTION.LOGOUT"></a></li>
                     </ul>
                 </div>
-                <div class="navbar-header pull-right">
-                    <a class="navbar-brand" title="{{'GENERAL.MAIN-TITLE' | translate}}"><span class="sr-only">{{'GENERAL.TITLE.MAIN' | translate}}</span></a>
+                <div class="navbar-header">
+                    <a ng-click="backToLanding()" class="landing-logo" title="{{'GENERAL.MAIN-TITLE' | translate}}">
+                        <img ng-src="../images/flowable-logo.png" ng-srcset="../images/flowable-logo.png 1x, ../images/flowable-logo@2x.png 2x">
+                    </a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" ng-show="authenticated">

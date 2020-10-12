@@ -73,7 +73,7 @@ public class FlowableUser extends org.springframework.security.core.userdetails.
     /**
      * The privileges are as {@link GrantedAuthority}. THey can be extracted through {@link #getAuthorities()}
      *
-     * @@deprecated use {@link #getAuthorities()} instead
+     * @deprecated use {@link #getAuthorities()} instead
      */
     @Deprecated
     public List<Privilege> getPrivileges() {

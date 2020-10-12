@@ -34,6 +34,7 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.TerminateEventDefinition;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**
@@ -216,7 +217,8 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
             if (config != null && config.getEventDispatcher().isEnabled()) {
                 config.getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
 
@@ -226,7 +228,8 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createCancelledEvent(execution.getId(), execution.getProcessInstanceId(),
-                            execution.getProcessDefinitionId(), terminateEndEventActivity));
+                            execution.getProcessDefinitionId(), terminateEndEventActivity),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         dispatchExecutionCancelled(scopeExecution, terminateEndEventActivity);
     }
@@ -258,7 +261,8 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
                         execution.getProcessInstanceId(), execution.getProcessDefinitionId(),
                         (String) activity.getProperties().get("type"),
                         activity.getActivityBehavior().getClass().getCanonicalName(),
-                        causeActivity));
+                        causeActivity),
+                EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
     public EndEvent getEndEvent() {

@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -303,9 +304,12 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfInts).isEqualTo(10);
         assertThat(nrOfSerializable).isEqualTo(10);
 
-        assertThat(vars.get("stringVar1")).isEqualTo("stringVarValue-1");
-        assertThat(vars.get("stringVar2")).isEqualTo("stringVarValue-2");
-        assertThat(vars.get("myVar")).isNull();
+        assertThat(vars)
+                .contains(
+                        entry("stringVar1", "stringVarValue-1"),
+                        entry("stringVar2", "stringVarValue-2")
+                );
+        assertThat(vars).doesNotContainKey("myVar");
 
         // Execution local
 
@@ -345,20 +349,25 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfInts).isEqualTo(10);
         assertThat(nrOfSerializable).isEqualTo(10);
 
-        assertThat(vars.get("stringVar1")).isEqualTo("hello");
-        assertThat(vars.get("stringVar2")).isEqualTo("world");
-        assertThat(vars.get("myVar")).isEqualTo("test123");
+        assertThat(vars)
+                .contains(
+                    entry("stringVar1", "hello"),
+                    entry("stringVar2", "world"),
+                    entry("myVar", "test123")
+                );
     }
 
     @Test
     public void testGetVariablesWithCollectionThroughRuntimeService() {
 
         Map<String, Object> vars = runtimeService.getVariables(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9"));
-        assertThat(vars).hasSize(4);
-        assertThat(vars.get("intVar1")).isEqualTo(100);
-        assertThat(vars.get("intVar3")).isEqualTo(300);
-        assertThat(vars.get("intVar5")).isEqualTo(500);
-        assertThat(vars.get("intVar9")).isEqualTo(900);
+        assertThat(vars)
+                .containsOnly(
+                        entry("intVar1", 100),
+                        entry("intVar3", 300),
+                        entry("intVar5", 500),
+                        entry("intVar9", 900)
+                );
 
         assertThat(runtimeService.getVariablesLocal(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9"))).hasSize(4);
 
@@ -519,11 +528,11 @@ public class VariablesTest extends PluggableFlowableTestCase {
         Collection<String> varNames = new ArrayList<>();
         varNames.add("stringVar1");
         assertThat(taskService.getVariable(task.getId(), "stringVar1")).isEqualTo("stringVarValue-1");
-        assertThat(taskService.getVariables(task.getId(), varNames).get("stringVar1")).isEqualTo("stringVarValue-1");
+        assertThat(taskService.getVariables(task.getId(), varNames)).containsEntry("stringVar1", "stringVarValue-1");
         taskService.setVariableLocal(task.getId(), "stringVar1", "Override");
         assertThat(taskService.getVariables(task.getId())).hasSize(71);
         assertThat(taskService.getVariable(task.getId(), "stringVar1")).isEqualTo("Override");
-        assertThat(taskService.getVariables(task.getId(), varNames).get("stringVar1")).isEqualTo("Override");
+        assertThat(taskService.getVariables(task.getId(), varNames)).containsEntry("stringVar1", "Override");
     }
 
     @Test

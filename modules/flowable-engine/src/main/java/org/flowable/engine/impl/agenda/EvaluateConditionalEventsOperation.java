@@ -58,7 +58,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
         for (ExecutionEntity childExecutionEntity : allExecutions) {
             String activityId = childExecutionEntity.getCurrentActivityId();
             FlowElement currentFlowElement = process.getFlowElement(activityId, true);
-            if (currentFlowElement != null && currentFlowElement instanceof Event) {
+            if (currentFlowElement instanceof Event) {
                 Event event = (Event) currentFlowElement;
                 if (!event.getEventDefinitions().isEmpty() && event.getEventDefinitions().get(0) instanceof ConditionalEventDefinition) {
                 
@@ -68,7 +68,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                     }
                 }
             
-            } else if (currentFlowElement != null && currentFlowElement instanceof SubProcess) {
+            } else if (currentFlowElement instanceof SubProcess) {
                 SubProcess subProcess = (SubProcess) currentFlowElement;
                 List<EventSubProcess> childEventSubProcesses = subProcess.findAllSubFlowElementInFlowMapOfType(EventSubProcess.class);
                 evaluateEventSubProcesses(childEventSubProcesses, childExecutionEntity);
@@ -94,7 +94,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                             if (StringUtils.isNotEmpty(conditionExpression)) {
                                 Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(conditionExpression);
                                 Object result = expression.getValue(parentExecution);
-                                if (result != null && result instanceof Boolean && (Boolean) result) {
+                                if (result instanceof Boolean && (Boolean) result) {
                                     conditionIsTrue = true;
                                 }
                             

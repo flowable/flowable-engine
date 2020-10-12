@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
 
@@ -47,6 +47,7 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
                 .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
                     assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
                     assertThat(httpServiceTask.getName()).isEqualTo("Service task");
+                    assertThat(httpServiceTask.getParallelInSameTransaction()).isNull();
                     assertThat(httpServiceTask.getFieldExtensions()).isEmpty();
                     assertThat(httpServiceTask.getHttpRequestHandler())
                             .extracting(FlowableHttpRequestHandler::getImplementationType, FlowableHttpRequestHandler::getImplementation)

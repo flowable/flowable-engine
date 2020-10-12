@@ -25,7 +25,7 @@ import org.flowable.common.engine.impl.FlowableVersions;
 public interface AppEngine extends Engine {
     
     /** the version of the flowable CMMN library */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     AppManagementService getAppManagementService();
     

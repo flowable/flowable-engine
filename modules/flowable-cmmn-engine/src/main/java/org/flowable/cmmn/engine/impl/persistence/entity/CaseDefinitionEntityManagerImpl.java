@@ -28,8 +28,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataM
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -92,13 +93,15 @@ public class CaseDefinitionEntityManagerImpl
         
         // Case instances
         CaseInstanceEntityManager caseInstanceEntityManager = getCaseInstanceEntityManager();
-        List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(new CaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
+        CommandContext commandContext = Context.getCommandContext();
+        List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(
+                new CaseInstanceQueryImpl(commandContext, engineConfiguration).caseDefinitionId(caseDefinitionId));
         for (CaseInstance caseInstance : caseInstances) {
             caseInstanceEntityManager.delete(caseInstance.getId(), true, null);
         }
         
         if (cascadeHistory) {
-            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForScopeDefinition(ScopeTypes.CMMN, caseDefinitionId);
+            engineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForScopeDefinition(ScopeTypes.CMMN, caseDefinitionId);
 
             HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = getHistoricIdentityLinkEntityManager();
             historicIdentityLinkEntityManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(caseDefinitionId, ScopeTypes.CMMN);
@@ -116,7 +119,7 @@ public class CaseDefinitionEntityManagerImpl
             List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceEntityManager
                     .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().scopeDefinitionId(caseDefinitionId).scopeType(ScopeTypes.CMMN)); 
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
-                TaskHelper.deleteHistoricTask(historicTaskInstance.getId());
+                TaskHelper.deleteHistoricTask(historicTaskInstance.getId(), engineConfiguration);
             }
 
             // Historic Plan Items

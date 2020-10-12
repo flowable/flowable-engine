@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,6 +29,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HistoricUserTaskLogDeleteJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public HistoricUserTaskLogDeleteJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_HISTORIC_TASK_LOG_DELETE);
@@ -43,7 +47,7 @@ public class HistoricUserTaskLogDeleteJsonTransformer extends AbstractHistoryJso
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         Long logNumber = getLongFromJson(historicalData, HistoryJsonConstants.LOG_ENTRY_LOGNUMBER);
         if (logNumber != null) {
-            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntry(logNumber);
         }
     }
 }

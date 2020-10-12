@@ -1,4 +1,4 @@
-package org.flowable.spring.boot.ldap;/* Licensed under the Apache License, Version 2.0 (the "License");
+/* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,6 +10,7 @@ package org.flowable.spring.boot.ldap;/* Licensed under the Apache License, Vers
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.spring.boot.ldap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.ldap.LDAPConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov

@@ -77,8 +77,7 @@ public interface ExpressionNode extends Node {
 	public Class<?> getType(Bindings bindings, ELContext context);
 
 	/**
-	 * Determine whether {@link #setValue(Bindings, ELContext, Object)} will throw a
-	 * {@link javax.el.PropertyNotWritableException}.
+	 * Determine whether {@link #setValue(Bindings, ELContext, Object)} will throw a javax.el.PropertyNotWritableException.
 	 * 
 	 * @param bindings
 	 *            bindings containing variables and functions
@@ -136,11 +135,11 @@ public interface ExpressionNode extends Node {
 	 * Get the canonical expression string for this node. Variable and funtion names will be
 	 * replaced in a way such that two expression nodes that have the same node structure and
 	 * bindings will also answer the same value here.
-	 * <p/>
+	 * <p>
 	 * For example, <code>"${foo:bar()+2*foobar}"</code> may lead to
-	 * <code>"${&lt;fn>() + 2 * &lt;var>}"</code> if <code>foobar</code> is a bound variable.
-	 * Otherwise, the structural id would be <code>"${&lt;fn>() + 2 * foobar}"</code>.
-	 * <p/>
+	 * <code>"${&lt;fn&gt;() + 2 * &lt;var&gt;}"</code> if <code>foobar</code> is a bound variable.
+	 * Otherwise, the structural id would be <code>"${&lt;fn&gt;() + 2 * foobar}"</code>.
+	 * <p>
 	 * If the bindings is <code>null</code>, the full canonical subexpression is returned.
 	 */
 	public String getStructuralId(Bindings bindings);

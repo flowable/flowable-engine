@@ -65,8 +65,9 @@ public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
     @Deprecated
     public void setIndentStep(int indentStep) {
         StringBuilder s = new StringBuilder();
-        for (; indentStep > 0; indentStep--)
+        for (; indentStep > 0; indentStep--) {
             s.append(' ');
+        }
         setIndentStep(s.toString());
     }
 
@@ -109,8 +110,9 @@ public class IndentingXMLStreamWriter extends DelegatingXMLStreamWriter {
      */
     private void doIndent() throws XMLStreamException {
         if (depth > 0) {
-            for (int i = 0; i < depth; i++)
+            for (int i = 0; i < depth; i++) {
                 super.writeCharacters(indentStep);
+            }
         }
     }
 

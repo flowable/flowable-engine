@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.engine.impl.runtime;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -21,6 +22,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Tijs Rademakers
  */
 public class DefaultCmmnDynamicStateManager extends AbstractCmmnDynamicStateManager implements CmmnDynamicStateManager {
+    
+    public DefaultCmmnDynamicStateManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
 
     @Override
     public void movePlanItemInstanceState(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, CommandContext commandContext) {

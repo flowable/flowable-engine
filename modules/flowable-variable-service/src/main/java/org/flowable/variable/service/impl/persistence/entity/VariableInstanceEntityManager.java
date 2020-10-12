@@ -30,7 +30,7 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
      * <b>IMPORTANT:</b> If you use this method you would have to call {@link VariableInstanceEntity#setValue(Object)}
      * for setting the value
      * @param name the name of the variable to create
-     * @param type the type of the creted variable
+     * @param type the type of the created variable
      *
      * @return the {@link VariableInstanceEntity} to be used
      */

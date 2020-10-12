@@ -14,6 +14,8 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -1967,8 +1969,274 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
             } else if (execution.getParentId().equals(execution.getProcessInstanceId())) {
                 assertThat(execution.getActivityId()).isEqualTo("embeddedSubprocess");
             } else {
-                fail();
+                fail("Unknown 'getParentID()'");
             }
         }
+    }
+
+    @Test
+    public void testQueryVariableValueEqualsAndNotEquals() {
+        ProcessInstance processWithStringValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With string value")
+                .start();
+
+        ProcessInstance processWithNullValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With null value")
+                .start();
+
+        ProcessInstance processWithLongValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With long value")
+                .start();
+
+        ProcessInstance processWithDoubleValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With double value")
+                .start();
+
+        Execution executionWithStringValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithStringValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithStringValue).isNotNull();
+        runtimeService.setVariableLocal(executionWithStringValue.getId(), "var", "TEST");
+
+        Execution executionWithNullValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithNullValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithNullValue).isNotNull();
+        runtimeService.setVariableLocal(executionWithNullValue.getId(), "var", null);
+
+        Execution executionWithLongValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithLongValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithLongValue).isNotNull();
+        runtimeService.setVariableLocal(executionWithLongValue.getId(), "var", 100L);
+
+        Execution executionWithDoubleValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithDoubleValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithDoubleValue).isNotNull();
+        runtimeService.setVariableLocal(executionWithDoubleValue.getId(), "var", 45.55);
+
+        assertThat(runtimeService.createExecutionQuery().variableValueNotEquals("var", "TEST").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueEquals("var", "TEST").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithStringValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueNotEquals("var", 100L).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueEquals("var", 100L).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueNotEquals("var", 45.55).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueEquals("var", 45.55).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueNotEquals("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().variableValueEquals("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .isEmpty();
+
+        assertThat(runtimeService.createExecutionQuery().variableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple(null, "theTask", executionWithStringValue.getId())
+                );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryProcessVariableValueEqualsAndNotEquals() {
+        ProcessInstance processWithStringValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With string value")
+                .variable("var", "TEST")
+                .start();
+
+        ProcessInstance processWithNullValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With null value")
+                .variable("var", null)
+                .start();
+
+        ProcessInstance processWithLongValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With long value")
+                .variable("var", 100L)
+                .start();
+
+        ProcessInstance processWithDoubleValue = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .name("With double value")
+                .variable("var", 45.55)
+                .start();
+
+        Execution executionWithStringValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithStringValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithStringValue).isNotNull();
+
+        Execution executionWithNullValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithNullValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithNullValue).isNotNull();
+
+        Execution executionWithLongValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithLongValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithLongValue).isNotNull();
+
+        Execution executionWithDoubleValue = runtimeService.createExecutionQuery()
+                .processInstanceId(processWithDoubleValue.getId())
+                .activityId("theTask")
+                .singleResult();
+        assertThat(executionWithDoubleValue).isNotNull();
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueNotEquals("var", "TEST").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", null, processWithNullValue.getId()),
+                        tuple("With long value", null, processWithLongValue.getId()),
+                        tuple("With double value", null, processWithDoubleValue.getId()),
+
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueEquals("var", "TEST").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", null, processWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithStringValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueNotEquals("var", 100L).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", null, processWithStringValue.getId()),
+                        tuple("With null value", null, processWithNullValue.getId()),
+                        tuple("With double value", null, processWithDoubleValue.getId()),
+
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueEquals("var", 100L).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With long value", null, processWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueNotEquals("var", 45.55).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", null, processWithStringValue.getId()),
+                        tuple("With null value", null, processWithNullValue.getId()),
+                        tuple("With long value", null, processWithLongValue.getId()),
+
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueEquals("var", 45.55).list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With double value", null, processWithDoubleValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueNotEquals("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", null, processWithStringValue.getId()),
+                        tuple("With null value", null, processWithNullValue.getId()),
+                        tuple("With long value", null, processWithLongValue.getId()),
+                        tuple("With double value", null, processWithDoubleValue.getId()),
+
+                        tuple(null, "theTask", executionWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueNotEqualsIgnoreCase("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With null value", null, processWithNullValue.getId()),
+                        tuple("With long value", null, processWithLongValue.getId()),
+                        tuple("With double value", null, processWithDoubleValue.getId()),
+
+                        tuple(null, "theTask", executionWithNullValue.getId()),
+                        tuple(null, "theTask", executionWithLongValue.getId()),
+                        tuple(null, "theTask", executionWithDoubleValue.getId())
+                );
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueEquals("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .isEmpty();
+
+        assertThat(runtimeService.createExecutionQuery().processVariableValueEqualsIgnoreCase("var", "test").list())
+                .extracting(Execution::getName, Execution::getActivityId, Execution::getId)
+                .containsExactlyInAnyOrder(
+                        tuple("With string value", null, processWithStringValue.getId()),
+                        tuple(null, "theTask", executionWithStringValue.getId())
+                );
     }
 }

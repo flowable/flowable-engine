@@ -18,8 +18,7 @@
         TOKEN_DATA_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{tokenValue, jdbcType=VARCHAR},
+        1, #{tokenValue, jdbcType=VARCHAR},
         #{tokenDate, jdbcType=TIMESTAMP},
         #{ipAddress, jdbcType=VARCHAR},
         #{userAgent, jdbcType=VARCHAR},
@@ -42,8 +41,7 @@
       <foreach collection="list" item="token" index="index" separator=",">
       (
         #{token.id ,jdbcType=VARCHAR},
-        1,
-        #{token.tokenValue, jdbcType=VARCHAR},
+        1, #{token.tokenValue, jdbcType=VARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
         #{token.ipAddress, jdbcType=VARCHAR},
         #{token.userAgent, jdbcType=VARCHAR},
@@ -67,8 +65,7 @@
             TOKEN_DATA_
       ) VALUES (
         #{token.id ,jdbcType=VARCHAR},
-        1,
-        #{token.tokenValue, jdbcType=VARCHAR},
+        1, #{token.tokenValue, jdbcType=VARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
         #{token.ipAddress, jdbcType=VARCHAR},
         #{token.userAgent, jdbcType=VARCHAR},

@@ -88,7 +88,8 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
             PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
             if (planItemInstanceEntity != null) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
-                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+                        CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), 
+                        planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
         }
     }
@@ -102,7 +103,8 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
             PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
             if (planItemInstanceEntity != null) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Unlocking job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
-                                CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_UNLOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), planItemInstanceEntity);
+                        CmmnLoggingSessionConstants.TYPE_SERVICE_TASK_UNLOCK_JOB, (JobEntity) job, planItemInstanceEntity.getPlanItemDefinition(), 
+                        planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
             }
         }
     }

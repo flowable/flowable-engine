@@ -270,13 +270,17 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     // //////////////////////////////////////////////////////////////////////
 
     protected void sendCompletedWithConditionEvent(DelegateExecution execution) {
-        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
-                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION));
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION),
+                processEngineConfiguration.getEngineCfgKey());
     }
 
     protected void sendCompletedEvent(DelegateExecution execution) {
-        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
-                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED));
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED),
+                processEngineConfiguration.getEngineCfgKey());
     }
 
     protected FlowableMultiInstanceActivityCompletedEvent buildCompletedEvent(DelegateExecution execution, FlowableEngineEventType eventType) {

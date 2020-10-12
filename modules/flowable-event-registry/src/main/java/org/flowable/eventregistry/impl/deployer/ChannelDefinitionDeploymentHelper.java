@@ -98,8 +98,7 @@ public class ChannelDefinitionDeploymentHelper {
     }
 
     /**
-     * Gets the persisted version of the already-deployed channel definition. Note that this is different from {@link #getExistingEventDefinition} as it looks specifically for a form that is already persisted and
-     * attached to a particular deployment, rather than the channel definition across all deployments.
+     * Gets the persisted version of the already-deployed channel definition.
      */
     public ChannelDefinitionEntity getPersistedInstanceOfChannelDefinition(ChannelDefinitionEntity channelDefinition) {
         String deploymentId = channelDefinition.getDeploymentId();

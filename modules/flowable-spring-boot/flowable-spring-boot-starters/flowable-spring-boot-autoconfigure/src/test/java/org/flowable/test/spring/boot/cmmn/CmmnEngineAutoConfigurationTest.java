@@ -35,6 +35,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.HttpClientConfig;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
@@ -44,6 +45,8 @@ import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -55,7 +58,7 @@ import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -101,6 +104,7 @@ public class CmmnEngineAutoConfigurationTest {
             assertThat(httpClientConfig.getConnectionRequestTimeout()).isEqualTo(1000);
             assertThat(httpClientConfig.getRequestRetryLimit()).isEqualTo(1);
             assertThat(httpClientConfig.isDisableCertVerify()).isTrue();
+            assertThat(httpClientConfig.getHttpClient()).isNull();
 
             deleteDeployments(cmmnEngine);
         });
@@ -447,9 +451,41 @@ public class CmmnEngineAutoConfigurationTest {
         });
     }
 
+    @Test
+    public void cmmnEngineWithCustomHttpClient() {
+        contextRunner.withUserConfiguration(CustomHttpClientConfiguration.class)
+                .run(context -> {
+                    assertThat(context)
+                            .as("CMMN engine").hasSingleBean(CmmnEngine.class)
+                            .as("Http Client").hasSingleBean(FlowableHttpClient.class);
+
+                    CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+
+                    CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
+                    assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
+                            .isEqualTo(context.getBean(FlowableHttpClient.class));
+                });
+    }
+
+    @Test
+    public void cmmnEngineWithCustomAsyncHttpClient() {
+        contextRunner.withUserConfiguration(CustomAsyncHttpClientConfiguration.class)
+                .run(context -> {
+                    assertThat(context)
+                            .as("CMMN engine").hasSingleBean(CmmnEngine.class)
+                            .as("Http Client").hasSingleBean(FlowableAsyncHttpClient.class);
+
+                    CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+
+                    CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
+                    assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
+                            .isEqualTo(context.getBean(FlowableAsyncHttpClient.class));
+                });
+    }
+
     private void assertAllServicesPresent(ApplicationContext context, CmmnEngine cmmnEngine) {
         List<Method> methods = Stream.of(CmmnEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getReturnType().equals(void.class) || method.getName().equals("getName"))).collect(Collectors.toList());
+            .filter(method -> !(method.getReturnType().equals(void.class) || "getName".equals(method.getName()))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {
@@ -552,6 +588,24 @@ public class CmmnEngineAutoConfigurationTest {
         @Override
         public void deployResources(String deploymentNameHint, Resource[] resources, CmmnEngine engine) {
 
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomHttpClientConfiguration {
+
+        @Bean
+        public FlowableHttpClient customHttpClient() {
+            return request -> null;
+        }
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomAsyncHttpClientConfiguration {
+
+        @Bean
+        public FlowableAsyncHttpClient customAsyncHttpClient() {
+            return request -> null;
         }
     }
 

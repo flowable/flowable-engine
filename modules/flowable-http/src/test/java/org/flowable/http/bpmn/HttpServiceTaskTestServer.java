@@ -129,6 +129,15 @@ public class HttpServiceTaskTestServer {
         }
 
         @Override
+        public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+            if (request.getMethod() != null && "PATCH".equalsIgnoreCase(request.getMethod())) {
+                doPatch(request, response);
+            } else {
+                super.service(request, response);
+            }
+        }
+
+        @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             HttpTestData data = parseTestData(req, resp);
             int code = data.getCode();
@@ -182,6 +191,11 @@ public class HttpServiceTaskTestServer {
 
         @Override
         protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            doPost(req, resp);
+        }
+        
+        // not in HttpServlet spec; see service()
+        protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doPost(req, resp);
         }
 

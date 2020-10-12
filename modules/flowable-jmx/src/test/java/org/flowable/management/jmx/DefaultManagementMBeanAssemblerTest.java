@@ -46,8 +46,9 @@ public class DefaultManagementMBeanAssemblerTest {
         assertThat(mbean.getMBeanInfo().getAttributes()).isNotNull();
         MBeanAttributeInfo[] attributes = mbean.getMBeanInfo().getAttributes();
         assertThat(attributes).hasSize(2);
-        assertThat((attributes[0].getName().equals("TestAttributeString") && attributes[1].getName().equals("TestAttributeBoolean") || (attributes[1].getName().equals("TestAttributeString") && attributes[0]
-                .getName().equals("TestAttributeBoolean")))).isTrue();
+        assertThat(("TestAttributeString".equals(attributes[0].getName()) && "TestAttributeBoolean".equals(attributes[1].getName()) || (
+		        "TestAttributeString".equals(attributes[1].getName()) && "TestAttributeBoolean".equals(attributes[0]
+		                .getName())))).isTrue();
         assertThat(mbean.getMBeanInfo().getOperations()).isNotNull();
         MBeanOperationInfo[] operations = mbean.getMBeanInfo().getOperations();
         assertThat(operations).isNotNull();

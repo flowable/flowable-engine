@@ -14,6 +14,7 @@ package org.flowable.dmn.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
@@ -23,6 +24,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.h2.util.IOUtils;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractFlowableDmnTest {
@@ -231,6 +233,201 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
     
     @Test
+    public void multipleSameDeployments() throws Exception {
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .enableDuplicateFiltering()
+                .deploy();
+
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .singleResult();
+        assertThat(deployment).isNotNull();
+        
+        List<DmnDecision> decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .list();
+        assertThat(deployments).hasSize(1);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        deleteDeployments();
+    }
+    
+    @Test
+    public void multipleDeployments() throws Exception {
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .enableDuplicateFiltering()
+                .deploy();
+
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .singleResult();
+        assertThat(deployment).isNotNull();
+        
+        List<DmnDecision> decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .list();
+        assertThat(deployments).hasSize(2);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("anotherDecision")
+                .list();
+        assertThat(decisions).hasSize(1);
+        
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .list();
+        assertThat(deployments).hasSize(2);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("anotherDecision")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        deleteDeployments();
+    }
+    
+    @Test
+    public void multipleSameDeploymentsInTenant() throws Exception {
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .tenantId("myTenant")
+                .enableDuplicateFiltering()
+                .deploy();
+
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .deploymentTenantId("myTenant")
+                .singleResult();
+        assertThat(deployment).isNotNull();
+        
+        List<DmnDecision> decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .decisionTenantId("myTenant")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .tenantId("myTenant")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .deploymentTenantId("myTenant")
+                .list();
+        assertThat(deployments).hasSize(1);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .decisionTenantId("myTenant")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        deleteDeployments();
+    }
+    
+    @Test
+    public void multipleDeploymentsInTenant() throws Exception {
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn")
+                .tenantId("myTenant")
+                .enableDuplicateFiltering()
+                .deploy();
+
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .deploymentTenantId("myTenant")
+                .singleResult();
+        assertThat(deployment).isNotNull();
+        
+        List<DmnDecision> decisions = repositoryService.createDecisionQuery()
+                .decisionKey("decision")
+                .decisionTenantId("myTenant")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                .tenantId("myTenant")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .deploymentTenantId("myTenant")
+                .list();
+        assertThat(deployments).hasSize(2);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("anotherDecision")
+                .decisionTenantId("myTenant")
+                .list();
+        assertThat(decisions).hasSize(1);
+        
+        repositoryService.createDeployment()
+                .name("deploymentA")
+                .addClasspathResource("org/flowable/dmn/engine/test/deployment/simple2.dmn")
+                .tenantId("myTenant")
+                .enableDuplicateFiltering()
+                .deploy();
+        
+        deployments = repositoryService.createDeploymentQuery()
+                .deploymentName("deploymentA")
+                .deploymentTenantId("myTenant")
+                .list();
+        assertThat(deployments).hasSize(2);
+        
+        decisions = repositoryService.createDecisionQuery()
+                .decisionKey("anotherDecision")
+                .decisionTenantId("myTenant")
+                .list();
+        assertThat(decisions).hasSize(1);
+
+        deleteDeployments();
+    }
+    
+    @Test
     public void deploySingleDecisionWithParentDeploymentId() {
         org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
@@ -294,13 +491,41 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertThat(deployment).isNotNull();
 
         List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
-        assertThat(decisionServices.size()).isEqualTo(2);
+        assertThat(decisionServices).hasSize(2);
         assertThat(decisionServices)
             .extracting(DmnDecision::getDecisionType)
             .containsExactly("decision_service", "decision_service");
 
         List<DmnDecision> decisionServices2 = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_SERVICE).list();
-        assertThat(decisionServices2.size()).isEqualTo(2);
+        assertThat(decisionServices2).hasSize(2);
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/decision_service_1.dmn")
+    public void testDecisionServicesDI() {
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
+        assertThat(deployment).isNotNull();
+
+        List<String> resourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
+        assertThat(resourceNames).hasSize(2);
+
+        String resourceName = "org/flowable/dmn/engine/test/deployment/decision_service_1.dmn";
+        String diagramResourceName = "org/flowable/dmn/engine/test/deployment/decision_service_1.decisionServiceOne.png";
+        assertThat(resourceNames).contains(resourceName, diagramResourceName);
+
+        InputStream inputStream = repositoryService.getResourceAsStream(deployment.getId(), resourceName);
+        assertThat(inputStream).isNotNull();
+        IOUtils.closeSilently(inputStream);
+
+        InputStream diagramInputStream = repositoryService.getResourceAsStream(deployment.getId(), diagramResourceName);
+        assertThat(diagramInputStream).isNotNull();
+        IOUtils.closeSilently(diagramInputStream);
+
+        DmnDecision decision = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).singleResult();
+
+        InputStream caseDiagramInputStream = repositoryService.getDecisionRequirementsDiagram(decision.getId());
+        assertThat(caseDiagramInputStream).isNotNull();
+        IOUtils.closeSilently(caseDiagramInputStream);
     }
 
     @Test
@@ -310,7 +535,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertThat(deployment).isNotNull();
 
         List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
-        assertThat(decisionServices.size()).isEqualTo(1);
+        assertThat(decisionServices).hasSize(1);
         assertThat(decisionServices.get(0).getDecisionType()).isEqualTo(DecisionTypes.DECISION_SERVICE);
     }
     

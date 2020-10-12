@@ -25,6 +25,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.asyncexecutor.FindExpiredJobsCmd;
 import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
@@ -46,12 +47,14 @@ class RestExpiredTimerJobsTest extends JobExecutorTestCase {
 
         String lockedJobId = commandExecutor.execute(commandContext -> {
             TimerJobEntity timer = createTweetTimer("i'm coding a locked test", Date.from(now.plusSeconds(10)));
-            CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+            timerJobService.scheduleTimerJob(timer);
             return timer.getId();
         });
 
         commandExecutor.execute(commandContext -> {
-            TimerJobEntity timer = CommandContextUtil.getTimerJobService(commandContext).findTimerJobById(lockedJobId);
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+            TimerJobEntity timer = timerJobService.findTimerJobById(lockedJobId);
             timer.setLockOwner("test");
             timer.setLockExpirationTime(Date.from(now.plus(5, ChronoUnit.MINUTES)));
             return null;
@@ -64,7 +67,8 @@ class RestExpiredTimerJobsTest extends JobExecutorTestCase {
 
         String notLockedJobId = commandExecutor.execute(commandContext -> {
             TimerJobEntity timer = createTweetTimer("i'm coding an unlocked test", Date.from(now.plusSeconds(10)));
-            CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);
+            TimerJobService timerJobService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+            timerJobService.scheduleTimerJob(timer);
             return timer.getId();
         });
 
@@ -72,14 +76,14 @@ class RestExpiredTimerJobsTest extends JobExecutorTestCase {
 
         JobServiceConfiguration jobServiceConfiguration = processEngineConfiguration.getJobServiceConfiguration();
         List<? extends JobInfoEntity> expiredJobs = managementService
-                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager()));
+                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager(), jobServiceConfiguration));
 
         assertThat(expiredJobs).isEmpty();
 
         processEngineConfiguration.getClock().setCurrentTime(Date.from(now.plus(15, ChronoUnit.MINUTES)));
 
         expiredJobs = managementService
-                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager()));
+                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager(), jobServiceConfiguration));
 
         assertThat(expiredJobs)
                 .extracting(JobInfoEntity::getId, JobInfoEntity::getJobHandlerConfiguration)
@@ -87,10 +91,10 @@ class RestExpiredTimerJobsTest extends JobExecutorTestCase {
                         tuple(lockedJobId, "i'm coding a locked test")
                 );
 
-        managementService.executeCommand(new ResetExpiredJobsCmd(Collections.singleton(lockedJobId), jobServiceConfiguration.getTimerJobEntityManager()));
+        managementService.executeCommand(new ResetExpiredJobsCmd(Collections.singleton(lockedJobId), jobServiceConfiguration.getTimerJobEntityManager(), jobServiceConfiguration));
 
         expiredJobs = managementService
-                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager()));
+                .executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getTimerJobEntityManager(), jobServiceConfiguration));
         assertThat(expiredJobs).isEmpty();
 
         lockedJob = managementService.createTimerJobQuery().jobId(lockedJobId).singleResult();

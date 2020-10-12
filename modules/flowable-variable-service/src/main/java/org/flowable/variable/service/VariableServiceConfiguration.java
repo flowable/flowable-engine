@@ -13,6 +13,7 @@
 package org.flowable.variable.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
@@ -54,6 +55,8 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     
+    protected ExpressionManager expressionManager;
+    
     protected int maxLengthString;
     
     protected boolean loggingSessionEnabled;
@@ -86,10 +89,10 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (variableInstanceDataManager == null) {
-            variableInstanceDataManager = new MybatisVariableInstanceDataManager();
+            variableInstanceDataManager = new MybatisVariableInstanceDataManager(this);
         }
         if (historicVariableInstanceDataManager == null) {
-            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager();
+            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager(this);
         }
     }
 
@@ -178,6 +181,15 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public VariableServiceConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
         this.internalHistoryVariableManager = internalHistoryVariableManager;
+        return this;
+    }
+
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public VariableServiceConfiguration setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
         return this;
     }
 

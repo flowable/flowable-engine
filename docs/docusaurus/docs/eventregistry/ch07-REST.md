@@ -277,7 +277,7 @@ Paging and order parameters can be added as query-string in the URL (for example
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**
 
 ### List of Event Registry Deployments
 
@@ -1350,7 +1350,7 @@ Returns a read-only view of the Event Registry engine that is used in this REST-
 
     {
        "name":"default",
-       "version":"6.5.0.event-SNAPSHOT"
+       "version":"6.6.0"
     }
 
 <table>

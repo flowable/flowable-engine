@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
@@ -178,4 +179,8 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
     }
     
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return jobServiceConfiguration.getIdGenerator();
+    }
 }

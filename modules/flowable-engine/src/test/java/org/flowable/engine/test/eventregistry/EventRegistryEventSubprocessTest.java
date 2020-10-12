@@ -311,7 +311,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

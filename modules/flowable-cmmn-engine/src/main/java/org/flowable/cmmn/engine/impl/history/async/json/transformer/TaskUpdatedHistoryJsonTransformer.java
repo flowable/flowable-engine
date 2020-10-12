@@ -12,10 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.history.async.AsyncHistorySession;
@@ -26,14 +29,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-
 /**
  * @author Joram Barrez
  */
 public class TaskUpdatedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskUpdatedHistoryJsonTransformer.class);
+    
+    public TaskUpdatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
 
     @Override
     public List<String> getTypes() {

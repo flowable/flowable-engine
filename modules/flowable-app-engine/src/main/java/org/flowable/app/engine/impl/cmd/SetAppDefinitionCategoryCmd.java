@@ -51,7 +51,7 @@ public class SetAppDefinitionCategoryCmd implements Command<Void> {
         // Update category
         appDefinition.setCategory(category);
 
-        // Remove app definition from cache, it will be refetched later
+        // Remove app definition from cache, it will be refetch later
         DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = CommandContextUtil.getAppEngineConfiguration(commandContext).getAppDefinitionCache();
         if (appDefinitionCache != null) {
             appDefinitionCache.remove(appDefinitionId);

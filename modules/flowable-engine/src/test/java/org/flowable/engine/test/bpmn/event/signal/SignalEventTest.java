@@ -185,7 +185,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(variableMap)
                 .containsOnly(
                         entry("myNewTextVar", "John Doe"),
-                        entry("myNewNumberVar", 2l));
+                        entry("myNewNumberVar", 2L));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         try {
             processEngineConfiguration.getClock().setCurrentTime(new Date(System.currentTimeMillis() + 1000));
-            waitForJobExecutorToProcessAllJobs(10000, 100l);
+            waitForJobExecutorToProcessAllJobs(10000, 100L);
 
             assertThat(createEventSubscriptionQuery().count()).isZero();
             assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
@@ -239,7 +239,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         
         try {
             processEngineConfiguration.getClock().setCurrentTime(new Date(System.currentTimeMillis() + 1000));
-            waitForJobExecutorToProcessAllJobs(10000, 100l);
+            waitForJobExecutorToProcessAllJobs(10000, 100L);
 
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -320,7 +320,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
     /**
@@ -891,7 +891,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         Map<String, Object> vars = runtimeService.getVariables(firstTask.getExecutionId());
         // file does not exists
-        assertThat(vars.get(fileExistsVar)).isEqualTo(false);
+        assertThat(vars)
+                .containsEntry(fileExistsVar, false);
 
         // create second instance
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("signalBoundaryProcess");
@@ -908,7 +909,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         // file does not exists yet
         vars = runtimeService.getVariables(secondTask.getExecutionId());
-        assertThat(vars.get(fileExistsVar)).isEqualTo(false);
+        assertThat(vars)
+                .containsEntry(fileExistsVar, false);
 
         // now, we "add a file"
         taskService.claim(firstTask.getId(), "user");

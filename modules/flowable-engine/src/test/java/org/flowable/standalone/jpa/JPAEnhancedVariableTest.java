@@ -14,6 +14,7 @@ package org.flowable.standalone.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,12 +121,12 @@ public class JPAEnhancedVariableTest extends ResourceFlowableTestCase {
         for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
-            if (name.equals("fieldEntity")) {
+            if ("fieldEntity".equals(name)) {
                 assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
-            } else if (name.equals("propertyEntity")) {
+            } else if ("propertyEntity".equals(name)) {
                 assertThat(value).isInstanceOf(PropertyAccessJPAEntity.class);
             } else {
-                fail();
+                fail("Unknown 'name' field");
             }
         }
     }

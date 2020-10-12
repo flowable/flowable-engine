@@ -61,7 +61,11 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
         this.processDefinitionId = processInstance.getProcessDefinitionId();
         this.tenantId = processInstance.getTenantId();
         this.graphicalNotationDefined = graphicalNotation;
-        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
+        if (startedBy != null) {
+            this.startedBy = new UserRepresentation(startedBy);
+        } else if (processInstance.getStartUserId() != null) {
+            this.startedBy = new UserRepresentation(processInstance.getStartUserId());
+        }
     }
 
     public ProcessInstanceRepresentation(HistoricProcessInstance processInstance, ProcessDefinition processDefinition, boolean graphicalNotation, User startedBy) {
@@ -78,7 +82,11 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
         this.graphicalNotationDefined = graphicalNotation;
         this.started = processInstance.getStartTime();
         this.ended = processInstance.getEndTime();
-        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
+        if (startedBy != null) {
+            this.startedBy = new UserRepresentation(startedBy);
+        } else if (processInstance.getStartUserId() != null) {
+            this.startedBy = new UserRepresentation(processInstance.getStartUserId());
+        }
     }
 
     protected void mapProcessDefinition(ProcessDefinition processDefinition) {

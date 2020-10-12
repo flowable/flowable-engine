@@ -36,6 +36,7 @@ public class ExternalWorkerJobFailureBuilderImpl implements ExternalWorkerJobFai
 
     public ExternalWorkerJobFailureBuilderImpl(String externalJobId, String workerId, CommandExecutor commandExecutor,
             JobServiceConfiguration jobServiceConfiguration) {
+        
         this.externalJobId = externalJobId;
         this.workerId = workerId;
         this.commandExecutor = commandExecutor;
@@ -68,7 +69,7 @@ public class ExternalWorkerJobFailureBuilderImpl implements ExternalWorkerJobFai
 
     @Override
     public void fail() {
-        commandExecutor
-                .execute(new ExternalWorkerJobFailCmd(externalJobId, workerId, retries, retryTimeout, errorMessage, errorDetails, jobServiceConfiguration));
+        commandExecutor.execute(new ExternalWorkerJobFailCmd(externalJobId, workerId, retries, retryTimeout, 
+                errorMessage, errorDetails, jobServiceConfiguration));
     }
 }

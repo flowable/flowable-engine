@@ -38,7 +38,7 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
         caseInstanceEntity.setState(newState);
     }
     
-    protected abstract String getNewState();
+    public abstract String getNewState();
     
     protected abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 

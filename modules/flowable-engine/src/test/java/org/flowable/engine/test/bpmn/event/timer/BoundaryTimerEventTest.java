@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -168,7 +167,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         // After setting the clock to time '1 hour and 5 seconds', the second
         // timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
         assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
@@ -519,7 +518,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -719,7 +718,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -780,7 +779,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();

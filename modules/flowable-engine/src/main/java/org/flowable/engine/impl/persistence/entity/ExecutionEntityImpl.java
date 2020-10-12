@@ -29,6 +29,9 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -39,6 +42,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -140,9 +144,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     /**
      * Persisted reference to the processDefinition.
      * 
-     * @see #processDefinition
-     * @see #setProcessDefinition(ProcessDefinitionImpl)
-     * @see #getProcessDefinition()
+     * @see #processDefinitionId
+     * @see #setProcessDefinitionId(String)
+     * @see #getProcessDefinitionId()
      */
     protected String processDefinitionId;
 
@@ -167,11 +171,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String deploymentId;
 
     /**
-     * Persisted reference to the current position in the diagram within the {@link #processDefinition}.
+     * Persisted reference to the current position in the diagram within the {@link #processDefinitionId}.
      * 
-     * @see #activity
-     * @see #setActivity(ActivityImpl)
-     * @see #getActivity()
+     * @see #activityId
+     * @see #setActivityId(String)
+     * @see #getActivityId()
      */
     protected String activityId;
 
@@ -204,7 +208,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
      * Persisted reference to the super execution of this execution
      * 
      * @see #getSuperExecution()
-     * @see #setSuperExecution(ExecutionEntityImpl)
+     * @see #setSuperExecution(ExecutionEntity)
      */
     protected String superExecutionId;
 
@@ -282,6 +286,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("timerJobCount", timerJobCount);
         persistentState.put("suspendedJobCount", suspendedJobCount);
         persistentState.put("deadLetterJobCount", deadLetterJobCount);
+        persistentState.put("externalWorkerJobCount", externalWorkerJobCount);
         persistentState.put("variableCount", variableCount);
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
@@ -290,6 +295,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("referenceType", referenceType);
         persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
+    }
+
+    @Override
+    public ReadOnlyDelegateExecution snapshotReadOnly() {
+        return new ReadOnlyDelegateExecutionImpl(this);
     }
 
     // The current flow element, will be filled during operation execution
@@ -609,7 +619,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstancesByExecutionId(id);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        return processEngineConfiguration.getVariableServiceConfiguration().getVariableService().findVariableInstancesByExecutionId(id);
     }
 
     @Override
@@ -824,7 +835,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             throw new FlowableException("lazy loading outside command context");
         }
 
-        return CommandContextUtil.getVariableService()
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return processEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .executionId(id)
                 .withoutTaskId()
@@ -838,7 +850,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        return CommandContextUtil.getVariableService()
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        return processEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .executionId(id)
                 .withoutTaskId()
@@ -856,7 +870,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureEventSubscriptionsInitialized() {
         if (eventSubscriptions == null) {
-            eventSubscriptions = CommandContextUtil.getEventSubscriptionService().findEventSubscriptionsByExecution(id);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            eventSubscriptions = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                    .findEventSubscriptionsByExecution(id);
         }
     }
 
@@ -890,7 +906,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureTasksInitialized() {
         if (tasks == null) {
-            tasks = CommandContextUtil.getTaskService().findTasksByExecutionId(id);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            tasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByExecutionId(id);
         }
     }
 
@@ -910,7 +927,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     protected void ensureIdentityLinksInitialized() {
         if (identityLinks == null) {
-            identityLinks = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessInstanceId(id);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            identityLinks = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .findIdentityLinksByProcessInstanceId(id);
         }
     }
 
@@ -1378,6 +1397,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             }
             return strb.toString();
         }
+    }
+
+
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return CommandContextUtil.getProcessEngineConfiguration().getVariableServiceConfiguration();
     }
 
 }

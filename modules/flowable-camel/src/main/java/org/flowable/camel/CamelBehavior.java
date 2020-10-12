@@ -49,7 +49,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  * now extend one one or the other. 
  * <p>
  * The chosen implementation can be set using extension elements:
- * <p>
+ *
  * <pre>
  * {@code
  * <serviceTask id="serviceTask1" flowable:type="camel">

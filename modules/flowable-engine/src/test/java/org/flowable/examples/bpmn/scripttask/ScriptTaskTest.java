@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -92,6 +93,15 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
                 .as("Starting process should result in error in script")
                 .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("Error in Script");
+    }
+    
+    @Test
+    @Deployment
+    public void testThrowFlowableIllegalArgumentException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("failingScript"))
+                .as("Starting process should result in illegal argument exception in script")
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("illegal");
     }
 
     @Test

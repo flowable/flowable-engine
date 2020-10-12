@@ -20,5 +20,5 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
  * @author Robert Hafner
  */
 public interface FlowableMultiInstanceActivityEvent extends FlowableActivityEvent {
-    public boolean isSequential();
+    boolean isSequential();
 }

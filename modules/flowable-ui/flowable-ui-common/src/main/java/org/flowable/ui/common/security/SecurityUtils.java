@@ -12,8 +12,10 @@
  */
 package org.flowable.ui.common.security;
 
-import org.flowable.idm.api.User;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -22,66 +24,55 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class SecurityUtils {
 
-    private static User assumeUser;
+    static final String GROUP_PREFIX = "GROUP_";
+    static final String TENANT_PREFIX = "TENANT_";
+
+    private static SecurityScopeProvider securityScopeProvider = new FlowableSecurityScopeProvider();
 
     private SecurityUtils() {
+    }
+
+    public static GrantedAuthority createTenantAuthority(String tenantId) {
+        return new SimpleGrantedAuthority(TENANT_PREFIX + tenantId);
+    }
+
+    public static GrantedAuthority createGroupAuthority(String groupId) {
+        return new SimpleGrantedAuthority(GROUP_PREFIX + groupId);
+    }
+
+    public static void setSecurityScopeProvider(SecurityScopeProvider securityScopeProvider) {
+        SecurityUtils.securityScopeProvider = securityScopeProvider;
     }
 
     /**
      * Get the login of the current user.
      */
     public static String getCurrentUserId() {
-        User user = getCurrentUserObject();
+        SecurityScope user = getCurrentSecurityScope();
         if (user != null) {
-            return user.getId();
+            return user.getUserId();
         }
         return null;
     }
 
-    /**
-     * @return the {@link User} object associated with the current logged in user.
-     */
-    public static User getCurrentUserObject() {
-        if (assumeUser != null) {
-            return assumeUser;
-        }
-
-        User user = null;
-        FlowableAppUser appUser = getCurrentFlowableAppUser();
-        if (appUser != null) {
-            user = appUser.getUserObject();
-        }
-        return user;
-    }
-
-    public static FlowableAppUser getCurrentFlowableAppUser() {
-        FlowableAppUser user = null;
+    public static SecurityScope getCurrentSecurityScope() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         if (securityContext != null && securityContext.getAuthentication() != null) {
-            Object principal = securityContext.getAuthentication().getPrincipal();
-            if (principal instanceof FlowableAppUser) {
-                user = (FlowableAppUser) principal;
-            }
+            return getSecurityScope(securityContext.getAuthentication());
         }
-        return user;
+        return null;
     }
 
-    public static boolean currentUserHasCapability(String capability) {
-        FlowableAppUser user = getCurrentFlowableAppUser();
-        for (GrantedAuthority grantedAuthority : user.getAuthorities()) {
-            if (capability.equals(grantedAuthority.getAuthority())) {
-                return true;
-            }
+    public static SecurityScope getSecurityScope(Authentication authentication) {
+        return securityScopeProvider.getSecurityScope(authentication);
+    }
+
+    public static SecurityScope getAuthenticatedSecurityScope() {
+        SecurityScope currentSecurityScope = getCurrentSecurityScope();
+        if (currentSecurityScope != null) {
+            return currentSecurityScope;
         }
-        return false;
-    }
-
-    public static void assumeUser(User user) {
-        assumeUser = user;
-    }
-
-    public static void clearAssumeUser() {
-        assumeUser = null;
+        throw new FlowableIllegalStateException("User is not authenticated");
     }
 
 }

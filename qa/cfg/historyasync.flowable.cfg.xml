@@ -30,16 +30,18 @@
     </property>
   
     <property name="history" value="full" />
-    <property name="asyncHistoryEnabled" value="true" />
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
-    
+
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
-    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
     <property name="asyncExecutorActivate" value="false" />
-    
+
+    <property name="asyncHistoryEnabled" value="true" />
+    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
+    <property name="asyncHistoryExecutorNumberOfRetries" value="100" />
+
     <property name="defaultFailedJobWaitTime" value="1" />
     <property name="asyncFailedJobWaitTime" value="1" />
     

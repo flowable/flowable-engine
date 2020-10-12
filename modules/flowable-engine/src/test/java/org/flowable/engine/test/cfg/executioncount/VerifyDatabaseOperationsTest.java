@@ -26,7 +26,6 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.test.profiler.CommandStats;
@@ -37,7 +36,6 @@ import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
 import org.flowable.job.api.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +65,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         this.oldExecutionRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts();
         this.oldTaskRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
         this.oldenableProcessDefinitionInfoCacheValue = processEngineConfiguration.isEnableProcessDefinitionInfoCache();
-        oldHistoryLevel = ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).getHistoryLevel();
+        oldHistoryLevel = processEngineConfiguration.getHistoryLevel();
 
         processEngineConfiguration.setBulkInsertEnabled(true);
 
@@ -79,7 +77,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(true);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(false);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(HistoryLevel.AUDIT);
+        processEngineConfiguration.setHistoryLevel(HistoryLevel.AUDIT);
 
         // The time interceptor should be first
         CommandExecutorImpl commandExecutor = ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor());
@@ -119,7 +117,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(oldTaskRelationshipCountValue);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(oldenableProcessDefinitionInfoCacheValue);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(oldHistoryLevel);
+        processEngineConfiguration.setHistoryLevel(oldHistoryLevel);
 
         ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor()).setFirst(oldFirstCommandInterceptor);
 
@@ -517,7 +515,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 "HistoricTaskLogEntryEntityImpl", 2L,
                     "CommentEntityImpl", 2L,
                     "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, 
-                    "IdentityLinkEntityImpl-bulk-with-2", 2l);
+                    "IdentityLinkEntityImpl-bulk-with-2", 2L);
             assertDatabaseSelects("AddIdentityLinkCmd", 
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, 
                     "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
@@ -626,7 +624,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseSelects(String commandClass, Object... expectedSelects) {
         CommandStats stats = getStats(commandClass);
 
-        assertThat(stats.getDbSelects()).as("Unexpected number of database selects for " + commandClass + ". ").hasSize(expectedSelects.length / 2);
+        assertThat(stats.getDbSelects())
+                .as("Unexpected number of database selects for " + commandClass + ". ")
+                .hasSize(expectedSelects.length / 2);
 
         for (int i = 0; i < expectedSelects.length; i += 2) {
             String dbSelect = (String) expectedSelects[i];
@@ -640,7 +640,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected void assertDatabaseUpdates(String commandClass, Object... expectedUpdates) {
         CommandStats stats = getStats(commandClass);
-        assertThat(stats.getDbUpdates()).as("Unexpected number of database updates for " + commandClass + ". ").hasSize(expectedUpdates.length / 2);
+        assertThat(stats.getDbUpdates())
+                .as("Unexpected number of database updates for " + commandClass + ". ")
+                .hasSize(expectedUpdates.length / 2);
 
         for (int i = 0; i < expectedUpdates.length; i += 2) {
             String dbUpdate = (String) expectedUpdates[i];
@@ -655,9 +657,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseInserts(String commandClass, Object... expectedInserts) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedInserts.length / 2 != stats.getDbInserts().size()) {
-            Assert.fail("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2);
-        }
+        assertThat(stats.getDbInserts())
+                .as("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2)
+                .hasSize(expectedInserts.length / 2);
 
         for (int i = 0; i < expectedInserts.length; i += 2) {
             String dbInsert = (String) expectedInserts[i];
@@ -672,9 +674,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     protected void assertDatabaseDeletes(String commandClass, Object... expectedDeletes) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedDeletes.length / 2 != stats.getDbDeletes().size()) {
-            Assert.fail("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2));
-        }
+        assertThat(stats.getDbDeletes())
+                .as("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2))
+                .hasSize(expectedDeletes.length / 2);
 
         for (int i = 0; i < expectedDeletes.length; i += 2) {
             String dbDelete = (String) expectedDeletes[i];

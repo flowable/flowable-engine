@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.agenda;
 
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
-import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * The agenda also gives easy access to methods to plan new operations when writing {@link ActivityBehavior} implementations.
  *
- * During a {@link Command} execution, the agenda can always be fetched using {@link Context#getAgenda()}.
+ * During a {@link Command} execution, the agenda can always be fetched using {@link CommandContextUtil#getAgenda()}.
  *
  * @author Joram Barrez
  */

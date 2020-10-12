@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
@@ -77,10 +77,10 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
 
             // All case/process instances still need to have entity links
             for (String caseInstanceId : caseInstanceIds) {
-                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).isNotEmpty();
             }
             for (String processInstanceId : processInstanceIds) {
-                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).isNotEmpty();
             }
 
             // Completing the root instance, deletes all entity links
@@ -123,10 +123,10 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
 
             // All case/process instances still need to have entity links
             for (String caseInstanceId : caseInstanceIds) {
-                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(caseInstanceId, ScopeTypes.CMMN)).isNotEmpty();
             }
             for (String processInstanceId : processInstanceIds) {
-                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).hasSizeGreaterThan(0);
+                assertThat(getEntityLinks(processInstanceId, ScopeTypes.BPMN)).isNotEmpty();
             }
 
             // Completing the root instance, deletes all entity links
@@ -140,13 +140,17 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
     }
 
     protected List<EntityLink> getRootEntityLinks(String rootScopeId, String rootScopeType) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
         return processEngineManagementService.executeCommand(commandContext
-            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByRootScopeIdAndRootType(rootScopeId, rootScopeType));
+            -> processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
+                .findEntityLinksByRootScopeIdAndRootType(rootScopeId, rootScopeType));
     }
 
     protected List<EntityLink> getEntityLinks(String scopeId, String scopeType) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
         return processEngineManagementService.executeCommand(commandContext
-            -> CommandContextUtil.getEntityLinkService(commandContext).findEntityLinksByScopeIdAndType(scopeId, scopeType, EntityLinkType.CHILD));
+            -> processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService()
+                .findEntityLinksByScopeIdAndType(scopeId, scopeType, EntityLinkType.CHILD));
     }
 
 }

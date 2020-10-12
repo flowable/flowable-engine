@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,11 @@ import org.slf4j.LoggerFactory;
  */
 public class AppCommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AppCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppCommandInvoker.class);
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         commandContext.setResult(command.execute(commandContext));
         

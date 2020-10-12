@@ -186,7 +186,8 @@ public class ErrorPropagation {
                 }
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                     processEngineConfiguration.getEventDispatcher()
-                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
+                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity),
+                                    processEngineConfiguration.getEngineCfgKey());
                 }
             }
             
@@ -214,7 +215,8 @@ public class ErrorPropagation {
 
                 processEngineConfiguration.getEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
-                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
+                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
 
@@ -433,5 +435,27 @@ public class ErrorPropagation {
             finalErrorCode = errorCode;
         }
         return finalErrorCode;
+    }
+
+    public static <E extends Throwable> void handleException(Throwable exc, ExecutionEntity execution, List<MapExceptionEntry> exceptionMap) throws E {
+        Throwable cause = exc;
+        BpmnError error = null;
+        while (cause != null) {
+            if (cause instanceof BpmnError) {
+                error = (BpmnError) cause;
+                break;
+            } else if (cause instanceof Exception) {
+                if (ErrorPropagation.mapException((Exception) cause, (ExecutionEntity) execution, exceptionMap)) {
+                    return;
+                }
+            }
+            cause = cause.getCause();
+        }
+
+        if (error != null) {
+            ErrorPropagation.propagateError(error, execution);
+        } else {
+            throw (E) exc;
+        }
     }
 }

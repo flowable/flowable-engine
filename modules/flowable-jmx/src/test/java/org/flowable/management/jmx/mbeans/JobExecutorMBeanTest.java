@@ -97,7 +97,7 @@ public class JobExecutorMBeanTest {
         int counter = 0;
 
         for (MBeanOperationInfo op : beanInfo.getOperations()) {
-            if (op.getName().equals("setJobExecutorActivate")) {
+            if ("setJobExecutorActivate".equals(op.getName())) {
                 counter++;
                 assertThat(op.getDescription()).isEqualTo("set job executor activate");
                 assertThat(op.getReturnType()).isEqualTo("void");
@@ -114,7 +114,7 @@ public class JobExecutorMBeanTest {
         counter = 0;
 
         for (MBeanAttributeInfo attr : beanInfo.getAttributes()) {
-            if (attr.getName().equals("JobExecutorActivated")) {
+            if ("JobExecutorActivated".equals(attr.getName())) {
                 counter++;
                 assertThat(attr.getDescription()).isEqualTo("check if the job executor is activated");
                 assertThat(attr.getType()).isEqualTo("boolean");

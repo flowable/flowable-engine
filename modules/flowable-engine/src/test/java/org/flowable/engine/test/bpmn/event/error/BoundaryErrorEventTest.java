@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -29,6 +30,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * @author Joram Barrez
@@ -508,6 +512,15 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testCatchErrorThrownByExpressionWithFutureOnServiceTask() {
+        HashMap<String, Object> variables = new HashMap<>();
+        variables.put("bpmnErrorBean", new BpmnErrorBean());
+        String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByExpressionWithFutureOnServiceTask", variables).getId();
+        assertThatErrorHasBeenCaught(procId);
+    }
+
+    @Test
+    @Deployment
     public void testCatchErrorThrownByDelegateExpressionOnServiceTask() {
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("bpmnErrorBean", new BpmnErrorBean());
@@ -522,6 +535,49 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
         variables.put("bpmnErrorBean", new BpmnErrorBean());
         String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask", variables).getId();
         assertThatErrorHasBeenCaught(procId);
+    }
+
+    @Deployment
+    @ParameterizedTest(name = "JavaFutureDelegate via class throws error in {0} should escalate with {1}")
+    @MethodSource("argumentsForCatchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode")
+    public void testCatchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode(String throwErrorIn, String expectedEscalatedTaskName) {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("catchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode")
+                .variable("throwErrorIn", throwErrorIn)
+                .start()
+                .getId();
+
+        // The service task will throw an error event,
+        // which is caught on the service task boundary
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo(expectedEscalatedTaskName);
+    }
+
+    @Deployment
+    @ParameterizedTest(name = "JavaFutureDelegate via expression throws error in {0} should escalate with {1}")
+    @MethodSource("argumentsForCatchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode")
+    public void testCatchErrorThrownByFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask(String throwErrorIn, String expectedEscalatedTaskName) {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCatchErrorThrownByFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask")
+                .transientVariable("bpmnErrorBean", new ThrowBpmnErrorFutureDelegate())
+                .variable("throwErrorIn", throwErrorIn)
+                .start()
+                .getId();
+
+        // The service task will throw an error event,
+        // which is caught on the service task boundary
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getName()).isEqualTo(expectedEscalatedTaskName);
+    }
+
+    static Stream<Arguments> argumentsForCatchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode() {
+        return Stream.of(
+                Arguments.of("beforeExecution", "Escalated Task for before execution"),
+                Arguments.of("execute", "Escalated Task for execute"),
+                Arguments.of("afterExecution", "Escalated Task for after execution")
+        );
     }
 
 }

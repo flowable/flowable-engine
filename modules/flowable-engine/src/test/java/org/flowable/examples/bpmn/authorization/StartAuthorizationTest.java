@@ -14,6 +14,7 @@
 package org.flowable.examples.bpmn.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;

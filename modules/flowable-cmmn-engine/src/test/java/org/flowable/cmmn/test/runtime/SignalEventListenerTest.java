@@ -19,9 +19,13 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.SignalEventListenerInstance;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.Rule;
 import org.junit.Test;
@@ -145,6 +149,46 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         assertCaseInstanceNotEnded(caseInstance);
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testActiveState() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleEnableTask").start();
+        SignalEventListenerInstance signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult();
+
+        // In older releases, the signal event listener lifecycle wasn't consistent with the other event listeners.
+        // More specifically: it could be active (which an event listener never can be), which now is available (consistent with all event listeners)
+
+        assertThat(signalEventListenerInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).isNotEmpty();
+
+        // Changing the state programmatically to mimic the old instances
+        ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+
+                PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findById(signalEventListenerInstance.getId());
+                planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
+
+                return null;
+            }
+
+        });
+
+        // Note that the SignalEventListenerInstanceQuery since its creation has a stateAvailable method, but no stateActive,
+        // so usage of this API can't have been with stateAvailable before the fix.
+        assertThat(cmmnRuntimeService.createSignalEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNotNull();
+
+        // Terminating the case triggers the state change
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).isEmpty();
+
     }
 
 }

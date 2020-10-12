@@ -45,6 +45,7 @@ import io.swagger.annotations.Authorization;
  *
  * @deprecated use {@link DecisionCollectionResource} instead.
  */
+@Deprecated
 @RestController
 @Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableCollectionResource {

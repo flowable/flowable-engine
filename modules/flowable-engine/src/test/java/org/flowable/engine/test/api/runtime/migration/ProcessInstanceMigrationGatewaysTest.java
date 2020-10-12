@@ -1813,7 +1813,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
                 .containsOnly(procInclusiveGtw.getId());
 
         //Complete one sequence
-        task = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("taskMore")).findFirst().get();
+        task = tasks.stream().filter(t -> "taskMore".equals(t.getTaskDefinitionKey())).findFirst().get();
         completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -1926,7 +1926,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
                 .containsOnly(procInclusiveGtw.getId());
 
         //Complete one sequence
-        Task task = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("taskMore")).findFirst().get();
+        Task task = tasks.stream().filter(t -> "taskMore".equals(t.getTaskDefinitionKey())).findFirst().get();
         completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
@@ -2286,7 +2286,7 @@ public class ProcessInstanceMigrationGatewaysTest extends AbstractProcessInstanc
                 .containsOnly(procInclusiveGtw.getId());
 
         //Complete one sequence
-        task = tasks.stream().filter(t -> t.getTaskDefinitionKey().equals("taskMore")).findFirst().get();
+        task = tasks.stream().filter(t -> "taskMore".equals(t.getTaskDefinitionKey())).findFirst().get();
         completeTask(task);
 
         executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();

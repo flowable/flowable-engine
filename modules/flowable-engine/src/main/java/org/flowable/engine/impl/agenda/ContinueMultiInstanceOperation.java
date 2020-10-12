@@ -93,7 +93,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             processEngineConfiguration.getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode), processEngineConfiguration.getEngineCfgKey());
         }
 
         try {
@@ -138,11 +138,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         }
         MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
-        if (!flowNode.isAsynchronous()) {
-            execution.setVariableLocal(elementIndexVariable, loopCounter);
-        } else {
-            multiInstanceRootExecution.setVariableLocal(elementIndexVariable, loopCounter);
-        }
+        execution.setVariableLocal(elementIndexVariable, loopCounter);
         return activityBehavior;
     }
     

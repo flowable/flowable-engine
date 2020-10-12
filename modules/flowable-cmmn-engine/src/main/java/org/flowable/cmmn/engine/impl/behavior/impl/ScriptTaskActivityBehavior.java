@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -39,11 +40,22 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             throw new FlowableException("Could not execute script task instance: no scripting engines found.");
         }
         String scriptFormat = scriptTask.getScriptFormat() != null ? scriptTask.getScriptFormat() : ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
-        Object result = scriptingEngines.evaluate(scriptTask.getScript(), scriptFormat, planItemInstanceEntity, scriptTask.isAutoStoreVariables());
-        String resultVariableName = scriptTask.getResultVariableName();
-        if (StringUtils.isNotBlank(scriptTask.getResultVariableName())) {
-            planItemInstanceEntity.setVariable(resultVariableName.trim(), result);
+        
+        try {
+            Object result = scriptingEngines.evaluate(scriptTask.getScript(), scriptFormat, planItemInstanceEntity, scriptTask.isAutoStoreVariables());
+            String resultVariableName = scriptTask.getResultVariableName();
+            if (StringUtils.isNotBlank(scriptTask.getResultVariableName())) {
+                planItemInstanceEntity.setVariable(resultVariableName.trim(), result);
+            }
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+
+        } catch (FlowableException e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof FlowableException) {
+                throw (FlowableException) rootCause;
+            } else {
+                throw e;
+            }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 }

@@ -39,7 +39,7 @@ import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
+public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnEventRegistryEventConsumer.class);
 
@@ -154,7 +154,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     @Override
     protected EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(commandExecutor);
+        return new EventSubscriptionQueryImpl(commandExecutor, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

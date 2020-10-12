@@ -20,7 +20,6 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableExecutionExceptionHandler {
     
@@ -34,7 +33,7 @@ public class UnacquireAsyncHistoryJobExceptionHandler implements AsyncRunnableEx
                     return jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<Boolean>() {
                         @Override
                         public Boolean execute(CommandContext commandContext2) {
-                            CommandContextUtil.getJobManager(commandContext2).unacquireWithDecrementRetries(job);
+                            jobServiceConfiguration.getJobManager().unacquireWithDecrementRetries(job, exception);
                             return true;
                         }
                     });

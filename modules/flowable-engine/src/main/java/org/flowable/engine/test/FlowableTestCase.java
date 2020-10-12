@@ -49,7 +49,7 @@ import junit.framework.TestCase;
  * 
  * <p>
  * You can declare a deployment with the {@link Deployment} annotation. This base class will make sure that this deployment gets deployed in the setUp and
- * {@link RepositoryService#deleteDeploymentCascade(String, boolean) cascade deleted} in the tearDown.
+ * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} in the tearDown.
  * </p>
  * 
  * <p>

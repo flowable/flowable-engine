@@ -13,17 +13,21 @@
 package org.flowable.cmmn.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.db.EntityToTableMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,7 +39,7 @@ public class EntitiesTest {
 
     @Test
     public void verifyMappedEntitiesExist() {
-        Set<String> mappedResources = getMappedResources();
+        Set<String> mappedResources = getEngineEntityMappingResources();
         assertThat(mappedResources.size()).isPositive();
         for (String mappedResource : mappedResources) {
             getAndAssertEntityInterfaceClass(mappedResource);
@@ -45,7 +49,7 @@ public class EntitiesTest {
 
     @Test
     public void verifyEntitiesInEntityDependencyOrder() {
-        Set<String> mappedResources = getMappedResources();
+        Set<String> mappedResources = getEngineEntityMappingResources();
         for (String mappedResource : mappedResources) {
             assertThat(EntityDependencyOrder.INSERT_ORDER)
                     .as("No insert entry in EntityDependencyOrder for " + mappedResource)
@@ -58,11 +62,31 @@ public class EntitiesTest {
 
     @Test
     public void verifyEntitiesInTableDataManager() {
-        Set<String> mappedResources = getMappedResources();
+        Set<String> mappedResources = getEngineEntityMappingResources();
         for (String mappedResource : mappedResources) {
             assertThat(EntityToTableMap.entityToTableNameMap)
                     .as("No entry in TableDataManagerImpl for " + mappedResource)
                     .containsKey(getAndAssertEntityInterfaceClass(mappedResource));
+        }
+    }
+
+    @Test
+    public void verifyVersionInsertHasSpaceAfterNumber() throws Exception {
+        Set<String> mappingFilePaths = getAllMappedEntityResources();
+        for (String mappingFilePath : mappingFilePaths) {
+            List<String> lines = IOUtils.readLines(this.getClass().getClassLoader().getResourceAsStream(mappingFilePath));
+
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.contains("1,")) {
+                    if ("1,".equals(line)) {
+                        fail(mappingFilePath + " has '1,' on one line. This doesn't work with some databases. (line " + (i + 1) + ")");
+                    }
+                    if (!line.contains("1, ")) {
+                        fail(mappingFilePath + " has '1,' but no space follows the comma. This doesn't work with some databases. (line " + (i + 1) + ")");
+                    }
+                }
+            }
         }
     }
 
@@ -86,7 +110,33 @@ public class EntitiesTest {
         }
     }
 
-    private Set<String> getMappedResources() {
+    protected Set<String> getEngineEntityMappingResources() {
+        return getResources((nodeList, resources) -> {
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
+                if (resource.startsWith("org/flowable/cmmn/db/mapping/entity/") && !resource.contains("common.xml")) {
+                    resource = resource.replaceAll("org/flowable/cmmn/db/mapping/entity/", "");
+                    resource = resource.replaceAll(".xml", "");
+                    resources.add(resource);
+                }
+            }
+        });
+    }
+
+    protected Set<String> getAllMappedEntityResources() {
+        return getResources((nodeList, resources) -> {
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
+                if (!resource.contains("common.xml")) {
+                    resources.add(resource);
+                }
+            }
+        });
+    }
+
+    protected Set<String> getResources(BiConsumer<NodeList, Set<String>> consumer) {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             docBuilderFactory.setValidating(false);
@@ -96,17 +146,10 @@ public class EntitiesTest {
             docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
             Document document = docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(CmmnEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE));
+
             Set<String> resources = new HashSet<>();
             NodeList nodeList = document.getElementsByTagName("mapper");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                if (resource.startsWith("org/flowable/cmmn") && !resource.contains("common.xml")) {
-                    resource = resource.replaceAll("org/flowable/cmmn/db/mapping/entity/", "");
-                    resource = resource.replaceAll(".xml", "");
-                    resources.add(resource);
-                }
-            }
+            consumer.accept(nodeList, resources);
 
             resources.remove("TableData"); // not an entity
 

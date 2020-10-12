@@ -27,8 +27,7 @@
                       PROPAGATED_STAGE_INST_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
                       IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_)
     values (#{id, jdbcType=VARCHAR},
-            1,
-            #{name, jdbcType=VARCHAR},
+            1, #{name, jdbcType=VARCHAR},
             #{parentTaskId, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{priority, jdbcType=INTEGER},
@@ -67,8 +66,7 @@
     VALUES
       <foreach collection="list" item="task" index="index" separator=",">
         (#{task.id, jdbcType=VARCHAR},
-         1,
-         #{task.name, jdbcType=VARCHAR},
+         1, #{task.name, jdbcType=VARCHAR},
          #{task.parentTaskId, jdbcType=VARCHAR},
          #{task.description, jdbcType=VARCHAR},
          #{task.priority, jdbcType=INTEGER},
@@ -108,8 +106,7 @@
               DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_,
               IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_, SUB_TASK_COUNT_) VALUES
         (#{task.id, jdbcType=VARCHAR},
-         1,
-         #{task.name, jdbcType=VARCHAR},
+         1, #{task.name, jdbcType=VARCHAR},
          #{task.parentTaskId, jdbcType=VARCHAR},
          #{task.description, jdbcType=VARCHAR},
          #{task.priority, jdbcType=INTEGER},
@@ -414,7 +411,7 @@
   <!-- Using distinct here because a task can appear multiple times in a resultset when -->
   <select id="selectTaskByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskQueryImpl" resultMap="taskResultMap">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if> <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if>
     <include refid="selectTaskByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
@@ -930,7 +927,7 @@
                 <if test="var.name == null">
                   and A${index}.NAME_ is not null
                 </if>
-                <if test="!var.type.equals('null')">
+                <if test="var.needsTypeCheck()">
                   and A${index}.TYPE_ = #{var.type}
                 </if>
 
@@ -938,10 +935,10 @@
                 <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                   <choose>
                     <when test="var.operator.equals('EQUALS_IGNORE_CASE') || var.operator.equals('NOT_EQUALS_IGNORE_CASE') || var.operator.equals('LIKE_IGNORE_CASE')">
-                      and lower(A${index}.TEXT_)
+                      and (lower(A${index}.TEXT_)
                     </when>
                     <otherwise>
-                      and A${index}.TEXT_
+                      and (A${index}.TEXT_
                     </otherwise>
                   </choose>
                   <choose>
@@ -952,6 +949,10 @@
                   <choose>
         			<when test="var.operator.equals('LIKE') || var.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
         		  </choose>
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.TEXT_ is null
+                  </if>
+                  )
                 </if>
                 <if test="var.textValue2 != null">
                   and A${index}.TEXT2_
@@ -965,14 +966,22 @@
         		  </choose>
                 </if>
                 <if test="var.longValue != null">
-                  and A${index}.LONG_
+                  and (A${index}.LONG_
                   <include refid="executionVariableOperator" />
                   #{var.longValue}
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.LONG_ is null
+                  </if>
+                  )
                 </if>
                 <if test="var.doubleValue != null">
-                  and A${index}.DOUBLE_
+                  and (A${index}.DOUBLE_
                   <include refid="executionVariableOperator" />
                   #{var.doubleValue}
+                  <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A${index}.DOUBLE_ is null
+                  </if>
+                  )
                 </if>
                 <!-- Null variable type -->
                 <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
@@ -1374,17 +1383,17 @@
                       <if test="var.name == null">
                         and A_${orLocal}OR${orIndex}.NAME_ is not null
                       </if>
-                      <if test="!var.type.equals('null')">
+                      <if test="var.needsTypeCheck()">
                         and A_${orLocal}OR${orIndex}.TYPE_ = #{var.type}
                       </if>
                       <!-- Variable value -->
                       <if test="var.textValue != null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">
                         <choose>
                           <when test="var.operator.equals('EQUALS_IGNORE_CASE') || var.operator.equals('NOT_EQUALS_IGNORE_CASE') || var.operator.equals('LIKE_IGNORE_CASE')">
-                            and lower(A_${orLocal}OR${orIndex}.TEXT_)
+                            and (lower(A_${orLocal}OR${orIndex}.TEXT_)
                           </when>
                           <otherwise>
-                            and A_${orLocal}OR${orIndex}.TEXT_
+                            and (A_${orLocal}OR${orIndex}.TEXT_
                           </otherwise>
                         </choose>
                         <choose>
@@ -1395,6 +1404,10 @@
                         <choose>
                             <when test="var.operator.equals('LIKE') || var.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                         </choose>
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.TEXT_ is null
+                        </if>
+                        )
                       </if>
                       <if test="var.textValue2 != null">
                         and A_${orLocal}OR${orIndex}.TEXT2_
@@ -1408,14 +1421,22 @@
                         </choose>
                       </if>
                       <if test="var.longValue != null">
-                        and A_${orLocal}OR${orIndex}.LONG_
+                        and (A_${orLocal}OR${orIndex}.LONG_
                         <include refid="executionVariableOperator" />
                         #{var.longValue}
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.LONG_ is null
+                        </if>
+                        )
                       </if>
                       <if test="var.doubleValue != null">
-                        and A_${orLocal}OR${orIndex}.DOUBLE_
+                        and (A_${orLocal}OR${orIndex}.DOUBLE_
                         <include refid="executionVariableOperator" />
                         #{var.doubleValue}
+                        <if test="var.operator.equals('NOT_EQUALS') || var.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                            or A_${orLocal}OR${orIndex}.DOUBLE_ is null
+                        </if>
+                        )
                       </if>
                       <!-- Null variable type -->
                       <if test="var.textValue == null &amp;&amp; var.textValue2 == null &amp;&amp; var.longValue == null &amp;&amp; var.doubleValue == null">

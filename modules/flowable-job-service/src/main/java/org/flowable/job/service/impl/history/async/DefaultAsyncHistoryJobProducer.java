@@ -119,7 +119,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     
     protected void processHistoryJobEntities(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration,
             List<ObjectNode> historyObjectNodes, List<HistoryJobEntity> historyJobEntities) {
-        // Meant to be overidden in case something extra needs to happen with the created history job entities. 
+        // Meant to be overridden in case something extra needs to happen with the created history job entities.
     }
 
 }

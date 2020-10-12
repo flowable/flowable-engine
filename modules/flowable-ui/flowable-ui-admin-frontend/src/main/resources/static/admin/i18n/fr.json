@@ -4,6 +4,7 @@
         "NO": "Non",
         "ACTION": {
             "LOGOUT": "Déconnexion",
+            "DASHBOARD": "Dashboard",
             "DISMISS-ALERT": "Cliquez pour retirer ce message",
             "RETURN-TO-LIST": "Retourner à la liste",
             "SHOW-RESULTS": "Montrer {{size}} résultats",

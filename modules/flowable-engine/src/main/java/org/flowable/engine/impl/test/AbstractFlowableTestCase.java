@@ -13,6 +13,11 @@
 
 package org.flowable.engine.impl.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -395,8 +400,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, 
-                    processEngineConfiguration.getHistoryLevel(), processEngineConfiguration.isUsePrefixId()));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
@@ -415,8 +419,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         if (isAsyncHistoryEnabled) {
             processEngineConfiguration.setAsyncHistoryEnabled(false);
             asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration, 
-                    processEngineConfiguration.getHistoryLevel(), processEngineConfiguration.isUsePrefixId()));
+            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
         }
         
         repositoryService.deleteDeployment(deploymentId, true);

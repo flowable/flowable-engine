@@ -13,6 +13,7 @@
 package org.flowable.spring.test.taskListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
@@ -133,11 +134,11 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
                         tuple("usertask2", "User Task 2")
                 );
 
-        assertThat(currentTasks.get(0).getExecutionVariables()).hasSize(1);
-        assertThat(currentTasks.get(0).getExecutionVariables().get("injectedExecutionVariable")).isEqualTo("test1");
+        assertThat(currentTasks.get(0).getExecutionVariables())
+                .containsOnly(entry("injectedExecutionVariable", "test1"));
 
-        assertThat(currentTasks.get(1).getExecutionVariables()).hasSize(1);
-        assertThat(currentTasks.get(1).getExecutionVariables().get("injectedExecutionVariable")).isEqualTo("test2");
+        assertThat(currentTasks.get(1).getExecutionVariables())
+                .containsOnly(entry("injectedExecutionVariable", "test2"));
     }
 
     @Test
@@ -194,8 +195,8 @@ public class TaskListenerOnTransactionTest extends SpringFlowableTestCase {
                         CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName)
                 .containsExactly(tuple("usertask1", "User Task 1"));
 
-        assertThat(currentTasks.get(0).getCustomPropertiesMap()).hasSize(1);
-        assertThat(currentTasks.get(0).getCustomPropertiesMap().get("customProp1")).isEqualTo("usertask1");
+        assertThat(currentTasks.get(0).getCustomPropertiesMap())
+                .containsOnly(entry("customProp1", "usertask1"));
     }
 
 }

@@ -12,6 +12,7 @@
     },
     "ACTION": {
       "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
       "HELP": "クイックスタート",
       "EDIT-PROFILE": "プロフィールの編集",
       "SAVE": "保存",

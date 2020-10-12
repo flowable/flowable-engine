@@ -12,10 +12,8 @@
  */
 package org.flowable.crystalball.simulator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,9 +51,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -81,12 +79,12 @@ public class SimpleSimulationRunTest {
 
     protected InMemoryRecordFlowableEventListener listener;
 
-    @Before
+    @BeforeEach
     public void initListener() {
         listener = new InMemoryRecordFlowableEventListener(getTransformers());
     }
 
-    @After
+    @AfterEach
     public void cleanupListener() {
         listener = null;
     }
@@ -124,9 +122,9 @@ public class SimpleSimulationRunTest {
 
     private void step2Check(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance procInstance = runtimeService.createProcessInstanceQuery().active().processInstanceBusinessKey("oneTaskProcessBusinessKey").singleResult();
-        assertNull(procInstance);
+        assertThat(procInstance).isNull();
         Task t = taskService.createTaskQuery().active().taskDefinitionKey("userTask").singleResult();
-        assertNull(t);
+        assertThat(t).isNull();
     }
 
     @Test
@@ -144,7 +142,7 @@ public class SimpleSimulationRunTest {
 
         simDebugger.runTo(0);
         ProcessInstance procInstance = runtimeService.createProcessInstanceQuery().active().processInstanceBusinessKey("oneTaskProcessBusinessKey").singleResult();
-        assertNull(procInstance);
+        assertThat(procInstance).isNull();
 
         // debugger step - deploy process
         simDebugger.runTo(1);
@@ -168,15 +166,16 @@ public class SimpleSimulationRunTest {
         ProcessEngines.destroy();
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRunToTimeInThePast() throws Exception {
+    @Test
+    public void testRunToTimeInThePast() {
 
         recordEvents();
         SimulationDebugger simDebugger = createDebugger();
         simDebugger.init(new NoExecutionVariableScope());
         try {
-            simDebugger.runTo(-1);
-            fail("RuntimeException expected - unable to execute event from the past");
+            assertThatThrownBy(() -> simDebugger.runTo(-1))
+                    .as("RuntimeException expected - unable to execute event from the past")
+                    .isInstanceOf(RuntimeException.class);
         } finally {
             simDebugger.close();
             ProcessEngines.destroy();
@@ -199,15 +198,18 @@ public class SimpleSimulationRunTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRunToNonExistingEvent() throws Exception {
+    @Test
+    public void testRunToNonExistingEvent() {
 
         recordEvents();
         SimulationDebugger simDebugger = createDebugger();
         simDebugger.init(new NoExecutionVariableScope());
         try {
-            simDebugger.runTo("");
-            checkStatus(SimulationRunContext.getHistoryService());
+            assertThatThrownBy(() -> {
+                simDebugger.runTo("");
+                checkStatus(SimulationRunContext.getHistoryService());
+            })
+                    .isInstanceOf(RuntimeException.class);
         } finally {
             simDebugger.close();
             ProcessEngines.destroy();
@@ -217,15 +219,14 @@ public class SimpleSimulationRunTest {
     private void step0Check(RepositoryService repositoryService) {
         Deployment deployment;
         deployment = repositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(deployment);
-    }
+        assertThat(deployment).isNotNull();    }
 
     private void step1Check(RuntimeService runtimeService, TaskService taskService) {
         ProcessInstance procInstance;
         procInstance = runtimeService.createProcessInstanceQuery().active().processInstanceBusinessKey("oneTaskProcessBusinessKey").singleResult();
-        assertNotNull(procInstance);
+        assertThat(procInstance).isNotNull();
         Task t = taskService.createTaskQuery().active().taskDefinitionKey("userTask").singleResult();
-        assertNotNull(t);
+        assertThat(t).isNotNull();
     }
 
     @Test
@@ -258,10 +259,10 @@ public class SimpleSimulationRunTest {
 
     private void checkStatus(HistoryService historyService) {
         final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().singleResult();
-        assertNotNull(historicProcessInstance);
-        assertEquals("oneTaskProcessBusinessKey", historicProcessInstance.getBusinessKey());
+        assertThat(historicProcessInstance).isNotNull();
+        assertThat(historicProcessInstance.getBusinessKey()).isEqualTo("oneTaskProcessBusinessKey");
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("userTask").singleResult();
-        assertEquals("user1", historicTaskInstance.getAssignee());
+        assertThat(historicTaskInstance.getAssignee()).isEqualTo("user1");
     }
 
     private void recordEvents() {

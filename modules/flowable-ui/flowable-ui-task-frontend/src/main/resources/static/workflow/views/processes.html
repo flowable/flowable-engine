@@ -52,7 +52,7 @@
                         </div>
                         <div class="summary">
                              <span ng-if="processInstance.startedBy">
-                             	{{'PROCESS.MESSAGE.STARTED-BY' | translate}} {{processInstance.startedBy.firstName && processInstance.startedBy.firstName != 'null' ? processInstance.startedBy.firstName : ''}} {{processInstance.startedBy.lastName && processInstance.startedBy.lastName != 'null' ? processInstance.startedBy.lastName : ''}}
+                             	{{'PROCESS.MESSAGE.STARTED-BY' | translate}} {{processInstance.startedBy | username}}
                             </span>
                         </div>
                         <div class="detail">
@@ -86,29 +86,25 @@
             </div>
         </div>
 
-        <div>
+        <div class="nothing-to-see" ng-if="root.processDefinitions.length == 0">
+            <span>{{'PROCESS.MESSAGE.NO-PROCESS-DEFINITIONS' | translate}}</span>
+        </div>
 
-            <div class="nothing-to-see" ng-if="root.processDefinitions.length == 0">
-                <span>{{'PROCESS.MESSAGE.NO-PROCESS-DEFINITIONS' | translate}}</span>
-            </div>
-
-            <div class="list-wrapper">
-                <ul class="full-list">
-                    <li ng-repeat="definition in root.processDefinitions"
-                        ng-class="{'active' : newProcessInstance.processDefinitionId == definition.id}"
-                        ng-click="selectProcessDefinition(definition)">
-                        <div>
-                            <div class="title">
-                                {{definition.name}}
-                            </div>
-                            <div class="summary">
-                                {{definition.description}}
-                            </div>
+        <div class="list-wrapper">
+            <ul class="full-list">
+                <li ng-repeat="definition in root.processDefinitions"
+                    ng-class="{'active' : newProcessInstance.processDefinitionId == definition.id}"
+                    ng-click="selectProcessDefinition(definition)">
+                    <div>
+                        <div class="title">
+                            {{definition.name}}
                         </div>
-                    </li>
-                </ul>
-            </div>
-
+                        <div class="summary">
+                            {{definition.description}}
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
 
     </div>

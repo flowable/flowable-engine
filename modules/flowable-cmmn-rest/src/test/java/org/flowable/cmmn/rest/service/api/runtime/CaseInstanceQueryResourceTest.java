@@ -124,7 +124,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("operation", "like");
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
 
-        // String liek ignore case
+        // String like ignore case
         variableNode.put("name", "stringVar");
         variableNode.put("value", "AzEr%");
         variableNode.put("operation", "likeIgnoreCase");

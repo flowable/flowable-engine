@@ -89,9 +89,9 @@ public class IdmEngineAutoConfiguration extends AbstractEngineAutoConfiguration 
                 encoder = new BCryptPasswordEncoder();
             } else if (encoderType != null && encoderType.startsWith("spring_delegating")) {
                 encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-                if (encoderType.equals("spring_delegating_bcrypt")) {
+                if ("spring_delegating_bcrypt".equals(encoderType)) {
                     ((DelegatingPasswordEncoder) encoder).setDefaultPasswordEncoderForMatches(new BCryptPasswordEncoder());
-                } else if (encoderType.equals("spring_delegating_noop")) {
+                } else if ("spring_delegating_noop".equals(encoderType)) {
                     ((DelegatingPasswordEncoder) encoder).setDefaultPasswordEncoderForMatches(NoOpPasswordEncoder.getInstance());
                 }
             } else {

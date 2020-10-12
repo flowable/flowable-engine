@@ -27,8 +27,8 @@ import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends Entity, DM extends DataManager<EntityImpl>>
     extends AbstractServiceEngineEntityManager<JobServiceConfiguration, EntityImpl, DM> {
 
-    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration variableServiceConfiguration, DM dataManager) {
-        super(variableServiceConfiguration, dataManager);
+    public AbstractJobServiceEngineEntityManager(JobServiceConfiguration jobServiceConfiguration, String engineType, DM dataManager) {
+        super(jobServiceConfiguration, engineType, dataManager);
     }
 
     @Override
@@ -37,8 +37,8 @@ public abstract class AbstractJobServiceEngineEntityManager<EntityImpl extends E
     }
 
     protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
-        if(jobByteArrayRef != null) {
-            jobByteArrayRef.delete();
+        if (jobByteArrayRef != null) {
+            jobByteArrayRef.delete(serviceConfiguration.getEngineName());
         }
     }
 }

@@ -22,8 +22,11 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -35,7 +38,6 @@ public class CommandContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
-    protected AbstractEngineConfiguration currentEngineConfiguration;
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<>();
@@ -44,7 +46,12 @@ public class CommandContext {
     protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
     protected boolean reused;
     protected LinkedList<Object> resultStack = new LinkedList<>(); // needs to be a stack, as JavaDelegates can do api calls again
-
+    protected CommandExecutor commandExecutor;
+    protected ClassLoader classLoader;
+    protected boolean useClassForNameClassLoading;
+    protected Clock clock;
+    protected ObjectMapper objectMapper;
+    
     public CommandContext(Command<?> command) {
         this.command = command;
     }
@@ -270,32 +277,65 @@ public class CommandContext {
         this.sessionFactories = sessionFactories;
     }   
 
-    public AbstractEngineConfiguration getCurrentEngineConfiguration() {
-        return currentEngineConfiguration;
-    }
-
-    public void setCurrentEngineConfiguration(AbstractEngineConfiguration currentEngineConfiguration) {
-        this.currentEngineConfiguration = currentEngineConfiguration;
-    }
-
     public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {
         return engineConfigurations;
     }
-
+    
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
     }
     
-    public void addEngineConfiguration(String engineKey, AbstractEngineConfiguration engineConfiguration) {
+    public void addEngineConfiguration(String engineKey, String scopeType, AbstractEngineConfiguration engineConfiguration) {
         if (engineConfigurations == null) {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(engineKey, engineConfiguration);
+        engineConfigurations.put(scopeType, engineConfiguration);
+    }
+    
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    public boolean isUseClassForNameClassLoading() {
+        return useClassForNameClassLoading;
+    }
+
+    public void setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
+        this.useClassForNameClassLoading = useClassForNameClassLoading;
+    }
+
+    public Clock getClock() {
+        return clock;
+    }
+
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
+    
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
     
     // getters and setters
     // //////////////////////////////////////////////////////
-    
+
     public Command<?> getCommand() {
         return command;
     }

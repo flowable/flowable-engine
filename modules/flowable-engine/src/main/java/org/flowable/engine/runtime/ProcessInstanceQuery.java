@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.engine.ProcessEngineConfiguration;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.
@@ -150,7 +149,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /**
      * Only select process instances which have a global variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      * 
      * @param name
      *            name of the variable, cannot be null.
@@ -159,7 +158,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /**
      * Only select process instances which have at least one global variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      */
     ProcessInstanceQuery variableValueEquals(Object value);
 

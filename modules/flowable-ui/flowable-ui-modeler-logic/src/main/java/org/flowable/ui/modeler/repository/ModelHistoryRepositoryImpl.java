@@ -44,6 +44,7 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
         return sqlSessionTemplate.selectOne(NAMESPACE + "selectModelHistory", id);
     }
 
+    @Override
     public List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType) {
         Map<String, Object> params = new HashMap<>();
         params.put("modelType", modelType);
@@ -52,15 +53,16 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
         return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);
     }
 
+    @Override
     public List<ModelHistory> findByModelId(String modelId) {
         return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByModelId", modelId);
     }
 
     @Override
     public void save(ModelHistory modelHistory) {
-        modelHistory.setTenantId(tenantProvider.getTenantId());
         if (modelHistory.getId() == null) {
             modelHistory.setId(idGenerator.generateId());
+            modelHistory.setTenantId(tenantProvider.getTenantId());
             sqlSessionTemplate.insert(NAMESPACE + "insertModelHistory", modelHistory);
         } else {
             sqlSessionTemplate.update(NAMESPACE + "updateModelHistory", modelHistory);

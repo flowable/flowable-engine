@@ -48,9 +48,9 @@ public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase 
         boolean oneTaskProcessFound = false;
         for (ProcessInstance processInstance : processInstances) {
             ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            if (processDefinition.getKey().equals("startProcessFromDelegate")) {
+            if ("startProcessFromDelegate".equals(processDefinition.getKey())) {
                 startProcessFromDelegateFound = true;
-            } else if (processDefinition.getKey().equals("oneTaskProcess")) {
+            } else if ("oneTaskProcess".equals(processDefinition.getKey())) {
                 oneTaskProcessFound = true;
             }
         }
@@ -76,9 +76,9 @@ public class UseFlowableServiceInServiceTaskTest extends SpringFlowableTestCase 
         boolean oneTaskProcessFound = false;
         for (ProcessInstance processInstance : processInstances) {
             ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            if (processDefinition.getKey().equals("startProcessFromDelegate")) {
+            if ("startProcessFromDelegate".equals(processDefinition.getKey())) {
                 startProcessFromDelegateFound = true;
-            } else if (processDefinition.getKey().equals("oneTaskProcess")) {
+            } else if ("oneTaskProcess".equals(processDefinition.getKey())) {
                 oneTaskProcessFound = true;
             }
         }

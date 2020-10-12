@@ -91,7 +91,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(startDate.getTime() + 11000L));
-        waitForJobExecutorToProcessAllJobs(15000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(15000L, 25L);
 
         jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertThat(jobQuery.count()).isZero();
@@ -227,7 +227,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 2);
         processEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         // Confirm timer has run
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -247,7 +247,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertThat(jobQuery.count()).isEqualTo(2);
 
-        // After setting the clock to time '50minutes and 5 seconds', the bouth timers should fire in parralel
+        // After setting the clock to time '50minutes and 5 seconds', the both timers should fire in parallel
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
         try {
             JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(

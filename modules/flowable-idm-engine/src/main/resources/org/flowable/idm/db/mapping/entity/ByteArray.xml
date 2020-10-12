@@ -10,8 +10,7 @@
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values (
       #{id, jdbcType=VARCHAR},
-      1, 
-      #{name, jdbcType=VARCHAR}, 
+      1, #{name, jdbcType=VARCHAR},
       #{bytes, jdbcType=${blobType}}
     )  
   </insert>
@@ -21,8 +20,7 @@
     values
       <foreach collection="list" item="byteArray" index="index" separator=","> 
          (#{byteArray.id, jdbcType=VARCHAR},
-          1, 
-          #{byteArray.name, jdbcType=VARCHAR}, 
+          1, #{byteArray.name, jdbcType=VARCHAR},
           #{byteArray.bytes, jdbcType=${blobType}})
       </foreach>
   </insert>
@@ -32,8 +30,7 @@
       <foreach collection="list" item="byteArray" index="index">
         into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_) VALUES 
          (#{byteArray.id, jdbcType=VARCHAR},
-          1, 
-          #{byteArray.name, jdbcType=VARCHAR}, 
+          1, #{byteArray.name, jdbcType=VARCHAR},
           #{byteArray.bytes, jdbcType=${blobType}})
       </foreach>
     SELECT * FROM dual

@@ -22,7 +22,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
- * Quick access methods (only useable when within a command execution) to the current 
+ * Quick access methods (only usable when within a command execution) to the current
  * 
  * - {@link org.flowable.common.engine.impl.interceptor.CommandContext},
  * - {@link ProcessEngineConfigurationImpl}

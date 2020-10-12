@@ -22,14 +22,16 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 public class GetLockValueCmd implements Command<String> {
 
     protected String lockName;
+    protected String engineType;
 
-    public GetLockValueCmd(String lockName) {
+    public GetLockValueCmd(String lockName, String engineType) {
         this.lockName = lockName;
+        this.engineType = engineType;
     }
 
     @Override
     public String execute(CommandContext commandContext) {
-        PropertyEntity lockProperty = commandContext.getCurrentEngineConfiguration().getPropertyEntityManager().findById(lockName);
+        PropertyEntity lockProperty = commandContext.getEngineConfigurations().get(engineType).getPropertyEntityManager().findById(lockName);
 
         if (lockProperty != null) {
             return lockProperty.getValue();

@@ -54,7 +54,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -91,7 +91,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });

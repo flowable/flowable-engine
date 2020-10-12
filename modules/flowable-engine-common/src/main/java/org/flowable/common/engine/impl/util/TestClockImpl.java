@@ -28,8 +28,8 @@ public class TestClockImpl extends DefaultClockImpl {
     public Date getCurrentTime() {
         Date currentTime = super.getCurrentTime();
 
-        if(CURRENT_TIME == null) {
-            if(currentTime.equals(PREVIOUS_TIME)) {
+        if (CURRENT_TIME == null) {
+            if (currentTime.equals(PREVIOUS_TIME)) {
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {

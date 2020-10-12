@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 
 public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityManager<T> {
@@ -52,4 +53,5 @@ public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityMa
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 
+    JobServiceConfiguration getJobServiceConfiguration();
 }

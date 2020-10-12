@@ -17,6 +17,7 @@ import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.test.api.event.TestFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Test to verify event-listeners, which are configured in the cfg.xml, are notified.
@@ -39,7 +40,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch a custom event
         FlowableEvent event = new ActivitiEventImpl(FlowableEngineEventType.CUSTOM);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertEquals(1, listener.getEventsReceived().size());
         assertEquals(event, listener.getEventsReceived().get(0));
@@ -47,9 +48,9 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch another event the listener is registered for
         event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_DELETED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_UPDATED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
 
         assertEquals(2, listener.getEventsReceived().size());
         assertEquals(FlowableEngineEventType.ENTITY_DELETED, listener.getEventsReceived().get(0).getType());
@@ -58,7 +59,7 @@ public class TypedEventListenersConfigurationTest extends ResourceFlowableTestCa
 
         // Dispatch an event that is NOT part of the types configured
         event = new ActivitiEventImpl(FlowableEngineEventType.ENTITY_CREATED);
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(event, EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         assertTrue(listener.getEventsReceived().isEmpty());
     }
 }

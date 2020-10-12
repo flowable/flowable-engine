@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,7 +34,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
@@ -987,7 +985,8 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historicIdentityLink.getCreateTime()).isNotNull();
 
         managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService()
+                .deleteHistoricTaskLogEntriesForProcessDefinition(processInstance.getProcessDefinitionId());
             return null;
         });
     }

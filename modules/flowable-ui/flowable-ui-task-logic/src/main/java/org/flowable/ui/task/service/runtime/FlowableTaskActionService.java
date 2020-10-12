@@ -18,18 +18,18 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.idm.api.User;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.ui.common.model.UserRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.NotFoundException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
-import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
+import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskActionService.class);
 
     public void completeTask(String taskId) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         if (task == null) {
@@ -74,7 +74,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
     }
 
     public TaskRepresentation assignTask(String taskId, ObjectNode requestNode) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         if (task == null) {
@@ -114,7 +114,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
             throw new NotFoundException("Task with id: " + taskId + " does not exist");
         }
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         permissionService.validateReadPermissionOnTask(currentUser, task.getId());
 
         if (requestNode.get("userId") != null) {
@@ -138,7 +138,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
             throw new NotFoundException("Task with id: " + taskId + " does not exist");
         }
 
-        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getAuthenticatedSecurityScope(), task.getId());
 
         String assigneeString = null;
         if (requestNode.get("userId") != null) {
@@ -162,7 +162,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
     public void claimTask(String taskId) {
 
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
 
         if (task == null) {
@@ -172,13 +172,13 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         permissionService.validateReadPermissionOnTask(currentUser, task.getId());
 
         try {
-            taskService.claim(task.getId(), String.valueOf(currentUser.getId()));
+            taskService.claim(task.getId(), currentUser.getUserId());
         } catch (FlowableException e) {
             throw new BadRequestException("Task " + taskId + " can't be claimed", e);
         }
     }
 
-    protected void checkTaskPermissions(String taskId, User currentUser, Task task) {
+    protected void checkTaskPermissions(String taskId, SecurityScope currentUser, Task task) {
         permissionService.validateReadPermissionOnTask(currentUser, task.getId());
     }
 
@@ -190,7 +190,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         return email;
     }
 
-    protected void assignTask(User currentUser, Task task, String assigneeIdString) {
+    protected void assignTask(SecurityScope currentUser, Task task, String assigneeIdString) {
         try {
             String oldAssignee = task.getAssignee();
             taskService.setAssignee(task.getId(), assigneeIdString);
@@ -199,7 +199,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
             addIdentiyLinkForUser(task, oldAssignee, IdentityLinkType.PARTICIPANT);
 
             // If the current user wasn't part of the involved users yet, make it so
-            String currentUserIdString = String.valueOf(currentUser.getId());
+            String currentUserIdString = currentUser.getUserId();
             addIdentiyLinkForUser(task, currentUserIdString, IdentityLinkType.PARTICIPANT);
 
         } catch (FlowableException e) {
@@ -225,6 +225,8 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
             CachedUser cachedUser = userCache.getUser(task.getAssignee());
             if (cachedUser != null && cachedUser.getUser() != null) {
                 rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
+            } else {
+                rep.setAssignee(new UserRepresentation(task.getAssignee()));
             }
         }
     }
@@ -239,6 +241,8 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
                 CachedUser cachedUser = userCache.getUser(link.getUserId());
                 if (cachedUser != null && cachedUser.getUser() != null) {
                     result.add(new UserRepresentation(cachedUser.getUser()));
+                } else {
+                    result.add(new UserRepresentation(link.getUserId()));
                 }
             }
         }

@@ -111,9 +111,10 @@ public interface DynamicBpmnService {
     /**
      * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
+     *
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -127,9 +128,9 @@ public interface DynamicBpmnService {
      * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list. Previous values for the BPMN Element with
      * {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -143,9 +144,9 @@ public interface DynamicBpmnService {
     /**
      * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -159,9 +160,9 @@ public interface DynamicBpmnService {
      * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list. Previous values for the BPMN Element with
      * {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -205,9 +206,9 @@ public interface DynamicBpmnService {
      * Clears the field from the infoNode. So the engine uses the {@link org.flowable.bpmn.model.BpmnModel} value On next instance.
      * </p>
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to save the modified infoNode by calling {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param elementId
      *            the flow elements id.

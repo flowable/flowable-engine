@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AUTH;
 import org.apache.http.auth.AuthScope;
@@ -40,6 +41,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -503,36 +505,31 @@ public class FlowableClientService {
 
     public HttpPost createPost(String uri, ServerConfig serverConfig) {
         HttpPost post = new HttpPost(getServerUrl(serverConfig, uri));
-        post.setHeader("Content-Type", "application/json");
-        post.setHeader("Accept", "application/json");
+        post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return post;
     }
 
     public HttpPost createPost(URIBuilder builder, ServerConfig serverConfig) {
         HttpPost post = new HttpPost(getServerUrl(serverConfig, builder));
-        post.setHeader("Content-Type", "application/json");
-        post.setHeader("Accept", "application/json");
+        post.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return post;
     }
 
     public HttpPut createPut(String uri, ServerConfig serverConfig) {
         HttpPut put = new HttpPut(getServerUrl(serverConfig, uri));
-        put.setHeader("Content-Type", "application/json");
-        put.setHeader("Accept", "application/json");
+        put.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return put;
     }
 
     public HttpPut createPut(URIBuilder builder, ServerConfig serverConfig) {
         HttpPut put = new HttpPut(getServerUrl(serverConfig, builder));
-        put.setHeader("Content-Type", "application/json");
-        put.setHeader("Accept", "application/json");
+        put.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return put;
     }
 
     public HttpDelete createDelete(URIBuilder builder, ServerConfig serverConfig) {
         HttpDelete delete = new HttpDelete(getServerUrl(serverConfig, builder));
-        delete.setHeader("Content-Type", "application/json");
-        delete.setHeader("Accept", "application/json");
+        delete.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
         return delete;
     }
 
@@ -541,7 +538,7 @@ public class FlowableClientService {
         // add
 
         try {
-            return new StringEntity(json.toString());
+            return new StringEntity(json.toString(), ContentType.APPLICATION_JSON);
         } catch (Exception e) {
             LOGGER.warn("Error translation json to http client entity {}", json, e);
         }
@@ -550,7 +547,7 @@ public class FlowableClientService {
 
     public StringEntity createStringEntity(String json) {
         try {
-            return new StringEntity(json);
+            return new StringEntity(json, ContentType.APPLICATION_JSON);
         } catch (Exception e) {
             LOGGER.warn("Error translation json to http client entity {}", json, e);
         }

@@ -23,7 +23,7 @@ public interface FormEngine extends Engine {
     /**
      * the version of the flowable form library
      */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     FormManagementService getFormManagementService();
 

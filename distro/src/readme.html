@@ -28,22 +28,78 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - 6.5.1</h3>
+<h3>Release Notes - Flowable - 6.6.0</h3>
 
 <h4>GENERAL</h4>
+
 <ul>
-    <li>
-        When deploying via the BPMN, CMMN or DMN repository service
-        the created deployment will have the parent deployment id set from its id.
-    </li>
-    <li>
-        The FlowableExpressionEnhancer has been removed.
-        We have adapted the Expression parsing, so now functions are enhanced during the
-        expression tree building. This is a lower level api and uses the new FlowableAstFunctionCreator.
-    </li>
+	<li>External worker tasks have been added to the BPMN and CMMN engine. This is a new paradigm that is available to execute service logic outside of the BPMN and CMMN engine.
+	Until this release this could be done by pushing work to another service, like with using a HTTP task or send an event with the event registry task. The external worker task
+	can be used to pull work from the BPMN and CMMN engine. This means that a service written in any language can pull for open external worker tasks over a dedicated external worker REST API,
+	then execute the work, and finally complete the worker task to move the state of the process or case to the next state.</li>
+	<li>Added support for future Java delegates to enable running service tasks and HTTP tasks actually in parallel. Until this release a parallel gateway with multiple outgoing sequence flows to a service task
+	didn't run the synchronous service tasks really in parallel, they were still executed sequential. When these service tasks are made asynchronous and not exclusive, then they were executed in parallel by the
+	async executor, but also in different transactions. With the new future service task support, it's now possible to run synchronous service tasks within the same transaction in parallel.
+	The service tasks are executed in parallel on a thread pool and the future will wait until all service tasks are completed.
+	More info is available in this <a href="https://blog.flowable.org/2020/08/06/true-parallel-service-task-execution-with-flowable/">blog post</a></li>
+	<li>Added a category property to jobs to be able to distinguish between different groups of jobs. This can also be used to enable the execution of only
+	specific job categories in the BPMN or CMMN engine. In this way different micro services with an embedded Flowable engine using the same database can be configured
+	to only execute jobs from a defined list of categories, as an example.</li>
+	<li>History jobs are now moved to the deadletter job table when the retries are exhausted. This ensures that the history job is always kept in the database.</li>
+	<li>Removed the get current engine configuration from the CommandContextUtil classes of the Flowable engines because in an application 
+	where multiple engines are used it could not be guaranteed that the correct engine configuration was returned.</li>
+	<li>JSON variable changes are now tracked when updated in expressions, scripts, delegate classes or Spring beans. This means that when updating a property like
+	customer.name in a delegate class, the customer JSON variable will now automatically be updated.</li>
+	<li>Extended the entity link support to also record grand parent entity links, which means the parent process of a task in a sub process for example.</li>
+    <li>When deploying via the BPMN, CMMN or DMN repository service the created deployment will have the parent deployment id set from its own deployment id.</li>
+    <li>The FlowableExpressionEnhancer has been removed. We have adapted the Expression parsing, so now functions are enhanced during the
+    expression tree building. This is a lower level api and uses the new FlowableAstFunctionCreator.</li>
 </ul>
+
 <h4>BPMN</h4>
+
+<ul>
+	<li>In and out parameters can be defined for signal events, similar to the existing in and out parameter support for call activities.
+	By defining in parameters for a signal boundary event for example, variables can be set on the process instance scope from the signal payload data.</li>
+	<li>Added support for triggerable service tasks with expressions.</li>
+	<li>Added support for event registry backed receive task and intermediate catch event.<li>
+	<li>Added support for JSON variables in web service tasks.</li>
+	<li>For ordering activity instances that are part of the same Flowable transaction, a transaction order value has been added, which is a basic numeric value starting with 1
+	and incremented with 1 for every new activity instance.</li>
+</ul>
+
 <h4>CMMN</h4>
+
+<ul>
+	<li>Added support for case instance migration with defining for which plan item definitions the state needs to be changed. 
+	This also includes moving new plan item definitions to available state if needed.</li>
+	<li>The Case task now supports in and out parameter mapping.</li>
+</ul>
+
+<h4>DMN</h4>
+
+<ul>
+	<li>Support for Decision services and DRD (Decision Requirement Diagram) has been added to the DMN engine. This enables the usage of a hierarchy of 
+	decision tables to calculate the output of a decision service in multiple decision tables.</li>
+</ul>
+
+<h4>APPS</h4>
+
+<ul>
+	<li>The UI Apps have been consolidated in one single Flowable UI App instead of 4 different applications. This makes the authentication and authorization logic
+	less complex, makes the demo experience and installation experience easier and doesn't require you to switch between multiple browser tabs all the time.
+	This means that now only 2 WAR files are provided in the Flowable Download, the Flowable UI app, that includes the Modeler, IDM, Admin and Task application together with the Flowable REST API and
+	the second WAR file is the REST application that only includes the Flowable REST API. For more information you can read this 
+	<a href="https://blog.flowable.org/2020/10/12/whats-new-with-the-flowable-ui-apps/">blog post</a></li>
+	<li>Support for OAuth2 authentication is added to the Flowable UI App, with Keycloak as an example implementation.</li>
+	<li>Updated Docker images and Kubernetes Helm charts for the new Flowable UI app and with more configuration options.</li>
+</ul>
+
+<h4>ADDITIONAL</h4>
+
+<ul>
+    <li>In this release an upgrade to Spring Boot 2.3.4 and Spring 5.2.9 was done.</li>
+</ul>
 
 <h3>Release Notes - Flowable - 6.5.0</h3>
     

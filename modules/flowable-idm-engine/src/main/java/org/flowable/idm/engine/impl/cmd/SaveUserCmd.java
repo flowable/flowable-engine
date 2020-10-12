@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -31,10 +32,13 @@ public class SaveUserCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
     
+    protected IdmEngineConfiguration idmEngineConfiguration;
+    
     protected User user;
 
-    public SaveUserCmd(User user) {
+    public SaveUserCmd(User user, IdmEngineConfiguration idmEngineConfiguration) {
         this.user = user;
+        this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
     @Override
@@ -43,22 +47,22 @@ public class SaveUserCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("user is null");
         }
         
-        if (CommandContextUtil.getUserEntityManager(commandContext).isNewUser(user)) {
+        if (idmEngineConfiguration.getUserEntityManager().isNewUser(user)) {
             if (user.getPassword() != null) {
-                PasswordEncoder passwordEncoder = CommandContextUtil.getIdmEngineConfiguration().getPasswordEncoder();
-                PasswordSalt passwordSalt = CommandContextUtil.getIdmEngineConfiguration().getPasswordSalt();
+                PasswordEncoder passwordEncoder = idmEngineConfiguration.getPasswordEncoder();
+                PasswordSalt passwordSalt = idmEngineConfiguration.getPasswordSalt();
                 user.setPassword(passwordEncoder.encode(user.getPassword(), passwordSalt));
             }
             
             if (user instanceof UserEntity) {
-                CommandContextUtil.getUserEntityManager(commandContext).insert((UserEntity) user, true);
+                idmEngineConfiguration.getUserEntityManager().insert((UserEntity) user, true);
             } else {
-                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) user);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) user, idmEngineConfiguration.getIdGenerator());
             }
         } else {
-            UserEntity dbUser = CommandContextUtil.getUserEntityManager().findById(user.getId());
+            UserEntity dbUser = idmEngineConfiguration.getUserEntityManager().findById(user.getId());
             user.setPassword(dbUser.getPassword());
-            CommandContextUtil.getUserEntityManager().updateUser(user);
+            idmEngineConfiguration.getUserEntityManager().updateUser(user);
         }
 
         return null;

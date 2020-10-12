@@ -12,9 +12,10 @@
  */
 package org.flowable.form.rest.conf.common;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Avinash

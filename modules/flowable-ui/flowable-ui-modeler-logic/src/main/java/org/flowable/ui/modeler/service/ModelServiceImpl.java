@@ -42,7 +42,6 @@ import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.flowable.form.model.SimpleFormModel;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
@@ -120,6 +119,7 @@ public class ModelServiceImpl implements ModelService {
         return model;
     }
 
+    @Override
     public ModelRepresentation getModelRepresentation(String modelId) {
         Model model = getModel(modelId);
         return new ModelRepresentation(model);
@@ -127,7 +127,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<AbstractModel> getModelsByModelType(Integer modelType) {
-        return new ArrayList<AbstractModel>(modelRepository.findByModelType(modelType, ModelSort.NAME_ASC));
+        return new ArrayList<>(modelRepository.findByModelType(modelType, ModelSort.NAME_ASC));
     }
 
     @Override
@@ -176,6 +176,7 @@ public class ModelServiceImpl implements ModelService {
         return xmlBytes;
     }
 
+    @Override
     public ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key) {
         ModelKeyRepresentation modelKeyResponse = new ModelKeyRepresentation();
         modelKeyResponse.setKey(key);
@@ -207,7 +208,7 @@ public class ModelServiceImpl implements ModelService {
         } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_DECISION_TABLE).equals(model.getModelType())) {
             try {
                 DecisionTableDefinitionRepresentation decisionTableDefinition = new DecisionTableDefinitionRepresentation();
-
+                decisionTableDefinition.setModelVersion("3");
                 String decisionTableDefinitionKey = model.getName().replaceAll(" ", "");
                 decisionTableDefinition.setKey(decisionTableDefinitionKey);
 
@@ -272,7 +273,7 @@ public class ModelServiceImpl implements ModelService {
             editorNode.set("stencilset", stencilSetNode);
 
             ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("drd_id", "DMNDiagram_" + model.getKey());
+            propertiesNode.put("drd_id", model.getKey());
             propertiesNode.put("name", model.getName());
             if (StringUtils.isNotEmpty(model.getDescription())) {
                 propertiesNode.put("documentation", model.getDescription());
@@ -305,14 +306,6 @@ public class ModelServiceImpl implements ModelService {
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "ExpandedDecisionService");
-
-            ObjectNode decisionServicePropertiesNode = objectMapper.createObjectNode();
-            childNode.set("properties", decisionServicePropertiesNode);
-            decisionServicePropertiesNode.put("overrideid", model.getKey());
-            decisionServicePropertiesNode.put("name", model.getName());
-            if (StringUtils.isNotEmpty(model.getDescription())) {
-                decisionServicePropertiesNode.put("documentation", model.getDescription());
-            }
 
             ObjectNode outgoingDecisionsShape = objectMapper.createObjectNode();
             childShapes.add(outgoingDecisionsShape);
@@ -405,39 +398,40 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public Model createModel(Model newModel, User createdBy) {
+    public Model createModel(Model newModel, String createdBy) {
         newModel.setVersion(1);
         newModel.setCreated(Calendar.getInstance().getTime());
-        newModel.setCreatedBy(createdBy.getId());
+        newModel.setCreatedBy(createdBy);
         newModel.setLastUpdated(Calendar.getInstance().getTime());
-        newModel.setLastUpdatedBy(createdBy.getId());
+        newModel.setLastUpdatedBy(createdBy);
 
         persistModel(newModel);
         return newModel;
     }
 
     @Override
-    public Model createModel(ModelRepresentation model, String editorJson, User createdBy) {
+    public Model createModel(ModelRepresentation model, String editorJson, String createdBy) {
         Model newModel = new Model();
         newModel.setVersion(1);
         newModel.setName(model.getName());
         newModel.setKey(model.getKey());
         newModel.setModelType(model.getModelType());
         newModel.setCreated(Calendar.getInstance().getTime());
-        newModel.setCreatedBy(createdBy.getId());
+        newModel.setCreatedBy(createdBy);
         newModel.setDescription(model.getDescription());
         newModel.setModelEditorJson(editorJson);
         newModel.setLastUpdated(Calendar.getInstance().getTime());
-        newModel.setLastUpdatedBy(createdBy.getId());
+        newModel.setLastUpdatedBy(createdBy);
         newModel.setTenantId(model.getTenantId());
 
         persistModel(newModel);
         return newModel;
     }
 
+    @Override
     public ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream) {
         Model processModel = getModel(modelId);
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
             try {
@@ -456,7 +450,7 @@ public class ModelServiceImpl implements ModelService {
                 ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
 
                 AbstractModel savedModel = saveModel(modelId, processModel.getName(), processModel.getKey(),
-                        processModel.getDescription(), modelNode.toString(), true, "Version import via REST service", currentUser);
+                        processModel.getDescription(), modelNode.toString(), true, "Version import via REST service", currentUserId);
                 return new ModelRepresentation(savedModel);
 
             } catch (BadRequestException e) {
@@ -471,18 +465,18 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public Model createNewModelVersion(Model modelObject, String comment, User updatedBy) {
+    public Model createNewModelVersion(Model modelObject, String comment, String updatedBy) {
         return (Model) internalCreateNewModelVersion(modelObject, comment, updatedBy, false);
     }
 
     @Override
-    public ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, User updatedBy) {
+    public ModelHistory createNewModelVersionAndReturnModelHistory(Model modelObject, String comment, String updatedBy) {
         return (ModelHistory) internalCreateNewModelVersion(modelObject, comment, updatedBy, true);
     }
 
-    protected AbstractModel internalCreateNewModelVersion(Model modelObject, String comment, User updatedBy, boolean returnModelHistory) {
+    protected AbstractModel internalCreateNewModelVersion(Model modelObject, String comment, String updatedBy, boolean returnModelHistory) {
         modelObject.setLastUpdated(new Date());
-        modelObject.setLastUpdatedBy(updatedBy.getId());
+        modelObject.setLastUpdatedBy(updatedBy);
         modelObject.setComment(comment);
 
         ModelHistory historyModel = createNewModelhistory(modelObject);
@@ -500,7 +494,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, User updatedBy) {
+    public Model saveModel(Model modelObject, String editorJson, byte[] imageBytes, boolean newVersion, String newVersionComment, String updatedBy) {
 
         return internalSave(modelObject.getName(), modelObject.getKey(), modelObject.getDescription(), editorJson, newVersion,
                 newVersionComment, imageBytes, updatedBy, modelObject);
@@ -508,19 +502,19 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Model saveModel(String modelId, String name, String key, String description, String editorJson,
-                           boolean newVersion, String newVersionComment, User updatedBy) {
+                           boolean newVersion, String newVersionComment, String updatedBy) {
 
         Model modelObject = modelRepository.get(modelId);
         return internalSave(name, key, description, editorJson, newVersion, newVersionComment, null, updatedBy, modelObject);
     }
 
     protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion,
-                                 String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
+                                 String newVersionComment, byte[] imageBytes, String updatedBy, Model modelObject) {
 
         if (!newVersion) {
 
             modelObject.setLastUpdated(new Date());
-            modelObject.setLastUpdatedBy(updatedBy.getId());
+            modelObject.setLastUpdatedBy(updatedBy);
             modelObject.setName(name);
             modelObject.setKey(key);
             modelObject.setDescription(description);
@@ -537,7 +531,7 @@ public class ModelServiceImpl implements ModelService {
 
             modelObject.setVersion(modelObject.getVersion() + 1);
             modelObject.setLastUpdated(new Date());
-            modelObject.setLastUpdatedBy(updatedBy.getId());
+            modelObject.setLastUpdatedBy(updatedBy);
             modelObject.setName(name);
             modelObject.setKey(key);
             modelObject.setDescription(description);
@@ -593,7 +587,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, User user, String newVersionComment) {
+    public ReviveModelResultRepresentation reviveProcessModelHistory(ModelHistory modelHistory, String userId, String newVersionComment) {
         Model latestModel = modelRepository.get(modelHistory.getModelId());
         if (latestModel == null) {
             throw new IllegalArgumentException("No process model found with id: " + modelHistory.getModelId());
@@ -606,7 +600,7 @@ public class ModelServiceImpl implements ModelService {
         // Populate the actual latest version with the properties in the historic model
         latestModel.setVersion(latestModel.getVersion() + 1);
         latestModel.setLastUpdated(new Date());
-        latestModel.setLastUpdatedBy(user.getId());
+        latestModel.setLastUpdatedBy(userId);
         latestModel.setName(modelHistory.getName());
         latestModel.setKey(modelHistory.getKey());
         latestModel.setDescription(modelHistory.getDescription());
@@ -748,8 +742,9 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
-    public Long getModelCountForUser(User user, int modelType) {
-        return modelRepository.countByModelTypeAndCreatedBy(modelType, user.getId());
+    @Override
+    public Long getModelCountForUser(String userId, int modelType) {
+        return modelRepository.countByModelTypeAndCreatedBy(modelType, userId);
     }
 
     protected Model persistModel(Model model) {
@@ -808,8 +803,7 @@ public class ModelServiceImpl implements ModelService {
                 handleAppModelProcessRelations(model, jsonNode);
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_SERVICE) {
                 // Thumbnail
-//                byte[] thumbnail = modelImageService.generateDrdThumbnailImage(model, jsonNode);
-                byte[] thumbnail = null;
+                byte[] thumbnail = modelImageService.generateDmnThumbnailImage(model, jsonNode);
                 if (thumbnail != null) {
                     model.setThumbnail(thumbnail);
                 }

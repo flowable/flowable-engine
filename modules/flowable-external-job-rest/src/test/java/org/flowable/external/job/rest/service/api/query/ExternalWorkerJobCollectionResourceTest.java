@@ -302,7 +302,6 @@ class ExternalWorkerJobCollectionResourceTest {
                         + "  order: 'asc',"
                         + "  data: []"
                         + "}");
-        ;
     }
 
     @Test
@@ -829,7 +828,6 @@ class ExternalWorkerJobCollectionResourceTest {
                         + "  order: 'asc',"
                         + "  data: []"
                         + "}");
-        ;
     }
 
 }

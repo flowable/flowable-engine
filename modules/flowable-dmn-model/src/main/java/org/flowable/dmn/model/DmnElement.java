@@ -86,8 +86,9 @@ public abstract class DmnElement {
         if (attributes != null && !attributes.isEmpty()) {
             for (DmnExtensionAttribute attribute : attributes) {
                 if ((namespace == null && attribute.getNamespace() == null)
-                        || namespace.equals(attribute.getNamespace()))
+                        || namespace.equals(attribute.getNamespace())) {
                     return attribute.getValue();
+                }
             }
         }
         return null;

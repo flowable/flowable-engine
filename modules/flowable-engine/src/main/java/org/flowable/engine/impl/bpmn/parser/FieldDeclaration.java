@@ -17,9 +17,9 @@ import java.io.Serializable;
 
 /**
  * Represents a field declaration in object form:
- * 
- * &lt;field name='someField&gt; &lt;string ...
- * 
+ * <p>
+ * {@code <field name='someField> <string ...}
+ * <p>
  * @author Joram Barrez
  * @author Frederik Heremans
  */

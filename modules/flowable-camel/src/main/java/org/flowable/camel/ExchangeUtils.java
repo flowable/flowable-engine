@@ -40,8 +40,8 @@ public class ExchangeUtils {
      * the Object as it comes.
      * <ul>
      * <li>If the copyVariablesFromProperties parameter is set on the endpoint, the properties are copied instead</li>
-     * <li>If the copyCamelBodyToBodyAsString parameter is set on the endpoint, the camelBody is converted to java.lang.String and added as a camelBody variable, unless it is a Map&lt;String,
-     * Object&gt;</li>
+     * <li>If the copyCamelBodyToBodyAsString parameter is set on the endpoint, the camelBody is converted to java.lang.String and added as a camelBody variable, unless it is a {@code Map<String,
+     * Object>}</li>
      * <li>If the copyVariablesFromHeader parameter is set on the endpoint, each Camel Header will be copied to an individual process variable.</li>
      * </ul>
      */
@@ -65,7 +65,7 @@ public class ExchangeUtils {
         }
 
         String lower = booleanString.toLowerCase();
-        return lower.equals("true") || lower.equals("false");
+        return "true".equals(lower) || "false".equals(lower);
     }
 
     public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint endpoint) {

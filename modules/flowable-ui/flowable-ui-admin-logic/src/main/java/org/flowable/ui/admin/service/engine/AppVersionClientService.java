@@ -12,11 +12,12 @@
  */
 package org.flowable.ui.admin.service.engine;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 public class AppVersionClientService extends AbstractEncryptingService {

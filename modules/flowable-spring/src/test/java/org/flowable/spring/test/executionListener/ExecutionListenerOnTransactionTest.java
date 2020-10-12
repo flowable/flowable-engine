@@ -14,6 +14,7 @@ package org.flowable.spring.test.executionListener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -116,13 +117,13 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
 
         assertThat(currentActivities.get(1).getActivityId()).isEqualTo("serviceTask2");
         assertThat(currentActivities.get(1).getActivityName()).isEqualTo("Service Task 2");
-        assertThat(currentActivities.get(1).getExecutionVariables()).hasSize(1);
-        assertThat(currentActivities.get(1).getExecutionVariables().get("injectedExecutionVariable")).isEqualTo("test1");
+        assertThat(currentActivities.get(1).getExecutionVariables())
+                .containsOnly(entry("injectedExecutionVariable", "test1"));
 
         assertThat(currentActivities.get(2).getActivityId()).isEqualTo("serviceTask3");
         assertThat(currentActivities.get(2).getActivityName()).isEqualTo("Service Task 3");
-        assertThat(currentActivities.get(2).getExecutionVariables()).hasSize(1);
-        assertThat(currentActivities.get(2).getExecutionVariables().get("injectedExecutionVariable")).isEqualTo("test2");
+        assertThat(currentActivities.get(2).getExecutionVariables())
+                .containsOnly(entry("injectedExecutionVariable", "test2"));
     }
 
     @Test
@@ -172,8 +173,8 @@ public class ExecutionListenerOnTransactionTest extends SpringFlowableTestCase {
 
         assertThat(currentActivities.get(0).getActivityId()).isEqualTo("serviceTask1");
         assertThat(currentActivities.get(0).getActivityName()).isEqualTo("Service Task 1");
-        assertThat(currentActivities.get(0).getCustomPropertiesMap()).hasSize(1);
-        assertThat(currentActivities.get(0).getCustomPropertiesMap().get("customProp1")).isEqualTo("serviceTask1");
+        assertThat(currentActivities.get(0).getCustomPropertiesMap())
+                .containsOnly(entry("customProp1", "serviceTask1"));
     }
 
 }

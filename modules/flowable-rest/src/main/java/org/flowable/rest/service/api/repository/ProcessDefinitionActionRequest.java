@@ -13,10 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+
 import org.flowable.rest.service.api.RestActionRequest;
 
-import java.util.Date;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans

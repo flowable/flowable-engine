@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionFormDefinitionCollectionResource extends BaseCaseDefinitionResource {
 
-    @ApiOperation(value = "List form definitions for a case definition", nickname = "listCaseDefinitionFormDefinitions", tags = { "Process Definitions" })
+    @ApiOperation(value = "List form definitions for a case definition", nickname = "listCaseDefinitionFormDefinitions", tags = { "Case Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")

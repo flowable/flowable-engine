@@ -113,6 +113,9 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     @Override
     @Deprecated
     public List<Map<String, Object>> execute() {
@@ -196,6 +199,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return variables;
     }
 
+    @Override
     public ExecuteDecisionContext buildExecuteDecisionContext() {
         ExecuteDecisionContext executeDecisionContext = new ExecuteDecisionContext();
         executeDecisionContext.setDecisionKey(decisionKey);

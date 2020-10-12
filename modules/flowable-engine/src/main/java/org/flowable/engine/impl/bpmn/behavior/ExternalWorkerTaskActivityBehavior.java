@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobAfterContext;
@@ -78,7 +79,8 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
                 interceptor.beforeCreateExternalWorkerJob(beforeContext);
             }
 
-            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            JobServiceConfiguration jobServiceConfiguration = processEngineConfiguration.getJobServiceConfiguration();
             JobService jobService = jobServiceConfiguration.getJobService();
 
             ExternalWorkerJobEntity job = jobService.createExternalWorkerJob();
@@ -91,8 +93,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             job.setExclusive(exclusive);
 
             if (StringUtils.isNotEmpty(beforeContext.getJobCategory())) {
-                Expression categoryExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext)
-                        .getExpressionManager()
+                Expression categoryExpression = processEngineConfiguration.getExpressionManager()
                         .createExpression(beforeContext.getJobCategory());
                 Object categoryValue = categoryExpression.getValue(execution);
                 if (categoryValue != null) {
@@ -112,8 +113,7 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             if (StringUtils.isEmpty(beforeContext.getJobTopicExpression())) {
                 jobTopicExpression = this.jobTopicExpression;
             } else {
-                jobTopicExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext)
-                        .getExpressionManager()
+                jobTopicExpression = processEngineConfiguration.getExpressionManager()
                         .createExpression(beforeContext.getJobTopicExpression());
             }
             Object topicValue = jobTopicExpression.getValue(execution);

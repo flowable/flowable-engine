@@ -18,6 +18,7 @@ import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.domain.ModelHistory;
 import org.flowable.ui.modeler.service.BpmnDisplayJsonConverter;
 import org.flowable.ui.modeler.service.CmmnDisplayJsonConverter;
+import org.flowable.ui.modeler.service.DmnDisplayJsonConverter;
 import org.flowable.ui.modeler.serviceapi.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,6 +41,9 @@ public class EditorDisplayJsonClientResource {
     @Autowired
     protected CmmnDisplayJsonConverter cmmnDisplayJsonConverter;
 
+    @Autowired
+    protected DmnDisplayJsonConverter dmnDisplayJsonConverter;
+
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     @GetMapping(value = "/rest/models/{modelId}/model-json", produces = "application/json")
@@ -48,6 +52,8 @@ public class EditorDisplayJsonClientResource {
         Model model = modelService.getModel(modelId);
         if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
             cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
+        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
+            dmnDisplayJsonConverter.processDefinitionElements(model, displayNode, new org.flowable.dmn.model.GraphicInfo());
         } else {
             bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
         }
@@ -60,6 +66,8 @@ public class EditorDisplayJsonClientResource {
         ModelHistory model = modelService.getModelHistory(processModelId, processModelHistoryId);
         if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
             cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
+        } else if (model.getModelType() != null && AbstractModel.MODEL_TYPE_DECISION_SERVICE == model.getModelType()) {
+            dmnDisplayJsonConverter.processDefinitionElements(model, displayNode, new org.flowable.dmn.model.GraphicInfo());
         } else {
             bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
         }

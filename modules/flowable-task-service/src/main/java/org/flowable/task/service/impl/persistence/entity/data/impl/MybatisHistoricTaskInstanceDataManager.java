@@ -16,20 +16,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<HistoricTaskInstanceEntity> implements HistoricTaskInstanceDataManager {
 
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    
+    public MybatisHistoricTaskInstanceDataManager(TaskServiceConfiguration taskServiceConfiguration) {
+        this.taskServiceConfiguration = taskServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends HistoricTaskInstanceEntity> getManagedEntityClass() {
         return HistoricTaskInstanceEntityImpl.class;
@@ -81,7 +88,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         if (historicTaskInstanceQuery.getTaskVariablesLimit() != null) {
             historicTaskInstanceQuery.setMaxResults(historicTaskInstanceQuery.getTaskVariablesLimit());
         } else {
-            historicTaskInstanceQuery.setMaxResults(CommandContextUtil.getTaskServiceConfiguration().getHistoricTaskQueryLimit());
+            historicTaskInstanceQuery.setMaxResults(taskServiceConfiguration.getHistoricTaskQueryLimit());
         }
         historicTaskInstanceQuery.setFirstResult(0);
 
@@ -129,5 +136,10 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     public void deleteHistoricTaskInstancesForNonExistingCaseInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances", null, HistoricTaskInstanceEntityImpl.class);
+    }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return taskServiceConfiguration.getIdGenerator();
     }
 }

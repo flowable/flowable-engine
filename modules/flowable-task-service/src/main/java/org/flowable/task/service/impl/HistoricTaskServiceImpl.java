@@ -16,11 +16,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -34,7 +37,6 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntity;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -109,7 +111,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     }
 
     @Override
-    public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
+    public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime, AbstractEngineConfiguration engineConfiguration) {
         HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
         if (historicTaskInstance != null) {
             historicTaskInstance.setName(taskEntity.getName());
@@ -126,12 +128,14 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
             if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {
                 historicTaskInstance.setAssignee(taskEntity.getAssignee());
-                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.ASSIGNEE, historicTaskInstance.getAssignee());
+                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.ASSIGNEE, 
+                        historicTaskInstance.getAssignee(), engineConfiguration);
             }
 
             if (!Objects.equals(historicTaskInstance.getOwner(), taskEntity.getOwner())) {
                 historicTaskInstance.setOwner(taskEntity.getOwner());
-                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.OWNER, historicTaskInstance.getOwner());
+                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.OWNER, 
+                        historicTaskInstance.getOwner(), engineConfiguration);
             }
         }
         return historicTaskInstance;
@@ -171,7 +175,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
     @Override
     public HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery(CommandExecutor commandExecutor) {
-        return new HistoricTaskLogEntryQueryImpl(commandExecutor);
+        return new HistoricTaskLogEntryQueryImpl(commandExecutor, configuration);
     }
 
     @Override
@@ -226,15 +230,15 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
 
     @Override
     public NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery(CommandExecutor commandExecutor) {
-        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor);
+        return new NativeHistoricTaskLogEntryQueryImpl(commandExecutor, configuration);
     }
 
     protected HistoricTaskLogEntryEntityManager getHistoricTaskLogEntryEntityManager() {
         return configuration.getHistoricTaskLogEntryEntityManager();
     }
 
-    protected void createHistoricIdentityLink(String taskId, String type, String userId) {
-        HistoricIdentityLinkService historicIdentityLinkService =  CommandContextUtil.getHistoricIdentityLinkService();
+    protected void createHistoricIdentityLink(String taskId, String type, String userId, AbstractEngineConfiguration engineConfiguration) {
+        HistoricIdentityLinkService historicIdentityLinkService = getIdentityLinkServiceConfiguration(engineConfiguration).getHistoricIdentityLinkService();
         HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
         historicIdentityLinkEntity.setTaskId(taskId);
         historicIdentityLinkEntity.setType(type);
@@ -247,4 +251,7 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
         return configuration.getHistoricTaskInstanceEntityManager();
     }
 
+    protected IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (IdentityLinkServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
 }

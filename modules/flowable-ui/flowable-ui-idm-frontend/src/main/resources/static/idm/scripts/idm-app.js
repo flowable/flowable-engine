@@ -315,7 +315,8 @@ flowableApp
         updateWindowSize();
 
         $rootScope.logout = function() {
-            AuthenticationSharedService.logout();
+            // Changing the href causes a reload, so no need to do a new reload again
+            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/app/logout';
         };
 
         // Call when the 401 response is returned by the client
@@ -373,13 +374,7 @@ flowableApp
         });
 
         $rootScope.backToLanding = function() {
-            var baseUrl = $location.absUrl();
-            var index = baseUrl.indexOf('/#');
-            if (index >= 0) {
-                baseUrl = baseUrl.substring(0, index);
-                baseUrl += '/';
-            }
-            $window.location.href = baseUrl;
+            $window.location.href = FLOWABLE.CONFIG.contextRoot;
         };
 }])
 	

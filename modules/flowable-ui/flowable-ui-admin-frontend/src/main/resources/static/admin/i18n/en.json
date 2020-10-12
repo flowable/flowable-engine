@@ -4,6 +4,7 @@
         "NO": "No",
         "ACTION": {
             "LOGOUT": "Sign out",
+            "DASHBOARD": "Dashboard",
             "DISMISS-ALERT": "Click to dismiss this message",
             "RETURN-TO-LIST": "Return to list",
             "SHOW-RESULTS": "Show {{size}} results",
@@ -971,6 +972,12 @@
             },
             "SHOW-CASE-MODEL": {
                 "TITLE": "Case diagram"
+            },
+            "MIGRATE": {
+                "TITLE": "Migrate case instance",
+                "MESSAGE": "Migrate the case instance to another version of the case definition and define plan item definition mappings.",
+                "CURRENT-DEFINITION": "Current case definition",
+                "TARGET-DEFINITION": "Target case definition"
             }
         }
     },
@@ -1047,6 +1054,7 @@
             "SHOW-ALL-TASKS": "Show all tasks",
             "SHOW-ALL-JOBS": "Show all jobs",
             "SHOW-DIAGRAM": "Show case diagram",
+            "MIGRATE-CASEINSTANCE": "Migrate case instance",
             "TITLE-VARIABLES": "Actions on selected variable",
             "DELETE-VARIABLE": "Delete the variable",
             "UPDATE-VALUE": "Update variable",

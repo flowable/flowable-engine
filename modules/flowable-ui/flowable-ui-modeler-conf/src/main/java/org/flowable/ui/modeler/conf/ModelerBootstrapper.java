@@ -53,8 +53,9 @@ public class ModelerBootstrapper implements ApplicationListener<ContextRefreshed
         List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
 
         decisionTableModels.forEach(decisionTableModel -> {
-            decisionTableModel = DecisionTableModelConversionUtil.convertModelToV3(decisionTableModel);
-            modelRepository.save(decisionTableModel);
+            if (DecisionTableModelConversionUtil.convertModelToV3(decisionTableModel)) {
+                modelRepository.save(decisionTableModel);
+            }
         });
     }
 }

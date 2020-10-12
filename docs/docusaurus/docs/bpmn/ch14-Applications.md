@@ -3,52 +3,47 @@ id: ch14-Applications
 title: Flowable applications
 ---
 
-Flowable provides several ui web applications to demonstrate and leverage the functionality provided by the Flowable project:
+Flowable provides a web UI application to demonstrate and leverage the functionality provided by the Flowable project.  This application contains four main app components:
 
--   Flowable IDM: an Identity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
+-   Flowable IDM: an Identity Management app that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
 
--   Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
+-   Flowable Modeler: an app that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
 
--   Flowable Task: a runtime task application that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.
+-   Flowable Task: a runtime task app that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.
 
--   Flowable Admin: an administrative application that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin application connects to the engines through the REST API that is deployed together with the Flowable Task app and the Flowable REST app.
+-   Flowable Admin: an administrative app that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin app connects to the engines through the REST API that is deployed together with the Flowable UI application and the Flowable REST application.
 
-The Flowable IDM is required for all other apps to enable authentication. The WAR files for each app can be deployed to the same servlet container (such as Apache Tomcat), but can also be deployed on different servlet containers. Because the same cookie is used for authentication with each app, the apps need to run on the same domain.
+This UI application is provided as a single WAR file that can be dropped in any web server or started with its embedded server.  Spring Boot starters are available for each separate component app.
+
+The application and components are Spring Boot 2.0 based, which means that that the WAR file is actually executable and can be run as a normal standalone application.
+See [The Executable Jar Format](https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging) in the Spring Boot reference documentation.
 
 Flowable also provides the `flowable-rest.war` which contains the Flowable REST API. More about this can be read in the [REST API](bpmn/ch15-REST.md) chapter.
 
-The apps are Spring Boot 2.0 based, which means that that the WAR files are actually executable and can be run as a normal standalone applications.
-See [The Executable Jar Format](https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-maven-plugin.html#build-tool-plugins-maven-packaging) in the Spring Boot reference documentation.
+## Flowable UI application installation
 
-## Flowable UI Applications installation
-
-As mentioned before, all four UI apps can be deployed together on the same Tomcat server, and to get started this is probably the easiest approach. You can choose to only install the Modeler app, for example, but make sure the Flowable IDM app is always running/deployed as well. For this installation guide we’ll describe the installation of all four apps to a Tomcat server.
+As mentioned before, the UI application can be deployed on a Tomcat server, and to get started this is probably the easiest approach when additional configuration settings are used. For this installation guide we’ll describe the installation of the application in a Tomcat server.
 
 1.  Download a recent stable version of [Apache Tomcat](http://tomcat.apache.org).
 
 2.  Download the latest stable [Flowable 6 version](http://www.flowable.org/downloads.html).
 
-3.  Copy the flowable-admin.war, flowable-idm.war, flowable-modeler.war and flowable-task.war files from the Flowable distribution *wars* folder to the Tomcat webapps folder.
+3.  Copy the flowable-ui.war file from the Flowable distribution *wars* folder to the Tomcat webapps folder.
 
 4.  Startup the Tomcat server by running the bin/startup.sh (Mac OS and Linux) or bin/startup.bat (Windows) script.
 
-5.  Open a web browser and go to [<http://localhost:8080/flowable-modeler>](http://localhost:8080/flowable-modeler).
+5.  Open a web browser and go to [<http://localhost:8080/flowable-ui>](http://localhost:8080/flowable-ui).
 
-All Flowable UI apps should now be running with an H2 in-memory database and the following login screen should be shown in your web browser:
+The Flowable UI application should now be running with an H2 in-memory database and the following login screen should be shown in your web browser:
 
 ![flowable idm login screen](assets/bpmn/flowable_idm_login_screen.png)
 
-By default, the Flowable IDM application will create an admin user that has privileges to all the Flowable UI apps. You can login with admin/test and the browser should redirect to the Flowable Modeler application:
+By default, the Flowable IDM component will create an admin user that has privileges to all the Flowable UI apps. You can login with admin/test and the browser should go to the Flowable landing page:
 
-![flowable modeler startup screen](assets/bpmn/flowable_modeler_startup_screen.png)
-
-Since the UI apps are Spring Boot executable apps it is possible to run them as standalone applications without the need of an application server.
-Starting single application looks like:
-
-    java -jar flowable-idm.war
+![flowable landing screen](assets/bpmn/flowable_landing_screen.png)
 
 Usually, you will want to change the default H2 in-memory database configuration to a MySQL or Postgres (or other persistent database) configuration.
-You can do this per app by changing the application.properties file in the *WEB-INF/classes/* directory of each app.
+You can do this by changing the application.properties file in the *WEB-INF/classes/* directory of the application.
 However, it is easier to use the Spring Boot [Externalized Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html).
 An example configuration can be found on [Github](https://github.com/flowable/flowable-engine/blob/master/modules/flowable-ui-task/flowable-ui-task-app/src/main/resources/flowable-default.properties)
 To change the default configuration to MySQL the following changes are needed to the properties file:
@@ -65,22 +60,22 @@ This configuration will expect a flowable database to be present in the MySQL se
     spring.datasource.username=flowable
     spring.datasource.password=flowable
 
-In addition to changing the configuration, make sure the database driver is available on the classpath. Again, you could do this for every web application separately by adding the driver JAR file to the WEB-INF/lib folder, but you can also copy the JAR file once to the Tomcat lib folder. For MySQL and Postgres the database drivers can be downloaded from:
+In addition to changing the configuration, make sure the database driver is available on the classpath. Again, you could do this for the web application by adding the driver JAR file to the WEB-INF/lib folder, but you can also copy the JAR file to the Tomcat lib folder. For MySQL and Postgres the database drivers can be downloaded from:
 
 -   MySQL: [<https://dev.mysql.com/downloads/connector/j>](https://dev.mysql.com/downloads/connector/j)
 
 -   Postgres: [<https://jdbc.postgresql.org/>](https://jdbc.postgresql.org/)
 
-When running the apps as standalone applications the database driver can be added by using the `loader.path` property.
+When running the UI as a standalone application the database driver can be added by using the `loader.path` property.
 
-    java -Dloader.path=/location/to/your/driverfolder -jar flowable-idm.war
+    java -Dloader.path=/location/to/your/driverfolder -jar flowable-ui.war
 
 See the [`PropertiesLauncher` Features](https://docs.spring.io/spring-boot/docs/current/reference/html/executable-jar.html#executable-jar-property-launcher-features) in the Spring Boot reference documentation for more information.
 
-## Flowable UI Applications Configurations
+## Flowable UI Application Configuration
 
-As the Flowable UI apps are Spring Boot applications you can use all the properties Spring Boot provides.
-In order to provide custom configuration for the apps have a look at the [Externalized Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html) section of the Spring Boot documentation.
+As the Flowable UI app is a Spring Boot application, you can use all the properties Spring Boot provides.
+In order to provide custom configuration for the application have a look at the [Externalized Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html) section of the Spring Boot documentation.
 
     You can also use YAML based properties.
 
@@ -105,19 +100,19 @@ In order to provide custom configuration for the apps have a look at the [Extern
 <td><p>flowable.common.app.idm-url</p></td>
 <td><p>idm.app.url</p></td>
 <td><p>-</p></td>
-<td><p>The URL to the IDM application, used for the user info and token info REST GET calls. It’s also used as a fallback for the redirect url to the login page in the UI apps.</p></td>
+<td><p>The URL to the IDM application, used for the user info and token info REST GET calls. It’s also used as a fallback for the redirect url to the login page in the UI apps. Required for standalone applications.</p></td>
 </tr>
 <tr class="even">
 <td><p>flowable.common.app.idm-redirect-url</p></td>
 <td><p>idm.app.redirect.url</p></td>
 <td><p>-</p></td>
-<td><p>The redirect URL to the IDM application, used for the login redirect when the cookie isn’t set or is invalid.</p></td>
+<td><p>The redirect URL to the IDM application, used for the login redirect when the cookie isn’t set or is invalid.Required for standalone applications.</p></td>
 </tr>
 <tr class="odd">
 <td><p>flowable.common.app.redirect-on-auth-success</p></td>
 <td><p>app.redirect.url.on.authsuccess</p></td>
 <td><p>-</p></td>
-<td><p>The URL to which the redirect should occur after a successful authentication.</p></td>
+<td><p>The URL to which the redirect should occur after a successful authentication. Required for standalone applications.</p></td>
 </tr>
 <tr class="even">
 <td><p>flowable.common.app.role-prefix</p></td>
@@ -579,26 +574,26 @@ make a best effort to restore them quickly and efficiently.</p></td>
 </tbody>
 </table>
 
-## Flowable IDM application
+## Flowable IDM app
 
-The Flowable IDM application is used by all other three Flowable web applications for authentication and authorization and is therefore required to be available when you want to run the Modeler, Task or Admin application. The Flowable IDM application is a simple identity management application and is targeted at providing single sign-on capabilities to the Flowable web applications, including providing a central place to define users, groups and privileges.
+The Flowable IDM app is used for authentication and authorization. The Flowable IDM is a simple identity management component that provides a central place to define users, groups and privileges.
 
-The IDM application boots the IDM engine at startup and will create the identity tables as defined in the IDM engine in the datasource defined in the properties configuration.
+The IDM component boots the IDM engine at startup and will create the identity tables as defined in the IDM engine in the datasource defined in the properties configuration.
 
-When the Flowable IDM application is deployed and started, it will check if there’s a user available in the ACT\_ID\_USER table, and if not it will use the `flowable.common.app.idm-admin.user` property to create a new default admin user in this table.
+When the Flowable application is deployed and started, it will check if there’s a user available in the ACT\_ID\_USER table, and if not it will use the `flowable.common.app.idm-admin.user` property to create a new default admin user in this table.
 It will also add all available privileges in the Flowable project to the newly created admin user:
 
 -   access-idm: provides the privilege to manage users, groups and privileges
 
--   access-admin: allows the user to login to the Flowable Admin application, manage the Flowable engines and access the Actuator endpoints of all the applications
+-   access-admin: allows the user to login to the Flowable Admin app, manage the Flowable engines and access the Actuator endpoints of the application
 
--   access-modeler: enables access to the Flowable Modeler application
+-   access-modeler: enables access to the Flowable Modeler app
 
--   access-task: provides the privilege to login to the Flowable Task application
+-   access-task: provides the privilege to login to the Flowable Task app
 
 -   access-rest-api: allows the user to do call the REST API. Otherwise a 403 (forbidden) http status will be returned. Note that *flowable.rest.app.authentication-mode* needs to be set to *verify-privilege*, which is the default.
 
-When logging in to [<http://localhost:8080/flowable-idm>](http://localhost:8080/flowable-idm) with admin/test for the first time the following user overview screen is shown:
+When opening the IDM app for the first time the following user overview screen is shown:
 
 ![flowable idm startup screen](assets/bpmn/flowable_idm_startup_screen.png)
 
@@ -608,7 +603,7 @@ In this screen users can be added, removed and updated. The groups section can b
 
 There’s no option to define new privileges yet, but you can add and remove users and groups for the existing four privileges.
 
-This are the IDM UI App specific properties.
+Following are the IDM UI app specific properties.
 
 <table>
 <caption>IDM UI App Properties</caption>
@@ -702,7 +697,7 @@ This are the IDM UI App specific properties.
 </tbody>
 </table>
 
-In addition to the default identity tables, the IDM application can also be configured to use an LDAP server.
+In addition to the default identity tables, the IDM component can also be configured to use an LDAP server.
 To connect to a LDAP server, additional properties in the application.properties file (or any other way of configuring the application) are needed:
 
     #
@@ -732,23 +727,21 @@ When the `flowable.idm.ldap.enabled` property is set to true, the IDM app will e
 In this example configuration the server configuration + LDAP queries for the Apache Directory Server are provided.
 For other LDAP servers, like Active Directory, other configuration values are needed.
 
-When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM application.
+When LDAP is configured, authentication and group retrieval for a user will be done through the LDAP server. Only privileges will still be retrieved from the Flowable identity tables. So make sure each LDAP user has the correct privileges defined in the IDM app.
 
-If the IDM application is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables.
+If the IDM component is booted with LDAP configuration the bootstrap logic will check if there are already privileges present in the Flowable identity tables.
 If there are no privileges (only when booting the first time), the 4 default privileges will be created and the `flowable.idm.app.admin.user-id` property value (from application.properties or configured in the environment) will be used as the user id to get all 4 privileges.
 So make sure that the `flowable.idm.app.admin.user-id` property value is set to a valid LDAP user, otherwise nobody will be able to login to any of the Flowable UI apps.
 
-## Flowable Modeler application
+## Flowable Modeler app
 
-The Flowable Modeler application can be used to model BPMN processes, DMN decision table, Form definitions and create app definitions. The BPMN modeler uses the same Oryx and Angular foundation as in Flowable 5, but the functionality has now been moved into a separate Modeler application. When using the Flowable Modeler application, make sure the Flowable IDM application is deployed and running as well (for authentication and authorization purposes).
-
-When you login to the Modeler application ([<http://localhost:8080/flowable-modeler>](http://localhost:8080/flowable-modeler)) with your user (or the default admin/test user), you will see the process overview screen. From here you can start creating new BPMN process models by clicking on the Create Process or Import Process button.
+The Flowable Modeler app can be used to model BPMN processes, DMN decision table, Form definitions and create app definitions. When you open the Modeler app, you will see the process overview screen. From here you can start creating new BPMN process models by clicking on the Create Process or Import Process button.
 
 ![flowable modeler createmodel popup](assets/bpmn/flowable_modeler_createmodel_popup.png)
 
 When creating a process model (but also any other model), it’s important to think carefully about the model key value. The model key is a unique identifier for the model across the full model repository. If you choose a model key that already exists in the model repository, an error message is shown and the model is not saved.
 
-After creating the model with the popup, the BPMN modeling canvas is shown. The BPMN editor is very similar to the Flowable 5 BPMN editor that was part of the Explorer application. All BPMN elements supported by the Flowable engine are available to be used in the design of a process model.
+After creating the model with the popup, the BPMN modeling canvas is shown. All BPMN elements supported by the Flowable engine are available to be used in the design of a process model.
 
 ![flowable modeler design screen](assets/bpmn/flowable_modeler_design_screen.png)
 
@@ -772,7 +765,7 @@ Form fields can be dragged from the form palette on to the form canvas. In this 
 
 The id field is an important value, because a process variable will be created with the form field value using the id property value. When filling in the label property, the id property is automatically filled. If needed, you can also provide the id property value yourself by checking the override id checkbox.
 
-After saving the form model and closing the form editor, you are automatically navigated back to the process model (when the form editor was opened via the BPMN editor). When selecting the User task element again and clicking on the *Referenced form* property you will see that the newly created form definition is now attached to the User task. When clicking on the *Form* tab in the header of the Modeler application, all form definitions available in the model repository are shown.
+After saving the form model and closing the form editor, you are automatically navigated back to the process model (when the form editor was opened via the BPMN editor). When selecting the User task element again and clicking on the *Referenced form* property you will see that the newly created form definition is now attached to the User task. When clicking on the *Form* tab in the header of the Modeler app, all form definitions available in the model repository are shown.
 
 ![flowable modeler formoverview screen](assets/bpmn/flowable_modeler_formoverview_screen.png)
 
@@ -790,7 +783,7 @@ The DMN editor provides a table editor with input columns, where input condition
 
 Another important part of the DMN decision table definition is the hit policy. Currently, Flowable supports the First and Any hit policy. With the First hit policy, when the first rule is found that evaluates to true the DMN execution will stop and its output variables are returned. For the Any hit policy, all rules will be executed and the output variables for the last rule that evaluates to true are returned.
 
-When the DMN editor is saved and closed, the Modeler application navigates back to the BPMN editor and the newly created DMN decision table is now attached to the Decision task. The decision task will be generated in the BPMN XML like;
+When the DMN editor is saved and closed, the Modeler app navigates back to the BPMN editor and the newly created DMN decision table is now attached to the Decision task. The decision task will be generated in the BPMN XML like;
 
     <serviceTask id="decisionTask" name="Is manager approval needed?" flowable:type="dmn">
         <extensionElements>
@@ -812,7 +805,7 @@ With the process model completed, we can now create an app definition that combi
 
 ![flowable modeler appeditor screen](assets/bpmn/flowable_modeler_appeditor_screen.png)
 
-In the app editor, an icon and a theme color can be selected that will be used in the Flowable Task application to show the application in the dashboard. The important step is to add the vacation request process model, and by selecting the process model, automatically include any form definitions and DMN decision tables.
+In the app editor, an icon and a theme color can be selected that will be used in the Flowable Task app to show the process app in the dashboard. The important step is to add the vacation request process model, and by selecting the process model, automatically include any form definitions and DMN decision tables.
 
 ![flowable modeler modelselection popup](assets/bpmn/flowable_modeler_modelselection_popup.png)
 
@@ -821,9 +814,11 @@ A process model can be selected by clicking on the model thumbnail. When one or 
 ![flowable modeler appdetails screen](assets/bpmn/flowable_modeler_appdetails_screen.png)
 
 From this view, you can download the app definition in two different formats. The first download button (with the arrow pointing downwards) can be used to
-download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable Modeler applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
+download the app definition with the JSON model files for each included model. This makes it easy to share app definitions between different Flowable UI applications. The second download button (with the arrow point to upper right) will provide a BAR file of the app definition models, which can be deployed on the Flowable engine. In the BAR file, only the deployable artifacts are included, such as the BPMN 2.0 XML file and the DMN XML file, and not the JSON model files. All files in a BAR file deployed on a Flowable engine are stored in the database, so therefore only the deployable files are included.
 
-From the app definition details view, you can also *Publish* the app definition directly to the Flowable engine. The Flowable Modeler uses the URL defined in the application.properties file with the *flowable.modeler.app.deployment-api-url* property key. By default, the deployment URL is configured so the app definition will be deployed on the Flowable Task application when it’s running. However, this can be changed to use the Flowable REST application, for example. Make sure the Flowable Task application is running and click on the *Publish* button. The app definition is now deployed as a BAR file to the Flowable Task application.
+From the app definition details view, you can also *Publish* the app definition directly to the Flowable engine. 
+The Flowable Modeler can only deploy if it is part of the single UI app (i.e. the engines are present during the runtime).
+Once you click on the *Publish* button, the app definition is now deployed as a BAR file to the Flowable UI runtime engines.
 
 This are the Modeler UI App specific properties.
 
@@ -851,13 +846,6 @@ This are the Modeler UI App specific properties.
 <td><p>The prefix for the database tables.</p></td>
 </tr>
 <tr class="even">
-<td><p>flowable.modeler.app.deployment-api-url</p></td>
-<td><p>deployment.api.url</p></td>
-<td><p><a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
-<td><p>The root URI to the REST services of the Flowable engine, used by the Flowable Modeler application to deploy the application definition BAR file to the engine.
-Default url for the Flowable Task application is <a href="http://localhost:8080/flowable-task/app-api">http://localhost:8080/flowable-task/app-api</a></p></td>
-</tr>
-<tr class="odd">
 <td><p>flowable.modeler.app.rest-enabled</p></td>
 <td><p>rest.modeler-app.enabled</p></td>
 <td><p>true</p></td>
@@ -866,11 +854,11 @@ Default url for the Flowable Task application is <a href="http://localhost:8080/
 </tbody>
 </table>
 
-## Flowable Task application
+## Flowable Task app
 
-The Flowable Task application is the runtime application of the Flowable project and includes the Flowable BPMN, DMN, Form and Content engines by default. With the Flowable Task application, new process instances can be started, tasks can be completed, task forms can be rendered and so on. In the previous section, the vacation request app definition was deployed on the Flowable Task application REST API, and through that deployed on the Flowable engine. If you look in the Flowable database, you can see a new deployment entry has been added to the ACT\_RE\_DEPLOYMENT table for the BPMN Engine. Also, new entries haven been created in the ACT\_DMN\_DEPLOYMENT and ACT\_FO\_FORM\_DEPLOYMENT tables for the DMN and Form engines.
+The Flowable Task app is the UI to the runtime engines of the Flowable project and includes the Flowable BPMN, DMN, Form and Content engines by default. With the Flowable Task app, new process instances can be started, tasks can be completed, task forms can be rendered and so on. In the previous section, the vacation request app definition was deployed on the Flowable Task app REST API, and through that deployed on the Flowable engine. If you look in the Flowable database, you can see a new deployment entry has been added to the ACT\_RE\_DEPLOYMENT table for the BPMN Engine. Also, new entries haven been created in the ACT\_DMN\_DEPLOYMENT and ACT\_FO\_FORM\_DEPLOYMENT tables for the DMN and Form engines.
 
-On the dashboard on [<http://localhost:8080/flowable-task>](http://localhost:8080/flowable-task), you can see a vacation request app in addition to the default Task app, and any other apps that have been deployed to the Flowable engine already.
+On the dashboard in the Task app, you can see a vacation request app in addition to the default Task app, and any other apps that have been deployed to the Flowable engine already.
 
 ![flowable task dashboard screen](assets/bpmn/flowable_task_dashboard_screen.png)
 
@@ -880,7 +868,7 @@ When clicking on the vacation request app, the task list for the logged-in user 
 
 When clicking on the *Processes* tab you can choose to start a new process instance by clicking on the *Start a process* button. The list of available process definitions within the context of this app definition is now displayed. In the general Task app this works in a similar way, but in the Task app, all process definitions deployed on the Flowable engine are shown. After selecting the vacation request process definition, the *Start process* button can be clicked to start a new vacation request process instance.
 
-The Flowable Task application automatically navigates to the process instance details view. You can see the *Provide vacation information* task is active and, for example, comments can be added and the process instance state can be shown diagrammatically using the *Show diagram* button.
+The Flowable Task app automatically navigates to the process instance details view. You can see the *Provide vacation information* task is active and, for example, comments can be added and the process instance state can be shown diagrammatically using the *Show diagram* button.
 
 ![flowable task processdetails screen](assets/bpmn/flowable_task_processdetails_screen.png)
 
@@ -945,9 +933,9 @@ This are the Task UI App specific properties.
 </tbody>
 </table>
 
-## Flowable Admin application
+## Flowable Admin app
 
-The fourth UI application the Flowable project provides is the Flowable Admin application. This application provides ways to, for example, query deployments in the BPMN, DMN and Form Engines, but also shows the active state of a process instance with its active tasks and process variables. It also provides actions to assign a task to a different assignee and to complete an active task. The Flowable Admin application uses the REST API to communicate with the Flowable engines. By default, it is configured to connect to the Flowable Task REST API, but you can easily change this to use the Flowable REST app REST API instead. When going to [<http://localhost:8080/flowable-admin>](http://localhost:8080/flowable-admin), the configuration screen is shown (which is also available by clicking on the arrow at the top right near the Flowable logo).
+The fourth UI component the Flowable project provides is the Flowable Admin app. This provides ways to, for example, query deployments in the BPMN, DMN and Form Engines, but also shows the active state of a process instance with its active tasks and process variables. It also provides actions to assign a task to a different assignee and to complete an active task. The Flowable Admin app uses the REST API to communicate with the Flowable engines. By default, it is configured to connect to the Flowable UI REST API, but you can easily change this to use the Flowable REST app REST API instead. When going to the Admin app, the configuration screen is shown (which is also available by clicking on the arrow at the top right near the Flowable logo).
 
 ![flowable admin configuration screen](assets/bpmn/flowable_admin_configuration_screen.png)
 
@@ -965,7 +953,7 @@ More details of a deployment are shown here and also the process definitions tha
 
 ![flowable admin processdefinitiondetails screen](assets/bpmn/flowable_admin_processdefinitiondetails_screen.png)
 
-In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there’s one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin application to the DMN engine. You can always navigate back to the Process engine by clicking on the *Parent Deployment ID* link.
+In the process definition details view, the first page of process instances is shown, together with optional decision table definitions and form definitions that are used in the process definition. For the vacation request process definition, there’s one connected decision table and one connected form definition. Clicking on the decision table definition navigates the Flowable Admin app to the DMN engine. You can always navigate back to the Process engine by clicking on the *Parent Deployment ID* link.
 
 In addition to the deployments and definitions, you can also query on process instances, tasks, jobs and event subscriptions in the Process engine. The views all work in a similar way to what’s already been described.
 
@@ -1016,22 +1004,22 @@ This are the Admin UI App specific properties
 </tbody>
 </table>
 
-In addition to these properties, the Flowable admin application has a few more properties. The full
+In addition to these properties, the Flowable admin app has a few more properties. The full
 content of the properties file can be viewed on {sc-flowable-ui-admin}/flowable-ui-admin-app/src/main/resources/application.properties\[Github\].
 The additional properties are mainly used for defining the initial values for the REST endpoints for the different engines.
-The Admin application uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin application configuration view and these values are stored in the *ACT\\\_ADM\\\_SERVER\\\_CONFIG* table.
+The Admin app uses the initial values to make a connection to the Flowable engines, but the values can be overridden in the Admin app configuration view and these values are stored in the *ACT\\\_ADM\\\_SERVER\\\_CONFIG* table.
 An example of the BPMN Engine REST properties is shown below:
 
     flowable.admin.app.server-config.process.name=Flowable Process app
     flowable.admin.app.server-config.process.description=Flowable Process REST config
     flowable.admin.app.server-config.process.server-address=http://localhost
     flowable.admin.app.server-config.process.port=8080
-    flowable.admin.app.server-config.process.context-root=flowable-task
+    flowable.admin.app.server-config.process.context-root=flowable-ui
     flowable.admin.app.server-config.process.rest-root=process-api
     flowable.admin.app.server-config.process.user-name=admin
     flowable.admin.app.server-config.process.password=test
 
-These values can be used when the Flowable Task app (with all the Flowable engines included) is managed by the Flowable Admin application.
+These values can be used when multiple Flowable UI applications (with all the Flowable engines included) are managed by the Flowable Admin app.
 
 <table>
 <caption>Admin UI App Properties managed by Spring Boot</caption>
@@ -1055,7 +1043,7 @@ These values can be used when the Flowable Task app (with all the Flowable engin
 
 ## Internationalization
 
-The Flowable UI apps support internationalization (i18n). The project maintains the English translations. It is however possible to provide your own translation files in order to support other languages.
+The Flowable UI application supports internationalization (i18n). The project maintains the English translations. It is however possible to provide your own translation files in order to support other languages.
 
 The [Angular Translate]($$https://github.com/angular-translate/angular-translate) library tries to load a specific translation file based on the browser’s locale located in the *i18n* folder (present in each UI module). When a matching translation file cannot be loaded the framework will fallback to the English translation.
 
@@ -1082,9 +1070,9 @@ For example; your browser is configured for English (United States) and provides
 
 By uncommenting the *.registerAvailableLanguageKeys* block you can map *en-US* (and all other *en* language keys) to the *en.json* language file.
 
-## Production ready endpoints
+## Production-ready endpoints
 
-The [Production ready endpoints](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html) from Spring Boot are present for all applications.
+The [Production ready endpoints](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html) from Spring Boot are present for the application.
 To have an overview of all the available Endpoints have a look at the [Actuator Web API Documentation](https://docs.spring.io/spring-boot/docs/current/actuator-api/html/).
 
 This properties are set per default:
@@ -1104,12 +1092,12 @@ All the rest of the endpoints are accessing only to users with the `access-admin
 
 ## Custom bean deployment
 
-There are multiple ways of providing custom beans to the Flowable applications.
+There are multiple ways of providing custom beans to the Flowable application.
 
 ### Using Spring Boot auto configuration
 
-The Flowable applications are Spring Boot 2 applications.
-Which means that normal Spring Boot auto configuration can be used to make the beans to Flowable.
+The Flowable application is a Spring Boot 2 application.
+This means that normal Spring Boot auto configuration can be used to make the beans to Flowable.
 This can be done in the following manner
 
     package com.your.own.package.configuration;
@@ -1153,13 +1141,13 @@ Placing this jar in the lib folder of the servlet container (e.g. Tomcat) is not
 ### Component scan
 
 Another way to provide custom Spring beans to the Flowable engine is to put them under a certain package and have the Flowable application component scan that package.
-Based on the used application this package is different:
+Based on the application used, this package is different:
 
 -   `org.flowable.rest.app` for the `flowable-rest.war`
 
--   `org.flowable.ui.task.application` for the `flowable-task.war`
+-   `org.flowable.ui.application` for the `flowable-ui.war`
 
-The custom beans can be located in a single JAR and this jar should be present on the classpath when the applications are starting up.
+The custom beans can be located in a single JAR and this jar should be present on the classpath when the application is starting up.
 Depending where there JAR is placed, the lib folder of the servlet container (e.g. Tomcat) or the `WEB-INF/lib` folder of the exploded war, there are different possibilities.
 
 When using the lib folder of the servlet container then the created classes should be self contained, i.e. they should only use classes from within the jar.

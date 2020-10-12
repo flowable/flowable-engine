@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.query.Query;
  * Note that it is impossible to retrieve the deployment resources through the results of this operation, since that would cause a huge transfer of (possibly) unneeded bytes over the wire.
  * 
  * To retrieve the actual bytes of a deployment resource use the operations on the {@link EventRepositoryService#getDeploymentResourceNames(String)} and
- * {@link RepositoryService#getResourceAsStream(String, String)}
+ * {@link EventRepositoryService#getResourceAsStream(String, String)}
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
@@ -46,14 +46,14 @@ public interface EventDeploymentQuery extends Query<EventDeploymentQuery, EventD
     /**
      * Only select deployments with the given category.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see EventDeploymentBuilder#category(String)
      */
     EventDeploymentQuery deploymentCategory(String category);
 
     /**
      * Only select deployments that have a different category then the given one.
      * 
-     * @see DeploymentBuilder#category(String)
+     * @see EventDeploymentBuilder#category(String)
      */
     EventDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
 

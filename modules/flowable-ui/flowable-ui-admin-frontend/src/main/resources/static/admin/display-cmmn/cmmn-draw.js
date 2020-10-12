@@ -14,28 +14,29 @@
 function _cmmnGetColor(element, defaultColor)
 {
     var strokeColor;
-    if(element.current) {
+    if (element.current) {
         strokeColor = CURRENT_COLOR;
     } else if(element.completed) {
         strokeColor = COMPLETED_COLOR;
+    } else if (element.available) {
+        strokeColor = AVAILABLE_COLOR;
     } else {
         strokeColor = defaultColor;
     }
     return strokeColor;
 }
 
-function _drawPlanModel(planModel)
+function _drawPlanModel(planModel, isMigrationModelElement, currentPaper)
 {
-	var rect = paper.rect(planModel.x, planModel.y, planModel.width, planModel.height);
+	var rect = currentPaper.rect(planModel.x, planModel.y, planModel.width, planModel.height);
 
 	rect.attr({"stroke-width": 1,
 		"stroke": "#000000",
 		"fill": "white"
  	});
 
-	if (planModel.name)
-	{
-		var planModelName = paper.text(planModel.x + 14, planModel.y + (planModel.height / 2), planModel.name).attr({
+	if (planModel.name) {
+		var planModelName = currentPaper.text(planModel.x + 14, planModel.y + (planModel.height / 2), planModel.name).attr({
 	        "text-anchor" : "middle",
 	        "font-family" : "Arial",
 	        "font-size" : "12",
@@ -46,9 +47,9 @@ function _drawPlanModel(planModel)
 	}
 }
 
-function _drawSubProcess(element)
+function _drawSubProcess(element, isMigrationModelElement, currentPaper)
 {
-	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
+	var rect = currentPaper.rect(element.x, element.y, element.width, element.height, 4);
 
 	var strokeColor = _cmmnGetColor(element, MAIN_STROKE_COLOR);
 
@@ -58,108 +59,102 @@ function _drawSubProcess(element)
  	});
 }
 
-function _drawVariableServiceTaskIcon(element)
+function _drawVariableServiceTaskIcon(element, isMigrationModelElement, currentPaper)
 {
-	_drawTask(element);
-	if (element.taskType === "mail")
-	{
-		_drawSendTaskIcon(paper, element.x + 4, element.y + 4);
+	_drawTask(element, isMigrationModelElement, currentPaper);
+	if (element.taskType === "mail") {
+		_drawSendTaskIcon(currentPaper, element.x + 4, element.y + 4);
+		
+	} else if (element.taskType === "camel") {
+		_drawCamelTaskIcon(currentPaper, element.x + 4, element.y + 4);
+		
+	} else if (element.taskType === "mule") {
+		_drawMuleTaskIcon(currentPaper, element.x + 4, element.y + 4);
+		
+	} else if (element.taskType === "http") {
+        _drawHttpTaskIcon(currentPaper, element.x + 4, element.y + 4);
+        
+    } else if (element.stencilIconId) {
+		currentPaper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);
+		
+	} else {
+		_drawServiceTaskIcon(currentPaper, element.x + 4, element.y + 4);
 	}
-	else if (element.taskType === "camel")
-	{
-		_drawCamelTaskIcon(paper, element.x + 4, element.y + 4);
-	}
-	else if (element.taskType === "mule")
-	{
-		_drawMuleTaskIcon(paper, element.x + 4, element.y + 4);
-	}
-    else if (element.taskType === "http")
-    {
-        _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
-    }
-	else if (element.stencilIconId)
-	{
-		paper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);
-	}
-	else
-	{
-		_drawServiceTaskIcon(paper, element.x + 4, element.y + 4);
-	}
-	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawHttpServiceTask(element)
+function _drawHttpServiceTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawHttpTaskIcon(currentPaper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawHumanTask(element)
+function _drawHumanTask(element, isMigrationModelElement, currentPaper)
 {
-	_drawTask(element);
-	_drawHumanTaskIcon(paper, element.x + 4, element.y + 4);
-	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+	_drawTask(element, isMigrationModelElement, currentPaper);
+	_drawHumanTaskIcon(currentPaper, element.x + 4, element.y + 4);
+	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawCaseTask(element)
+function _drawCaseTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawCaseTaskIcon(paper, element.x + 1, element.y + 1);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawCaseTaskIcon(currentPaper, element.x + 1, element.y + 1);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawProcessTask(element)
+function _drawProcessTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawProcessTaskIcon(paper, element.x + 1, element.y + 1);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawProcessTaskIcon(currentPaper, element.x + 1, element.y + 1);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawScriptTaskIcon(paper, startX, startY)
+function _drawScriptTaskIcon(currentPaper, startX, startY)
 {
-	var path1 = paper.path("m 5,2 0,0.094 c 0.23706,0.064 0.53189,0.1645 0.8125,0.375 0.5582,0.4186 1.05109,1.228 1.15625,2.5312 l 8.03125,0 1,0 1,0 c 0,-3 -2,-3 -2,-3 l -10,0 z M 4,3 4,13 2,13 c 0,3 2,3 2,3 l 9,0 c 0,0 2,0 2,-3 L 15,6 6,6 6,5.5 C 6,4.1111 5.5595,3.529 5.1875,3.25 4.8155,2.971 4.5,3 4.5,3 L 4,3 z");
+	var path1 = currentPaper.path("m 5,2 0,0.094 c 0.23706,0.064 0.53189,0.1645 0.8125,0.375 0.5582,0.4186 1.05109,1.228 1.15625,2.5312 l 8.03125,0 1,0 1,0 c 0,-3 -2,-3 -2,-3 l -10,0 z M 4,3 4,13 2,13 c 0,3 2,3 2,3 l 9,0 c 0,0 2,0 2,-3 L 15,6 6,6 6,5.5 C 6,4.1111 5.5595,3.529 5.1875,3.25 4.8155,2.971 4.5,3 4.5,3 L 4,3 z");
 	path1.attr({
 		"opacity": 1,
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
 
-	var scriptTaskIcon = paper.set();
+	var scriptTaskIcon = currentPaper.set();
 	scriptTaskIcon.push(path1);
 
 	scriptTaskIcon.transform("T" + startX + "," + startY);
 }
 
-function _drawScriptServiceTask(element)
+function _drawScriptServiceTask(element, isMigrationModelElement, currentPaper)
 {
-	_drawTask(element);
-	_drawScriptTaskIcon(paper, element.x + 4, element.y + 4);
-	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+	_drawTask(element, isMigrationModelElement, currentPaper);
+	_drawScriptTaskIcon(currentPaper, element.x + 4, element.y + 4);
+	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawSendEventServiceTask(element)
+function _drawSendEventServiceTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawSendTaskIcon(paper, element.x + 4, element.y + 4);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawSendTaskIcon(currentPaper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawDecisionTask(element)
+function _drawDecisionTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawDecisionTaskIcon(paper, element.x + 1, element.y + 1);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawDecisionTaskIcon(currentPaper, element.x + 1, element.y + 1);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawServiceTask(element)
+function _drawServiceTask(element, isMigrationModelElement, currentPaper)
 {
-    _drawTask(element);
-    _drawVariableServiceTaskIcon(element);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawTask(element, isMigrationModelElement, currentPaper);
+    _drawVariableServiceTaskIcon(element, currentPaper);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawTask(element)
+function _drawTask(element, isMigrationModelElement, currentPaper)
 {
     var rectAttrs = {};
 
@@ -177,7 +172,7 @@ function _drawTask(element)
 	var width = element.width - (strokeWidth / 2);
 	var height = element.height - (strokeWidth / 2);
 
-	var rect = paper.rect(element.x, element.y, width, height, 4);
+	var rect = currentPaper.rect(element.x, element.y, width, height, 4);
     rectAttrs['stroke-width'] = strokeWidth;
 
     // Fill
@@ -187,36 +182,36 @@ function _drawTask(element)
 	rect.id = element.id;
 
 	if (element.name) {
-		this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11);
+		this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11, currentPaper);
 	}
 }
 
-function _drawTimerEventListener(element)
+function _drawTimerEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element);
-    _drawTimerEventListenerIcon(paper, element);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawEventListener(element, currentPaper);
+    _drawTimerEventListenerIcon(currentPaper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawUserEventListener(element)
+function _drawUserEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element);
-    _drawUserEventListenerIcon(paper, element);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawEventListener(element, currentPaper);
+    _drawUserEventListenerIcon(currentPaper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawGenericEventListener(element)
+function _drawGenericEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element);
-    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+    _drawEventListener(element, currentPaper);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
-function _drawEventListener(element)
+function _drawEventListener(element, isMigrationModelElement, currentPaper)
 {
     var x = element.x + (element.width / 2);
 	var y = element.y + (element.height / 2);
 
-	var circle = paper.circle(x, y, 15);
+	var circle = currentPaper.circle(x, y, 15);
 
     circle.attr({"stroke-width": 1,
         "stroke": "black",
@@ -226,7 +221,7 @@ function _drawEventListener(element)
 	circle.id = element.id;
 }
 
-function _drawMilestone(element)
+function _drawMilestone(element, isMigrationModelElement, currentPaper)
 {
     var rectAttrs = {};
 
@@ -244,7 +239,7 @@ function _drawMilestone(element)
     var width = element.width - (strokeWidth / 2);
     var height = element.height - (strokeWidth / 2);
 
-    var rect = paper.rect(element.x, element.y, width, height, 24);
+    var rect = currentPaper.rect(element.x, element.y, width, height, 24);
     rectAttrs['stroke-width'] = strokeWidth;
 
     // Fill
@@ -254,11 +249,11 @@ function _drawMilestone(element)
     rect.id = element.id;
 
     if (element.name) {
-        this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11);
+        this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11, currentPaper);
     }
 }
 
-function _drawStage(element)
+function _drawStage(element, isMigrationModelElement, currentPaper)
 {
     var rectAttrs = {};
 
@@ -276,7 +271,7 @@ function _drawStage(element)
     var width = element.width - (strokeWidth / 2);
     var height = element.height - (strokeWidth / 2);
 
-    var rect = paper.rect(element.x, element.y, width, height, 16);
+    var rect = currentPaper.rect(element.x, element.y, width, height, 16);
     rectAttrs['stroke-width'] = strokeWidth;
 
     // Fill
@@ -286,11 +281,11 @@ function _drawStage(element)
     rect.id = element.id;
 
     if (element.name) {
-        this._drawMultilineText(element.name, element.x + 10, element.y + 5, element.width, element.height, "start", "top", 11);
+        this._drawMultilineText(element.name, element.x + 10, element.y + 5, element.width, element.height, "start", "top", 11, currentPaper);
     }
 }
 
-function _drawPlanModel(element)
+function _drawPlanModel(element, isMigrationModelElement, currentPaper)
 {
     var rectAttrs = {};
 
@@ -308,7 +303,7 @@ function _drawPlanModel(element)
     var width = element.width - (strokeWidth / 2);
     var height = element.height - (strokeWidth / 2);
 
-    var rect = paper.rect(element.x, element.y, width, height, 4);
+    var rect = currentPaper.rect(element.x, element.y, width, height, 4);
     rectAttrs['stroke-width'] = strokeWidth;
 
     // Fill
@@ -317,27 +312,27 @@ function _drawPlanModel(element)
     rect.attr(rectAttrs);
     rect.id = element.id;
 
-    var path1 = paper.path("M20 55 L37 34 L275 34 L291 55");
+    var path1 = currentPaper.path("M20 55 L37 34 L275 34 L291 55");
     path1.attr({
         "opacity": 1,
         "stroke": strokeColor,
         "fill": "#ffffff"
     });
 
-    var planModelHeader = paper.set();
+    var planModelHeader = currentPaper.set();
     planModelHeader.push(path1);
 
     planModelHeader.translate(element.x, element.y - 55);
     if (element.name) {
-        this._drawMultilineText(element.name, element.x + 10, element.y - 16, 275, element.height, "middle", "top", 11);
+        this._drawMultilineText(element.name, element.x + 10, element.y - 16, 275, element.height, "middle", "top", 11, currentPaper);
     }
 }
 
-function _drawEntryCriterion(element)
+function _drawEntryCriterion(element, isMigrationModelElement, currentPaper)
 {
     var strokeColor = _cmmnGetColor(element, MAIN_STROKE_COLOR);
 
-    var rhombus = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) +
+    var rhombus = currentPaper.path("M" + element.x + " " + (element.y + (element.height / 2)) +
         "L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) +
         "L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
         "L" + (element.x + (element.width / 2)) + " " + element.y + "z"
@@ -357,11 +352,11 @@ function _drawEntryCriterion(element)
     rhombus.id = element.id;
 }
 
-function _drawExitCriterion(element)
+function _drawExitCriterion(element, isMigrationModelElement, currentPaper)
 {
     var strokeColor = _cmmnGetColor(element, MAIN_STROKE_COLOR);
 
-    var rhombus = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) +
+    var rhombus = currentPaper.path("M" + element.x + " " + (element.y + (element.height / 2)) +
         "L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) +
         "L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
         "L" + (element.x + (element.width / 2)) + " " + element.y + "z"
@@ -381,28 +376,24 @@ function _drawExitCriterion(element)
     rhombus.id = element.id;
 }
 
-function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, verticalAnchor, fontSize)
+function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, verticalAnchor, fontSize, currentPaper)
 {
-	if (!text || text == "")
-	{
+	if (!text || text == "") {
 		return;
 	}
 
 	var textBoxX, textBoxY;
     var width = boxWidth - (2 * TEXT_PADDING);
 
-    if (horizontalAnchor === "middle")
-    {
+    if (horizontalAnchor === "middle") {
     	textBoxX = x + (boxWidth / 2);
-    }
-    else if (horizontalAnchor === "start")
-    {
+    } else if (horizontalAnchor === "start") {
     	textBoxX = x;
     }
 
     textBoxY = y + (boxHeight / 2);
 
- 	var t = paper.text(textBoxX + TEXT_PADDING, textBoxY + TEXT_PADDING).attr({
+ 	var t = currentPaper.text(textBoxX + TEXT_PADDING, textBoxY + TEXT_PADDING).attr({
         "text-anchor" : horizontalAnchor,
         "font-family" : "Arial",
         "font-size" : fontSize,
@@ -420,8 +411,7 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     });
     var removedLineBreaks = text.split("\n");
     var x = 0, s = [];
-    for (var r = 0; r < removedLineBreaks.length; r++)
-    {
+    for (var r = 0; r < removedLineBreaks.length; r++) {
   	    var words = removedLineBreaks[r].split(" ");
   	    for ( var i = 0; i < words.length; i++) {
 
@@ -440,25 +430,24 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     	"text" : s.join("")
     });
 
-    if (verticalAnchor && verticalAnchor === "top")
-    {
+    if (verticalAnchor && verticalAnchor === "top") {
     	t.attr({"y": y + (t.getBBox().height / 2)});
     }
 }
 
-function _drawAssociation(flow){
+function _drawAssociation(flow, currentPaper) {
 
-	var polyline = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
-	polyline.element = paper.path(polyline.path);
+	var polyline = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, currentPaper);
+	polyline.element = currentPaper.path(polyline.path);
 	polyline.element.attr({"stroke-width": ASSOCIATION_STROKE});
 	polyline.element.attr({"stroke-dasharray": ". "});
 	polyline.element.attr({"stroke":"#585858"});
 
 	polyline.element.id = flow.id;
 
-	var polylineInvisible = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
+	var polylineInvisible = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, currentPaper);
 
-	polylineInvisible.element = paper.path(polyline.path);
+	polylineInvisible.element = currentPaper.path(polyline.path);
 	polylineInvisible.element.attr({
 			"opacity": 0,
 			"stroke-width": 8,
@@ -468,19 +457,19 @@ function _drawAssociation(flow){
 	_showTip(jQuery(polylineInvisible.element.node), flow);
 
 	polylineInvisible.element.mouseover(function() {
-		paper.getById(polyline.element.id).attr({"stroke":"blue"});
+		currentPaper.getById(polyline.element.id).attr({"stroke":"blue"});
 	});
 
 	polylineInvisible.element.mouseout(function() {
-		paper.getById(polyline.element.id).attr({"stroke":"#585858"});
+		currentPaper.getById(polyline.element.id).attr({"stroke":"#585858"});
 	});
 }
 
-function _drawArrowHead(line, connectionType)
+function _drawArrowHead(line, connectionType, currentPaper)
 {
 	var doubleArrowWidth = 2 * ARROW_WIDTH;
 
-	var arrowHead = paper.path("M0 0L-" + (ARROW_WIDTH / 2 + .5) + " -" + doubleArrowWidth + "L" + (ARROW_WIDTH/2 + .5) + " -" + doubleArrowWidth + "z");
+	var arrowHead = currentPaper.path("M0 0L-" + (ARROW_WIDTH / 2 + .5) + " -" + doubleArrowWidth + "L" + (ARROW_WIDTH/2 + .5) + " -" + doubleArrowWidth + "z");
 
 	// anti smoothing
 	if (this.strokeWidth%2 == 1)

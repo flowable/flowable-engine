@@ -8,36 +8,36 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>6.5.1-SNAPSHOT</version>
+	<version>6.6.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.2.7.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.7.RELEASE</spring.framework.version>
-		<spring.security.version>5.2.5.RELEASE</spring.security.version>
-		<spring.amqp.version>2.2.5.RELEASE</spring.amqp.version>
-		<spring.kafka.version>2.3.7.RELEASE</spring.kafka.version>
-		<jackson.version>2.10.3</jackson.version>
+		<spring.boot.version>2.3.4.RELEASE</spring.boot.version>
+		<spring.framework.version>5.2.9.RELEASE</spring.framework.version>
+		<spring.security.version>5.3.5.RELEASE</spring.security.version>
+		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
+		<spring.kafka.version>2.5.6.RELEASE</spring.kafka.version>
+		<reactor-netty.version>0.9.12.RELEASE</reactor-netty.version>
+		<jackson.version>2.11.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-        <camel.version>2.25.0</camel.version>
-		<cxf.version>3.3.6</cxf.version>
+    <camel.version>2.25.0</camel.version>
+		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
+		<jib-maven-plugin.version>1.6.1</jib-maven-plugin.version>
 
 		<junit.version>4.13</junit.version>
-		<junit.jupiter.version>5.6.1</junit.jupiter.version>
-		<hikari.version>3.4.3</hikari.version>
+		<junit.jupiter.version>5.7.0</junit.jupiter.version>
+		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.3.3</mockito.version>
+		<mockito.version>3.5.13</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
-
-		<spotify.docker.plugin.version>1.4.10</spotify.docker.plugin.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
@@ -114,17 +114,17 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.10</version>
+				<version>3.11</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.7</version>
+				<version>2.8.0</version>
 			</dependency>
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.14</version>
+			    <version>1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -155,12 +155,12 @@
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
-				<version>2.3.2</version>
+				<version>2.3.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>2.3.2</version>
+				<version>2.3.3</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
@@ -188,12 +188,12 @@
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-annotations</artifactId>
-				<version>1.5.24</version>
+				<version>1.6.2</version>
 			</dependency>
 			<dependency>
 				<groupId>io.swagger</groupId>
 				<artifactId>swagger-models</artifactId>
-				<version>1.5.24</version>
+				<version>1.6.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
@@ -384,6 +384,11 @@
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-dmn-engine-configurator</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-dmn-image-generator</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -668,6 +673,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
+				<artifactId>flowable-http-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
 				<artifactId>flowable-crystalball</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -772,7 +782,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>2.5.12</version>
+				<version>3.0.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -907,6 +917,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
+				<artifactId>spring-webflux</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
@@ -1021,6 +1036,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>io.projectreactor.netty</groupId>
+				<artifactId>reactor-netty</artifactId>
+				<version>${reactor-netty.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>jakarta.jms</groupId>
 				<artifactId>jakarta.jms-api</artifactId>
 				<version>${jakarta-jms.version}</version>
@@ -1059,13 +1080,13 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.16.0</version>
+				<version>3.17.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.17.0</version>
+				<version>2.19.0</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -1109,6 +1130,11 @@
         <module>modules/flowable-form-engine-configurator</module>
 		<module>modules/flowable-dmn-model</module>
 		<module>modules/flowable-dmn-api</module>
+		<module>modules/flowable-dmn-json-converter</module>
+		<module>modules/flowable-dmn-xml-converter</module>
+		<module>modules/flowable-dmn-engine</module>
+		<module>modules/flowable-dmn-engine-configurator</module>
+		<module>modules/flowable-dmn-image-generator</module>
 		<module>modules/flowable-content-api</module>
         <module>modules/flowable-cmmn-api</module>
         <module>modules/flowable-cmmn-model</module>
@@ -1120,7 +1146,8 @@
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>
 		<module>modules/flowable-spring-security</module>
-	</modules>
+        <module>modules/flowable-http-common</module>
+    </modules>
 
 	<build>
 		<plugins>
@@ -1145,7 +1172,7 @@
 						<exclude>**/*TestCase.java</exclude>
 					</excludes>
 					<runOrder>alphabetical</runOrder>
-					<rerunFailingTestsCount>2</rerunFailingTestsCount>
+					<rerunFailingTestsCount>5</rerunFailingTestsCount>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1182,11 +1209,6 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>${spotify.docker.plugin.version}</version>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
@@ -1303,6 +1325,11 @@
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>1.6.0</version>
 				</plugin>
+				<plugin>
+					<groupId>com.google.cloud.tools</groupId>
+					<artifactId>jib-maven-plugin</artifactId>
+					<version>${jib-maven-plugin.version}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -1380,6 +1407,7 @@
 				<module>modules/flowable-cxf</module>
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
+				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-cdi</module>
@@ -1493,9 +1521,9 @@
 				<module>modules/flowable-content-spring-configurator</module>
 				<module>modules/flowable-content-rest</module>
                 <module>modules/flowable-http</module>
+                <module>modules/flowable-http-common</module>
                 <module>modules/flowable-spring-boot</module>
 				<module>modules/flowable-jms-spring-executor</module>
-				<module>modules/flowable-ui</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1631,6 +1659,7 @@
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
+				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-ldap</module>
@@ -1638,7 +1667,6 @@
 				<module>modules/flowable-jmx</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-crystalball</module>
-				<module>modules/flowable-ui</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
@@ -1975,10 +2003,6 @@
 		<system>Github issues</system>
 		<url>https://github.com/flowable/flowable-engine/issues</url>
 	</issueManagement>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://qa.flowable.org</url>
-	</ciManagement>
 	<scm>
 		<url>git@github.com:flowable/flowable-engine.git</url>
 		<connection>scm:git:git@github.com:flowable/flowable-engine.git</connection>

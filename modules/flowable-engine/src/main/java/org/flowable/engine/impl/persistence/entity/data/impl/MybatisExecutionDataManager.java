@@ -123,7 +123,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
             return true;
         }
         
-        // Fetches execution tree. This will store them in the cache and thus avoind extra database calls.
+        // Fetches execution tree. This will store them in the cache and thus avoids extra database calls.
         getList("selectExecutionsWithSameRootProcessInstanceId", executionId,
                 executionsWithSameRootProcessInstanceIdMatcher, true);
         

@@ -60,7 +60,7 @@ public class LDAPConfigurator extends IdmEngineConfigurator {
         super.configure(engineConfiguration);
         
         getIdmEngineConfiguration(engineConfiguration)
-                .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache));
+                .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache, idmEngineConfiguration));
     }
 
     // Getters and Setters //////////////////////////////////////////////////

@@ -33,7 +33,7 @@
         "title": "Forms"
       },
       "bpmn/ch09-ProcessInstanceMigration": {
-        "title": "Process Instance Migration (Experimental)"
+        "title": "Process Instance Migration"
       },
       "bpmn/ch10-JPA": {
         "title": "JPA"
@@ -166,6 +166,7 @@
       "Event Registry User Guide": "Event Registry User Guide",
       "DMN User Guide": "DMN User Guide",
       "Forms User Guide": "Forms User Guide",
+      "Applications Guide": "Applications Guide",
       "Migration from v5": "Migration from v5",
       "Disclaimer": "Disclaimer"
     }

@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -40,17 +41,18 @@ public class TimerManager {
     protected void removeObsoleteTimers(ProcessDefinitionEntity processDefinition) {
         List<TimerJobEntity> jobsToDelete = null;
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processDefinition.getTenantId() != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
-            jobsToDelete = CommandContextUtil.getTimerJobService().findJobsByTypeAndProcessDefinitionKeyAndTenantId(
+            jobsToDelete = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().findJobsByTypeAndProcessDefinitionKeyAndTenantId(
                     TimerStartEventJobHandler.TYPE, processDefinition.getKey(), processDefinition.getTenantId());
         } else {
-            jobsToDelete = CommandContextUtil.getTimerJobService()
+            jobsToDelete = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService()
                     .findJobsByTypeAndProcessDefinitionKeyNoTenantId(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
         }
 
         if (jobsToDelete != null) {
             for (TimerJobEntity job : jobsToDelete) {
-                new CancelJobsCmd(job.getId()).execute(Context.getCommandContext());
+                new CancelJobsCmd(job.getId(), processEngineConfiguration.getJobServiceConfiguration()).execute(Context.getCommandContext());
             }
         }
     }

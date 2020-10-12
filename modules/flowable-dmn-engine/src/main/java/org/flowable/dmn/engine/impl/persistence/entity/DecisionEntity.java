@@ -33,6 +33,10 @@ public interface DecisionEntity extends DmnDecision, Entity {
 
     void setResourceName(String resourceName);
 
+    void setHasGraphicalNotation(boolean hasGraphicalNotation);
+
+    void setDiagramResourceName(String diagramResourceName);
+
     void setTenantId(String tenantId);
 
     void setCategory(String category);

@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer  {
+public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsumer {
 
     private static Logger LOGGER = LoggerFactory.getLogger(CmmnEventRegistryEventConsumer.class);
 
@@ -141,7 +141,7 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     @Override
     protected EventSubscriptionQuery createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(commandExecutor);
+        return new EventSubscriptionQueryImpl(commandExecutor, cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

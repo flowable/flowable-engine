@@ -12,14 +12,17 @@
  */
 package org.flowable.engine.impl.test;
 
-import org.flowable.common.engine.api.FlowableException;
+import static org.flowable.engine.test.FlowableExtension.DEFAULT_CONFIGURATION_RESOURCE;
+
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
+import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -35,7 +38,6 @@ import org.junit.platform.commons.support.AnnotationSupport;
 public class PluggableFlowableExtension extends InternalFlowableExtension {
 
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(PluggableFlowableExtension.class);
-    private static final String PROCESS_ENGINE = "cachedProcessEngine";
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
@@ -50,7 +52,8 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
 
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
-        ProcessEngine processEngine = getStore(context).getOrComputeIfAbsent(PROCESS_ENGINE, key -> initializeProcessEngine(), ProcessEngine.class);
+        String configurationResource = getConfigurationResource(context);
+        ProcessEngine processEngine = getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
 
         // Enable verbose execution tree debugging if needed
         Class<?> testClass = context.getRequiredTestClass();
@@ -60,15 +63,24 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
         return processEngine;
     }
 
-    protected ProcessEngine initializeProcessEngine() {
-        logger.info("No cached process engine found for test. Retrieving the default engine.");
-        ProcessEngines.destroy(); // Just to be sure we're not getting any previously cached version
+    protected ProcessEngine initializeProcessEngine(String configurationResource) {
+        logger.info("No cached process engine found for test. Retrieving engine from {}.", configurationResource);
 
-        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
-        if (processEngine == null) {
-            throw new FlowableException("no default process engine available");
+        ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration
+                .createProcessEngineConfigurationFromResource(configurationResource);
+        ProcessEngine previousProcessEngine = ProcessEngines.getProcessEngine(processEngineConfiguration.getEngineName());
+        if (previousProcessEngine != null) {
+            ProcessEngines.unregister(previousProcessEngine); // Just to be sure we're not getting any previously cached version
         }
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+        ProcessEngines.setInitialized(true);
         return processEngine;
+    }
+
+    protected String getConfigurationResource(ExtensionContext context) {
+        return AnnotationSupport.findAnnotation(context.getTestClass(), ConfigurationResource.class)
+                .map(ConfigurationResource::value)
+                .orElse(DEFAULT_CONFIGURATION_RESOURCE);
     }
 
     protected void swapCommandInvoker(ProcessEngine processEngine, boolean debug) {

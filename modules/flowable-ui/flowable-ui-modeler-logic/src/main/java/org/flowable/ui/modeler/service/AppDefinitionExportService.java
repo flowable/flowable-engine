@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -121,20 +122,24 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                 }
             }
 
-            Collection<Model> allDecisionTableModels = converterContext.getAllDecisionTableModels();
+            Collection<Model> allDirectDecisionTableModels = converterContext.getAllDecisionTableModels();
+            Collection<Model> allReferencedDecisionTableModels = converterContext.getAllReferencedDecisionTableModels();
             Collection<Model> allDecisionServiceModels = converterContext.getAllDecisionServiceModels();
 
-            Map<String, String> decisionTableEditorJSONs = new HashMap<>();
-            if (!allDecisionTableModels.isEmpty()) {
-                decisionTableEditorJSONs = allDecisionTableModels.stream()
-                    .collect(Collectors.toMap(
-                        AbstractModel::getKey,
-                        AbstractModel::getModelEditorJson
-                    ));
-            }
+            allReferencedDecisionTableModels
+                    .forEach(referencedDecisionTableModel -> converterContext.getDecisionTableKeyToJsonStringMap().put(
+                            referencedDecisionTableModel.getKey(), referencedDecisionTableModel.getModelEditorJson()));
 
-            createDecisionTableZipEntries(allDecisionTableModels, decisionTableEditorJSONs, zipOutputStream);
-            createDecisionServiceZipEntries(allDecisionServiceModels, decisionTableEditorJSONs, zipOutputStream);
+            Collection<Model> allDecisionTableModels = Stream.of(allDirectDecisionTableModels, allReferencedDecisionTableModels)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toMap(
+                            Model::getKey,
+                            d -> d,
+                            (Model x, Model y) -> x))
+                    .values();
+
+            createDecisionTableZipEntries(allDecisionTableModels, converterContext, zipOutputStream);
+            createDecisionServiceZipEntries(allDecisionServiceModels, converterContext, zipOutputStream);
 
             zipOutputStream.close();
 
@@ -148,12 +153,12 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         }
     }
 
-    protected void createDecisionTableZipEntries(Collection<Model> decisionTableModels, Map<String, String> decisionTableEditorJSONs, ZipOutputStream zipOutputStream) throws Exception {
+    protected void createDecisionTableZipEntries(Collection<Model> decisionTableModels, ConverterContext converterContext, ZipOutputStream zipOutputStream) throws Exception {
         for (Model decisionTableModel : decisionTableModels) {
             createZipEntries(decisionTableModel, "decision-table-models", zipOutputStream);
             try {
                 JsonNode decisionTableNode = objectMapper.readTree(decisionTableModel.getModelEditorJson());
-                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId(), decisionTableEditorJSONs);
+                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionTableNode, decisionTableModel.getId());
                 byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
                 createZipEntry(zipOutputStream, "decision-table-models/" + decisionTableModel.getKey() + ".dmn", dmnXMLBytes);
             } catch (Exception e) {
@@ -162,12 +167,12 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         }
     }
 
-    protected void createDecisionServiceZipEntries(Collection<Model> decisionServiceModels, Map<String, String> decisionTableEditorJSONs, ZipOutputStream zipOutputStream) throws Exception {
+    protected void createDecisionServiceZipEntries(Collection<Model> decisionServiceModels, ConverterContext converterContext, ZipOutputStream zipOutputStream) throws Exception {
         for (Model decisionServiceModel : decisionServiceModels) {
             createZipEntries(decisionServiceModel, "decision-service-models", zipOutputStream);
             try {
                 JsonNode decisionServiceNode = objectMapper.readTree(decisionServiceModel.getModelEditorJson());
-                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), decisionTableEditorJSONs);
+                DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(decisionServiceNode, decisionServiceModel.getId(), converterContext);
                 byte[] dmnXMLBytes = dmnXMLConverter.convertToXML(dmnDefinition);
                 createZipEntry(zipOutputStream, "decision-service-models/" + decisionServiceModel.getKey() + ".dmn", dmnXMLBytes);
             } catch (Exception e) {
@@ -198,7 +203,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createBpmnZipEntries(List<AppModelDefinition> modelDefinitions, ZipOutputStream zipOutputStream,
-            ConverterContext converterContext) throws Exception {
+                                        ConverterContext converterContext) throws Exception {
 
         for (AppModelDefinition modelDef : modelDefinitions) {
             Model model = modelService.getModel(modelDef.getId());
@@ -214,8 +219,8 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
                     converterContext.addDecisionServiceModel(childModel);
                     List<Model> referencedDecisionTableModels = modelRepository.findByParentModelId(childModel.getId());
                     referencedDecisionTableModels.stream()
-                        .filter(refModel -> Model.MODEL_TYPE_DECISION_TABLE == refModel.getModelType())
-                        .forEach(converterContext::addDecisionTableModel);
+                            .filter(refModel -> Model.MODEL_TYPE_DECISION_TABLE == refModel.getModelType())
+                            .forEach(converterContext::addReferencedDecisionTableModel);
                 }
             }
 
@@ -238,7 +243,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createBpmnZipEntries(Collection<Model> models, ZipOutputStream zipOutputStream,
-            ConverterContext converterContext) throws Exception {
+                                        ConverterContext converterContext) throws Exception {
 
         for (Model model : models) {
 
@@ -297,7 +302,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
     }
 
     protected void createCmmnZipEntries(Collection<Model> models, ZipOutputStream zipOutputStream,
-            ConverterContext converterContext) throws Exception {
+                                        ConverterContext converterContext) throws Exception {
 
         for (Model model : models) {
             CmmnModel cmmnModel = modelService.getCmmnModel(model, converterContext);

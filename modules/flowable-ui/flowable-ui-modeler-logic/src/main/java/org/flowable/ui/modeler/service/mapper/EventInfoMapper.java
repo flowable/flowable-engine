@@ -23,6 +23,7 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 
 public class EventInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         Event event = (Event) element;
         if (CollectionUtils.isNotEmpty(event.getEventDefinitions())) {

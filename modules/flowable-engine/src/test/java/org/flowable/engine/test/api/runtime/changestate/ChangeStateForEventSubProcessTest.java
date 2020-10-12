@@ -572,7 +572,7 @@ public class ChangeStateForEventSubProcessTest extends PluggableFlowableTestCase
         //Spawn the parallel task
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
                 .list().stream()
-                .filter(j -> getJobActivityId(j).equals("spawnParallelTask"))
+                .filter(j -> "spawnParallelTask".equals(getJobActivityId(j)))
                 .findFirst().get();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
@@ -783,7 +783,7 @@ public class ChangeStateForEventSubProcessTest extends PluggableFlowableTestCase
         //Spawn the parallel task
         Job job = managementService.createTimerJobQuery().processInstanceId(processInstance.getId())
                 .list().stream()
-                .filter(j -> getJobActivityId(j).equals("spawnParallelTask"))
+                .filter(j -> "spawnParallelTask".equals(getJobActivityId(j)))
                 .findFirst().get();
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());

@@ -27,24 +27,24 @@ public interface AppDefinition {
     /** label used for display purposes */
     String getName();
 
-    /** unique name for all versions of this case definition */
+    /** unique name for all versions of this app definition */
     String getKey();
 
-    /** description of this case definition **/
+    /** description of this app definition **/
     String getDescription();
 
-    /** version of this case definition */
+    /** version of this app definition */
     int getVersion();
 
     /**
-     * name of {@link AppRepositoryService#getResourceAsStream(String, String) the resource} of this case definition.
+     * name of {@link AppRepositoryService#getResourceAsStream(String, String) the resource} of this app definition.
      */
     String getResourceName();
 
-    /** The deployment in which this case definition is contained. */
+    /** The deployment in which this app definition is contained. */
     String getDeploymentId();
 
-    /** The tenant identifier of this case definition */
+    /** The tenant identifier of this app definition */
     String getTenantId();
 
 }

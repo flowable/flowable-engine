@@ -19,10 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +30,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.editor.converter.DmnJsonConverter;
+import org.flowable.dmn.editor.converter.DmnJsonConverterContext;
+import org.flowable.dmn.editor.converter.StandaloneDmnConverterContext;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.idm.api.User;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
@@ -129,26 +127,11 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         exportDefinition(response, modelHistory);
     }
 
-    public void exportDecisionTableHistory(HttpServletResponse response, String decisionTableId) {
-        exportDefinition(response, getModel(decisionTableId, true, false));
-    }
-
-    public void exportDefinition(HttpServletResponse response, String decisionId) {
-        List<Model> decisionTableModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.MODIFIED_DESC);
-        Map<String, String> decisionTableEditorJSON = decisionTableModels.stream()
-            .collect(Collectors.toMap(
-                AbstractModel::getKey,
-                AbstractModel::getModelEditorJson
-            ));
-
-        exportDefinition(response, getModel(decisionId, true, false), decisionTableEditorJSON);
-    }
-
     protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel) {
-        exportDefinition(response, definitionModel, Collections.emptyMap());
+        exportDefinition(response, definitionModel, new StandaloneDmnConverterContext());
     }
 
-    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, Map<String, String> decisionTablesEditorJson) {
+    protected void exportDefinition(HttpServletResponse response, AbstractModel definitionModel, DmnJsonConverterContext converterContext) {
         try {
 
             JsonNode editorJsonNode = objectMapper.readTree(definitionModel.getModelEditorJson());
@@ -160,7 +143,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/xml");
 
-            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), decisionTablesEditorJson);
+            DmnDefinition dmnDefinition = dmnJsonConverter.convertToDmn(editorJsonNode, definitionModel.getId(), converterContext);
             byte[] xmlBytes = dmnXmlConverter.convertToXML(dmnDefinition);
 
             BufferedInputStream in = new BufferedInputStream(new ByteArrayInputStream(xmlBytes));
@@ -209,7 +192,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
                 modelRepresentation.setName(dmnDefinition.getName());
                 modelRepresentation.setDescription(dmnDefinition.getDescription());
                 modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
-                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserObject());
+                Model model = modelService.createModel(modelRepresentation, editorJsonNode.toString(), SecurityUtils.getCurrentUserId());
                 return new ModelRepresentation(model);
 
             } catch (Exception e) {
@@ -239,7 +222,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         Model decisionTableModel = getModel(decisionTableId, true, false);
 
         // convert to new model version
-        decisionTableModel = DecisionTableModelConversionUtil.convertModel(decisionTableModel);
+        DecisionTableModelConversionUtil.convertModel(decisionTableModel);
 
         return decisionTableModel;
     }
@@ -277,7 +260,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
 
     public DecisionTableRepresentation saveDecisionTable(String decisionTableId, DecisionTableSaveRepresentation saveRepresentation) {
 
-        User user = SecurityUtils.getCurrentUserObject();
+        String user = SecurityUtils.getCurrentUserId();
         Model model = getModel(decisionTableId, false, false);
 
         String decisionKey = saveRepresentation.getDecisionTableRepresentation().getKey();

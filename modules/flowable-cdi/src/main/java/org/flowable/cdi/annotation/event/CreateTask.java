@@ -32,6 +32,6 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface CreateTask {
     /** the id of the task that has been created */
-    public String value();
+    String value();
 
 }

@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The ProcessEngine and the services will be made available to the test class through the parameter resolution (BeforeEach, AfterEach, test methods).
  * The ProcessEngine will be initialized by default with the flowable.cfg.xml resource on the classpath.
- * To specify a different configuration file, annotate your class witn {@link ConfigurationResource}.
+ * To specify a different configuration file, annotate your class with {@link ConfigurationResource}.
  * Process engines will be cached as part of the JUnit Jupiter Extension context.
  * Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
  * </p>

@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnDecisionService;
+import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.test.DmnDeployment;

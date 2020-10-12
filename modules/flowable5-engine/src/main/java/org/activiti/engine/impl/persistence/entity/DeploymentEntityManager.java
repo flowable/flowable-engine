@@ -30,6 +30,7 @@ import org.activiti.engine.impl.persistence.AbstractManager;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 
@@ -102,9 +103,10 @@ public class DeploymentEntityManager extends AbstractManager {
             if (timerStartJobs != null && timerStartJobs.size() > 0) {
                 for (Job timerStartJob : timerStartJobs) {
                     if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                        Context.getProcessEngineConfiguration()
-                                .getEventDispatcher()
-                                .dispatchEvent(ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+                        Context.getProcessEngineConfiguration().getEventDispatcher()
+                                .dispatchEvent(ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, 
+                                        timerStartJob, null, null, processDefinition.getId()),
+                                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                     }
 
                     ((TimerJobEntity) timerStartJob).delete();
@@ -150,7 +152,7 @@ public class DeploymentEntityManager extends AbstractManager {
                     List<EventSubscriptionDeclaration> signalEventDefinitions = (List<EventSubscriptionDeclaration>) resolvedProcessDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
                     if (signalEventDefinitions != null) {
                         for (EventSubscriptionDeclaration eventDefinition : signalEventDefinitions) {
-                            if (eventDefinition.getEventType().equals("signal") && eventDefinition.isStartEvent()) {
+                            if ("signal".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                                 SignalEventSubscriptionEntity subscriptionEntity = new SignalEventSubscriptionEntity();
                                 subscriptionEntity.setEventName(eventDefinition.getEventName());
@@ -159,7 +161,7 @@ public class DeploymentEntityManager extends AbstractManager {
                                 subscriptionEntity.setTenantId(previousProcessDefinition.getTenantId());
                                 subscriptionEntity.insert();
 
-                            } else if (eventDefinition.getEventType().equals("message") && eventDefinition.isStartEvent()) {
+                            } else if ("message".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
                                 MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
                                 newSubscription.setEventName(eventDefinition.getEventName());
                                 newSubscription.setActivityId(eventDefinition.getActivityId());

@@ -14,6 +14,9 @@ package org.flowable.task.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
@@ -22,6 +25,7 @@ import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Tom Baeyens
@@ -59,8 +63,8 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     }
 
     @Override
-    public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl();
+    public TaskQuery createTaskQuery(CommandExecutor commandExecutor, AbstractEngineConfiguration engineConfiguration) {
+        return new TaskQueryImpl(commandExecutor, configuration, getVariableServiceConfiguration(engineConfiguration), configuration.getIdmIdentityService());
     }
 
     @Override
@@ -115,5 +119,9 @@ public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration>
     @Override
     public TaskEntity createTask(TaskBuilder taskBuilder) {
         return getTaskEntityManager().createTask(taskBuilder);
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
 }

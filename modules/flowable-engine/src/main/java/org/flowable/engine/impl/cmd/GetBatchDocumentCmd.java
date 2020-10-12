@@ -16,6 +16,7 @@ import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class GetBatchDocumentCmd implements Command<String> {
@@ -28,11 +29,12 @@ public class GetBatchDocumentCmd implements Command<String> {
     
     @Override
     public String execute(CommandContext commandContext) {
-        Batch batch = CommandContextUtil.getBatchService(commandContext).getBatch(batchId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        Batch batch = processEngineConfiguration.getBatchServiceConfiguration().getBatchService().getBatch(batchId);
         if (batch == null) {
             throw new FlowableObjectNotFoundException("No batch found for id " + batchId);
         }
         
-        return batch.getBatchDocumentJson();
+        return batch.getBatchDocumentJson(processEngineConfiguration.getEngineCfgKey());
     }
 }

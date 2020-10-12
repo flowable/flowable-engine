@@ -119,7 +119,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="task.assignee.id">
-                                    {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                                    {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee | username}}
                                 </span>
                                 <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
                                 </span>
@@ -142,7 +142,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="model.processInstance.startedBy.id">
-                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{model.processInstance.startedBy.firstName && model.processInstance.startedBy.firstName != 'null' ? model.processInstance.startedBy.firstName : ''}} {{model.processInstance.startedBy.lastName && model.processInstance.startedBy.lastName != 'null' ? model.processInstance.startedBy.lastName : ''}}
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{model.processInstance.startedBy | username}}
                                     {{model.processInstance.started | dateformat:'fromNow'}}
                                 </span>
                             </div>
@@ -166,7 +166,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="task.assignee.id">
-                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{task.assignee | username}}
                                     {{task.endDate | dateformat:'fromNow'}}
                                 </span>
                                 <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">

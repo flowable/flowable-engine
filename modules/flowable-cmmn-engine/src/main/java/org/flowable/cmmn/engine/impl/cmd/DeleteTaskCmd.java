@@ -15,7 +15,9 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -26,6 +28,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 public class DeleteTaskCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String taskId;
     protected Collection<String> taskIds;
     protected boolean cascade;
@@ -59,6 +62,7 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     }
 
     protected void deleteTask(CommandContext commandContext, String taskId) {
-        TaskHelper.deleteTask(taskId, deleteReason, cascade);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        TaskHelper.deleteTask(taskId, deleteReason, cascade, cmmnEngineConfiguration);
     }
 }

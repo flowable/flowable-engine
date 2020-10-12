@@ -22,6 +22,7 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 
 public class UserTaskInfoMapper extends AbstractInfoMapper {
 
+    @Override
     protected void mapProperties(Object element) {
         UserTask userTask = (UserTask) element;
         createPropertyNode("Assignee", userTask.getAssignee());

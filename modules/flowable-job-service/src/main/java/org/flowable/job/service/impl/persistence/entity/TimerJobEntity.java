@@ -13,7 +13,7 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 /**
- * Stub of the common parts of a Job. You will normally work with a subclass of JobEntity, such as {@link TimerEntity} or {@link MessageEntity}.
+ * Stub of the common parts of a timer job.
  *
  * @author Tijs Rademakers
  * @author Joram Barrez

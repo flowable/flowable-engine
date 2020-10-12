@@ -32,6 +32,7 @@ public class ExternalWorkerJobFailCmd extends AbstractExternalWorkerJobCmd {
 
     public ExternalWorkerJobFailCmd(String externalJobId, String workerId, int retries, Duration retryTimeout, String errorMessage, String errorDetails,
             JobServiceConfiguration jobServiceConfiguration) {
+        
         super(externalJobId, workerId, jobServiceConfiguration);
         this.retries = retries;
         this.retryTimeout = retryTimeout;

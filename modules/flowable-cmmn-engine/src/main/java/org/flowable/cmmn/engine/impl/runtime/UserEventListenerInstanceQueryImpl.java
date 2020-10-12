@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
@@ -31,8 +32,8 @@ public class UserEventListenerInstanceQueryImpl implements UserEventListenerInst
 
     protected PlanItemInstanceQuery innerQuery;
 
-    UserEventListenerInstanceQueryImpl(CommandExecutor commandExecutor) {
-        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor)
+    public UserEventListenerInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration)
             .planItemDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
             .planItemInstanceStateAvailable();
     }

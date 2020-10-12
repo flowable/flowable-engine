@@ -32,7 +32,7 @@ public interface Batch {
     
     String getStatus();
 
-    String getBatchDocumentJson();
+    String getBatchDocumentJson(String engineType);
     
     String getTenantId();
 

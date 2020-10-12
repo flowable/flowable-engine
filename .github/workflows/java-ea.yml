@@ -6,6 +6,11 @@ on:
       - master
       - 'flowable-release-*'
 
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
 jobs:
   test_jdkea:
     name: Linux (OpenJDK EA)
@@ -14,15 +19,21 @@ jobs:
       - uses: actions/checkout@v2-beta
         with:
           fetch-depth: 10
+      - name: Cache Maven Repository
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Install
         # If installing the JDK is in a different step then wrong java would be used
         # Need to do install first in order for the OSGi tests to work
         run: |
           . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw install -V -B --no-transfer-progress -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+          ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Test
         # If installing the JDK is in a different step then wrong java would be used
         run: |
           . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw verify -Pdistro,errorLogging,includeDockerTests -B -V -Dmaven.test.redirectTestOutputToFile=false
+          ./mvnw verify -Pdistro,errorLogging,includeDockerTests ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true

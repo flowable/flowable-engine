@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.bpmn.data.IOSpecification;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
@@ -72,7 +73,9 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            definitionIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessDefinitionId(id);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            definitionIdentityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                    .getIdentityLinkService().findIdentityLinksByProcessDefinitionId(id);
             isIdentityLinksInitialized = true;
         }
 
@@ -91,7 +94,7 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getName() {
-        if(localizedName != null && localizedName.length() > 0) {
+        if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
         }
         return name;
@@ -118,7 +121,7 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getDescription() {
-        if(localizedDescription != null && localizedDescription.length() > 0) {
+        if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
         }
         return description;

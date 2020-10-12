@@ -106,7 +106,7 @@ public interface FormDefinitionQuery extends Query<FormDefinitionQuery, FormDefi
      * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed decision tables.
      * 
      * @throws FlowableIllegalArgumentException
-     *             if used in combination with {@link #groupId(string)}, {@link #formVersion(int)} or {@link #deploymentId(String)}
+     *             if used in combination with {@link #formVersion(Integer)} or {@link #deploymentId(String)}
      */
     FormDefinitionQuery latestVersion();
 

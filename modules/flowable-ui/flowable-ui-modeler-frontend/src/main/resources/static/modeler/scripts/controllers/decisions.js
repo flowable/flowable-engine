@@ -57,6 +57,12 @@ angular.module('flowableModeler')
             }, $modal, $scope);
         };
 
+        $scope.importDecisionService = function () {
+            _internalCreateModal({
+                template: 'views/popup/decision-service-import.html?version=' + Date.now()
+            }, $modal, $scope);
+        };
+
         $scope.loadDecisionTables = function () {
             $scope.model.loading = true;
 
@@ -122,6 +128,14 @@ angular.module('flowableModeler')
             }
         };
 
+        $scope.createDecision = function () {
+            if ($scope.model.activeFilter.type === "decision-services") {
+                return $scope.createDecisionService();
+            } else {
+                return $scope.createDecisionTable();
+            }
+        }
+
         $scope.createDecisionTable = function () {
             $rootScope.currentKickstartModel = undefined;
             $rootScope.currentDecisionTableModel = undefined;
@@ -167,7 +181,7 @@ angular.module('flowableModeler')
             if (decision) {
                 $rootScope.editorHistory = [];
                 if (decision.modelType === 4) {
-                    $location.url("/decision-table-editor/" + eFncodeURIComponent(decision.id));
+                    $location.url("/decision-table-editor/" + encodeURIComponent(decision.id));
                 } else if (decision.modelType === 6) {
                     $location.url("/decision-service-editor/" + encodeURIComponent(decision.id));
                 }
@@ -333,6 +347,63 @@ angular.module('flowableModeler')
         }]);
 
 angular.module('flowableModeler')
+    .controller('DuplicateDecisionServiceCtrl', ['$rootScope', '$scope', '$http',
+        function ($rootScope, $scope, $http) {
+
+            $scope.model = {
+                loading: false,
+                decisionService: {
+                    id: '',
+                    name: '',
+                    description: '',
+                    modelType: null
+                }
+            };
+
+            if ($scope.originalModel) {
+                //clone the model
+                $scope.model.decisionService.name = $scope.originalModel.decisionService.name;
+                $scope.model.decisionService.key = $scope.originalModel.decisionService.key;
+                $scope.model.decisionService.description = $scope.originalModel.decisionService.description;
+                $scope.model.decisionService.modelType = $scope.originalModel.decisionService.modelType;
+                $scope.model.decisionService.id = $scope.originalModel.decisionService.id;
+            }
+
+            $scope.ok = function () {
+
+                if (!$scope.model.decisionService.name || $scope.model.decisionService.name.length == 0) {
+                    return;
+                }
+
+                $scope.model.loading = true;
+
+                $http({
+                    method: 'POST',
+                    url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.decisionService.id),
+                    data: $scope.model.decisionService
+                }).success(function (data, status, headers, config) {
+                    $scope.$hide();
+                    $scope.model.loading = false;
+
+                    if ($scope.duplicateDecisionServiceCallback) {
+                        $scope.duplicateDecisionServiceCallback(data);
+                        $scope.duplicateDecisionServiceCallback = undefined;
+                    }
+
+                }).error(function (data, status, headers, config) {
+                    $scope.model.loading = false;
+                    $scope.model.errorMessage = data.message;
+                });
+            };
+
+            $scope.cancel = function () {
+                if (!$scope.model.loading) {
+                    $scope.$hide();
+                }
+            };
+        }]);
+
+angular.module('flowableModeler')
     .controller('ImportDecisionTableModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
         $scope.model = {
@@ -363,6 +434,58 @@ angular.module('flowableModeler')
                     $scope.model.loading = false;
 
                     $location.path("/decision-table-editor/" + data.id);
+                    $scope.$hide();
+
+                }).error(function (data, status, headers, config) {
+
+                    if (data && data.message) {
+                        $scope.model.errorMessage = data.message;
+                    }
+
+                    $scope.model.error = true;
+                    $scope.model.loading = false;
+                });
+            }
+        };
+
+        $scope.cancel = function () {
+            if (!$scope.model.loading) {
+                $scope.$hide();
+            }
+        };
+    }]);
+
+angular.module('flowableModeler')
+    .controller('ImportDecisionServiceModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
+
+        $scope.model = {
+            loading: false
+        };
+
+        $scope.onFileSelect = function ($files, isIE) {
+
+            for (var i = 0; i < $files.length; i++) {
+                var file = $files[i];
+
+                var url;
+                if (isIE) {
+                    url = FLOWABLE.APP_URL.getDecisionServiceTextImportUrl();
+                } else {
+                    url = FLOWABLE.APP_URL.getDecisionServiceImportUrl();
+                }
+
+                Upload.upload({
+                    url: url,
+                    method: 'POST',
+                    file: file
+                }).progress(function (evt) {
+                    $scope.model.loading = true;
+                    $scope.model.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
+
+                }).success(function (data, status, headers, config) {
+                    $scope.model.loading = false;
+
+                    $location.path("/decision-service-editor/" + data.id);
                     $scope.$hide();
 
                 }).error(function (data, status, headers, config) {

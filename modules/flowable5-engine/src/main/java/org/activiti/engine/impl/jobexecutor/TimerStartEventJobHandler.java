@@ -24,6 +24,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 import org.slf4j.Logger;
@@ -108,7 +109,8 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
     protected void dispatchTimerFiredEvent(Job job, CommandContext commandContext) {
         if (commandContext.getEventDispatcher().isEnabled()) {
             commandContext.getEventDispatcher().dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }
 

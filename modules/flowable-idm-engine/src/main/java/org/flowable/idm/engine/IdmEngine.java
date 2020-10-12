@@ -22,7 +22,7 @@ public interface IdmEngine extends Engine {
     /**
      * the version of the flowable idm library
      */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     IdmIdentityService getIdmIdentityService();
 

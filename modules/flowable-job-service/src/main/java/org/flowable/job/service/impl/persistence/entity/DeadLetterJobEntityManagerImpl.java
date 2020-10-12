@@ -16,6 +16,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -26,11 +27,11 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
  * @author Tijs Rademakers
  */
 public class DeadLetterJobEntityManagerImpl
-    extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
-    implements DeadLetterJobEntityManager {
+        extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
+        implements DeadLetterJobEntityManager {
 
     public DeadLetterJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DeadLetterJobDataManager jobDataManager) {
-        super(jobServiceConfiguration, jobDataManager);
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
     }
 
     @Override
@@ -88,16 +89,24 @@ public class DeadLetterJobEntityManagerImpl
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
+        // If the job used to be a history job, the configuration contains the id of the byte array containing the history json
+        // (because deadletter jobs don't have an advanced configuration column)
+        if (HistoryJobEntity.HISTORY_JOB_TYPE.equals(jobEntity.getJobType()) && jobEntity.getJobHandlerConfiguration() != null) {
+            // To avoid duplicating the byteArrayEntityManager lookup, a (fake) ByteArrayRef is created.
+            new ByteArrayRef(jobEntity.getJobHandlerConfiguration(), serviceConfiguration.getCommandExecutor()).delete(serviceConfiguration.getEngineName());
+        }
+
         if (getServiceConfiguration().getInternalJobManager() != null) {
             getServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
         }
 
         // Send event
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.ENTITY_DELETED, jobEntity), engineType);
         }
     }
-    
+
     protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());

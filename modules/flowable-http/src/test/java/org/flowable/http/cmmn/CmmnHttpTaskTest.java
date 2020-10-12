@@ -28,7 +28,6 @@ import org.flowable.http.bpmn.HttpServiceTaskTestServer;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author martin.grofcik
@@ -36,9 +35,15 @@ import org.junit.rules.ExpectedException;
 public class CmmnHttpTaskTest {
 
     @Rule
-    public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/http/cmmn/CmmnHttpTaskTest.cfg.xml");
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    public FlowableCmmnRule cmmnRule;
+
+    public CmmnHttpTaskTest() {
+        this("org/flowable/http/cmmn/CmmnHttpTaskTest.cfg.xml");
+    }
+
+    protected CmmnHttpTaskTest(String configurationResource) {
+        this.cmmnRule = new FlowableCmmnRule(configurationResource);
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -57,7 +62,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithVariableName.cmmn")
     public void testGetWithVariableName() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -66,7 +71,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithoutVariableName.cmmn")
     public void testGetWithoutVariableName() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -74,7 +79,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithResponseHandler.cmmn")
     public void testGetWithResponseHandler() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -87,7 +92,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithRequestHandler.cmmn")
     public void testGetWithRequestHandler() {
         CaseInstance caseInstance = createCaseInstance();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
@@ -96,13 +101,13 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpsSelfSigned.cmmn")
     public void testHttpsSelfSigned() {
         assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testConnectTimeout.cmmn")
     public void testConnectTimeout() {
         assertThatThrownBy(() -> createCaseInstance())
                 .isExactlyInstanceOf(FlowableException.class)
@@ -110,7 +115,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testRequestTimeout.cmmn")
     public void testRequestTimeout() {
         assertThatThrownBy(() -> createCaseInstance())
                 .isExactlyInstanceOf(FlowableException.class)
@@ -119,7 +124,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testDisallowRedirects.cmmn")
     public void testDisallowRedirects() {
         assertThatThrownBy(() -> createCaseInstance())
                 .isExactlyInstanceOf(FlowableException.class)
@@ -127,7 +132,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testFailStatusCodes.cmmn")
     public void testFailStatusCodes() {
         assertThatThrownBy(() -> createCaseInstance())
                 .isExactlyInstanceOf(FlowableException.class)
@@ -135,19 +140,19 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHandleStatusCodes.cmmn")
     public void testHandleStatusCodes() {
         assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testIgnoreException.cmmn")
     public void testIgnoreException() {
         assertThat(createCaseInstance()).isNotNull();
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testMapException.cmmn")
     public void testMapException() {
         //exception mapping is not implemented yet in Cmmn
         assertThatThrownBy(() -> createCaseInstance())
@@ -155,17 +160,17 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpGet3XX.cmmn")
     public void testHttpGet3XX() {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
         Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
-        assertThat(variables.get("httpGetResponseStatusCode")).isEqualTo(302);
+        assertThat(variables).containsEntry("httpGetResponseStatusCode", 302);
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpGet4XX.cmmn")
     public void testHttpGet4XX() {
         assertThatThrownBy(() -> createCaseInstance())
                 .isExactlyInstanceOf(FlowableException.class)
@@ -173,7 +178,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpGet5XX.cmmn")
     public void testHttpGet5XX() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -193,7 +198,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpPost2XX.cmmn")
     public void testHttpPost2XX() throws Exception {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -212,7 +217,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpPost3XX.cmmn")
     public void testHttpPost3XX() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -225,7 +230,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpDelete4XX.cmmn")
     public void testHttpDelete4XX() {
         CaseInstance caseInstance = createCaseInstance();
 
@@ -239,7 +244,7 @@ public class CmmnHttpTaskTest {
     }
 
     @Test
-    @CmmnDeployment
+    @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpPut5XX.cmmn")
     public void testHttpPut5XX() throws Exception {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")

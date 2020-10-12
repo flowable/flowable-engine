@@ -208,11 +208,11 @@ public abstract class AbstractEngineConfiguration {
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
      * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
      * <p>
-     * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
+     * By default: 100 (55 for mssql server as it has a hard limit of 2000 parameters in a statement)
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
 
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
+    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 55; // currently Execution has most params (35). 2000 / 35 = 57.
 
     protected String mybatisMappingFile;
     protected Set<Class<?>> customMybatisMappers;
@@ -248,8 +248,8 @@ public abstract class AbstractEngineConfiguration {
     protected boolean usingRelationalDatabase = true;
     
     /**
-     * Flag that can be set to configure whether or not a schema is used. This is usefil for custom implementations that do not use relational databases at all.
-     * Setting {@link #usingRelationalDatabase} to true will automotically imply using a schema.
+     * Flag that can be set to configure whether or not a schema is used. This is useful for custom implementations that do not use relational databases at all.
+     * Setting {@link #usingRelationalDatabase} to true will automatically imply using a schema.
      */
     protected boolean usingSchemaMgmt = true;
 
@@ -257,7 +257,7 @@ public abstract class AbstractEngineConfiguration {
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', Flowable will query for executions
      * in a table named 'PRE1.ACT_RU_EXECUTION_'.
      *
-     * <p />
+     * <p>
      * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
      * {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, Flowable will create the database tables using the default names, regardless of the prefix configured here.</strong>
      */
@@ -407,7 +407,7 @@ public abstract class AbstractEngineConfiguration {
     protected int maxLengthStringVariableType = -1;
     
     protected void initEngineConfigurations() {
-        engineConfigurations.put(getEngineCfgKey(), this);
+        addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
 
     // DataSource
@@ -500,7 +500,7 @@ public abstract class AbstractEngineConfiguration {
             logger.debug("using database type: {}", databaseType);
 
         } catch (SQLException e) {
-            logger.error("Exception while initializing Database connection", e);
+            throw new RuntimeException("Exception while initializing Database connection", e);
         } finally {
             try {
                 if (connection != null) {
@@ -599,11 +599,10 @@ public abstract class AbstractEngineConfiguration {
 
             if (commandContextFactory != null) {
                 String engineCfgKey = getEngineCfgKey();
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
+                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
+                        classLoader, useClassForNameClassLoading, clock, objectMapper);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);
                 interceptors.add(commandContextInterceptor);
             }
 
@@ -622,6 +621,8 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract String getEngineCfgKey();
+    
+    public abstract String getEngineScopeType();
 
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
         return null;
@@ -672,11 +673,11 @@ public abstract class AbstractEngineConfiguration {
 
     public void initDataManagers() {
         if (propertyDataManager == null) {
-            propertyDataManager = new MybatisPropertyDataManager();
+            propertyDataManager = new MybatisPropertyDataManager(idGenerator);
         }
 
         if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisByteArrayDataManager();
+            byteArrayDataManager = new MybatisByteArrayDataManager(idGenerator);
         }
     }
 
@@ -688,11 +689,11 @@ public abstract class AbstractEngineConfiguration {
         }
 
         if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, this::getEventDispatcher);
+            byteArrayEntityManager = new ByteArrayEntityManagerImpl(byteArrayDataManager, getEngineCfgKey(), this::getEventDispatcher);
         }
 
         if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
+            tableDataManager = new TableDataManagerImpl(this);
         }
     }
 
@@ -728,6 +729,11 @@ public abstract class AbstractEngineConfiguration {
             }
             
             commandContextFactory.setSessionFactories(sessionFactories);
+            
+        } else {
+            if (usingRelationalDatabase) {
+                initDbSqlSessionFactoryEntitySettings();
+            }
         }
 
         if (customSessionFactories != null) {
@@ -1032,7 +1038,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public LockManager getLockManager(String lockName) {
-        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate());
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate(), getEngineCfgKey());
     }
 
     // getters and setters
@@ -1371,11 +1377,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public void addEngineConfiguration(String key, AbstractEngineConfiguration engineConfiguration) {
+    public void addEngineConfiguration(String key, String scopeType, AbstractEngineConfiguration engineConfiguration) {
         if (engineConfigurations == null) {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(key, engineConfiguration);
+        engineConfigurations.put(scopeType, engineConfiguration);
     }
 
     public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {

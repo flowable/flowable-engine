@@ -21,7 +21,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
  */
 public abstract class AbstractVariableComparatorExpressionFunction extends AbstractFlowableVariableExpressionFunction {
     
-    protected static enum OPERATOR { LT, LTE, GT, GTE, EQ };
+    protected enum OPERATOR { LT, LTE, GT, GTE, EQ };
 
     public AbstractVariableComparatorExpressionFunction(List<String> functionNameOptions, String functionName) {
         super(functionNameOptions, functionName);
@@ -49,7 +49,7 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
                         return longVariableValue >= longComparedValue;
                     }
 
-                } else if(variableValue instanceof Integer) {
+                } else if (variableValue instanceof Integer) {
                     
                     int intVariableValue = ((Number) variableValue).intValue();
                     int intComparedValue =((Number) comparedValue).intValue();
@@ -63,7 +63,7 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
                         return intVariableValue >= intComparedValue;
                     }
                     
-                } else if(variableValue instanceof Double) {
+                } else if (variableValue instanceof Double) {
                     
                     double doubleVariableValue = ((Number) variableValue).doubleValue();
                     double doubleComparedValue =((Number) comparedValue).doubleValue();
@@ -77,7 +77,7 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
                         return doubleVariableValue >= doubleComparedValue;
                     }
                     
-                } else if(variableValue instanceof Float) {
+                } else if (variableValue instanceof Float) {
                     
                     float floatVariableValue = ((Number) variableValue).floatValue();
                     float floatComparedValue =((Number) comparedValue).floatValue();
@@ -91,7 +91,7 @@ public abstract class AbstractVariableComparatorExpressionFunction extends Abstr
                         return floatVariableValue >= floatComparedValue;
                     }
                     
-                } else if(variableValue instanceof Short) {
+                } else if (variableValue instanceof Short) {
                     
                     short shortVariableValue = ((Number) variableValue).shortValue();
                     short shortComparedValue =((Number) comparedValue).shortValue();

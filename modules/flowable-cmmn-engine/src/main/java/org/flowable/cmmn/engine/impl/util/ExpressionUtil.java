@@ -43,7 +43,7 @@ public class ExpressionUtil {
         if (evaluationResult instanceof Boolean) {
             return (boolean) evaluationResult;
         } else if (evaluationResult instanceof String) {
-            return ((String) evaluationResult).toLowerCase().equals("true");
+            return "true".equals(((String) evaluationResult).toLowerCase());
         } else {
             throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
         }

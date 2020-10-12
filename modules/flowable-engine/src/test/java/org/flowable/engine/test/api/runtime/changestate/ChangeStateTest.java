@@ -14,6 +14,7 @@
 package org.flowable.engine.test.api.runtime.changestate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Iterator;
@@ -2324,15 +2325,21 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
-        assertThat(processVariables.get("processVar1")).isEqualTo("test");
-        assertThat(processVariables.get("processVar2")).isEqualTo(10);
-        assertThat(processVariables.get("localVar1")).isNull();
-        assertThat(processVariables.get("localVar2")).isNull();
+        assertThat(processVariables)
+                .contains(
+                        entry("processVar1", "test"),
+                        entry("processVar2", 10)
+                );
+        assertThat(processVariables)
+                .doesNotContainKeys("localVar1", "localVar2");
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").singleResult();
         Map<String, Object> localVariables = runtimeService.getVariablesLocal(execution.getId());
-        assertThat(localVariables.get("localVar1")).isEqualTo("test2");
-        assertThat(localVariables.get("localVar2")).isEqualTo(20);
+        assertThat(localVariables)
+                .contains(
+                        entry("localVar1", "test2"),
+                        entry("localVar2", 20)
+                );
 
         // Verify events
         assertThat(changeStateEventListener.getEvents())
@@ -2409,15 +2416,21 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertThat(executions).hasSize(2);
 
         Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
-        assertThat(processVariables.get("processVar1")).isEqualTo("test");
-        assertThat(processVariables.get("processVar2")).isEqualTo(10);
-        assertThat(processVariables.get("localVar1")).isNull();
-        assertThat(processVariables.get("localVar2")).isNull();
+        assertThat(processVariables)
+                .contains(
+                        entry("processVar1", "test"),
+                        entry("processVar2", 10)
+                );
+        assertThat(processVariables)
+                .doesNotContainKeys("localVar1", "localVar2");
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").singleResult();
         Map<String, Object> localVariables = runtimeService.getVariablesLocal(execution.getId());
-        assertThat(localVariables.get("localVar1")).isEqualTo("test2");
-        assertThat(localVariables.get("localVar2")).isEqualTo(20);
+        assertThat(localVariables)
+                .contains(
+                        entry("localVar1", "test2"),
+                        entry("localVar2", 20)
+                );
 
         // Verify events
         assertThat(changeStateEventListener.getEvents())
@@ -2541,8 +2554,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -2593,8 +2605,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -2803,8 +2814,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -2857,8 +2867,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
         Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -3064,8 +3073,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
     protected void checkInitialStateForMultipleProcessesWithSimpleEventCatch(Map<String, List<Execution>> executionsByProcessInstance) {
         executionsByProcessInstance.forEach((processId, executions) -> {
             Map<String, List<Execution>> classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-            assertThat(classifiedExecutions).hasSize(1);
-            assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+            assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
             List<Task> tasks = taskService.createTaskQuery().processInstanceId(processId).list();
             Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
             assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -3162,7 +3170,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         //Move both processes to the eventCatch
         ChangeActivityStateBuilder changeActivityStateBuilder = runtimeService.createChangeActivityStateBuilder();
         allExecutions.stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .map(Execution::getId)
                 .forEach(id -> changeActivityStateBuilder.moveExecutionToActivityId(id, "intermediateCatchEvent"));
         changeActivityStateBuilder.changeState();
@@ -3228,8 +3236,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         processId = processInstance2.getId();
         executions = executionsByProcessInstance.get(processId);
         classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -3301,7 +3308,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         //Move one execution to the event catch
         String executionId = executionsByProcessInstance.get(processInstance1.getId()).stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .findFirst()
                 .map(Execution::getId)
                 .get();
@@ -3330,8 +3337,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         processId = processInstance2.getId();
         executions = executionsByProcessInstance.get(processId);
         classifiedExecutions = groupListContentBy(executions, Execution::getActivityId);
-        assertThat(classifiedExecutions).hasSize(1);
-        assertThat(classifiedExecutions.get("beforeCatchEvent")).isNotNull();
+        assertThat(classifiedExecutions).containsOnlyKeys("beforeCatchEvent");
         tasks = taskService.createTaskQuery().processInstanceId(processId).list();
         Map<String, List<Task>> classifiedTasks = groupListContentBy(tasks, Task::getTaskDefinitionKey);
         assertThat(classifiedTasks.get("beforeCatchEvent")).hasSize(1);
@@ -3344,7 +3350,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         //Move the second process to the eventCatch
         executionId = executionsByProcessInstance.get(processInstance2.getId()).stream()
-                .filter(e -> e.getActivityId().equals("beforeCatchEvent"))
+                .filter(e -> "beforeCatchEvent".equals(e.getActivityId()))
                 .findFirst()
                 .map(Execution::getId)
                 .get();

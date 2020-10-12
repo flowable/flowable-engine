@@ -63,7 +63,7 @@ public class CaseInstanceUtil {
     }
 
     /**
-     * Similar to {@link #findChildPlanItemInstances(CaseInstanceEntity, List)}, but returns a map {planItemId, List<PlanItemInstances>}
+     * Similar to {@link #findChildPlanItemInstances(CaseInstanceEntity, List)}, but returns a map planItemId, List
      */
     public static Map<String, List<PlanItemInstanceEntity>> findChildPlanItemInstancesMap(CaseInstanceEntity caseInstanceEntity, List<PlanItem> planItems) {
 

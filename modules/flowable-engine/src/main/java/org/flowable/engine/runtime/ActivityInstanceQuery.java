@@ -28,7 +28,7 @@ public interface ActivityInstanceQuery extends Query<ActivityInstanceQuery, Acti
     ActivityInstanceQuery activityInstanceId(String activityInstanceId);
 
     /**
-     * Only select activity instances with the given process instance. {@link ProcessInstance) ids and {@link ActivityInstance#getProcessInstanceId()} ids match.
+     * Only select activity instances with the given process instance. {@link ProcessInstance} ids and {@link ActivityInstance#getProcessInstanceId()} ids match.
      */
     ActivityInstanceQuery processInstanceId(String processInstanceId);
 

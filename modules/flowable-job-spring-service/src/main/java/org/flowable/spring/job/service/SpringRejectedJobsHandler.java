@@ -25,5 +25,5 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
  */
 public interface SpringRejectedJobsHandler {
 
-    public void jobRejected(AsyncExecutor asyncExecutor, JobInfo job);
+    void jobRejected(AsyncExecutor asyncExecutor, JobInfo job);
 }

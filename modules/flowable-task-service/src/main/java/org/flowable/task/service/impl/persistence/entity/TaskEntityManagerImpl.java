@@ -20,7 +20,6 @@ import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
 import org.flowable.task.api.TaskInfo;
@@ -32,7 +31,6 @@ import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -40,10 +38,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskEntityManagerImpl
-    extends AbstractTaskServiceEntityManager<TaskEntity, TaskDataManager>
-    implements TaskEntityManager {
-
+public class TaskEntityManagerImpl extends AbstractTaskServiceEntityManager<TaskEntity, TaskDataManager> implements TaskEntityManager {
+    
     public TaskEntityManagerImpl(TaskServiceConfiguration taskServiceConfiguration, TaskDataManager taskDataManager) {
         super(taskServiceConfiguration, taskDataManager);
     }
@@ -92,8 +88,8 @@ public class TaskEntityManagerImpl
         );
 
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled() && taskEntity.getAssignee() != null) {
-            getEventDispatcher().dispatchEvent(
-                    FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+            getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity),
+                    serviceConfiguration.getEngineName());
         }
 
         serviceConfiguration.getInternalHistoryTaskManager().recordTaskCreated(taskEntity);
@@ -115,10 +111,6 @@ public class TaskEntityManagerImpl
             logTaskUpdateEvents(taskEntity);
         }
         return super.update(taskEntity, fireUpdateEvents);
-    }
-
-    protected IdentityLinkService getIdentityLinkService() {
-        return CommandContextUtil.getIdentityLinkServiceConfiguration().getIdentityLinkService();
     }
 
     @Override
@@ -282,26 +274,30 @@ public class TaskEntityManagerImpl
             }
             if (!Objects.equals(task.getOwner(), getOriginalState(task, "owner"))) {
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_OWNER_CHANGED, task));
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_OWNER_CHANGED, task),
+                            serviceConfiguration.getEngineName());
                 }
 
                 logOwnerChanged(task, (String) getOriginalState(task, "owner"), task.getOwner());
             }
             if (!Objects.equals(task.getPriority(), getOriginalState(task, "priority"))) {
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_PRIORITY_CHANGED, task));
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_PRIORITY_CHANGED, task),
+                            serviceConfiguration.getEngineName());
                 }
                 logPriorityChanged(task, (Integer) getOriginalState(task, "priority"), task.getPriority());
             }
             if (!Objects.equals(task.getDueDate(), getOriginalState(task, "dueDate"))) {
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_DUEDATE_CHANGED, task));
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_DUEDATE_CHANGED, task),
+                            serviceConfiguration.getEngineName());
                 }
                 logDueDateChanged(task, (Date) getOriginalState(task, "dueDate"), task.getDueDate());
             }
             if (!Objects.equals(task.getName(), getOriginalState(task, "name"))) {
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_NAME_CHANGED, task));
+                    getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_NAME_CHANGED, task),
+                            serviceConfiguration.getEngineName());
                 }
                 logNameChanged(task, (String) getOriginalState(task, "name"), task.getName());
             }

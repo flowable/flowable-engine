@@ -133,7 +133,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
                 if (field instanceof OptionFormField) {
                     // Drop down options to be populated from an expression
                     OptionFormField optionFormField = (OptionFormField) field;
-                    if(optionFormField.getOptionsExpression() != null) {
+                    if (optionFormField.getOptionsExpression() != null) {
                         Expression optionsExpression = formEngineConfiguration.getExpressionManager().createExpression(optionFormField.getOptionsExpression());
                         Object value = null;
                         try {
@@ -141,11 +141,11 @@ public class GetFormModelWithVariablesCmd implements Command<FormInfo>, Serializ
                         } catch (Exception e) {
                             throw new FlowableException("Error getting value for optionsExpression: " + optionFormField.getOptionsExpression(), e);
                         }
-                        if(value instanceof List) {
+                        if (value instanceof List) {
                             @SuppressWarnings("unchecked")
                             List<Option> options = (List<Option>) value;
                             optionFormField.setOptions(options);
-                        } else if(value instanceof String) {
+                        } else if (value instanceof String) {
                             String json = (String) value;
                             try {
                                 List<Option> options = formEngineConfiguration.getObjectMapper().readValue(json, new TypeReference<List<Option>>(){});

@@ -15,7 +15,6 @@ package org.flowable.engine.impl.history.async;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.convertToBase64;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.putIfNotNull;
 
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,8 +33,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager {
 
-    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
-        super(processEngineConfiguration, historyLevel, usePrefixId);
+    public AbstractAsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
 
     protected void addCommonProcessInstanceFields(ExecutionEntity processInstance, ObjectNode data) {

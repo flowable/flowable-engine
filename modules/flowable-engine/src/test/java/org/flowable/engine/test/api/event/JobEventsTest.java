@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -549,11 +550,10 @@ public class JobEventsTest extends PluggableFlowableTestCase {
 
         // Process Cancelled event should not be sent for the subprocess
         List<FlowableEvent> eventsReceived = activitiEventListener.getEventsReceived();
-        for (FlowableEvent eventReceived : eventsReceived) {
-            if (FlowableEngineEventType.PROCESS_CANCELLED == eventReceived.getType()) {
-                fail("Should not have received PROCESS_CANCELLED event");
-            }
-        }
+        assertThat(eventsReceived)
+                .extracting(FlowableEvent::getType)
+                .as("Should not have received PROCESS_CANCELLED event")
+                .doesNotContain(FlowableEngineEventType.PROCESS_CANCELLED);
 
         // validate the activityType string
         for (FlowableEvent eventReceived : eventsReceived) {

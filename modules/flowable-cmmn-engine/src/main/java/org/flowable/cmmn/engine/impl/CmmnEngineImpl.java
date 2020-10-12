@@ -87,7 +87,7 @@ public class CmmnEngineImpl implements CmmnEngine {
 
         // When running together with the bpmn engine, the asyncHistoryExecutor is shared by default.
         // However, calling multiple times .start() won't do anything (the method returns if already running),
-        // so no need to check this case specically here.
+        // so no need to check this case specifically here.
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
             asyncHistoryExecutor.start();
         }
@@ -114,7 +114,7 @@ public class CmmnEngineImpl implements CmmnEngine {
             asyncExecutor.shutdown();
 
             // Async executor will have cleared the jobs lock owner/times, but not yet the case instance lock time/owner
-            cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+            cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(asyncExecutor.getLockOwner(), cmmnEngineConfiguration));
         }
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isActive()) {
             asyncHistoryExecutor.shutdown();

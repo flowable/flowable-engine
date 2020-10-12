@@ -15,17 +15,21 @@ package org.flowable.engine.impl.history.async.json.transformer;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractNeedsTaskHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public AbstractNeedsTaskHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        return CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId) != null;
+        return processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId) != null;
     }
 
 }

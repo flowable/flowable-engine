@@ -18,6 +18,8 @@ import java.util.Map;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
+import org.flowable.common.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -27,8 +29,6 @@ import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.idm.engine.impl.cmd.GetPropertiesCmd;
-import org.flowable.idm.engine.impl.cmd.GetTableCountCmd;
-import org.flowable.idm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -37,9 +37,13 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
  */
 public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineConfiguration> implements IdmManagementService {
 
+    public IdmManagementServiceImpl(IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
+    }
+    
     @Override
     public Map<String, Long> getTableCount() {
-        return commandExecutor.execute(new GetTableCountCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override
@@ -49,12 +53,12 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
 
     @Override
     public TableMetaData getTableMetaData(String tableName) {
-        return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
+        return commandExecutor.execute(new GetTableMetaDataCmd(tableName, configuration.getEngineCfgKey()));
     }
 
     @Override
     public TablePageQuery createTablePageQuery() {
-        return new TablePageQueryImpl(commandExecutor);
+        return new TablePageQueryImpl(commandExecutor, configuration);
     }
 
     @Override

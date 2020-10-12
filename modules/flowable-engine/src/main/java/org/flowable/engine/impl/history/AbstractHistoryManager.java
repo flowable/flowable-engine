@@ -48,15 +48,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHistoryManager.class.getName());
 
-    protected HistoryLevel historyLevel;
-    protected boolean enableProcessDefinitionHistoryLevel;
-    protected boolean usePrefixId;
-
-    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
+    public AbstractHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
-        this.historyLevel = historyLevel;
-        this.enableProcessDefinitionHistoryLevel = processEngineConfiguration.isEnableProcessDefinitionHistoryLevel();
-        this.usePrefixId = usePrefixId;
     }
     
     @Override
@@ -64,9 +57,14 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         return isHistoryLevelAtLeast(level, null);
     }
 
+    protected boolean isEnableProcessDefinitionHistoryLevel() {
+        return processEngineConfiguration.isEnableProcessDefinitionHistoryLevel();
+    }
+
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level, String processDefinitionId) {
-        if (enableProcessDefinitionHistoryLevel && processDefinitionId != null) {
+        HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
+        if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
             HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
             if (processDefinitionLevel != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -75,32 +73,34 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 return processDefinitionLevel.isAtLeast(level);
             } else {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+                    LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, level);
                 }
-                return historyLevel.isAtLeast(level);
+                return engineHistoryLevel.isAtLeast(level);
             }
             
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+                LOGGER.debug("Current history level: {}, level required: {}", engineHistoryLevel, level);
             }
             
             // Comparing enums actually compares the location of values declared in the enum
-            return historyLevel.isAtLeast(level);
+            return engineHistoryLevel.isAtLeast(level);
         }
     }
 
     @Override
     public boolean isHistoryEnabled() {
+        HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", historyLevel);
+            LOGGER.debug("Current history level: {}", engineHistoryLevel);
         }
-        return historyLevel != HistoryLevel.NONE;
+        return engineHistoryLevel != HistoryLevel.NONE;
     }
     
     @Override
     public boolean isHistoryEnabled(String processDefinitionId) {
-        if (enableProcessDefinitionHistoryLevel && processDefinitionId != null) {
+        HistoryLevel engineHistoryLevel = processEngineConfiguration.getHistoryLevel();
+        if (isEnableProcessDefinitionHistoryLevel() && processDefinitionId != null) {
             HistoryLevel processDefinitionLevel = getProcessDefinitionHistoryLevel(processDefinitionId);
             if (processDefinitionLevel != null) {
                 if (LOGGER.isDebugEnabled()) {
@@ -109,16 +109,16 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
                 return !processDefinitionLevel.equals(HistoryLevel.NONE);
             } else {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Current history level: {}", historyLevel);
+                    LOGGER.debug("Current history level: {}", engineHistoryLevel);
                 }
-                return !historyLevel.equals(HistoryLevel.NONE);
+                return !engineHistoryLevel.equals(HistoryLevel.NONE);
             }
            
         } else {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Current history level: {}", historyLevel);
+                LOGGER.debug("Current history level: {}", engineHistoryLevel);
             }
-            return !historyLevel.equals(HistoryLevel.NONE);
+            return !engineHistoryLevel.equals(HistoryLevel.NONE);
         }
     }
 
@@ -257,8 +257,8 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         }
 
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-            historicTaskService.recordTaskInfoChange(task, updateTime);
+            HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
+            historicTaskService.recordTaskInfoChange(task, updateTime, processEngineConfiguration);
         }
 
     }
@@ -352,7 +352,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             }
     
             if (processDefinitionHistoryLevel == null) {
-                processDefinitionHistoryLevel = this.historyLevel;
+                processDefinitionHistoryLevel = this.processEngineConfiguration.getHistoryLevel();
             }
         } catch (Exception e) {}
 
@@ -370,11 +370,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-
-    public void setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
+        return processEngineConfiguration.getHistoryLevel();
     }
 
     protected String getProcessDefinitionId(VariableInstanceEntity variable, ExecutionEntity sourceActivityExecution) {
@@ -382,12 +378,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
         if (sourceActivityExecution != null) {
             processDefinitionId = sourceActivityExecution.getProcessDefinitionId();
         } else if (variable.getProcessInstanceId() != null) {
-            ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
+            ExecutionEntity processInstanceExecution = processEngineConfiguration.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             if (processInstanceExecution != null) {
                 processDefinitionId = processInstanceExecution.getProcessDefinitionId();
             }
         } else if (variable.getTaskId() != null) {
-            TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(variable.getTaskId());
+            TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(variable.getTaskId());
             if (taskEntity != null) {
                 processDefinitionId = taskEntity.getProcessDefinitionId();
             }
@@ -398,12 +394,12 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
         String processDefinitionId = null;
         if (identityLink.getProcessInstanceId() != null) {
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(identityLink.getProcessInstanceId());
             if (execution != null) {
                 processDefinitionId = execution.getProcessDefinitionId();
             }
         } else if (identityLink.getTaskId() != null) {
-            TaskEntity task = CommandContextUtil.getTaskService().getTask(identityLink.getTaskId());
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(identityLink.getTaskId());
             if (task != null) {
                 processDefinitionId = task.getProcessDefinitionId();
             }
@@ -414,13 +410,13 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     protected String getProcessDefinitionId(EntityLinkEntity entityLink) {
         String processDefinitionId = null;
         if (ScopeTypes.BPMN.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(entityLink.getScopeId());
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(entityLink.getScopeId());
             if (execution != null) {
                 processDefinitionId = execution.getProcessDefinitionId();
             }
 
         } else if (ScopeTypes.TASK.equals(entityLink.getScopeType()) && entityLink.getScopeId() != null) {
-            TaskEntity task = CommandContextUtil.getTaskService().getTask(entityLink.getScopeId());
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(entityLink.getScopeId());
             if (task != null) {
                 processDefinitionId = task.getProcessDefinitionId();
             }

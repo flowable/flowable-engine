@@ -33,6 +33,7 @@
     },
     "ACTION": {
       "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
       "ADD-COMMENT": "コメントの追加",
       "SAVE": "保存",
       "CANCEL": "キャンセル",

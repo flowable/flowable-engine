@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
@@ -38,16 +39,16 @@ import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnDecisionService;
+import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
 import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
-import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.RuleEngineExecutorImpl;
 import org.flowable.dmn.engine.impl.agenda.DefaultDmnEngineAgendaFactory;
 import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaFactory;
@@ -58,6 +59,7 @@ import org.flowable.dmn.engine.impl.cmd.SchemaOperationsDmnEngineBuild;
 import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
 import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
+import org.flowable.dmn.engine.impl.deployer.DecisionRequirementsDiagramHelper;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
@@ -102,6 +104,8 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDecision
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnDeploymentDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisDmnResourceDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoricDecisionExecutionDataManager;
+import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
+import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -156,6 +160,18 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected List<Deployer> customPostDeployers;
     protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
+    protected DecisionRequirementsDiagramHelper decisionRequirementsDiagramHelper;
+
+    /**
+     * Decision requirements diagram generator. Default value is DefaultDecisionRequirementsDiagramGenerator
+     */
+    protected DecisionRequirementsDiagramGenerator decisionRequirementsDiagramGenerator;
+
+    protected boolean isCreateDiagramOnDeploy = true;
+
+    protected String decisionFontName = "Arial";
+    protected String labelFontName = "Arial";
+    protected String annotationFontName = "Arial";
 
     protected boolean historyEnabled;
 
@@ -226,6 +242,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected void init() {
         initEngineConfigurations();
+        initClock();
         initFunctionDelegates();
         initExpressionManager();
         initCommandContextFactory();
@@ -257,9 +274,9 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
-        initClock();
         initHitPolicyBehaviors();
         initRuleEngineExecutor();
+        initDecisionRequirementsDiagramGenerator();
     }
 
     // services
@@ -371,6 +388,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG;
     }
+    
+    @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.DMN;
+    }
 
     @Override
     public CommandInterceptor createTransactionInterceptor() {
@@ -476,6 +498,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         dmnDeployer.setDmnDeploymentHelper(dmnDeploymentHelper);
         dmnDeployer.setCachingAndArtifactsManager(cachingAndArtifactsManager);
         dmnDeployer.setUsePrefixId(usePrefixId);
+        dmnDeployer.setDecisionRequirementsDiagramHelper(decisionRequirementsDiagramHelper);
 
         defaultDeployers.add(dmnDeployer);
         return defaultDeployers;
@@ -495,6 +518,10 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
         if (cachingAndArtifactsManager == null) {
             cachingAndArtifactsManager = new CachingAndArtifactsManager();
+        }
+
+        if (decisionRequirementsDiagramHelper == null) {
+            decisionRequirementsDiagramHelper = new DecisionRequirementsDiagramHelper();
         }
     }
 
@@ -573,7 +600,19 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     	    }
     	}
     }
+    // decision requirements diagram
+    /////////////////////////////////////////////////////////////
+    public void initDecisionRequirementsDiagramGenerator() {
+        if (decisionRequirementsDiagramGenerator == null) {
+            decisionRequirementsDiagramGenerator = new DefaultDecisionRequirementsDiagramGenerator();
+        }
+    }
 
+    public void initDecisionRequirementsDiagramHelper() {
+        if (decisionRequirementsDiagramHelper == null) {
+            decisionRequirementsDiagramHelper = new DecisionRequirementsDiagramHelper();
+        }
+    }
 
     // getters and setters
     // //////////////////////////////////////////////////////
@@ -890,10 +929,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         return this;
     }
 
+    @Override
     public TableDataManager getTableDataManager() {
         return tableDataManager;
     }
 
+    @Override
     public DmnEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;
@@ -1014,5 +1055,50 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     @Override
     public ObjectMapper getObjectMapper() {
         return dmnEngineObjectMapper;
+    }
+
+    public DecisionRequirementsDiagramGenerator getDecisionRequirementsDiagramGenerator() {
+        return decisionRequirementsDiagramGenerator;
+    }
+
+    public DmnEngineConfiguration setDecisionRequirementsDiagramGenerator(DecisionRequirementsDiagramGenerator decisionRequirementsDiagramGenerator) {
+        this.decisionRequirementsDiagramGenerator = decisionRequirementsDiagramGenerator;
+        return this;
+    }
+
+    public boolean isCreateDiagramOnDeploy() {
+        return isCreateDiagramOnDeploy;
+    }
+
+    public DmnEngineConfiguration setCreateDiagramOnDeploy(boolean isCreateDiagramOnDeploy) {
+        this.isCreateDiagramOnDeploy = isCreateDiagramOnDeploy;
+        return this;
+    }
+
+    public String getDecisionFontName() {
+        return decisionFontName;
+    }
+
+    public DmnEngineConfiguration setDecisionFontName(String decisionFontName) {
+        this.decisionFontName = decisionFontName;
+        return this;
+    }
+
+    public String getLabelFontName() {
+        return labelFontName;
+    }
+
+    public DmnEngineConfiguration setLabelFontName(String labelFontName) {
+        this.labelFontName = labelFontName;
+        return this;
+    }
+
+    public String getAnnotationFontName() {
+        return annotationFontName;
+    }
+
+    public DmnEngineConfiguration setAnnotationFontName(String annotationFontName) {
+        this.annotationFontName = annotationFontName;
+        return this;
     }
 }

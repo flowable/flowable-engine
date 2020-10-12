@@ -463,7 +463,7 @@ It’s possible to support additional variable-types with a custom JSON represen
 
 ## Deployment
 
-**When using tomcat, please read [Usage in Tomcat](restUsageInTomcat).**
+**When using Tomcat, please read [Usage in Tomcat](#usage-In-tomcat).**
 
 ### List of Deployments
 
@@ -3005,14 +3005,8 @@ The general [paging and sorting query-parameters](restPagingAndSort) can be used
 
 **Success response body:**
 
-    {
-       "id":"7",
-       "url":"http://localhost:8182/runtime/process-instances/7",
-       "businessKey":"myBusinessKey",
-       "suspended":false,
-       "processDefinitionUrl":"http://localhost:8182/repository/process-definitions/processOne%3A1%3A4",
-       "activityId":"processTask"
-    }
+    The response is a Blob object containing the binary data or null.
+    
 
 ### Get involved people for process instance
 

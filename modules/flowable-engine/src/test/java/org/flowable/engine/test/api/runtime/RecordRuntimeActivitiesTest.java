@@ -36,7 +36,7 @@ public class RecordRuntimeActivitiesTest extends AbstractTestCase {
         try {
             processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
-            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery().count() > 0L).isTrue();
+            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery().count()).isGreaterThan(0);
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
             processEngine.close();

@@ -15,6 +15,7 @@ package org.flowable.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.net.URISyntaxException;
 import java.sql.Driver;
@@ -168,7 +169,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         String filePath = "org/flowable/spring/test/autodeployment/autodeploy.a.bpmn20.xml";
         String originalBpmnFileContent = IoUtil.readFileAsString(filePath);
         String updatedBpmnFileContent = originalBpmnFileContent.replace("flow1", "fromStartToEndFlow");
-        assertThat(updatedBpmnFileContent.length()).isGreaterThan(originalBpmnFileContent.length());
+        assertThat(updatedBpmnFileContent).hasSizeGreaterThan(originalBpmnFileContent.length());
         IoUtil.writeStringToFile(updatedBpmnFileContent, filePath);
 
         // Classic produced/consumer problem here:

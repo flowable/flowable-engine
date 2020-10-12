@@ -152,6 +152,7 @@ public class SendEventTaskJsonConverter extends BaseBpmnJsonConverter {
         return task;
     }
     
+    @Override
     protected String getExtensionValue(String name, FlowElement flowElement) {
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get(name);
         if (extensionElements != null && extensionElements.size() > 0) {

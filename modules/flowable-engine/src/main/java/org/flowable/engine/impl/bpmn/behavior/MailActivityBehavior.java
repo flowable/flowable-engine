@@ -81,7 +81,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         boolean isSkipExpressionEnabled = false;
         String skipExpressionText = null;
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        if (flowElement != null && flowElement instanceof ServiceTask) {
+        if (flowElement instanceof ServiceTask) {
             ServiceTask serviceTask = (ServiceTask) flowElement;
             skipExpressionText = serviceTask.getSkipExpression();
             isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, flowElement.getId(), execution, commandContext);

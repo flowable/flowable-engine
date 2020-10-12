@@ -328,13 +328,7 @@ flowableApp
         $rootScope.logout = function () {
             $rootScope.authenticated = false;
             $rootScope.authenticationError = false;
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
-                .success(function (data, status, headers, config) {
-                    $rootScope.login = null;
-                    $rootScope.authenticated = false;
-                    // Changing the href causes a reload, so no need to do a new reload again
-                    $window.location.href = FLOWABLE.CONFIG.contextRoot;
-                });
+            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/app/logout';
         };
 
     }
@@ -345,12 +339,7 @@ flowableApp
         var fixedUrlPart = '/' + appName + '/';
 
         $rootScope.backToLanding = function() {
-            var baseUrl = $location.absUrl();
-            var index = baseUrl.indexOf(fixedUrlPart);
-            if (index >= 0) {
-                baseUrl = baseUrl.substring(0, index) + '/';
-            }
-            $window.location.href = baseUrl;
+            $window.location.href = FLOWABLE.CONFIG.contextRoot;
         };
     }])
 
@@ -398,24 +387,25 @@ flowableApp
     .filter('username', function() {
         return function(user) {
             if (user) {
-               if(user.firstName) {
+               if (user.fullName) {
+                   return user.fullName;
+               } else if(user.firstName) {
                    return user.firstName + " " + user.lastName;
                } else if(user.lastName) {
                    return user.lastName;
-               } else {
-			       if (user != undefined && user != null){
-				       var _user = user.split(".");
-					   if (_user.length > 1){
-					       user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1) +" "+ _user[1].charAt(0).toUpperCase() + _user[1].slice(1);
-					   } else {
-						   user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1);
-					   }
-					   return user;
-					   
-				   } else {
-					   return "??";
-			       }
-			   }
+               } else if (user.email) {
+                   return user.email
+               } else if (typeof user === 'string') {
+                   var _user = user.split(".");
+                   if (_user.length > 1){
+                       user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1) +" "+ _user[1].charAt(0).toUpperCase() + _user[1].slice(1);
+                   } else {
+                       user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1);
+                   }
+                   return user;
+			   } else {
+                   return user.id;
+               }
             }
             return '';
         };

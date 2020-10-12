@@ -31,6 +31,7 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +86,8 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+                ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED), 
+                EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
     @Override
@@ -97,7 +99,8 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
+                ActivitiEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED),
+                EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
     // getters and setters //////////////////////////////////////////////////////

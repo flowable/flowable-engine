@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.HistoryJobQuery;
-import org.flowable.job.api.JobInfo;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.api.TimerJobQuery;
@@ -68,8 +67,6 @@ public interface JobService {
     AbstractRuntimeJobEntity moveJobToDeadLetterJob(AbstractRuntimeJobEntity job);
     
     void updateAllJobTypesTenantIdForDeployment(String deploymentId, String newTenantId);
-    
-    void unacquireWithDecrementRetries(JobInfo job);
     
     void createAsyncJob(JobEntity job, boolean isExclusive);
     

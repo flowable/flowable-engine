@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -46,6 +47,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Valentin Zickner
  */
 public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateManager implements CaseInstanceMigrationManager {
+    
+    public CaseInstanceMigrationManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
 
     @Override
     public CaseInstanceMigrationValidationResult validateMigrateCaseInstancesOfCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId, CaseInstanceMigrationDocument document, CommandContext commandContext) {
@@ -66,8 +71,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             } else {
                 CmmnModel newModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
 
-                CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
-                List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(new CaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
+                CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+                List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(
+                        new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId));
 
                 for (CaseInstance caseInstance : caseInstances) {
                     doValidateCaseInstanceMigration(caseInstance.getId(), newModel, document, validationResult, commandContext);
@@ -161,8 +167,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             throw new FlowableException("Cannot find the case definition to migrate to, identified by " + printCaseDefinitionIdentifierMessage(document));
         }
 
-        CaseInstanceQueryImpl caseInstanceQueryByCaseDefinitionId = new CaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId);
-        CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
+        CaseInstanceQueryImpl caseInstanceQueryByCaseDefinitionId = new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId);
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(caseInstanceQueryByCaseDefinitionId);
 
         for (CaseInstance caseInstance : caseInstances) {
@@ -180,6 +186,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         caseInstance.setCaseDefinitionName(caseDefinitionToMigrateTo.getName());
         caseInstance.setCaseDefinitionVersion(caseDefinitionToMigrateTo.getVersion());
         caseInstance.setCaseDefinitionDeploymentId(caseDefinitionToMigrateTo.getDeploymentId());
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).update(caseInstance);
 
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
                 .setCaseInstanceId(caseInstance.getId())

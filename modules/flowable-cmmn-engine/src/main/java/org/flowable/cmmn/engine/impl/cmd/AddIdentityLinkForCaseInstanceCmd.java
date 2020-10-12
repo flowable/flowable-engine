@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -64,15 +65,15 @@ public class AddIdentityLinkForCaseInstanceCmd implements Command<Void>, Seriali
 
     @Override
     public Void execute(CommandContext commandContext) {
-
-        CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(caseInstanceId);
 
         if (caseInstance == null) {
             throw new FlowableObjectNotFoundException("Cannot find case instance with id " + caseInstanceId, CaseInstanceEntity.class);
         }
 
-        IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, userId, groupId, type);
+        IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, userId, groupId, type, cmmnEngineConfiguration);
         
         return null;
 

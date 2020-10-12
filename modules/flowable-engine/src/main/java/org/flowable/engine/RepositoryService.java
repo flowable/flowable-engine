@@ -22,8 +22,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
 import org.flowable.engine.repository.MergeMode;
@@ -390,7 +390,7 @@ public interface RepositoryService {
     /**
      * Creates a new model. The model is transient and must be saved using {@link #saveModel(Model)}.
      */
-    public Model newModel();
+    Model newModel();
 
     /**
      * Saves the model. If the model already existed, the model is updated otherwise a new model is created.
@@ -398,13 +398,13 @@ public interface RepositoryService {
      * @param model
      *            model to save, cannot be null.
      */
-    public void saveModel(Model model);
+    void saveModel(Model model);
 
     /**
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
-    public void deleteModel(String modelId);
+    void deleteModel(String modelId);
 
     /**
      * Saves the model editor source for a model
@@ -412,7 +412,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
-    public void addModelEditorSource(String modelId, byte[] bytes);
+    void addModelEditorSource(String modelId, byte[] bytes);
 
     /**
      * Saves the model editor source extra for a model
@@ -420,10 +420,10 @@ public interface RepositoryService {
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
      */
-    public void addModelEditorSourceExtra(String modelId, byte[] bytes);
+    void addModelEditorSourceExtra(String modelId, byte[] bytes);
 
     /** Query models. */
-    public ModelQuery createModelQuery();
+    ModelQuery createModelQuery();
 
     /**
      * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
@@ -436,7 +436,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public Model getModel(String modelId);
+    Model getModel(String modelId);
 
     /**
      * Returns the model editor source as a byte array
@@ -444,7 +444,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public byte[] getModelEditorSource(String modelId);
+    byte[] getModelEditorSource(String modelId);
 
     /**
      * Returns the model editor source extra as a byte array
@@ -452,7 +452,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public byte[] getModelEditorSourceExtra(String modelId);
+    byte[] getModelEditorSourceExtra(String modelId);
 
     /**
      * Authorizes a candidate user for a process definition.

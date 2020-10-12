@@ -16,6 +16,7 @@
         },
         "ACTION": {
             "LOGOUT": "Déconnexion",
+            "DASHBOARD": "Dashboard",
             "RETURN-TO-LIST": "Afficher toutes les définitions",
             "CANCEL": "Annuler",
             "CLOSE": "Fermer",
@@ -142,7 +143,7 @@
         }
     },
 
-    "DECISION-TABLES-LIST": {
+    "DECISIONS-LIST": {
         "TITLE": "Tables de décision",
         "SEARCH-PLACEHOLDER": "Recherche",
         "ACTION": {

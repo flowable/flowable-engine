@@ -362,7 +362,6 @@ public class CompositeELResolver extends ELResolver {
 	 * <li>Otherwise, iteration stops and no more component resolvers are considered. The value
 	 * returned by <code>getValue()</code> is returned by this method.</li>
 	 * </ol>
-	 * </p>
 	 * 
 	 * <p>
 	 * If none of the component resolvers were able to perform this operation, the value

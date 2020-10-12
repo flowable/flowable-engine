@@ -55,18 +55,18 @@ public class AppDefinitionEntityManagerImpl
     }
 
     @Override
-    public AppDefinition findAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer caseDefinitionVersion, String tenantId) {
+    public AppDefinition findAppDefinitionByKeyAndVersionAndTenantId(String appDefinitionKey, Integer appDefinitionVersion, String tenantId) {
         if (tenantId == null || AppEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-            return dataManager.findAppDefinitionByKeyAndVersion(appDefinitionKey, caseDefinitionVersion);
+            return dataManager.findAppDefinitionByKeyAndVersion(appDefinitionKey, appDefinitionVersion);
         } else {
-            return dataManager.findAppDefinitionByKeyAndVersionAndTenantId(appDefinitionKey, caseDefinitionVersion, tenantId);
+            return dataManager.findAppDefinitionByKeyAndVersionAndTenantId(appDefinitionKey, appDefinitionVersion, tenantId);
         }
     }
     
     @Override
     public void deleteAppDefinitionAndRelatedData(String appDefinitionId) {
-        AppDefinitionEntity caseDefinitionEntity = findById(appDefinitionId);
-        delete(caseDefinitionEntity);
+        AppDefinitionEntity appDefinitionEntity = findById(appDefinitionId);
+        delete(appDefinitionEntity);
     }
     
     @Override

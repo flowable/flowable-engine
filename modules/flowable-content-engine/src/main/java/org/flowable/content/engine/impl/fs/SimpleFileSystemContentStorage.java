@@ -12,9 +12,12 @@
  */
 package org.flowable.content.engine.impl.fs;
 
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -27,11 +30,9 @@ import org.flowable.content.api.ContentStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedGenerator;
 
 /**
  * (Very) simple implementation of the {@link ContentStorage} that relies on the passed metadata to store content.
@@ -215,7 +216,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             File subFolder=null;
             if (PROCESS_INSTANCE_PREFIX.equals(typePrefix)) {
                 subFolder = processInstanceFolder;
-            } else if(TASK_PREFIX.equals(typePrefix)) {
+            } else if (TASK_PREFIX.equals(typePrefix)) {
                 subFolder = taskFolder;
             } else if (CASE_PREFIX.equals(typePrefix)) {
                 subFolder = caseFolder;

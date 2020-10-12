@@ -19,18 +19,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.flowable.idm.api.User;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.ui.common.model.UserRepresentation;
+import org.flowable.ui.common.security.SecurityScope;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.NotFoundException;
+import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
 import org.flowable.ui.task.model.runtime.TaskRepresentation;
 import org.flowable.ui.task.model.runtime.TaskUpdateRepresentation;
-import org.flowable.ui.common.service.idm.cache.UserCache.CachedUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskService.class);
 
     public TaskRepresentation getTask(String taskId) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
         TaskRepresentation rep = null;
@@ -85,7 +85,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
     }
 
     public List<TaskRepresentation> getSubTasks(String taskId) {
-        User currentUser = SecurityUtils.getCurrentUserObject();
+        SecurityScope currentUser = SecurityUtils.getAuthenticatedSecurityScope();
         HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, taskId);
         
         List<Task> subTasks = this.taskService.getSubTasks(taskId);
@@ -108,6 +108,8 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             CachedUser cachedUser = userCache.getUser(task.getAssignee());
             if (cachedUser != null && cachedUser.getUser() != null) {
                 rep.setAssignee(new UserRepresentation(cachedUser.getUser()));
+            } else {
+                rep.setAssignee(new UserRepresentation(task.getAssignee()));
             }
         }
     }
@@ -122,6 +124,8 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
                 CachedUser cachedUser = userCache.getUser(link.getUserId());
                 if (cachedUser != null && cachedUser.getUser() != null) {
                     result.add(new UserRepresentation(cachedUser.getUser()));
+                } else {
+                    result.add(new UserRepresentation(link.getUserId()));
                 }
             }
         }
@@ -135,7 +139,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             throw new NotFoundException("Task with id: " + taskId + " does not exist");
         }
 
-        permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), task.getId());
+        permissionService.validateReadPermissionOnTask(SecurityUtils.getAuthenticatedSecurityScope(), task.getId());
 
         if (updated.isNameSet()) {
             task.setName(updated.getName());

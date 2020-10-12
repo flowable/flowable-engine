@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 
 /**
@@ -19,4 +20,9 @@ import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransf
  */
 public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTransformer {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public AbstractHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
 }

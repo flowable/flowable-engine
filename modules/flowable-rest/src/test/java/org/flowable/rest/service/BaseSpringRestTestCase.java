@@ -515,7 +515,7 @@ public class BaseSpringRestTestCase {
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertThat(toBeFound.isEmpty()).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isTrue();
+        assertThat(toBeFound).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
     /**

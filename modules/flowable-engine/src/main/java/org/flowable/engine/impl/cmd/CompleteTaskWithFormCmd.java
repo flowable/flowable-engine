@@ -36,8 +36,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected String formDefinitionId;
     protected String outcome;
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
-    protected boolean localScope;
+    protected Map<String, Object> transientVariablesLocal;
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);
@@ -48,16 +49,27 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
-
         this(taskId, formDefinitionId, outcome, variables);
-        this.localScope = localScope;
+        if (localScope) {
+            this.variablesLocal = variables;
+        } else {
+            this.variables = variables;
+        }
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+                                   Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
+    }
+
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String,
+            Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        this(taskId, formDefinitionId, outcome, variables);
+        this.variablesLocal = variablesLocal;
+        this.transientVariables = transientVariables;
+        this.transientVariablesLocal = transientVariablesLocal;
     }
 
     @Override
@@ -92,11 +104,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
-            TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);
-
-        } else {
-            TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
         }
+        TaskHelper.completeTask(task, variables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+
 
         return null;
     }

@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
@@ -42,6 +44,12 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByProcessInstanceUserGroupAndTypeMatcher = new IdentityLinksByProcessInstanceUserGroupAndTypeMatcher();
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByScopeIdScopeTypeUserGroupAndTypeMatcher = new IdentityLinksByScopeIdScopeTypeUserGroupAndTypeMatcher();
 
+    protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    
+    public MybatisIdentityLinkDataManager(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
+        this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends IdentityLinkEntity> getManagedEntityClass() {
         return IdentityLinkEntityImpl.class;
@@ -211,4 +219,8 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         getDbSqlSession().delete("deleteIdentityLinksByScopeDefinitionIdAndScopeType", parameters, IdentityLinkEntityImpl.class);
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return identityLinkServiceConfiguration.getIdGenerator();
+    }
 }

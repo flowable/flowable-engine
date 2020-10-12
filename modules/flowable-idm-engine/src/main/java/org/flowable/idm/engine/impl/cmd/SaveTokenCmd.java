@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Token;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -28,10 +29,14 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 public class SaveTokenCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected IdmEngineConfiguration idmEngineConfiguration;
+    
     protected Token token;
 
-    public SaveTokenCmd(Token token) {
+    public SaveTokenCmd(Token token, IdmEngineConfiguration idmEngineConfiguration) {
         this.token = token;
+        this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
     @Override
@@ -40,14 +45,14 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("token is null");
         }
 
-        if (CommandContextUtil.getTokenEntityManager(commandContext).isNewToken(token)) {
+        if (idmEngineConfiguration.getTokenEntityManager().isNewToken(token)) {
             if (token instanceof TokenEntity) {
-                CommandContextUtil.getTokenEntityManager(commandContext).insert((TokenEntity) token, true);
+                idmEngineConfiguration.getTokenEntityManager().insert((TokenEntity) token, true);
             } else {
-                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) token);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) token, idmEngineConfiguration.getIdGenerator());
             }
         } else {
-            CommandContextUtil.getTokenEntityManager(commandContext).updateToken(token);
+            idmEngineConfiguration.getTokenEntityManager().updateToken(token);
         }
 
         return null;

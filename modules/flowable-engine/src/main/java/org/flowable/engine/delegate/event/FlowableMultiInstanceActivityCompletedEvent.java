@@ -13,9 +13,9 @@
 package org.flowable.engine.delegate.event;
 
 public interface FlowableMultiInstanceActivityCompletedEvent extends FlowableMultiInstanceActivityEvent {
-    public int getNumberOfInstances();
+    int getNumberOfInstances();
 
-    public int getNumberOfActiveInstances();
+    int getNumberOfActiveInstances();
 
-    public int getNumberOfCompletedInstances();
+    int getNumberOfCompletedInstances();
 }

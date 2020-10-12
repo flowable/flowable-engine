@@ -24,7 +24,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
 import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
@@ -86,7 +85,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
 
         List<EntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkService entityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
 
             return entityLinkService.findEntityLinksByScopeIdAndType(processInstance.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
         });
@@ -187,7 +186,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Verify query and check form key
         task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertThat(task.getProcessVariables().size()).isEqualTo(vars.size());
+        assertThat(task.getProcessVariables()).hasSameSizeAs(vars);
 
         assertThat(task.getFormKey()).isEqualTo("test123");
     }
@@ -281,6 +280,28 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         } finally {
             processEngineConfiguration.setCreateUserTaskInterceptor(null);
         }
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskIdVariableName.bpmn20.xml")
+    public void testUserTaskIdVariableName() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
+
+        // Normal string
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+
+        String actualTaskId = firstTask.getId();
+        String myTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
+        assertThat(myTaskId).isEqualTo(actualTaskId);
+
+        // Expression
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+
+        actualTaskId = secondTask.getId();
+        String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
+        assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {

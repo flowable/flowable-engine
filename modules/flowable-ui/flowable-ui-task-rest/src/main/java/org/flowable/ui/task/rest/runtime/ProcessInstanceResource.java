@@ -12,6 +12,8 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.ui.task.model.runtime.FormModelRepresentation;
@@ -25,8 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * REST controller for managing a process instance.

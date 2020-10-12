@@ -70,9 +70,9 @@ public interface ManagementAgent {
 
     /**
      * Get the MBeanServer which hosts managed objects.
-     * <p/>
+     * <p>
      * <b>Notice:</b> If the JMXEnabled configuration is not set to <tt>true</tt>, this method will return <tt>null</tt>.
-     * 
+     * </p>
      * @return the MBeanServer
      */
     MBeanServer getMBeanServer();
@@ -85,8 +85,8 @@ public interface ManagementAgent {
      */
     void setMBeanServer(MBeanServer mbeanServer);
 
-    public void findAndRegisterMbeans() throws Exception;
+    void findAndRegisterMbeans() throws Exception;
 
-    public void doStart();
+    void doStart();
 
 }

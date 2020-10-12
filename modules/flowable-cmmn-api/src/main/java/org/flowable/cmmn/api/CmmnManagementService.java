@@ -21,6 +21,7 @@ import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
 import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -114,7 +115,22 @@ public interface CmmnManagementService {
     Job moveDeadLetterJobToExecutableJob(String jobId, int retries);
 
     /**
-     * Moves a suspendend job from the suspended letter job table back to be an executable job. The retries are untouched.
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @param retries
+     *            the number of retries (value greater than 0) which will be set on the job.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     * @throws org.flowable.common.engine.api.FlowableIllegalArgumentException
+     *              when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
+
+    /**
+     * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.
      *
      * @param jobId
      *            id of the job to move, cannot be null.
@@ -260,6 +276,27 @@ public interface CmmnManagementService {
      *             when there is no historyJob with the given id.
      */
     void executeHistoryJob(String historyJobId);
+
+    /**
+     * Get the advanced configuration (storing the history json data) of a {@link HistoryJob}.
+     *
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     *
+     */
+    String getHistoryJobHistoryJson(String historyJobId);
+
+    /**
+     * Delete the history job with the provided id.
+     *
+     * @param jobId
+     *            id of the history job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    void deleteHistoryJob(String jobId);
 
     // External Worker
 

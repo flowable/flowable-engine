@@ -221,7 +221,7 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, WAITING_FOR_REPETITION);
 
-        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in witing for repetition state
+        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in waiting for repetition state
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Kill active tasks B"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);
@@ -324,7 +324,7 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, WAITING_FOR_REPETITION);
 
-        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in witing for repetition state
+        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in waiting for repetition state
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Kill active and enabled tasks B"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);
@@ -388,7 +388,7 @@ public class PlanItemExitSentryTest extends FlowableCmmnTestCase {
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, WAITING_FOR_REPETITION);
 
-        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in witing for repetition state
+        // trigger exit sentry with Task B still in active state -> must terminate the active task B, but leave it in waiting for repetition state
         cmmnRuntimeService.completeUserEventListenerInstance(getPlanItemInstanceIdByName(planItemInstances, "Kill active and enabled tasks B"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);

@@ -15,35 +15,39 @@ package org.flowable.task.service.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
-import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.task.service.TaskServiceConfiguration;
 
 public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Task> implements NativeTaskQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected TaskServiceConfiguration taskServiceConfiguration;
 
-    public NativeTaskQueryImpl(CommandContext commandContext) {
+    public NativeTaskQueryImpl(CommandContext commandContext, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandContext);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
-    public NativeTaskQueryImpl(CommandExecutor commandExecutor) {
+    public NativeTaskQueryImpl(CommandExecutor commandExecutor, TaskServiceConfiguration taskServiceConfiguration) {
         super(commandExecutor);
+        this.taskServiceConfiguration = taskServiceConfiguration;
     }
 
     // results ////////////////////////////////////////////////////////////////
 
     @Override
     public List<Task> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getTaskEntityManager(commandContext).findTasksByNativeQuery(parameterMap);
+        return taskServiceConfiguration.getTaskEntityManager().findTasksByNativeQuery(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByNativeQuery(parameterMap);
+        return taskServiceConfiguration.getTaskEntityManager().findTaskCountByNativeQuery(parameterMap);
     }
 
 }

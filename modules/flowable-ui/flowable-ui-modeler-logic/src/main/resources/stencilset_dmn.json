@@ -12,7 +12,23 @@
           "title": "DRD identifier",
           "value": "drdModel",
           "description": "Unique identifier of the DRD.",
+          "readonly": true,
           "popular": true
+        }
+      ]
+    },
+    {
+      "name": "drd_namepackage",
+      "properties": [
+        {
+          "id": "name",
+          "type": "String",
+          "title": "Name",
+          "value": "",
+          "description": "The descriptive name of the DRD element.",
+          "popular": true,
+          "readonly": true,
+          "refToView": "text_name"
         }
       ]
     },
@@ -85,7 +101,7 @@
       "hide": true,
       "propertyPackages": [
         "drd_idpackage",
-        "namepackage",
+        "drd_namepackage",
         "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
@@ -117,47 +133,6 @@
     },
     {
       "type": "node",
-      "id": "InputData",
-      "title": "Input data",
-      "description": "Input data",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"31\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\" rx=\"31\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>",
-      "icon": "activity/list/type.service.png",
-      "groups": [
-        "Elements"
-      ],
-      "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "documentationpackage"
-      ],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "information_requirement_start"
-      ]
-    },
-    {
-      "type": "node",
-      "id": "KnowledgeSource",
-      "title": "Knowledge source",
-      "description": "Knowledge Source",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
-      "icon": "activity/list/type.service.png",
-      "groups": [
-        "Elements"
-      ],
-      "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "documentationpackage"
-      ],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "information_requirement_start",
-        "information_requirement_end"
-      ]
-    },
-    {
-      "type": "node",
       "id": "ExpandedDecisionService",
       "title": "Expanded Decision service",
       "description": "A decision service",
@@ -169,9 +144,6 @@
       "mayBeRoot": true,
       "hide": true,
       "propertyPackages": [
-        "overrideidpackage",
-        "namepackage",
-        "documentationpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -224,50 +196,6 @@
       "title": "Information requirement",
       "description": "Input data or a decision output being used as one of the inputs of a decision",
       "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<defs>\r\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\r\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\r\n\t  \t</marker>\r\n\t</defs>\r\n\t<g id=\"edge\">\r\n\t\t<path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" marker-start=\"url(#start)\" marker-end=\"url(#end)\" />\r\n\t\t<text id=\"text_name\" x=\"0\" y=\"0\" oryx:edgePosition=\"startTop\"/>\r\n\t</g>\r\n</svg>",
-      "icon": "connector/sequenceflow.png",
-      "groups": [
-        "Requirements"
-      ],
-      "layout": [
-        {
-          "type": "layout.bpmn2_0.sequenceflow"
-        }
-      ],
-      "propertyPackages": [],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "ConnectingObjectsMorph",
-        "all"
-      ]
-    },
-    {
-      "type": "edge",
-      "id": "KnowledgeRequirement",
-      "title": "Knowledge requirement",
-      "description": "The invocation of a business knownledge model",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n\txmlns=\"http://www.w3.org/2000/svg\"\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\n\tversion=\"1.0\"\n\toryx:edge=\"edge\" >\n    <defs>\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\n\t  \t</marker>\n\t</defs>\n\t<g id=\"edge\">\n\t    <path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"3, 4\" marker-end=\"url(#end)\" />\n\t\t<text id=\"name\" x=\"0\" y=\"0\" oryx:edgePosition=\"midTop\" oryx:offsetTop=\"6\" style=\"font-size:9px;\"/>\n\t</g>\n</svg>",
-      "icon": "connector/association.undirected.png",
-      "groups": [
-        "Requirements"
-      ],
-      "layout": [
-        {
-          "type": "layout.bpmn2_0.sequenceflow"
-        }
-      ],
-      "propertyPackages": [],
-      "hiddenPropertyPackages": [],
-      "roles": [
-        "ConnectingObjectsMorph",
-        "all"
-      ]
-    },
-    {
-      "type": "edge",
-      "id": "AuthorityRequirement",
-      "title": "Authority requirement",
-      "description": "The dependence of a DRD element on another DRD element",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<defs>\r\n\t  \t<marker id=\"start\" refX=\"1\" refY=\"5\" markerUnits=\"userSpaceOnUse\" markerWidth=\"17\" markerHeight=\"11\" orient=\"auto\">\r\n\t  \t\t<!-- <path id=\"conditional\"   d=\"M 0 6 L 8 1 L 15 5 L 8 9 L 1 5\" fill=\"white\" stroke=\"black\" stroke-width=\"1\" /> -->\r\n\t\t\t<path id=\"default\" d=\"M 5 0 L 11 10\" fill=\"white\" stroke=\"#585858\" stroke-width=\"1\" />\r\n\t  \t</marker>\r\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\r\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\r\n\t  \t</marker>\r\n\t</defs>\r\n\t<g id=\"edge\">\r\n\t\t<path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" marker-start=\"url(#start)\" marker-end=\"url(#end)\" />\r\n\t\t<text id=\"text_name\" x=\"0\" y=\"0\" oryx:edgePosition=\"startTop\"/>\r\n\t</g>\r\n</svg>",
       "icon": "connector/sequenceflow.png",
       "groups": [
         "Requirements"

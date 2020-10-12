@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -50,16 +51,18 @@ public class ReceiveEventTaskActivityBehavior extends AbstractBpmnActivityBehavi
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
-        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-            .eventType(eventDefinitionKey)
-            .executionId(executionEntity.getId())
-            .processInstanceId(executionEntity.getProcessInstanceId())
-            .activityId(executionEntity.getCurrentActivityId())
-            .processDefinitionId(executionEntity.getProcessDefinitionId())
-            .scopeType(ScopeTypes.BPMN)
-            .tenantId(executionEntity.getTenantId())
-            .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
-            .create();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                    .eventType(eventDefinitionKey)
+                    .executionId(executionEntity.getId())
+                    .processInstanceId(executionEntity.getProcessInstanceId())
+                    .activityId(executionEntity.getCurrentActivityId())
+                    .processDefinitionId(executionEntity.getProcessDefinitionId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .tenantId(executionEntity.getTenantId())
+                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, executionEntity))
+                    .create();
 
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
         executionEntity.getEventSubscriptions().add(eventSubscription);
@@ -74,7 +77,8 @@ public class ReceiveEventTaskActivityBehavior extends AbstractBpmnActivityBehavi
             EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
         }
 
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
         CommandContext commandContext = Context.getCommandContext();

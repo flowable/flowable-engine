@@ -54,7 +54,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
         ProcessDefinitionInfoEntity processDefinitionInfo = findById(id);
         if (processDefinitionInfo != null) {
             ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId(), null);
-            ref.setValue("json", json);
+            ref.setValue("json", json, engineConfiguration.getEngineCfgKey());
 
             if (processDefinitionInfo.getInfoJsonId() == null) {
                 processDefinitionInfo.setInfoJsonId(ref.getId());
@@ -68,7 +68,7 @@ public class ProcessDefinitionInfoEntityManagerImpl
     public void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo) {
         if (processDefinitionInfo.getInfoJsonId() != null) {
             ByteArrayRef ref = new ByteArrayRef(processDefinitionInfo.getInfoJsonId(), null);
-            ref.delete();
+            ref.delete(engineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -80,6 +80,6 @@ public class ProcessDefinitionInfoEntityManagerImpl
     @Override
     public byte[] findInfoJsonById(String infoJsonId) {
         ByteArrayRef ref = new ByteArrayRef(infoJsonId, null);
-        return ref.getBytes();
+        return ref.getBytes(engineConfiguration.getEngineCfgKey());
     }
 }

@@ -12,6 +12,7 @@
         },
         "ACTION": {
             "LOGOUT": "Salir",
+            "DASHBOARD": "Dashboard",
             "HELP": "Guía de inicio",
             "EDIT-PROFILE": "Editar perfil",
             "SAVE": "Guardar",

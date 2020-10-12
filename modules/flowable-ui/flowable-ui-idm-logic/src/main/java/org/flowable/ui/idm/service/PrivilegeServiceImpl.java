@@ -35,6 +35,7 @@ public class PrivilegeServiceImpl extends AbstractIdmService implements Privileg
         return identityService.createPrivilegeQuery().privilegeId(id).singleResult();
     }
 
+    @Override
     public List<Privilege> findPrivileges() {
         return identityService.createPrivilegeQuery().list();
     }

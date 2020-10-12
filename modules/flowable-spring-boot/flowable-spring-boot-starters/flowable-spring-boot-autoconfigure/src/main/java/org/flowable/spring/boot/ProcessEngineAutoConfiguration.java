@@ -24,9 +24,11 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
@@ -46,6 +48,7 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -57,7 +60,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
@@ -126,15 +129,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConfigurationProperties(prefix = "flowable.process.async.executor")
     @ConditionalOnMissingBean(name = "processAsyncExecutor")
     public SpringAsyncExecutor processAsyncExecutor(
-        ObjectProvider<TaskExecutor> taskExecutor,
-        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        return new SpringAsyncExecutor(
-            getIfAvailable(processTaskExecutor, taskExecutor),
-            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
-        );
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        asyncExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
+        return asyncExecutor;
     }
     
     @Bean
@@ -143,15 +143,12 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
     @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
     public SpringAsyncHistoryExecutor asyncHistoryExecutor(
-        ObjectProvider<TaskExecutor> taskExecutor,
-        @Process ObjectProvider<TaskExecutor> processTaskExecutor,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        return new SpringAsyncHistoryExecutor(
-            getIfAvailable(processTaskExecutor, taskExecutor),
-            getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler)
-        );
+        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor();
+        asyncHistoryExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
+        return asyncHistoryExecutor;
     }
 
     @Bean
@@ -160,7 +157,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
+            @Qualifier("applicationTaskExecutor") ObjectProvider<AsyncListenableTaskExecutor> applicationTaskExecutorProvider,
             @ProcessAsyncHistory ObjectProvider<AsyncExecutor> asyncHistoryExecutorProvider,
+            ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
+            @Process ObjectProvider<AsyncListenableTaskExecutor> processTaskExecutor,
+            ObjectProvider<FlowableHttpClient> flowableHttpClient,
             ObjectProvider<List<AutoDeploymentStrategy<ProcessEngine>>> processEngineAutoDeploymentStrategies) throws IOException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
@@ -180,7 +181,19 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         if (springAsyncExecutor != null) {
             conf.setAsyncExecutor(springAsyncExecutor);
         }
-        
+
+        AsyncListenableTaskExecutor asyncTaskExecutor = getIfAvailable(processTaskExecutor, taskExecutor);
+        if (asyncTaskExecutor == null) {
+            // Get the applicationTaskExecutor
+            asyncTaskExecutor = applicationTaskExecutorProvider.getObject();
+        }
+        if (asyncTaskExecutor != null) {
+            // The task executors are shared
+            org.flowable.common.engine.api.async.AsyncTaskExecutor flowableTaskExecutor = new SpringAsyncTaskExecutor(asyncTaskExecutor);
+            conf.setAsyncTaskExecutor(flowableTaskExecutor);
+            conf.setAsyncHistoryTaskExecutor(flowableTaskExecutor);
+        }
+
         AsyncExecutor springAsyncHistoryExecutor = asyncHistoryExecutorProvider.getIfUnique();
         if (springAsyncHistoryExecutor != null) {
             conf.setAsyncHistoryEnabled(true);
@@ -214,6 +227,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.getHttpClientConfig().setDisableCertVerify(httpProperties.isDisableCertVerify());
         conf.getHttpClientConfig().setRequestRetryLimit(httpProperties.getRequestRetryLimit());
         conf.getHttpClientConfig().setSocketTimeout(httpProperties.getSocketTimeout());
+        conf.getHttpClientConfig().setHttpClient(flowableHttpClient.getIfAvailable());
 
         conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());

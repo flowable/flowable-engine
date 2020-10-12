@@ -25,6 +25,7 @@ public class DmnResourceEntityImpl extends AbstractDmnEngineNoRevisionEntity imp
     protected String name;
     protected byte[] bytes;
     protected String deploymentId;
+    protected boolean generated;
 
     public DmnResourceEntityImpl() {
 
@@ -68,6 +69,11 @@ public class DmnResourceEntityImpl extends AbstractDmnEngineNoRevisionEntity imp
     @Override
     public boolean isGenerated() {
         return false;
+    }
+
+    @Override
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
     }
 
     // common methods //////////////////////////////////////////////////////////

@@ -22,7 +22,7 @@ public class EventSubscriptionsByExecutionIdMatcher extends CachedEntityMatcherA
 
     @Override
     public boolean isRetained(EventSubscriptionEntity eventSubscriptionEntity, Object parameter) {
-        return eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals((String) parameter);
+        return eventSubscriptionEntity.getExecutionId() != null && eventSubscriptionEntity.getExecutionId().equals(parameter);
     }
 
 }

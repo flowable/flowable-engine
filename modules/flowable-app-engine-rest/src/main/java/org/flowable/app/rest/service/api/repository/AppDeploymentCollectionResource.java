@@ -79,7 +79,7 @@ public class AppDeploymentCollectionResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of App Deployments", nickname = "listAppDeployments", tags = { "Form Deployments" })
+    @ApiOperation(value = "List of App Deployments", nickname = "listAppDeployments", tags = { "App Deployments" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return app deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return app deployments with a name like the given name.", paramType = "query"),
@@ -117,7 +117,7 @@ public class AppDeploymentCollectionResource {
             deploymentQuery.deploymentTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            Boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 deploymentQuery.deploymentWithoutTenantId();
             }

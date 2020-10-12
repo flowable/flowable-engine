@@ -23,6 +23,7 @@ import java.util.Set;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
@@ -157,7 +158,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
 
         for (String cleanupDeploymentId : cleanupDeploymentIds) {
-            cmmnRepositoryService.deleteDeployment(cleanupDeploymentId, true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cleanupDeploymentId);
         }
         cleanupDeploymentIds.clear();
 
@@ -289,7 +290,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().singleResult().getTenantId()).isNullOrEmpty();
 
         InboundChannelModel defaultSharedInboundChannelModel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("sharedDefaultChannel");
-        // The chanel has a tenant detector that will use the correct tenant to start the case instance
+        // The channel has a tenant detector that will use the correct tenant to start the case instance
 
         ((TestInboundChannelAdapter) defaultSharedInboundChannelModel.getInboundEventChannelAdapter()).triggerEventForTenantId("customerA", TENANT_A);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantId(TENANT_A).count()).isEqualTo(1);

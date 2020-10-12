@@ -27,7 +27,7 @@ import org.flowable.app.rest.service.BaseSpringRestTestCase;
 public class AppDefinitionCollectionResourceTest extends BaseSpringRestTestCase {
 
     /**
-     * Test getting case definitions. GET app-repository/app-definitions
+     * Test getting app definitions. GET app-repository/app-definitions
      */
     public void testGetAppDefinitions() throws Exception {
 

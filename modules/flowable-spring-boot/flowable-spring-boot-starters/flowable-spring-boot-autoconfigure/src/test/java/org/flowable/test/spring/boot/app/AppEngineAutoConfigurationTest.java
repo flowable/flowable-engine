@@ -31,6 +31,7 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
@@ -48,7 +49,7 @@ import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.task.api.Task;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -104,8 +105,11 @@ public class AppEngineAutoConfigurationTest {
                 assertThat(engineConfiguration.getEngineConfigurations())
                         .containsOnlyKeys(
                                 EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                                ScopeTypes.APP,
                                 EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
-                                EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG
+                                ScopeTypes.EVENT_REGISTRY,
+                                EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
+                                "idm"
                         );
 
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -149,7 +153,8 @@ public class AppEngineAutoConfigurationTest {
 
                 assertThat(engineConfiguration.getEngineConfigurations())
                         .containsOnlyKeys(
-                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG
+                                EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                                ScopeTypes.APP
                         );
 
                 assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
@@ -269,17 +274,25 @@ public class AppEngineAutoConfigurationTest {
             assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            ScopeTypes.APP,
                             EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            ScopeTypes.EVENT_REGISTRY,
                             EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            "idm",
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             assertThat(processConfiguration.getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
+                            ScopeTypes.APP,
                             EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG,
+                            ScopeTypes.EVENT_REGISTRY,
                             EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            "idm",
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             deleteDeployments(appEngine);
@@ -329,13 +342,17 @@ public class AppEngineAutoConfigurationTest {
             assertThat(appEngine.getAppEngineConfiguration().getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            ScopeTypes.APP,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             assertThat(processConfiguration.getEngineConfigurations())
                     .containsOnlyKeys(
                             EngineConfigurationConstants.KEY_APP_ENGINE_CONFIG,
-                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG
+                            ScopeTypes.APP,
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG,
+                            ScopeTypes.BPMN
                     );
 
             deleteDeployments(appEngine);
@@ -372,7 +389,7 @@ public class AppEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, AppEngine appEngine) {
         List<Method> methods = Stream.of(AppEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+            .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName()))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {

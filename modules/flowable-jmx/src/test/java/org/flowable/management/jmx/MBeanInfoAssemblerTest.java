@@ -69,13 +69,13 @@ public class MBeanInfoAssemblerTest {
 
         int counter = 0;
         for (MBeanAttributeInfo info : testAttributes) {
-            if (info.getName().equals("TestAttributeBoolean")) {
+            if ("TestAttributeBoolean".equals(info.getName())) {
                 counter++;
                 assertThat(info.getDescription()).isEqualTo("test attribute Boolean description");
                 assertThat(info.getType()).isEqualTo("java.lang.Boolean");
                 assertThat(info.isReadable()).isTrue();
                 assertThat(info.isWritable()).isFalse();
-            } else if (info.getName().equals("TestAttributeString")) {
+            } else if ("TestAttributeString".equals(info.getName())) {
                 counter++;
                 assertThat(info.getDescription()).isEqualTo("test attribute String description");
                 assertThat(info.getType()).isEqualTo("java.lang.String");

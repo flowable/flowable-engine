@@ -171,42 +171,50 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
     @Override
     public void trigger() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void enable() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
+        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void disable() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
+        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void start() {
-        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, childTaskVariables, childTaskFormVariables, childTaskFormOutcome, childTaskFormInfo));
+        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables, childTaskVariables, childTaskFormVariables, 
+                childTaskFormOutcome, childTaskFormInfo));
     }
 
     @Override
     public void terminate() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables));
+        commandExecutor.execute(new TerminatePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables));
     }
 
     @Override
     public void completeStage() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, false));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables, false));
     }
 
     @Override
     public void forceCompleteStage() {
         validateChildTaskVariablesNotSet();
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables, true));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
+                formInfo, localVariables, transientVariables, true));
     }
 
     protected void validateChildTaskVariablesNotSet() {

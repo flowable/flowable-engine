@@ -20,7 +20,7 @@ public interface VariableType {
     /**
      * name of variable type (limited to 100 characters length)
      */
-    public String getTypeName();
+    String getTypeName();
 
     /**
      * <p>

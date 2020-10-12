@@ -179,6 +179,10 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter {
         if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
             propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
         }
+        Boolean parallelInSameTransaction = ((HttpServiceTask) serviceTask).getParallelInSameTransaction();
+        if (parallelInSameTransaction != null) {
+            propertiesNode.put(PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION, parallelInSameTransaction.toString());
+        }
         setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_METHOD, "requestMethod", serviceTask, propertiesNode);
         setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_URL, "requestUrl", serviceTask, propertiesNode);
         setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_HEADERS, "requestHeaders", serviceTask, propertiesNode);

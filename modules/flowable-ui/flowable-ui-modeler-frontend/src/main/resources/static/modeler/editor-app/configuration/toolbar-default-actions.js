@@ -349,7 +349,10 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
                 if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('cmmn1.1') !== -1) {
                     $location.path("/casemodels");
                 	return;
-            	}
+            	} else if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('dmn1.2') !== -1) {
+                    $location.path("/decision-services");
+                    return;
+                }
         	}
         	$location.path('/processes');
     	});

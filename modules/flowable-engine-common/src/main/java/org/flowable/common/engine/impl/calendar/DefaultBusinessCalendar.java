@@ -52,7 +52,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
 
     @Override
     public Date resolveDuedate(String duedate) {
-        Date resolvedDuedate = Context.getCommandContext().getCurrentEngineConfiguration().getClock().getCurrentTime(); 
+        Date resolvedDuedate = Context.getCommandContext().getClock().getCurrentTime(); 
 
         String[] tokens = duedate.split(" and ");
         for (String token : tokens) {
@@ -79,7 +79,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
         }
 
         String quantityText = singleUnitQuantity.substring(0, spaceIndex);
-        Integer quantity = Integer.valueOf(quantityText);
+        int quantity = Integer.parseInt(quantityText);
 
         String unitText = singleUnitQuantity.substring(spaceIndex + 1).trim().toLowerCase();
 

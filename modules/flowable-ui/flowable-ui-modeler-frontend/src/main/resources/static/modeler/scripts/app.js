@@ -148,6 +148,10 @@ flowableModeler
         .when('/decision-services/:modelId', {
             templateUrl: 'views/decision-service.html',
             controller: 'DecisionServiceDetailsCtrl'
+        })
+        .when('/decision-services/:modelId/history/:modelHistoryId', {
+            templateUrl: 'views/decision-service.html',
+            controller: 'DecisionServiceDetailsCtrl'
         });
 
         if (FLOWABLE.CONFIG.appDefaultRoute) {
@@ -355,13 +359,8 @@ flowableModeler
 	        $rootScope.logout = function () {
                 $rootScope.authenticated = false;
                 $rootScope.authenticationError = false;
-                $http.get(FLOWABLE.APP_URL.getLogoutUrl())
-                    .success(function (data, status, headers, config) {
-                        $rootScope.login = null;
-                        $rootScope.authenticated = false;
-                        // Changing the href causes a reload, so no need to do a new reload again
-                        $window.location.href = FLOWABLE.CONFIG.contextRoot;
-                    });
+                // Changing the href causes a reload, so no need to do a new reload again
+                $window.location.href = FLOWABLE.CONFIG.contextRoot + '/app/logout';
             };
         }
   ])
@@ -371,13 +370,7 @@ flowableModeler
             var fixedUrlPart = '/editor/';
 
             $rootScope.backToLanding = function() {
-                var baseUrl = $location.absUrl();
-                var index = baseUrl.indexOf(fixedUrlPart);
-                if (index >= 0) {
-                    baseUrl = baseUrl.substring(0, index);
-                    baseUrl += '/';
-                }
-                $window.location.href = baseUrl;
+                $window.location.href = FLOWABLE.CONFIG.contextRoot;
             };
         }])
 

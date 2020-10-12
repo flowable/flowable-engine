@@ -271,6 +271,15 @@
     </annotation>
   </attribute>
 
+  <attribute name="parallelInSameTransaction" type="boolean">
+    <annotation>
+      <documentation>
+        Attribute on an HTTP Task indicating whether the HTTP call should be executed in parallel in the same transaction
+        or it should be done blocking on the same thread.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="expression" type="string">
     <annotation>
       <documentation>
@@ -880,6 +889,14 @@
       <documentation>
         Optional script task attribute flag (default: false) that indicates whether or not variables defined in the script will be stored
         in the Execution instance context.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="taskIdVariableName" type="string" default="">
+    <annotation>
+      <documentation>
+        Allows to specify a variable name on a user task where the task ID will be stored.
       </documentation>
     </annotation>
   </attribute>

@@ -63,6 +63,12 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, serviceTask.getImplementation());
                 }
+
+                Boolean parallelInSameTransaction = ((HttpServiceTask) serviceTask).getParallelInSameTransaction();
+                if (parallelInSameTransaction != null) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION, parallelInSameTransaction.toString());
+                }
+
                 break;
 
             case ScriptServiceTask.SCRIPT_TASK:
@@ -75,6 +81,8 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (((ScriptServiceTask) serviceTask).isAutoStoreVariables()) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, "true");
                 }
+                break;
+            default:
                 break;
         }
     }

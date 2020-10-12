@@ -73,13 +73,13 @@ public interface WebServiceMock {
     void setTo(@WebParam(name = "value") int value);
 
     /**
-     * Returns a formated string composed of prefix + current count + suffix
+     * Returns a formatted string composed of prefix + current count + suffix
      *
      * @param prefix
      *            the prefix
      * @param suffix
      *            the suffix
-     * @return the formated string
+     * @return the formatted string
      */
     @WebResult(name = "prettyPrint")
     String prettyPrintCount(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);

@@ -196,7 +196,8 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor);
+        return new TaskQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration(), configuration.getVariableServiceConfiguration(),
+                configuration.getIdmIdentityService());
     }
     
     @Override
@@ -345,22 +346,26 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
     
     @Override
     public void setAssignee(String taskId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, IdentityLinkType.ASSIGNEE));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                IdentityLinkType.ASSIGNEE));
     }
 
     @Override
     public void setOwner(String taskId, String userId) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, IdentityLinkType.OWNER));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                IdentityLinkType.OWNER));
     }
     
     @Override
     public void addUserIdentityLink(String taskId, String userId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, identityLinkType));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, userId, AddIdentityLinkCmd.IDENTITY_USER, 
+                identityLinkType));
     }
 
     @Override
     public void addGroupIdentityLink(String taskId, String groupId, String identityLinkType) {
-        commandExecutor.execute(new AddIdentityLinkCmd(taskId, groupId, AddIdentityLinkCmd.IDENTITY_GROUP, identityLinkType));
+        commandExecutor.execute(new AddIdentityLinkCmd(taskId, groupId, AddIdentityLinkCmd.IDENTITY_GROUP, 
+                identityLinkType));
     }
     
     @Override
@@ -380,7 +385,7 @@ public class CmmnTaskServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfi
 
     @Override
     public TaskBuilder createTaskBuilder() {
-        return new CmmnTaskBuilderImpl(commandExecutor);
+        return new CmmnTaskBuilderImpl(commandExecutor, configuration);
     }
 
 }

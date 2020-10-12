@@ -3011,7 +3011,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
             // json - when doing the migration new variable is set
-            // json - when triggering the received task (the value is udpated so new details is created
+            // json - when triggering the received task (the value is updated so new details is created
             assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
         }
     }
@@ -3041,7 +3041,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             // serializable - when starting the process instance
             // serializable - when triggering the received task (the value is updated so new detail is created)
             // json - when doing the migration new variable is set
-            // json - when triggering the received task (the value is udpated so new details is created
+            // json - when triggering the received task (the value is updated so new details is created
             assertThatVariablesTypeHistoryIs(processInstanceToMigrate, "serializable", "serializable", "json", "json");
         }
     }

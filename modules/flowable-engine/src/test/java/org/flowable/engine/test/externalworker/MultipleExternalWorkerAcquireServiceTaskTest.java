@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.test.Deployment;
@@ -160,7 +161,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
         }
 
         @Override
-        public <T> T execute(CommandConfig config, Command<T> command) {
+        public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
 
             if (workLatch != null) {
                 try {
@@ -170,7 +171,7 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 }
             }
 
-            T result = super.execute(config, command);
+            T result = super.execute(config, command, commandExecutor);
 
             if (waitLatch != null) {
                 try {

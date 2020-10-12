@@ -89,28 +89,29 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
                 }
                 
             } else {
-                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentTime().desc().list();
+                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            DeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (DeploymentEntity) existingDeployments.get(0);
-            }
-
-            if (existingDeployment != null && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                DeploymentEntity existingDeployment = (DeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 
         deployment.setNew(true);
 
         // Save the data
-        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+        processEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
         if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
             // If no parent deployment id is set then set the current ID as the parent
@@ -121,8 +122,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         // Deployment settings
@@ -138,8 +139,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         }
 
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return deployment;
@@ -166,8 +167,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         for (String resourceName : resources.keySet()) {
             EngineResource savedResource = savedResources.get(resourceName);
 
-            if (savedResource == null)
+            if (savedResource == null) {
                 return true;
+            }
 
             if (!savedResource.isGenerated()) {
                 EngineResource resource = resources.get(resourceName);

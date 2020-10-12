@@ -16,6 +16,7 @@
         },
         "ACTION": {
             "LOGOUT": "Salir",
+            "DASHBOARD": "Dashboard",
             "RETURN-TO-LIST": "Mostrar todas las definiciones",
             "CANCEL": "Cancelar",
             "CLOSE": "Cerrar",
@@ -197,6 +198,12 @@
           "PRIORITYDEFINITION" : {
             "TITLE" : "Prioridad",
             "DESCRIPTION" : "Prioridad de la tarea de usuario."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
           }
         },
         "SERVICETASKCLASSPACKAGE" : {
@@ -503,6 +510,12 @@
           "HTTPTASKSAVERESPONSEASJSON" : {
             "TITLE" : "Guardar respuesta como JSON",
             "DESCRIPTION" : "Determina si se guarda la variable de respuesta como JSON en lugar de String"
+          }
+        },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
           }
         },
         "SKIPEXPRESSIONPACKAGE" : {
@@ -1295,6 +1308,12 @@
             "DESCRIPTION" : "Prioridad de la tarea de usuario."
           }
         },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
+          }
+        },
         "SERVICETASKCLASSPACKAGE" : {
           "SERVICETASKCLASS" : {
             "TITLE" : "Clase",
@@ -1521,6 +1540,12 @@
           "HTTPTASKSAVERESPONSEASJSON" : {
             "TITLE" : "Guardar respuesta como JSON",
             "DESCRIPTION" : "Determina si se guarda la variable de respuesta como JSON en lugar de String"
+          }
+        },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
           }
         },
         "EVENTREGISTRYPACKAGE" : {
@@ -1945,7 +1970,7 @@
         }
     },
 
-    "DECISION-TABLES-LIST": {
+    "DECISIONS-LIST": {
         "TITLE": "Tablas de decisión",
         "SEARCH-PLACEHOLDER": "Búsqueda",
         "ACTION": {

@@ -90,9 +90,9 @@ public class ModelRepositoryImpl implements ModelRepository {
 
     @Override
     public void save(Model model) {
-        model.setTenantId(tenantProvider.getTenantId());
         if (model.getId() == null) {
             model.setId(idGenerator.generateId());
+            model.setTenantId(tenantProvider.getTenantId());
             sqlSessionTemplate.insert(NAMESPACE + "insertModel", model);
         } else {
             sqlSessionTemplate.update(NAMESPACE + "updateModel", model);

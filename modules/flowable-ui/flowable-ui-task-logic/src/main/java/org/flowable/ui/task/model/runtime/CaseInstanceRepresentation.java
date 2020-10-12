@@ -61,7 +61,11 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
         this.caseDefinitionId = caseInstance.getCaseDefinitionId();
         this.tenantId = caseInstance.getTenantId();
         this.graphicalNotationDefined = graphicalNotation;
-        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
+        if (startedBy != null) {
+            this.startedBy = new UserRepresentation(startedBy);
+        } else if (caseInstance.getStartUserId() != null) {
+            this.startedBy = new UserRepresentation(caseInstance.getStartUserId());
+        }
     }
 
     public CaseInstanceRepresentation(HistoricCaseInstance caseInstance, CaseDefinition caseDefinition, boolean graphicalNotation, User startedBy) {
@@ -78,7 +82,11 @@ public class CaseInstanceRepresentation extends AbstractRepresentation {
         this.started = caseInstance.getStartTime();
         this.ended = caseInstance.getEndTime();
         this.graphicalNotationDefined = graphicalNotation;
-        this.startedBy = startedBy != null ? new UserRepresentation(startedBy) : null;
+        if (startedBy != null) {
+            this.startedBy = new UserRepresentation(startedBy);
+        } else if (caseInstance.getStartUserId() != null) {
+            this.startedBy = new UserRepresentation(caseInstance.getStartUserId());
+        }
     }
 
     protected void mapCaseDefinition(CaseDefinition caseDefinition) {

@@ -30,10 +30,10 @@ import org.flowable.common.engine.impl.FlowableVersions;
 public interface CmmnEngine extends Engine {
     
     /** the version of the flowable CMMN library */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * Starts the execuctors (async and async history), if they are configured to be auto-actived.
+     * Starts the execuctors (async and async history), if they are configured to be auto-activated.
      */
     void startExecutors();
 

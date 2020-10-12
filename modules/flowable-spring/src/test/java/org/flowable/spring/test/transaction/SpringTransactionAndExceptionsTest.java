@@ -244,7 +244,7 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
             @Override
             public void execute(DelegateExecution execution) {
 
-                // Exception gets catched, so shouldn't lead to rolling back the whole transaction
+                // Exception gets caught, so shouldn't lead to rolling back the whole transaction
                 try {
                     managementService.executeCommand(new Command<Void>() {
 

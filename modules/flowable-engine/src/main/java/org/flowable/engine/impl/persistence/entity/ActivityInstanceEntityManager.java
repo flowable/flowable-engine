@@ -59,7 +59,7 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      * Record the start of an activity, if activity event logging is enabled.
      *
      * @param executionEntity
-     *     execution which is starting activityz
+     *     execution which is starting activity
      */
     void recordActivityStart(ExecutionEntity executionEntity);
 

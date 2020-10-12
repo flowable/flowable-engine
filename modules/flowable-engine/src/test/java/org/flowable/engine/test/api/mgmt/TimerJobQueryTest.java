@@ -110,7 +110,8 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         // Executing the async job throws an exception -> job retry + creation of timer
         Job asyncJob = managementService.createJobQuery().singleResult();
         assertThat(asyncJob).isNotNull();
-        assertThatThrownBy(() -> managementService.executeJob(asyncJob.getId()));
+        assertThatThrownBy(() -> managementService.executeJob(asyncJob.getId()))
+                .isInstanceOf(Exception.class);
 
         assertThat(managementService.createJobQuery().count()).isZero();
         assertThat(managementService.createTimerJobQuery().timers().count()).isEqualTo(3);

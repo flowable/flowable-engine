@@ -19,13 +19,13 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
-import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,14 +83,22 @@ public class CmmnEngineConfiguratorAsyncJobTest {
         cmmnEngine.getCmmnRepositoryService().createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.processAndTimer.cmmn.xml").deploy();
 
+
         // Starting the case instance starts the process task. The process has an async job at the beginning
         cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder().caseDefinitionKey("timerAndProcess").start();
+
+        // One timer job should exist for the timer event listener
+        Job timerEventListenerJob = cmmnEngine.getCmmnManagementService().createTimerJobQuery().singleResult();
+        assertThat(timerEventListenerJob).isNotNull();
+
         Job job = processEngine.getManagementService().createJobQuery().singleResult();
         assertThat(job.getScopeType()).isNull();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngine.getManagementService(), 10000L, 100L);
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+        processEngine.getTaskService().complete(task.getId());
 
-        // There should now be two timers, one for the case and one for the process
         List<Job> timerJobs = processEngine.getManagementService().createTimerJobQuery().list();
+        assertThat(timerJobs).hasSize(2); // There should now be two timers, one for the case and one for the process
         timerJobs.forEach(timerJob -> {
             if (timerJob.getScopeId() != null) { // cmmn
                 assertThat(timerJob.getScopeType()).isEqualTo(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN);
@@ -107,19 +115,13 @@ public class CmmnEngineConfiguratorAsyncJobTest {
 
         try {
             long startTime = new Date().getTime();
-            while (processEngine.getManagementService().createJobQuery().count() > 0
-                    && (new Date().getTime() - startTime > 10000)) {
+            while (processEngine.getTaskService().createTaskQuery().count() != 2) { // 2 tasks = stable state
                 Thread.sleep(100L);
             }
         } finally {
             processEngineAsyncExecutor.shutdown();
             cmmnEngineAsyncExecutor.shutdown();
         }
-
-        // There should be one user task which is async (from the case)
-        job = processEngine.getManagementService().createJobQuery().singleResult();
-        assertThat(job.getScopeType()).isEqualTo(JobServiceConfiguration.JOB_EXECUTION_SCOPE_CMMN);
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 10000L, 100L, true);
 
         // There should be two user tasks now: one after the timer of the case and one after the timer of the process
         assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(2);

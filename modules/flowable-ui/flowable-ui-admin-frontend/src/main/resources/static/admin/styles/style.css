@@ -9,6 +9,22 @@
 	   - Selection blue: #aad1ec
 */
 
+/** Landing logo (shared between apps) */
+
+.landing-logo {
+	line-height: 40px;
+	height: 40px;
+	width: 180px;
+	float: left;
+	cursor: pointer;
+}
+
+.landing-logo img {
+	max-height: 35px;
+	margin-top: -3px;
+	margin-left: 10px;
+}
+
 @font-face {
 	font-family: 'Titillium Web';
 	font-style: normal;
@@ -103,16 +119,16 @@ body {
 	border: none;
 }
 
-.navbar-header .navbar-brand {
-    position: relative;
-	padding-top: 0px;
-	top: 2px;
-	line-height: 35px;
-    height: 35px;
-    background: url(../images/flowable-logo.png) no-repeat 15px center;
-    background-size: cover;
-    width: 180px;
-}
+/*.navbar-header .navbar-brand {*/
+/*    position: relative;*/
+/*	padding-top: 0px;*/
+/*	top: 2px;*/
+/*	line-height: 35px;*/
+/*    height: 35px;*/
+/*    background: url(../images/flowable-logo.png) no-repeat 15px center;*/
+/*    background-size: cover;*/
+/*    width: 180px;*/
+/*}*/
 
 .nav.navbar-nav li a {
     line-height: 40px;

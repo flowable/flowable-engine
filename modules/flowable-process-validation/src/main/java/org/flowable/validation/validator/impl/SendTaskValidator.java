@@ -42,11 +42,11 @@ public class SendTaskValidator extends ExternalInvocationTaskValidator {
             // Verify type
             if (StringUtils.isNotEmpty(sendTask.getType())) {
 
-                if (!sendTask.getType().equalsIgnoreCase("mail") && !sendTask.getType().equalsIgnoreCase("mule") && !sendTask.getType().equalsIgnoreCase("camel")) {
+                if (!"mail".equalsIgnoreCase(sendTask.getType()) && !"mule".equalsIgnoreCase(sendTask.getType()) && !"camel".equalsIgnoreCase(sendTask.getType())) {
                     addError(errors, Problems.SEND_TASK_INVALID_TYPE, process, sendTask, "Invalid or unsupported type for send task");
                 }
 
-                if (sendTask.getType().equalsIgnoreCase("mail")) {
+                if ("mail".equalsIgnoreCase(sendTask.getType())) {
                     validateFieldDeclarationsForEmail(process, sendTask, sendTask.getFieldExtensions(), errors);
                 }
 

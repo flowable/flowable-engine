@@ -11,8 +11,7 @@
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
         values (
             #{id, jdbcType=VARCHAR},
-            1,
-            #{type, jdbcType=VARCHAR},
+            1, #{type, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{executionId, jdbcType=VARCHAR},
@@ -34,8 +33,7 @@
         <foreach collection="list" item="variable" index="index" separator=",">
             (
                 #{variable.id, jdbcType=VARCHAR},
-                1,
-                #{variable.typeName, jdbcType=VARCHAR },
+                1, #{variable.typeName, jdbcType=VARCHAR },
                 #{variable.name, jdbcType=VARCHAR},
                 #{variable.processInstanceId, jdbcType=VARCHAR},
                 #{variable.executionId, jdbcType=VARCHAR},
@@ -59,8 +57,7 @@
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
             (
                 #{variable.id, jdbcType=VARCHAR},
-                1,
-                #{variable.typeName, jdbcType=VARCHAR },
+                1, #{variable.typeName, jdbcType=VARCHAR },
                 #{variable.name, jdbcType=VARCHAR},
                 #{variable.processInstanceId, jdbcType=VARCHAR},
                 #{variable.executionId, jdbcType=VARCHAR},

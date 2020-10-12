@@ -127,7 +127,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
                 nrOfTasks++;
             }
 
-            if (!planItem.getId().equals("planItemTaskA")) {
+            if (!"planItemTaskA".equals(planItem.getId())) {
                 assertThat(planItem.getEntryCriteria())
                         .hasSize(1)
                         .extracting(Criterion::getSentry)
@@ -135,7 +135,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             }
 
             if (planItem.getPlanItemDefinition() instanceof Task) {
-                if (planItem.getId().equals("planItemTaskB")) {
+                if ("planItemTaskB".equals(planItem.getId())) {
                     assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isFalse();
                 } else {
                     assertThat(((Task) planItem.getPlanItemDefinition()).isBlocking()).isTrue();
@@ -179,7 +179,7 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(nestedStage).isNotNull();
         assertThat(nestedStage.getName()).isEqualTo("Nested Stage");
 
-        // Nested stage has 3 plan items, and one of them refereces the rootTook from the plan model
+        // Nested stage has 3 plan items, and one of them references the rootTook from the plan model
         assertThat(nestedStage.getPlanItems()).hasSize(3);
         Stage nestedNestedStage = null;
         for (PlanItem planItem : nestedStage.getPlanItems()) {

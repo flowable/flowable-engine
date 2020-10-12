@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.dmn.engine.impl.agenda.DmnEngineAgenda;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -28,11 +29,11 @@ import org.slf4j.LoggerFactory;
  */
 public class DmnCommandInvoker extends AbstractCommandInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DmnCommandInvoker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DmnCommandInvoker.class);
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         final DmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         if (commandContext.isReused() && !agenda.isEmpty()) {
@@ -55,8 +56,8 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
         DmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executing agenda operation {}", runnable);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing agenda operation {}", runnable);
             }
             runnable.run();
         }

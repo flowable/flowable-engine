@@ -121,7 +121,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected void unlockTimerJobs(CommandExecutor commandExecutor, Collection<TimerJobEntity> timerJobs) {
         try {
             if (!timerJobs.isEmpty()) {
-                commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs));
+                commandExecutor.execute(new UnlockTimerJobsCmd(timerJobs, asyncExecutor.getJobServiceConfiguration()));
             }
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {

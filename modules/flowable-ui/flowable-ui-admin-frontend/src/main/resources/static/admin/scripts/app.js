@@ -582,14 +582,13 @@ flowableAdminApp
 	            $rootScope.logout = function () {
 					$rootScope.authenticated = false;
 					$rootScope.authenticationError = false;
-					$http.get(FlowableAdmin.Config.contextRoot + '/app/logout')
-						.success(function (data, status, headers, config) {
-							$rootScope.login = null;
-							$rootScope.authenticated = false;
-                            // Changing the href causes a reload, so no need to do a new reload again
-                            $window.location.href = FlowableAdmin.Config.contextRoot;
-						});
-				}; 
+                    // Changing the href causes a reload, so no need to do a new reload again
+                    $window.location.href = FlowableAdmin.Config.contextRoot + '/app/logout';
+				};
+
+                $rootScope.backToLanding = function() {
+                    $window.location.href = FlowableAdmin.Config.contextRoot;
+                };
 
 	            $rootScope.executeWhenReady = function(callback) {
 	                if ($rootScope.activeServers) {

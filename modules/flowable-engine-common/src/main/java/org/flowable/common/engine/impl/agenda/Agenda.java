@@ -12,6 +12,9 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
 import org.flowable.common.engine.impl.interceptor.Session;
 
 public interface Agenda extends Session {
@@ -25,17 +28,9 @@ public interface Agenda extends Session {
      * Get next operation from agenda and remove operation from the queue.
      *
      * @return next operation from the queue
-     * @throws {@link  org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
+     * throws {@link org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
      */
     Runnable getNextOperation();
-
-    /**
-     * Get next operation from agenda and keep operation on the top of the agenda
-     *
-     * @return the first operation from the agenda
-     * @throws {@link org.flowable.common.engine.api.FlowableException} in the case when agenda is empty
-     */
-    Runnable peekOperation();
 
     /**
      * Plan operation for execution
@@ -44,4 +39,13 @@ public interface Agenda extends Session {
      */
     void planOperation(Runnable operation);
     
+    /**
+     * Plan an operation for a future execution
+     *
+     * @param <V> the type of the value the future returns
+     * @param future the future that will return the value
+     * @param completeAction the action that should be invoked once the future completes
+     */
+    <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction);
+
 }

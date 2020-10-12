@@ -15,9 +15,9 @@ package org.flowable.eventregistry.impl;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.eventregistry.api.EventManagementService;
-import org.flowable.eventregistry.impl.cmd.GetTableCountsCmd;
 import org.flowable.eventregistry.impl.cmd.GetTableNamesCmd;
 
 /**
@@ -31,7 +31,7 @@ public class EventManagementServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public Map<String, Long> getTableCounts() {
-        return commandExecutor.execute(new GetTableCountsCmd());
+        return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
     }
 
     @Override

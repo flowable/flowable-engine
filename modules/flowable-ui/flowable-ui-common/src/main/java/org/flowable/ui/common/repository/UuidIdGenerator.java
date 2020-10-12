@@ -12,12 +12,12 @@
  */
 package org.flowable.ui.common.repository;
 
+import org.springframework.stereotype.Component;
+import org.springframework.util.IdGenerator;
+
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
-
-import org.springframework.stereotype.Component;
-import org.springframework.util.IdGenerator;
 
 /**
  * {@link IdGenerator} implementation based on the current time and the ethernet address of the machine it is running on.

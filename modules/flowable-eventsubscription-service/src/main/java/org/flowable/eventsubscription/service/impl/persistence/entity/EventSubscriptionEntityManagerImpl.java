@@ -36,7 +36,7 @@ public class EventSubscriptionEntityManagerImpl
     public EventSubscriptionEntityManagerImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration, 
                     EventSubscriptionDataManager eventSubscriptionDataManager) {
         
-        super(eventSubscriptionServiceConfiguration, eventSubscriptionDataManager);
+        super(eventSubscriptionServiceConfiguration, eventSubscriptionServiceConfiguration.getEngineName(), eventSubscriptionDataManager);
     }
 
     @Override

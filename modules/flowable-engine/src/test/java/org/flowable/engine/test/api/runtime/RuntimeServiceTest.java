@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -75,7 +76,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertThat(task.getProcessVariables()).isNotNull();
-        assertThat(task.getProcessVariables().get("longString")).isEqualTo(longString.toString());
+        assertThat(task.getProcessVariables())
+                .containsEntry("longString", longString.toString());
     }
 
     @Test
@@ -101,7 +103,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testStartProcessInstanceByIdUnexistingId() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceById("unexistingId"))
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-                .hasMessageContaining("No process definition found for id = 'unexistingId'");
+                .hasMessageContaining("no deployed process definition found with id 'unexistingId'");
     }
 
     @Test
@@ -253,7 +255,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         assertThatThrownBy(() -> processInstanceBuilder.processDefinitionId("nonExistingDefinitionId").startAsync())
             .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
-            .hasMessage("No process definition found for id = 'nonExistingDefinitionId'");
+            .hasMessage("no deployed process definition found with id 'nonExistingDefinitionId'");
     }
 
     @Test
@@ -505,7 +507,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task parallelUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("ParallelUserTask")) {
+            if ("ParallelUserTask".equals(task.getName())) {
                 parallelUserTask = task;
             }
         }
@@ -525,7 +527,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task beforeErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("BeforeError")) {
+            if ("BeforeError".equals(task.getName())) {
                 beforeErrorUserTask = task;
             }
         }
@@ -541,7 +543,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task afterErrorUserTask = null;
         for (org.flowable.task.api.Task task : tasks) {
-            if (task.getName().equals("AfterError")) {
+            if ("AfterError".equals(task.getName())) {
                 afterErrorUserTask = task;
             }
         }

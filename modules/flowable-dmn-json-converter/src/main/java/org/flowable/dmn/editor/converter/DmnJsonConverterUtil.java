@@ -12,12 +12,7 @@
  */
 package org.flowable.dmn.editor.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
@@ -44,6 +39,11 @@ import org.flowable.dmn.model.GraphicInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Yvo Swillens
  */
@@ -62,10 +62,14 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         return propertyValue;
     }
 
-    public static JsonNode migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+    public static boolean migrateModel(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+
+        boolean wasMigrated = false;
 
         // check if model is version 1
         if ((decisionTableNode.get("modelVersion") == null || decisionTableNode.get("modelVersion").isNull()) && decisionTableNode.has("name")) {
+            wasMigrated = true;
+
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model with name {} found with version < v2; migrating to v3", modelName);
 
@@ -198,18 +202,20 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
                 decisionTableObjectNode.replace("rules", newRuleNodes);
             }
 
-            LOGGER.info("Decision table model {} migrated to v2", modelName);
+            LOGGER.info("Decision table model {} migrated to v3", modelName);
         }
 
-        return decisionTableNode;
+        return wasMigrated;
     }
 
-    public static JsonNode migrateModelV3(JsonNode decisionTableNode, ObjectMapper objectMapper) {
+    public static boolean migrateModelV3(JsonNode decisionTableNode, ObjectMapper objectMapper) {
         // migrate to v2
-        decisionTableNode = migrateModel(decisionTableNode, objectMapper);
+        boolean wasMigrated = migrateModel(decisionTableNode, objectMapper);
 
         // migrate to v3
-        if (decisionTableNode.has("modelVersion") && decisionTableNode.get("modelVersion").asText().equals("2") && decisionTableNode.has("name")) {
+        if (decisionTableNode.has("modelVersion") && "2".equals(decisionTableNode.get("modelVersion").asText()) && decisionTableNode.has("name")) {
+            wasMigrated = true;
+
             String modelName = decisionTableNode.get("name").asText();
             LOGGER.info("Decision table model {} found with version v2; migrating to v3", modelName);
 
@@ -266,7 +272,7 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
             LOGGER.info("Decision table model {} migrated to v3", modelName);
         }
 
-        return decisionTableNode;
+        return wasMigrated;
     }
 
     public static String determineExpressionType(String expressionValue) {
@@ -461,6 +467,18 @@ public class DmnJsonConverterUtil implements EditorJsonConstants, DmnStencilCons
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_DECISION);
         return getDmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISION_TABLE_REFERENCE, allowedStencilTypes);
+    }
+
+    public static void updateDecisionTableModelReferences(ObjectNode decisionServiceObjectNode, DmnJsonConverterContext converterContext) {
+        List<JsonNode> decisionTableNodes = DmnJsonConverterUtil.filterOutJsonNodes(DmnJsonConverterUtil.getDmnModelDecisionTableReferences(decisionServiceObjectNode));
+        decisionTableNodes.forEach(decisionNode -> {
+            String decisionTableKey = decisionNode.get("key").asText();
+            Map<String, String> modelInfo = converterContext.getDecisionTableModelInfoForDecisionTableModelKey(decisionTableKey);
+            if (modelInfo != null) {
+                ((ObjectNode) decisionNode).put("id", modelInfo.get("id"));
+            }
+        });
+
     }
 
     protected static void internalGetDmnChildShapePropertyValues(JsonNode editorJsonNode, String propertyName,

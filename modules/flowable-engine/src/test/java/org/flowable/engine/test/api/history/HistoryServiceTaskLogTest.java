@@ -29,8 +29,8 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
@@ -66,23 +66,24 @@ public class HistoryServiceTaskLogTest {
         }
     }
 
-    protected void deleteTaskWithLogEntries(TaskService taskService, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration,
-            String taskId) {
+    protected void deleteTaskWithLogEntries(TaskService taskService, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration, String taskId) {
         taskService.deleteTask(taskId, true);
         managementService.executeCommand(new Command<Void>() {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager = CommandContextUtil.getTaskServiceConfiguration(commandContext)
+                ProcessEngineConfigurationImpl processEngineConfigurationImpl = (ProcessEngineConfigurationImpl) processEngineConfiguration;
+                HistoricTaskLogEntryEntityManager historicTaskLogEntryEntityManager = processEngineConfigurationImpl.getTaskServiceConfiguration()
                         .getHistoricTaskLogEntryEntityManager();
                 List<HistoricTaskLogEntry> taskLogEntries = historicTaskLogEntryEntityManager
-                        .findHistoricTaskLogEntriesByQueryCriteria(new HistoricTaskLogEntryQueryImpl(processEngineConfiguration.getCommandExecutor()));
+                        .findHistoricTaskLogEntriesByQueryCriteria(new HistoricTaskLogEntryQueryImpl(processEngineConfiguration.getCommandExecutor(), 
+                                processEngineConfigurationImpl.getTaskServiceConfiguration()));
                 for (HistoricTaskLogEntry historicTaskLogEntry : taskLogEntries) {
                     historicTaskLogEntryEntityManager.deleteHistoricTaskLogEntry(historicTaskLogEntry.getLogNumber());
                 }
-
-                HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
-                List<HistoryJob> jobs = historyJobService.findHistoryJobsByQueryCriteria(new HistoryJobQueryImpl(commandContext));
+                
+                HistoryJobService historyJobService = processEngineConfigurationImpl.getJobServiceConfiguration().getHistoryJobService();
+                List<HistoryJob> jobs = historyJobService.findHistoryJobsByQueryCriteria(new HistoryJobQueryImpl(commandContext, processEngineConfigurationImpl.getJobServiceConfiguration()));
                 for (HistoryJob historyJob : jobs) {
                     historyJobService.deleteHistoryJob((HistoryJobEntity) historyJob);
                 }
@@ -516,7 +517,8 @@ public class HistoryServiceTaskLogTest {
         } finally {
             String taskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
             managementService.executeCommand(commandContext -> {
-                CommandContextUtil.getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
+                ((ProcessEngineConfigurationImpl) processEngineConfiguration).getTaskServiceConfiguration()
+                    .getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
                 return null;
             });
             runtimeService.deleteProcessInstance(processInstance.getId(), "clean up");
@@ -825,7 +827,7 @@ public class HistoryServiceTaskLogTest {
                 assertThat(logEntries).hasSize(1);
                 assertThat(logEntries.get(0)).extracting(HistoricTaskLogEntry::getTaskId).isEqualTo(task.getId());
 
-                assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1l);
+                assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isEqualTo(1);
             }
 
         } finally {
@@ -1029,7 +1031,7 @@ public class HistoryServiceTaskLogTest {
                         allLogEntries.get(1).getLogNumber(), allLogEntries.get(2).getLogNumber(), allLogEntries.get(3).getLogNumber()
                 );
 
-                assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3l);
+                assertThat(historicTaskLogEntryQuery.count()).isEqualTo(3);
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
@@ -1043,6 +1045,7 @@ public class HistoryServiceTaskLogTest {
     @Test
     public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, HistoryService historyService, ManagementService managementService,
             ProcessEngineConfiguration processEngineConfiguration) {
+        
         assertThat(managementService.getTableName(HistoricTaskLogEntryEntity.class, false)).isEqualTo("ACT_HI_TSK_LOG");
         assertThat(managementService.getTableName(HistoricTaskLogEntry.class, false)).isEqualTo("ACT_HI_TSK_LOG");
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
@@ -1074,6 +1077,7 @@ public class HistoryServiceTaskLogTest {
     @Test
     public void queryForTaskLogOrderBy(TaskService taskService, HistoryService historyService, ManagementService managementService,
             ProcessEngineConfiguration processEngineConfiguration) {
+        
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
         historicTaskLogEntryBuilder.taskId("1").timeStamp(getInsertDate()).create();
         historicTaskLogEntryBuilder.taskId("2").timeStamp(getCompareAfterDate()).create();

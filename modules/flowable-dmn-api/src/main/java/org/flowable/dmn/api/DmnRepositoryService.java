@@ -78,4 +78,6 @@ public interface DmnRepositoryService {
     void setDecisionCategory(String decisionId, String category);
 
     DmnDefinition getDmnDefinition(String decisionId);
+
+    InputStream getDecisionRequirementsDiagram(String decisionId);
 }

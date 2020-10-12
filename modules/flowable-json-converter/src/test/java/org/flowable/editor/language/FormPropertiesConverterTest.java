@@ -62,18 +62,18 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         List<FormProperty> formProperties = startEvent.getFormProperties();
 
         assertThat(formProperties).isNotNull();
-        assertThat(formProperties.size()).as("Invalid form properties list: ").isEqualTo(8);
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
-            if (formProperty.getId().equals("new_property_1")) {
+            if ("new_property_1".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v000", true, false, false);
-            } else if (formProperty.getId().equals("new_property_2")) {
+            } else if ("new_property_2".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v001", true, false, true);
-            } else if (formProperty.getId().equals("new_property_3")) {
+            } else if ("new_property_3".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v010", true, true, false);
-            } else if (formProperty.getId().equals("new_property_4")) {
+            } else if ("new_property_4".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v011", true, true, true);
-            } else if (formProperty.getId().equals("new_property_5")) {
+            } else if ("new_property_5".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v100", true, false, false);
 
                 List<Map<String, Object>> formValues = new ArrayList<>();
@@ -85,11 +85,11 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
                 }
                 checkFormPropertyFormValues(formValues);
 
-            } else if (formProperty.getId().equals("new_property_6")) {
+            } else if ("new_property_6".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v101", true, false, true);
-            } else if (formProperty.getId().equals("new_property_7")) {
+            } else if ("new_property_7".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v110", true, true, false);
-            } else if (formProperty.getId().equals("new_property_8")) {
+            } else if ("new_property_8".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v111", true, true, true);
             } else {
                 fail("unexpected form property id " + formProperty.getId());
@@ -104,18 +104,18 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         formProperties = userTask.getFormProperties();
 
         assertThat(formProperties).isNotNull();
-        assertThat(formProperties.size()).as("Invalid form properties list: ").isEqualTo(8);
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
-            if (formProperty.getId().equals("new_property_1")) {
+            if ("new_property_1".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v000", false, false, false);
-            } else if (formProperty.getId().equals("new_property_2")) {
+            } else if ("new_property_2".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v001", false, false, true);
-            } else if (formProperty.getId().equals("new_property_3")) {
+            } else if ("new_property_3".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v010", false, true, false);
-            } else if (formProperty.getId().equals("new_property_4")) {
+            } else if ("new_property_4".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v011", false, true, true);
-            } else if (formProperty.getId().equals("new_property_5")) {
+            } else if ("new_property_5".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v100", true, false, false);
 
                 List<Map<String, Object>> formValues = new ArrayList<>();
@@ -127,11 +127,11 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
                 }
                 checkFormPropertyFormValues(formValues);
 
-            } else if (formProperty.getId().equals("new_property_6")) {
+            } else if ("new_property_6".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v101", true, false, true);
-            } else if (formProperty.getId().equals("new_property_7")) {
+            } else if ("new_property_7".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v110", true, true, false);
-            } else if (formProperty.getId().equals("new_property_8")) {
+            } else if ("new_property_8".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, "v111", true, true, true);
             } else {
                 fail("unexpected form property id " + formProperty.getId());

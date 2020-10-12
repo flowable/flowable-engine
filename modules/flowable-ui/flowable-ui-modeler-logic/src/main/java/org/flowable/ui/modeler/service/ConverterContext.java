@@ -23,6 +23,7 @@ import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverterContext;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.editor.converter.DmnJsonConverterContext;
 import org.flowable.editor.language.json.converter.BpmnJsonConverterContext;
 import org.flowable.ui.modeler.domain.Model;
 import org.flowable.ui.modeler.serviceapi.ModelService;
@@ -38,7 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  * @author Joram Barrez
  */
-public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConverterContext {
+public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConverterContext, DmnJsonConverterContext {
 
     protected ModelService modelService;
     protected ObjectMapper objectMapper;
@@ -55,6 +56,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     protected Map<String, Model> caseKeyToModelMap = new HashMap<>();
     protected Map<String, Model> formKeyToModelMap = new HashMap<>();
     protected Map<String, Model> decisionTableKeyToModelMap = new HashMap<>();
+    protected Map<String, Model> referencedDecisionTableKeyToModelMap = new HashMap<>();
     protected Map<String, Model> decisionServiceKeyToModelMap = new HashMap<>();
 
     // Thumbnails part of the app
@@ -233,7 +235,26 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         addDecisionTableModel(model, null);
     }
 
+    public void addReferencedDecisionTableModel(Model model) {
+        this.referencedDecisionTableKeyToModelMap.put(model.getKey(), model);
+        this.decisionTableIdToModelMap.put(model.getId(), model);
+    }
+
     public void addDecisionTableModel(Model model, String ... oldDecisionTableModelIds) {
+        this.decisionTableKeyToModelMap.put(model.getKey(), model);
+        this.decisionTableIdToModelMap.put(model.getId(), model);
+
+        if (oldDecisionTableModelIds != null) {
+            for (String oldDecisionTableModelId : oldDecisionTableModelIds) {
+                this.decisionTableIdToModelMap.put(oldDecisionTableModelId, model);
+            }
+        }
+
+        // For decision models there is no 'unresolved' key handling needed,
+        // as the import of decisions always happens before the model referencing them
+    }
+
+    public void addReferencedDecisionTableModel(Model model, String ... oldDecisionTableModelIds) {
         this.decisionTableKeyToModelMap.put(model.getKey(), model);
         this.decisionTableIdToModelMap.put(model.getId(), model);
 
@@ -361,6 +382,10 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
         return decisionTableKeyToModelMap.values();
     }
 
+    public Collection<Model> getAllReferencedDecisionTableModels() {
+        return referencedDecisionTableKeyToModelMap.values();
+    }
+
     public Collection<Model> getAllDecisionServiceModels() {
         return decisionServiceKeyToModelMap.values();
     }
@@ -370,7 +395,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     }
 
     /*
-     * Model JSON String retieval
+     * Model JSON String retrieval
      */
 
     public Map<String, String> getProcessKeyToJsonStringMap() {
@@ -382,9 +407,13 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
     public Map<String, String> getFormKeyToJsonStringMap() {
         return formKeyToJsonStringMap;
     }
+
+    @Override
     public Map<String, String> getDecisionTableKeyToJsonStringMap() {
         return decisionTableKeyToJsonStringMap;
     }
+
+    @Override
     public Map<String, String> getDecisionServiceKeyToJsonStringMap() {
         return decisionServiceKeyToJsonStringMap;
     }
@@ -407,6 +436,7 @@ public class ConverterContext implements BpmnJsonConverterContext, CmmnJsonConve
      * as the other model types are imported before them.
      */
 
+    @Override
     public void registerUnresolvedCaseModelReferenceForCaseModel(String unresolvedCaseModelKey, CmmnModel cmmnModel) {
         // The CmmnModel needs to be passed, as the actual key on the CmmnModel (stored as id) will be typically only be set later.
         unresolvedCaseModelKeyToCmmnModels.computeIfAbsent(unresolvedCaseModelKey, key -> new ArrayList<>()).add(cmmnModel);

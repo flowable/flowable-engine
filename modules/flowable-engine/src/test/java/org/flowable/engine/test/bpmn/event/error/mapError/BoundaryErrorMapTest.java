@@ -22,6 +22,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.standalone.testing.helpers.ServiceTaskTestMock;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Saeid Mirzaei
@@ -40,12 +42,36 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
+    @ParameterizedTest(name = "JavaFutureDelegate via class throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment
+    public void testClassFutureDelegateSingleDirectMap(String throwErrorIn) {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
+        vars.put("throwErrorIn", throwErrorIn);
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
     @Test
     @Deployment
     public void testExpressionSingleDirectMap() {
         FlagDelegate.reset();
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+    
+    @Test
+    @Deployment
+    public void testExpressionNonRuntimeException() {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorNonRuntimeException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
         assertThat(FlagDelegate.isVisited()).isTrue();
@@ -59,6 +85,21 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
+    @ParameterizedTest(name = "JavaFutureDelegate via delegate expression throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment
+    public void testFutureDelegateExpressionSingleDirectMap(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processWithSingleExceptionMap")
+                .variable("exceptionClass", BoundaryErrorParentException.class.getName())
+                .variable("throwErrorIn", throwErrorIn)
+                .transientVariable("throwCustomExceptionFutureDelegate", new ThrowCustomExceptionFutureDelegate())
+                .start();
         assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
@@ -82,6 +123,24 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalStateException.class.getName());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
+    }
+
+
+    @ParameterizedTest(name = "JavaFutureDelegate via class throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testClassFutureDelegateSingleDirectMap.bpmn20.xml")
+    public void testClassFutureDelegateSingleDirectMapNotMatchingException(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", IllegalStateException.class.getName());
+        vars.put("throwErrorIn", throwErrorIn);
         assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
@@ -115,6 +174,25 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
+    }
+
+    @ParameterizedTest(name = "JavaFutureDelegate via delegate expression throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testFutureDelegateExpressionSingleDirectMap.bpmn20.xml")
+    public void testFutureDelegateExpressionSingleDirectMapNotMatchingException(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
+
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processWithSingleExceptionMap")
+                .variable("exceptionClass", IllegalArgumentException.class.getName())
+                .variable("throwErrorIn", throwErrorIn)
+                .transientVariable("throwCustomExceptionFutureDelegate", new ThrowCustomExceptionFutureDelegate())
+                .start())
                 .as("exception expected, as there is no matching exception map")
                 .isInstanceOf(Exception.class);
         assertThat(FlagDelegate.isVisited()).isFalse();

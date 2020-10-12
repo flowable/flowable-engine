@@ -12,13 +12,14 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.dmn.api.DmnDeployment;
 
-import java.util.Date;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Yvo Swillens

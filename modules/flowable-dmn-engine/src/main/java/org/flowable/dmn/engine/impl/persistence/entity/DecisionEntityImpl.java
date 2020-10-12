@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +34,8 @@ public class DecisionEntityImpl extends AbstractDmnEngineNoRevisionEntity implem
     protected String category;
     protected String deploymentId;
     protected String resourceName;
+    protected boolean isGraphicalNotationDefined;
+    protected String diagramResourceName;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String decisionType;
 
@@ -109,6 +111,30 @@ public class DecisionEntityImpl extends AbstractDmnEngineNoRevisionEntity implem
     }
 
     @Override
+    public boolean hasGraphicalNotation() {
+        return isGraphicalNotationDefined;
+    }
+
+    public boolean isGraphicalNotationDefined() {
+        return hasGraphicalNotation();
+    }
+
+    @Override
+    public void setHasGraphicalNotation(boolean hasGraphicalNotation) {
+        this.isGraphicalNotationDefined = hasGraphicalNotation;
+    }
+
+    @Override
+    public String getDiagramResourceName() {
+        return diagramResourceName;
+    }
+
+    @Override
+    public void setDiagramResourceName(String diagramResourceName) {
+        this.diagramResourceName = diagramResourceName;
+    }
+
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -142,7 +168,5 @@ public class DecisionEntityImpl extends AbstractDmnEngineNoRevisionEntity implem
     public String toString() {
         return "DecisionEntity[" + id + "]";
     }
-
-
 
 }

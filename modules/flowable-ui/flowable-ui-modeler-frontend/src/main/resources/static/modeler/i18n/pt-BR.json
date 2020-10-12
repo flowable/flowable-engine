@@ -15,6 +15,7 @@
     },
     "ACTION":{
       "LOGOUT":"Sair",
+      "DASHBOARD": "Dashboard",
       "RETURN-TO-LIST":"Mostrar todas as definições",
       "CANCEL":"Cancelar",
       "CLOSE":"Fechar",
@@ -102,7 +103,7 @@
       "NAME-DESC":"Nome, Z-A"
     }
   },
-  "DECISION-TABLES-LIST":{
+  "DECISIONS-LIST":{
     "TITLE":"Tabelas de Decisão",
     "SEARCH-PLACEHOLDER":"Busca",
     "ACTION":{

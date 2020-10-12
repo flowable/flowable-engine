@@ -32,19 +32,19 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         boolean textOrHtmlDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
-            if (fieldExtension.getFieldName().equals("to")) {
+            if ("to".equals(fieldExtension.getFieldName())) {
                 toDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("html")) {
+            if ("html".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("htmlVar")) {
+            if ("htmlVar".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("text")) {
+            if ("text".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("textVar")) {
+            if ("textVar".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
         }
@@ -64,11 +64,11 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldName = fieldExtension.getFieldName();
             String fieldValue = fieldExtension.getStringValue();
 
-            if (fieldName.equals("command")) {
+            if ("command".equals(fieldName)) {
                 shellCommandDefined = true;
             }
 
-            if ((fieldName.equals("wait") || fieldName.equals("redirectError") || fieldName.equals("cleanEnv")) && !fieldValue.toLowerCase().equals("true") && !fieldValue.toLowerCase().equals("false")) {
+            if (("wait".equals(fieldName) || "redirectError".equals(fieldName) || "cleanEnv".equals(fieldName)) && !"true".equals(fieldValue.toLowerCase()) && !"false".equals(fieldValue.toLowerCase())) {
                 addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, "Undefined parameter value for shell field");
             }
 
@@ -86,11 +86,11 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldName = fieldExtension.getFieldName();
             String fieldValue = fieldExtension.getStringValue();
 
-            if (fieldName.equals("decisionTableReferenceKey") && fieldValue != null && fieldValue.length() > 0) {
+            if ("decisionTableReferenceKey".equals(fieldName) && fieldValue != null && fieldValue.length() > 0) {
                 keyDefined = true;
                 break;
             }
-            if (fieldName.equals("decisionServiceReferenceKey") && fieldValue != null && fieldValue.length() > 0) {
+            if ("decisionServiceReferenceKey".equals(fieldName) && fieldValue != null && fieldValue.length() > 0) {
                 keyDefined = true;
                 break;
             }
@@ -111,11 +111,11 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldValue = fieldExtension.getStringValue();
             String fieldExpression = fieldExtension.getExpression();
 
-            if (fieldName.equals("requestMethod") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+            if ("requestMethod".equals(fieldName) && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
                 requestMethodDefined = true;
             }
 
-            if (fieldName.equals("requestUrl") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+            if ("requestUrl".equals(fieldName) && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
                 requestUrlDefined = true;
             }
         }

@@ -126,8 +126,10 @@ public interface StencilConstants {
     final String PROPERTY_MESSAGE_ITEM_REF = "message_item_ref";
 
     final String PROPERTY_MESSAGEREF = "messageref";
+    final String PROPERTY_MESSAGEEXPRESSION = "messageexpression";
 
     final String PROPERTY_SIGNALREF = "signalref";
+    final String PROPERTY_SIGNALEXPRESSION = "signalexpression";
     
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 
@@ -192,6 +194,7 @@ public interface StencilConstants {
     final String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
     final String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
     final String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
+    final String PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME = "taskidvariablename";
 
     final String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
     final String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
@@ -327,6 +330,7 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_TRANSIENT = "httptasksaveresponseparameterstransient";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_AS_JSON = "httptasksaveresponseasjson";
+    final String PROPERTY_HTTPTASK_PARALLEL_IN_SAME_TRANSACTION = "httptaskparallelinsametransaction";
 
     final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
 

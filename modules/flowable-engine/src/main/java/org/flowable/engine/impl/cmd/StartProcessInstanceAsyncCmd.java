@@ -39,8 +39,8 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
     @Override
     public ProcessInstance execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration);
-        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration, commandContext);
+        processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ExecutionEntity processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName,
             overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
             callbackId, callbackType, referenceId, referenceType, stageInstanceId, false);
@@ -49,18 +49,19 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
 
         processInstanceHelper.processAvailableEventSubProcesses(processInstance, process, commandContext);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
-        executeAsynchronous(execution, process);
+        executeAsynchronous(execution, process, commandContext);
 
         return processInstance;
     }
 
-    protected void executeAsynchronous(ExecutionEntity execution, Process process) {
-        JobService jobService = CommandContextUtil.getJobService();
+    protected void executeAsynchronous(ExecutionEntity execution, Process process, CommandContext commandContext) {
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
 
         JobEntity job = jobService.createJob();
         job.setExecutionId(execution.getId());

@@ -13,7 +13,6 @@
 package org.flowable.common.engine.impl.lock;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -38,21 +37,23 @@ public class LockManagerImpl implements LockManager {
     protected CommandExecutor commandExecutor;
     protected String lockName;
     protected Duration lockPollRate;
+    protected String engineType;
     protected CommandConfig lockCommandConfig;
     protected boolean hasAcquiredLock;
 
-    public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate) {
+    public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, String engineType) {
         this.commandExecutor = commandExecutor;
         this.lockName = lockName;
         this.lockPollRate = lockPollRate;
+        this.engineType = engineType;
         this.lockCommandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
     }
 
     @Override
     public void waitForLock(Duration waitTime) {
-        long timeToGiveUp = new Date().getTime() + waitTime.toMillis();
+        long timeToGiveUp = System.currentTimeMillis()+ waitTime.toMillis();
         boolean locked = false;
-        while (!locked && (new Date().getTime() < timeToGiveUp)) {
+        while (!locked && (System.currentTimeMillis() < timeToGiveUp)) {
             locked = acquireLock();
             if (!locked) {
                 try {
@@ -64,7 +65,7 @@ public class LockManagerImpl implements LockManager {
         }
 
         if (!locked) {
-            String lockValue = executeCommand(new GetLockValueCmd(lockName));
+            String lockValue = executeCommand(new GetLockValueCmd(lockName, engineType));
             throw new FlowableException("Could not acquire lock " + lockName + ". Current lock value: " + lockValue);
         }
     }
@@ -76,7 +77,7 @@ public class LockManagerImpl implements LockManager {
         }
 
         try {
-            hasAcquiredLock = executeCommand(new LockCmd(lockName));
+            hasAcquiredLock = executeCommand(new LockCmd(lockName, engineType));
             LOGGER.info("successfully acquired lock {}", lockName);
         } catch (FlowableOptimisticLockingException ex) {
             LOGGER.info("failed to acquire lock {} due to optimistic locking", lockName, ex);
@@ -87,7 +88,7 @@ public class LockManagerImpl implements LockManager {
 
     @Override
     public void releaseLock() {
-        executeCommand(new ReleaseLockCmd(lockName));
+        executeCommand(new ReleaseLockCmd(lockName, engineType));
         LOGGER.info("successfully released lock {}", lockName);
         hasAcquiredLock = false;
     }

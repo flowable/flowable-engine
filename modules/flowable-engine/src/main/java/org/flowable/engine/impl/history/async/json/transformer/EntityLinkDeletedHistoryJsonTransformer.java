@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -27,6 +27,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class EntityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public EntityLinkDeletedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(HistoryJsonConstants.TYPE_ENTITY_LINK_DELETED);
@@ -39,7 +43,7 @@ public class EntityLinkDeletedHistoryJsonTransformer extends AbstractHistoryJson
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
+        HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
         historicEntityLinkService.deleteHistoricEntityLink(getStringFromJson(historicalData, HistoryJsonConstants.ID));
     }
 

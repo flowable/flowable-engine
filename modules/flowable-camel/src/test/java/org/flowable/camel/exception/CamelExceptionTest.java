@@ -77,7 +77,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         }
     }
 
-    // check happy path in synchronouse camel call
+    // check happy path in synchronous camel call
     @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteSynchronous.bpmn20.xml" })
     public void testHappyPathSynchronous() {
@@ -89,7 +89,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         assertThat(NoExceptionServiceMock.isCalled()).isTrue();
     }
 
-    // Check Non BPMN error in synchronouse camel call
+    // Check Non BPMN error in synchronous camel call
     @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteSynchronous.bpmn20.xml" })
     public void testNonBpmnExceptionInCamel() {
@@ -138,7 +138,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         assertThat(NoExceptionServiceMock.isCalled()).isTrue();
     }
 
-    // check non bpmn exception in asynchronouse camel call
+    // check non bpmn exception in asynchronous camel call
     @Test
     @Deployment(resources = { "org/flowable/camel/exception/bpmnExceptionInRouteAsynchronous.bpmn20.xml" })
     public void testNonBpmnPathAsynchronous() {

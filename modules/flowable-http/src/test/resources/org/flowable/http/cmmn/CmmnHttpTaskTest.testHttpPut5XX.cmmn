@@ -6,18 +6,18 @@
     <case id="myCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
 
-            <planItem id="httpGet" name="Task One" definitionRef="httpCmmnTask" />
+            <planItem id="planItem1" name="Task One" definitionRef="httpGet" />
             <planItem id="planItem2" name="The Case" definitionRef="task">
                 <entryCriterion sentryRef="sentry1" />
             </planItem>
 
             <sentry id="sentry1">
-                <planItemOnPart sourceRef="httpGet">
+                <planItemOnPart sourceRef="planItem1">
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
 
-            <task id="httpCmmnTask" name="http" isBlocking="false" flowable:type="http">
+            <task id="httpGet" name="http" isBlocking="false" flowable:type="http">
                 <extensionElements>
                     <flowable:field name="requestMethod">
                         <flowable:expression><![CDATA[PUT]]></flowable:expression>

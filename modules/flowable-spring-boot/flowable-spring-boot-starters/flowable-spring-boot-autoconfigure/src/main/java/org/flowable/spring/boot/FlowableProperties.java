@@ -72,7 +72,7 @@ public class FlowableProperties {
     private boolean useLockForDatabaseSchemaUpdate = false;
 
     /**
-     * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#enabled}
+     * @deprecated use {@link org.flowable.spring.boot.idm.FlowableIdmProperties#isEnabled}
      */
     @Deprecated
     private boolean isDbIdentityUsed = true;

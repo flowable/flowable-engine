@@ -40,7 +40,7 @@ public class EventInstanceBpmnUtil {
     /**
      * Processes the 'out parameters' of an {@link EventInstance} and stores the corresponding variables on the {@link VariableScope}.
      *
-     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope)}.
+     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope}).
      */
     public static void handleEventInstanceOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
         Map<String, EventPayloadInstance> payloadInstances = eventInstance.getPayloadInstances()
@@ -62,7 +62,7 @@ public class EventInstanceBpmnUtil {
                 for (ExtensionElement outParameter : outParameters) {
                     String payloadSourceName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
                     String variableName = outParameter.getAttributeValue(null, BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET);
-                    Boolean isTransient = Boolean.valueOf(outParameter.getAttributeValue(null, "transient"));
+                    boolean isTransient = Boolean.parseBoolean(outParameter.getAttributeValue(null, "transient"));
                     setEventParameterVariable(payloadSourceName, variableName, isTransient, payloadInstances, variableScope);
                 }
             }

@@ -19,11 +19,11 @@ import java.util.List;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -55,16 +55,16 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
         AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
 
         for (JobInfoEntity job : jobs) {
-            lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
+            lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis(), asyncExecutor.getJobServiceConfiguration());
             acquiredJobs.addJob(job);
         }
 
         return acquiredJobs;
     }
 
-    protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis) {
+    protected void lockJob(CommandContext commandContext, JobInfoEntity job, int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime());
+        gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
         job.setLockOwner(asyncExecutor.getLockOwner());
         job.setLockExpirationTime(gregorianCalendar.getTime());

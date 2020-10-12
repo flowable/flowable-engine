@@ -145,4 +145,28 @@ public class CaseInstanceClientResource extends AbstractClientResource {
             throw new BadRequestException(e.getMessage());
         }
     }
+    
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}/change-state")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void changePlanItemState(@PathVariable String caseInstanceId, @RequestBody JsonNode changeStateBody) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
+        try {
+            clientService.changePlanItemState(serverConfig, caseInstanceId, changeStateBody);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error changing plan item state for case instance {}", caseInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
+    
+    @PostMapping(value = "/rest/admin/case-instances/{caseInstanceId}/migrate")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void migrateProcessInstance(@PathVariable String caseInstanceId, @RequestBody String migrationDocument) throws BadRequestException {
+        ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
+        try {
+            clientService.migrateCaseInstance(serverConfig, caseInstanceId, migrationDocument);
+        } catch (FlowableServiceException e) {
+            LOGGER.error("Error migrating case instance {}", caseInstanceId, e);
+            throw new BadRequestException(e.getMessage());
+        }
+    }
 }

@@ -127,7 +127,7 @@ public class EventDefinitionEntityImpl extends AbstractEventRegistryNoRevisionEn
 
     @Override
     public String toString() {
-        return "EventDefitionEntity[" + id + "]";
+        return "EventDefinitionEntity[" + id + "]";
     }
 
 }

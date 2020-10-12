@@ -12,8 +12,6 @@
  */
 package org.flowable.ui.modeler.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 @Transactional
 public class AppDefinitionServiceImpl implements AppDefinitionService {
@@ -64,11 +64,13 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Override
     public AppDefinitionRepresentation getAppDefinition(String modelId) {
         Model model = modelService.getModel(modelId);
         return createAppDefinitionRepresentation(model);
     }
 
+    @Override
     public AppDefinitionRepresentation getAppDefinitionHistory(String modelId, String modelHistoryId) {
         ModelHistory model = modelService.getModelHistory(modelId, modelHistoryId);
         return createAppDefinitionRepresentation(model);
@@ -124,11 +126,12 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
         return resultList;
     }
 
+    @Override
     public AppDefinitionUpdateResultRepresentation updateAppDefinition(String modelId, AppDefinitionSaveRepresentation updatedModel) {
 
         AppDefinitionUpdateResultRepresentation result = new AppDefinitionUpdateResultRepresentation();
 
-        User user = SecurityUtils.getCurrentUserObject();
+        String currentUserId = SecurityUtils.getCurrentUserId();
 
         Model model = modelService.getModel(modelId);
 
@@ -143,11 +146,11 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
             throw new InternalServerErrorException("App definition could not be saved " + modelId);
         }
 
-        model = modelService.saveModel(model, editorJson, null, false, null, user);
+        model = modelService.saveModel(model, editorJson, null, false, null, currentUserId);
 
         AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(model);
         if (updatedModel.isPublish()) {
-            appDefinitionPublishService.publishAppDefinition(null, model, user);
+            appDefinitionPublishService.publishAppDefinition(null, model, currentUserId);
         } else {
             appDefinition.setDefinition(updatedModel.getAppDefinition().getDefinition());
         }

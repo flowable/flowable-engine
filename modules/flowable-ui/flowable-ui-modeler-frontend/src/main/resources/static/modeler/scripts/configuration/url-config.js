@@ -182,6 +182,18 @@ FLOWABLE.APP_URL = {
         return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/decision-service-models';
     },
 
+    getDecisionServiceImportUrl: function () {
+        return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/import-decision-service-model';
+    },
+
+    getDecisionServiceTextImportUrl: function () {
+        return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/import-decision-service-model/text';
+    },
+
+    getDmnModelDownloadUrl: function (modelId, modelHistoryId) {
+        return FLOWABLE.CONFIG.contextModelerRestRoot + '/rest/decision-service-models/' + modelId + (modelHistoryId ? '/history/' + modelHistoryId : '') + '/dmn?version=' + Date.now();
+    },
+
     /* FORM MODEL URLS */
 
     getFormModelsUrl: function () {

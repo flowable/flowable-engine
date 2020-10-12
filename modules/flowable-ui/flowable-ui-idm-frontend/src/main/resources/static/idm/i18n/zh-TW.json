@@ -12,6 +12,7 @@
         },
      "ACTION": {
             "LOGOUT": "退出",
+            "DASHBOARD": "Dashboard",
             "HELP": "入门",
             "EDIT-PROFILE": "编辑配置文件",
             "SAVE": "保存",

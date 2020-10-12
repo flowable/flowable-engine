@@ -56,7 +56,8 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_USER_CATEGORY),
             new ExtensionAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_EXTENSIONID),
-            new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION));
+            new ExtensionAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION),
+            new ExtensionAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME));
 
     public UserTaskXMLConverter() {
         HumanPerformerParser humanPerformerParser = new HumanPerformerParser();
@@ -100,6 +101,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         userTask.setAssignee(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_ASSIGNEE, xtr));
         userTask.setOwner(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_OWNER, xtr));
         userTask.setPriority(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_USER_PRIORITY, xtr));
+        userTask.setTaskIdVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_ID_VARIABLE_NAME, xtr));
 
         String sameDeploymentAttribute = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr);
         if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(sameDeploymentAttribute)) {
@@ -156,6 +158,9 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         }
         if (userTask.getSkipExpression() != null) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_USER_SKIP_EXPRESSION, userTask.getSkipExpression(), xtw);
+        }
+        if (userTask.getTaskIdVariableName() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_ID_VARIABLE_NAME, userTask.getTaskIdVariableName(), xtw);
         }
         // write custom attributes
         BpmnXMLUtil.writeCustomAttributes(userTask.getAttributes().values(), xtw, defaultElementAttributes,
@@ -328,8 +333,9 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
                 identityLinkType = xtr.getAttributeValue(null, ATTRIBUTE_NAME);
             }
 
-            if (identityLinkType == null)
+            if (identityLinkType == null) {
                 return;
+            }
 
             String resourceElement = XMLStreamReaderUtil.moveDown(xtr);
             if (StringUtils.isNotEmpty(resourceElement) && ELEMENT_RESOURCE_ASSIGNMENT.equals(resourceElement)) {
