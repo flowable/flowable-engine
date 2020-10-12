@@ -50,7 +50,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
         this(taskId, formDefinitionId, outcome, variables);
-        this.variablesLocal = variables;
+        if (localScope) {
+            this.variablesLocal = variables;
+        } else {
+            this.variables = variables;
+        }
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
