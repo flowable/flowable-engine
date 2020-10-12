@@ -119,9 +119,16 @@ public class TaskHelper {
                 // where a boolean flag is passed through the API.
                 // This means that if the flag is set, local variables always have precedence in the event.
 
+                boolean local = localVariables != null && !localVariables.isEmpty();
+                Map<String, Object> eventVariables = null;
+                if (local) {
+                    eventVariables = localVariables;
+                } else {
+                    eventVariables = variables;
+                }
+
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(
-                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables,
-                    localVariables != null && !localVariables.isEmpty()), processEngineConfiguration.getEngineCfgKey());
+                        FlowableEngineEventType.TASK_COMPLETED, taskEntity, eventVariables, local), processEngineConfiguration.getEngineCfgKey());
 
             } else {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity),
