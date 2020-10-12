@@ -286,6 +286,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("timerJobCount", timerJobCount);
         persistentState.put("suspendedJobCount", suspendedJobCount);
         persistentState.put("deadLetterJobCount", deadLetterJobCount);
+        persistentState.put("externalWorkerJobCount", externalWorkerJobCount);
         persistentState.put("variableCount", variableCount);
         persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
