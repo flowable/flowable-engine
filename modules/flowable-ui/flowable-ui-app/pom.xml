@@ -296,7 +296,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.7</image>
+                                <image>flowable/flowable-jre:11.0.8</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-ui</image>
@@ -338,7 +338,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.7</image>
+                                <image>flowable/flowable-jre:11.0.8</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-ui:${project.version}</image>
@@ -380,7 +380,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:11.0.7</image>
+                                <image>flowable/flowable-jre:11.0.8</image>
                             </from>
                             <to>
                                 <image>flowable/flowable-ui:${project.version}</image>

@@ -26,7 +26,7 @@
     <camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<jib-maven-plugin.version>1.6.1</jib-maven-plugin.version>
+		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13</junit.version>
 		<junit.jupiter.version>5.7.0</junit.jupiter.version>
