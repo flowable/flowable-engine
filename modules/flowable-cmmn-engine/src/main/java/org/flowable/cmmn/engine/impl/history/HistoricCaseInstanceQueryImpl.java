@@ -495,7 +495,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findByCriteria(this);
         }
 
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getCaseLocalizationManager() != null) {
             for (HistoricCaseInstance historicCaseInstance : results) {
                 cmmnEngineConfiguration.getCaseLocalizationManager().localize(historicCaseInstance, locale, withLocalizationFallback);
