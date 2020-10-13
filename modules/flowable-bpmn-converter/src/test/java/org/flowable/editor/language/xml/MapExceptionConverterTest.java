@@ -68,10 +68,11 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
         resourceName = "mapException/mapExceptionModel.bpmn";
 
         BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
+        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
+        validateModel(parsedModel);
     }
 
-    private void validateModel(BpmnModel model) {
+    protected void validateModel(BpmnModel model) {
 
         // check service task with andChildren Set to True
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetaskWithAndTrueAndChildren");
@@ -80,14 +81,15 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
                     assertThat(serviceTask.getId()).isEqualTo("servicetaskWithAndTrueAndChildren");
                     assertThat(serviceTask.getMapExceptions()).isNotNull();
                     assertThat(serviceTask.getMapExceptions())
-                            .extracting(MapExceptionEntry::getErrorCode, MapExceptionEntry::getClassName, MapExceptionEntry::isAndChildren)
+                            .extracting(MapExceptionEntry::getErrorCode, MapExceptionEntry::getClassName, 
+                                    MapExceptionEntry::getRootCause, MapExceptionEntry::isAndChildren)
                             .containsExactly(
                                     // check a normal mapException, with hasChildren == true
-                                    tuple("myErrorCode1", "com.activiti.Something1", true),
+                                    tuple("myErrorCode1", "com.activiti.Something1", null, true),
                                     // check a normal mapException, with hasChildren == false
-                                    tuple("myErrorCode2", "com.activiti.Something2", false),
+                                    tuple("myErrorCode2", "com.activiti.Something2", null, false),
                                     // check a normal mapException, with no hasChildren Defined, default should be false
-                                    tuple("myErrorCode3", "com.activiti.Something3", false)
+                                    tuple("myErrorCode3", "com.activiti.Something3", "org.flowable.Exception", false)
                             );
                 });
 

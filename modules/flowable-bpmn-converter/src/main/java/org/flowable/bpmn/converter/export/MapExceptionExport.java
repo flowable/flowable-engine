@@ -37,6 +37,7 @@ public class MapExceptionExport implements BpmnXMLConstants {
 
                 BpmnXMLUtil.writeDefaultAttribute(MAP_EXCEPTION_ERRORCODE, mapException.getErrorCode(), xtw);
                 BpmnXMLUtil.writeDefaultAttribute(MAP_EXCEPTION_ANDCHILDREN, Boolean.toString(mapException.isAndChildren()), xtw);
+                BpmnXMLUtil.writeDefaultAttribute(MAP_EXCEPTION_ROOTCAUSE, mapException.getRootCause(), xtw);
 
                 if (StringUtils.isNotEmpty(mapException.getClassName())) {
                     xtw.writeCData(mapException.getClassName());
