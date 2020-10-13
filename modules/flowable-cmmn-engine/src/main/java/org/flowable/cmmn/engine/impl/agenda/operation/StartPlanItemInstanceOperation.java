@@ -70,8 +70,8 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
 
         planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
         planItemInstanceEntity.setLastStartedTime(getCurrentTime(commandContext));
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
         executeActivityBehavior();
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceStarted(planItemInstanceEntity);
     }
 
     protected void executeActivityBehavior() {

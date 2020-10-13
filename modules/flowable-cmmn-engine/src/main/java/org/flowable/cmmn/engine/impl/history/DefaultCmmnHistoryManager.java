@@ -309,6 +309,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             h -> {
                 h.setLastStartedTime(planItemInstanceEntity.getLastStartedTime());
                 h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
+
+                // Can be updated when the plan item instance starts
+                h.setReferenceId(planItemInstanceEntity.getReferenceId());
+                h.setReferenceType(planItemInstanceEntity.getReferenceType());
             });
     }
 

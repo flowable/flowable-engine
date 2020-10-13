@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
@@ -41,6 +42,8 @@ import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -85,7 +88,46 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertThat(planItemInstances)
                 .extracting(PlanItemInstance::getName)
                 .containsExactly("Task Two");
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .includeEnded()
+                .singleResult();
+        assertThat(processTaskPlanItemInstance).isNotNull();
+        assertThat(processTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
+
+        ProcessInstance childProcessInstance = processEngine.getRuntimeService()
+                .createProcessInstanceQuery()
+                .singleResult();
+        assertThat(childProcessInstance).isNotNull();
+
+        // There is no callback id since the task is non blocking
+        assertThat(childProcessInstance.getCallbackId()).isNull();
+        assertThat(childProcessInstance.getCallbackType()).isNull();
+
+        assertThat(processTaskPlanItemInstance.getReferenceId()).isEqualTo(childProcessInstance.getId());
+        assertThat(processTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
+            HistoricPlanItemInstance historicProcessTaskPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceId(processTaskPlanItemInstance.getId())
+                    .singleResult();
+            assertThat(historicProcessTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
+            assertThat(historicProcessTaskPlanItemInstance.getReferenceId()).isEqualTo(childProcessInstance.getId());
+            assertThat(historicProcessTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())) {
+            HistoricProcessInstance historicChildProcessInstance = processEngine.getHistoryService()
+                    .createHistoricProcessInstanceQuery()
+                    .processInstanceId(childProcessInstance.getId())
+                    .singleResult();
+            // There is no callback id since the task is non blocking
+            assertThat(historicChildProcessInstance.getCallbackId()).isNull();
+            assertThat(historicChildProcessInstance.getCallbackType()).isNull();
+        }
 
         processEngine.getTaskService().complete(processTasks.get(0).getId());
         assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
@@ -549,6 +591,15 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                     .processInstanceCallbackId(processTaskPlanItemInstance.getId())
                     .processInstanceCallbackType(CallbackTypes.PLAN_ITEM_CHILD_PROCESS).singleResult().getId()).isEqualTo(processInstance.getId());
+        }
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricPlanItemInstance historicProcessTaskPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceId(processTaskPlanItemInstance.getId())
+                    .singleResult();
+            assertThat(historicProcessTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+            assertThat(historicProcessTaskPlanItemInstance.getReferenceId()).isEqualTo(processInstance.getId());
+            assertThat(historicProcessTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
         }
 
         // Completing task will trigger completion of process task plan item
