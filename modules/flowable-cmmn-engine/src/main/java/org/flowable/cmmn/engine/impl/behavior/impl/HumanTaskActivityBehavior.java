@@ -38,6 +38,7 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -138,6 +139,9 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
+            
+            planItemInstanceEntity.setReferenceId(taskEntity.getId());
+            planItemInstanceEntity.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_HUMAN_TASK);
 
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),

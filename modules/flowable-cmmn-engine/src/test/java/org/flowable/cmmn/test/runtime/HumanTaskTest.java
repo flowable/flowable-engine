@@ -19,12 +19,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -80,6 +84,23 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             .containsExactlyInAnyOrder(
                 tuple("assignee", "JohnDoe", null)
             );
+
+        PlanItemInstance taskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateActive()
+                .singleResult();
+        assertThat(taskPlanItemInstance).isNotNull();
+        assertThat(taskPlanItemInstance.getReferenceId()).isEqualTo(task.getId());
+        assertThat(taskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_HUMAN_TASK);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricPlanItemInstance historicTaskPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceId(taskPlanItemInstance.getId())
+                    .singleResult();
+
+            assertThat(historicTaskPlanItemInstance.getReferenceId()).isEqualTo(task.getId());
+            assertThat(historicTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_HUMAN_TASK);
+        }
 
         cmmnTaskService.complete(task.getId());
 
