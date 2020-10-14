@@ -23,6 +23,7 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
+import org.flowable.bpmn.converter.export.MapExceptionExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -125,6 +126,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
                 callActivity.getInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_OUT_PARAMETERS,
                 callActivity.getOutParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = MapExceptionExport.writeMapExceptionExtensions(callActivity.getMapExceptions(), didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;
     }
 

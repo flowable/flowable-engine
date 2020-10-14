@@ -21,6 +21,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.MapExceptionEntry;
 import org.junit.jupiter.api.Test;
 
 public class CallActivityConverterTest extends AbstractConverterTest {
@@ -69,5 +70,12 @@ public class CallActivityConverterTest extends AbstractConverterTest {
                 .containsExactly(
                         tuple("test", "test")
                 );
+        
+        List<MapExceptionEntry> mapExceptions = callActivity.getMapExceptions();
+        assertThat(mapExceptions).hasSize(1);
+        MapExceptionEntry mapExectionEntry = mapExceptions.get(0);
+        assertThat(mapExectionEntry.getErrorCode()).isEqualTo("myErrorCode");
+        assertThat(mapExectionEntry.getClassName()).isEqualTo("org.flowable.Something");
+        assertThat(mapExectionEntry.getRootCause()).isEqualTo("org.flowable.Exception");
     }
 }
