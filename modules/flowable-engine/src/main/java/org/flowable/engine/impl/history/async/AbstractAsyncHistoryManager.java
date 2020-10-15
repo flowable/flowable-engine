@@ -52,6 +52,7 @@ public abstract class AbstractAsyncHistoryManager extends AbstractHistoryManager
         putIfNotNull(data, HistoryJsonConstants.CALLBACK_TYPE, processInstance.getCallbackType());
         putIfNotNull(data, HistoryJsonConstants.REFERENCE_ID, processInstance.getReferenceId());
         putIfNotNull(data, HistoryJsonConstants.REFERENCE_TYPE, processInstance.getReferenceType());
+        putIfNotNull(data, HistoryJsonConstants.PROPAGATED_STAGE_INSTANCE_ID, processInstance.getPropagatedStageInstanceId());
         putIfNotNull(data, HistoryJsonConstants.TENANT_ID, processInstance.getTenantId());
 
         addProcessDefinitionFields(data, processInstance.getProcessDefinitionId());
