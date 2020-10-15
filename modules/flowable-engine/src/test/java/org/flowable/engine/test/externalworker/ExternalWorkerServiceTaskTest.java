@@ -846,7 +846,6 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         Job movedJob = managementService.moveDeadLetterJobToExecutableJob(deadLetterJob.getId(), 4);
 
-        assertThat(movedJob).isNotNull();
         assertThat(movedJob).isInstanceOf(ExternalWorkerJob.class);
         assertThat(movedJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
         assertThat(movedJob.getRetries()).isEqualTo(4);

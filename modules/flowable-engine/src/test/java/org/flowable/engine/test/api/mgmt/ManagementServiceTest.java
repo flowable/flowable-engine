@@ -103,13 +103,11 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertThat(timerJob2).isNotNull();
-        assertThat(timerJob2.getExceptionMessage()).isNotNull();
         assertThat(timerJob2.getExceptionMessage())
                 .contains("This is an exception thrown from scriptTask");
 
         // Get the full stacktrace using the managementService
         String exceptionStack = managementService.getTimerJobExceptionStacktrace(timerJob2.getId());
-        assertThat(exceptionStack).isNotNull();
         assertThat(exceptionStack)
                 .contains("This is an exception thrown from scriptTask");
     }

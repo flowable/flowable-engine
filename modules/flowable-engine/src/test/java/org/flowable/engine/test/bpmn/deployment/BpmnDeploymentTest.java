@@ -66,7 +66,6 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         // verify content
         InputStream deploymentInputStream = repositoryService.getResourceAsStream(deploymentId, bpmnResourceName);
         String contentFromDeployment = readInputStreamToString(deploymentInputStream);
-        assertThat(contentFromDeployment).isNotEmpty();
         assertThat(contentFromDeployment).contains("process id=\"emptyProcess\"");
 
         InputStream fileInputStream = ReflectUtil.getResourceAsStream(

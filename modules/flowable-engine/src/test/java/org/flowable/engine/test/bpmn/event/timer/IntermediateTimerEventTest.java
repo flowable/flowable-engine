@@ -200,7 +200,6 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 2);
         Job rescheduledJob = managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
         assertThat(rescheduledJob).isNotNull();
-        assertThat(rescheduledJob.getId()).isNotNull();
         assertThat(rescheduledJob.getId()).isNotSameAs(timerJob.getId());
 
         Job timer = managementService.createTimerJobQuery().singleResult();

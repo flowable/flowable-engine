@@ -491,7 +491,6 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         calendar.add(Calendar.HOUR, 2);
         Job rescheduledTimerJob = managementService.rescheduleTimeDateJob(timerJob.getId(), sdf.format(calendar.getTime()));
         assertThat(rescheduledTimerJob).isNotNull();
-        assertThat(rescheduledTimerJob.getId()).isNotNull();
         assertThat(rescheduledTimerJob.getId()).isNotSameAs(timerJob.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -691,7 +690,6 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         String timeCycle = "R/PT2H";
         Job rescheduledTimerJob = managementService.rescheduleTimerJob(timerJob.getId(), null, null, timeCycle, null, null);
         assertThat(rescheduledTimerJob).isNotNull();
-        assertThat(rescheduledTimerJob.getId()).isNotNull();
         assertThat(rescheduledTimerJob.getId()).isNotSameAs(timerJob.getId());
 
         timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();

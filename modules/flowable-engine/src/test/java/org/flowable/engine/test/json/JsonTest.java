@@ -513,7 +513,6 @@ public class JsonTest extends PluggableFlowableTestCase {
                         + "}");
 
         value = (ObjectNode) runtimeService.getVariable(processInstance.getId(), BIG_JSON_OBJ);
-        assertThat(value).isNotNull();
         assertThat(value).hasToString(createBigJsonObject().toString());
 
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), BIG_JSON_OBJ);
@@ -531,7 +530,6 @@ public class JsonTest extends PluggableFlowableTestCase {
 
             assertThat(historicVariableInstances.get(0).getVariableName()).isEqualTo(BIG_JSON_OBJ);
             value = (ObjectNode) historicVariableInstances.get(0).getValue();
-            assertThat(value).isNotNull();
             assertThat(value).hasToString(createBigJsonObject().toString());
 
             assertThat(historicVariableInstances.get(1).getVariableName()).isEqualTo(MY_JSON_OBJ);

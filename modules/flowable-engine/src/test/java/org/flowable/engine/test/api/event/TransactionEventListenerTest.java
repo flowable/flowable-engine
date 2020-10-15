@@ -95,8 +95,11 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             // During the async history execution it is possible that some historic jobs are inserted again (to be retried) therefore using hasSizeGreaterThan
             assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSizeGreaterThanOrEqualTo(historyCreatedEvents);
             assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_INITIALIZED.name())).hasSizeGreaterThanOrEqualTo(historyCreatedEvents);
-            assertThat(TestTransactionEventListener.eventsReceived).doesNotContainKey(FlowableEngineEventType.PROCESS_STARTED.name());
-            assertThat(TestTransactionEventListener.eventsReceived).doesNotContainKey(FlowableEngineEventType.TASK_CREATED.name());
+            assertThat(TestTransactionEventListener.eventsReceived)
+                    .doesNotContainKeys(
+                            FlowableEngineEventType.PROCESS_STARTED.name(),
+                            FlowableEngineEventType.TASK_CREATED.name()
+            );
 
         } else {
             assertThat(TestTransactionEventListener.eventsReceived.get(FlowableEngineEventType.ENTITY_CREATED.name())).hasSize(expectedCreatedEvents);

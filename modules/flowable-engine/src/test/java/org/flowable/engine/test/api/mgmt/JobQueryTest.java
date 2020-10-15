@@ -521,7 +521,6 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         Job failedJob = query.singleResult();
         assertThat(failedJob).isNotNull();
         assertThat(failedJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
-        assertThat(failedJob.getExceptionMessage()).isNotNull();
         assertThat(failedJob.getExceptionMessage()).containsSequence(EXCEPTION_MESSAGE);
     }
 

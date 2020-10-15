@@ -75,7 +75,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         vars.put("longString", longString.toString());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertThat(task.getProcessVariables()).isNotNull();
         assertThat(task.getProcessVariables())
                 .containsEntry("longString", longString.toString());
     }
@@ -471,7 +470,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         List<String> activities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertThat(activities).isNotNull();
         assertThat(activities).hasSize(1);
     }
 

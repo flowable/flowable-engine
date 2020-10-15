@@ -45,10 +45,8 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
     public void testProcessInstanceAndExecutionIdInCache() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
 
-        assertThat(ServiceCacheTask.processInstanceId).isNotNull();
         assertThat(ServiceCacheTask.processInstanceId).isEqualTo(processInstance.getId());
         assertThat(ServiceCacheTask.executionId).isNotNull();
-        assertThat(ServiceCacheTask.historicProcessInstanceId).isNotNull();
         assertThat(ServiceCacheTask.historicProcessInstanceId).isEqualTo(processInstance.getId());
     }
 
@@ -59,9 +57,7 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        assertThat(TestCacheTaskListener.TASK_ID).isNotNull();
         assertThat(TestCacheTaskListener.TASK_ID).isEqualTo(task.getId());
-        assertThat(TestCacheTaskListener.HISTORIC_TASK_ID).isNotNull();
         assertThat(TestCacheTaskListener.HISTORIC_TASK_ID).isEqualTo(task.getId());
     }
 

@@ -361,7 +361,6 @@ public class TenancyTest extends PluggableFlowableTestCase {
         assertThat(repositoryService.createProcessDefinitionQuery().list()).hasSize(2);
         assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionTenantId(TEST_TENANT_ID).list()).isEmpty();
         assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionTenantId(newTenantId).list()).hasSize(1);
-        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionTenantId(newTenantId).list()).hasSize(1);
 
         // Verify process instances
         assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(nrOfProcessInstancesNoTenant + nrOfProcessInstancesWithTenant);
