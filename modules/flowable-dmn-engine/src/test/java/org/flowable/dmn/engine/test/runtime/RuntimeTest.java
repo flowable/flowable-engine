@@ -177,12 +177,15 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .execute();
 
         assertThat(result).hasSize(3);
-        assertThat(result.get(0)).hasSize(1);
-        assertThat(result.get(0)).containsEntry("output1", 11d);
-        assertThat(result.get(1)).hasSize(1);
-        assertThat(result.get(1)).containsEntry("output2", 11d);
-        assertThat(result.get(2)).hasSize(1);
-        assertThat(result.get(2)).containsEntry("output3", 11d);
+        assertThat(result.get(0))
+                .hasSize(1)
+                .containsEntry("output1", 11d);
+        assertThat(result.get(1))
+                .hasSize(1)
+                .containsEntry("output2", 11d);
+        assertThat(result.get(2))
+                .hasSize(1)
+                .containsEntry("output3", 11d);
     }
 
     @Test

@@ -45,12 +45,10 @@ public class ThrowCompensationEventTest extends AbstractConverterTest {
 
     private void modelShouldHaveAThrowEventContainingCompensationEventDefinition(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("throwCompensationEvent");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ThrowEvent.class);
         ThrowEvent throwEvent = (ThrowEvent) flowElement;
 
         final List<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-        assertThat(eventDefinitions).isNotNull();
         assertThat(eventDefinitions).hasSize(1);
         assertThat(eventDefinitions.get(0)).isInstanceOf(CompensateEventDefinition.class);
         assertThat(((CompensateEventDefinition) eventDefinitions.get(0)).getActivityRef()).isEqualTo("activity_ref");

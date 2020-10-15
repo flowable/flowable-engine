@@ -45,7 +45,6 @@ public class CallActivityWithFallbackValueFalseConverterTest extends AbstractCon
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;
         assertThat(callActivity.getId()).isEqualTo("callactivity");

@@ -784,7 +784,6 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
         Job movedJob = cmmnManagementService.moveDeadLetterJobToExecutableJob(deadLetterJob.getId(), 4);
 
-        assertThat(movedJob).isNotNull();
         assertThat(movedJob).isInstanceOf(ExternalWorkerJob.class);
         assertThat(movedJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
         assertThat(movedJob.getRetries()).isEqualTo(4);

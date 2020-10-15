@@ -62,8 +62,9 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule3.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(8);
-        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).containsKey("CUSTOM_HIT_POLICY");
+        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors())
+                .hasSize(8)
+                .containsKey("CUSTOM_HIT_POLICY");
     }
 
 }

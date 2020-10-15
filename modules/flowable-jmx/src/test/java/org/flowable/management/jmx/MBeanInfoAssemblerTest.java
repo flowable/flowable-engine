@@ -64,7 +64,6 @@ public class MBeanInfoAssemblerTest {
 
         assertThat(beanInfo.getDescription()).isEqualTo("test description");
         MBeanAttributeInfo[] testAttributes = beanInfo.getAttributes();
-        assertThat(testAttributes).isNotNull();
         assertThat(testAttributes).hasSize(2);
 
         int counter = 0;
@@ -87,7 +86,6 @@ public class MBeanInfoAssemblerTest {
 
         // check the single operation
 
-        assertThat(beanInfo.getOperations()).isNotNull();
         assertThat(beanInfo.getOperations()).hasSize(3);
     }
 
@@ -126,9 +124,7 @@ public class MBeanInfoAssemblerTest {
     public void testInherited() throws JMException {
         ModelMBeanInfo beanInfo = mbeanInfoAssembler.getMBeanInfo(new BadInherited(), null, "someName");
         assertThat(beanInfo).isNotNull();
-        assertThat(beanInfo.getAttributes()).isNotNull();
         assertThat(beanInfo.getAttributes()).hasSize(2);
-        assertThat(beanInfo.getOperations()).isNotNull();
         assertThat(beanInfo.getOperations()).hasSize(3);
 
     }

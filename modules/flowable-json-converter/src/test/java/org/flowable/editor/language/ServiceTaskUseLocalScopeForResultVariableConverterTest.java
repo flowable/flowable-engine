@@ -44,7 +44,6 @@ public class ServiceTaskUseLocalScopeForResultVariableConverterTest extends Abst
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("shareniuservice", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ServiceTask.class);
         assertThat(flowElement.getId()).isEqualTo("shareniuservice");
         ServiceTask serviceTask = (ServiceTask) flowElement;

@@ -62,13 +62,11 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         }
 
         FlowElement userFlowElement = model.getMainProcess().getFlowElement("userTask");
-        assertThat(userFlowElement).isNotNull();
         assertThat(userFlowElement).isInstanceOf(UserTask.class);
         UserTask userTask = (UserTask) userFlowElement;
 
         List<FormProperty> formProperties = userTask.getFormProperties();
 
-        assertThat(formProperties).isNotNull();
         assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
