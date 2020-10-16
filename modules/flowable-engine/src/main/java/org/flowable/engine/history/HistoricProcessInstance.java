@@ -122,6 +122,14 @@ public interface HistoricProcessInstance {
      */
     String getReferenceType();
 
+    /**
+     * If this process instance runs in the context of a case and stage, this method returns it's closest parent stage instance id
+     * (the stage plan item instance id to be precise).
+     *
+     * @return the stage instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage
+     */
+    String getPropagatedStageInstanceId();
+
     /** Returns the process variables if requested in the process instance query */
     Map<String, Object> getProcessVariables();
 }

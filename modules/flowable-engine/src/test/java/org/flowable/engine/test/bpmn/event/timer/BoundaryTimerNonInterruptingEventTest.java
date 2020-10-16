@@ -120,7 +120,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // After setting the clock to time '1 hour and 5 seconds', the first timer should fire
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
 
         // timer has fired
         assertThat(jobQuery.count()).isZero();

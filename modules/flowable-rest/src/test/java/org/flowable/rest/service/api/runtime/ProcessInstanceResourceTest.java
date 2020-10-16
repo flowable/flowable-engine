@@ -56,6 +56,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                 .callbackType("testCallbackType")
                 .referenceId("testReferenceId")
                 .referenceType("testReferenceType")
+                .stageInstanceId("testStageInstanceId")
                 .start();
         Authentication.setAuthenticatedUserId(null);
 
@@ -78,6 +79,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"
                         + "referenceType: 'testReferenceType',"
+                        + "propagatedStageInstanceId: 'testStageInstanceId',"
                         + "suspended: false,"
                         + "tenantId: '',"
                         + "url: '" + url + "',"

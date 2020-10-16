@@ -50,6 +50,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String callbackType;
     protected String referenceId;
     protected String referenceType;
+    protected String propagatedStageInstanceId;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -74,6 +75,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         this.callbackType = processInstance.getCallbackType();
         this.referenceId = processInstance.getReferenceId();
         this.referenceType = processInstance.getReferenceType();
+        this.propagatedStageInstanceId = processInstance.getPropagatedStageInstanceId();
 
         // Inherit tenant id (if applicable)
         if (processInstance.getTenantId() != null) {
@@ -101,6 +103,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("callbackType", callbackType);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
     }
 
@@ -290,6 +293,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setReferenceType(String referenceType) {
         this.referenceType = referenceType;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    @Override
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     @Override

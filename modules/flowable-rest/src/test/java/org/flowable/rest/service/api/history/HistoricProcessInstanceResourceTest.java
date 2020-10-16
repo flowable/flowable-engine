@@ -52,6 +52,7 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
                 .callbackType("testCallbackType")
                 .referenceId("testReferenceId")
                 .referenceType("testReferenceType")
+                .stageInstanceId("testStageInstanceId")
                 .start();
 
         CloseableHttpResponse response = executeRequest(
@@ -71,7 +72,8 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
                         + "callbackId: 'testCallbackId',"
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"
-                        + "referenceType: 'testReferenceType'"
+                        + "referenceType: 'testReferenceType',"
+                        + "propagatedStageInstanceId: 'testStageInstanceId'"
                         + "}");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

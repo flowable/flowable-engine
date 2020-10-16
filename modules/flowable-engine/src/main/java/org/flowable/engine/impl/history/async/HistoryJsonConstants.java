@@ -200,6 +200,8 @@ public interface HistoryJsonConstants {
 
     String REFERENCE_TYPE = "referenceType";
 
+    String PROPAGATED_STAGE_INSTANCE_ID = "propagatedStageInstanceId";
+
     String CALLED_PROCESS_INSTANCE_ID = "calledProcessInstanceId";
 
     String SCOPE_ID = "scopeId";

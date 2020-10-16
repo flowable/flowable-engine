@@ -380,7 +380,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
         // Set clock time to '1 hour and 5 seconds' ahead to fire timer
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-        waitForJobExecutorToProcessAllJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
 
         // timer has fired
         assertThat(managementService.createJobQuery().count()).isZero();
