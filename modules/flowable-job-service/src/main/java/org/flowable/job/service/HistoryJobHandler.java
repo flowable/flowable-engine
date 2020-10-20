@@ -22,5 +22,5 @@ public interface HistoryJobHandler {
 
     String getType();
 
-    void execute(HistoryJobEntity job, String configuration, CommandContext commandContext);
+    void execute(HistoryJobEntity job, String configuration, CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration);
 }

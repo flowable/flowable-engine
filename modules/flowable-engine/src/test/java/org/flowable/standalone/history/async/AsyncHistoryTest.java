@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -723,14 +724,41 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         taskService.complete(task.getId());
 
         assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+        assertThat(historyService.createHistoricTaskInstanceQuery().list()).isEmpty();
+        assertThat(historyService.createHistoricActivityInstanceQuery().activityId("theTask").list()).isEmpty();
         waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
         assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(2);
+        assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().activityId("theTask").list()).isEmpty();
+
+        // Even though there are dead letter jobs, only the delta of the jobs needs to be there
+        // the parts that didn't fail should still create the historic process instance
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .singleResult();
+
+        assertThat(historicProcessInstance).isNotNull();
+        assertThat(historicProcessInstance.getEndTime()).isNotNull();
 
         List<String> exceptionMessages = managementService.createDeadLetterJobQuery().list().stream().map(job -> job.getExceptionMessage()).collect(Collectors.toList());
         assertThat(exceptionMessages).containsOnly(
-            "Job is not applicable for transformer types: [activity-end]",
-            "Job is not applicable for transformer types: [activity-update]"
+            "Failed to process async history json. See suppressed exceptions.",
+            "Failed to process async history json. See suppressed exceptions."
         );
+
+        List<String> exceptionStacktraces = managementService.createDeadLetterJobQuery()
+                .list()
+                .stream()
+                .sorted(Comparator.comparing(Job::getCreateTime))
+                .map(job -> managementService.getDeadLetterJobExceptionStacktrace(job.getId()))
+                .collect(Collectors.toList());
+
+        assertThat(exceptionStacktraces.get(0))
+                .contains("Job is not applicable for transformer types: [activity-update]");
+
+        assertThat(exceptionStacktraces.get(1))
+                .contains("Job is not applicable for transformer types: [activity-end]");
 
         // The history jobs in the deadletter table have no link to the process instance, hence why a manual cleanup is needed.
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
