@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -114,11 +115,15 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
 
                 }
 
+            } else if (timerValue instanceof Instant) {
+                timerDueDate = Date.from((Instant) timerValue);
+
             }
         }
 
         if (timerDueDate == null) {
             throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
+                    + "java.time.Instant, "
                     + "an ISO8601 date/duration/repetition string or a cron expression");
         }
 
