@@ -292,11 +292,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
             for (Case caseModel : model.getCases()) {
 
-                if (caseModel.getPlanModel().getPlanItems().isEmpty()) {
-                    // empty case, ignore it
-                    continue;
-                }
-
                 CaseExport.writeCase(model, caseModel, xtw);
 
                 Stage planModel = caseModel.getPlanModel();

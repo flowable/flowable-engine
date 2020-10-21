@@ -409,11 +409,6 @@ public class DefaultJobManager implements JobManager {
                     deadLetterJob.setExceptionStacktrace(getExceptionStacktrace(exception));
                 }
 
-                // History jobs don't use the configuration field. Deadletter jobs don't have an advanced configuration column.
-                // To work around that, the id of the byte ref (of the advanced config) is copied to the configuration field.
-                // The id will later be taken from the configuration field when moving back to a history job.
-                deadLetterJob.setJobHandlerConfiguration(historyJobEntity.getAdvancedJobHandlerConfigurationByteArrayRef().getId());
-
                 jobServiceConfiguration.getDeadLetterJobEntityManager().insert(deadLetterJob);
 
             }
@@ -561,7 +556,7 @@ public class DefaultJobManager implements JobManager {
             if (jobHandlers != null) {
                 HistoryJobHandler jobHandler = jobHandlers.get(historyJobEntity.getJobHandlerType());
                 if (jobHandler != null) {
-                    jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext());
+                    jobHandler.execute(historyJobEntity, historyJobEntity.getJobHandlerConfiguration(), getCommandContext(), jobServiceConfiguration);
                 } else {
                     throw new FlowableException("No history job handler registered for type " + historyJobEntity.getJobHandlerType() +
                                     " in job config for engine: " + jobServiceConfiguration.getEngineName());
@@ -742,6 +737,9 @@ public class DefaultJobManager implements JobManager {
         deadLetterJob.setJobType(HistoryJob.HISTORY_JOB_TYPE);
         copyHistoryJobProperties(deadLetterJob, historyJobEntity);
 
+        // History jobs don't use the configuration field. Deadletter jobs don't have an advanced configuration column.
+        // To work around that, the id of the byte ref (of the advanced config) is copied to the configuration field.
+        // The id will later be taken from the configuration field when moving back to a history job.
         if (historyJobEntity.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             deadLetterJob.setJobHandlerConfiguration(historyJobEntity.getAdvancedJobHandlerConfigurationByteArrayRef().getId());
         }

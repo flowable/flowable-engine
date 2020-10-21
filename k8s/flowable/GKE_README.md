@@ -38,7 +38,10 @@ gcloud init
 ### Create Google Cloud Cluster
 
 ```console
-gcloud container clusters create flowable-cluster --zone europe-west1-b \\n    --machine-type=n1-standard-2  --enable-autorepair \\n    --enable-autoscaling --max-nodes=10 --min-nodes=1
+gcloud container clusters create flowable-cluster \
+    --zone europe-west1-b \
+    --machine-type=n1-standard-2  --enable-autorepair \
+    --enable-autoscaling --max-nodes=10 --min-nodes=1
 ```
 
 ### Deploy Nginx Ingress
@@ -54,7 +57,10 @@ helm repo update
 
 kubectl create ns nginx
 
-helm install nginx ingress-nginx/ingress-nginx --namespace nginx --set rbac.create=true --set controller.publishService.enabled=true
+helm install nginx ingress-nginx/ingress-nginx \
+    --namespace nginx \
+    --set rbac.create=true \
+    --set controller.publishService.enabled=true
 ```
 
 #### Determine publicIP

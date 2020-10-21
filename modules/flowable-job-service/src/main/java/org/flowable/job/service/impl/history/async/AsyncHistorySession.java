@@ -99,6 +99,10 @@ public class AsyncHistorySession implements Session {
 
     }
 
+    public AsyncHistoryListener getAsyncHistoryListener() {
+        return asyncHistoryListener;
+    }
+
     public String getTenantId() {
         return tenantId;
     }
