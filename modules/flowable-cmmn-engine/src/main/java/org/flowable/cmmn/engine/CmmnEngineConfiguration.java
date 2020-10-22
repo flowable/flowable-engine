@@ -2049,7 +2049,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 if (eventRegistryConfigurator != null) {
                     specificConfigurators.add(eventRegistryConfigurator);
                 } else {
-                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                    specificConfigurators.add(createDefaultEventRegistryEngineConfigurator());
                 }
             }
             
