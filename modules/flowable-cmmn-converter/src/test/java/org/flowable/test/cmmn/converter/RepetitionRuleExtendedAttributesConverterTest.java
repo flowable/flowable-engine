@@ -22,30 +22,16 @@ import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * Testing to read and write the extended repetition rule attributes.
  *
  * @author Micha Kiener
  */
-public class RepetitionRuleExtendedAttributesConverterTest extends AbstractConverterTest {
+public class RepetitionRuleExtendedAttributesConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/repetitionRuleExtension.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/repetitionRuleExtension.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
         assertThat(cmmnModel.getCases()).hasSize(1);

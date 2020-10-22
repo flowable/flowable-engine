@@ -25,28 +25,14 @@ import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Tijs Rademakers
  */
-public class CasePageTaskCmmnXmlConverterTest extends AbstractConverterTest {
+public class CasePageTaskCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/case-page-task.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/case-page-task.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
 

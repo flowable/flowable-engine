@@ -15,10 +15,8 @@ package org.flowable.test.cmmn.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
@@ -31,21 +29,11 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
-import org.flowable.common.engine.api.io.InputStreamProvider;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnXmlConverterTest extends AbstractConverterTest {
-
-    private CmmnXmlConverter cmmnXmlConverter;
-
-    @Before
-    public void setup() {
-        this.cmmnXmlConverter = new CmmnXmlConverter();
-    }
+public class CmmnXmlConverterTest {
 
     /**
      * Test simple case model, with 4 consequent elements: taskA -> milestone 1 -> taskB -> milestone 2.
@@ -58,20 +46,8 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
      * - 4 sentries
      * - 3 entry criteria (on all plan items except taskA)
      */
-    @Test
-    public void testSimpleCmmnModelConversion() {
-        CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/simple-case.cmmn");
-        validateSimpleCaseModel(cmmnModel);
-    }
-
-    @Test
-    public void testSimpleCmmnModelDoubleConversion() {
-        CmmnModel cmmnModel = readXMLFile("org/flowable/test/cmmn/converter/simple-case.cmmn");
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateSimpleCaseModel(parsedModel);
-    }
-
-    protected void validateSimpleCaseModel(CmmnModel cmmnModel) {
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest("org/flowable/test/cmmn/converter/simple-case.cmmn")
+    protected void simpleCaseModelConversion(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
 
         // Case
@@ -148,11 +124,10 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
     }
 
     /**
-     * Same case model as in {@link #testSimpleCmmnModelConversion()}, but now with an exit criteria on the plan model.
+     * Same case model as in {@link #simpleCaseModelConversion(CmmnModel)}, but now with an exit criteria on the plan model.
      */
-    @Test
-    public void testExitCriteriaOnPlanModel() {
-        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("exit-criteria-on-planmodel.cmmn"));
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest("org/flowable/test/cmmn/converter/exit-criteria-on-planmodel.cmmn")
+    public void exitCriteriaOnPlanModelConversion(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(planModel.getSentries()).hasSize(4);
 
@@ -163,9 +138,8 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
         assertThat(criterion.getSentry().getOnParts().get(0).getSource().getId()).isEqualTo("planItemMileStoneOne");
     }
 
-    @Test
-    public void testNestedStages() {
-        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("nested-stages.cmmn"));
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest("org/flowable/test/cmmn/converter/nested-stages.cmmn")
+    public void nestedStagesConversion(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(planModel.getPlanItems()).hasSize(2);
 
@@ -195,10 +169,8 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
                 .containsExactly("rootTask");
     }
 
-    @Test
-    public void testCaseLifecycleListener() throws Exception {
-        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("case-lifecycle-listeners.cmmn"));
-        cmmnModel = exportAndReadXMLFile(cmmnModel);
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest("org/flowable/test/cmmn/converter/case-lifecycle-listeners.cmmn")
+    public void caseLifecycleListenerConversion(CmmnModel cmmnModel) {
 
         assertThat(cmmnModel.getCases()).hasSize(1);
         Case aCase = cmmnModel.getCases().get(0);
@@ -209,9 +181,8 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
                         tuple("active", "completed", ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, "${caseInstance.setVariable('stageThree', false)}"));
     }
 
-    @Test
-    public void testMissingIdsAdded() {
-        CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(getInputStreamProvider("exit-criteria-on-planmodel.cmmn"));
+    @org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest("org/flowable/test/cmmn/converter/exit-criteria-on-planmodel.cmmn")
+    public void testMissingIdsAdded(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(planModel.getId()).isNotNull();
 
@@ -222,17 +193,4 @@ public class CmmnXmlConverterTest extends AbstractConverterTest {
             }
         }
     }
-
-    private InputStreamProvider getInputStreamProvider(final String resourceName) {
-        return new InputStreamProvider() {
-
-            @Override
-            public InputStream getInputStream() {
-                return this.getClass().getClassLoader().getResourceAsStream(
-                        this.getClass().getPackage().getName().replaceAll("\\.", "/") + "/" + resourceName);
-            }
-
-        };
-    }
-
 }

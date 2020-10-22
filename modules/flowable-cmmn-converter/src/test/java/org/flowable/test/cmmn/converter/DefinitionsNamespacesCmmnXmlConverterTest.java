@@ -16,28 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import org.flowable.cmmn.model.CmmnModel;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Filip Hrisafov
  */
-public class DefinitionsNamespacesCmmnXmlConverterTest extends AbstractConverterTest {
+public class DefinitionsNamespacesCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/simple-namespaces.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/simple-namespaces.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
         assertThat(cmmnModel.getNamespaces())

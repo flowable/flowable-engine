@@ -22,28 +22,14 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessTaskCmmnXmlConverterTest extends AbstractConverterTest {
+public class ProcessTaskCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/process-task.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/process-task.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
         assertThat(cmmnModel.getCases()).hasSize(1);

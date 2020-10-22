@@ -20,25 +20,11 @@ import java.util.List;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.SignalEventListener;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
-public class SignalEventListenerCmmnXmlConverterTest extends AbstractConverterTest {
+public class SignalEventListenerCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/signal-event-listener.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/signal-event-listener.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
 

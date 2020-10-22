@@ -15,28 +15,14 @@ package org.flowable.test.cmmn.converter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.CmmnModel;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Joram Barrez
  */
-public class CaseStartEventXmlConverterTest extends AbstractConverterTest {
-    
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/case-start-event-type.cmmn";
-    
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
+public class CaseStartEventXmlConverterTest {
 
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-    
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/case-start-event-type.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel.getPrimaryCase().getStartEventType()).isEqualTo("myEvent");
     }

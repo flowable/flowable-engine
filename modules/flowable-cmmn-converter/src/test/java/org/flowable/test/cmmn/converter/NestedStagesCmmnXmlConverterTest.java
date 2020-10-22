@@ -17,28 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Tijs Rademakers
  */
-public class NestedStagesCmmnXmlConverterTest extends AbstractConverterTest {
+public class NestedStagesCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/nested-stages.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/nested-stages.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(planModel.getPlanItems()).hasSize(2);
