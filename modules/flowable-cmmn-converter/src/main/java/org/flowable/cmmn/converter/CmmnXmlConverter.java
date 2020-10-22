@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.util.CriterionUtil.generateEntryCriterionId;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -542,6 +544,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     // which means no special care will need to be taken in the core engine operations
                     
                     Criterion criterion = new Criterion();
+                    criterion.setId(generateEntryCriterionId(planItem));
                     criterion.setEntryCriterion(true);
                     
                     SentryOnPart sentryOnPart = new SentryOnPart();
@@ -574,12 +577,16 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {
         for (Criterion entryCriterion : hasEntryCriteria.getEntryCriteria()) {
-            Sentry sentry = entryCriterion.getParent().findSentry(entryCriterion.getSentryRef());
-            if (sentry != null) {
-                entryCriterion.setSentry(sentry);
-            } else {
-                throw new FlowableException("No sentry found for reference "
-                        + entryCriterion.getSentryRef() + " of entry criterion " + entryCriterion.getId());
+            if (entryCriterion.getSentry() == null) {
+                // The timer event listener creates a fake sentry for the planItemStartTrigger.
+                // Therefore only look for a sentry if it hasn't been set yet
+                Sentry sentry = entryCriterion.getParent().findSentry(entryCriterion.getSentryRef());
+                if (sentry != null) {
+                    entryCriterion.setSentry(sentry);
+                } else {
+                    throw new FlowableException("No sentry found for reference "
+                            + entryCriterion.getSentryRef() + " of entry criterion " + entryCriterion.getId());
+                }
             }
         }
     }

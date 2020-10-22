@@ -20,11 +20,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.TimerEventListener;
 
 public class CriteriaExport implements CmmnXmlConstants {
 
     public static void writeCriteriaElements(PlanItem planItem, XMLStreamWriter xtw) throws Exception {
-        writeEntryCriteriaElements(planItem.getEntryCriteria(), xtw);
+        if (!(planItem.getPlanItemDefinition() instanceof TimerEventListener)) {
+            // Timer event listeners are not allowed to have criteria.
+            // However the planItemStartTrigger is implemented as a fake criterion.
+            // Therefore we ignore writing the entry criteria elements for Timer Event listeners
+            writeEntryCriteriaElements(planItem.getEntryCriteria(), xtw);
+        }
         writeExitCriteriaElements(planItem.getExitCriteria(), xtw);
     }
 
