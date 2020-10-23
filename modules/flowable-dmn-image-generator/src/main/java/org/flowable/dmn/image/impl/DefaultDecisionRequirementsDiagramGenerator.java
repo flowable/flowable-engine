@@ -130,6 +130,11 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
         for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
 
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
+
+            if (decisionServiceInfo == null) {
+                continue;
+            }
+
             List<GraphicInfo> decisionServiceDividerInfos = dmnDefinition.getDecisionServiceDividerGraphicInfo(decisionService.getId());
             decisionRequirementsDiagramCanvas.drawDecisionService(decisionService.getName(), decisionServiceInfo, decisionServiceDividerInfos, scaleFactor);
 
@@ -346,6 +351,10 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
 
         for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
+
+            if (decisionServiceInfo == null) {
+                continue;
+            }
 
             // width
             if (decisionServiceInfo.getX() + decisionServiceInfo.getWidth() > maxX) {

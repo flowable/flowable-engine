@@ -72,9 +72,11 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnXMLConverter.class);
 
-    protected static final String DMN_XSD = "org/flowable/impl/dmn/parser/DMN12.xsd";
+    protected static final String DMN_XSD = "org/flowable/impl/dmn/parser/DMN13.xsd";
     protected static final String DMN_11_XSD = "org/flowable/impl/dmn/parser/dmn.xsd";
+    protected static final String DMN_12_XSD = "org/flowable/impl/dmn/parser/DMN12.xsd";
     protected static final String DMN_12_TARGET_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/MODEL/";
+    protected static final String DMN_13_TARGET_NAMESPACE = "https://www.omg.org/spec/DMN/20191111/MODEL/";
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseDmnXMLConverter> convertersToDmnMap = new HashMap<>();
@@ -110,8 +112,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     public void validateModel(InputStreamProvider inputStreamProvider) throws Exception {
         Schema schema;
-        if (isDMN12(inputStreamProvider.getInputStream())) {
+        if (isDMN13(inputStreamProvider.getInputStream())) {
             schema = createSchema(DMN_XSD);
+        } else if (isDMN12(inputStreamProvider.getInputStream())) {
+            schema = createSchema(DMN_12_XSD);
         } else {
             schema = createSchema(DMN_11_XSD);
         }
@@ -122,8 +126,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     public void validateModel(XMLStreamReader xmlStreamReader) throws Exception {
         Schema schema;
-        if (isDMN12(xmlStreamReader)) {
+        if (isDMN13(xmlStreamReader)) {
             schema = createSchema(DMN_XSD);
+        } else if (isDMN12(xmlStreamReader)) {
+            schema = createSchema(DMN_12_XSD);
         } else {
             schema = createSchema(DMN_11_XSD);
         }
@@ -154,6 +160,38 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 }
 
                 return DMN_12_TARGET_NAMESPACE.equals(xtr.getNamespaceURI());
+            }
+            return false;
+        } catch (XMLStreamException e) {
+            LOGGER.error("Error processing DMN document", e);
+            throw new DmnXMLException("Error processing DMN document", e);
+        }
+
+    }
+
+    protected boolean isDMN13(InputStream is) {
+        try {
+            XMLInputFactory xif = XMLInputFactory.newInstance();
+            XMLStreamReader xtr = xif.createXMLStreamReader(is);
+
+            return isDMN13(xtr);
+        } catch (XMLStreamException e) {
+            LOGGER.error("Error processing DMN document", e);
+            throw new DmnXMLException("Error processing DMN document", e);
+        }
+    }
+
+    protected boolean isDMN13(XMLStreamReader xtr) {
+        try {
+            while (xtr.hasNext()) {
+                try {
+                    xtr.next();
+                } catch (Exception e) {
+                    LOGGER.debug("Error reading XML document", e);
+                    throw new DmnXMLException("Error reading XML", e);
+                }
+
+                return DMN_13_TARGET_NAMESPACE.equals(xtr.getNamespaceURI());
             }
             return false;
         } catch (XMLStreamException e) {
