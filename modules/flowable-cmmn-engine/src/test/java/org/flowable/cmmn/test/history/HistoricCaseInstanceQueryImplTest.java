@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -1098,96 +1097,6 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar", "test")
             );
-        }
-    }
-
-    @Test
-    public void testQueryVariableValueEqualsAndNotEquals() {
-        CaseInstance caseWithStringValue = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .name("With string value")
-                .variable("var", "TEST")
-                .start();
-
-        CaseInstance caseWithNullValue = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .name("With null value")
-                .variable("var", null)
-                .start();
-
-        CaseInstance caseWithLongValue = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .name("With long value")
-                .variable("var", 100L)
-                .start();
-
-        CaseInstance caseWithDoubleValue = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .name("With double value")
-                .variable("var", 45.55)
-                .start();
-
-        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "TEST").list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With null value", caseWithNullValue.getId()),
-                    tuple("With long value", caseWithLongValue.getId()),
-                    tuple("With double value", caseWithDoubleValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "TEST").list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With string value", caseWithStringValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", 100L).list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With string value", caseWithStringValue.getId()),
-                    tuple("With null value", caseWithNullValue.getId()),
-                    tuple("With double value", caseWithDoubleValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", 100L).list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With long value", caseWithLongValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", 45.55).list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With string value", caseWithStringValue.getId()),
-                    tuple("With null value", caseWithNullValue.getId()),
-                    tuple("With long value", caseWithLongValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", 45.55).list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With double value", caseWithDoubleValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueNotEquals("var", "test").list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With string value", caseWithStringValue.getId()),
-                    tuple("With null value", caseWithNullValue.getId()),
-                    tuple("With long value", caseWithLongValue.getId()),
-                    tuple("With double value", caseWithDoubleValue.getId())
-                );
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEquals("var", "test").list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .isEmpty();
-
-            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().variableValueEqualsIgnoreCase("var", "test").list())
-                .extracting(HistoricCaseInstance::getName, HistoricCaseInstance::getId)
-                .containsExactlyInAnyOrder(
-                    tuple("With string value", caseWithStringValue.getId())
-                );
         }
     }
 }
