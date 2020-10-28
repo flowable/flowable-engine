@@ -1317,7 +1317,7 @@ Any number of variables can be passed into the request body array.
 
 ### Update a single variable on a case instance
 
-    PUT cmm-runtime/case-instances/{caseInstanceId}/variables/{variableName}
+    PUT cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
 
 |Parameter|Required|Value|Description|
 | - | - | - | - | 
