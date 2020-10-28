@@ -1281,7 +1281,7 @@ In case the variable is a binary variable or serializable, the +valueUrl+ points
 
     POST cmmn-runtime/case-instances/{caseInstanceId}/variables
 
-    PUT casecase-instancesruntime/case-instances/{caseInstanceId}/variables
+    PUT cmmn-runtime/case-instances/{caseInstanceId}/variables
 
 
 When using +POST+, all variables that are passed are created. In case one of the variables already exists on the case instance, the request results in an error (409 - CONFLICT). When +PUT+ is used, nonexistent variables are created on the case-instance and existing ones are overridden without any error.
@@ -1317,7 +1317,7 @@ Any number of variables can be passed into the request body array.
 
 ### Update a single variable on a case instance
 
-    PUT casecase-instancesruntime/case-instances/{caseInstanceId}/variables/{variableName}
+    PUT cmm-runtime/case-instances/{caseInstanceId}/variables/{variableName}
 
 |Parameter|Required|Value|Description|
 | - | - | - | - | 
