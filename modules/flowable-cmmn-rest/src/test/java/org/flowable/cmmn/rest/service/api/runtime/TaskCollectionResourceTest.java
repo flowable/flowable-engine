@@ -376,4 +376,39 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PropagatedStageInstanceId.cmmn" })
+    public void testQueryWithPropagatedStageId() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("propagatedStageInstanceId").start();
+        Task task1 = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        PlanItemInstance stageInstanceId1 = runtimeService.createPlanItemInstanceQuery()
+            .onlyStages()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionId("expandedStage2")
+            .singleResult();
+        assertThat(stageInstanceId1).isNotNull();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=wrong";
+        assertEmptyResultsPresentInDataResponse(url);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=" + stageInstanceId1.getId();
+        assertResultsPresentInDataResponse(url, task1.getId());
+
+        taskService.complete(task1.getId());
+        Task task2 = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        PlanItemInstance stageInstanceId2 = runtimeService.createPlanItemInstanceQuery()
+            .onlyStages()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionId("expandedStage3")
+            .singleResult();
+        assertThat(stageInstanceId2).isNotNull();
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=" + stageInstanceId2.getId();
+        assertResultsPresentInDataResponse(url, task2.getId());
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?propagatedStageInstanceId=" + stageInstanceId1.getId();
+        assertEmptyResultsPresentInDataResponse(url);
+    }
 }

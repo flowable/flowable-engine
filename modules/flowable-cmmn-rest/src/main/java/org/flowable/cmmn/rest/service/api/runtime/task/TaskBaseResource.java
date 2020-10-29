@@ -195,6 +195,9 @@ public class TaskBaseResource {
         if (request.getPlanItemInstanceId() != null) {
             taskQuery.planItemInstanceId(request.getPlanItemInstanceId());
         }
+        if (request.getPropagatedStageInstanceId() != null) {
+            taskQuery.propagatedStageInstanceId(request.getPropagatedStageInstanceId());
+        }
         if (request.getScopeId() != null) {
             taskQuery.scopeId(request.getScopeId());
         }

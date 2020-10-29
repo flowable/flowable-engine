@@ -247,6 +247,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getScopeType() != null) {
             query.scopeType(queryRequest.getScopeType());
         }
+        if (queryRequest.getPropagatedStageInstanceId() != null) {
+            query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.taskTenantId(queryRequest.getTenantId());
