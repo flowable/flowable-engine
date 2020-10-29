@@ -296,9 +296,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             }
 
             if (callActivity.isUseLocalScopeForOutParameters()) {
-                execution.setVariableLocal(variableName, value);
+                executionEntity.setVariableLocal(variableName, value);
             } else {
-                execution.setVariable(variableName, value);
+                executionEntity.setVariable(variableName, value);
             }
         }
     }
@@ -306,6 +306,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     @Override
     public void completed(DelegateExecution execution) throws Exception {
         // only control flow. no sub process instance data available
+
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
+            throw new FlowableException("Cannot complete process instance. Parent process instance " + executionEntity.getId() + " is suspended");
+        }
+
         leave(execution);
     }
 

@@ -46,6 +46,7 @@ import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -1084,6 +1085,38 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn" })
+    public void testCompleteCaseTaskWithSuspendedParentProcessInstance() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+            processEngineTaskService.complete(processEngineTaskService.createTaskQuery().singleResult().getId());
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+
+            processEngineRuntimeService.suspendProcessInstanceById(processInstance.getId());
+
+            Task taskInCaseInstance = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+            try {
+                cmmnTaskService.complete(taskInCaseInstance.getId());
+                Assert.fail();
+            } catch (FlowableException e) {
+                assertThat(e.getMessage()).contains("Cannot complete case task. Parent process instance ", " is suspended");
+            }
+
+            processEngineRuntimeService.activateProcessInstanceById(processInstance.getId());
+            cmmnTaskService.complete(taskInCaseInstance.getId());
+            assertCaseInstanceEnded(caseInstance);
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
 
     static class ClearExecutionReferenceCmd implements Command<Void> {
