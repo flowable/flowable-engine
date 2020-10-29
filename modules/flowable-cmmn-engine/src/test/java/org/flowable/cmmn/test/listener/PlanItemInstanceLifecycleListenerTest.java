@@ -290,7 +290,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
     }
 
     private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {
-        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListeners(planItemDefinitionType, testLifeCycleListener);
+        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListener(planItemDefinitionType, testLifeCycleListener);
         this.testLifeCycleListener = testLifeCycleListener;
     }
 

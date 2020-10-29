@@ -28,8 +28,9 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author martin.grofcik
+ * @author Joram Barrez
  */
-public class CaseLifeCycleListenerUtil {
+public class CaseInstanceLifeCycleListenerUtil {
 
     public static void callLifecycleListeners(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
         if (Objects.equals(oldState, newState)) {
@@ -48,6 +49,15 @@ public class CaseLifeCycleListenerUtil {
                     CaseInstanceLifecycleListener lifecycleListener = listenerNotificationHelper.createCaseLifecycleListener(flowableListener);
                     executeLifecycleListener(caseInstance, oldState, newState, lifecycleListener);
                 }
+            }
+        }
+
+        // Lifecycle listeners defined on the cmmn engine configuration
+        List<CaseInstanceLifecycleListener> caseInstanceLifecycleListeners = CommandContextUtil
+            .getCmmnEngineConfiguration(commandContext).getCaseInstanceLifecycleListeners();
+        if (caseInstanceLifecycleListeners != null && !caseInstanceLifecycleListeners.isEmpty()) {
+            for (CaseInstanceLifecycleListener caseInstanceLifecycleListener : caseInstanceLifecycleListeners) {
+                executeLifecycleListener(caseInstance, oldState, newState, caseInstanceLifecycleListener);
             }
         }
     }
