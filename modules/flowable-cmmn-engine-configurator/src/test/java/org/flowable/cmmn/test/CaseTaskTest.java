@@ -46,7 +46,6 @@ import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -1103,12 +1102,10 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             Task taskInCaseInstance = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
-            try {
-                cmmnTaskService.complete(taskInCaseInstance.getId());
-                Assert.fail();
-            } catch (FlowableException e) {
-                assertThat(e.getMessage()).contains("Cannot complete case task. Parent process instance ", " is suspended");
-            }
+            assertThatThrownBy(() -> cmmnTaskService.complete(taskInCaseInstance.getId()))
+                    .isInstanceOf(FlowableException.class)
+                    .hasMessageContaining("Cannot complete case task. Parent process instance")
+                    .hasMessageContaining("is suspended");
 
             processEngineRuntimeService.activateProcessInstanceById(processInstance.getId());
             cmmnTaskService.complete(taskInCaseInstance.getId());
