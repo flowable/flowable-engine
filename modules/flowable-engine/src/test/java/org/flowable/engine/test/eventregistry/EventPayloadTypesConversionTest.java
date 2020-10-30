@@ -173,6 +173,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
         assertThat(runtimeService.getVariable(processInstance.getId(), "doublePayload")).isEqualTo(2.22);
         assertThat(runtimeService.getVariable(processInstance.getId(), "longPayload")).isEqualTo(33333333L);
         assertThat(runtimeService.getVariable(processInstance.getId(), "booleanPayload")).isEqualTo(false);
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "jsonPayload")).isEqualTo("{ hello: 'world' }");
     }
 
     @Test
@@ -342,6 +343,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
             "  <doublePayload>2.22</doublePayload>" +
             "  <longPayload>33333333</longPayload>" +
             "  <booleanPayload>false</booleanPayload>" +
+            "  <jsonPayload>{\"hello\":\"world\"}</jsonPayload>" +
             "</data>";
 
             eventRegistry.eventReceived(inboundChannelModel, event);
