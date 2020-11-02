@@ -56,7 +56,7 @@ public class BaseDecisionResource {
         DmnDecision decision = dmnRepositoryService.getDecision(decisionId);
 
         if (decision == null) {
-            throw new FlowableObjectNotFoundException("Could not find a decision with id '" + decision);
+            throw new FlowableObjectNotFoundException("Could not find a decision with id '" + decisionId + "'.");
         }
         
         if (restApiInterceptor != null) {
