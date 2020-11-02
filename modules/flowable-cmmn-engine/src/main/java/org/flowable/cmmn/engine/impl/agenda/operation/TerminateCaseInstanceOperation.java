@@ -66,7 +66,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         // we don't use the completion flag directly on the entity as it gets evaluated only at the end of an evaluation cycle which we didn't hit yet
         // at this point, so we need a proper evaluation of the completion
         CompletionEvaluationResult completionEvaluationResult = PlanItemInstanceContainerUtil
-            .shouldPlanItemContainerComplete(commandContext, caseInstance, true);
+            .shouldPlanItemContainerComplete(commandContext, caseInstance, isAutoComplete);
 
         if (!completionEvaluationResult.isCompletable()) {
             // we can't complete the case as it is currently not completable, so we need to throw an exception
