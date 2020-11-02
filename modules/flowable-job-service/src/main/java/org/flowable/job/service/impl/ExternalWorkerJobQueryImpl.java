@@ -330,6 +330,11 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     }
 
     @Override
+    public ExternalWorkerJobQuery orderByJobCreateTime() {
+        return orderBy(JobQueryProperty.CREATE_TIME);
+    }
+
+    @Override
     public ExternalWorkerJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }

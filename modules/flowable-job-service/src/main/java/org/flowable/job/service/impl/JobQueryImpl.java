@@ -337,6 +337,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     }
 
     @Override
+    public JobQuery orderByJobCreateTime() {
+        return orderBy(JobQueryProperty.CREATE_TIME);
+    }
+
+    @Override
     public JobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }

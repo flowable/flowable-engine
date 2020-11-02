@@ -141,6 +141,11 @@ public interface JobQuery extends Query<JobQuery, Job> {
     JobQuery orderByJobDuedate();
 
     /**
+     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    JobQuery orderByJobCreateTime();
+
+    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     JobQuery orderByJobRetries();
