@@ -50,7 +50,6 @@ public class BpmnModel {
     protected String sourceSystemId;
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
-    protected int nextFlowIdCounter = 1;
     protected Object eventSupport;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {

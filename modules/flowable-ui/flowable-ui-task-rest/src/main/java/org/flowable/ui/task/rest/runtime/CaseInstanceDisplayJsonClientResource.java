@@ -12,11 +12,8 @@
  */
 package org.flowable.ui.task.rest.runtime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -43,7 +40,6 @@ import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.service.exception.NotPermittedException;
-import org.flowable.ui.task.service.editor.mapper.InfoMapper;
 import org.flowable.ui.task.service.runtime.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,8 +69,6 @@ public class CaseInstanceDisplayJsonClientResource {
     protected PermissionService permissionService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
-    protected List<String> eventElementTypes = new ArrayList<>();
-    protected Map<String, InfoMapper> propertyMappers = new HashMap<>();
 
     public CaseInstanceDisplayJsonClientResource() {
 

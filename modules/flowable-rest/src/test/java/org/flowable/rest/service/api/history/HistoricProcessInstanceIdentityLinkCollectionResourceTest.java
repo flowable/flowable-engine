@@ -28,7 +28,6 @@ import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -38,8 +37,6 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Tijs Rademakers
  */
 public class HistoricProcessInstanceIdentityLinkCollectionResourceTest extends BaseSpringRestTestCase {
-
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
     /**
      * GET history/historic-process-instances/{processInstanceId}/identitylinks
