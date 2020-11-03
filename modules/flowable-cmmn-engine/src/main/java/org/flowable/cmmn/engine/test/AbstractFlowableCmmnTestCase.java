@@ -22,8 +22,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
@@ -64,20 +67,33 @@ public abstract class AbstractFlowableCmmnTestCase {
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnMigrationService cmmnMigrationService;
 
-    protected String deploymentId;
+    protected Set<String> autoCleanupDeploymentIds = new HashSet<>();
+
+    protected String addDeploymentForAutoCleanup(CmmnDeployment cmmnDeployment) {
+        String deploymentId = cmmnDeployment.getId();
+        addDeploymentForAutoCleanup(deploymentId);
+        return deploymentId;
+    }
+
+    protected void addDeploymentForAutoCleanup(String deploymentId) {
+        this.autoCleanupDeploymentIds.add(deploymentId);
+    }
 
     @After
     public void cleanup() {
-        if (deploymentId != null) {
-            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
+        if (autoCleanupDeploymentIds != null && !autoCleanupDeploymentIds.isEmpty()) {
+            for (String deploymentId : autoCleanupDeploymentIds) {
+                CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
+            }
         }
+        autoCleanupDeploymentIds = new HashSet<>();
     }
 
     protected void deployOneHumanTaskCaseModel() {
-        deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-human-task-model.cmmn")
                 .deploy()
-                .getId();
+        );
     }
 
     protected CaseInstance deployAndStartOneHumanTaskCaseModel() {
@@ -86,10 +102,9 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected void deployOneTaskCaseModel() {
-        deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn")
-                .deploy()
-                .getId();
+                .deploy());
     }
     
     protected Date setClockFixedToCurrentTime() {
