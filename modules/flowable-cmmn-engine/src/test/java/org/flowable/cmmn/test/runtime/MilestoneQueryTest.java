@@ -46,7 +46,6 @@ public class MilestoneQueryTest extends FlowableCmmnTestCase {
                 .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count()).isEqualTo(4);
 
         List<MilestoneInstance> milestoneInstances = cmmnRuntimeService.createMilestoneInstanceQuery().list();
-        assertThat(milestoneInstances).isNotNull();
         assertThat(milestoneInstances).isEmpty();
 
         //event triggering

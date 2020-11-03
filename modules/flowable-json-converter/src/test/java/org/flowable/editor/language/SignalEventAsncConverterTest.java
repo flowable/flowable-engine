@@ -42,7 +42,6 @@ public class SignalEventAsncConverterTest extends AbstractConverterTest {
 
         ThrowEvent throwEvent = (ThrowEvent) model.getMainProcess().getFlowElement("throwEvent", true);
         List<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-        assertThat(eventDefinitions).isNotNull();
         assertThat(eventDefinitions).isNotEmpty();
 
         EventDefinition eventDefinition = eventDefinitions.get(0);

@@ -58,7 +58,6 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
         assertThat(onPart.getSource().getPlanItemDefinition().getId()).isEqualTo("startTaskAUserEvent");
         PlanItem task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskA").getPlanItemRef());
         List<Criterion> criterions = task.getEntryCriteria();
-        assertThat(criterions).isNotNull();
         assertThat(criterions).hasSize(1);
         assertThat(sentry.getId()).isEqualTo(criterions.get(0).getSentryRef());
 
@@ -71,7 +70,6 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
         assertThat(onPart.getSource().getPlanItemDefinition().getId()).isEqualTo("stopTaskBUserEvent");
         task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskB").getPlanItemRef());
         criterions = task.getExitCriteria();
-        assertThat(criterions).isNotNull();
         assertThat(criterions).hasSize(1);
         assertThat(sentry.getId()).isEqualTo(criterions.get(0).getSentryRef());
 

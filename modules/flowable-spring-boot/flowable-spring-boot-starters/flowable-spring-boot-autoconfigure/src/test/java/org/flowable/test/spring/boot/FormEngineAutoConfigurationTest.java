@@ -292,7 +292,6 @@ public class FormEngineAutoConfigurationTest {
 
             FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
             assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
-            assertThat(formEngine).as("Form engine").isNotNull();
             assertThat(context.getBean(FormService.class)).as("Form service")
                 .isEqualTo(formEngine.getFormService());
 
@@ -336,7 +335,6 @@ public class FormEngineAutoConfigurationTest {
 
             FormEngineConfigurationApi formEngine = context.getBean(FormEngineConfigurationApi.class);
             assertThat(formEngine).isEqualTo(formProcessConfigurationApi);
-            assertThat(formEngine).as("Form engine").isNotNull();
             assertThat(context.getBean(FormService.class)).as("Form service")
                 .isEqualTo(formEngine.getFormService());
 

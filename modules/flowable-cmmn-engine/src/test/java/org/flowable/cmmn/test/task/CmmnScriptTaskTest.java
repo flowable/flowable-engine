@@ -52,7 +52,6 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variables).isNotNull();
         assertThat(variables).isEmpty();
     }
 
@@ -91,15 +90,16 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertThat(caseVariables).hasSize(1);
         assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "aInt")).isTrue();
         Object integer = cmmnRuntimeService.getVariable(caseInstance.getId(), "aInt");
-        assertThat(integer).isInstanceOf(Integer.class);
-        assertThat(integer).isEqualTo(5);
+        assertThat(integer)
+                .isInstanceOf(Integer.class)
+                .isEqualTo(5);
 
         //The planItemInstance scope variable is available on the history service
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceId(scriptTaskPlanInstanceId)
-                .list();
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceId(scriptTaskPlanInstanceId)
+                    .list();
             assertThat(historicVariables).hasSize(1);
 
             HistoricVariableInstance planItemInstanceVariable = historicVariables.get(0);
@@ -114,26 +114,26 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
 
         //Both variables are still in the history
-            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-                List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .list();
-                assertThat(historicVariables).hasSize(2);
+            assertThat(historicVariables).hasSize(2);
 
-                HistoricVariableInstance caseScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() == null).findFirst().get();
-                assertThat(caseScopeVariable)
+            HistoricVariableInstance caseScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() == null).findFirst().get();
+            assertThat(caseScopeVariable)
                     .extracting(HistoricVariableInstance::getVariableName,
-                        HistoricVariableInstance::getVariableTypeName,
-                        HistoricVariableInstance::getValue)
+                            HistoricVariableInstance::getVariableTypeName,
+                            HistoricVariableInstance::getValue)
                     .containsExactly("aInt", "integer", 5);
 
-                HistoricVariableInstance planItemScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() != null).findFirst().get();
-                assertThat(planItemScopeVariable)
+            HistoricVariableInstance planItemScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() != null).findFirst().get();
+            assertThat(planItemScopeVariable)
                     .extracting(HistoricVariableInstance::getVariableName,
-                        HistoricVariableInstance::getVariableTypeName,
-                        HistoricVariableInstance::getValue)
+                            HistoricVariableInstance::getVariableTypeName,
+                            HistoricVariableInstance::getValue)
                     .containsExactly("aString", "string", "value set in the script");
-            }
+        }
     }
 
     @Test

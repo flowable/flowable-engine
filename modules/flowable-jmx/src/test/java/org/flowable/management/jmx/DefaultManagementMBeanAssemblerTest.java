@@ -51,7 +51,6 @@ public class DefaultManagementMBeanAssemblerTest {
 		                .getName())))).isTrue();
         assertThat(mbean.getMBeanInfo().getOperations()).isNotNull();
         MBeanOperationInfo[] operations = mbean.getMBeanInfo().getOperations();
-        assertThat(operations).isNotNull();
         assertThat(operations).hasSize(3);
 
     }

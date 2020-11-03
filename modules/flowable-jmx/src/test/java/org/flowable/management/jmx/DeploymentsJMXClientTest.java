@@ -66,14 +66,12 @@ public class DeploymentsJMXClientTest {
 
         // one process is there now, test remote deployments
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertThat(deployments).isNotNull();
         assertThat(deployments).hasSize(1);
         assertThat(deployments.get(0)).hasSize(3);
         String firstDeploymentId = deployments.get(0).get(0);
 
         // test remote process definition
         List<List<String>> pdList = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "ProcessDefinitions");
-        assertThat(pdList).isNotNull();
         assertThat(pdList).hasSize(1);
         assertThat(pdList.get(0)).hasSize(5);
         assertThat(pdList.get(0).get(0)).isNotNull();
@@ -87,7 +85,6 @@ public class DeploymentsJMXClientTest {
 
         // now there should be two deployments
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertThat(deployments).isNotNull();
         assertThat(deployments).hasSize(2);
         assertThat(deployments.get(0)).hasSize(3);
         assertThat(deployments.get(1)).hasSize(3);
@@ -95,7 +92,6 @@ public class DeploymentsJMXClientTest {
         // there should be two process definitions, one with version equals to
         // two
         pdList = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "ProcessDefinitions");
-        assertThat(pdList).isNotNull();
         assertThat(pdList).hasSize(2);
         assertThat(pdList.get(0)).hasSize(5);
         assertThat(pdList.get(1)).hasSize(5);
@@ -133,12 +129,10 @@ public class DeploymentsJMXClientTest {
 
         // test if it is reported as suspended and not the other one
         List<String> pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
-        assertThat(pd).isNotNull();
         assertThat(pd).hasSize(5);
         assertThat(pd.get(3)).isEqualTo("true");
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV1 }, new String[] { String.class.getName() });
-        assertThat(pd).isNotNull();
         assertThat(pd).hasSize(5);
         assertThat(pd.get(3)).isEqualTo("false");
 
@@ -152,12 +146,10 @@ public class DeploymentsJMXClientTest {
         // test if they are properly reported as activated
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
-        assertThat(pd).isNotNull();
         assertThat(pd).hasSize(5);
         assertThat(pd.get(3)).isEqualTo("false");
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV1 }, new String[] { String.class.getName() });
-        assertThat(pd).isNotNull();
         assertThat(pd).hasSize(5);
         assertThat(pd.get(3)).isEqualTo("false");
 
@@ -173,7 +165,6 @@ public class DeploymentsJMXClientTest {
         // check if it is also affected in returned results.
 
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertThat(deployments).isNotNull();
         assertThat(deployments).hasSize(1);
         assertThat(deployments.get(0)).hasSize(3);
         assertThat(firstDeploymentId).isNotEqualTo(deployments.get(0).get(0));

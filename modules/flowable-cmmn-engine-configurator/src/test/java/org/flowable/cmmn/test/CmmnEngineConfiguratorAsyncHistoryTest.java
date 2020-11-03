@@ -67,7 +67,6 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         AsyncExecutor processEngineAsyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncHistoryExecutor();
         AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncHistoryExecutor();
         assertThat(processEngineAsyncExecutor).isNotNull();
-        assertThat(cmmnEngineAsyncExecutor).isNotNull();
         assertThat(cmmnEngineAsyncExecutor).isSameAs(processEngineAsyncExecutor);
 
         // Running them together should have moved the job execution scope to 'all' (from process which is null)

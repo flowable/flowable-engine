@@ -92,7 +92,6 @@ public class JobExecutorMBeanTest {
         assertThat(modelBean).isNotNull();
         MBeanInfo beanInfo = modelBean.getMBeanInfo();
         assertThat(beanInfo).isNotNull();
-        assertThat(beanInfo.getOperations()).isNotNull();
         assertThat(beanInfo.getOperations()).hasSize(2);
         int counter = 0;
 
@@ -108,7 +107,6 @@ public class JobExecutorMBeanTest {
         assertThat(counter).isEqualTo(1);
 
         // check attributes
-        assertThat(beanInfo.getAttributes()).isNotNull();
         assertThat(beanInfo.getAttributes()).hasSize(1);
 
         counter = 0;

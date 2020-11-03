@@ -68,7 +68,6 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
         validateExtensionElements(extensionElementMap);
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ServiceTask.class);
         assertThat(flowElement.getId()).isEqualTo("servicetask");
         ServiceTask serviceTask = (ServiceTask) flowElement;
