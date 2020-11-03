@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @RestController
 public class ProcessDefinitionClientResource extends AbstractClientResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ModelsClientResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionClientResource.class);
 
     @Autowired
     protected ProcessDefinitionService clientService;

@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseInstanceOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EvaluateCriteriaOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEvaluationCriteriaOperation.class);
 
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
 
