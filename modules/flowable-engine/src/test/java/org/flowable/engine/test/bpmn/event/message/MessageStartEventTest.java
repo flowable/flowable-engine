@@ -13,9 +13,14 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 import java.util.Calendar;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -23,26 +28,38 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class MessageStartEventTest extends PluggableFlowableTestCase {
 
     @Test
     public void testDeploymentCreatesSubscriptions() {
-        String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
-                .deploy().getId();
+        String deploymentId1 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+            .deploy().getId();
+        ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult();
 
-        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), null));
 
-        assertThat(eventSubscriptions).hasSize(1);
+        String deploymentId2 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+            .deploy().getId();
+        ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId2).singleResult();
 
-        repositoryService.deleteDeployment(deploymentId);
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition2.getId(), null)); // Note the changed definition id
+
+        repositoryService.deleteDeployment(deploymentId1);
+        repositoryService.deleteDeployment(deploymentId2);
     }
 
     @Test
