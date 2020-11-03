@@ -97,7 +97,6 @@ public class ClearProcessInstanceLocksTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd((Job) acquiredJob, processEngineConfiguration.getJobServiceConfiguration()));
 
             // After locking, the lockowner should be shared by the job and the process instance
-            assertThat(acquiredJob.getLockOwner()).isNotNull();
             assertThat(acquiredJob.getLockOwner()).isEqualTo(processEngineConfiguration.getAsyncExecutor().getLockOwner());
             assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
 

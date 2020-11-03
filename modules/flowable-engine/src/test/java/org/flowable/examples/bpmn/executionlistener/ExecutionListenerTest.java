@@ -43,12 +43,10 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", "businessKey123");
 
         String varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
-        assertThat(varSetInExecutionListener).isNotNull();
         assertThat(varSetInExecutionListener).isEqualTo("firstValue");
 
         // Check if business key was available in execution listener
         String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
-        assertThat(businessKey).isNotNull();
         assertThat(businessKey).isEqualTo("businessKey123");
 
         // Transition take executionListener will set 2 variables
@@ -58,7 +56,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
 
-        assertThat(varSetInExecutionListener).isNotNull();
         assertThat(varSetInExecutionListener).isEqualTo("secondValue");
 
         ExampleExecutionListenerPojo myPojo = new ExampleExecutionListenerPojo();
@@ -71,7 +68,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // First usertask uses a method-expression as executionListener:
         // ${myPojo.myMethod(execution.eventName)}
         ExampleExecutionListenerPojo pojoVariable = (ExampleExecutionListenerPojo) runtimeService.getVariable(processInstance.getId(), "myPojo");
-        assertThat(pojoVariable.getReceivedEventName()).isNotNull();
         assertThat(pojoVariable.getReceivedEventName()).isEqualTo("end");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -114,7 +110,6 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);
 
         Object varSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
-        assertThat(varSetByListener).isNotNull();
         assertThat(varSetByListener).isInstanceOf(String.class);
 
         // Result is a concatenation of fixed injected field and injected expression
@@ -181,12 +176,10 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // Process start executionListener will have executionListener class
         // that sets 2 variables
         varSetInExecutionListener = (String) runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
-        assertThat(varSetInExecutionListener).isNotNull();
         assertThat(varSetInExecutionListener).isEqualTo("firstValue");
 
         // Check if business key was available in execution listener
         String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
-        assertThat(businessKey).isNotNull();
         assertThat(businessKey).isEqualTo("businessKey123");
 
     }

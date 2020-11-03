@@ -748,7 +748,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Test EQUAL on single string variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("stringVar", "abcdef");
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Test EQUAL on two string variables, should result in single match
@@ -845,7 +844,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Query on single long variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("longVar", 12345L);
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two long variables, should result in single match
@@ -934,7 +932,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Query on single double variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("doubleVar", 12345.6789);
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two double variables, should result in single value
@@ -1025,7 +1022,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Query on single integer variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("integerVar", 12345);
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two integer variables, should result in single value
@@ -1115,7 +1111,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().or().variableValueEquals("integerVar", 12345).processDefinitionId("undefined")
                 .endOr();
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         query = runtimeService.createProcessInstanceQuery()
@@ -1128,7 +1123,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .processDefinitionId("undefined")
                 .endOr();
         processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two integer variables, should result in single value
@@ -1247,7 +1241,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Query on single short variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("shortVar", shortVar);
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two short variables, should result in single value
@@ -1354,7 +1347,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         // Query on single short variable, should result in 2 matches
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().variableValueEquals("dateVar", date1);
         List<ProcessInstance> processInstances = query.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(2);
 
         // Query on two short variables, should result in single value
@@ -1492,7 +1484,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         // Test value-only matching, no results present
         instances = runtimeService.createProcessInstanceQuery().variableValueEquals(true).list();
-        assertThat(instances).isNotNull();
         assertThat(instances).isEmpty();
     }
 
@@ -1843,7 +1834,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(processInstanceQuery.count()).isEqualTo(5);
 
         List<ProcessInstance> processInstances = processInstanceQuery.list();
-        assertThat(processInstances).isNotNull();
         assertThat(processInstances).hasSize(5);
 
         for (ProcessInstance processInstance : processInstances) {

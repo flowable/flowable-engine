@@ -855,21 +855,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
-        assertThat(instanceList).isNotNull();
         assertThat(instanceList).hasSize(3);
 
         List<Task> taskList = taskService.createTaskQuery().list();
-        assertThat(taskList).isNotNull();
         assertThat(taskList).hasSize(2);
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "Test cascading");
 
         instanceList = runtimeService.createProcessInstanceQuery().list();
-        assertThat(instanceList).isNotNull();
         assertThat(instanceList).isEmpty();
 
         taskList = taskService.createTaskQuery().list();
-        assertThat(taskList).isNotNull();
         assertThat(taskList).isEmpty();
     }
 

@@ -442,8 +442,6 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
         List<HistoricActivityInstance> historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("join").processInstanceId(processInstance.getId()).list();
 
-        assertThat(historicActivityInstance).isNotNull();
-
         // History contains 2 entries for parallel join (one for each path
         // arriving in the join), should contain end-time
         assertThat(historicActivityInstance).hasSize(2);

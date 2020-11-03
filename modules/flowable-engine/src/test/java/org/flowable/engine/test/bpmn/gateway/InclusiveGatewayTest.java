@@ -775,8 +775,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(childExecutions).hasSize(5);
         classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
         assertThat(classifiedExecutions)
-                .containsKeys("multiInstanceSubProcess", "taskInclusive1", "taskInclusive2", "inclusiveJoin");
-        assertThat(classifiedExecutions).doesNotContainKey("taskInclusive3");
+                .containsKeys("multiInstanceSubProcess", "taskInclusive1", "taskInclusive2", "inclusiveJoin")
+                .doesNotContainKey("taskInclusive3");
         assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(2);
         assertThat(classifiedExecutions.get("taskInclusive1")).hasSize(1);
         assertThat(classifiedExecutions.get("taskInclusive2")).hasSize(1);
@@ -786,8 +786,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
         assertThat(classifiedTasks)
-                .containsOnlyKeys("taskInclusive1", "taskInclusive2");
-        assertThat(classifiedTasks).doesNotContainKeys("taskInclusive3");
+                .containsOnlyKeys("taskInclusive1", "taskInclusive2")
+                .doesNotContainKeys("taskInclusive3");
 
         //Finish the rest of the tasks
         Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive2").stream())
