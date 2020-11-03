@@ -207,11 +207,9 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().singleResult();
 
         Object testVariable2 = runtimeService.getVariable(processInstance.getId(), "test2");
-        assertThat(testVariable2).isNotNull();
         assertThat(testVariable2).hasToString("compensated2");
 
         Object testVariable1 = runtimeService.getVariable(processInstance.getId(), "test1");
-        assertThat(testVariable1).isNotNull();
         assertThat(testVariable1).hasToString("compensated1");
     }
 

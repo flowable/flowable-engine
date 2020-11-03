@@ -37,7 +37,6 @@ public class ParallelGatewayConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("parallelGateway");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ParallelGateway.class);
 
         ParallelGateway gateway = (ParallelGateway) flowElement;

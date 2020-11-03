@@ -45,7 +45,6 @@ public class CaseServiceTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("caseServiceTask");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(CaseServiceTask.class);
         CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
         assertThat(caseServiceTask.getId()).isEqualTo("caseServiceTask");

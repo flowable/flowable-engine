@@ -98,7 +98,6 @@ public class ClearCaseInstanceLocksTest extends FlowableCmmnTestCase {
             cmmnEngineConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd((Job) acquiredJob, cmmnEngineConfiguration.getJobServiceConfiguration()));
 
             // After locking, the lockowner should be shared by the job and the process instance
-            assertThat(acquiredJob.getLockOwner()).isNotNull();
             assertThat(acquiredJob.getLockOwner()).isEqualTo(cmmnEngineConfiguration.getAsyncExecutor().getLockOwner());
             assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
 

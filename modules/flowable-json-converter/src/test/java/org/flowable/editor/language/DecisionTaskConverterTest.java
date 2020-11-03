@@ -43,7 +43,6 @@ public class DecisionTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("decisiontask", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ServiceTask.class);
         ServiceTask serviceTask = (ServiceTask) flowElement;
         assertThat(serviceTask.getId()).isEqualTo("decisiontask");

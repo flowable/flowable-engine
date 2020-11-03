@@ -206,7 +206,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(1);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
@@ -219,7 +218,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().list();
 
-        assertThat(tasks).isNotNull();
         assertThat(tasks).isEmpty();
 
         assertThat(TaskDeleteListener.getCurrentMessages())
@@ -237,7 +235,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersOnDelete");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertThat(tasks).isNotNull();
         assertThat(tasks).hasSize(1);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("User Task 1").singleResult();
@@ -250,7 +247,6 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().list();
 
-        assertThat(tasks).isNotNull();
         assertThat(tasks).isEmpty();
 
         assertThat(TaskDeleteListener.getCurrentMessages())

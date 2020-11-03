@@ -61,7 +61,6 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
         UserTask userTask = (UserTask) flowElement;
 
         Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
-        assertThat(attributesMap).isNotNull();
         assertThat(attributesMap).hasSize(2);
 
         attributes = attributesMap.get("id");

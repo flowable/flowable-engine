@@ -51,7 +51,6 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertThat(task.getDueDate()).isNotNull();
         assertThat(task.getDueDate()).isEqualTo(date);
     }
 
@@ -106,7 +105,6 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertThat(task.getDueDate()).isNotNull();
         assertThat(task.getDueDate()).isEqualTo(new Date(0));
     }
 

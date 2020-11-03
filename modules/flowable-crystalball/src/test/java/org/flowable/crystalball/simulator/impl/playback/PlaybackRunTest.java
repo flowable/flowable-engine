@@ -120,14 +120,17 @@ public class PlaybackRunTest {
 
     private void checkStatus(ProcessEngine processEngine) {
         HistoryService historyService = processEngine.getHistoryService();
-        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().singleResult();
+        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables()
+                .singleResult();
         assertThat(historicProcessInstance).isNotNull();
         RepositoryService repositoryService = processEngine.getRepositoryService();
-        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
+        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
         assertThat(processDefinition.getKey()).isEqualTo(SIMPLEST_PROCESS);
 
-        assertThat(historicProcessInstance.getProcessVariables()).hasSize(1);
-        assertThat(historicProcessInstance.getProcessVariables()).containsEntry(TEST_VARIABLE, TEST_VALUE);
+        assertThat(historicProcessInstance.getProcessVariables())
+                .hasSize(1)
+                .containsEntry(TEST_VARIABLE, TEST_VALUE);
         assertThat(historicProcessInstance.getBusinessKey()).isEqualTo(BUSINESS_KEY);
     }
 

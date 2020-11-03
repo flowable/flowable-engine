@@ -66,21 +66,6 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
 
         if (inputStream != null) {
             // Stream given, write to store and save a reference to the content object
-            Map<String, Object> metaData = new HashMap<>();
-            if (contentItem.getTaskId() != null) {
-                metaData.put(ContentMetaDataKeys.TASK_ID, contentItem.getTaskId());
-            } else {
-                if (contentItem.getProcessInstanceId() != null) {
-                    metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, contentItem.getProcessInstanceId());
-                } else {
-                    if (StringUtils.isNotEmpty(contentItem.getScopeType())) {
-                        metaData.put(ContentMetaDataKeys.SCOPE_TYPE, contentItem.getScopeType());
-                    }
-                    if (StringUtils.isNotEmpty(contentItem.getScopeId())) {
-                        metaData.put(ContentMetaDataKeys.SCOPE_ID, contentItem.getScopeId());
-                    }
-                }
-            }
 
             ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
             ContentObject createContentObject = contentStorage.createContentObject(inputStream, new ContentItemContentObjectMetadata());

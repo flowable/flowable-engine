@@ -43,18 +43,15 @@ public class EventNonInterruptingSubProcessConverterTest extends AbstractConvert
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("task1");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(UserTask.class);
         assertThat(flowElement.getId()).isEqualTo("task1");
 
         FlowElement eventSubProcessElement = model.getMainProcess().getFlowElement("eventSubProcess");
-        assertThat(eventSubProcessElement).isNotNull();
         assertThat(eventSubProcessElement).isInstanceOf(EventSubProcess.class);
         EventSubProcess eventSubProcess = (EventSubProcess) eventSubProcessElement;
         assertThat(eventSubProcess.getId()).isEqualTo("eventSubProcess");
 
         FlowElement signalStartEvent = eventSubProcess.getFlowElement("eventSignalStart");
-        assertThat(signalStartEvent).isNotNull();
         assertThat(signalStartEvent).isInstanceOf(StartEvent.class);
         StartEvent startEvent = (StartEvent) signalStartEvent;
         assertThat(startEvent.getId()).isEqualTo("eventSignalStart");

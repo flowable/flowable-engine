@@ -42,7 +42,6 @@ public abstract class AbstractConverterTest {
     }
 
     protected EventDefinition extractEventDefinition(FlowElement flowElement) {
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(Event.class);
         Event event = (Event) flowElement;
         assertThat(event.getEventDefinitions()).isNotEmpty();

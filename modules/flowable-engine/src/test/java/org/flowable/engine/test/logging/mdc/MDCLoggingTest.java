@@ -80,10 +80,13 @@ public class MDCLoggingTest extends PluggableFlowableTestCase {
                 .isInstanceOf(Exception.class);
         String messages = console.toString();
 
-        assertThat(messages).contains("ProcessDefinitionId=" + TestService.processDefinitionId);
-        assertThat(messages).contains("executionId=" + TestService.executionId);
-        assertThat(messages).contains("mdcProcessInstanceID=" + TestService.processInstanceId);
-        assertThat(messages).contains("mdcBusinessKey=" + (TestService.businessKey == null ? "" : TestService.businessKey));
+        assertThat(messages)
+                .contains(
+                        "ProcessDefinitionId=" + TestService.processDefinitionId,
+                        "executionId=" + TestService.executionId,
+                        "mdcProcessInstanceID=" + TestService.processInstanceId,
+                        "mdcBusinessKey=" + (TestService.businessKey == null ? "" : TestService.businessKey)
+                );
         console.clear();
         restoreLoggers();
 

@@ -104,7 +104,6 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertThat(executionEntity.getParentId()).isNotNull();
         assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent activitiEvent = mylistener.getEventsReceived().get(2);

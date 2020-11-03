@@ -2329,8 +2329,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
                 .contains(
                         entry("processVar1", "test"),
                         entry("processVar2", 10)
-                );
-        assertThat(processVariables)
+                )
                 .doesNotContainKeys("localVar1", "localVar2");
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").singleResult();
@@ -2420,8 +2419,7 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
                 .contains(
                         entry("processVar1", "test"),
                         entry("processVar2", 10)
-                );
-        assertThat(processVariables)
+                )
                 .doesNotContainKeys("localVar1", "localVar2");
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("taskBefore").singleResult();

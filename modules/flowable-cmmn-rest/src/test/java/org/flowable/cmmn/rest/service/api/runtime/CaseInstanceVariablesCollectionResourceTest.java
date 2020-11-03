@@ -151,7 +151,6 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariable(caseInstance.getId(), "binaryVariable");
-        assertThat(variableValue).isNotNull();
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }
@@ -200,7 +199,6 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariable(caseInstance.getId(), "serializableVariable");
-        assertThat(variableValue).isNotNull();
         assertThat(variableValue).isInstanceOf(TestSerializableVariable.class);
         assertThat(((TestSerializableVariable) variableValue).getSomeField()).isEqualTo("some value");
     }

@@ -66,7 +66,6 @@ public class JobExceptionStacktraceResourceTest extends BaseSpringRestTestCase {
                 SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_EXCEPTION_STRACKTRACE, timerJob.getId())), HttpStatus.SC_OK);
 
         String stack = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-        assertThat(stack).isNotNull();
         assertThat(stack).isEqualTo(managementService.getTimerJobExceptionStacktrace(timerJob.getId()));
 
         // Also check content-type

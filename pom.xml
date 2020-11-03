@@ -15,7 +15,7 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.3.5.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.9.RELEASE</spring.framework.version>
+		<spring.framework.version>5.2.10.RELEASE</spring.framework.version>
 		<spring.security.version>5.3.5.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.5.6.RELEASE</spring.kafka.version>
@@ -38,9 +38,6 @@
 
 		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
-
-        <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
-        <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
         <!-- JVM params for test execution -->
 		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
@@ -1940,16 +1937,6 @@
 			</dependencies>
 		</profile>
 	</profiles>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-            </plugin>
-        </plugins>
-    </reporting>
 
 	<!-- Various information, not used by the build -->
 
