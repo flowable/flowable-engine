@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -583,16 +584,16 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
 
             // Check if engine has correct variables set
             Map<String, Object> taskVariables = taskService.getVariablesLocal(task.getId());
-            assertThat(taskVariables).hasSize(7);
-
-            assertThat(taskVariables.get("stringVariable")).isEqualTo("simple string value");
-            assertThat(taskVariables.get("integerVariable")).isEqualTo(1234);
-            assertThat(taskVariables.get("shortVariable")).isEqualTo((short) 123);
-            assertThat(taskVariables.get("longVariable")).isEqualTo(4567890L);
-            assertThat(taskVariables.get("doubleVariable")).isEqualTo(123.456);
-            assertThat(taskVariables.get("booleanVariable")).isEqualTo(Boolean.TRUE);
-            assertThat(taskVariables.get("dateVariable")).isEqualTo(dateFormat.parse(isoString));
-
+            assertThat(taskVariables)
+                    .containsOnly(
+                            entry("stringVariable", "simple string value"),
+                            entry("integerVariable", 1234),
+                            entry("shortVariable", (short) 123),
+                            entry("longVariable", 4567890L),
+                            entry("doubleVariable", 123.456),
+                            entry("booleanVariable", Boolean.TRUE),
+                            entry("dateVariable", dateFormat.parse(isoString))
+                    );
         } finally {
             // Clean adhoc-tasks even if test fails
             List<Task> tasks = taskService.createTaskQuery().list();

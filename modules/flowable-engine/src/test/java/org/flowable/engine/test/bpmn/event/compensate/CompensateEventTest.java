@@ -105,6 +105,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testCompensateSubprocessWithoutActivityRef() {
 
