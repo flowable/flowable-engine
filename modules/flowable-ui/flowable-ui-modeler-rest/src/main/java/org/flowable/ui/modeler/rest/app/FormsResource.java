@@ -14,7 +14,6 @@ package org.flowable.ui.modeler.rest.app;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 

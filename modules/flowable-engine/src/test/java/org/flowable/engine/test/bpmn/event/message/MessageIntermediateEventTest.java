@@ -13,7 +13,6 @@
 
 package org.flowable.engine.test.bpmn.event.message;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.util.HashMap;
