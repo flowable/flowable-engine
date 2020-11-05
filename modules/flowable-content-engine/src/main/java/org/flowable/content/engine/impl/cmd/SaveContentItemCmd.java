@@ -14,16 +14,12 @@ package org.flowable.content.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
-import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
 import org.flowable.content.api.ContentObjectStorageMetadata;
 import org.flowable.content.api.ContentStorage;

@@ -15,8 +15,6 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
