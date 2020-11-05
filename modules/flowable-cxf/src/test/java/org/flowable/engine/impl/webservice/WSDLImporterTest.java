@@ -125,7 +125,8 @@ public class WSDLImporterTest {
 
     private List<WSOperation> sortOperations() {
         List<WSOperation> operations = new ArrayList<>(importer.getOperations().values());
-        Collections.sort(operations, new Comparator<WSOperation>() {
+        operations.sort(new Comparator<WSOperation>() {
+
             @Override
             public int compare(WSOperation o1, WSOperation o2) {
                 return o1.getName().compareTo(o2.getName());
@@ -136,7 +137,8 @@ public class WSDLImporterTest {
 
     private List<StructureDefinition> sortStructures() {
         List<StructureDefinition> structures = new ArrayList<>(importer.getStructures().values());
-        Collections.sort(structures, new Comparator<StructureDefinition>() {
+        structures.sort(new Comparator<StructureDefinition>() {
+
             @Override
             public int compare(StructureDefinition o1, StructureDefinition o2) {
                 return o1.getId().compareTo(o2.getId());

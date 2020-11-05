@@ -84,7 +84,7 @@ public class FormsResource {
             reps.add(new FormRepresentation(model));
         }
 
-        Collections.sort(reps, new NameComparator());
+        reps.sort(new NameComparator());
 
         ResultListDataRepresentation result = new ResultListDataRepresentation(reps);
         result.setTotal(Long.valueOf(models.size()));

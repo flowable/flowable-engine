@@ -40,7 +40,8 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
 
         // sort on predefined list(s) of output values
-        Collections.sort(ruleResults, new Comparator<Object>() {
+        ruleResults.sort(new Comparator<Object>() {
+
             boolean noOutputValuesPresent = true;
 
             @SuppressWarnings("unchecked")
@@ -51,9 +52,9 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
                     List<Object> outputValues = entry.getValue();
                     if (outputValues != null && !outputValues.isEmpty()) {
                         noOutputValuesPresent = false;
-                        compareToBuilder.append(((Map<String, Object>) o1).get(entry.getKey()), 
-                                        ((Map<String, Object>) o2).get(entry.getKey()), 
-                                        new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                        compareToBuilder.append(((Map<String, Object>) o1).get(entry.getKey()),
+                                ((Map<String, Object>) o2).get(entry.getKey()),
+                                new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
                     }
                 }
 
@@ -63,9 +64,11 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
                     if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                         throw new FlowableException(String.format("HitPolicy %s violated; no output values present.", getHitPolicyName()));
                     } else {
-                        executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; no output values present. Setting first valid result as final result.", getHitPolicyName()));
+                        executionContext.getAuditContainer().setValidationMessage(
+                                String.format("HitPolicy %s violated; no output values present. Setting first valid result as final result.",
+                                        getHitPolicyName()));
                     }
-                    
+
                     return 0;
                 }
             }

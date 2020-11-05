@@ -678,7 +678,7 @@ public class ExecutionEntityManagerImpl
         if (childExecutions != null && childExecutions.size() > 0) {
 
             // Have a fixed ordering of child executions (important for the order in which events are sent)
-            Collections.sort(childExecutions, ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR);
+            childExecutions.sort(ExecutionEntity.EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR);
 
             for (ExecutionEntity childExecution : childExecutions) {
                 if (!executionIdsToExclude.contains(childExecution.getId())) {
