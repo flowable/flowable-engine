@@ -78,12 +78,6 @@
             <artifactId>mybatis-spring</artifactId>
       	</dependency>
 
-		<!-- Xerces -->
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
-
         <!-- DATABASE -->
         <dependency>
             <groupId>org.liquibase</groupId>
