@@ -754,11 +754,19 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 .map(job -> managementService.getDeadLetterJobExceptionStacktrace(job.getId()))
                 .collect(Collectors.toList());
 
-        assertThat(exceptionStacktraces.get(0))
-                .contains("Job is not applicable for transformer types: [activity-update]");
-
-        assertThat(exceptionStacktraces.get(1))
+        String stackTrace1 = exceptionStacktraces.get(0);
+        if (stackTrace1.contains("[activity-update]")) {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-update]");
+            
+            assertThat(exceptionStacktraces.get(1))
                 .contains("Job is not applicable for transformer types: [activity-end]");
+            
+        } else {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-end]");
+            
+            assertThat(exceptionStacktraces.get(1))
+                .contains("Job is not applicable for transformer types: [activity-update]");
+        }
 
         // The history jobs in the deadletter table have no link to the process instance, hence why a manual cleanup is needed.
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
