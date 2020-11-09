@@ -14,6 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -63,6 +66,10 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
+            throw new FlowableException("The task instance is created by the cmmn engine and should be completed via the cmmn engine API");
+        }
+        
         // Backwards compatibility
         if (task.getProcessDefinitionId() != null) {
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {

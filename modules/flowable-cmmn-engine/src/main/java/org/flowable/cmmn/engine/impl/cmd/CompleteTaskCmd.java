@@ -59,6 +59,10 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
         
+        if (StringUtils.isNotEmpty(taskEntity.getProcessInstanceId())) {
+            throw new FlowableException("The task instance is created by the process engine and should be completed via the process engine API");
+        }
+        
         String planItemInstanceId = taskEntity.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = null;
         if (planItemInstanceId != null) {

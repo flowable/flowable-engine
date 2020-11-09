@@ -16,6 +16,7 @@ import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -67,6 +68,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (StringUtils.isNotEmpty(task.getProcessInstanceId())) {
+            throw new FlowableException("The task instance is created by the process engine and should be completed via the process engine API");
+        }
+        
         FormService formService = CommandContextUtil.getFormService(commandContext);
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
