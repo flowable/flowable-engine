@@ -1389,7 +1389,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected void resolveProcessDefinitionInfo() {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
         if (processDefinition == null) {
-            throw new FlowableException("Cannot get process definition for id " + processDefinition.getId());
+            throw new FlowableException("Cannot get process definition for id " + processDefinitionId);
         }
         
         this.processDefinitionKey = processDefinition.getKey();
