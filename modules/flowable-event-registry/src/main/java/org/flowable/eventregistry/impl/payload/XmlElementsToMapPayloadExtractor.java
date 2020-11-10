@@ -36,7 +36,11 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
+
+    public XmlElementsToMapPayloadExtractor(ObjectMapper objectMapper){
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Document event) {

@@ -28,10 +28,18 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Filip Hrisafov
  */
 public class OutboundChannelModelProcessor implements ChannelModelProcessor {
+
+    protected ObjectMapper objectMapper;
+
+    public OutboundChannelModelProcessor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -56,7 +64,7 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
             if (StringUtils.isNotEmpty(inboundChannelModel.getPipelineDelegateExpression())) {
                 eventProcessingPipeline = resolveExpression(inboundChannelModel.getPipelineDelegateExpression(), OutboundEventProcessingPipeline.class);
             } else if ("json".equals(inboundChannelModel.getSerializerType())) {
-                OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
+                OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer(objectMapper);
                 eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
             } else if ("xml".equals(inboundChannelModel.getSerializerType())) {

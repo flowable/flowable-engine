@@ -28,12 +28,12 @@ public class JsonPointerBasedInboundEventKeyDetector implements InboundEventKeyD
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonPointerBasedInboundEventKeyDetector.class);
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
-
+    protected ObjectMapper objectMapper;
     protected String jsonPointerValue;
     protected JsonPointer jsonPointerExpression;
 
-    public JsonPointerBasedInboundEventKeyDetector(String jsonPointerExpression) {
+    public JsonPointerBasedInboundEventKeyDetector(ObjectMapper objectMapper, String jsonPointerExpression) {
+        this.objectMapper = objectMapper;
         this.jsonPointerValue = jsonPointerExpression;
         this.jsonPointerExpression = JsonPointer.compile(jsonPointerExpression);
     }

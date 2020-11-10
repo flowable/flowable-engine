@@ -28,12 +28,12 @@ public class JsonPointerBasedInboundEventTenantDetector implements InboundEventT
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonPointerBasedInboundEventTenantDetector.class);
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
-
+    protected ObjectMapper objectMapper;
     protected String jsonPointerExpression;
     protected JsonPointer jsonPointer;
 
-    public JsonPointerBasedInboundEventTenantDetector(String jsonPointerExpression) {
+    public JsonPointerBasedInboundEventTenantDetector(ObjectMapper objectMapper, String jsonPointerExpression) {
+        this.objectMapper = objectMapper;
         this.jsonPointerExpression = jsonPointerExpression;
         this.jsonPointer = JsonPointer.compile(jsonPointerExpression);
     }

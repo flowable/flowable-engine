@@ -23,11 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
-
+    protected ObjectMapper objectMapper;
     protected String field;
 
-    public JsonFieldBasedInboundEventKeyDetector(String field) {
+    public JsonFieldBasedInboundEventKeyDetector(ObjectMapper objectMapper, String field) {
+        this.objectMapper = objectMapper;
         this.field = field;
     }
 
