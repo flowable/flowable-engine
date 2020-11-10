@@ -12,11 +12,15 @@
  */
 package org.flowable.common.engine.api.delegate.event;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /**
  * Describes a class that listens for {@link FlowableEvent}s dispatched by the engine.
  * 
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public interface FlowableEventListener {
 
@@ -43,4 +47,13 @@ public interface FlowableEventListener {
      */
     String getOnTransaction();
     
+    /**
+     * The event types that this event listener needs to be registered for
+     *
+     * @return the specific event types that this listeners should register itself for
+     */
+    default Collection<? extends FlowableEventType> getTypes() {
+        return Collections.emptySet();
+    }
+
 }

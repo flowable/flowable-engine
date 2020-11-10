@@ -13,6 +13,7 @@
  */
 package org.flowable.engine.delegate.event;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
@@ -20,6 +21,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -197,6 +199,11 @@ public abstract class AbstractFlowableEngineEventListener extends AbstractFlowab
     @Override
     public boolean isFailOnException() {
         return true;
+    }
+
+    @Override
+    public Collection<? extends FlowableEventType> getTypes() {
+        return types == null ? super.getTypes() : types;
     }
 
     protected void entityCreated(FlowableEngineEntityEvent event) {}
