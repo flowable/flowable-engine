@@ -124,7 +124,7 @@ public class DefaultJobManager implements JobManager {
         jobServiceConfiguration.getTimerJobEntityManager().insert(timerJob);
     }
 
-    private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
+    protected void sendTimerScheduledEvent(TimerJobEntity timerJob) {
         FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
@@ -231,9 +231,19 @@ public class DefaultJobManager implements JobManager {
             jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
         } else if (job instanceof ExternalWorkerJobEntity) {
             jobServiceConfiguration.getExternalWorkerJobEntityManager().delete((ExternalWorkerJobEntity) job);
+        } else {
+            throw new FlowableIllegalArgumentException("Cannot move the job to deadletter: the job is not a timer, async job or external worker job");
         }
 
         return deadLetterJob;
+    }
+
+    protected void sendMoveToDeadletterEvent(JobInfo job) {
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                FlowableEngineEventType.JOB_MOVED_TO_DEADLETTER, job), jobServiceConfiguration.getEngineName());
+        }
     }
 
     @Override
@@ -728,6 +738,7 @@ public class DefaultJobManager implements JobManager {
     public DeadLetterJobEntity createDeadLetterJobFromOtherJob(AbstractRuntimeJobEntity otherJob) {
         DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getDeadLetterJobEntityManager().create();
         copyJobInfo(deadLetterJob, otherJob);
+        sendMoveToDeadletterEvent(otherJob);
         return deadLetterJob;
     }
 
@@ -743,6 +754,8 @@ public class DefaultJobManager implements JobManager {
         if (historyJobEntity.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             deadLetterJob.setJobHandlerConfiguration(historyJobEntity.getAdvancedJobHandlerConfigurationByteArrayRef().getId());
         }
+
+        sendMoveToDeadletterEvent(historyJobEntity);
 
         return deadLetterJob;
     }
