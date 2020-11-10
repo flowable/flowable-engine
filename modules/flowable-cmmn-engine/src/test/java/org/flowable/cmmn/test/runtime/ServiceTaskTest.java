@@ -38,6 +38,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
 /**
@@ -163,6 +164,43 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .variableName("beanResponse")
                 .singleResult().getValue()).isEqualTo("hello test");
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testDefinitionExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertThat(planItemInstance).isNotNull();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "resultVersion")).isEqualTo("1");
+        assertThat(cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "resultVersion").getTypeName()).isEqualTo("string");
+
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("resultVersion")
+                    .singleResult();
+            
+            assertThat(historicVariableInstance.getValue()).isEqualTo("1");
+            assertThat(historicVariableInstance.getVariableTypeName()).isEqualTo("string");
         }
     }
 

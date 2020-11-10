@@ -139,7 +139,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertThat(executionEntity.getParentId()).isNotNull();
         assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
@@ -307,7 +306,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(1);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertThat(executionEntity.getParentId()).isNotNull();
         assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(2);
@@ -447,7 +445,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         entityEvent = (FlowableEntityEvent) mylistener.getEventsReceived().get(idx++);
         assertThat(entityEvent.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
-        assertThat(executionEntity.getParentId()).isNotNull();
         assertThat(executionEntity.getParentId()).isEqualTo(processExecutionId);
 
         FlowableEvent flowableEvent = mylistener.getEventsReceived().get(idx++);

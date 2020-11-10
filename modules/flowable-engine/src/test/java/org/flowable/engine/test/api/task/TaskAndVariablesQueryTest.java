@@ -75,18 +75,18 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testQuery() {
-        org.flowable.task.api.Task task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("gonzo").singleResult();
+        Task task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("gonzo").singleResult();
         assertThat(task.getProcessVariables()).isEmpty();
         Map<String, Object> variableMap = task.getTaskLocalVariables();
-        assertThat(variableMap).hasSize(3);
         assertThat(variableMap)
+                .hasSize(3)
                 .contains(
                         entry("testVar", "someVariable"),
                         entry("testVar2", 123)
                 );
         assertThat(new String((byte[]) variableMap.get("testVarBinary"))).isEqualTo("This is a binary variable");
 
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
+        List<Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks).hasSize(3);
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("gonzo").singleResult();
@@ -121,8 +121,8 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
         assertThat(task.getTaskLocalVariables()).isEmpty();
-        assertThat(task.getProcessVariables()).hasSize(3);
         assertThat(task.getProcessVariables())
+                .hasSize(3)
                 .contains(
                         entry("processVar", true),
                         entry("anotherProcessVar", 123)
@@ -131,8 +131,9 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         tasks = taskService.createTaskQuery().includeTaskLocalVariables().taskCandidateUser("kermit").list();
         assertThat(tasks).hasSize(2);
-        assertThat(tasks.get(0).getTaskLocalVariables()).hasSize(2);
-        assertThat(tasks.get(0).getTaskLocalVariables()).containsEntry("test", "test");
+        assertThat(tasks.get(0).getTaskLocalVariables())
+                .hasSize(2)
+                .containsEntry("test", "test");
         assertThat(tasks.get(0).getProcessVariables()).isEmpty();
 
         tasks = taskService.createTaskQuery().includeProcessVariables().taskCandidateUser("kermit").list();
@@ -264,19 +265,16 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     public void testQueryWithIncludeTaskVariableAndTaskCategory() {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("gonzo").list();
         for (org.flowable.task.api.Task task : tasks) {
-            assertThat(task.getCategory()).isNotNull();
             assertThat(task.getCategory()).isEqualTo("testCategory");
         }
 
         tasks = taskService.createTaskQuery().taskAssignee("gonzo").includeTaskLocalVariables().list();
         for (org.flowable.task.api.Task task : tasks) {
-            assertThat(task.getCategory()).isNotNull();
             assertThat(task.getCategory()).isEqualTo("testCategory");
         }
 
         tasks = taskService.createTaskQuery().taskAssignee("gonzo").includeProcessVariables().list();
         for (org.flowable.task.api.Task task : tasks) {
-            assertThat(task.getCategory()).isNotNull();
             assertThat(task.getCategory()).isEqualTo("testCategory");
         }
     }
@@ -377,9 +375,10 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
             query1 = query1.processVariableValueEquals("anotherProcessVar", i);
         }
         query1 = query1.endOr();
-        org.flowable.task.api.Task task = query1.singleResult();
-        assertThat(task.getProcessVariables()).hasSize(2);
-        assertThat(task.getProcessVariables()).containsEntry("anotherProcessVar", 123);
+        Task task = query1.singleResult();
+        assertThat(task.getProcessVariables())
+                .hasSize(2)
+                .containsEntry("anotherProcessVar", 123);
     }
 
     @Test

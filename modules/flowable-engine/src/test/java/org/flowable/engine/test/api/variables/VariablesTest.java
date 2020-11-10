@@ -30,6 +30,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
@@ -257,7 +258,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testGetVariablesLocal2() {
 
         // Trying the same after moving the process
-        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -308,8 +309,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 .contains(
                         entry("stringVar1", "stringVarValue-1"),
                         entry("stringVar2", "stringVarValue-2")
-                );
-        assertThat(vars).doesNotContainKey("myVar");
+                )
+                .doesNotContainKey("myVar");
 
         // Execution local
 
@@ -351,9 +352,9 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         assertThat(vars)
                 .contains(
-                    entry("stringVar1", "hello"),
-                    entry("stringVar2", "world"),
-                    entry("myVar", "test123")
+                        entry("stringVar1", "hello"),
+                        entry("stringVar2", "world"),
+                        entry("myVar", "test123")
                 );
     }
 

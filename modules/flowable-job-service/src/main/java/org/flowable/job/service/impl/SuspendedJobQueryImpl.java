@@ -384,6 +384,11 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     @Override
+    public SuspendedJobQuery orderByJobCreateTime() {
+        return orderBy(JobQueryProperty.CREATE_TIME);
+    }
+
+    @Override
     public SuspendedJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }

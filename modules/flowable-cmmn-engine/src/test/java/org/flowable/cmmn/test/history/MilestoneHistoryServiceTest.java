@@ -49,7 +49,6 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricMilestoneInstance> historicMilestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery().list();
-            assertThat(historicMilestoneInstances).isNotNull();
             assertThat(historicMilestoneInstances).isEmpty();
         }
 

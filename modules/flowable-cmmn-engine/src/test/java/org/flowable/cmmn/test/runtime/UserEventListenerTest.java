@@ -77,8 +77,6 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
                 .isNotNull();
-        assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
-                .isNotNull();
 
         //2 HumanTasks ... one active and other waiting (available)
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count()).isEqualTo(2);
@@ -244,8 +242,9 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
                 .planItemDefinitionId("taskA")
                 .list().stream()
                 .collect(Collectors.groupingBy(PlanItemInstance::getState));
-        assertThat(tasks).hasSize(2);
-        assertThat(tasks).containsKey(PlanItemInstanceState.ACTIVE);
+        assertThat(tasks)
+                .hasSize(2)
+                .containsKey(PlanItemInstanceState.ACTIVE);
         assertThat(tasks.get(PlanItemInstanceState.ACTIVE)).hasSize(1);
         assertThat(tasks).containsKey(PlanItemInstanceState.WAITING_FOR_REPETITION);
         assertThat(tasks.get(PlanItemInstanceState.WAITING_FOR_REPETITION)).hasSize(1);

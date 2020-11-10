@@ -48,12 +48,10 @@ public class SimpleConverterTest extends AbstractConverterTest {
         assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("flow1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(SequenceFlow.class);
         assertThat(flowElement.getId()).isEqualTo("flow1");
 
         flowElement = model.getMainProcess().getFlowElement("catchEvent", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
         assertThat(flowElement.getId()).isEqualTo("catchEvent");
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
@@ -64,7 +62,6 @@ public class SimpleConverterTest extends AbstractConverterTest {
         assertThat(timerDefinition.getTimeDuration()).isEqualTo("PT5M");
 
         flowElement = model.getMainProcess().getFlowElement("flow1Condition", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(SequenceFlow.class);
         assertThat(flowElement.getId()).isEqualTo("flow1Condition");
         SequenceFlow flow = (SequenceFlow) flowElement;

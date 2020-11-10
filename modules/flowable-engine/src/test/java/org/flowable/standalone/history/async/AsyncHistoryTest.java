@@ -22,8 +22,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -754,11 +758,19 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                 .map(job -> managementService.getDeadLetterJobExceptionStacktrace(job.getId()))
                 .collect(Collectors.toList());
 
-        assertThat(exceptionStacktraces.get(0))
-                .contains("Job is not applicable for transformer types: [activity-update]");
-
-        assertThat(exceptionStacktraces.get(1))
+        String stackTrace1 = exceptionStacktraces.get(0);
+        if (stackTrace1.contains("[activity-update]")) {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-update]");
+            
+            assertThat(exceptionStacktraces.get(1))
                 .contains("Job is not applicable for transformer types: [activity-end]");
+            
+        } else {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-end]");
+            
+            assertThat(exceptionStacktraces.get(1))
+                .contains("Job is not applicable for transformer types: [activity-update]");
+        }
 
         // The history jobs in the deadletter table have no link to the process instance, hence why a manual cleanup is needed.
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
@@ -766,6 +778,9 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
     @Test
     public void testMoveDeadLetterJobBackToHistoryJob() {
+        TestDeadletterEventListener testDeadletterEventListener = new TestDeadletterEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(testDeadletterEventListener, FlowableEngineEventType.JOB_MOVED_TO_DEADLETTER);
+
         Task task = startOneTaskprocess();
 
         HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
@@ -773,11 +788,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         String originalAdvancedConfiguration = getAdvancedJobHandlerConfiguration(historyJob.getId());
         assertThat(originalAdvancedConfiguration).isNotEmpty();
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(0);
 
         waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
 
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(0);
         Job deadLetterJob = managementService.createDeadLetterJobQuery().singleResult();
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(1);
 
         managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(1);
@@ -795,6 +812,31 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         runtimeService.deleteProcessInstance(task.getProcessInstanceId(), null);
         managementService.createHistoryJobQuery().list().forEach(j -> managementService.deleteHistoryJob(j.getId()));
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
+
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(1);
+        processEngineConfiguration.getEventDispatcher().removeEventListener(testDeadletterEventListener);
+    }
+
+    static final class TestDeadletterEventListener implements FlowableEventListener {
+
+        public static AtomicInteger COUNTER = new AtomicInteger(0);
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            COUNTER.incrementAndGet();
+        }
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
     }
 
     protected void changeTransformerTypeToInvalidType(HistoryJobEntity historyJob) {

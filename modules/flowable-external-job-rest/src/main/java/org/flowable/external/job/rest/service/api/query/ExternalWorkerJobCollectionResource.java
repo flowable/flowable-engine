@@ -44,6 +44,7 @@ public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseRe
         PROPERTIES = new HashMap<>();
         PROPERTIES.put("id", JobQueryProperty.JOB_ID);
         PROPERTIES.put("dueDate", JobQueryProperty.DUEDATE);
+        PROPERTIES.put("createTime", JobQueryProperty.CREATE_TIME);
         PROPERTIES.put("executionId", JobQueryProperty.EXECUTION_ID);
         PROPERTIES.put("processInstanceId", JobQueryProperty.PROCESS_INSTANCE_ID);
         PROPERTIES.put("retries", JobQueryProperty.RETRIES);

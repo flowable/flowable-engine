@@ -14,8 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -74,6 +77,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
+            throw new FlowableException("The task instance is created by the cmmn engine and should be completed via the cmmn engine API");
+        }
+        
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");

@@ -116,7 +116,6 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_CREATED);
 
             List<Comment> commentsOnProcess = taskService.getProcessInstanceComments(pi.getId());
-            assertThat(commentsOnProcess).isNotNull();
             assertThat(commentsOnProcess).hasSize(1);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());

@@ -102,11 +102,11 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     protected void evaluateDecisionTable(DecisionTable decisionTable, ELExecutionContext executionContext) {
-        LOGGER.debug("Start table evaluation: {}", decisionTable.getId());
-
         if (decisionTable == null || decisionTable.getRules().isEmpty()) {
             throw new IllegalArgumentException("no rules present in table");
         }
+
+        LOGGER.debug("Start table evaluation: {}", decisionTable.getId());
 
         if (executionContext == null) {
             throw new FlowableException("no execution context available");

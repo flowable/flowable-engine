@@ -64,7 +64,6 @@ public class ShellTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ServiceTask.class);
         assertThat(flowElement.getId()).isEqualTo("servicetask");
         ServiceTask serviceTask = (ServiceTask) flowElement;

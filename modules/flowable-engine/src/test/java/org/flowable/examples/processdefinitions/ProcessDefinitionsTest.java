@@ -48,8 +48,6 @@ public class ProcessDefinitionsTest extends PluggableFlowableTestCase {
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionKey().asc().orderByProcessDefinitionVersion().desc().list();
 
-        assertThat(processDefinitions).isNotNull();
-
         assertThat(processDefinitions).hasSize(5);
 
         ProcessDefinition processDefinition = processDefinitions.get(0);

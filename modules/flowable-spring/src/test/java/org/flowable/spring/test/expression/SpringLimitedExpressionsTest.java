@@ -41,7 +41,6 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("limitedExpressionProcess");
 
         String beanOutput = (String) runtimeService.getVariable(processInstance.getId(), "beanOutput");
-        assertThat(beanOutput).isNotNull();
         assertThat(beanOutput).isEqualTo("Activiti BPMN 2.0 process engine");
 
         // Finish the task, should continue to serviceTask which uses a bean that is present

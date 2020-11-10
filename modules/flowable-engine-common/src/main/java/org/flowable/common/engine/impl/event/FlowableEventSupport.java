@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.event;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,15 @@ public class FlowableEventSupport {
         if (listenerToAdd == null) {
             throw new FlowableIllegalArgumentException("Listener cannot be null.");
         }
-        if (!eventListeners.contains(listenerToAdd)) {
-            eventListeners.add(listenerToAdd);
+        Collection<? extends FlowableEventType> types = listenerToAdd.getTypes();
+        if (types.isEmpty()) {
+            if (!eventListeners.contains(listenerToAdd)) {
+                eventListeners.add(listenerToAdd);
+            }
+        } else {
+            for (FlowableEventType type : types) {
+                addTypedEventListener(listenerToAdd, type);
+            }
         }
     }
 

@@ -104,7 +104,6 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             List<Comment> commentsOnTask = taskService.getTaskComments(task.getId());
-            assertThat(commentsOnTask).isNotNull();
             assertThat(commentsOnTask).hasSize(1);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -148,7 +147,6 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
 
         List<Comment> commentsOnTask = taskService.getTaskComments(task.getId());
-        assertThat(commentsOnTask).isNotNull();
         assertThat(commentsOnTask).hasSize(1);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());

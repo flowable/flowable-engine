@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class DecisionTableModelConversionUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowableDecisionTableService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionTableModelConversionUtil.class);
 
     public static Model convertModel(Model decisionTableModel) {
 

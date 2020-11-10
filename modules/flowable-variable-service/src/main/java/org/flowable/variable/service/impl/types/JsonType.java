@@ -80,7 +80,7 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
     @Override
     public Object getValue(ValueFields valueFields) {
         if (valueFields.getCachedValue() != null) {
-            valueFields.getCachedValue();
+            return valueFields.getCachedValue();
         }
 
         JsonNode jsonValue = null;

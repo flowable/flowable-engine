@@ -67,7 +67,6 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
     };
 
     private static Consumer<HistoricPlanItemInstance> assertStartedStateHistoricPlanItemInstance = h -> {
-        assertThat(h.getState()).isNotNull();
         assertThat(h.getState())
                 .isIn(PlanItemInstanceState.ACTIVE, PlanItemInstanceState.ENABLED, PlanItemInstanceState.ASYNC_ACTIVE);
     };
