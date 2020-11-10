@@ -12,9 +12,12 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
@@ -298,8 +301,10 @@ public class AsyncExecutorTest {
         } finally {
 
             TestBlockingJavaDelegate.SEMAPHORE.release(nrOfProcesses);
-            JobTestHelper.waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(processEngineConfiguration, processEngine.getManagementService(), 10000, 100);
 
+            // 2 blocked jobs should be processed and end the process instance
+            // other job should have been changed to a timer job
+            await().atMost(Duration.of(10, SECONDS)).until(() -> processEngine.getRuntimeService().createProcessInstanceQuery().count() == 1);
             assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(1);
 
             if (processEngine != null) {
