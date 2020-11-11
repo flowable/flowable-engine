@@ -275,6 +275,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+    public void testProcessInstanceDefinitionInformationWithoutProcessDefinitionName() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("twoTasksProcess").start();
+
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+        assertThat(processInstance.getProcessDefinitionKey()).isEqualTo("twoTasksProcess");
+        assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(processDefinition.getVersion());
+        assertThat(processInstance.getProcessDefinitionName()).isNull();
+    }
+
+    @Test
     public void testStartProcessInstanceByProcessInstanceBuilderWithTenantId() {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml").

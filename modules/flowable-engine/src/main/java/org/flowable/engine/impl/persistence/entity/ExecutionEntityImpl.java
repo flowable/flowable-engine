@@ -417,7 +417,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public String getProcessDefinitionName() {
-        if (StringUtils.isEmpty(processDefinitionName) && StringUtils.isNotEmpty(processDefinitionId)) {
+        // The process definition name can be null, therefore we can't use an is empty check on it
+        // as it will lead to evaluating the information every time we try to get the name, even though it is null
+        // The process definition key can never be empty, therefore we use it to check if process definition information has been resolved
+        if (StringUtils.isEmpty(processDefinitionKey) && StringUtils.isNotEmpty(processDefinitionId)) {
             resolveProcessDefinitionInfo();
         }
         return processDefinitionName;
@@ -1387,7 +1390,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
     
     protected void resolveProcessDefinitionInfo() {
-        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration == null) {
+            // We are outside of a command context so do not try to resolve anything
+            return;
+        }
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId, false, processEngineConfiguration);
         if (processDefinition == null) {
             throw new FlowableException("Cannot get process definition for id " + processDefinitionId);
         }
