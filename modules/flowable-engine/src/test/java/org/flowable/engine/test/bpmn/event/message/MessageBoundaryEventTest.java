@@ -14,6 +14,7 @@
 package org.flowable.engine.test.bpmn.event.message;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.time.Instant;
@@ -22,15 +23,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.job.api.TimerJobQuery;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
 
@@ -74,6 +80,28 @@ public class MessageBoundaryEventTest extends PluggableFlowableTestCase {
         taskService.complete(userTask.getId());
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
+    }
+
+    @Test
+    public void testRedeployWithRuntimeEventSubscription() {
+        org.flowable.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testSingleBoundaryMessageEvent.bpmn20.xml").deploy();
+        ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
+        deploymentIdsForAutoCleanup.add(deployment1.getId());
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition1.getId());
+
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), processInstance.getId()));
+
+        org.flowable.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageBoundaryEventTest.testSingleBoundaryMessageEvent.bpmn20.xml").deploy();
+        deploymentIdsForAutoCleanup.add(deployment2.getId());
+
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), processInstance.getId())); // definition should have remained the same
     }
 
     @Test

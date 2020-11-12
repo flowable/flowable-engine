@@ -42,7 +42,6 @@ public class JpaTest extends SpringFlowableTestCase {
         // Variable should be present containing the loanRequest created by the
         // spring bean
         Object value = runtimeService.getVariable(processInstance.getId(), "loanRequest");
-        assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(LoanRequest.class);
         LoanRequest request = (LoanRequest) value;
         assertThat(request.getCustomerName()).isEqualTo("John Doe");
@@ -78,7 +77,6 @@ public class JpaTest extends SpringFlowableTestCase {
         // Variable should be present containing the loanRequest created by the
         // spring bean
         Object value = runtimeService.getVariable(processInstance.getId(), "loanRequest");
-        assertThat(value).isNotNull();
         assertThat(value).isInstanceOf(LoanRequest.class);
         LoanRequest request = (LoanRequest) value;
         assertThat(request.getCustomerName()).isEqualTo("Jane Doe");

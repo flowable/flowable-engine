@@ -61,13 +61,9 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
             HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult();
 
-            assertThat(ServiceCacheTask.caseInstanceId).isNotNull();
             assertThat(ServiceCacheTask.caseInstanceId).isEqualTo(caseInstance.getId());
-            assertThat(ServiceCacheTask.historicCaseInstanceId).isNotNull();
             assertThat(ServiceCacheTask.historicCaseInstanceId).isEqualTo(caseInstance.getId());
-            assertThat(ServiceCacheTask.planItemInstanceId).isNotNull();
             assertThat(ServiceCacheTask.planItemInstanceId).isEqualTo(planItemInstance.getId());
-            assertThat(ServiceCacheTask.historicPlanItemInstanceId).isNotNull();
             assertThat(ServiceCacheTask.historicPlanItemInstanceId).isEqualTo(planItemInstance.getId());
         }
     }
@@ -84,9 +80,7 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task).isNotNull();
 
-        assertThat(CacheTaskListener.taskId).isNotNull();
         assertThat(CacheTaskListener.taskId).isEqualTo(task.getId());
-        assertThat(CacheTaskListener.historicTaskId).isNotNull();
         assertThat(CacheTaskListener.historicTaskId).isEqualTo(task.getId());
     }
 
@@ -105,9 +99,7 @@ public class CacheTaskTest extends FlowableCmmnTestCase {
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
             assertThat(milestoneInstance).isNotNull();
 
-            assertThat(CacheMilestoneListener.milestoneInstanceId).isNotNull();
             assertThat(CacheMilestoneListener.milestoneInstanceId).isEqualTo(milestoneInstance.getId());
-            assertThat(CacheMilestoneListener.historicMilestoneInstanceId).isNotNull();
             assertThat(CacheMilestoneListener.historicMilestoneInstanceId).isEqualTo(milestoneInstance.getId());
         }
     }

@@ -50,7 +50,6 @@ public class RulesDeployerTest extends ResourceFlowableTestCase {
         assertThat(order.isValid()).isTrue();
 
         Collection<Object> ruleOutputList = (Collection<Object>) runtimeService.getVariable(processInstance.getId(), "rulesOutput");
-        assertThat(ruleOutputList).isNotNull();
         assertThat(ruleOutputList).hasSize(1);
         order = (Order) ruleOutputList.iterator().next();
         assertThat(order.isValid()).isTrue();

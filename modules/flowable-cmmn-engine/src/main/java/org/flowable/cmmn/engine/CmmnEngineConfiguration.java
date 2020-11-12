@@ -39,6 +39,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
 import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
@@ -373,6 +374,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnDynamicStateManager dynamicStateManager;
     protected CaseInstanceMigrationManager caseInstanceMigrationManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
+    protected List<CaseInstanceLifecycleListener> caseInstanceLifecycleListeners;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
@@ -2049,7 +2051,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 if (eventRegistryConfigurator != null) {
                     specificConfigurators.add(eventRegistryConfigurator);
                 } else {
-                    specificConfigurators.add(new EventRegistryEngineConfigurator());
+                    specificConfigurators.add(createDefaultEventRegistryEngineConfigurator());
                 }
             }
             
@@ -2555,7 +2557,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.planItemInstanceLifecycleListeners = planItemInstanceLifecycleListeners;
         return this;
     }
-    
+
+    public List<CaseInstanceLifecycleListener> getCaseInstanceLifecycleListeners() {
+        return caseInstanceLifecycleListeners;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceLifecycleListeners(List<CaseInstanceLifecycleListener> caseInstanceLifecycleListeners) {
+        this.caseInstanceLifecycleListeners = caseInstanceLifecycleListeners;
+        return this;
+    }
+
     public StartCaseInstanceInterceptor getStartCaseInstanceInterceptor() {
         return startCaseInstanceInterceptor;
     }
@@ -2593,13 +2604,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     /**
-     * Register a global {@link PlanItemInstanceLifecycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
+     * Registers a global {@link PlanItemInstanceLifecycleListener} to listen to {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
      *
      * @param planItemDefinitionType A string from {@link org.flowable.cmmn.api.runtime.PlanItemDefinitionType}.
      *                               If null is passed, the listener will be invoked for any type.
      * @param planItemInstanceLifeCycleListener The listener instance.
      */
-    public void addPlanItemInstanceLifeCycleListeners(String planItemDefinitionType, PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
+    public void addPlanItemInstanceLifeCycleListener(String planItemDefinitionType, PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
         if (planItemInstanceLifecycleListeners == null) {
             planItemInstanceLifecycleListeners = new HashMap<>();
         }
@@ -2612,8 +2623,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * Register a global {@link PlanItemInstanceLifecycleListener} to listen to any (all plan item definition types)
      * {@link org.flowable.cmmn.api.runtime.PlanItemInstance} state changes.
      */
-    public void addPlanItemInstanceLifeCycleListeners(PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
-        addPlanItemInstanceLifeCycleListeners(null, planItemInstanceLifeCycleListener);
+    public void addPlanItemInstanceLifeCycleListener(PlanItemInstanceLifecycleListener planItemInstanceLifeCycleListener) {
+        addPlanItemInstanceLifeCycleListener(null, planItemInstanceLifeCycleListener);
+    }
+
+    /**
+     * Registers a global {@link CaseInstanceLifecycleListener} to listen to {@link org.flowable.cmmn.api.runtime.CaseInstance} state changes.
+     */
+    public void addCaseInstanceLifeCycleListener(CaseInstanceLifecycleListener caseInstanceLifecycleListener) {
+        if (caseInstanceLifecycleListeners == null) {
+            caseInstanceLifecycleListeners = new ArrayList<>();
+        }
+        caseInstanceLifecycleListeners.add(caseInstanceLifecycleListener);
     }
 
     @Override

@@ -22,28 +22,14 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Joram Barrez
  */
-public class EventListenerWithEventTypeXmlConverterTest extends AbstractConverterTest {
+public class EventListenerWithEventTypeXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/event-listener-with-event-type.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/event-listener-with-event-type.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition("eventListener");
         assertThat(planItemDefinition).isInstanceOf(GenericEventListener.class);

@@ -50,7 +50,7 @@ public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
             @ApiImplicitParam(name = "priority", dataType = "string", value = "Only return tasks with the given priority.", paramType = "query"),
@@ -76,6 +76,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
@@ -206,6 +207,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("planItemInstanceId")) {
             request.setPlanItemInstanceId(requestParams.get("planItemInstanceId"));
+        }
+
+        if (requestParams.containsKey("propagatedStageInstanceId")) {
+            request.setPropagatedStageInstanceId(requestParams.get("propagatedStageInstanceId"));
         }
 
         if (requestParams.containsKey("scopeId")) {

@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -380,15 +381,17 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         // Check if engine has correct variables set
         Map<String, Object> caseVariables = runtimeService.getVariables(caseInstance.getId());
-        assertThat(caseVariables).hasSize(7);
 
-        assertThat(caseVariables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(caseVariables.get("integerVariable")).isEqualTo(1234);
-        assertThat(caseVariables.get("shortVariable")).isEqualTo((short) 123);
-        assertThat(caseVariables.get("longVariable")).isEqualTo(4567890L);
-        assertThat(caseVariables.get("doubleVariable")).isEqualTo(123.456);
-        assertThat(caseVariables.get("booleanVariable")).isEqualTo(Boolean.TRUE);
-        assertThat(caseVariables.get("dateVariable")).isEqualTo(longDateFormat.parse(isoString));
+        assertThat(caseVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", Boolean.TRUE),
+                        entry("dateVariable", longDateFormat.parse(isoString))
+                );
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })

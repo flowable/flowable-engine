@@ -45,7 +45,6 @@ public class PropertiesCollectionResourceTest extends BaseSpringRestTestCase {
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(responseNode).isNotNull();
         assertThat(responseNode).hasSize(properties.size());
 
         Iterator<Map.Entry<String, JsonNode>> nodes = responseNode.fields();

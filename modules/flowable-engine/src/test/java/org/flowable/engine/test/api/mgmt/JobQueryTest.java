@@ -435,12 +435,14 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         // asc
         assertThat(managementService.createJobQuery().orderByJobId().asc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByJobDuedate().asc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobCreateTime().asc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByExecutionId().asc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByProcessInstanceId().asc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByJobRetries().asc().count()).isEqualTo(1);
 
         assertThat(managementService.createTimerJobQuery().orderByJobId().asc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByJobDuedate().asc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobCreateTime().asc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByExecutionId().asc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByProcessInstanceId().asc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByJobRetries().asc().count()).isEqualTo(3);
@@ -448,12 +450,14 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         // desc
         assertThat(managementService.createJobQuery().orderByJobId().desc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByJobDuedate().desc().count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().orderByJobCreateTime().desc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByExecutionId().desc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByProcessInstanceId().desc().count()).isEqualTo(1);
         assertThat(managementService.createJobQuery().orderByJobRetries().desc().count()).isEqualTo(1);
 
         assertThat(managementService.createTimerJobQuery().orderByJobId().desc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByJobDuedate().desc().count()).isEqualTo(3);
+        assertThat(managementService.createTimerJobQuery().orderByJobCreateTime().desc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByExecutionId().desc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByProcessInstanceId().desc().count()).isEqualTo(3);
         assertThat(managementService.createTimerJobQuery().orderByJobRetries().desc().count()).isEqualTo(3);
@@ -521,7 +525,6 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         Job failedJob = query.singleResult();
         assertThat(failedJob).isNotNull();
         assertThat(failedJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
-        assertThat(failedJob.getExceptionMessage()).isNotNull();
         assertThat(failedJob.getExceptionMessage()).containsSequence(EXCEPTION_MESSAGE);
     }
 

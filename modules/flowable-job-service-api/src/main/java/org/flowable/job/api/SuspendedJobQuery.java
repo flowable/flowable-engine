@@ -142,6 +142,11 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     SuspendedJobQuery orderByJobDuedate();
 
     /**
+     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    SuspendedJobQuery orderByJobCreateTime();
+
+    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     SuspendedJobQuery orderByJobRetries();

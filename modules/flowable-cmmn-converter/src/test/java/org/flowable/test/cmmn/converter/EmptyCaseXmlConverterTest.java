@@ -20,29 +20,22 @@ import java.util.List;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 
 /**
  * @author Filip Hrisafov
  */
-public class EmptyCaseXmlConverterTest extends AbstractConverterTest {
+public class EmptyCaseXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/empty-case.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
+    @BeforeEach
+    void setUp(TestInfo testInfo) {
+        System.out.println("Before: " + testInfo);
     }
 
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
-    public void validateModel(CmmnModel cmmnModel) {
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/empty-case.cmmn")
+    public void emptyCase(CmmnModel cmmnModel) {
 
         assertThat(cmmnModel).isNotNull();
         Case primaryCase = cmmnModel.getPrimaryCase();

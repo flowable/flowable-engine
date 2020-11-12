@@ -99,6 +99,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getCaseDefinitionKeyLikeIgnoreCase() != null) {
             query.caseDefinitionKeyLikeIgnoreCase(queryRequest.getCaseDefinitionKeyLikeIgnoreCase());
         }
+        if (queryRequest.getPropagatedStageInstanceId() != null) {
+            query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
+        }
         if (queryRequest.getTaskName() != null) {
             query.taskName(queryRequest.getTaskName());
         }

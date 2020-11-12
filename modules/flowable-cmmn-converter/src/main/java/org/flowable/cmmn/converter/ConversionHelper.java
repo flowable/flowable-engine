@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.util.CriterionUtil.generateEntryCriterionId;
+import static org.flowable.cmmn.converter.util.CriterionUtil.generateExitCriterionId;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -111,7 +114,7 @@ public class ConversionHelper {
 
             if (StringUtils.isEmpty(entryCriterion.getId())) {
                 // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
-                entryCriterion.setId("entryCriterion_" + (hasEntryCriteria.getEntryCriteria().size() + 1));
+                entryCriterion.setId(generateEntryCriterionId(hasEntryCriteria));
             }
 
             entryCriterion.setAttachedToRefId(hasEntryCriteria.getId());
@@ -144,7 +147,7 @@ public class ConversionHelper {
 
         if (StringUtils.isEmpty(exitCriterion.getId())) {
             // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
-            exitCriterion.setId("exitCriterion_" + (hasExitCriteria.getExitCriteria().size() + 1));
+            exitCriterion.setId(generateExitCriterionId(hasExitCriteria));
         }
 
         exitCriterion.setAttachedToRefId(hasExitCriteria.getId());

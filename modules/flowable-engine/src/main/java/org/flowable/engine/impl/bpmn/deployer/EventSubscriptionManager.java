@@ -12,14 +12,18 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
@@ -35,10 +39,10 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
-import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
@@ -61,34 +65,48 @@ public class EventSubscriptionManager {
             removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, SignalEventHandler.EVENT_HANDLER_TYPE);
         }
     }
-    
+
     protected void removeObsoleteEventRegistryEventSubScription(ProcessDefinitionEntity previousProcessDefinition) {
         // remove all subscriptions for the previous version
         if (previousProcessDefinition != null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-            EventSubscriptionQueryImpl eventSubscriptionQuery = new EventSubscriptionQueryImpl(Context.getCommandContext(), 
-                    processEngineConfiguration.getEventSubscriptionServiceConfiguration());
-            eventSubscriptionQuery.processDefinitionId(previousProcessDefinition.getId()).scopeType(ScopeTypes.BPMN);
-            if (previousProcessDefinition.getTenantId() != null) {
-                eventSubscriptionQuery.tenantId(previousProcessDefinition.getTenantId());
-            }
-            
-            List<EventSubscription> subscriptionsToDelete = eventSubscriptionService.findEventSubscriptionsByQueryCriteria(eventSubscriptionQuery);
-            for (EventSubscription eventSubscription : subscriptionsToDelete) {
-                EventSubscriptionEntity eventSubscriptionEntity = (EventSubscriptionEntity) eventSubscription;
-                eventSubscriptionService.deleteEventSubscription(eventSubscriptionEntity);
-                CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscriptionEntity);
+            Set<String> eventRegistryStartEventEventTypes = getEventRegistryStartEventEventTypes(previousProcessDefinition);
+            if (eventRegistryStartEventEventTypes != null) {
+                for (String eventRegistryStartEventEventType : eventRegistryStartEventEventTypes) {
+                    removeObsoleteEventSubscriptionsImpl(previousProcessDefinition, eventRegistryStartEventEventType);
+                }
             }
         }
     }
-    
+
+    protected Set<String> getEventRegistryStartEventEventTypes(ProcessDefinitionEntity previousProcessDefinition) {
+        Set<String> result = null;
+        Process process = ProcessDefinitionUtil.getProcess(previousProcessDefinition.getId());
+        List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, true);
+        if (!startEvents.isEmpty()) {
+            for (StartEvent startEvent : startEvents) {
+                if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
+                        String eventType = eventTypeElements.get(0).getElementText();
+                        if (StringUtils.isNotEmpty(eventType)) {
+                            if (result == null) {
+                                result = new HashSet<>();
+                            }
+                            result.add(eventType);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     protected void removeObsoleteEventSubscriptionsImpl(ProcessDefinitionEntity processDefinition, String eventHandlerType) {
         // remove all subscriptions for the previous version
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService
-                        .findEventSubscriptionsByTypeAndProcessDefinitionId(eventHandlerType, processDefinition.getId(), processDefinition.getTenantId());
+            .findEventSubscriptionsByTypeAndProcessDefinitionId(eventHandlerType, processDefinition.getId(), processDefinition.getTenantId());
 
         for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
             eventSubscriptionService.deleteEventSubscription(eventSubscriptionEntity);

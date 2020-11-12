@@ -84,5 +84,7 @@ public interface EventSubscriptionService {
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+
+    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
     
 }

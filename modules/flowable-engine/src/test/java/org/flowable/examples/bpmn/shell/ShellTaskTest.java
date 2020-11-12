@@ -63,7 +63,6 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellWindows");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertThat(st).isNotNull();
             assertThat(st).startsWith("EchoTest");
         }
     }
@@ -77,7 +76,6 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellLinux");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertThat(st).isNotNull();
             assertThat(st).startsWith("EchoTest");
         }
     }
@@ -91,7 +89,6 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellMac");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertThat(st).isNotNull();
             assertThat(st).startsWith("EchoTest");
         }
     }

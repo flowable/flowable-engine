@@ -74,8 +74,6 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
                 .isNotNull();
-        assertThat(cmmnRuntimeService.createGenericEventListenerInstanceQuery().caseDefinitionId(listenerInstance.getCaseDefinitionId()).singleResult())
-                .isNotNull();
 
         //2 HumanTasks ... one active and other waiting (available)
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count()).isEqualTo(2);

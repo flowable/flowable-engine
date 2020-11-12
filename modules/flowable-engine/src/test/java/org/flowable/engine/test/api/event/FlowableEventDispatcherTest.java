@@ -260,30 +260,25 @@ public class FlowableEventDispatcherTest extends PluggableFlowableTestCase {
     public void testActivitiEventTypeParsing() throws Exception {
         // Check with empty null
         FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(null);
-        assertThat(types).isNotNull();
         assertThat(types).isEmpty();
 
         // Check with empty string
         types = FlowableEngineEventType.getTypesFromString("");
-        assertThat(types).isNotNull();
         assertThat(types).isEmpty();
 
         // Single value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED");
-        assertThat(types).isNotNull();
         assertThat(types).hasSize(1);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
 
         // Multiple value
         types = FlowableEngineEventType.getTypesFromString("ENTITY_CREATED,ENTITY_DELETED");
-        assertThat(types).isNotNull();
         assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
 
         // Additional separators should be ignored
         types = FlowableEngineEventType.getTypesFromString(",ENTITY_CREATED,,ENTITY_DELETED,,,");
-        assertThat(types).isNotNull();
         assertThat(types).hasSize(2);
         assertThat(types[0]).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
         assertThat(types[1]).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);

@@ -66,9 +66,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variablesFromGet).containsKey("stringVar");
-        assertThat(variablesFromGet).containsEntry("stringVar", "Hello World");
-        assertThat(variablesFromGet).containsKey("intVar");
+        assertThat(variablesFromGet)
+                .containsKeys("stringVar", "intVar")
+                .containsEntry("stringVar", "Hello World");
         assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
 
         Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
@@ -109,9 +109,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setLocalVariable(planItemInstance.getId(), "intVar", 21);
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertThat(variablesFromGet).containsKey("stringVar");
-        assertThat(variablesFromGet).containsEntry("stringVar", "Hello World");
-        assertThat(variablesFromGet).containsKey("intVar");
+        assertThat(variablesFromGet)
+                .containsKeys("stringVar", "intVar")
+                .containsEntry("stringVar", "Hello World");
         assertThat(((Integer) variablesFromGet.get("intVar")).intValue()).isEqualTo(42);
 
         Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
@@ -125,9 +125,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertThat(variableInstance.getTypeName()).isEqualTo("integer");
 
         Map<String, Object> localVariablesFromGet = cmmnRuntimeService.getLocalVariables(planItemInstance.getId());
-        assertThat(localVariablesFromGet).containsKey("stringVar");
-        assertThat(localVariablesFromGet).containsEntry("stringVar", "Changed value");
-        assertThat(localVariablesFromGet).containsKey("intVar");
+        assertThat(localVariablesFromGet)
+                .containsKeys("stringVar", "intVar")
+                .containsEntry("stringVar", "Changed value");
         assertThat(((Integer) localVariablesFromGet.get("intVar")).intValue()).isEqualTo(21);
 
         Map<String, VariableInstance> localVariableInstancesFromGet = cmmnRuntimeService.getLocalVariableInstances(planItemInstance.getId());

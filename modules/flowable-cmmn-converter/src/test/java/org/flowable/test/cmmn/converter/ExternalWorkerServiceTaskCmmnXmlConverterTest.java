@@ -24,28 +24,14 @@ import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerServiceTaskCmmnXmlConverterTest extends AbstractConverterTest {
+public class ExternalWorkerServiceTaskCmmnXmlConverterTest{
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/external-worker-service-task.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/external-worker-service-task.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
 

@@ -20,28 +20,14 @@ import java.util.List;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.Stage;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Tijs Rademakers
  */
-public class MilestoneCmmnXmlConverterTest extends AbstractConverterTest {
+public class MilestoneCmmnXmlConverterTest {
 
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/milestone.cmmn";
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/milestone.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         List<Milestone> milestones = planModel.findPlanItemDefinitionsOfType(Milestone.class, false);

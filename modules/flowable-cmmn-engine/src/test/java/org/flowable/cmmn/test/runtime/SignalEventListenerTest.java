@@ -13,7 +13,9 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -27,6 +29,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.flowable.task.api.Task;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -189,6 +193,53 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(0L);
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().list()).isEmpty();
 
+    }
+
+    @Test
+    public void testRedeployDefinitionWithRuntimeEventSubscriptions() {
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/runtime/SignalEventListenerTest.testRedeploy.cmmn")
+            .deploy();
+        addDeploymentForAutoCleanup(deployment);
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+
+        // After the case instance is started, there should be one eventsubscription for the signal event listener
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRedeploy").start();
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeType(ScopeTypes.CMMN).list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId,  EventSubscription::getScopeType, EventSubscription::getScopeId)
+            .containsOnly(
+                tuple(SignalEventSubscriptionEntity.EVENT_TYPE, caseDefinition.getId(), ScopeTypes.CMMN, caseInstance.getId())
+            );
+
+        // Redeploying the same definition:
+        // Event subscription to start should reflect new definition id
+        // Existing subscription for event listener should remain
+        org.flowable.cmmn.api.repository.CmmnDeployment redeployment = cmmnRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/runtime/SignalEventListenerTest.testRedeploy.cmmn")
+            .deploy();
+        addDeploymentForAutoCleanup(redeployment);
+        CaseDefinition caseDefinitionAfterRedeploy = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(redeployment.getId()).singleResult();
+
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeType(ScopeTypes.CMMN).list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId,  EventSubscription::getScopeType, EventSubscription::getScopeId)
+            .containsOnly(
+                tuple(SignalEventSubscriptionEntity.EVENT_TYPE, caseDefinition.getId(), ScopeTypes.CMMN, caseInstance.getId())
+            );
+
+        // Triggering the instance event subscription should continue the case instance like before
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list())
+            .extracting(Task::getName)
+            .containsOnly("My task 1");
+
+        SignalEventListenerInstance signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+            .caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list())
+            .extracting(Task::getName, Task::getScopeId)
+            .containsOnly(
+                tuple("My task 1", caseInstance.getId()),
+                tuple("My task 2", caseInstance.getId()));
     }
 
 }

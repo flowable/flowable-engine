@@ -202,7 +202,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertThat(historicVariable.getVariableName()).isEqualTo("number");
         assertThat(historicVariable.getValue()).isEqualTo("two");
         assertThat(historicVariable.getCreateTime()).isNotNull();
-        assertThat(historicVariable.getLastUpdatedTime()).isNotNull();
         assertThat(historicVariable.getLastUpdatedTime()).isNotSameAs(historicVariable.getCreateTime());
 
         historicVariable = historicVariables.get(3);
@@ -481,7 +480,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
         // Out execution only has a single activity waiting, the task
         List<String> activityIds = runtimeService.getActiveActivityIds(task.getExecutionId());
-        assertThat(activityIds).isNotNull();
         assertThat(activityIds).hasSize(1);
 
         String taskActivityId = activityIds.get(0);
@@ -879,7 +877,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
         // Historic property should be available
         List<HistoricDetail> details = historyService.createHistoricDetailQuery().formProperties().processInstanceId(processInstance.getId()).list();
-        assertThat(details).isNotNull();
         assertThat(details).hasSize(1);
 
         // org.flowable.task.service.Task should be active in the same activity as the previous one
@@ -887,7 +884,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         formService.submitTaskFormData(task.getId(), data);
 
         details = historyService.createHistoricDetailQuery().formProperties().processInstanceId(processInstance.getId()).list();
-        assertThat(details).isNotNull();
         assertThat(details).hasSize(2);
 
         // Should have 2 different historic activity instance ID's, with the
@@ -1135,7 +1131,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("booleanVar", true).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("dateVar", date).count()).isZero();
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", null).count()).isZero();
-        assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("nullVar", null).count()).isZero();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("longVar", 67890L).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().variableValueNotEquals("shortVar", (short) 456).count()).isEqualTo(1);
@@ -1292,7 +1287,6 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
         assertThat(variableUpdates).hasSize(1);
         HistoricVariableUpdate update = (HistoricVariableUpdate) variableUpdates.get(0);
-        assertThat(update.getValue()).isNotNull();
         assertThat(update.getValue()).isInstanceOf(FieldAccessJPAEntity.class);
 
         assertThat(((FieldAccessJPAEntity) update.getValue()).getId()).isEqualTo(entity.getId());

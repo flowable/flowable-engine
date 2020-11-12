@@ -410,7 +410,6 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         // new timer should NOT be scheduled. The orphan detection algorithm will take in account the waiting for repetition state and the fact its missing here
         assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
-        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Ignoring second occur event

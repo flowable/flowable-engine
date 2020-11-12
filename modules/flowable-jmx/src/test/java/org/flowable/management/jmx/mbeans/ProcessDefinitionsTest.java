@@ -95,7 +95,6 @@ public class ProcessDefinitionsTest {
         when(processDefinitionQuery.list()).thenReturn(processDefinitionList);
 
         List<List<String>> result = processDefinitionsMBean.getProcessDefinitions();
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         assertThat(result.get(0)).hasSize(5);
         assertThat(result.get(0).get(0)).isEqualTo("testId");
@@ -123,7 +122,6 @@ public class ProcessDefinitionsTest {
         when(deploymentQuery.list()).thenReturn(deploymentList);
 
         List<List<String>> result = processDefinitionsMBean.getDeployments();
-        assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         assertThat(result.get(0)).hasSize(3);
         assertThat(result.get(0).get(0)).isEqualTo("testDeploymentId");
@@ -169,7 +167,6 @@ public class ProcessDefinitionsTest {
         assertThat(modelBean).isNotNull();
         MBeanInfo beanInfo = modelBean.getMBeanInfo();
         assertThat(beanInfo).isNotNull();
-        assertThat(beanInfo.getOperations()).isNotNull();
         assertThat(beanInfo.getOperations()).hasSize(9);
         int counter = 0;
 
@@ -217,7 +214,6 @@ public class ProcessDefinitionsTest {
         assertThat(counter).isEqualTo(6);
 
         // check attributes
-        assertThat(beanInfo.getAttributes()).isNotNull();
         assertThat(beanInfo.getAttributes()).hasSize(2);
 
         counter = 0;

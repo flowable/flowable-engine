@@ -244,7 +244,6 @@ public class IdentityServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testFindUsersByGroupUnexistingGroup() {
         List<User> users = identityService.createUserQuery().memberOfGroup("unexistinggroup").list();
-        assertThat(users).isNotNull();
         assertThat(users).isEmpty();
     }
 

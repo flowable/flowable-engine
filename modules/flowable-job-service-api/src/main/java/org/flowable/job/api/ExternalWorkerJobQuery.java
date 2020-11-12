@@ -178,6 +178,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
     ExternalWorkerJobQuery orderByJobDuedate();
 
     /**
+     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    ExternalWorkerJobQuery orderByJobCreateTime();
+
+    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     ExternalWorkerJobQuery orderByJobRetries();

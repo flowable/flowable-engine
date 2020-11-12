@@ -291,6 +291,25 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Test
     @Deployment
+    public void testHtmlMailWithGetOrDefaultVariableFunctions() throws Exception {
+        runtimeService.startProcessInstanceByKey("htmlMail", CollectionUtil.singletonMap("gender", "male"));
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        String expectedMessage = "<html>\n"
+                + "                <body>\n"
+                + "                <ul>\n"
+                + "                  <li><b>Currency:</b>unknown</li>\n"
+                + "                  <li><b>Gender:</b>male</li>\n"
+                + "                  </ul>\n"
+                + "                </body>\n"
+                + "              </html>";
+        assertEmailSend(messages.get(0), true, "Test", expectedMessage, "flowable@localhost", Collections.singletonList(
+                "kermit@flowable.org"), null);
+    }
+
+    @Test
+    @Deployment
     public void testVariableTemplatedMail() throws Exception {
         Map<String, Object> vars = new HashMap<>();
         vars.put("gender", "male");
@@ -486,7 +505,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         dataHandler.writeTo(baos);
         baos.flush();
-        return baos.toString();
+        return baos.toString().replaceAll("\r\n", "\n");
     }
 
 }
