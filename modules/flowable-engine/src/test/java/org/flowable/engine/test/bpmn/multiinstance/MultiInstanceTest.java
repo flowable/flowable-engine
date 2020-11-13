@@ -15,6 +15,10 @@ package org.flowable.engine.test.bpmn.multiinstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,13 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -47,6 +55,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Joram Barrez
@@ -1631,6 +1640,41 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
         assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+    }
+
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testExecutionListenersOnMultiInstanceSubprocess.bpmn20.xml" })
+    @Test
+    public void testDispatchFlowableMultiInstanceActivityCompletedEventLoopVariables() {
+        FlowableEventDispatcher eventDispatcher = spy(processEngine.getProcessEngineConfiguration().getEventDispatcher());;
+        processEngine.getProcessEngineConfiguration().setEventDispatcher(eventDispatcher);
+
+        Map<String, Object> variableMap = new HashMap<>();
+        List<String> assignees = new ArrayList<>();
+        assignees.add("john");
+        assignees.add("jane");
+        assignees.add("matt");
+        variableMap.put("assignees", assignees);
+        runtimeService.startProcessInstanceByKey("MultiInstanceTest", variableMap);
+
+        ArgumentCaptor<FlowableEvent> eventCaptor = ArgumentCaptor.forClass(FlowableEvent.class);;
+        verify(eventDispatcher, atLeastOnce()).dispatchEvent(eventCaptor.capture(), eq(processEngineConfiguration.getEngineCfgKey()));
+
+        List<FlowableMultiInstanceActivityCompletedEvent> multiInstanceEvents = eventCaptor.getAllValues().stream()
+                .filter(event -> event instanceof FlowableMultiInstanceActivityCompletedEvent)
+                .map(event -> (FlowableMultiInstanceActivityCompletedEvent) event).collect(Collectors.toList());
+        assertThat(multiInstanceEvents.size()).isEqualTo(1);
+
+        Integer numberOfActiveInstances = multiInstanceEvents.stream()
+                .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfActiveInstances).findFirst().get();
+        Integer numberOfCompletedInstances = multiInstanceEvents.stream()
+                .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfCompletedInstances).findFirst().get();
+        Integer numberOfInstances = multiInstanceEvents.stream().map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfInstances)
+                .findFirst().get();
+
+        assertThat(numberOfActiveInstances).isEqualTo(0);
+        assertThat(numberOfCompletedInstances).isEqualTo(3);
+        assertThat(numberOfInstances).isEqualTo(3);
     }
 
     @Test
