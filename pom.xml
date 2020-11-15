@@ -18,7 +18,7 @@
 		<spring.framework.version>5.2.10.RELEASE</spring.framework.version>
 		<spring.security.version>5.3.5.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
-		<spring.kafka.version>2.5.6.RELEASE</spring.kafka.version>
+		<spring.kafka.version>2.5.8.RELEASE</spring.kafka.version>
 		<reactor-netty.version>0.9.12.RELEASE</reactor-netty.version>
 		<jackson.version>2.11.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
