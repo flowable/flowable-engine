@@ -18,24 +18,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ConditionalConverterTest extends AbstractConverterTest {
+class ConditionalConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("conditionaltest.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getFlowElement("conditionalCatch");
         assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
         
@@ -43,10 +31,5 @@ public class ConditionalConverterTest extends AbstractConverterTest {
         assertThat(catchEvent.getEventDefinitions()).hasSize(1);
         ConditionalEventDefinition event = (ConditionalEventDefinition) catchEvent.getEventDefinitions().get(0);
         assertThat(event.getConditionExpression()).isEqualTo("${testVar == 'test'}");
-    }
-
-    @Override
-    protected String getResource() {
-        return "conditionaltest.bpmn";
     }
 }

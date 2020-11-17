@@ -19,29 +19,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DataStore;
 import org.flowable.bpmn.model.MessageFlow;
 import org.flowable.bpmn.model.Pool;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class MessageFlowConverterTest extends AbstractConverterTest {
+class MessageFlowConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "messageflow.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("messageflow.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getDataStores()).hasSize(1);
         DataStore dataStore = model.getDataStore("DATASTORE_1");
         assertThat(dataStore).isNotNull();

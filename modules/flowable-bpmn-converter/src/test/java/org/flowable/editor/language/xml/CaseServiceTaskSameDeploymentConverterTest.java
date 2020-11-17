@@ -17,29 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CaseServiceTaskSameDeploymentConverterTest extends AbstractConverterTest {
+class CaseServiceTaskSameDeploymentConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "caseServiceTaskSameDeployment.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("caseServiceTaskSameDeployment.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("caseServiceTask");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(CaseServiceTask.class, task -> {
