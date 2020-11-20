@@ -14,6 +14,8 @@ package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.exportAndReadXMLFile;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.readXMLFile;
 
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.model.BpmnModel;
@@ -22,19 +24,20 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 import org.junit.jupiter.api.Test;
 
-public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
+class SubProcessConverterAutoLayoutTest {
 
     @Test
     public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
+        BpmnModel bpmnModel = readXMLFile("subprocessmodel_autolayout.bpmn");
         validateModel(bpmnModel);
     }
 
     @Test
     public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
+        BpmnModel bpmnModel = readXMLFile("subprocessmodel_autolayout.bpmn");
 
         // Add DI information to bpmn model
         BpmnAutoLayout bpmnAutoLayout = new BpmnAutoLayout(bpmnModel);
@@ -42,11 +45,6 @@ public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
 
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "subprocessmodel_autolayout.bpmn";
     }
 
     private void validateModel(BpmnModel model) {

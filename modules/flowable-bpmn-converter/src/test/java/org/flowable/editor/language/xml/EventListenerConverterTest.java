@@ -19,27 +19,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * Test for ACT-1657
  * 
  * @author Frederik Heremans
  */
-public class EventListenerConverterTest extends AbstractConverterTest {
+class EventListenerConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "eventlistenersmodel.bpmn20.xml";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("eventlistenersmodel.bpmn20.xml")
+    void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
         assertThat(process).isNotNull();
         assertThat(process.getEventListeners()).isNotNull();

@@ -30,9 +30,11 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricProcessIdentityLinksForNonExistingInstances();
         processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
-        if (historicEntityLinkService != null) {
-            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingProcessInstances();
+        if (processEngineConfiguration.isEnableEntityLinks()) {
+            HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+            if (historicEntityLinkService != null) {
+                historicEntityLinkService.deleteHistoricEntityLinksForNonExistingProcessInstances();
+            }
         }
         processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
         processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();

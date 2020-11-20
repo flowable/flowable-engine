@@ -14,6 +14,7 @@ package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER;
 
 import java.util.List;
 
@@ -22,37 +23,12 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.SendEventServiceTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SendEventServiceTaskConverterTest extends AbstractConverterTest {
+class SendEventServiceTaskConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        
-        FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("sendEventServiceTask");
-        flowElement.getExtensionElements().remove("eventType");
-        flowElement.getExtensionElements().remove("triggerEventType");
-        flowElement.getExtensionElements().remove("sendSynchronously");
-        flowElement.getExtensionElements().remove("eventInParameter");
-        flowElement.getExtensionElements().remove("eventOutParameter");
-        
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "sendeventservicetask.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("sendeventservicetask.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("sendEventServiceTask");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(SendEventServiceTask.class, sendEventServiceTask -> {

@@ -32,14 +32,14 @@ import org.junit.Test;
  */
 public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
+    protected String deploymentId;
     protected String caseDefinitionId;
 
     @Before
     public void deployCaseDefinition() {
-        deploymentId = cmmnRepositoryService.createDeployment()
+        deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
-                .deploy()
-                .getId();
+                .deploy());
         caseDefinitionId = cmmnRepositoryService.createCaseDefinitionQuery()
                 .deploymentId(deploymentId)
                 .singleResult()

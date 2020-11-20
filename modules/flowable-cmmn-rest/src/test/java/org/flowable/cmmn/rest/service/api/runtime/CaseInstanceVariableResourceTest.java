@@ -199,7 +199,6 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         // Read the serializable from the stream
         ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
         Object readSerializable = stream.readObject();
-        assertThat(readSerializable).isNotNull();
         assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
         assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
@@ -420,7 +419,6 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariable(caseInstance.getId(), "binaryVariable");
-        assertThat(variableValue).isNotNull();
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }

@@ -1015,4 +1015,12 @@
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
   </delete>
 
+  <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId" parameterType="map">
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where
+     SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+     and SCOPE_TYPE_ = #{scopeType}
+     and SCOPE_ID_ is null
+  </delete>
+
+
 </mapper>

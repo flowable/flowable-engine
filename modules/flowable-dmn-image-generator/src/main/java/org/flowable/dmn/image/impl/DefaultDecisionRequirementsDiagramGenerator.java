@@ -239,8 +239,8 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
 
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             graphicInfoList = connectionPerfectionizer(decisionRequirementsDiagramCanvas, dmnDefinition, sourceDecision, targetDecision, graphicInfoList);
-            int xPoints[] = new int[graphicInfoList.size()];
-            int yPoints[] = new int[graphicInfoList.size()];
+            int[] xPoints = new int[graphicInfoList.size()];
+            int[] yPoints = new int[graphicInfoList.size()];
 
             for (int i = 1; i < graphicInfoList.size(); i++) {
                 GraphicInfo graphicInfo = graphicInfoList.get(i);
@@ -288,8 +288,8 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
     protected static GraphicInfo getLineCenter(List<GraphicInfo> graphicInfoList) {
         GraphicInfo gi = new GraphicInfo();
 
-        int xPoints[] = new int[graphicInfoList.size()];
-        int yPoints[] = new int[graphicInfoList.size()];
+        int[] xPoints = new int[graphicInfoList.size()];
+        int[] yPoints = new int[graphicInfoList.size()];
 
         double length = 0;
         double[] lengths = new double[graphicInfoList.size()];

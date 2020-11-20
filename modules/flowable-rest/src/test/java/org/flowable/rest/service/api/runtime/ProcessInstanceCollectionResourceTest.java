@@ -442,15 +442,16 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
         // Check if engine has correct variables set
         Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
-        assertThat(processVariables).hasSize(7);
-
-        assertThat(processVariables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(processVariables.get("integerVariable")).isEqualTo(1234);
-        assertThat(processVariables.get("shortVariable")).isEqualTo((short) 123);
-        assertThat(processVariables.get("longVariable")).isEqualTo(4567890L);
-        assertThat(processVariables.get("doubleVariable")).isEqualTo(123.456);
-        assertThat(processVariables.get("booleanVariable")).isEqualTo(Boolean.TRUE);
-        assertThat(processVariables.get("dateVariable")).isEqualTo(dateFormat.parse(isoString));
+        assertThat(processVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", Boolean.TRUE),
+                        entry("dateVariable", dateFormat.parse(isoString))
+                );
     }
 
     /**

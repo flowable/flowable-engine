@@ -109,7 +109,6 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         // start the process
         runtimeService.startProcessInstanceByKey("ForkProcess");
         List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().list();
-        assertThat(taskList).isNotNull();
         assertThat(taskList).hasSize(2);
 
         // make sure user task exists

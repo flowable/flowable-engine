@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * Start a CMMN case with the case service task
  *
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
@@ -167,9 +168,15 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
         execution.setVariables(variables);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
+            throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity.getId() + " is suspended");
+        }
+
         // Set the reference id and type to null since the execution could be reused
         executionEntity.setReferenceId(null);
         executionEntity.setReferenceType(null);
+
         leave(execution);
     }
 }

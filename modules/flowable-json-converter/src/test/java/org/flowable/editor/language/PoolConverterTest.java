@@ -63,18 +63,18 @@ public class PoolConverterTest extends AbstractConverterTest {
                 );
 
         Lane lane = process.getLanes().get(0);
-        assertThat(lane.getFlowReferences()).hasSize(7);
         assertThat(lane.getFlowReferences())
+                .hasSize(7)
                 .contains("startevent", "usertask1", "usertask6", "endevent");
 
         lane = process.getLanes().get(1);
-        assertThat(lane.getFlowReferences()).hasSize(4);
         assertThat(lane.getFlowReferences())
+                .hasSize(4)
                 .contains("usertask2", "usertask5");
 
         lane = process.getLanes().get(2);
-        assertThat(lane.getFlowReferences()).hasSize(4);
         assertThat(lane.getFlowReferences())
+                .hasSize(4)
                 .contains("usertask3", "usertask4");
 
         assertThat(process.getFlowElement("startevent", true)).isNotNull();

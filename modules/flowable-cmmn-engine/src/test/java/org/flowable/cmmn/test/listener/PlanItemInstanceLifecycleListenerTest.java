@@ -36,14 +36,14 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
 
     private AbstractTestLifecycleListener testLifeCycleListener;
 
+
     @Before
     public void addListeners() {
         this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/listener/PlanItemInstanceLifeCycleListenerTest.cmmn")
-            .deploy()
-            .getId();
+            .deploy());
     }
 
     @After
@@ -290,7 +290,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
     }
 
     private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {
-        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListeners(planItemDefinitionType, testLifeCycleListener);
+        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListener(planItemDefinitionType, testLifeCycleListener);
         this.testLifeCycleListener = testLifeCycleListener;
     }
 

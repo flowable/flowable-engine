@@ -41,7 +41,6 @@ public class DecisionResourceDataResourceTest extends BaseSpringDmnRestTestCase 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertThat(content).isNotNull();
         assertThat(content).contains("Full Decision");
     }
 

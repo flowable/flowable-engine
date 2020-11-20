@@ -17,29 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ExternalWorkerServiceTaskConverterTest extends AbstractConverterTest {
+class ExternalWorkerServiceTaskConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "externalWorkerServiceTask.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("externalWorkerServiceTask.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("externalWorkerServiceTask");
         assertThat(flowElement).isInstanceOf(ExternalWorkerServiceTask.class);
         assertThat(flowElement.getId()).isEqualTo("externalWorkerServiceTask");

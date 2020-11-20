@@ -49,7 +49,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
                 CompareToBuilder compareToBuilder = new CompareToBuilder();
                 for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
                     List<Object> outputValues = entry.getValue();
-                    if (outputValues != null || !outputValues.isEmpty()) {
+                    if (outputValues != null && !outputValues.isEmpty()) {
                         noOutputValuesPresent = false;
                         compareToBuilder.append(((Map<String, Object>) o1).get(entry.getKey()), 
                                         ((Map<String, Object>) o2).get(entry.getKey()), 

@@ -15,12 +15,15 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,10 +84,19 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             return true;
 
         } catch (RejectedExecutionException e) {
+            sendRejectedEvent(job);
             unacquireJobAfterRejection(job);
 
             // Job queue full, returning false so (if wanted) the acquiring can be throttled
             return false;
+        }
+    }
+
+    protected void sendRejectedEvent(JobInfo job) {
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                FlowableEngineEventType.JOB_REJECTED, job), jobServiceConfiguration.getEngineName());
         }
     }
 

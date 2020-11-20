@@ -254,7 +254,6 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
         // Set to JPA-entity again
         runtimeService.setVariable(processInstance.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
         currentValue = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
-        assertThat(currentValue).isNotNull();
         assertThat(currentValue).isInstanceOf(FieldAccessJPAEntity.class);
         assertThat(((FieldAccessJPAEntity) currentValue).getId().longValue()).isEqualTo(1L);
 

@@ -49,6 +49,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected String caseInstanceId;
     protected String caseInstanceIdWithChildren;
     protected String planItemInstanceId;
+    protected String propagatedStageInstanceId;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -283,6 +284,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setPlanItemInstanceId(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
+    }
+
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     public String getScopeId() {

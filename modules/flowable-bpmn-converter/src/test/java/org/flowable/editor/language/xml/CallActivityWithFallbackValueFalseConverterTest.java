@@ -21,31 +21,13 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CallActivityWithFallbackValueFalseConverterTest extends AbstractConverterTest {
+class CallActivityWithFallbackValueFalseConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "callactivityFallbackValueFalse.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("callactivityFallbackValueFalse.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;
         assertThat(callActivity.getId()).isEqualTo("callactivity");

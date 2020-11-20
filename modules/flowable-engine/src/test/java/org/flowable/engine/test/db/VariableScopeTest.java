@@ -142,18 +142,16 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // subProcessTask execution contains local the variablenames "test",
         // "subProcessLocalVariable" but not "helloWorld" and
         // "mainProcessLocalVariable"
-        assertThat(result).contains("test"); // the variable "test" was set
-        // locally by SetLocalVariableTask
-        assertThat(result).contains("subProcessLocalVariable");
+        assertThat(result).contains("test"); // the variable "test" was set locally by SetLocalVariableTask
         assertThat(result)
+                .contains("subProcessLocalVariable")
                 .doesNotContain("mainProcessLocalVariable", "helloWorld");
 
         // Returns a set of global variablenames of subProcessTask execution
         result = processEngineConfiguration.getCommandExecutor().execute(new GetVariableNamesCommand(subProcessTask.getExecutionId(), false));
 
         // subProcessTask execution contains global all defined variablenames
-        assertThat(result).contains("test"); // the variable "test" was set
-        // locally by SetLocalVariableTask
+        assertThat(result).contains("test"); // the variable "test" was set locally by SetLocalVariableTask
         assertThat(result)
                 .contains("subProcessLocalVariable", "helloWorld", "mainProcessLocalVariable");
 

@@ -15,44 +15,35 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.readXMLFile;
 
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
+import org.flowable.editor.language.xml.util.XmlTestUtils;
 import org.junit.jupiter.api.Test;
 
-public class MapExceptionConverterTest extends AbstractConverterTest {
+class MapExceptionConverterTest {
 
-    String resourceName;
-
-    @Override
-    protected String getResource() {
-        return resourceName;
+    @Test
+    void testMapExceptionWithInvalidHasChildren() {
+        assertThatThrownBy(() -> readXMLFile("mapException/mapExceptionInvalidHasChildrenModel.bpmn"))
+            .isInstanceOf(XMLException.class)
+            .hasMessageContaining("is not valid boolean");
     }
 
     @Test
-    public void testMapExceptionWithInvalidHasChildren() throws Exception {
-        resourceName = "mapException/mapExceptionInvalidHasChildrenModel.bpmn";
-        assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class)
-                .hasMessageContaining("is not valid boolean");
-    }
-
-    @Test
-    public void testMapExceptionWithNoErrorCode() throws Exception {
-        resourceName = "mapException/mapExceptionNoErrorCode.bpmn";
-        assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class)
+    void testMapExceptionWithNoErrorCode() {
+        assertThatThrownBy(() -> readXMLFile("mapException/mapExceptionNoErrorCode.bpmn"))
+                .isInstanceOf(XMLException.class)
                 .hasMessageContaining("No errorCode defined mapException with errorCode=null");
     }
 
-    @Test
-    public void testMapExceptionWithNoExceptionClass() throws Exception {
-        resourceName = "mapException/mapExceptionNoExceptionClass.bpmn";
-
-        BpmnModel bpmnModel = readXMLFile();
+    @BpmnXmlConverterTest("mapException/mapExceptionNoExceptionClass.bpmn")
+    void validateMapExceptionNoExceptionClass(BpmnModel bpmnModel) {
         FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("servicetaskWithAndTrueAndChildren");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
@@ -63,16 +54,9 @@ public class MapExceptionConverterTest extends AbstractConverterTest {
                 });
     }
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        resourceName = "mapException/mapExceptionModel.bpmn";
 
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    protected void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("mapException/mapExceptionModel.bpmn")
+    void validateMapExceptionModel(BpmnModel model) {
 
         // check service task with andChildren Set to True
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetaskWithAndTrueAndChildren");

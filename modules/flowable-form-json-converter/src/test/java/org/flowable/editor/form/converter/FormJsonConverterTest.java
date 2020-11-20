@@ -47,7 +47,6 @@ public class FormJsonConverterTest {
         SimpleFormModel formModel = new FormJsonConverter().convertToFormModel(testJsonResource);
 
         assertThat(formModel).isNotNull();
-        assertThat(formModel.getFields()).isNotNull();
         assertThat(formModel.getFields()).hasSize(1);
 
         FormField formField = formModel.getFields().get(0);

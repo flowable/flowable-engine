@@ -55,13 +55,11 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement startFlowElement = model.getMainProcess().getFlowElement("startNode", true);
-        assertThat(startFlowElement).isNotNull();
         assertThat(startFlowElement).isInstanceOf(StartEvent.class);
         StartEvent startEvent = (StartEvent) startFlowElement;
 
         List<FormProperty> formProperties = startEvent.getFormProperties();
 
-        assertThat(formProperties).isNotNull();
         assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {
@@ -97,13 +95,11 @@ public class FormPropertiesConverterTest extends AbstractConverterTest {
         }
 
         FlowElement userFlowElement = model.getMainProcess().getFlowElement("userTask", true);
-        assertThat(userFlowElement).isNotNull();
         assertThat(userFlowElement).isInstanceOf(UserTask.class);
         UserTask userTask = (UserTask) userFlowElement;
 
         formProperties = userTask.getFormProperties();
 
-        assertThat(formProperties).isNotNull();
         assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
 
         for (FormProperty formProperty : formProperties) {

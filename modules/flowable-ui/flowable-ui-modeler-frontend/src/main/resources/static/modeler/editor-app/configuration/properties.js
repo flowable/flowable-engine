@@ -21,7 +21,8 @@ FLOWABLE.PROPERTY_CONFIG =
         "writeModeTemplateUrl": "editor-app/configuration/properties/string-property-write-mode-template.html"
     },
     "boolean": {
-        "templateUrl": "editor-app/configuration/properties/boolean-property-template.html"
+        "readModeTemplateUrl": "editor-app/configuration/properties/boolean-property-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/boolean-property-template.html"
     },
     "text" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",

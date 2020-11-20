@@ -23,29 +23,12 @@ import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest {
+class CustomNamespaceAttributeConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "customnamespaceattributemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("customnamespaceattributemodel.bpmn")
+    void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
         assertThat(process.getAttributes()).isNotNull();
         List<ExtensionAttribute> attributes = process.getAttributes().get("version");
@@ -61,7 +44,6 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
         UserTask userTask = (UserTask) flowElement;
 
         Map<String, List<ExtensionAttribute>> attributesMap = userTask.getAttributes();
-        assertThat(attributesMap).isNotNull();
         assertThat(attributesMap).hasSize(2);
 
         attributes = attributesMap.get("id");

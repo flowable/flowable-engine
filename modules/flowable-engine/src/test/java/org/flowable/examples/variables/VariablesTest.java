@@ -987,7 +987,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(dataObject.getName()).isEqualTo("stringVar");
         assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(dataObject.getType()).isEqualTo("string");
-        assertThat(dataObject.getType()).isEqualTo("string");
         assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         // getDataObjects via names (from subprocess)
@@ -1503,7 +1502,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
         assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
         assertThat(dataObject.getId()).isNotNull();
-        assertThat(dataObject.getId()).isNotNull();
         assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
         assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(dataObject.getType()).isEqualTo("int");
@@ -1587,7 +1585,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
         assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
         assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
-        assertThat(dataObject.getId()).isNotNull();
         assertThat(dataObject.getId()).isNotNull();
         assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
         assertThat(dataObject.getName()).isEqualTo("intVar");
@@ -1737,7 +1734,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(dataObject.getValue()).isEqualTo("coca-cola");
         assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
         assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
-        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
         assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
         assertThat(dataObject.getType()).isEqualTo("string");
         assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());

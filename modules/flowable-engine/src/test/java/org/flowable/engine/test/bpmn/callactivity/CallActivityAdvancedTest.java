@@ -855,21 +855,17 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
-        assertThat(instanceList).isNotNull();
         assertThat(instanceList).hasSize(3);
 
         List<Task> taskList = taskService.createTaskQuery().list();
-        assertThat(taskList).isNotNull();
         assertThat(taskList).hasSize(2);
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "Test cascading");
 
         instanceList = runtimeService.createProcessInstanceQuery().list();
-        assertThat(instanceList).isNotNull();
         assertThat(instanceList).isEmpty();
 
         taskList = taskService.createTaskQuery().list();
-        assertThat(taskList).isNotNull();
         assertThat(taskList).isEmpty();
     }
 
@@ -1318,6 +1314,72 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariables(task.getProcessInstanceId())).isEmpty();
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "myVariable-123")).isEqualTo(task.getProcessInstanceId());
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testCompleteChildProcessInstanceWithSuspendedParentProcess() {
+        // Bring process instance to task in child process instance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+        // one task in the subprocess should be active after starting the process instance
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+
+        // Completing the task continues the process which leads to calling the subprocess
+        taskService.complete(taskBeforeSubProcess.getId());
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
+
+        Execution childProcessInstance = runtimeService.createExecutionQuery().executionId(taskInSubProcess.getProcessInstanceId()).singleResult();
+
+        // Suspend process instance
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+        assertThatThrownBy(() -> taskService.complete(taskInSubProcess.getId()))
+            .isInstanceOf(FlowableException.class)
+            .hasMessageContainingAll("Cannot complete process instance. Parent process instance", "is suspended");
+
+        // Activate and complete
+        runtimeService.activateProcessInstanceById(processInstance.getId());
+        taskService.complete(taskInSubProcess.getId());
+        assertProcessEnded(childProcessInstance.getId());
+
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testCompleteChildProcessInstanceWithSuspendedParentProcessDefinition() {
+        // Bring process instance to task in child process instance
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+        // one task in the subprocess should be active after starting the process instance
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+
+        // Completing the task continues the process which leads to calling the subprocess
+        taskService.complete(taskBeforeSubProcess.getId());
+        Task taskInSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
+
+        Execution childProcessInstance = runtimeService.createExecutionQuery().executionId(taskInSubProcess.getProcessInstanceId()).singleResult();
+
+        // Suspend process instance
+        repositoryService.suspendProcessDefinitionByKey("callSimpleSubProcess");
+
+        assertThatThrownBy(() -> taskService.complete(taskInSubProcess.getId()))
+            .isInstanceOf(FlowableException.class)
+            .hasMessageContainingAll("Cannot complete process instance. Parent process instance", "is suspended");
+
+        // Activate and complete
+        repositoryService.activateProcessDefinitionByKey("callSimpleSubProcess");
+        taskService.complete(taskInSubProcess.getId());
+        assertProcessEnded(childProcessInstance.getId());
+
     }
 
     protected void assertCallActivityToFallback() {

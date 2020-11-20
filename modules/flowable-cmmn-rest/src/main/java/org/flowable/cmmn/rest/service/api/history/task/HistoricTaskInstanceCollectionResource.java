@@ -45,6 +45,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The case instance id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instance of a case instance and its children.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic task instance.", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
             @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskNameLike", dataType = "string", value = "The task name with like operator for the historic task instance.", paramType = "query"),
@@ -102,6 +103,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("caseDefinitionId") != null) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
+        }
+
+        if (allRequestParams.get("propagatedStageInstanceId") != null) {
+            queryRequest.setPropagatedStageInstanceId(allRequestParams.get("propagatedStageInstanceId"));
         }
 
         if (allRequestParams.get("taskName") != null) {

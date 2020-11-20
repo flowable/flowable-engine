@@ -59,6 +59,10 @@ public interface ContentStorage {
             }
         }
 
+        if (StringUtils.isNotEmpty(metaData.getTenantId())) {
+            mapMetaData.put("tenantId", metaData.getTenantId());
+        }
+
         return createContentObject(contentStream, mapMetaData);
     }
 
@@ -102,6 +106,11 @@ public interface ContentStorage {
                 mapMetaData.put(ContentMetaDataKeys.SCOPE_ID, metaData.getScopeId());
             }
         }
+
+        if (StringUtils.isNotEmpty(metaData.getTenantId())) {
+            mapMetaData.put("tenantId", metaData.getTenantId());
+        }
+
 
         return updateContentObject(id, contentStream, mapMetaData);
     }
