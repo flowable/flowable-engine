@@ -93,7 +93,6 @@ import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.Transaction;
-import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -488,21 +487,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             } else if (flowElement instanceof SubProcess) {
                 SubProcess subProcess = (SubProcess) flowElement;
                 Collection<FlowElement> childFlowElements = subProcess.getFlowElements();
-
-                List<VariableAggregationDefinition> variableAggregationDefinitions = subProcess.getVariableAggregationDefinitions();
-                if (variableAggregationDefinitions != null && !variableAggregationDefinitions.isEmpty()) {
-                    for (FlowElement childFlowElement : childFlowElements) {
-                        if (childFlowElement instanceof FlowNode) {
-                            FlowNode childFlowNode = (FlowNode) childFlowElement;
-                            if (childFlowNode.getVariableAggregationDefinitions() == null) {
-                                childFlowNode.setVariableAggregationDefinitions(new ArrayList<>());
-                            }
-                            childFlowNode.getVariableAggregationDefinitions().addAll(variableAggregationDefinitions);
-                        }
-                    }
-
-                }
-
                 processFlowElements(childFlowElements, subProcess);
             }
         }

@@ -12,26 +12,27 @@
 
         <subProcess id="theSubProcess">
 
-            <extensionElements>
-                <flowable:variableAggregation targetArrayVariable="reviews" source="myScore" target="score" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description" />
-            </extensionElements>
-
             <multiInstanceLoopCharacteristics isSequential="false">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews">
+                        <variable source="myScore" target="score" />
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
                 <loopCardinality>${nrOfLoops}</loopCardinality>
             </multiInstanceLoopCharacteristics>
 
             <startEvent id="subStart"  />
             <sequenceFlow id="subflow0" sourceRef="subStart" targetRef="userTaskOne" />
 
-            <userTask id="userTaskOne" name="task one" />
+            <userTask id="userTaskOne" name="task one" flowable:category="Category  ${loopCounter}" />
             <sequenceFlow id="subflow1" sourceRef="userTaskOne" targetRef="userTaskTwo" />
 
-            <userTask id="userTaskTwo" name="task two" />
+            <userTask id="userTaskTwo" name="task two" flowable:category="Category  ${loopCounter}" />
             <sequenceFlow id="subflow2" sourceRef="userTaskTwo" targetRef="userTaskThree" />
 
-            <userTask id="userTaskThree" name="task three" />
+            <userTask id="userTaskThree" name="task three" flowable:category="Category  ${loopCounter}" />
             <sequenceFlow id="subFlow3" sourceRef="userTaskThree" targetRef="subEnd" />
 
             <endEvent id="subEnd" />

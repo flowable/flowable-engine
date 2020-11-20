@@ -16,10 +16,13 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CollectionHandler;
@@ -28,6 +31,8 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.VariableAggregationDefinition;
+import org.flowable.bpmn.model.VariableAggregationDefinitions;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -41,6 +46,7 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateCollectionHandler;
+import org.flowable.engine.impl.bpmn.helper.ClassDelegateUtil;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionCollectionHandler;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -48,17 +54,20 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
+import org.flowable.engine.impl.delegate.JsonVariableAggregator;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
+import org.flowable.engine.impl.delegate.VariableAggregator;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
-import org.flowable.variable.service.impl.util.VariableAggregationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +84,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements SubProcessActivityBehavior {
 
@@ -98,6 +108,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionElementVariable;
     protected String collectionString;
     protected CollectionHandler collectionHandler;
+    protected VariableAggregationDefinitions aggregations;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -141,58 +152,105 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
-        if (hasVariableAggregationDefinitions(execution)) {
-            aggregateVariablesOfAllInstances(execution);
-        }
         cleanupMiRoot(execution);
     }
 
     protected boolean hasVariableAggregationDefinitions(DelegateExecution execution) {
-        return execution.getCurrentFlowElement() instanceof FlowNode
-            && ((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions() != null
-            && !((FlowNode) execution.getCurrentFlowElement()).getVariableAggregationDefinitions().isEmpty();
-    }
-
-    protected void aggregateVariablesOfOneInstance(DelegateExecution execution) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-
-        // Gathered variables for one instance are stored on the instance execution (child of multi instance root execution)
-        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance((ExecutionEntity) execution).getId()) // See VariableAggregationUtil#copyCreatedVariableForAggregation : the variables have been stored on the (multi-instance) instance execution
-            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
-            .list();
-        if (variableInstances == null || variableInstances.isEmpty()) {
-            return;
-        }
-
-        String elementId = execution.getCurrentActivityId();
-        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) execution).getVariableAggregationInfo();
-
-        // After aggregation, the objectNode is stored on the multi instance root execution
-        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo.getInstanceId(),
-            variableAggregationInfo.getAggregationScopeIdForElementId(elementId),
-            variableAggregationInfo.getVariableAggregationsForElementId(elementId),
-            variableInstances);
+        return aggregations != null && !aggregations.getAggregations().isEmpty();
     }
 
     /**
-     * Aggregates all variables that were stored before for each instance
+     * Aggregated the variables for the finished child multi instance execution
+     * @param childExecution the child execution
+     * @param miRootExecution the multi instance root execution
      */
-    protected void aggregateVariablesOfAllInstances(DelegateExecution execution) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+    protected void aggregateVariablesForChildExecution(DelegateExecution childExecution, DelegateExecution miRootExecution) {
+        if (hasVariableAggregationDefinitions(childExecution) && miRootExecution != null) {
 
-        // Gathered variables are stored on the multi instance root execution
-        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(getMultiInstanceRootExecution(execution).getId()) // All objectNodes are stored against the MI root execution after instance completion
-            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
-            .list();
-        if (variableInstances == null || variableInstances.isEmpty()) {
-            return;
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+            VariableService variableService = variableServiceConfiguration.getVariableService();
+            VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
+
+            for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+
+                String targetVarName = getAggregationTargetVarName(aggregation, childExecution, processEngineConfiguration);
+
+                if (targetVarName != null) {
+
+                    VariableAggregator aggregator = resolveVariableAggregator(aggregation, childExecution);
+                    Object aggregatedValue = aggregator.aggregateSingle(childExecution, aggregation);
+
+                    VariableType variableType = variableTypes.findVariableType(aggregatedValue);
+                    VariableInstanceEntity aggregatedVarInstance = variableService.createVariableInstance(targetVarName, variableType, aggregatedValue);
+                    aggregatedVarInstance.setScopeId(childExecution.getProcessInstanceId());
+                    aggregatedVarInstance.setSubScopeId(miRootExecution.getId());
+                    aggregatedVarInstance.setScopeType(ScopeTypes.BPMN_VARIABLE_AGGREGATION);
+
+                    variableService.insertVariableInstance(aggregatedVarInstance);
+                    //TODO maybe create a new variable with the loop counter `__flowableAggregationInfo`
+                }
+            }
         }
+    }
 
-        VariableAggregationUtil.aggregateVariablesOfAllInstances(execution, variableInstances);
+    protected String getAggregationTargetVarName(VariableAggregationDefinition aggregation, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        String targetVarName = null;
+        if (StringUtils.isNotEmpty(aggregation.getTargetExpression())) {
+            Object value = processEngineConfiguration.getExpressionManager()
+                    .createExpression(aggregation.getTargetExpression())
+                    .getValue(execution);
+            if (value != null) {
+                targetVarName = value.toString();
+            }
+        } else if (StringUtils.isNotEmpty(aggregation.getTarget())) {
+            targetVarName = aggregation.getTarget();
+        }
+        return targetVarName;
+    }
+
+    /**
+     * Aggregates all variables that were stored before for each child instance
+     */
+    protected void aggregateVariablesOfAllInstances(DelegateExecution multiInstanceRootExecution) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> instances = variableService.createInternalVariableInstanceQuery()
+                .subScopeId(multiInstanceRootExecution.getId())
+                .scopeType(ScopeTypes.BPMN_VARIABLE_AGGREGATION)
+                .list();
+
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(multiInstanceRootExecution, processEngineConfiguration);
+
+        if (!instances.isEmpty()) {
+            Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(instances);
+
+            for (Map.Entry<String, List<VariableInstance>> entry : instancesByName.entrySet()) {
+                String varName = entry.getKey();
+
+                VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
+                VariableAggregator aggregator = resolveVariableAggregator(aggregation, multiInstanceRootExecution);
+                Object value = aggregator.aggregateMulti(multiInstanceRootExecution, entry.getValue(), aggregation);
+
+                multiInstanceRootExecution.getParent().setVariable(varName, value);
+            }
+        }
+    }
+
+    protected Map<String, List<VariableInstance>> groupVariableInstancesByName(List<? extends VariableInstance> instances) {
+        return instances.stream().collect(Collectors.groupingBy(VariableInstance::getName));
+    }
+
+    protected Map<String, VariableAggregationDefinition> groupAggregationsByTarget(DelegateExecution multiInstanceRootExecution,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = new HashMap<>();
+
+        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+            String targetVarName = getAggregationTargetVarName(aggregation, multiInstanceRootExecution, processEngineConfiguration);
+            aggregationsByTarget.put(targetVarName, aggregation);
+        }
+        return aggregationsByTarget;
     }
 
     protected void cleanupMiRoot(DelegateExecution execution) {
@@ -200,6 +258,12 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         // Create a fresh execution to continue
         
         ExecutionEntity multiInstanceRootExecution = (ExecutionEntity) getMultiInstanceRootExecution(execution);
+
+        if (hasVariableAggregationDefinitions(execution)) {
+            aggregateVariablesOfAllInstances(multiInstanceRootExecution);
+        }
+
+
         FlowElement flowElement = multiInstanceRootExecution.getCurrentFlowElement();
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
         
@@ -541,6 +605,28 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         }
         return collectionHandler;
     }
+
+    protected VariableAggregator resolveVariableAggregator(VariableAggregationDefinition aggregation, DelegateExecution execution) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(aggregation.getImplementationType())) {
+            Object delegate = ClassDelegateUtil.instantiateDelegate(aggregation.getImplementation(), null);
+            if (delegate instanceof VariableAggregator) {
+                return (VariableAggregator) delegate;
+            }
+
+            throw new FlowableIllegalArgumentException("Class " + aggregation.getImplementation() + " does not implement " + VariableAggregator.class);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(aggregation.getImplementationType())) {
+            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(
+                    CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(aggregation.getImplementation()), execution);
+
+            if (delegate instanceof VariableAggregator) {
+                return (VariableAggregator) delegate;
+            }
+
+            throw new FlowableIllegalArgumentException("Delegate expression " + aggregation.getImplementation() + " did not resolve to an implementation of " + VariableAggregator.class);
+        } else {
+            return CommandContextUtil.getProcessEngineConfiguration().getVariableAggregator();
+        }
+    }
     
     // Getters and Setters
     // ///////////////////////////////////////////////////////////
@@ -601,7 +687,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 		this.collectionHandler = collectionHandler;
 	}
 
-	public String getCollectionElementIndexVariable() {
+    public VariableAggregationDefinitions getAggregations() {
+        return aggregations;
+    }
+
+    public void setAggregations(VariableAggregationDefinitions aggregations) {
+        this.aggregations = aggregations;
+    }
+
+    public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 

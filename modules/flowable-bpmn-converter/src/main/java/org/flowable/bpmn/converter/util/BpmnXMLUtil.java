@@ -58,7 +58,6 @@ import org.flowable.bpmn.converter.child.TimeCycleParser;
 import org.flowable.bpmn.converter.child.TimeDateParser;
 import org.flowable.bpmn.converter.child.TimeDurationParser;
 import org.flowable.bpmn.converter.child.TimerEventDefinitionParser;
-import org.flowable.bpmn.converter.parser.VariableAggregationDefinitionParser;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
@@ -91,7 +90,6 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new IOSpecificationParser());
         addGenericParser(new MessageEventDefinitionParser());
         addGenericParser(new MultiInstanceParser());
-        addGenericParser(new VariableAggregationDefinitionParser());
         addGenericParser(new SignalEventDefinitionParser());
         addGenericParser(new TaskListenerParser());
         addGenericParser(new TerminateEventDefinitionParser());

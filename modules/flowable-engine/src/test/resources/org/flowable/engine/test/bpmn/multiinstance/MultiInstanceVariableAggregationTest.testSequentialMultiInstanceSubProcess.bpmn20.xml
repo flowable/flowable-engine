@@ -12,13 +12,14 @@
 
         <subProcess id="theSubProcess">
 
-            <extensionElements>
-                <flowable:variableAggregation targetArrayVariable="reviews" source="myScore" target="score" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description" />
-            </extensionElements>
-
             <multiInstanceLoopCharacteristics isSequential="true">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews">
+                        <variable source="myScore" target="score" />
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
                 <loopCardinality>${nrOfLoops}</loopCardinality>
             </multiInstanceLoopCharacteristics>
 

@@ -25,7 +25,6 @@ public abstract class FlowNode extends FlowElement {
 
     protected boolean asynchronous;
     protected boolean notExclusive;
-    protected List<VariableAggregationDefinition> variableAggregationDefinitions;
 
     protected List<SequenceFlow> incomingFlows = new ArrayList<>();
     protected List<SequenceFlow> outgoingFlows = new ArrayList<>();
@@ -61,14 +60,6 @@ public abstract class FlowNode extends FlowElement {
         this.notExclusive = notExclusive;
     }
 
-    public List<VariableAggregationDefinition> getVariableAggregationDefinitions() {
-        return variableAggregationDefinitions;
-    }
-
-    public void setVariableAggregationDefinitions(List<VariableAggregationDefinition> variableAggregationDefinitions) {
-        this.variableAggregationDefinitions = variableAggregationDefinitions;
-    }
-
     public Object getBehavior() {
         return behavior;
     }
@@ -97,6 +88,5 @@ public abstract class FlowNode extends FlowElement {
         super.setValues(otherNode);
         setAsynchronous(otherNode.isAsynchronous());
         setNotExclusive(otherNode.isNotExclusive());
-        setVariableAggregationDefinitions(otherNode.getVariableAggregationDefinitions());
     }
 }

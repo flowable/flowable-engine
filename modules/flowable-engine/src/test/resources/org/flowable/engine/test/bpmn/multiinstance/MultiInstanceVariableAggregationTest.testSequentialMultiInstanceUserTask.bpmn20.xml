@@ -12,13 +12,14 @@
 
         <userTask id="miTasks" name="My Task" flowable:assigneeVariableName="taskAssignee">
 
-            <extensionElements>
-                <flowable:variableAggregation targetArrayVariable="reviews" source="taskAssignee" target="userId" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description" />
-            </extensionElements>
-
             <multiInstanceLoopCharacteristics isSequential="true">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews">
+                        <variable source="taskAssignee" target="userId" />
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
                 <loopCardinality>${nrOfLoops}</loopCardinality>
             </multiInstanceLoopCharacteristics>
 

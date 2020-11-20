@@ -220,7 +220,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
             .subScopeId(planItemInstanceEntity.getId())
-            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
             .list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;
@@ -254,7 +254,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
             .subScopeIds(planItemInstances.stream().map(PlanItemInstanceEntity::getId).collect(Collectors.toList()))
-            .scopeType(ScopeTypes.VARIABLE_AGGREGATION)
+            .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
             .list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;

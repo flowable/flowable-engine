@@ -12,61 +12,36 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class VariableAggregationDefinition {
 
-    protected FlowNode element; // The element where the aggregation will happen. This can be a parent element (e.g. multi-instance subprocess with a number of user tasks)
-    protected String targetArrayVariable;
-    protected String targetArrayVariableExpression;
-    protected String source;
-    protected String sourceExpression;
+    protected String implementationType;
+    protected String implementation;
+
     protected String target;
     protected String targetExpression;
+    protected List<Variable> definitions;
 
-    public FlowNode getElement() {
-        return element;
+    public String getImplementationType() {
+        return implementationType;
     }
 
-    public void setElement(FlowNode element) {
-        this.element = element;
+    public void setImplementationType(String implementationType) {
+        this.implementationType = implementationType;
     }
 
-    public String getElementId() {
-        return element.getId();
+    public String getImplementation() {
+        return implementation;
     }
 
-    public String getTargetArrayVariable() {
-        return targetArrayVariable;
-    }
-
-    public void setTargetArrayVariable(String targetArrayVariable) {
-        this.targetArrayVariable = targetArrayVariable;
-    }
-
-    public String getTargetArrayVariableExpression() {
-        return targetArrayVariableExpression;
-    }
-
-    public void setTargetArrayVariableExpression(String targetArrayVariableExpression) {
-        this.targetArrayVariableExpression = targetArrayVariableExpression;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public String getSourceExpression() {
-        return sourceExpression;
-    }
-
-    public void setSourceExpression(String sourceExpression) {
-        this.sourceExpression = sourceExpression;
+    public void setImplementation(String implementation) {
+        this.implementation = implementation;
     }
 
     public String getTarget() {
@@ -83,6 +58,99 @@ public class VariableAggregationDefinition {
 
     public void setTargetExpression(String targetExpression) {
         this.targetExpression = targetExpression;
+    }
+
+    public List<Variable> getDefinitions() {
+        return definitions;
+    }
+
+    public void setDefinitions(List<Variable> definitions) {
+        this.definitions = definitions;
+    }
+
+    public void addDefinition(Variable definition) {
+        if (definitions == null) {
+            definitions = new ArrayList<>();
+        }
+
+        definitions.add(definition);
+    }
+
+    @Override
+    public VariableAggregationDefinition clone() {
+        VariableAggregationDefinition aggregation = new VariableAggregationDefinition();
+        aggregation.setValues(this);
+        return aggregation;
+    }
+
+    public void setValues(VariableAggregationDefinition otherVariableDefinitionAggregation) {
+        setImplementationType(otherVariableDefinitionAggregation.getImplementationType());
+        setImplementation(otherVariableDefinitionAggregation.getImplementation());
+        setTarget(otherVariableDefinitionAggregation.getTarget());
+        setTargetExpression(otherVariableDefinitionAggregation.getTargetExpression());
+        List<Variable> otherDefinitions = otherVariableDefinitionAggregation.getDefinitions();
+        if (otherDefinitions != null) {
+            List<Variable> newDefinitions = new ArrayList<>(otherDefinitions.size());
+            for (Variable otherDefinition : otherDefinitions) {
+                newDefinitions.add(otherDefinition.clone());
+            }
+
+            setDefinitions(newDefinitions);
+        }
+    }
+
+    public static class Variable {
+
+        protected String source;
+        protected String target;
+        protected String targetExpression;
+        protected String sourceExpression;
+
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        public String getTarget() {
+            return target;
+        }
+
+        public void setTarget(String target) {
+            this.target = target;
+        }
+
+        public String getTargetExpression() {
+            return targetExpression;
+        }
+
+        public void setTargetExpression(String targetExpression) {
+            this.targetExpression = targetExpression;
+        }
+
+        public String getSourceExpression() {
+            return sourceExpression;
+        }
+
+        public void setSourceExpression(String sourceExpression) {
+            this.sourceExpression = sourceExpression;
+        }
+
+        @Override
+        public Variable clone() {
+            Variable definition = new Variable();
+            definition.setValues(this);
+            return definition;
+        }
+
+        public void setValues(Variable otherDefinition) {
+            setSource(otherDefinition.getSource());
+            setSourceExpression(otherDefinition.getSourceExpression());
+            setTarget(otherDefinition.getTarget());
+            setTargetExpression(otherDefinition.getTargetExpression());
+        }
     }
 
 }

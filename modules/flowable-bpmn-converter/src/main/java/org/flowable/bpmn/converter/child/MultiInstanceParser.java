@@ -70,6 +70,7 @@ public class MultiInstanceParser extends BaseChildElementParser {
                     // initialize collection element parser in case it exists
                     Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
                     childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
+                    childParserMap.put(ELEMENT_VARIABLE_AGGREGATION, new VariableAggregationDefinitionParser());
                     BpmnXMLUtil.parseChildElements(ELEMENT_EXTENSIONS, multiInstanceDef, xtr, childParserMap, model);
 
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {

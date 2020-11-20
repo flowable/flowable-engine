@@ -19,22 +19,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
@@ -42,7 +39,6 @@ import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -637,81 +633,28 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
-    public VariableAggregationInfo getVariableAggregationInfo() {
-        FlowElement currentFlowElement = getCurrentFlowElement();
-        if (currentFlowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) currentFlowElement;
-            if (flowNode.getVariableAggregationDefinitions() != null && !flowNode.getVariableAggregationDefinitions().isEmpty())  {
-                List<VariableAggregation> variableAggregations = flowNode.getVariableAggregationDefinitions().stream()
-                    .map(variableAggregationDefinition -> {
+    protected boolean storeVariableLocal(String variableName) {
+        if (super.storeVariableLocal(variableName)) {
+            return true;
+        }
 
-                        String targetArrayVariable = null;
-                        if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariableExpression())) {
-                            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
-                            Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetArrayVariableExpression());
-                            Object value = expression.getValue(this);
-                            if (value != null) {
-                                targetArrayVariable = value.toString();
-                            }
-
-                        } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariable())) {
-                            targetArrayVariable = variableAggregationDefinition.getTargetArrayVariable();
-
-                        }
-
-                        String source = null;
-                        if (StringUtils.isNotEmpty(variableAggregationDefinition.getSourceExpression())) {
-                            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
-                            Expression expression = expressionManager.createExpression(variableAggregationDefinition.getSourceExpression());
-                            Object value = expression.getValue(this);
-                            if (value != null) {
-                                source = value.toString();
-                            }
-
-                        } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getSource())) {
-                            source = variableAggregationDefinition.getSource();
-
-                        }
-
-                        String target = null;
-                        if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetExpression())) {
-                            ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
-                            Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetExpression());
-                            Object value = expression.getValue(this);
-                            if (value != null) {
-                                target = value.toString();
-                            }
-
-                        } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTarget())) {
-                            target = variableAggregationDefinition.getTarget();
-
-                        }
-
-                        return new VariableAggregation(variableAggregationDefinition.getElementId(), targetArrayVariable, source, target);
-
-                    })
-                    .collect(Collectors.toList());
-
-                // Each distinct elementId has different executionId matching the corresponding multi-instance
-                Map<String, List<VariableAggregation>> aggregationsByElementId = new HashMap<>();
-                for (VariableAggregation variableAggregation : variableAggregations) {
-                    aggregationsByElementId.computeIfAbsent(variableAggregation.getElementId(), key -> new ArrayList<>()).add(variableAggregation);
-                }
-
-                VariableAggregationInfo variableAggregationInfo = new VariableAggregationInfo(getProcessInstanceId());
-                for (String elementId : aggregationsByElementId.keySet()) {
-                    DelegateExecution instanceExecution = ExecutionGraphUtil.getParentInstanceExecutionInMultiInstance(this, elementId);
-                    DelegateExecution multiInstanceRootExecution = ExecutionGraphUtil.getMultiInstanceRootExecution(this, elementId);
-                    if (instanceExecution != null && multiInstanceRootExecution != null) {
-                        variableAggregationInfo.addRuntimeInfo(elementId, variableAggregations, instanceExecution.getId(), multiInstanceRootExecution.getId());
-                    }
-                }
-
-                return variableAggregationInfo;
-
+        ExecutionEntityImpl parent = getParent();
+        if (parent != null && parent.isMultiInstanceRoot()) {
+            // If the parent is a multi instance root then the variable should be stored in this execution
+            // the multi instance behaviour will collect this variables once it is done
+            // For backwards compatibility we store the variable locally only if the loop characteristics has aggregations
+            FlowElement parentFlowElement = parent.getCurrentFlowElement();
+            if (parentFlowElement instanceof Activity) {
+                MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentFlowElement).getLoopCharacteristics();
+                return loopCharacteristics != null && loopCharacteristics.getAggregations() != null;
             }
         }
 
+        return false;
+    }
+
+    @Override
+    public VariableAggregationInfo getVariableAggregationInfo() {
         return  null;
     }
 
@@ -747,7 +690,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             }
 
             // If the variable exists on this scope, replace it
-            if (hasVariableLocal(variableName)) {
+            if (storeVariableLocal(variableName)) {
                 setVariableLocal(variableName, value, sourceExecution, true);
                 return;
             }

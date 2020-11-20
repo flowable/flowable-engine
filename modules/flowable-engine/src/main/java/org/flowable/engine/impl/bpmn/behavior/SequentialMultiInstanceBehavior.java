@@ -81,10 +81,9 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         callActivityEndListeners(execution);
 
-        if (hasVariableAggregationDefinitions(execution)) {
-            // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
-            aggregateVariablesOfOneInstance(execution);
-        }
+        // When leaving one of the child executions we need to aggregate the information for it
+        // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+        aggregateVariablesForChildExecution(execution, multiInstanceRootExecution);
 
         boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {

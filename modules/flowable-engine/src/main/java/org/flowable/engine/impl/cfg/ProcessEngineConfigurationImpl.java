@@ -206,6 +206,8 @@ import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
+import org.flowable.engine.impl.delegate.JsonVariableAggregator;
+import org.flowable.engine.impl.delegate.VariableAggregator;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
@@ -530,6 +532,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BatchServiceConfiguration batchServiceConfiguration;
 
     protected boolean enableEntityLinks;
+
+    // Variable Aggregation
+
+    protected VariableAggregator variableAggregator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -1065,6 +1071,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDataManagers();
         initEntityManagers();
         initCandidateManager();
+        initVariableAggregator();
         initHistoryManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
@@ -1355,6 +1362,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initCandidateManager() {
         if (candidateManager == null) {
             candidateManager = new DefaultCandidateManager(this);
+        }
+    }
+
+    // Variable Aggregator
+
+    public void initVariableAggregator() {
+        if (variableAggregator == null) {
+            variableAggregator = new JsonVariableAggregator(this);
         }
     }
 
@@ -4479,6 +4494,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
+        return this;
+    }
+
+    public VariableAggregator getVariableAggregator() {
+        return variableAggregator;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableAggregator(VariableAggregator variableAggregator) {
+        this.variableAggregator = variableAggregator;
         return this;
     }
 

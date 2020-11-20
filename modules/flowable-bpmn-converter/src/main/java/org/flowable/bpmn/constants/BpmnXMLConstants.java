@@ -180,8 +180,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
 
     public static final String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
-    public static final String ATTRIBUTE_TARGET_ARRAY_VARIABLE = "targetArrayVariable";
-    public static final String ATTRIBUTE_TARGET_ARRAY_VARIABLE_EXPRESSION = "targetArrayVariableExpression";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";
 
     public static final String ATTRIBUTE_TASK_IMPLEMENTATION = "implementation";
     public static final String ATTRIBUTE_TASK_OPERATION_REF = "operationRef";

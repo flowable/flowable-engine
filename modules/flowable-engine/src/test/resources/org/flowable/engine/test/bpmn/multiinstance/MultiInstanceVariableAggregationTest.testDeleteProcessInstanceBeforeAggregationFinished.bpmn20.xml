@@ -12,12 +12,13 @@
 
         <userTask id="miTasks" name="My Task" >
 
-            <extensionElements>
-                <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved" />
-                <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description" />
-            </extensionElements>
-
             <multiInstanceLoopCharacteristics isSequential="false">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews">
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
                 <loopCardinality>${nrOfLoops}</loopCardinality>
             </multiInstanceLoopCharacteristics>
 
