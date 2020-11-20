@@ -109,7 +109,7 @@ BPMN 2.0标准对流程的所有的参与者都很有用。最终用户不会因
 ----
 
 
-请参考link:$$http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html$$[这个教程]了解如何使用cron表达式。
+请参考link:$$http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html$$[这个教程]了解如何使用cron表达式。
 
 **请注意:** 与普通的Unix cron不同，第一个符号代表的是秒，而不是分钟。
 
