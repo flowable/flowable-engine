@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
+import org.flowable.dmn.image.exception.FlowableImageException;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
@@ -132,7 +133,7 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
 
             if (decisionServiceInfo == null) {
-                continue;
+                throw new FlowableImageException("Could not find graphic info for decision service: " + decisionService.getId());
             }
 
             List<GraphicInfo> decisionServiceDividerInfos = dmnDefinition.getDecisionServiceDividerGraphicInfo(decisionService.getId());
@@ -353,7 +354,7 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
 
             if (decisionServiceInfo == null) {
-                continue;
+                throw new FlowableImageException("Could not find graphic info for decision service: " + decisionService.getId());
             }
 
             // width
