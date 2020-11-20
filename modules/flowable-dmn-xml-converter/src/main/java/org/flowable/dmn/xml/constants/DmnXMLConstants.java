@@ -17,7 +17,7 @@ package org.flowable.dmn.xml.constants;
  */
 public interface DmnXMLConstants {
 
-    String DMN_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/MODEL/";
+    String DMN_NAMESPACE = "https://www.omg.org/spec/DMN/20191111/MODEL/";
     String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
     String XSI_PREFIX = "xsi";
     String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
@@ -25,7 +25,7 @@ public interface DmnXMLConstants {
     String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
     String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
     String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
-    String DMNDI_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DMNDI/";
+    String DMNDI_NAMESPACE = "https://www.omg.org/spec/DMN/20191111/DMNDI/";
     String DMNDI_PREFIX = "dmndi";
     String OMGDC_NAMESPACE = "http://www.omg.org/spec/DMN/20180521/DC/";
     String OMGDC_PREFIX = "dc";
