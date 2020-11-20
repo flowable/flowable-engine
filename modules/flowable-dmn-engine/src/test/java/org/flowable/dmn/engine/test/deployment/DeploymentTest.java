@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.flowable.dmn.image.exception.FlowableImageException;
 import org.h2.util.IOUtils;
 import org.junit.Test;
 
@@ -498,6 +500,9 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         List<DmnDecision> decisionServices2 = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_SERVICE).list();
         assertThat(decisionServices2).hasSize(2);
+
+        List<DmnDecision> decisionTables = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_TABLE).list();
+        assertThat(decisionServices2).hasSize(2);
     }
 
     @Test
@@ -506,14 +511,12 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
         assertThat(deployment).isNotNull();
 
+        List<String> resourceNames = repositoryService.getDeploymentResourceNames(deployment.getId());
+        // no diagram image because of missing DI info for some decision services
+        assertThat(resourceNames).hasSize(1);
+
         List<DmnDecision> decisionServices = repositoryService.createDecisionQuery().deploymentId(deployment.getId()).list();
         assertThat(decisionServices).hasSize(10);
-        assertThat(decisionServices)
-                .extracting(DmnDecision::getDecisionType)
-                .containsOnly("decision_service");
-
-        List<DmnDecision> decisionServices2 = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_SERVICE).list();
-        assertThat(decisionServices2).hasSize(10);
     }
 
     @Test
