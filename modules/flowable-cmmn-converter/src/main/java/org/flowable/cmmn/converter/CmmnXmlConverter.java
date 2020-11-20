@@ -371,13 +371,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.addEntryDependentPlanItem(planItem));
             planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
 
-            // Variable aggregation definitions
-            if (planItem.getPlanItemDefinition() != null
-                    && planItem.getPlanItemDefinition() instanceof Stage
-                    && planItem.getPlanItemDefinition().getVariableAggregationDefinitions() != null
-                    && !planItem.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty()) {
-                propagateVariableAggregationDefinitions((Stage) planItem.getPlanItemDefinition());
-            }
         }
 
         processCriteria(cmmnModel, conversionHelper.getEntryCriteria());
@@ -393,20 +386,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         // In case there are some associations that didn't have a DI then create an ID for them
         ensureIds(cmmnModel.getAssociations(), "association_");
-    }
-
-    protected void propagateVariableAggregationDefinitions(Stage stage) {
-        for (PlanItemDefinition childPlanItemDefinition : stage.getPlanItemDefinitions()) {
-
-            if (childPlanItemDefinition.getVariableAggregationDefinitions() == null) {
-                childPlanItemDefinition.setVariableAggregationDefinitions(new ArrayList<>());
-            }
-            childPlanItemDefinition.getVariableAggregationDefinitions().addAll(stage.getVariableAggregationDefinitions());
-
-            if (childPlanItemDefinition instanceof Stage) {
-                propagateVariableAggregationDefinitions((Stage) childPlanItemDefinition);
-            }
-        }
     }
 
     protected void processDiEdges(CmmnModel cmmnModel, List<CmmnDiEdge> diEdges) {

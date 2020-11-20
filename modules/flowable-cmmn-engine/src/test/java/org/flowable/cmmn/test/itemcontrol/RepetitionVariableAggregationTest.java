@@ -22,9 +22,12 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,6 +36,7 @@ import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
@@ -49,37 +53,37 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", false);
         variables.put("description", "description task 0");
-        cmmnTaskService.setVariablesLocal(task.getId(), variables);
         cmmnTaskService.setAssignee(task.getId(), "userOne");
-        cmmnTaskService.complete(task.getId());
+        cmmnTaskService.complete(task.getId(), variables);
 
         assertVariablesNotVisible(caseInstance);
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
         variables.put("approved", true);
         variables.put("description", "description task 1");
-        cmmnTaskService.setVariablesLocal(task.getId(), variables);
         cmmnTaskService.setAssignee(task.getId(), "userTwo");
-        cmmnTaskService.complete(task.getId());
+        cmmnTaskService.complete(task.getId(), variables);
 
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
         variables.put("approved", false);
         variables.put("description", "description task 2");
-        cmmnTaskService.setVariablesLocal(task.getId(), variables);
         cmmnTaskService.setAssignee(task.getId(), "userThree");
-        cmmnTaskService.complete(task.getId());
+        cmmnTaskService.complete(task.getId(), variables);
 
         assertVariablesNotVisible(caseInstance);
 
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
 
         assertThatJson(reviews)
+            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
                     + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
                     + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
                     + "]]");
+
+        assertNoAggregatedVariables();
 
     }
 
@@ -101,29 +105,25 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", true);
         variables.put("description", "description task 3");
-        cmmnTaskService.setVariablesLocal(tasks.get(3).getId(), variables);
         cmmnTaskService.setAssignee(tasks.get(3).getId(), "userThree");
-        cmmnTaskService.complete(tasks.get(3).getId());
+        cmmnTaskService.complete(tasks.get(3).getId(), variables);
 
         assertVariablesNotVisible(caseInstance);
 
         variables.put("approved", true);
         variables.put("description", "description task 1");
-        cmmnTaskService.setVariablesLocal(tasks.get(1).getId(), variables);
         cmmnTaskService.setAssignee(tasks.get(1).getId(), "userOne");
-        cmmnTaskService.complete(tasks.get(1).getId());
+        cmmnTaskService.complete(tasks.get(1).getId(), variables);
 
         variables.put("approved", false);
         variables.put("description", "description task 2");
-        cmmnTaskService.setVariablesLocal(tasks.get(2).getId(), variables);
         cmmnTaskService.setAssignee(tasks.get(2).getId(), "userTwo");
-        cmmnTaskService.complete(tasks.get(2).getId());
+        cmmnTaskService.complete(tasks.get(2).getId(), variables);
 
         variables.put("approved", false);
         variables.put("description", "description task 0");
-        cmmnTaskService.setVariablesLocal(tasks.get(0).getId(), variables);
         cmmnTaskService.setAssignee(tasks.get(0).getId(), "userZero");
-        cmmnTaskService.complete(tasks.get(0).getId());
+        cmmnTaskService.complete(tasks.get(0).getId(), variables);
 
         assertVariablesNotVisible(caseInstance);
 
@@ -138,6 +138,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ userId: 'userTwo', approved : false, description : 'description task 2' },"
                     + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
                     + "]]");
+
+        assertNoAggregatedVariables();
 
     }
 
@@ -156,16 +158,14 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("approved", i % 2 == 0);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
-            cmmnTaskService.complete(task.getId());
+            cmmnTaskService.complete(task.getId(), variables);
 
             // User task 'task two': sets description variable
             task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task B").singleResult();
 
             variables = new HashMap<>();
             variables.put("description", "description task " + i);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
-            cmmnTaskService.complete(task.getId());
+            cmmnTaskService.complete(task.getId(), variables);
 
             // User task 'task three': updates description and adds score
             task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task C").singleResult();
@@ -173,8 +173,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             variables = new HashMap<>();
             variables.put("myScore", i + 100);
             //            variables.put("description", "updated description task " + i);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
-            cmmnTaskService.complete(task.getId());
+            cmmnTaskService.complete(task.getId(), variables);
         }
 
         Task remainingTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -189,6 +188,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ score: 101, approved : false, description : 'description task 1' },"
                     + "{ score: 102, approved : true, description : 'description task 2' }"
                     + "]]");
+
+        assertNoAggregatedVariables();
 
     }
 
@@ -210,7 +211,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("approved", i % 2 == 0);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
             cmmnTaskService.complete(task.getId(), variables);
         }
 
@@ -223,7 +223,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("description", "description task " + i);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
             cmmnTaskService.complete(task.getId(), variables);
         }
 
@@ -236,7 +235,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("myScore", i + 10);
-            cmmnTaskService.setVariablesLocal(task.getId(), variables);
             cmmnTaskService.complete(task.getId(), variables);
         }
 
@@ -255,6 +253,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ score: 13, approved : false, description : 'description task 3' }"
                     + "]]");
 
+        assertNoAggregatedVariables();
+
     }
 
     protected void assertVariablesNotVisible(CaseInstance caseInstance) {
@@ -271,6 +271,17 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             assertThat(cmmnRuntimeService.getLocalVariable(planItemInstance.getId(), "description")).isNull();
         }
 
+    }
+
+    protected void assertNoAggregatedVariables() {
+        List<VariableInstanceEntity> variableInstanceEntities = cmmnEngineConfiguration.getCommandExecutor()
+                .execute(commandContext -> CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                        .getVariableServiceConfiguration()
+                        .getVariableService()
+                        .createInternalVariableInstanceQuery()
+                        .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
+                        .list());
+        assertThat(variableInstanceEntities).isEmpty();
     }
 
 }

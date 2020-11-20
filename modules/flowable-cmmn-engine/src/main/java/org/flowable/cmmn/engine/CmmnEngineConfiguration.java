@@ -39,6 +39,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
 import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
@@ -62,6 +63,7 @@ import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
+import org.flowable.cmmn.engine.impl.delegate.JsonPlanItemVariableAggregator;
 import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
@@ -366,7 +368,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean disableEventRegistry;
     
     protected CandidateManager candidateManager;
-    
+    protected PlanItemVariableAggregator variableAggregator;
+
     protected DecisionTableVariableManager decisionTableVariableManager;
 
     protected CaseInstanceHelper caseInstanceHelper;
@@ -897,6 +900,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initDeploymentManager();
         initCaseInstanceHelper();
         initCandidateManager();
+        initVariableAggregator();
         initHistoryManager();
         initDynamicStateManager();
         initCaseInstanceMigrationManager();
@@ -1363,6 +1367,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    public void initVariableAggregator() {
+        if (variableAggregator == null) {
+            variableAggregator = new JsonPlanItemVariableAggregator(this);
+        }
+    }
+
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             if (isAsyncHistoryEnabled) {
@@ -1444,7 +1454,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
     }
-    
+
     @Override
     public String getEngineScopeType() {
         return ScopeTypes.CMMN;
@@ -1501,7 +1511,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
-    
+
     public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
 
@@ -1747,7 +1757,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             };
         }
     }
-    
+
     public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
@@ -1807,7 +1817,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-        
+
         this.jobServiceConfiguration.init();
         
         if (this.jobHandlers != null) {
@@ -2016,7 +2026,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
             jobServiceConfiguration.setAsyncHistoryExecutor(asyncHistoryExecutor);
             jobServiceConfiguration.setAsyncHistoryExecutorNumberOfRetries(asyncHistoryExecutorNumberOfRetries);
-            
+
             asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
         }
     }
@@ -2360,6 +2370,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCandidateManager(CandidateManager candidateManager) {
         this.candidateManager = candidateManager;
+        return this;
+    }
+
+    public PlanItemVariableAggregator getVariableAggregator() {
+        return variableAggregator;
+    }
+
+    public CmmnEngineConfiguration setVariableAggregator(PlanItemVariableAggregator variableAggregator) {
+        this.variableAggregator = variableAggregator;
         return this;
     }
 

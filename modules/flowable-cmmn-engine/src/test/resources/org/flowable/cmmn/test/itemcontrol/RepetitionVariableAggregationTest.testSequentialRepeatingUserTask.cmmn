@@ -10,6 +10,13 @@
             <planItem id="planItem1" name="My Task" definitionRef="humanTask1">
                 <itemControl>
                     <repetitionRule>
+                        <extensionElements>
+                            <flowable:variableAggregation target="reviews">
+                                <variable source="taskAssignee" target="userId" />
+                                <variable source="approved" />
+                                <variable source="description" />
+                            </flowable:variableAggregation>
+                        </extensionElements>
                         <condition><![CDATA[${repetitionCounter < 3}]]></condition>
                     </repetitionRule>
                 </itemControl>
@@ -17,13 +24,7 @@
 
             <planItem id="planItem2" name="My Task 2" definitionRef="humanTask2" />
 
-            <humanTask id="humanTask1" name="My Task" flowable:assigneeVariableName="taskAssignee">
-                <extensionElements>
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="taskAssignee" target="userId" />
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved"/>
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description"/>
-                </extensionElements>
-            </humanTask>
+            <humanTask id="humanTask1" name="My Task" flowable:assigneeVariableName="taskAssignee"/>
 
             <humanTask id="humanTask2" name="My Task"></humanTask>
 

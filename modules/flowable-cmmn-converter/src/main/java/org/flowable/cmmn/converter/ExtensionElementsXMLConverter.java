@@ -18,8 +18,6 @@ import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_DELEGATE_EX
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
 
-import java.util.ArrayList;
-
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamReader;
 
@@ -44,9 +42,10 @@ import org.flowable.cmmn.model.HasLifecycleListeners;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
-import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
@@ -379,24 +379,45 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     protected void readVariableAggregationDefinition(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
 
-        if (currentCmmnElement instanceof PlanItemDefinition) {
-            PlanItemDefinition planItemDefinition = (PlanItemDefinition) currentCmmnElement;
+        if (currentCmmnElement instanceof RepetitionRule) {
+            RepetitionRule repetitionRule = (RepetitionRule) currentCmmnElement;
 
-            VariableAggregationDefinition variableAggregationDefinition = new VariableAggregationDefinition();
+            VariableAggregationDefinition aggregationDefinition = new VariableAggregationDefinition();
 
-            if (planItemDefinition.getVariableAggregationDefinitions() == null) {
-                planItemDefinition.setVariableAggregationDefinitions(new ArrayList<>());
+            if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_CLASS))) {
+                aggregationDefinition.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_CLASS));
+                aggregationDefinition.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+
+            } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_DELEGATE_EXPRESSION))) {
+                aggregationDefinition.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_DELEGATE_EXPRESSION));
+                aggregationDefinition.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
             }
-            planItemDefinition.getVariableAggregationDefinitions().add(variableAggregationDefinition);
 
-            variableAggregationDefinition.setElementId(currentCmmnElement.getId());
-            variableAggregationDefinition.setTargetArrayVariable(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE));
-            variableAggregationDefinition.setTargetArrayVariableExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_TARGET_ARRAY_VARIABLE_EXPRESSION));
-            variableAggregationDefinition.setSource(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE));
-            variableAggregationDefinition.setSourceExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION));
-            variableAggregationDefinition.setTarget(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET));
-            variableAggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+            aggregationDefinition.setTarget(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET));
+            aggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
 
+            repetitionRule.addAggregation(aggregationDefinition);
+
+            boolean readyWithAggregation = false;
+            try {
+                while (!readyWithAggregation && xtr.hasNext()) {
+                    xtr.next();
+                    if (xtr.isStartElement() && CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE.equalsIgnoreCase(xtr.getLocalName())) {
+                        VariableAggregationDefinition.Variable definition = new VariableAggregationDefinition.Variable();
+
+                        definition.setSource(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE));
+                        definition.setSourceExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION));
+                        definition.setTarget(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET));
+                        definition.setTargetExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+
+                        aggregationDefinition.addDefinition(definition);
+                    } else if (xtr.isEndElement() && CmmnXmlConstants.ELEMENT_VARIABLE_AGGREGATION.equalsIgnoreCase(xtr.getLocalName())) {
+                        readyWithAggregation = true;
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Error parsing collection child elements", e);
+            }
         }
 
     }

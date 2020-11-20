@@ -23,7 +23,6 @@ public class PlanItemDefinition extends CaseElement implements HasLifecycleListe
     protected String planItemRef;
     protected PlanItemControl defaultControl;
     protected List<FlowableListener> lifecycleListeners = new ArrayList<>();
-    protected List<VariableAggregationDefinition> variableAggregationDefinitions;
 
     public String getPlanItemRef() {
         return planItemRef;
@@ -51,20 +50,11 @@ public class PlanItemDefinition extends CaseElement implements HasLifecycleListe
         this.lifecycleListeners = lifecycleListeners;
     }
 
-    public List<VariableAggregationDefinition> getVariableAggregationDefinitions() {
-        return variableAggregationDefinitions;
-    }
-
-    public void setVariableAggregationDefinitions(List<VariableAggregationDefinition> variableAggregationDefinitions) {
-        this.variableAggregationDefinitions = variableAggregationDefinitions;
-    }
-
     public void setValues(PlanItemDefinition otherElement) {
         super.setValues(otherElement);
         setPlanItemRef(otherElement.getPlanItemRef());
         setDefaultControl(otherElement.getDefaultControl());
         setLifecycleListeners(otherElement.lifecycleListeners);
-        setVariableAggregationDefinitions(otherElement.getVariableAggregationDefinitions());
     }
     
     @Override

@@ -19,22 +19,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.delegate.ReadOnlyDelegatePlanItemInstanceImpl;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -477,7 +474,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    protected VariableScopeImpl getParentVariableScope() {
+    public VariableScopeImpl getParentVariableScope() {
+        PlanItemInstanceEntity stagePlanItem = getStagePlanItemInstanceEntity();
+        if (stagePlanItem != null) {
+            return (VariableScopeImpl) stagePlanItem;
+        }
         if (caseInstanceId != null) {
             return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
         }
@@ -492,86 +493,23 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    public VariableAggregationInfo getVariableAggregationInfo() {
-        PlanItemDefinition planItemDefinition = getPlanItemDefinition();
-        if (planItemDefinition.getVariableAggregationDefinitions() != null && !planItemDefinition.getVariableAggregationDefinitions().isEmpty())  {
-
-            List<VariableAggregation> variableAggregations = planItemDefinition.getVariableAggregationDefinitions().stream()
-                .map(variableAggregationDefinition -> {
-
-                    String targetArrayVariable = null;
-                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariableExpression())) {
-                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetArrayVariableExpression());
-                        Object value = expression.getValue(this);
-                        if (value != null) {
-                            targetArrayVariable = value.toString();
-                        }
-
-                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetArrayVariable())) {
-                        targetArrayVariable = variableAggregationDefinition.getTargetArrayVariable();
-
-                    }
-
-                    String source = null;
-                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getSourceExpression())) {
-                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getSourceExpression());
-                        Object value = expression.getValue(this);
-                        if (value != null) {
-                            source = value.toString();
-                        }
-
-                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getSource())) {
-                        source = variableAggregationDefinition.getSource();
-
-                    }
-
-                    String target = null;
-                    if (StringUtils.isNotEmpty(variableAggregationDefinition.getTargetExpression())) {
-                        ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-                        Expression expression = expressionManager.createExpression(variableAggregationDefinition.getTargetExpression());
-                        Object value = expression.getValue(this);
-                        if (value != null) {
-                            target = value.toString();
-                        }
-
-                    } else if (StringUtils.isNotEmpty(variableAggregationDefinition.getTarget())) {
-                        target = variableAggregationDefinition.getTarget();
-
-                    }
-
-                    return new VariableAggregation(variableAggregationDefinition.getElementId(), targetArrayVariable, source, target);
-
-                })
-                .collect(Collectors.toList());
-
-            // Each distinct elementId has different plan item instance for each individual repetition
-            Map<String, List<VariableAggregation>> aggregationsByElementId = new HashMap<>();
-            for (VariableAggregation variableAggregation : variableAggregations) {
-                aggregationsByElementId.computeIfAbsent(variableAggregation.getElementId(), key -> new ArrayList<>()).add(variableAggregation);
-            }
-
-            VariableAggregationInfo variableAggregationInfo = new VariableAggregationInfo(getCaseInstanceId());
-            for (String elementId : aggregationsByElementId.keySet()) {
-
-                // The variable aggregation can only be defined on itself or a parent stage
-                // (otherwise we would never have gotten here as the parser wouldn't have set the aggregation definition)
-                PlanItemInstanceEntity planItemInstanceForElementId = this;
-                while (planItemInstanceForElementId != null && !Objects.equals(elementId, planItemInstanceForElementId.getPlanItemDefinitionId())) {
-                    planItemInstanceForElementId = planItemInstanceForElementId.getStagePlanItemInstanceEntity();
-                }
-
-                if (planItemInstanceForElementId != null) {
-                    // For CMMN, the variables are always stored against the plan item instance before and after aggregation,
-                    // because (contrary to executions) they will not be removed when they're completed.
-                    variableAggregationInfo.addRuntimeInfo(elementId, variableAggregations, planItemInstanceForElementId.getId(), planItemInstanceForElementId.getId());
-                }
-            }
-
-            return variableAggregationInfo;
-
+    protected boolean storeVariableLocal(String variableName) {
+        if (super.storeVariableLocal(variableName)) {
+            return true;
         }
+
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(this);
+        if (repetitionRule != null && repetitionRule.getAggregations() != null) {
+            // If this is a plan item with a repetition rule and has aggregations then we need to store the variables locally
+            // Checking for the aggregations is for backwards compatibility
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public VariableAggregationInfo getVariableAggregationInfo() {
         return  null;
     }
 

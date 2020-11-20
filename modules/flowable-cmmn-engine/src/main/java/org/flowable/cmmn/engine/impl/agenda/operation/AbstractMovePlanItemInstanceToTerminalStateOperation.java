@@ -12,10 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ImplementationType;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -23,22 +29,31 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.cmmn.model.VariableAggregationDefinitions;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
-import org.flowable.variable.service.impl.util.VariableAggregationUtil;
 
 /**
  * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
  *
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
 
@@ -55,9 +70,12 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         // Not overriding the internalExecute, as that's meant for subclasses of this operation.
         super.run();
 
-        boolean hasVariableAggregationDefinitions = hasVariableAggregationDefinitions();
-        if (hasVariableAggregationDefinitions) {
-            aggregateVariablesForOneInstance(planItemInstanceEntity);
+        VariableAggregationDefinitions aggregations = getVariableAggregations();
+        // There is a fake plan item instance created for waiting for repetition
+        // This instance does not follow the same lifecycle and thus we should not aggregate variables for it
+        boolean shouldAggregate = aggregations != null && PlanItemInstanceState.ACTIVE_STATES.contains(originalState);
+        if (shouldAggregate) {
+            aggregateVariablesForOneInstance(planItemInstanceEntity, aggregations);
         }
 
         if (!isNoop) {  // The super.run() could have marked this as a no-op. No point in continuing.
@@ -89,8 +107,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                     }
                 }
 
-            } else if (hasVariableAggregationDefinitions()) {
-                aggregateVariablesForAllInstances(planItemInstanceEntity);
+            } else if (shouldAggregate) {
+                aggregateVariablesForAllInstances(planItemInstanceEntity, aggregations);
 
             }
 
@@ -98,10 +116,9 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
     }
 
-    protected boolean hasVariableAggregationDefinitions() {
-        return planItemInstanceEntity.getPlanItemDefinition() != null
-            && planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions() != null
-            && !planItemInstanceEntity.getPlanItemDefinition().getVariableAggregationDefinitions().isEmpty();
+    protected VariableAggregationDefinitions getVariableAggregations() {
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        return repetitionRule != null ? repetitionRule.getAggregations() : null;
     }
 
     /**
@@ -213,28 +230,70 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
     }
 
-    protected void aggregateVariablesForOneInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    protected void aggregateVariablesForOneInstance(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
-        // Gathered variables are stored on finished the plan item instances
-        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeId(planItemInstanceEntity.getId())
-            .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
-            .list();
-        if (variableInstances == null || variableInstances.isEmpty()) {
-            return;
+        // Gathered variables are stored on the finished plan item instances
+        VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
+
+        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+            String targetVarName = getAggregationTargetVarName(aggregation, planItemInstanceEntity, cmmnEngineConfiguration);
+
+            if (targetVarName != null) {
+                PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
+                Object aggregatedValue = aggregator.aggregateSingle(planItemInstanceEntity, aggregation);
+
+                VariableType variableType = variableTypes.findVariableType(aggregatedValue);
+                VariableInstanceEntity aggregatedVarInstance = variableService.createVariableInstance(targetVarName, variableType, aggregatedValue);
+                aggregatedVarInstance.setScopeId(planItemInstanceEntity.getCaseInstanceId());
+                aggregatedVarInstance.setSubScopeId(planItemInstanceEntity.getStageInstanceId());
+                aggregatedVarInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
+
+                variableService.insertVariableInstance(aggregatedVarInstance);
+            }
         }
 
-        String elementId = planItemInstanceEntity.getPlanItemDefinitionId();
-        VariableAggregationInfo variableAggregationInfo = ((VariableScopeImpl) planItemInstanceEntity).getVariableAggregationInfo();
-        VariableAggregationUtil.aggregateVariablesForOneInstance(variableAggregationInfo.getInstanceId(),
-            variableAggregationInfo.getAggregationScopeIdForElementId(elementId),
-            variableAggregationInfo.getVariableAggregationsForElementId(elementId),
-            variableInstances);
     }
 
-    protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity) {
+    protected String getAggregationTargetVarName(VariableAggregationDefinition aggregation, VariableScope planItemInstance,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        String targetVarName = null;
+        if (StringUtils.isNotEmpty(aggregation.getTargetExpression())) {
+            Object value = cmmnEngineConfiguration.getExpressionManager()
+                    .createExpression(aggregation.getTargetExpression())
+                    .getValue(planItemInstance);
+            if (value != null) {
+                targetVarName = value.toString();
+            }
+        } else if (StringUtils.isNotEmpty(aggregation.getTarget())) {
+            targetVarName = aggregation.getTarget();
+        }
+        return targetVarName;
+    }
+
+    protected PlanItemVariableAggregator resolveVariableAggregator(VariableAggregationDefinition aggregation, DelegatePlanItemInstance planItemInstance) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(aggregation.getImplementationType())) {
+            return cmmnEngineConfiguration.getClassDelegateFactory().create(aggregation.getImplementation(), null);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(aggregation.getImplementationType())) {
+            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(
+                    cmmnEngineConfiguration.getExpressionManager().createExpression(aggregation.getImplementation()),
+                    planItemInstance, null);
+
+            if (delegate instanceof PlanItemVariableAggregator) {
+                return (PlanItemVariableAggregator) delegate;
+            }
+
+            throw new FlowableIllegalArgumentException("Delegate expression " + aggregation.getImplementation() + " did not resolve to an implementation of " + PlanItemVariableAggregator.class);
+        } else {
+            return cmmnEngineConfiguration.getVariableAggregator();
+        }
+    }
+
+    protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
+
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
@@ -252,15 +311,48 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         // Gathered variables are stored on finished the plan item instances
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
-            .subScopeIds(planItemInstances.stream().map(PlanItemInstanceEntity::getId).collect(Collectors.toList()))
-            .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
-            .list();
+        InternalVariableInstanceQuery variableInstanceQuery = variableService.createInternalVariableInstanceQuery()
+                .scopeId(planItemInstanceEntity.getCaseInstanceId())
+                .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
+        if (StringUtils.isNotEmpty(planItemInstanceEntity.getStageInstanceId())) {
+            variableInstanceQuery.subScopeId(planItemInstanceEntity.getStageInstanceId());
+        }
+        List<VariableInstanceEntity> variableInstances = variableInstanceQuery.list();
         if (variableInstances == null || variableInstances.isEmpty()) {
             return;
         }
 
-        VariableAggregationUtil.aggregateVariablesOfAllInstances(planItemInstanceEntity, variableInstances);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity, aggregations, cmmnEngineConfiguration);
+
+        Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
+
+        for (Map.Entry<String, List<VariableInstance>> entry : instancesByName.entrySet()) {
+            String varName = entry.getKey();
+
+            VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
+            PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
+            Object value = aggregator.aggregateMulti(planItemInstanceEntity, entry.getValue(), aggregation);
+
+            planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+        }
+
+        variableInstances.forEach(variableService::deleteVariableInstance);
+    }
+
+    protected Map<String, List<VariableInstance>> groupVariableInstancesByName(List<? extends VariableInstance> instances) {
+        return instances.stream().collect(Collectors.groupingBy(VariableInstance::getName));
+    }
+
+    protected Map<String, VariableAggregationDefinition> groupAggregationsByTarget(VariableScope variableScope,
+            VariableAggregationDefinitions aggregations,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = new HashMap<>();
+
+        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+            String targetVarName = getAggregationTargetVarName(aggregation, variableScope, cmmnEngineConfiguration);
+            aggregationsByTarget.put(targetVarName, aggregation);
+        }
+        return aggregationsByTarget;
     }
 
     public abstract boolean isEvaluateRepetitionRule();

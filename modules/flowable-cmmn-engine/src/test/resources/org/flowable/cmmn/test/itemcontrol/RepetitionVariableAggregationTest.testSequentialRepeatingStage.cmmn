@@ -11,6 +11,13 @@
             <planItem id="planItem5" definitionRef="expandedStage1">
                 <itemControl>
                     <repetitionRule flowable:counterVariable="repetitionCounter">
+                        <extensionElements>
+                            <flowable:variableAggregation target="reviews">
+                                <variable source="myScore" target="score" />
+                                <variable source="approved" />
+                                <variable source="description" />
+                            </flowable:variableAggregation>
+                        </extensionElements>
                         <condition><![CDATA[${repetitionCounter < 3}]]></condition>
                     </repetitionRule>
                 </itemControl>
@@ -25,9 +32,6 @@
             <stage id="expandedStage1" flowable:includeInStageOverview="true">
                 <extensionElements>
                     <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="myScore" target="score" />
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved" />
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description" />
                 </extensionElements>
                 <planItem id="planItem2" name="Stage task A" definitionRef="humanTask2"></planItem>
                 <planItem id="planItem3" name="Stage task B" definitionRef="humanTask3">

@@ -9,7 +9,15 @@
             <planItem id="planItem2" name="Task B" definitionRef="humanTask2">
                 <itemControl>
                     <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
-                                    flowable:elementIndexVariable="itemIndex"></repetitionRule>
+                                    flowable:elementIndexVariable="itemIndex">
+                        <extensionElements>
+                            <flowable:variableAggregation target="reviews">
+                                <variable source="taskAssignee" target="userId" />
+                                <variable source="approved"  />
+                                <variable source="description" />
+                            </flowable:variableAggregation>
+                        </extensionElements>
+                    </repetitionRule>
                 </itemControl>
             </planItem>
             <planItem id="planItem3" name="Task C" definitionRef="humanTask1" />
@@ -19,13 +27,7 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="humanTask1" name="Task A" flowable:assignee="${initiator}"></humanTask>
-            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:assigneeVariableName="taskAssignee">
-                <extensionElements>
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="taskAssignee" target="userId" />
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="approved" target="approved"/>
-                    <flowable:variableAggregation targetArrayVariable="reviews" source="description" target="description"/>
-                </extensionElements>
-            </humanTask>
+            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:assigneeVariableName="taskAssignee"></humanTask>
             <humanTask id="humanTask3" name="Task C" flowable:assignee="${initiator}"></humanTask>
         </casePlanModel>
     </case>

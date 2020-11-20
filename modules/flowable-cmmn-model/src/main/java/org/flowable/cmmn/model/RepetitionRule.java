@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author Joram Barrez
  * @author Micha Kiener
+ * @author Filip Hrisafov
  */
 public class RepetitionRule extends PlanItemRule {
 
@@ -30,6 +31,8 @@ public class RepetitionRule extends PlanItemRule {
     protected String elementVariableName;
     protected String elementIndexVariableName;
     protected Integer maxInstanceCount;
+
+    protected VariableAggregationDefinitions aggregations;
 
     public String getRepetitionCounterVariableName() {
         if (repetitionCounterVariableName == null) {
@@ -88,6 +91,22 @@ public class RepetitionRule extends PlanItemRule {
 
     public void setMaxInstanceCount(Integer maxInstanceCount) {
         this.maxInstanceCount = maxInstanceCount;
+    }
+
+    public VariableAggregationDefinitions getAggregations() {
+        return aggregations;
+    }
+
+    public void setAggregations(VariableAggregationDefinitions aggregations) {
+        this.aggregations = aggregations;
+    }
+
+    public void addAggregation(VariableAggregationDefinition aggregation) {
+        if (this.aggregations == null) {
+            this.aggregations = new VariableAggregationDefinitions();
+        }
+
+        this.aggregations.getAggregations().add(aggregation);
     }
 
     @Override
