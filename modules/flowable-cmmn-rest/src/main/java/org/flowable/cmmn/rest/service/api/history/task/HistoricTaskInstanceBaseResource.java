@@ -218,6 +218,12 @@ public class HistoricTaskInstanceBaseResource {
             }
         }
 
+        if (request.getIncludeProcessVariables() != null) {
+            if (request.getIncludeProcessVariables()) {
+                taskQuery.includeProcessVariables();
+            }
+        }
+
         if (queryRequest.getTaskVariables() != null) {
             addTaskVariables(query, queryRequest.getTaskVariables());
         }  
