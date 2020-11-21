@@ -218,9 +218,9 @@ public class HistoricTaskInstanceBaseResource {
             }
         }
 
-        if (request.getIncludeProcessVariables() != null) {
-            if (request.getIncludeProcessVariables()) {
-                taskQuery.includeProcessVariables();
+        if (queryRequest.getIncludeProcessVariables() != null) {
+            if (queryRequest.getIncludeProcessVariables()) {
+                query.includeProcessVariables();
             }
         }
 

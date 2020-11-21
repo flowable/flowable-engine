@@ -226,8 +226,8 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setIncludeTaskLocalVariables(Boolean.valueOf(allRequestParams.get("includeTaskLocalVariables")));
         }
 
-        if (requestParams.containsKey("includeProcessVariables")) {
-            request.setIncludeProcessVariables(Boolean.valueOf(requestParams.get("includeProcessVariables")));
+        if (allRequestParams.containsKey("includeProcessVariables")) {
+            queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
         }
 
         if (allRequestParams.get("tenantId") != null) {
