@@ -796,6 +796,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         }
 
         PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+        // The repetition counter is 1 based
+        setRepetitionCounter(childPlanItemInstanceEntity, index + 1);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;
