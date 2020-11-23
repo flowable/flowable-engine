@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.image.exception.FlowableImageException;
 import org.h2.util.IOUtils;
 import org.junit.Test;
 
