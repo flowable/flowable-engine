@@ -112,9 +112,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     public void validateModel(InputStreamProvider inputStreamProvider) throws Exception {
         Schema schema;
-        if (isDMN13(inputStreamProvider.getInputStream())) {
+        String targetNameSpace = getTargetNameSpace(inputStreamProvider.getInputStream());
+        if (DMN_13_TARGET_NAMESPACE.equals(targetNameSpace)) {
             schema = createSchema(DMN_XSD);
-        } else if (isDMN12(inputStreamProvider.getInputStream())) {
+        } else if (DMN_12_TARGET_NAMESPACE.equals(targetNameSpace)) {
             schema = createSchema(DMN_12_XSD);
         } else {
             schema = createSchema(DMN_11_XSD);
@@ -126,9 +127,10 @@ public class DmnXMLConverter implements DmnXMLConstants {
 
     public void validateModel(XMLStreamReader xmlStreamReader) throws Exception {
         Schema schema;
-        if (isDMN13(xmlStreamReader)) {
+        String targetNameSpace = getTargetNameSpace(xmlStreamReader);
+        if (DMN_13_TARGET_NAMESPACE.equals(targetNameSpace)) {
             schema = createSchema(DMN_XSD);
-        } else if (isDMN12(xmlStreamReader)) {
+        } else if (DMN_12_TARGET_NAMESPACE.equals(targetNameSpace)) {
             schema = createSchema(DMN_12_XSD);
         } else {
             schema = createSchema(DMN_11_XSD);
@@ -137,68 +139,37 @@ public class DmnXMLConverter implements DmnXMLConstants {
         validator.validate(new StAXSource(xmlStreamReader));
     }
 
-    protected boolean isDMN12(InputStream is) {
+    protected String getTargetNameSpace(InputStream is) {
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();
             XMLStreamReader xtr = xif.createXMLStreamReader(is);
 
-            return isDMN12(xtr);
+            return getTargetNameSpace(xtr);
         } catch (XMLStreamException e) {
             LOGGER.error("Error processing DMN document", e);
             throw new DmnXMLException("Error processing DMN document", e);
         }
     }
 
-    protected boolean isDMN12(XMLStreamReader xtr) {
+    protected String getTargetNameSpace(XMLStreamReader xmlStreamReader) {
+        String targetNameSpace = null;
         try {
-            while (xtr.hasNext()) {
+            while (xmlStreamReader.hasNext()) {
                 try {
-                    xtr.next();
+                    xmlStreamReader.next();
                 } catch (Exception e) {
                     LOGGER.debug("Error reading XML document", e);
                     throw new DmnXMLException("Error reading XML", e);
                 }
-
-                return DMN_12_TARGET_NAMESPACE.equals(xtr.getNamespaceURI());
+                targetNameSpace = xmlStreamReader.getNamespaceURI();
+                break;
             }
-            return false;
         } catch (XMLStreamException e) {
             LOGGER.error("Error processing DMN document", e);
             throw new DmnXMLException("Error processing DMN document", e);
         }
 
-    }
-
-    protected boolean isDMN13(InputStream is) {
-        try {
-            XMLInputFactory xif = XMLInputFactory.newInstance();
-            XMLStreamReader xtr = xif.createXMLStreamReader(is);
-
-            return isDMN13(xtr);
-        } catch (XMLStreamException e) {
-            LOGGER.error("Error processing DMN document", e);
-            throw new DmnXMLException("Error processing DMN document", e);
-        }
-    }
-
-    protected boolean isDMN13(XMLStreamReader xtr) {
-        try {
-            while (xtr.hasNext()) {
-                try {
-                    xtr.next();
-                } catch (Exception e) {
-                    LOGGER.debug("Error reading XML document", e);
-                    throw new DmnXMLException("Error reading XML", e);
-                }
-
-                return DMN_13_TARGET_NAMESPACE.equals(xtr.getNamespaceURI());
-            }
-            return false;
-        } catch (XMLStreamException e) {
-            LOGGER.error("Error processing DMN document", e);
-            throw new DmnXMLException("Error processing DMN document", e);
-        }
-
+        return targetNameSpace;
     }
 
     protected Schema createSchema(String xsd) throws SAXException {
