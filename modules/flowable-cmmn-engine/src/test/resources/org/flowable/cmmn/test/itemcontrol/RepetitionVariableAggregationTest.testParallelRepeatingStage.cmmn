@@ -45,21 +45,21 @@
                         <standardEvent>complete</standardEvent>
                     </planItemOnPart>
                 </sentry>
-                <humanTask id="humanTask2" name="Stage task A" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                <humanTask id="humanTask2" name="Stage task A" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:priority="${itemIndex}">
                     <extensionElements>
                         <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                         <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                         <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
                     </extensionElements>
                 </humanTask>
-                <humanTask id="humanTask3" name="Stage task B" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                <humanTask id="humanTask3" name="Stage task B" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:priority="${itemIndex}">
                     <extensionElements>
                         <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                         <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
                         <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
                     </extensionElements>
                 </humanTask>
-                <humanTask id="humanTask4" name="Stage task C" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                <humanTask id="humanTask4" name="Stage task C" flowable:assignee="${initiator}" flowable:formFieldValidation="false" flowable:priority="${itemIndex}">
                     <extensionElements>
                         <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                         <design:stencilid><![CDATA[HumanTask]]></design:stencilid>

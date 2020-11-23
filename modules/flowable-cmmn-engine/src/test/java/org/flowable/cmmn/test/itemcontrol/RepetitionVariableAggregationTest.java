@@ -32,8 +32,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import net.javacrumbs.jsonunit.core.Option;
-
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
@@ -75,7 +73,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
@@ -99,7 +96,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
         cmmnTaskService.complete(task.getId());
 
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B").list();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B")
+                .orderByTaskPriority().asc()
+                .list();
         assertThat(tasks).hasSize(4);
 
         Map<String, Object> variables = new HashMap<>();
@@ -130,7 +129,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ userId: 'userZero', approved : false, description : 'description task 0' },"
@@ -181,7 +179,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ score: 100, approved : true, description : 'description task 0' },"
@@ -203,7 +200,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             .start();
 
         // User task 'Stage task A':  sets approved variable
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task A").list();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task A")
+                .orderByTaskPriority().asc()
+                .list();
         assertThat(tasks).hasSize(4);
 
         for (int i = 0; i < tasks.size();  i++) {
@@ -215,7 +214,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
         // User task 'Stage task B': sets description variable
-        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task B").list();
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task B")
+                .orderByTaskPriority().asc()
+                .list();
         assertThat(tasks).hasSize(4);
 
         for (int i = 0; i < tasks.size();  i++) {
@@ -227,7 +228,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
         // User task 'task three': updates description and adds score
-        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task C").list();
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Stage task C")
+                .orderByTaskPriority().asc()
+                .list();
         assertThat(tasks).hasSize(4);
 
         for (int i = 0; i < tasks.size();  i++) {
@@ -244,7 +247,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ score: 10, approved : true, description : 'description task 0' },"

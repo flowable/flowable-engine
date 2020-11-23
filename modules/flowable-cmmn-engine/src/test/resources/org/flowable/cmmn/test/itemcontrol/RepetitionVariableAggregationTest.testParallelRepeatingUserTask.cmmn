@@ -27,7 +27,7 @@
                 </planItemOnPart>
             </sentry>
             <humanTask id="humanTask1" name="Task A" flowable:assignee="${initiator}"></humanTask>
-            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:assigneeVariableName="taskAssignee"></humanTask>
+            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:assigneeVariableName="taskAssignee" flowable:priority="${itemIndex}"></humanTask>
             <humanTask id="humanTask3" name="Task C" flowable:assignee="${initiator}"></humanTask>
         </casePlanModel>
     </case>

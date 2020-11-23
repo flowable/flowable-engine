@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +45,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -56,6 +57,9 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Filip Hrisafov
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
+
+    protected static final String COUNTER_VAR_PREFIX = "__flowableCounter__";
+    protected static final String COUNTER_VAR_VALUE_SEPARATOR = "###";
 
     public AbstractMovePlanItemInstanceToTerminalStateOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
@@ -235,8 +239,6 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         // Gathered variables are stored on the finished plan item instances
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
-        VariableService variableService = variableServiceConfiguration.getVariableService();
-        VariableTypes variableTypes = variableServiceConfiguration.getVariableTypes();
 
         for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
             String targetVarName = getAggregationTargetVarName(aggregation, planItemInstanceEntity, cmmnEngineConfiguration);
@@ -245,16 +247,34 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
                 Object aggregatedValue = aggregator.aggregateSingle(planItemInstanceEntity, aggregation);
 
-                VariableType variableType = variableTypes.findVariableType(aggregatedValue);
-                VariableInstanceEntity aggregatedVarInstance = variableService.createVariableInstance(targetVarName, variableType, aggregatedValue);
-                aggregatedVarInstance.setScopeId(planItemInstanceEntity.getCaseInstanceId());
-                aggregatedVarInstance.setSubScopeId(planItemInstanceEntity.getStageInstanceId());
-                aggregatedVarInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
+                String caseInstanceId = planItemInstanceEntity.getCaseInstanceId();
+                String stageInstanceId = planItemInstanceEntity.getStageInstanceId();
+                VariableInstance aggregatedVarInstance = insertScopedVariableAggregation(targetVarName, caseInstanceId, stageInstanceId, aggregatedValue,
+                        variableServiceConfiguration);
 
-                variableService.insertVariableInstance(aggregatedVarInstance);
+                int repetitionCounter = getRepetitionCounter(planItemInstanceEntity);
+                String repetitionValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + repetitionCounter;
+                insertScopedVariableAggregation(COUNTER_VAR_PREFIX + targetVarName, caseInstanceId, stageInstanceId, repetitionValue,
+                        variableServiceConfiguration);
             }
         }
 
+    }
+
+    protected VariableInstance insertScopedVariableAggregation(String varName, String scopeId, String subScopeId, Object value,
+            VariableServiceConfiguration variableServiceConfiguration) {
+
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+
+        VariableType variableType = variableServiceConfiguration.getVariableTypes().findVariableType(value);
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName, variableType, value);
+        variableInstance.setScopeId(scopeId);
+        variableInstance.setSubScopeId(subScopeId);
+        variableInstance.setScopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
+
+        variableService.insertVariableInstance(variableInstance);
+
+        return variableInstance;
     }
 
     protected String getAggregationTargetVarName(VariableAggregationDefinition aggregation, VariableScope planItemInstance,
@@ -329,14 +349,40 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         for (Map.Entry<String, List<VariableInstance>> entry : instancesByName.entrySet()) {
             String varName = entry.getKey();
 
+            if (varName.startsWith(COUNTER_VAR_PREFIX)) {
+                continue;
+            }
+
             VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
             PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
-            Object value = aggregator.aggregateMulti(planItemInstanceEntity, entry.getValue(), aggregation);
+
+            List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
+            List<VariableInstance> varValues = entry.getValue();
+
+            sortVariablesByCounter(varValues, counterVariables);
+
+            Object value = aggregator.aggregateMulti(planItemInstanceEntity, varValues, aggregation);
 
             planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
         }
 
         variableInstances.forEach(variableService::deleteVariableInstance);
+    }
+
+    protected void sortVariablesByCounter(List<VariableInstance> variableInstances, List<VariableInstance> counterVariableInstances) {
+        if (counterVariableInstances == null || counterVariableInstances.isEmpty()) {
+            return;
+        }
+        Map<String, Integer> sortOrder = new HashMap<>();
+        for (VariableInstance counterVariable : counterVariableInstances) {
+            Object value = counterVariable.getValue();
+            String[] values = value.toString().split(COUNTER_VAR_VALUE_SEPARATOR);
+            String variableInstanceId = values[0];
+            int order = Integer.parseInt(values[1]);
+            sortOrder.put(variableInstanceId, order);
+        }
+
+        variableInstances.sort(Comparator.comparingInt(o -> sortOrder.getOrDefault(o.getId(), 0)));
     }
 
     protected Map<String, List<VariableInstance>> groupVariableInstancesByName(List<? extends VariableInstance> instances) {

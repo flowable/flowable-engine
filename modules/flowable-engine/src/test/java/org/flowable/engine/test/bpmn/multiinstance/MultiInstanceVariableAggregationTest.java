@@ -24,7 +24,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -32,8 +31,6 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Joram Barrez
@@ -48,7 +45,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .variable("nrOfLoops", 3)
             .start();
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
         assertThat(tasks).hasSize(3);
 
         taskService.setAssignee(tasks.get(0).getId(), "userOne");
@@ -75,7 +74,6 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                 + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
@@ -127,7 +125,6 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ userId: 'userOne', approved : false, description : 'a' },"
@@ -237,7 +234,6 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ score: 10, approved : true, description : 'description task 0' },"
@@ -294,7 +290,6 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
-            .when(Option.IGNORING_ARRAY_ORDER)
             .isEqualTo(
                 "["
                     + "{ score: 10, approved : true, description : 'description task 0' },"

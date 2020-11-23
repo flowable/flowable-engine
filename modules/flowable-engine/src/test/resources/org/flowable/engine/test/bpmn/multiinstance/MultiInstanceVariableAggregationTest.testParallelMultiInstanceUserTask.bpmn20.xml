@@ -10,7 +10,7 @@
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
 
-        <userTask id="miTasks" name="My Task" flowable:assigneeVariableName="taskAssignee">
+        <userTask id="miTasks" name="My Task" flowable:assigneeVariableName="taskAssignee" flowable:priority="${loopCounter}">
 
             <multiInstanceLoopCharacteristics isSequential="false">
                 <extensionElements>
