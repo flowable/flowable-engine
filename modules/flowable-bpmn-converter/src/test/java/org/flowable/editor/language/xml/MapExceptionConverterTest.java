@@ -23,7 +23,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
-import org.flowable.editor.language.xml.util.XmlTestUtils;
 import org.junit.jupiter.api.Test;
 
 class MapExceptionConverterTest {
