@@ -15,15 +15,9 @@ package org.flowable.editor.language.xml.util;
 import static org.flowable.editor.language.xml.util.XmlTestUtils.readXMLFile;
 import static org.flowable.editor.language.xml.util.XmlTestUtils.readXmlExportAndReadAgain;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.common.engine.api.io.InputStreamProvider;
-import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;

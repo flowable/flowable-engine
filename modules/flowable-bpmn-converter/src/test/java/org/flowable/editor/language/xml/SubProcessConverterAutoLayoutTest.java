@@ -24,7 +24,6 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 import org.junit.jupiter.api.Test;
 
 class SubProcessConverterAutoLayoutTest {
