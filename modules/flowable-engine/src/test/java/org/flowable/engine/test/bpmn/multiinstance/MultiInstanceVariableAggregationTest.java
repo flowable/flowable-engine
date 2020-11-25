@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestCase {
 
@@ -45,6 +46,15 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .variable("nrOfLoops", 3)
             .start();
 
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ },"
+                    + "{ },"
+                    + "{ }"
+                    + "]");
+
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .orderByTaskPriority().asc()
                 .list();
@@ -54,10 +64,30 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         taskService.setAssignee(tasks.get(1).getId(), "userTwo");
         taskService.setAssignee(tasks.get(2).getId(), "userThree");
 
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne' },"
+                    + "{ userId: 'userTwo' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
+
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", true);
         variables.put("description", "description task 0");
         taskService.complete(tasks.get(0).getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                    + "{ userId: 'userTwo' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
@@ -65,13 +95,23 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("description", "description task 1");
         taskService.complete(tasks.get(1).getId(), variables);
 
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                    + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
+
         variables.put("approved", false);
         variables.put("description", "description task 2");
         taskService.complete(tasks.get(2).getId(), variables);
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
-        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+       reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
 
         assertThatJson(reviews)
             .isEqualTo(
@@ -79,7 +119,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                 + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
                 + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
                 + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
-                + "]]");
+                + "]");
 
         assertNoAggregatedVariables();
     }
@@ -92,13 +132,36 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .variable("nrOfLoops", 4)
             .start();
 
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ }"
+                    + "]");
+
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("approved", false);
         variables.put("description", "a");
         taskService.setAssignee(task.getId(), "userOne");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne' }"
+                + "]");
+
         taskService.complete(task.getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne', approved : false, description : 'a' },"
+                + "{ }"
+                + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
@@ -114,6 +177,16 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         taskService.setAssignee(task.getId(), "userThree");
         taskService.complete(task.getId(), variables);
 
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne', approved : false, description : 'a' },"
+                + "{ userId: 'userTwo', approved : false, description : 'b' },"
+                + "{ userId: 'userThree', approved : true, description : 'c' },"
+                + "{ }"
+                + "]");
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         variables.put("approved", true);
         variables.put("description", "d");
@@ -122,7 +195,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
-        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+        reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
             .isEqualTo(
@@ -131,7 +204,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "{ userId: 'userTwo', approved : false, description : 'b' },"
                     + "{ userId: 'userThree', approved : true, description : 'c' },"
                     + "{ userId: 'userFour', approved : true, description : 'd' }"
-                    + "]]");
+                    + "]");
 
         assertNoAggregatedVariables();
     }
@@ -175,6 +248,16 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .variable("nrOfLoops", 4)
             .start();
 
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ },"
+                        + "{ },"
+                        + "{ },"
+                        + "{ }"
+                        + "]");
+
         // User task 'task one':  sets approved variable
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .orderByCategory().asc()
@@ -189,6 +272,16 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             variables.put("approved", i % 2 == 0);
             taskService.complete(task.getId(), variables);
         }
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ approved : true },"
+                        + "{ approved : false },"
+                        + "{ approved : true },"
+                        + "{ approved : false }"
+                        + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
@@ -206,6 +299,16 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             variables.put("description", "description task " + i);
             taskService.complete(task.getId(), variables);
         }
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ approved : true, description : 'description task 0' },"
+                        + "{ approved : false, description : 'description task 1' },"
+                        + "{ approved : true, description : 'description task 2' },"
+                        + "{ approved : false, description : 'description task 3' }"
+                        + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
 
@@ -231,7 +334,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
 
-        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
 
         assertThatJson(reviews)
             .isEqualTo(
@@ -253,6 +356,13 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             .variable("nrOfLoops", 3)
             .start();
 
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ }"
+                        + "]");
+
         for (int i = 0; i < 3; i++) {
 
             // User task 'task one':  sets approved variable
@@ -273,6 +383,23 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             taskService.complete(task.getId(), variables);
             assertVariablesNotVisibleForProcessInstance(processInstance);
 
+            if (i == 0) {
+                reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+                assertThatJson(reviews)
+                        .isEqualTo("["
+                                + "{ approved : true, description : 'description task 0' }"
+                                + "]");
+            } else if (i == 1) {
+                reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+                assertThatJson(reviews)
+                        .isEqualTo("["
+                                + "{ score: 10, approved : true, description : 'description task 0' },"
+                                + "{ approved : false, description : 'description task 1' }"
+                                + "]");
+            }
+
             // User task 'task three': updates description and adds score
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task.getName()).isEqualTo("task three");
@@ -287,7 +414,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
 
-        ArrayNode reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+        reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
 
         assertThatJson(reviews)
             .isEqualTo(

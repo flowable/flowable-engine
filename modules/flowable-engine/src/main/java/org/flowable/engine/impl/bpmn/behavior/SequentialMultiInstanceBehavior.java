@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Set;
+
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
@@ -112,6 +114,12 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 executeOriginalBehavior(executionToContinue, multiInstanceRootExecution, loopCounter);
             } else {
                 CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
+                // Delete all local variables
+                Set<String> localVariableInstances = execution.getVariableInstancesLocal().keySet();
+                localVariableInstances.remove(NUMBER_OF_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_COMPLETED_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_ACTIVE_INSTANCES);
+                execution.removeVariablesLocal(localVariableInstances);
                 executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 

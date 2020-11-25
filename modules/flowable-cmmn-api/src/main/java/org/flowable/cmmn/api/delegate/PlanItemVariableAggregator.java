@@ -28,19 +28,49 @@ public interface PlanItemVariableAggregator {
      * Create a single variable value based on the provided aggregation definition.
      *
      * @param planItemInstance the delegate planItemInstance from where we need to get data from
-     * @param aggregation the aggregation definition
+     * @param context the aggregation context
      * @return the value for the aggregated variable
      */
-    Object aggregateSingle(DelegatePlanItemInstance planItemInstance, VariableAggregationDefinition aggregation);
+    Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context);
 
     /**
      * Aggregated the provide variable instances into one variable value.
      *
      * @param planItemInstance the delegated planItemInstance for which we need to do the aggregation
      * @param instances the variable values that should be aggregated
-     * @param aggregation the aggregation definition
+     * @param context the aggregation context
      * @return the aggregated value
      */
-    Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, VariableAggregationDefinition aggregation);
+    Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context);
 
+    interface Context {
+
+        VariableAggregationDefinition getDefinition();
+
+        String getState();
+    }
+
+    interface ContextStates {
+
+        /**
+         * State when a plan item instance is completed and the aggregation needs to be prepared.
+         * e.g. This can be done for different executions:
+         * <ul>
+         *     <li>After a repeatable plan item instance completes</li>
+         *     <li>After all repeatable plan item instances complete</li>
+         *     <li>After any plan item instance completes</li>
+         * </ul>
+         */
+        String COMPLETE = "complete";
+
+        /**
+         * State when the plan item instance is not yet completed and we need to see an overview state.
+         * e.g. This can be done for different executions:
+         * <ul>
+         *     <li>For an active plan item instance part of a repeatable set of instances </li>
+         *     <li>For any plan item</li>
+         * </ul>
+         */
+        String OVERVIEW = "overview";
+    }
 }

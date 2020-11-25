@@ -27,7 +27,6 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemFutureJavaDelegateAct
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FixedValue;
@@ -148,14 +147,13 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
     }
 
     @Override
-    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, VariableAggregationDefinition aggregation) {
-        return getPlanItemVariableAggregator().aggregateSingle(planItemInstance, aggregation);
+    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context) {
+        return getPlanItemVariableAggregator().aggregateSingle(planItemInstance, context);
     }
 
     @Override
-    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances,
-            VariableAggregationDefinition aggregation) {
-        return getPlanItemVariableAggregator().aggregateMulti(planItemInstance, instances, aggregation);
+    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context) {
+        return getPlanItemVariableAggregator().aggregateMulti(planItemInstance, instances, context);
     }
 
     protected PlanItemVariableAggregator getPlanItemVariableAggregator() {

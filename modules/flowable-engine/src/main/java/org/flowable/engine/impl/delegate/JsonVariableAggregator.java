@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -50,13 +49,13 @@ public class JsonVariableAggregator implements VariableAggregator {
     }
 
     @Override
-    public Object aggregateSingle(DelegateExecution execution, VariableAggregationDefinition aggregation) {
+    public Object aggregateSingle(DelegateExecution execution, Context context) {
         ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
 
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         VariableTypes variableTypes = processEngineConfiguration.getVariableServiceConfiguration().getVariableTypes();
 
-        for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+        for (VariableAggregationDefinition.Variable definition : context.getDefinition().getDefinitions()) {
             String targetVarName = null;
             if (StringUtils.isNotEmpty(definition.getTargetExpression())) {
                 Object value = processEngineConfiguration.getExpressionManager()
@@ -120,7 +119,7 @@ public class JsonVariableAggregator implements VariableAggregator {
     }
 
     @Override
-    public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregationDefinition aggregation) {
+    public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, Context context) {
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {

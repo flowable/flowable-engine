@@ -29,18 +29,50 @@ public interface VariableAggregator {
      * Create a single variable value based on the provided aggregation definition.
      *
      * @param execution the delegate execution from where we need to get data from
-     * @param aggregation the aggregation definition
+     * @param context the aggregation context
      * @return the value for the aggregated variable
      */
-    Object aggregateSingle(DelegateExecution execution, VariableAggregationDefinition aggregation);
+    Object aggregateSingle(DelegateExecution execution, Context context);
 
     /**
      * Aggregated the provide variable instances into one variable value.
      *
      * @param execution the delegated execution for which we need to do the aggregation
      * @param instances the variable values that should be aggregated
-     * @param aggregation the aggregation definition
+     * @param context the aggregation context
      * @return the aggregated value
      */
-    Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregationDefinition aggregation);
+    Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, Context context);
+
+    interface Context {
+
+        VariableAggregationDefinition getDefinition();
+
+        String getState();
+    }
+
+    interface ContextStates {
+
+        /**
+         * State when the execution is completed and the aggregation needs to be prepared.
+         * e.g. This can be done for different executions:
+         * <ul>
+         *     <li>After the child execution of a multi instance execution completes</li>
+         *     <li>After the multi instance execution completes</li>
+         *     <li>After any execution completes</li>
+         * </ul>
+         */
+        String COMPLETE = "complete";
+
+        /**
+         * State when the execution is not yet completed and we need to see an overview state.
+         * e.g. This can be done for different executions:
+         * <ul>
+         *     <li>For an active child execution of a multi instance execution</li>
+         *     <li>For an active multi instance execution</li>
+         *     <li>For any execution</li>
+         * </ul>
+         */
+        String OVERVIEW = "overview";
+    }
 }

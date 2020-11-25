@@ -342,6 +342,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceData
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
@@ -2455,6 +2456,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new BpmnAggregatedVariableType());
             variableTypes.addType(new AggregatedVariableType());
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new AggregatedVariableType());
@@ -2463,6 +2465,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
                 }
+            }
+        } else {
+            if (variableTypes.getVariableType(BpmnAggregatedVariableType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new BpmnAggregatedVariableType(), SerializableType.TYPE_NAME);
             }
         }
     }
