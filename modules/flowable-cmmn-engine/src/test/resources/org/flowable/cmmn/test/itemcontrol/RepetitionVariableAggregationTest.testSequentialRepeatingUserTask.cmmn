@@ -17,7 +17,7 @@
                                 <variable source="description" />
                             </flowable:variableAggregation>
                         </extensionElements>
-                        <condition><![CDATA[${repetitionCounter < 3}]]></condition>
+                        <condition><![CDATA[${repetitionCounter < nrOfLoops}]]></condition>
                     </repetitionRule>
                 </itemControl>
             </planItem>

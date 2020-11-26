@@ -138,6 +138,22 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTask.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithZeroCardinality() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 0)
+            .start();
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getTaskDefinitionKey()).isEqualTo("afterMiTasks");
+
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviewsVarInstance.getValue()).isEqualTo("[]");
+    }
+
+    @Test
     @Deployment
     public void testSequentialMultiInstanceUserTask() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -222,6 +238,22 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertNoAggregatedVariables();
         VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
         assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testSequentialMultiInstanceUserTask.bpmn20.xml")
+    public void testSequentialMultiInstanceUserTaskWithZeroCardinality() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 0)
+            .start();
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getTaskDefinitionKey()).isEqualTo("afterMiTasks");
+
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviewsVarInstance.getValue()).isEqualTo("[]");
     }
 
     @Test

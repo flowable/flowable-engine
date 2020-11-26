@@ -46,7 +46,6 @@ import org.flowable.cmmn.model.VariableAggregationDefinitions;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -289,30 +288,23 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         // Gathered variables are stored on finished the plan item instances
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        InternalVariableInstanceQuery variableInstanceQuery = variableService.createInternalVariableInstanceQuery()
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
                 .subScopeId(subScopeId)
-                .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
-        List<VariableInstanceEntity> variableInstances = variableInstanceQuery.list();
-        if (variableInstances == null || variableInstances.isEmpty()) {
-            return;
-        }
+                .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
+                .list();
 
         Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity, aggregations, cmmnEngineConfiguration);
 
         Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
 
-        for (Map.Entry<String, List<VariableInstance>> entry : instancesByName.entrySet()) {
+        for (Map.Entry<String, VariableAggregationDefinition> entry : aggregationsByTarget.entrySet()) {
             String varName = entry.getKey();
-
-            if (varName.startsWith(COUNTER_VAR_PREFIX)) {
-                continue;
-            }
 
             VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
             PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
 
             List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
-            List<VariableInstance> varValues = entry.getValue();
+            List<VariableInstance> varValues = instancesByName.getOrDefault(varName, Collections.emptyList());
 
             sortVariablesByCounter(varValues, counterVariables);
 

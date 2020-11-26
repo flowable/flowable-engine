@@ -214,28 +214,22 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 .scopeType(ScopeTypes.BPMN_VARIABLE_AGGREGATION)
                 .list();
 
-        if (!instances.isEmpty()) {
-            Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(multiInstanceRootExecution, aggregations, processEngineConfiguration);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(multiInstanceRootExecution, aggregations, processEngineConfiguration);
 
-            Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(instances);
+        Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(instances);
 
-            for (Map.Entry<String, List<VariableInstance>> entry : instancesByName.entrySet()) {
-                String varName = entry.getKey();
+        for (Map.Entry<String, VariableAggregationDefinition> entry : aggregationsByTarget.entrySet()) {
+            String varName = entry.getKey();
 
-                if (varName.startsWith(COUNTER_VAR_PREFIX)) {
-                    continue;
-                }
+            VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
+            VariableAggregator aggregator = resolveVariableAggregator(aggregation, multiInstanceRootExecution);
+            List<VariableInstance> varValues = instancesByName.getOrDefault(varName, Collections.emptyList());
+            List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
 
-                VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
-                VariableAggregator aggregator = resolveVariableAggregator(aggregation, multiInstanceRootExecution);
-                List<VariableInstance> varValues = entry.getValue();
-                List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
+            sortVariablesByCounter(varValues, counterVariables);
 
-                sortVariablesByCounter(varValues, counterVariables);
-
-                Object value = aggregator.aggregateMulti(multiInstanceRootExecution, varValues, BaseVariableAggregatorContext.complete(aggregation));
-                multiInstanceRootExecution.getParent().setVariable(varName, value);
-            }
+            Object value = aggregator.aggregateMulti(multiInstanceRootExecution, varValues, BaseVariableAggregatorContext.complete(aggregation));
+            multiInstanceRootExecution.getParent().setVariable(varName, value);
         }
     }
 

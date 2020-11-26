@@ -51,6 +51,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     public void testSequentialRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingTask")
+            .variable("nrOfLoops", 3)
             .variable("otherVariable", "Hello World")
             .start();
 
