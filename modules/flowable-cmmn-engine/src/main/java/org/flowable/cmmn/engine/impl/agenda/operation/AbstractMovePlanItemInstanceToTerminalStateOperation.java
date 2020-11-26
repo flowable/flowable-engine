@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -260,8 +261,16 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
-        List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
-            .findByCaseInstanceIdAndPlanItemId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        List<PlanItemInstanceEntity> planItemInstances;
+
+        if (StringUtils.isNotEmpty(planItemInstanceEntity.getStageInstanceId())) {
+            planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByStageInstanceIdAndPlanItemId(planItemInstanceEntity.getStageInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        } else {
+            planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByCaseInstanceIdAndPlanItemId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        }
+
         if (planItemInstances == null || planItemInstances.isEmpty()) {
             return;
         }

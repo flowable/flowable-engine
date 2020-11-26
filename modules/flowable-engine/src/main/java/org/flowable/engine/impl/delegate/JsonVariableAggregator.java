@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
@@ -104,6 +105,14 @@ public class JsonVariableAggregator implements VariableAggregator {
                         objectNode.put(targetVarName, (String) varInstance.getValue());
                     } else if (NullType.TYPE_NAME.equals(varInstance.getTypeName())) {
                         objectNode.putNull(targetVarName);
+                    } else if (BpmnAggregatedVariableType.TYPE_NAME.equalsIgnoreCase(varInstance.getTypeName())) {
+                        if (ContextStates.OVERVIEW.equals(context.getState())) {
+                            // We can only use the aggregated variable if we are in an overview state
+                            Object value = varInstance.getValue();
+                            if (value instanceof JsonNode) {
+                                objectNode.set(targetVarName, (JsonNode) value);
+                            }
+                        }
                     }
 
                     //TODO other types

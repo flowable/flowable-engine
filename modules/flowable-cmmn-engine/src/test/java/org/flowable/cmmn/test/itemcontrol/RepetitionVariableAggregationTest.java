@@ -17,20 +17,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -104,6 +112,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
     }
 
@@ -192,6 +202,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
     }
 
@@ -262,6 +274,8 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
     }
 
@@ -361,7 +375,205 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testParallelRepeatingStageWithParallelRepeatingUserTask() {
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingStage")
+                .variable("myCollection", Arrays.asList("one", "two"))
+                .variable("otherVariable", "Hello World")
+                .start();
+
+        ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "  {"
+                        + "    first: [{ task: 11 }, { task: 12 }],"
+                        + "    second: [{ score: 0 }, { score: 0 }]"
+                        + "  },"
+                        + "  {"
+                        + "    first: [{ task: 21 }, { task: 22 }],"
+                        + "    second: [{ score: 0 }, { score: 0 }]"
+                        + "  }"
+                        + "]");
+
+        // User task 'task one': sets approved and description variable
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId())
+                .taskName("Stage task A")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            variables.put("description", "description task " + i);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 11, approved : true, description : 'description task 0' },"
+                        + "      { task: 12, approved : false, description : 'description task 1'}"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 0 },"
+                        + "      { score: 0 }"
+                        + "    ]"
+                        + "  },"
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 21, approved : true, description : 'description task 2' },"
+                        + "      { task: 22, approved : false, description : 'description task 3' }"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 0 },"
+                        + "      { score: 0 }"
+                        + "    ]"
+                        + "  }"
+                        + "]");
+
+        assertVariablesNotVisible(caseInstance);
+
+        // User task 'task two': sets myScore variable
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId())
+                .taskName("Stage task B")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        assertVariablesNotVisible(caseInstance);
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 11, approved : true, description : 'description task 0' },"
+                        + "      { task: 12, approved : false, description : 'description task 1'}"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 20 },"
+                        + "      { score: 22 }"
+                        + "    ]"
+                        + "  },"
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 21, approved : true, description : 'description task 2' },"
+                        + "      { task: 22, approved : false, description : 'description task 3' }"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 24 },"
+                        + "      { score: 26 }"
+                        + "    ]"
+                        + "  }"
+                        + "]");
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testParallelRepeatingStageWithParallelRepeatingUserTaskWithCustomAggregator() {
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingStage")
+                .variable("myCollection", Arrays.asList("one", "two"))
+                .variable("otherVariable", "Hello World")
+                .start();
+
+        ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 11, score: 0 },"
+                        + "{ task: 12, score: 0 },"
+                        + "{ task: 21, score: 0 },"
+                        + "{ task: 22, score: 0 }"
+                        + "]");
+
+        // User task 'task one': sets approved and description variable
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId())
+                .taskName("Stage task A")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            variables.put("description", "description task " + i);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 11, approved : true, description : 'description task 0', score: 0 },"
+                        + "{ task: 12, approved : false, description : 'description task 1', score: 0 },"
+                        + "{ task: 21, approved : true, description : 'description task 2', score: 0 },"
+                        + "{ task: 22, approved : false, description : 'description task 3', score: 0 }"
+                        + "]");
+
+        assertVariablesNotVisible(caseInstance);
+
+        // User task 'task two': sets myScore variable
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId())
+                .taskName("Stage task B")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            cmmnTaskService.complete(task.getId(), variables);
+        }
+
+        assertVariablesNotVisible(caseInstance);
+
+        reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 11, approved : true, description : 'description task 0', score: 20 },"
+                        + "{ task: 12, approved : false, description : 'description task 1', score: 22 },"
+                        + "{ task: 21, approved : true, description : 'description task 2', score: 24 },"
+                        + "{ task: 22, approved : false, description : 'description task 3', score: 26 }"
+                        + "]");
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
     }
 
     protected void assertVariablesNotVisible(CaseInstance caseInstance) {
@@ -389,6 +601,46 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                         .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
                         .list());
         assertThat(variableInstanceEntities).isEmpty();
+    }
+
+    public static class CustomVariableAggregator implements PlanItemVariableAggregator {
+
+        @Override
+        public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context) {
+            ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
+            for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
+                Object sourceVariable = planItemInstance.getVariable(variable.getSource());
+                if (sourceVariable instanceof ArrayNode) {
+                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                    for (int i = 0; i < sourceArrayNode.size(); i++) {
+                        JsonNode node = arrayNode.get(i);
+                        JsonNode sourceNode = sourceArrayNode.get(i);
+                        if (node == null) {
+                            arrayNode.add(sourceNode.deepCopy());
+                        } else if (node.isObject()) {
+                            ObjectNode objectNode = (ObjectNode) node;
+                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
+                            while (fieldsIterator.hasNext()) {
+                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
+                                objectNode.set(field.getKey(), field.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+
+            return arrayNode;
+        }
+
+        @Override
+        public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context) {
+            ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
+            for (VariableInstance instance : instances) {
+                arrayNode.addAll((ArrayNode) instance.getValue());
+            }
+
+            return arrayNode;
+        }
     }
 
 }

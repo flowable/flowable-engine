@@ -59,7 +59,7 @@ public class CmmnAggregation {
      */
     public static VariableInstanceEntity aggregateComplete(DelegatePlanItemInstance planItemInstance,
             VariableAggregationDefinition aggregation, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        return aggregate(planItemInstance, BaseVariableAggregatorContext.overview(aggregation), cmmnEngineConfiguration);
+        return aggregate(planItemInstance, BaseVariableAggregatorContext.complete(aggregation), cmmnEngineConfiguration);
     }
 
     /**
@@ -94,11 +94,10 @@ public class CmmnAggregation {
     public static VariableInstanceEntity aggregate(DelegatePlanItemInstance planItemInstance,
             PlanItemVariableAggregator.Context aggregationContext, CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemVariableAggregator aggregator,
             String targetVarName) {
-        VariableAggregationDefinition aggregation = aggregationContext.getDefinition();
 
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
 
-        Object aggregatedValue = aggregator.aggregateSingle(planItemInstance, BaseVariableAggregatorContext.complete(aggregation));
+        Object aggregatedValue = aggregator.aggregateSingle(planItemInstance, aggregationContext);
 
         String caseInstanceId = planItemInstance.getCaseInstanceId();
         String subScopeId = planItemInstance.getStageInstanceId();
@@ -148,8 +147,14 @@ public class CmmnAggregation {
         }
 
         String subScopeId = planItemInstance.getStageInstanceId();
+        List<PlanItemInstanceEntity> repetitionPlanItems;
         if (subScopeId == null) {
             subScopeId = planItemInstance.getCaseInstanceId();
+            repetitionPlanItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByCaseInstanceIdAndPlanItemId(subScopeId, planItemInstance.getPlanItem().getId());
+        } else {
+            repetitionPlanItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByStageInstanceIdAndPlanItemId(subScopeId, planItemInstance.getPlanItem().getId());
         }
 
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
@@ -170,9 +175,6 @@ public class CmmnAggregation {
         PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstance);
 
         PlanItemVariableAggregator.Context aggregationContext = BaseVariableAggregatorContext.overview(aggregation);
-
-        List<PlanItemInstanceEntity> repetitionPlanItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
-                .findByCaseInstanceIdAndPlanItemId(planItemInstance.getCaseInstanceId(), planItemInstance.getPlanItem().getId());
 
         for (PlanItemInstanceEntity repetitionPlanItem : repetitionPlanItems) {
             // We need to create overview values for every single active child plan item

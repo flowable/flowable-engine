@@ -60,7 +60,7 @@ public class BpmnAggregation {
      */
     public static VariableInstanceEntity aggregateComplete(DelegateExecution execution, DelegateExecution parentExecution,
             VariableAggregationDefinition aggregation, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        return aggregate(execution, parentExecution, BaseVariableAggregatorContext.overview(aggregation), processEngineConfiguration);
+        return aggregate(execution, parentExecution, BaseVariableAggregatorContext.complete(aggregation), processEngineConfiguration);
     }
 
     /**
@@ -97,11 +97,10 @@ public class BpmnAggregation {
     public static VariableInstanceEntity aggregate(DelegateExecution execution, DelegateExecution parentExecution,
             VariableAggregator.Context aggregationContext, ProcessEngineConfigurationImpl processEngineConfiguration, VariableAggregator aggregator,
             String targetVarName) {
-        VariableAggregationDefinition aggregation = aggregationContext.getDefinition();
 
         VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
 
-        Object aggregatedValue = aggregator.aggregateSingle(execution, BaseVariableAggregatorContext.complete(aggregation));
+        Object aggregatedValue = aggregator.aggregateSingle(execution, aggregationContext);
 
         String processInstanceId = execution.getProcessInstanceId();
         String parentExecutionId = parentExecution.getId();

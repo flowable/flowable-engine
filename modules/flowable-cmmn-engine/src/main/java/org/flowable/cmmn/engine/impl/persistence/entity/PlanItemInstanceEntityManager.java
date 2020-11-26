@@ -41,6 +41,8 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
 
+    List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+
     void deleteSentryRelatedData(String planItemId);
 
     void deleteByCaseDefinitionId(String caseDefinitionId);

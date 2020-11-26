@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.variable.CmmnAggregatedVariableType;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
@@ -105,6 +106,14 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                         objectNode.put(targetVarName, (String) varInstance.getValue());
                     } else if (NullType.TYPE_NAME.equals(varInstance.getTypeName())) {
                         objectNode.putNull(targetVarName);
+                    } else if (CmmnAggregatedVariableType.TYPE_NAME.equals(varInstance.getTypeName())) {
+                        if (ContextStates.OVERVIEW.equals(context.getState())) {
+                            // We can only use the aggregated variable if we are in an overview state
+                            Object value = varInstance.getValue();
+                            if (value instanceof JsonNode) {
+                                objectNode.set(targetVarName, (JsonNode) value);
+                            }
+                        }
                     }
 
                     //TODO other types

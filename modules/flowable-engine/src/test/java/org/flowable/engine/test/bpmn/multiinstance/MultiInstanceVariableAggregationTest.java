@@ -16,21 +16,32 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.delegate.VariableAggregator;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.JsonType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -122,6 +133,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                 + "]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
     }
 
     @Test
@@ -207,6 +220,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
     }
 
     @Test
@@ -346,6 +361,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
     }
 
     @Test
@@ -425,8 +442,207 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     + "]]");
 
         assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
 
     }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceSubProcessWithParallelMultiInstanceUserTask() {
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 2)
+                .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ first: [{ task: 0 }, { task: 1 }] },"
+                        + "{ first: [{ task: 10}, { task: 11 }] }"
+                        + "]");
+
+        // User task 'task one': sets approved and description variable
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByCategory().asc()
+                .list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task one");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            variables.put("description", "description task " + i);
+            taskService.complete(task.getId(), variables);
+        }
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 0, approved : true, description : 'description task 0' },"
+                        + "      { task: 1, approved : false, description : 'description task 1'}"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 0 },"
+                        + "      { score: 0 }"
+                        + "    ]"
+                        + "  },"
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 10, approved : true, description : 'description task 2' },"
+                        + "      { task: 11, approved : false, description : 'description task 3' }"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 0 },"
+                        + "      { score: 0 }"
+                        + "    ]"
+                        + "  }"
+                        + "]");
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        // User task 'task two': sets myScore variable
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByCategory().asc()
+                .list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task two");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            taskService.complete(task.getId(), variables);
+        }
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 0, approved : true, description : 'description task 0' },"
+                        + "      { task: 1, approved : false, description : 'description task 1'}"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 20 },"
+                        + "      { score: 22 }"
+                        + "    ]"
+                        + "  },"
+                        + "  {"
+                        + "    first: ["
+                        + "      { task: 10, approved : true, description : 'description task 2' },"
+                        + "      { task: 11, approved : false, description : 'description task 3' }"
+                        + "    ],"
+                        + "    second: ["
+                        + "      { score: 24 },"
+                        + "      { score: 26 }"
+                        + "    ]"
+                        + "  }"
+                        + "]");
+
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceSubProcessWithParallelMultiInstanceUserTaskWithCustomAggregator() {
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 2)
+                .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 0 },"
+                        + "{ task: 1 },"
+                        + "{ task: 10 },"
+                        + "{ task: 11 }"
+                        + "]");
+
+        // User task 'task one': sets approved and description variable
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByCategory().asc()
+                .list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task one");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("approved", i % 2 == 0);
+            variables.put("description", "description task " + i);
+            taskService.complete(task.getId(), variables);
+        }
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 0, approved : true, description : 'description task 0', score: 0 },"
+                        + "{ task: 1, approved : false, description : 'description task 1', score: 0 },"
+                        + "{ task: 10, approved : true, description : 'description task 2', score: 0 },"
+                        + "{ task: 11, approved : false, description : 'description task 3', score: 0 }"
+                        + "]");
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        // User task 'task two': sets myScore variable
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByCategory().asc()
+                .list();
+        assertThat(tasks).extracting(Task::getName).containsOnly("task two");
+        assertThat(tasks).hasSize(4);
+
+        for (int i = 0; i < tasks.size();  i++) {
+            Task task = tasks.get(i);
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myScore", i + 10);
+            taskService.complete(task.getId(), variables);
+        }
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        Task taskAfterMi = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfterMi.getName()).isEqualTo("Task after Mi");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ task: 0, approved : true, description : 'description task 0', score: 20 },"
+                        + "{ task: 1, approved : false, description : 'description task 1', score: 22 },"
+                        + "{ task: 10, approved : true, description : 'description task 2', score: 24 },"
+                        + "{ task: 11, approved : false, description : 'description task 3', score: 26 }"
+                        + "]");
+
+        assertNoAggregatedVariables();
+
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
 
     protected void assertVariablesNotVisibleForProcessInstance(ProcessInstance processInstance) {
 
@@ -443,6 +659,49 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                 .list());
         assertThat(variableInstanceEntities).isEmpty();
 
+    }
+
+    public static class CustomVariableAggregator implements VariableAggregator {
+
+        @Override
+        public Object aggregateSingle(DelegateExecution execution, Context context) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+
+            ArrayNode arrayNode = objectMapper.createArrayNode();
+            for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
+                Object sourceVariable = execution.getVariable(variable.getSource());
+                if (sourceVariable instanceof ArrayNode) {
+                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                    for (int i = 0; i < sourceArrayNode.size(); i++) {
+                        JsonNode node = arrayNode.get(i);
+                        JsonNode sourceNode = sourceArrayNode.get(i);
+                        if (node == null) {
+                            arrayNode.add(sourceNode.deepCopy());
+                        } else if (node.isObject()) {
+                            ObjectNode objectNode = (ObjectNode) node;
+                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
+                            while (fieldsIterator.hasNext()) {
+                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
+                                objectNode.set(field.getKey(), field.getValue());
+                            }
+                        }
+                    }
+                }
+            }
+
+            return arrayNode;
+        }
+
+        @Override
+        public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, Context context) {
+            ArrayNode arrayNode = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
+            for (VariableInstance instance : instances) {
+                arrayNode.addAll((ArrayNode) instance.getValue());
+            }
+
+            return arrayNode;
+        }
     }
 
 }
