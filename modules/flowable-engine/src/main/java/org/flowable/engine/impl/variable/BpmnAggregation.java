@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -178,7 +179,7 @@ public class BpmnAggregation {
 
         for (ExecutionEntity childExecution : parentExecution.getExecutions()) {
             // We need to create overview values for every single active child execution
-            if (childExecution.isActive()) {
+            if (childExecution.isActive() && !(childExecution.getCurrentFlowElement() instanceof BoundaryEvent)) {
 
                 VariableInstanceEntity aggregatedVarInstance = aggregate(childExecution, parentExecution,
                         aggregationContext, processEngineConfiguration, aggregator, targetVarName);

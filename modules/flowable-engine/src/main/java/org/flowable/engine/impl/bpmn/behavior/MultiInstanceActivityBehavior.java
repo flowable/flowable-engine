@@ -60,6 +60,7 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
+import org.flowable.engine.impl.delegate.InterruptibleActivityBehaviour;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.delegate.VariableAggregator;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -67,6 +68,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ExecutionGraphUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.impl.variable.BpmnAggregation;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
@@ -90,7 +92,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  * @author Filip Hrisafov
  */
-public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements SubProcessActivityBehavior {
+public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements SubProcessActivityBehavior, InterruptibleActivityBehaviour {
 
     private static final long serialVersionUID = 1L;
 
@@ -326,6 +328,25 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         leave(execution);
     }
     
+    @Override
+    public void interrupted(DelegateExecution execution) {
+        if (hasVariableAggregationDefinitions(execution)) {
+            Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(execution, aggregations,
+                    CommandContextUtil.getProcessEngineConfiguration());
+
+            for (String variableName : aggregationsByTarget.keySet()) {
+                VariableInstance variableInstance = execution.getVariableInstance(variableName);
+                if (variableInstance != null && BpmnAggregatedVariableType.TYPE_NAME.equals(variableInstance.getTypeName())) {
+                    execution.removeVariable(variableName);
+                }
+            }
+        }
+
+        if (innerActivityBehavior instanceof InterruptibleActivityBehaviour) {
+            ((InterruptibleActivityBehaviour) innerActivityBehavior).interrupted(execution);
+        }
+    }
+
     public boolean completionConditionSatisfied(DelegateExecution execution) {
         if (completionCondition != null) {
             

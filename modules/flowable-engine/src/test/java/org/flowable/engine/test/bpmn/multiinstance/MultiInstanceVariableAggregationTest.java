@@ -31,6 +31,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -138,6 +139,159 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithBoundaryEventCancel() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ },"
+                    + "{ },"
+                    + "{ }"
+                    + "]");
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne' },"
+                    + "{ userId: 'userTwo' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                    + "{ userId: 'userTwo' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+
+        runtimeService.messageEventReceived("Abort", eventSubscription.getExecutionId());
+
+        Task afterBoundary = taskService.createTaskQuery().singleResult();
+        assertThat(afterBoundary).isNotNull();
+        assertThat(afterBoundary.getTaskDefinitionKey()).isEqualTo("afterBoundary");
+
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithBoundaryEventComplete() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 3)
+                .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ },"
+                        + "{ },"
+                        + "{ }"
+                        + "]");
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo(
+                        "["
+                                + "{ userId: 'userOne' },"
+                                + "{ userId: 'userTwo' },"
+                                + "{ userId: 'userThree' }"
+                                + "]");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo(
+                        "["
+                                + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                                + "{ userId: 'userTwo' },"
+                                + "{ userId: 'userThree' }"
+                                + "]");
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        taskService.complete(tasks.get(1).getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo(
+                        "["
+                                + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                                + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                                + "{ userId: 'userThree' }"
+                                + "]");
+
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        taskService.complete(tasks.get(2).getId(), variables);
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo(
+                        "["
+                                + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                                + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                                + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
+                                + "]");
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTask.bpmn20.xml")
     public void testParallelMultiInstanceUserTaskWithZeroCardinality() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -156,6 +310,143 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     @Test
     @Deployment
     public void testSequentialMultiInstanceUserTask() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 4)
+            .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ }"
+                    + "]");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "a");
+        taskService.setAssignee(task.getId(), "userOne");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne' }"
+                + "]");
+
+        taskService.complete(task.getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne', approved : false, description : 'a' },"
+                + "{ }"
+                + "]");
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("approved", false);
+        variables.put("description", "b");
+        taskService.setAssignee(task.getId(), "userTwo");
+        taskService.complete(task.getId(), variables);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("approved", true);
+        variables.put("description", "c");
+        taskService.setAssignee(task.getId(), "userThree");
+        taskService.complete(task.getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne', approved : false, description : 'a' },"
+                + "{ userId: 'userTwo', approved : false, description : 'b' },"
+                + "{ userId: 'userThree', approved : true, description : 'c' },"
+                + "{ }"
+                + "]");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        variables.put("approved", true);
+        variables.put("description", "d");
+        taskService.setAssignee(task.getId(), "userFour");
+        taskService.complete(task.getId(), variables);
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        reviews = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "reviews");
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne', approved : false, description : 'a' },"
+                    + "{ userId: 'userTwo', approved : false, description : 'b' },"
+                    + "{ userId: 'userThree', approved : true, description : 'c' },"
+                    + "{ userId: 'userFour', approved : true, description : 'd' }"
+                    + "]");
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testSequentialMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testSequentialMultiInstanceUserTaskWithBoundaryEventCancel() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 4)
+            .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ }"
+                    + "]");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "a");
+        taskService.setAssignee(task.getId(), "userOne");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne' }"
+                + "]");
+
+        taskService.complete(task.getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                + "{ userId: 'userOne', approved : false, description : 'a' },"
+                + "{ }"
+                + "]");
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+
+        runtimeService.messageEventReceived("Abort", eventSubscription.getExecutionId());
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        assertNoAggregatedVariables();
+        VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviewsVarInstance).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testSequentialMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testSequentialMultiInstanceUserTaskWithBoundaryEventComplete() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .processDefinitionKey("myProcess")
             .variable("nrOfLoops", 4)
