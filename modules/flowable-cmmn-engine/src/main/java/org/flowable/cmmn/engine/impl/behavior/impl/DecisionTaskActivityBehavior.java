@@ -138,8 +138,8 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
             if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
                 DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
-                cmmnEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
-                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+                cmmnEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
+                    externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
                 cmmnEngineConfiguration.getDecisionTableVariableManager().setVariablesOnPlanItemInstance(decisionExecutionAuditContainer.getDecisionResult(),
                     externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());

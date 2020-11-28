@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.DecisionTableVariableManager;
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author martin.grofcik
  * @author Filip Hrisafov
+ * @author Valentin Zickner
  */
 public class DecisionTaskTest {
 
@@ -634,6 +636,204 @@ public class DecisionTaskTest {
                 .start();
         assertThat(setVariableOnPlanItemCalled[0]).isTrue();
         cmmnEngineConfiguration.setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.multipleResults.dmn"
+    })
+    public void withCustomDecisionTableManagerAndOldDecisionService_ensureDecisionTableManagerIsCalled() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnRule.getCmmnEngineConfiguration().getDecisionTableVariableManager();
+        final boolean[] setCalled = {false};
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+                setCalled[0] = true;
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start();
+        assertThat(setCalled[0]).isTrue();
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.multipleResults.dmn"
+    })
+    public void withCustomDecisionTableManagerAndNewDecisionService_ensureDecisionTableManagerIsCalledAndMultipleResultsIsTrue() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnRule.getCmmnEngineConfiguration().getDecisionTableVariableManager();
+        final boolean[] setCalled = {false};
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
+                setCalled[0] = true;
+                assertThat(multipleResults).isTrue();
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start();
+        assertThat(setCalled[0]).isTrue();
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.singleResult.dmn"
+    })
+    public void withCustomDecisionTableManagerAndNewDecisionServiceOneResult_ensureDecisionTableManagerIsCalledAndMultipleResultsIsFalse() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnRule.getCmmnEngineConfiguration().getDecisionTableVariableManager();
+        final boolean[] setCalled = {false};
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
+                setCalled[0] = true;
+                assertThat(multipleResults).isFalse();
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start();
+        assertThat(setCalled[0]).isTrue();
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.multipleTablesAsResult.dmn"
+    })
+    public void withCustomDecisionTableManagerAndNewDecisionServiceMultipleResultTables_ensureDecisionTableManagerIsCalledAndMultipleResultsIsTrue() {
+        DecisionTableVariableManager originalDecisionTableVariableManager = cmmnRule.getCmmnEngineConfiguration().getDecisionTableVariableManager();
+        final boolean[] setCalled = {false};
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(new DecisionTableVariableManager() {
+            @Override
+            public void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper) {
+            }
+
+            @Override
+            public void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionKey,
+                    PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
+                setCalled[0] = true;
+                assertThat(multipleResults).isTrue();
+            }
+        });
+        this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start();
+        assertThat(setCalled[0]).isTrue();
+        cmmnRule.getCmmnEngineConfiguration().setDecisionTableVariableManager(originalDecisionTableVariableManager);
+    }
+
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.multipleResults.dmn"
+    })
+    public void withMultipleResultsAndOneTable_ensureDecisionTableIsAList() {
+        Map<String, Object> processVariables = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start()
+                .getCaseVariables();
+        Object result = processVariables.get("decisionServiceTest");
+
+        assertThat(result).isInstanceOf(ObjectNode.class);
+        ObjectNode resultNode = (ObjectNode) result;
+        JsonNode decisionResult = resultNode.get("decision3");
+        assertThat(decisionResult).isInstanceOf(ArrayNode.class);
+        assertThat(decisionResult.size()).isEqualTo(4);
+        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1000");
+        assertThat(decisionResult.get(1).get("g").asText()).isEqualTo("100");
+        assertThat(decisionResult.get(2).get("g").asText()).isEqualTo("10");
+        assertThat(decisionResult.get(3).get("g").asText()).isEqualTo("1");
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.multipleResults.dmn"
+    })
+    public void withMultipleResultButOnlyOneMatchesAndOneTable_ensureDecisionTableIsAList() {
+        Map<String, Object> processVariables = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "100")
+                .variable("b", "100")
+                .variable("c", "100")
+                .start()
+                .getCaseVariables();
+        Object result = processVariables.get("decisionServiceTest");
+
+        assertThat(result).isInstanceOf(ObjectNode.class);
+        ObjectNode resultNode = (ObjectNode) result;
+        JsonNode decisionResult = resultNode.get("decision3");
+        assertThat(decisionResult).isInstanceOf(ArrayNode.class);
+        assertThat(decisionResult.size()).isEqualTo(1);
+        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1");
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.oneDecisionServiceTaskCase.cmmn",
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.singleResult.dmn"
+    })
+    public void withSingleResult_ensureDecisionTableIsAString() {
+        Map<String, Object> processVariables = this.cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("oneDecisionTaskCase")
+                .variable("a", "1")
+                .variable("b", "1")
+                .variable("c", "1")
+                .start()
+                .getCaseVariables();
+        Object result = processVariables.get("g");
+
+        assertThat(result).isEqualTo("1000");
     }
 
     // Helper methods

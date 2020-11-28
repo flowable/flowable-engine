@@ -143,7 +143,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
                 DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
                 processEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
-                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper());
+                    finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
                 processEngineConfiguration.getDecisionTableVariableManager().setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(),
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
