@@ -48,11 +48,11 @@ public class CmmnDeploymentsClientResource extends AbstractClientResource {
     protected CmmnDeploymentService clientService;
 
     /**
-     * GET /rest/admin/cmmn-deployments -> get a list of form deployments.
+     * GET /rest/admin/cmmn-deployments -> get a list of CMMN deployments.
      */
     @GetMapping(produces = "application/json")
     public JsonNode listCmmnDeployments(HttpServletRequest request) {
-        LOGGER.debug("REST request to get a list of form deployments");
+        LOGGER.debug("REST request to get a list of CMMN deployments");
 
         JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.CMMN);
@@ -62,7 +62,7 @@ public class CmmnDeploymentsClientResource extends AbstractClientResource {
             resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
         } catch (FlowableServiceException e) {
-            LOGGER.error("Error getting form deployments", e);
+            LOGGER.error("Error getting CMMN deployments", e);
             throw new BadRequestException(e.getMessage());
         }
 
@@ -70,7 +70,7 @@ public class CmmnDeploymentsClientResource extends AbstractClientResource {
     }
 
     /**
-     * POST /rest/admin/cmmn-deployments: upload a form deployment
+     * POST /rest/admin/cmmn-deployments: upload a CMMN deployment
      */
     @PostMapping(produces = "application/json")
     public JsonNode handleCmmnFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
@@ -88,7 +88,7 @@ public class CmmnDeploymentsClientResource extends AbstractClientResource {
                 }
 
             } catch (IOException e) {
-                LOGGER.error("Error deploying form upload", e);
+                LOGGER.error("Error deploying CMMN upload", e);
                 throw new InternalServerErrorException("Could not deploy file: " + e.getMessage());
             }
 

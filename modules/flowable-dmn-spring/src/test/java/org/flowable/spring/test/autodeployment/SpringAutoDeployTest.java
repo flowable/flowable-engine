@@ -143,7 +143,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(decisionQuery.count()).isEqualTo(2);
     }
 
-    // Updating the form file should lead to a new deployment when restarting the Spring container
+    // Updating the DMN file should lead to a new deployment when restarting the Spring container
     public void testResourceRedeploymentAfterDecisionTableChange() throws Exception {
         createAppContextWithoutDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
@@ -167,7 +167,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
             IoUtil.writeStringToFile(originalFormFileContent, filePath);
         }
 
-        // Assertions come AFTER the file write! Otherwise the form file is
+        // Assertions come AFTER the file write! Otherwise the DMN file is
         // messed up if the assertions fail.
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
         assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(4);

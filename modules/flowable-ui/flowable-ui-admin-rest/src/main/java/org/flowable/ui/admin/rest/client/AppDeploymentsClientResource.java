@@ -48,11 +48,11 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
     protected AppDeploymentService clientService;
 
     /**
-     * GET /rest/admin/app-deployments -> get a list of form deployments.
+     * GET /rest/admin/app-deployments -> get a list of app deployments.
      */
     @GetMapping(produces = "application/json")
     public JsonNode listAppDeployments(HttpServletRequest request) {
-        LOGGER.debug("REST request to get a list of form deployments");
+        LOGGER.debug("REST request to get a list of app deployments");
 
         JsonNode resultNode = null;
         ServerConfig serverConfig = retrieveServerConfig(EndpointType.APP);
@@ -62,7 +62,7 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
             resultNode = clientService.listDeployments(serverConfig, parameterMap);
 
         } catch (FlowableServiceException e) {
-            LOGGER.error("Error getting form deployments", e);
+            LOGGER.error("Error getting app deployments", e);
             throw new BadRequestException(e.getMessage());
         }
 
@@ -70,7 +70,7 @@ public class AppDeploymentsClientResource extends AbstractClientResource {
     }
 
     /**
-     * POST /rest/admin/app-deployments: upload a form deployment
+     * POST /rest/admin/app-deployments: upload a app deployment
      */
     @PostMapping(produces = "application/json")
     public JsonNode handleAppFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
