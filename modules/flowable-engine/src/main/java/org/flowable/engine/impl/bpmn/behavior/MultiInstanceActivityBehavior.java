@@ -320,6 +320,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     // required for supporting external subprocesses
     @Override
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
+        if (innerActivityBehavior instanceof SubProcessActivityBehavior) {
+            ((SubProcessActivityBehavior) innerActivityBehavior).completing(execution, subProcessInstance);
+        }
     }
 
     // required for supporting external subprocesses
