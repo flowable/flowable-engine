@@ -69,6 +69,7 @@ import org.flowable.common.engine.impl.el.function.VariableContainsExpressionFun
 import org.flowable.common.engine.impl.el.function.VariableEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableExistsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetExpressionFunction;
+import org.flowable.common.engine.impl.el.function.VariableGetOrDefaultIfNotExistExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGetOrDefaultExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableGreaterThanOrEqualsExpressionFunction;
@@ -2608,6 +2609,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             flowableFunctionDelegates.add(new VariableGetExpressionFunction());
             flowableFunctionDelegates.add(new VariableGetOrDefaultExpressionFunction());
+            flowableFunctionDelegates.add(new VariableGetOrDefaultIfNotExistExpressionFunction());
 
             flowableFunctionDelegates.add(new VariableContainsAnyExpressionFunction());
             flowableFunctionDelegates.add(new VariableContainsExpressionFunction());
