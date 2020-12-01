@@ -74,7 +74,7 @@ public class JsonVariableAggregator implements VariableAggregator {
             if (targetVarName != null) {
                 VariableInstance varInstance = null;
                 if (StringUtils.isNotEmpty(definition.getSource())) {
-                    varInstance = execution.getVariableInstanceLocal(definition.getSource());
+                    varInstance = execution.getVariableInstance(definition.getSource());
 
                 } else if (StringUtils.isNotEmpty(definition.getSourceExpression())) {
                     Object sourceValue = processEngineConfiguration.getExpressionManager()
@@ -105,13 +105,11 @@ public class JsonVariableAggregator implements VariableAggregator {
                         objectNode.put(targetVarName, (String) varInstance.getValue());
                     } else if (NullType.TYPE_NAME.equals(varInstance.getTypeName())) {
                         objectNode.putNull(targetVarName);
-                    } else if (BpmnAggregatedVariableType.TYPE_NAME.equalsIgnoreCase(varInstance.getTypeName())) {
-                        if (ContextStates.OVERVIEW.equals(context.getState())) {
-                            // We can only use the aggregated variable if we are in an overview state
-                            Object value = varInstance.getValue();
-                            if (value instanceof JsonNode) {
-                                objectNode.set(targetVarName, (JsonNode) value);
-                            }
+                    } else if (ContextStates.OVERVIEW.equals(context.getState())) {
+                        // We can only use the aggregated variable if we are in an overview state
+                        Object value = varInstance.getValue();
+                        if (value instanceof JsonNode) {
+                            objectNode.set(targetVarName, (JsonNode) value);
                         }
                     }
 

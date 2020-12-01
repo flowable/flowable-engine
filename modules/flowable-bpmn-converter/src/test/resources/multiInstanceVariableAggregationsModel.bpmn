@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="myProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks"/>
+
+        <userTask id="miTasks" name="My Task">
+
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews">
+                        <variable source="taskAssignee" target="userId"/>
+                        <variable source="approved"/>
+                        <variable sourceExpression="${score * 2}" targetExpression="${targetVar}"/>
+                    </flowable:variableAggregation>
+                    <flowable:variableAggregation targetExpression="${targetVar}">
+                        <variable source="taskAssignee" target="userId"/>
+                        <variable source="approved"/>
+                    </flowable:variableAggregation>
+                    <flowable:variableAggregation target="reviews" delegateExpression="${customVariableAggregator}">
+                        <variable source="approved"/>
+                    </flowable:variableAggregation>
+                    <flowable:variableAggregation target="reviews" class="com.example.flowable.CustomVariableAggregator">
+                        <variable source="description"/>
+                    </flowable:variableAggregation>
+                </extensionElements>
+                <loopCardinality>${nrOfLoops}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+        </userTask>
+
+        <sequenceFlow id="flow4" sourceRef="miTasks" targetRef="afterMiTasks"/>
+        <userTask id="afterMiTasks"/>
+
+        <sequenceFlow id="flow5" sourceRef="afterMiTasks" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

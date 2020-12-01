@@ -13,15 +13,21 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
@@ -89,5 +95,58 @@ class MultiInstanceTaskConverterTest {
                                 assertThat(loopCharacteristics2.getCompletionCondition()).isEqualTo("${numActiveTasks == \"2\"}");
                             });
                 });
+    }
+
+    @BpmnXmlConverterTest("multiInstanceVariableAggregationsModel.bpmn")
+    void variableAggregations(BpmnModel model) {
+        FlowElement flowElement = model.getMainProcess()
+                .getFlowElement("miTasks");
+
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        UserTask userTask = (UserTask) flowElement;
+        MultiInstanceLoopCharacteristics loopCharacteristics = userTask.getLoopCharacteristics();
+        assertThat(loopCharacteristics).isNotNull();
+        assertThat(loopCharacteristics.getAggregations()).isNotNull();
+        List<VariableAggregationDefinition> aggregations = new ArrayList<>(loopCharacteristics.getAggregations().getAggregations());
+        assertThat(aggregations)
+                .extracting(VariableAggregationDefinition::getTarget, VariableAggregationDefinition::getTargetExpression,
+                        VariableAggregationDefinition::getImplementationType, VariableAggregationDefinition::getImplementation)
+                .containsExactly(
+                        tuple("reviews", null, null, null),
+                        tuple(null, "${targetVar}", null, null),
+                        tuple("reviews", null, ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${customVariableAggregator}"),
+                        tuple("reviews", null, ImplementationType.IMPLEMENTATION_TYPE_CLASS, "com.example.flowable.CustomVariableAggregator")
+                );
+
+        assertThat(aggregations.get(0).getDefinitions())
+                .extracting(VariableAggregationDefinition.Variable::getSource, VariableAggregationDefinition.Variable::getSourceExpression,
+                        VariableAggregationDefinition.Variable::getTarget, VariableAggregationDefinition.Variable::getTargetExpression)
+                .containsExactly(
+                        tuple("taskAssignee", null, "userId", null),
+                        tuple("approved", null, null, null),
+                        tuple(null, "${score * 2}", null, "${targetVar}")
+                );
+
+        assertThat(aggregations.get(1).getDefinitions())
+                .extracting(VariableAggregationDefinition.Variable::getSource, VariableAggregationDefinition.Variable::getSourceExpression,
+                        VariableAggregationDefinition.Variable::getTarget, VariableAggregationDefinition.Variable::getTargetExpression)
+                .containsExactly(
+                        tuple("taskAssignee", null, "userId", null),
+                        tuple("approved", null, null, null)
+                );
+
+        assertThat(aggregations.get(2).getDefinitions())
+                .extracting(VariableAggregationDefinition.Variable::getSource, VariableAggregationDefinition.Variable::getSourceExpression,
+                        VariableAggregationDefinition.Variable::getTarget, VariableAggregationDefinition.Variable::getTargetExpression)
+                .containsExactly(
+                        tuple("approved", null, null, null)
+                );
+
+        assertThat(aggregations.get(3).getDefinitions())
+                .extracting(VariableAggregationDefinition.Variable::getSource, VariableAggregationDefinition.Variable::getSourceExpression,
+                        VariableAggregationDefinition.Variable::getTarget, VariableAggregationDefinition.Variable::getTargetExpression)
+                .containsExactly(
+                        tuple("description", null, null, null)
+                );
     }
 }

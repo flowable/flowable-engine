@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -640,6 +641,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
         ExecutionEntityImpl parent = getParent();
         if (parent != null && parent.isMultiInstanceRoot()) {
+
+            if (getCurrentFlowElement() instanceof BoundaryEvent) {
+                // Executions for boundary events should not store variables locally
+                return false;
+            }
+
             // If the parent is a multi instance root then the variable should be stored in this execution
             // the multi instance behaviour will collect this variables once it is done
             // For backwards compatibility we store the variable locally only if the loop characteristics has aggregations
