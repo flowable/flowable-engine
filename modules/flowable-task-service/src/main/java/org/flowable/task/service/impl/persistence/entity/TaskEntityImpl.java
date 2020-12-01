@@ -41,7 +41,6 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -213,15 +212,6 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             variableInstance.setProcessInstanceId(this.processInstanceId);
             variableInstance.setProcessDefinitionId(this.processDefinitionId);
         }
-    }
-
-    @Override
-    public VariableAggregationInfo getVariableAggregationInfo() {
-        VariableScopeImpl parentVariableScope = getParentVariableScope();
-        if (parentVariableScope != null) {
-            return parentVariableScope.getVariableAggregationInfo();
-        }
-        return null;
     }
 
     @Override

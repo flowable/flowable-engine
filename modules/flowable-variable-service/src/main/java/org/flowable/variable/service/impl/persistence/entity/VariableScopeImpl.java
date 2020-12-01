@@ -36,8 +36,6 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -938,8 +936,6 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     protected boolean storeVariableLocal(String variableName) {
         return hasVariableLocal(variableName);
     }
-
-    public abstract VariableAggregationInfo getVariableAggregationInfo();
 
     /*
      * Transient variables

@@ -219,7 +219,6 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.types.AggregatedVariableType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;

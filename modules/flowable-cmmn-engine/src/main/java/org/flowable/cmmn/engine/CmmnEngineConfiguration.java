@@ -302,7 +302,6 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
-import org.flowable.variable.service.impl.types.AggregatedVariableType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -1503,7 +1502,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new CmmnAggregatedVariableType(this));
-            variableTypes.addType(new AggregatedVariableType());
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
             if (customPostVariableTypes != null) {

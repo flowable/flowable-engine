@@ -33,10 +33,7 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -506,11 +503,6 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         }
 
         return false;
-    }
-
-    @Override
-    public VariableAggregationInfo getVariableAggregationInfo() {
-        return  null;
     }
 
     @Override

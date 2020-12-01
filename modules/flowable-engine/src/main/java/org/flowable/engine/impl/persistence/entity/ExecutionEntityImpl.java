@@ -48,8 +48,6 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.aggregation.VariableAggregation;
-import org.flowable.variable.service.impl.aggregation.VariableAggregationInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
@@ -658,11 +656,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         }
 
         return false;
-    }
-
-    @Override
-    public VariableAggregationInfo getVariableAggregationInfo() {
-        return  null;
     }
 
     @Override
