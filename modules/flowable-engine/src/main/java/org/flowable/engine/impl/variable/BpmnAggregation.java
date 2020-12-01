@@ -18,6 +18,7 @@ import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.bpmn.model.VariableAggregationDefinitions;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateUtil;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
@@ -117,8 +118,8 @@ public class BpmnAggregation {
      * @param targetVarName the name of the variable
      * @return the aggregated variable value
      */
-    public static Object aggregateOverview(String parentExecutionId, String targetVarName) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+    public static Object aggregateOverview(String parentExecutionId, String targetVarName, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntity parentExecution = processEngineConfiguration.getExecutionEntityManager()
                 .findById(parentExecutionId);
 

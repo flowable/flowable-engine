@@ -1502,7 +1502,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
-            variableTypes.addType(new CmmnAggregatedVariableType());
+            variableTypes.addType(new CmmnAggregatedVariableType(this));
             variableTypes.addType(new AggregatedVariableType());
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
@@ -1513,7 +1513,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         } else {
             if (variableTypes.getVariableType(CmmnAggregatedVariableType.TYPE_NAME) == null) {
-                variableTypes.addTypeBefore(new CmmnAggregatedVariableType(), SerializableType.TYPE_NAME);
+                variableTypes.addTypeBefore(new CmmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
             }
         }
     }

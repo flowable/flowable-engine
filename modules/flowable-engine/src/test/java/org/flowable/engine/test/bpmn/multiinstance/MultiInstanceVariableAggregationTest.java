@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.multiinstance;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.VariableAggregator;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -427,6 +429,126 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         }
 
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTask.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithExpressionModifyingOverviewVariable() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 3)
+                .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ },"
+                        + "{ },"
+                        + "{ }"
+                        + "]");
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo(
+                        "["
+                                + "{ userId: 'userOne' },"
+                                + "{ userId: 'userTwo' },"
+                                + "{ userId: 'userThree' }"
+                                + "]");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+                .isEqualTo("["
+                        + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                        + "{ userId: 'userTwo' },"
+                        + "{ userId: 'userThree' }"
+                        + "]");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                            + "{ userId: 'userTwo' },"
+                            + "{ userId: 'userThree' }"
+                            + "]");
+        }
+
+        managementService.executeCommand(commandContext -> {
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(processInstance.getId());
+            processEngineConfiguration.getExpressionManager()
+                    .createExpression("${reviews}")
+                    .setValue("customReviews", execution);
+
+            return null;
+        });
+
+        VariableInstance reviewsInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviewsInstance.getTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+        assertThatJson(reviewsInstance.getValue())
+                .isEqualTo("["
+                        + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                        + "{ userId: 'userTwo' },"
+                        + "{ userId: 'userThree' }"
+                        + "]");
+
+        assertThatThrownBy(() -> {
+            managementService.executeCommand(commandContext -> {
+                ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(processInstance.getId());
+                processEngineConfiguration.getExpressionManager()
+                        .createExpression("${reviews[0].userId}")
+                        .setValue("testUser", execution);
+                return null;
+            });
+        }).hasMessage("Error while evaluating expression: ${reviews[0].userId}");
+
+        reviewsInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviewsInstance.getTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+        assertThatJson(reviewsInstance.getValue())
+                .isEqualTo("["
+                        + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                        + "{ userId: 'userTwo' },"
+                        + "{ userId: 'userThree' }"
+                        + "]");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                            + "{ userId: 'userTwo' },"
+                            + "{ userId: 'userThree' }"
+                            + "]");
+        }
+
+    }
+
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTask.bpmn20.xml")

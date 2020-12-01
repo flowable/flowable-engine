@@ -24,6 +24,7 @@ import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.cmmn.model.VariableAggregationDefinitions;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
@@ -115,8 +116,8 @@ public class CmmnAggregation {
      * @param targetVarName the name of the variable
      * @return the aggregated variable value
      */
-    public static Object aggregateOverview(String parentScopeId, String targetVarName) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+    public static Object aggregateOverview(String parentScopeId, String targetVarName, CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         PlanItemInstanceEntity parent = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
                 .findById(parentScopeId);
 

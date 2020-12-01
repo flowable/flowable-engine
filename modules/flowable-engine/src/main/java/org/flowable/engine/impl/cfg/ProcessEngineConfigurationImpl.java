@@ -2456,7 +2456,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
-            variableTypes.addType(new BpmnAggregatedVariableType());
+            variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new AggregatedVariableType());
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new AggregatedVariableType());
@@ -2468,7 +2468,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         } else {
             if (variableTypes.getVariableType(BpmnAggregatedVariableType.TYPE_NAME) == null) {
-                variableTypes.addTypeBefore(new BpmnAggregatedVariableType(), SerializableType.TYPE_NAME);
+                variableTypes.addTypeBefore(new BpmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
             }
         }
     }

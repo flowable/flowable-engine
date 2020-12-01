@@ -32,4 +32,10 @@ public interface VariableInstanceEntity extends VariableInstance, Entity, HasRev
     VariableType getType();
 
     void setType(VariableType type);
+
+    @Override
+    default boolean isReadOnly() {
+        VariableType type = getType();
+        return type != null && type.isReadOnly();
+    }
 }
