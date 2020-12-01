@@ -21,24 +21,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SignalExpressionConverterTest extends AbstractConverterTest {
+class SignalExpressionConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("signalExpressionTest.bpmn")
+    void validateModel(BpmnModel model) {
         Collection<Signal> signals = model.getSignals();
         assertThat(signals).hasSize(1);
 
@@ -54,10 +42,5 @@ public class SignalExpressionConverterTest extends AbstractConverterTest {
                     assertThat(signalEventDefinition.getSignalExpression()).isEqualTo("${someExpressionThatReturnsSignalId}");
 
                 });
-    }
-
-    @Override
-    protected String getResource() {
-        return "signalExpressionTest.bpmn";
     }
 }

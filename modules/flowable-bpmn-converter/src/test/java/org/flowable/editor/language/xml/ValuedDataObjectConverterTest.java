@@ -30,34 +30,17 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @see {https://activiti.atlassian.net/browse/ACT-1847}.
  */
-public class ValuedDataObjectConverterTest extends AbstractConverterTest {
+class ValuedDataObjectConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "valueddataobjectmodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) throws ParseException {
+    @BpmnXmlConverterTest("valueddataobjectmodel.bpmn")
+    void validateModel(BpmnModel model) throws ParseException {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
