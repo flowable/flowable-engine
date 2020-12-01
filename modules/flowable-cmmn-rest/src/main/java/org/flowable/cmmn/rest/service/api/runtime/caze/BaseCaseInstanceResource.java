@@ -98,6 +98,14 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
+        
+        if (queryRequest.getActivePlanItemDefinitionId() != null) {
+            query.activePlanItemDefinitionId(queryRequest.getActivePlanItemDefinitionId());
+        }
+        
+        if (queryRequest.getActivePlanItemDefinitionIds() != null) {
+            query.activePlanItemDefinitionIds(queryRequest.getActivePlanItemDefinitionIds());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.caseInstanceTenantId(queryRequest.getTenantId());

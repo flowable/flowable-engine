@@ -40,6 +40,7 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -580,5 +581,33 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+    }
+    
+    /**
+     * Test getting a list of case instance, using all possible filters.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testGetCaseInstancesByActivePlanItemDefinitionId() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        String id = caseInstance.getId();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url);
+
+        Task task = taskService.createTaskQuery().caseInstanceId(id).singleResult();
+        taskService.complete(task.getId());
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url);
     }
 }

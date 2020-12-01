@@ -495,6 +495,16 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
             </if>
+            <if test="activePlanItemDefinitionId != null">
+                and EXISTS(select ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ = #{activePlanItemDefinitionId} and P.STATE_ = 'active')
+            </if>
+            <if test="activePlanItemDefinitionIds != null">
+                and EXISTS(select ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ in
+                <foreach item="activePlanItemDefinitionId" index="index" collection="activePlanItemDefinitionIds" open="(" separator="," close=")">
+                    #{activePlanItemDefinitionId}
+                </foreach>
+                and P.STATE_ = 'active')
+            </if>
             <if test="involvedUser != null">
                 and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
             </if>
@@ -676,6 +686,16 @@
                     <if test="orQueryObject.withoutTenantId">
                         or (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
                     </if>
+                    <if test="orQueryObject.activePlanItemDefinitionId != null">
+		                or EXISTS(select ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ = #{orQueryObject.activePlanItemDefinitionId} and P.STATE_ = 'active')
+		            </if>
+		            <if test="orQueryObject.activePlanItemDefinitionIds != null">
+		                or EXISTS(select ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ in
+		                <foreach item="activePlanItemDefinitionId" index="index" collection="orQueryObject.activePlanItemDefinitionIds" open="(" separator="," close=")">
+		                    #{activePlanItemDefinitionId}
+		                </foreach>
+		                and P.STATE_ = 'active')
+		            </if>
                     <if test="orQueryObject.involvedUser != null">
                         or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
                         #{orQueryObject.involvedUser})

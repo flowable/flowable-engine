@@ -65,6 +65,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
+    protected String activePlanItemDefinitionId;
+    protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
     protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
@@ -371,6 +373,33 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
         return this;
     }
+    
+    @Override
+    public CaseInstanceQuery activePlanItemDefinitionId(String planItemDefinitionId) {
+        if (planItemDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("planItemDefinitionId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.activePlanItemDefinitionId = planItemDefinitionId;
+        } else {
+            this.activePlanItemDefinitionId = planItemDefinitionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQuery activePlanItemDefinitionIds(Set<String> planItemDefinitionIds) {
+        if (planItemDefinitionIds == null) {
+            throw new FlowableIllegalArgumentException("planItemDefinitionIds is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.activePlanItemDefinitionIds = planItemDefinitionIds;
+        } else {
+            this.activePlanItemDefinitionIds = planItemDefinitionIds;
+        }
+        return this;
+    }
+    
     @Override
     public CaseInstanceQuery involvedUser(String userId) {
         if (userId == null) {
@@ -765,6 +794,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getActivePlanItemDefinitionId() {
+        return activePlanItemDefinitionId;
+    }
+
+    public Set<String> getActivePlanItemDefinitionIds() {
+        return activePlanItemDefinitionIds;
     }
 
     public String getInvolvedUser() {
