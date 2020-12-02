@@ -127,7 +127,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         return result;
     }
 
-    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
+    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws XMLStreamException {
         if (StringUtils.isNotEmpty(value) && !"null".equalsIgnoreCase(value)) {
             xtw.writeAttribute(attributeName, value);
         }
