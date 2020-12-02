@@ -75,7 +75,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         // There is a fake plan item instance created for waiting for repetition
         // This instance does not follow the same lifecycle and thus we should not aggregate variables for it
         boolean shouldAggregate = aggregations != null && PlanItemInstanceState.ACTIVE_STATES.contains(originalState);
-        if (shouldAggregate) {
+        if (shouldAggregate && shouldAggregateForOneInstance()) {
             aggregateVariablesForOneInstance(planItemInstanceEntity, aggregations);
         }
 
@@ -297,24 +297,47 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
 
+        boolean aggregateMulti = shouldAggregateMulti();
+
         for (Map.Entry<String, VariableAggregationDefinition> entry : aggregationsByTarget.entrySet()) {
             String varName = entry.getKey();
+            if (aggregateMulti) {
 
-            VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
-            PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
+                VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
+                PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
 
-            List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
-            List<VariableInstance> varValues = instancesByName.getOrDefault(varName, Collections.emptyList());
+                List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
+                List<VariableInstance> varValues = instancesByName.getOrDefault(varName, Collections.emptyList());
 
-            sortVariablesByCounter(varValues, counterVariables);
+                sortVariablesByCounter(varValues, counterVariables);
 
-            Object value = aggregator.aggregateMulti(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
+                Object value = aggregator.aggregateMulti(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
 
-            planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+                planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+            } else {
+                planItemInstanceEntity.getParentVariableScope().removeVariable(varName);
+            }
+
         }
 
         variableInstances.forEach(variableService::deleteVariableInstance);
     }
+
+    /**
+     * Whether variable aggregation should be done when a single instance completes.
+     * This does not need to check whether the plan item instance has variable aggregations,
+     * that is the same for all instances.
+     * e.g. When an instance completes normally we should aggregate the data, but if it terminates we shouldn't
+     */
+    protected abstract boolean shouldAggregateForOneInstance();
+
+    /**
+     * Whether multi aggregation needs to be done.
+     * This does not need to check whether the plan item instance has variable aggregations,
+     * that is the same for all instances.
+     * e.g. Multi aggregation needs to be done when we do a normal completion, but not when the plan items are terminated
+     */
+    protected abstract boolean shouldAggregateMulti();
 
     public abstract boolean isEvaluateRepetitionRule();
     

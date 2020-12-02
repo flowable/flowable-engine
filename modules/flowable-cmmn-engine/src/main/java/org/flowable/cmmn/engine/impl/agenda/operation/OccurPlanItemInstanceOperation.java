@@ -45,6 +45,16 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
     }
     
     @Override
+    protected boolean shouldAggregateForOneInstance() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldAggregateMulti() {
+        return true;
+    }
+
+    @Override
     protected void internalExecute() {
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
         planItemInstanceEntity.setOccurredTime(planItemInstanceEntity.getEndedTime());

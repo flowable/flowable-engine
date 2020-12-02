@@ -43,6 +43,16 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
+    protected boolean shouldAggregateForOneInstance() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldAggregateMulti() {
+        return true;
+    }
+
+    @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
             // terminate any remaining child plan items (e.g. in enabled / available state), but don't complete them as it might lead
