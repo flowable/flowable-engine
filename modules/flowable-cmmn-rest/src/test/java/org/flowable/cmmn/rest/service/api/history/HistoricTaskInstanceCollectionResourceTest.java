@@ -94,8 +94,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId(), 2, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseDefinitionkey=myCase", 3, task.getId());
-            assertResultsPresentInDataResponse(url + "?caseDefinitionkeyLike=%Case", 3, task.getId());
-            assertResultsPresentInDataResponse(url + "?caseDefinitionKeyLikeIgnoreCase=%case", 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionkeyLike=" + encode("%Case"), 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%case"), 3, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance2.getId(), 1, task2.getId());
 

@@ -22,16 +22,29 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
+import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -1632,6 +1645,44 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
         assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
     }
+    
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testExecutionListenersOnMultiInstanceSubprocess.bpmn20.xml" })
+    @Test
+    public void testDispatchFlowableMultiInstanceActivityCompletedEventLoopVariables() {
+        MultiInstanceUserActivityEventListener testListener = new MultiInstanceUserActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(testListener);
+        
+        try {
+            Map<String, Object> variableMap = new HashMap<>();
+            List<String> assignees = new ArrayList<>();
+            assignees.add("john");
+            assignees.add("jane");
+            assignees.add("matt");
+            variableMap.put("assignees", assignees);
+            runtimeService.startProcessInstanceByKey("MultiInstanceTest", variableMap);
+            
+            List<FlowableMultiInstanceActivityCompletedEvent> multiInstanceEvents = testListener.getEventsReceived().stream()
+                    .filter(event -> event instanceof FlowableMultiInstanceActivityCompletedEvent)
+                    .map(event -> (FlowableMultiInstanceActivityCompletedEvent) event).collect(Collectors.toList());
+            assertThat(multiInstanceEvents.size()).isEqualTo(1);
+            
+            Integer numberOfActiveInstances = multiInstanceEvents.stream()
+                    .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfActiveInstances).findFirst().get();
+            Integer numberOfCompletedInstances = multiInstanceEvents.stream()
+                    .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfCompletedInstances).findFirst().get();
+            Integer numberOfInstances = multiInstanceEvents.stream().map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfInstances)
+                    .findFirst().get();
+            
+            assertThat(numberOfActiveInstances).isEqualTo(0);
+            assertThat(numberOfCompletedInstances).isEqualTo(3);
+            assertThat(numberOfInstances).isEqualTo(3);
+            
+        } finally {
+            testListener.clearEventsReceived();
+            processEngineConfiguration.getEventDispatcher().removeEventListener(testListener);
+        }
+    }
 
     @Test
     @Deployment
@@ -1943,6 +1994,108 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             count.incrementAndGet();
         }
 
+    }
+    
+    class MultiInstanceUserActivityEventListener extends AbstractFlowableEngineEventListener {
+
+        private List<FlowableEvent> eventsReceived;
+
+        public MultiInstanceUserActivityEventListener() {
+            super(new HashSet<>(Arrays.asList(
+                    FlowableEngineEventType.ACTIVITY_STARTED,
+                    FlowableEngineEventType.ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.ACTIVITY_CANCELLED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_CANCELLED,
+                    FlowableEngineEventType.TASK_CREATED,
+                    FlowableEngineEventType.TASK_COMPLETED,
+                    FlowableEngineEventType.PROCESS_STARTED,
+                    FlowableEngineEventType.PROCESS_COMPLETED,
+                    FlowableEngineEventType.PROCESS_CANCELLED,
+                    FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT
+            )));
+            eventsReceived = new ArrayList<>();
+        }
+
+        public List<FlowableEvent> getEventsReceived() {
+            return eventsReceived;
+        }
+
+        public void clearEventsReceived() {
+            eventsReceived.clear();
+        }
+
+        @Override
+        protected void activityStarted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void activityCompleted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCreated(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processStarted(FlowableProcessStartedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompleted(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompletedWithTerminateEnd(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCancelled(FlowableCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityStarted(FlowableMultiInstanceActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityCompletedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCompletedWithCondition(FlowableMultiInstanceActivityCompletedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCancelled(FlowableMultiInstanceActivityCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
     }
 
 }

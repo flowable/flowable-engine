@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployment" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResourceResource {
 
     @Autowired
@@ -55,7 +55,7 @@ public class AppDeploymentResourceResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Get a deployment resource", tags = { "Deployment" }, notes = "Replace ** by ResourceId")
+    @ApiOperation(value = "Get a deployment resource", tags = { "App Deployments" }, notes = "Replace ** by ResourceId")
     /*
      * @ApiImplicitParams({
      * 

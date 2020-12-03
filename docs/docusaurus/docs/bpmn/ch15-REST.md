@@ -10252,23 +10252,18 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 </tr>
 <tr class="odd">
 <td><p>tenantId</p></td>
-<td><p>No</p></td>
+<td><p>Only return jobs with the given tenantId.</p></td>
 <td><p>String</p></td>
 </tr>
 <tr class="even">
-<td><p>Only return jobs with the given tenantId.</p></td>
 <td><p>tenantIdLike</p></td>
-<td><p>No</p></td>
+<td><p>Only return jobs with a tenantId like the given value.</p></td>
+<td><p>String</p></td>
 </tr>
 <tr class="odd">
-<td><p>String</p></td>
-<td><p>Only return jobs with a tenantId like the given value.</p></td>
 <td><p>withoutTenantId</p></td>
-</tr>
-<tr class="even">
-<td><p>No</p></td>
-<td><p>Boolean</p></td>
 <td><p>If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.</p></td>
+<td><p>Boolean</p></td>
 </tr>
 <tr class="odd">
 <td><p>sort</p></td>

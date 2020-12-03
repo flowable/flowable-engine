@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployment" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResourceCollectionResource {
 
     @Autowired
@@ -54,7 +54,7 @@ public class AppDeploymentResourceCollectionResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List resources in a deployment", tags = { "Deployment" }, nickname="listDeploymentResources",
+    @ApiOperation(value = "List resources in a deployment", tags = { "App Deployments" }, nickname="listDeploymentResources",
             notes = "The dataUrl property in the resulting JSON for a single resource contains the actual URL to use for retrieving the binary resource.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the deployment was found and the resource list has been returned."),
