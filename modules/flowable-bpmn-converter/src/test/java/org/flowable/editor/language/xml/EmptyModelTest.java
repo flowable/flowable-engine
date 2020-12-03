@@ -14,25 +14,18 @@ package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.impl.util.io.StringStreamSource;
 import org.junit.jupiter.api.Test;
 
-public class EmptyModelTest extends AbstractConverterTest {
+class EmptyModelTest {
 
     @Test
-    public void convertXMLToModel() throws Exception {
-        assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class);
-    }
+    void convertEmptyModel() {
+        assertThatThrownBy(() -> new BpmnXMLConverter()
+                .convertToBpmnModel(new StringStreamSource(""), true, false, "UTF-8"))
+            .isInstanceOf(XMLException.class);
 
-    @Test
-    public void convertModelToXML() throws Exception {
-        assertThatThrownBy(() -> readXMLFile())
-                .isExactlyInstanceOf(XMLException.class);
-    }
-
-    @Override
-    protected String getResource() {
-        return "empty.bpmn";
     }
 }

@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.exportAndReadXMLFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,10 +30,10 @@ import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.junit.jupiter.api.Test;
 
-public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
+class BpmnModelWithDataObjectTest {
 
     @Test
-    public void convertModelToXML() throws Exception {
+    public void convertModelToXML() {
         BpmnModel bpmnModel = new BpmnModel();
         Process process = new Process();
         process.setId("myProcess");
@@ -80,10 +81,5 @@ public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
         assertThat(dataObj.getName()).isEqualTo("stringDataObject");
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
         assertThat(dataObj.getValue()).isEqualTo("test");
-    }
-
-    @Override
-    protected String getResource() {
-        return null;
     }
 }

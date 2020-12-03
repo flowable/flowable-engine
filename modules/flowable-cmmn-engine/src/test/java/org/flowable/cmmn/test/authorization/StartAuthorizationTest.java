@@ -119,7 +119,7 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("case2").singleResult();
             assertThat(latestCaseDef).isNotNull();
             links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
-            assertThat(extractProperty("getUserId").from(links))
+            assertThat(extractProperty("userId").from(links))
                     .containsExactlyInAnyOrder("user1", "user2");
 
             latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("case3").singleResult();
@@ -133,9 +133,9 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             assertThat(latestCaseDef).isNotNull();
             links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
             assertThat(links).hasSize(3);
-            assertThat(extractProperty("getGroupId").from(links))
+            assertThat(extractProperty("groupId").from(links))
                     .contains("group1", "group2");
-            assertThat(extractProperty("getUserId").from(links))
+            assertThat(extractProperty("userId").from(links))
                     .contains("user1");
 
             // Case instance identity links should not have an impact on the identityLinks query
@@ -174,9 +174,9 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             cmmnRepositoryService.addCandidateStarterUser(latestCaseDef.getId(), "user1");
             links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
             assertThat(links).hasSize(2);
-            assertThat(extractProperty("getGroupId").from(links))
+            assertThat(extractProperty("groupId").from(links))
                     .contains("group1");
-            assertThat(extractProperty("getUserId").from(links))
+            assertThat(extractProperty("userId").from(links))
                     .contains("user1");
 
             cmmnRepositoryService.deleteCandidateStarterGroup(latestCaseDef.getId(), "nonexisting");
@@ -213,13 +213,13 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             // user1 and user2 are potential starters of Case 2
             latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("case2").singleResult();
             links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
-            assertThat(extractProperty("getUserId").from(links))
+            assertThat(extractProperty("userId").from(links))
                     .containsExactlyInAnyOrder("user1", "user2");
 
             // Case 3 has 3 groups as authorized starter groups
             latestCaseDef = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("case3").singleResult();
             links = cmmnRepositoryService.getIdentityLinksForCaseDefinition(latestCaseDef.getId());
-            assertThat(extractProperty("getGroupId").from(links))
+            assertThat(extractProperty("groupId").from(links))
                     .containsExactlyInAnyOrder("group1", "group2", "group3");
 
             // do not mention user, all cases should be selected

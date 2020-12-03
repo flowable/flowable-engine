@@ -18,34 +18,17 @@ import java.util.Collection;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Escalation;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class EscalationConverterTest extends AbstractConverterTest {
+class EscalationConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("escalationtest.bpmn")
+    void validateModel(BpmnModel model) {
         Collection<Escalation> escalations = model.getEscalations();
         assertThat(escalations).hasSize(2);
         assertThat(model.getEscalation("escalation1").getEscalationCode()).isEqualTo("firstEscalation");
         assertThat(model.getEscalation("escalation1").getName()).isEqualTo("Escalation 1");
         assertThat(model.getEscalation("escalation2").getEscalationCode()).isEqualTo("secondEscalation");
         assertThat(model.getEscalation("escalation2").getName()).isEqualTo("Escalation 2");
-    }
-
-    @Override
-    protected String getResource() {
-        return "escalationtest.bpmn";
     }
 }

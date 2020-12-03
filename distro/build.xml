@@ -204,6 +204,24 @@
 			<fileset dir="../modules/flowable-dmn-rest/target">
 				<include name="flowable-dmn-rest-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-idm-api/target">
+				<include name="flowable-idm-api-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-idm-engine/target">
+				<include name="flowable-idm-engine-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-idm-engine-configurator/target">
+				<include name="flowable-idm-engine-configurator-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-idm-rest/target">
+				<include name="flowable-idm-rest-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-idm-spring/target">
+				<include name="flowable-idm-spring-*.jar" />
+			</fileset>
+			<fileset dir="../modules/flowable-idm-spring-configurator/target">
+				<include name="flowable-idm-spring-configurator-*.jar" />
+			</fileset>
 			<fileset dir="../modules/flowable-event-registry/target">
                 <include name="flowable-event-registry-*.jar" />
             </fileset>

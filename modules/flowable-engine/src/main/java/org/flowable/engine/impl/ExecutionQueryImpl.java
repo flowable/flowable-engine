@@ -95,6 +95,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String activeActivityId;
+    protected Set<String> activeActivityIds;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -1110,6 +1112,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public void setDeploymentIds(List<String> deploymentIds) {
         this.deploymentIds = deploymentIds;
+    }
+
+    public String getActiveActivityId() {
+        return activeActivityId;
+    }
+
+    public void setActiveActivityId(String activeActivityId) {
+        this.activeActivityId = activeActivityId;
+    }
+
+    public Set<String> getActiveActivityIds() {
+        return activeActivityIds;
+    }
+
+    public void setActiveActivityIds(Set<String> activeActivityIds) {
+        this.activeActivityIds = activeActivityIds;
     }
 
     public Date getStartedBefore() {

@@ -17,29 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SendEventServiceTaskSynchronouslyConverterTest extends AbstractConverterTest {
+class SendEventServiceTaskSynchronouslyConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "sendeventservicetaskSynchronously.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("sendeventservicetaskSynchronously.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("sendEventServiceTask");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(SendEventServiceTask.class, sendEventServiceTask -> {

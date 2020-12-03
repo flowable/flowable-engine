@@ -22,27 +22,17 @@ import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * Test for ACT-1657
  * 
  * @author Frederik Heremans
  */
-public class EventBasedGatewayConverterTest extends AbstractConverterTest {
+class EventBasedGatewayConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "eventgatewaymodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("eventgatewaymodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("eventBasedGateway");
         assertThat(flowElement).isInstanceOf(EventGateway.class);
 

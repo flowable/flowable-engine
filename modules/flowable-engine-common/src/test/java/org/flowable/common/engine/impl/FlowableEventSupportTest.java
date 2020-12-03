@@ -16,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,53 @@ class FlowableEventSupportTest {
         TestFlowableEventType testEventType = new TestFlowableEventType("test");
         flowableEventSupport.addEventListener(test1Listener, testEventType);
         flowableEventSupport.addEventListener(test2Listener, testEventType);
+
+        TestFlowableEventListener otherTestListener = new TestFlowableEventListener();
+        TestFlowableEventType otherTestEventType = new TestFlowableEventType("otherTest");
+        flowableEventSupport.addEventListener(otherTestListener, otherTestEventType);
+
+        FlowableEvent globalEvent = new TestFlowableEvent(new TestFlowableEventType("global"));
+        FlowableEvent test1Event = new TestFlowableEvent(testEventType);
+        FlowableEvent test2Event = new TestFlowableEvent(testEventType);
+        FlowableEvent otherTest1Event = new TestFlowableEvent(otherTestEventType);
+        flowableEventSupport.dispatchEvent(globalEvent);
+        flowableEventSupport.dispatchEvent(test1Event);
+        flowableEventSupport.dispatchEvent(test2Event);
+        flowableEventSupport.dispatchEvent(otherTest1Event);
+
+        assertThat(global1Listener.getReceivedEvents())
+            .as("global1 listener")
+            .containsExactly(globalEvent, test1Event, test2Event, otherTest1Event);
+
+        assertThat(global2Listener.getReceivedEvents())
+            .as("global2 listener")
+            .containsExactly(globalEvent, test1Event, test2Event, otherTest1Event);
+
+        assertThat(test1Listener.getReceivedEvents())
+            .as("test1 listener")
+            .containsExactly(test1Event, test2Event);
+
+        assertThat(test2Listener.getReceivedEvents())
+            .as("test2 listener")
+            .containsExactly(test1Event, test2Event);
+
+        assertThat(otherTestListener.getReceivedEvents())
+            .as("otherTest1 listener")
+            .containsExactly(otherTest1Event);
+    }
+
+    @Test
+    void dispatchEventShouldProperlyDispatchToAllListenersWhenTheyHaveExplicitEvents() {
+        TestFlowableEventListener global1Listener = new TestFlowableEventListener();
+        TestFlowableEventListener global2Listener = new TestFlowableEventListener();
+        flowableEventSupport.addEventListener(global1Listener);
+        flowableEventSupport.addEventListener(global2Listener);
+
+        TestFlowableEventType testEventType = new TestFlowableEventType("test");
+        TestFlowableEventListener test1Listener = new TestFlowableEventListener(testEventType);
+        TestFlowableEventListener test2Listener = new TestFlowableEventListener(testEventType);
+        flowableEventSupport.addEventListener(test1Listener);
+        flowableEventSupport.addEventListener(test2Listener);
 
         TestFlowableEventListener otherTestListener = new TestFlowableEventListener();
         TestFlowableEventType otherTestEventType = new TestFlowableEventType("otherTest");
@@ -479,6 +528,16 @@ class FlowableEventSupportTest {
         protected boolean failOnException;
         protected RuntimeException exceptionToThrow;
 
+        protected FlowableEventType eventType;
+
+        public TestFlowableEventListener() {
+            this(null);
+        }
+
+        protected TestFlowableEventListener(FlowableEventType eventType) {
+            this.eventType = eventType;
+        }
+
         @Override
         public void onEvent(FlowableEvent event) {
             receivedEvents.add(event);
@@ -490,6 +549,11 @@ class FlowableEventSupportTest {
         @Override
         public boolean isFailOnException() {
             return failOnException;
+        }
+
+        @Override
+        public Collection<? extends FlowableEventType> getTypes() {
+            return eventType == null ? super.getTypes() : Collections.singleton(eventType);
         }
 
         public List<FlowableEvent> getReceivedEvents() {

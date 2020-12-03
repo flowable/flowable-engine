@@ -18,30 +18,13 @@ import java.util.Collection;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Signal;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SignalConverterTest extends AbstractConverterTest {
+class SignalConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("signaltest.bpmn")
+    void validateModel(BpmnModel model) {
         Collection<Signal> signals = model.getSignals();
         assertThat(signals).hasSize(2);
-    }
-
-    @Override
-    protected String getResource() {
-        return "signaltest.bpmn";
     }
 }

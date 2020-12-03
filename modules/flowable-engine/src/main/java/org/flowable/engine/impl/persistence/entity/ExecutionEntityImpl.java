@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.common.engine.api.FlowableException;
@@ -37,6 +38,7 @@ import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -402,6 +404,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public String getProcessDefinitionKey() {
+        if (StringUtils.isEmpty(processDefinitionKey) && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
         return processDefinitionKey;
     }
 
@@ -412,6 +417,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public String getProcessDefinitionName() {
+        // The process definition name can be null, therefore we can't use an is empty check on it
+        // as it will lead to evaluating the information every time we try to get the name, even though it is null
+        // The process definition key can never be empty, therefore we use it to check if process definition information has been resolved
+        if (StringUtils.isEmpty(processDefinitionKey) && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
         return processDefinitionName;
     }
 
@@ -422,6 +433,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public Integer getProcessDefinitionVersion() {
+        if (processDefinitionVersion == null && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
         return processDefinitionVersion;
     }
 
@@ -432,6 +446,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public String getDeploymentId() {
+        if (StringUtils.isEmpty(deploymentId) && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
         return deploymentId;
     }
 
@@ -1370,6 +1387,23 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             }
         }
         return activityInstanceId;
+    }
+    
+    protected void resolveProcessDefinitionInfo() {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration == null) {
+            // We are outside of a command context so do not try to resolve anything
+            return;
+        }
+        ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId, false, processEngineConfiguration);
+        if (processDefinition == null) {
+            throw new FlowableException("Cannot get process definition for id " + processDefinitionId);
+        }
+        
+        this.processDefinitionKey = processDefinition.getKey();
+        this.processDefinitionName = processDefinition.getName();
+        this.processDefinitionVersion = processDefinition.getVersion();
+        this.deploymentId = processDefinition.getDeploymentId();
     }
 
     // toString /////////////////////////////////////////////////////////////////

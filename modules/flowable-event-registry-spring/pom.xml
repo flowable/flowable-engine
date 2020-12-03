@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Flowable - Event registry - Spring</name>
+    <name>Flowable - Event Registry - Spring</name>
     <artifactId>flowable-event-registry-spring</artifactId>
 
     <parent>
@@ -190,7 +190,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.0.0</version>
+            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

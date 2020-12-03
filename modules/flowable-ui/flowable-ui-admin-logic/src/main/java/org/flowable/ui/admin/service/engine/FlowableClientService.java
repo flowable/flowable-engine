@@ -264,7 +264,7 @@ public class FlowableClientService {
                 boolean success = Arrays.asList(expectedStatusCodes).contains(statusCode);
                 if (success) {
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        String contentDispositionFileName[] = response.getHeaders("Content-Disposition")[0].getValue().split("=");
+                        String[] contentDispositionFileName = response.getHeaders("Content-Disposition")[0].getValue().split("=");
                         String fileName = contentDispositionFileName[contentDispositionFileName.length - 1];
                         return new AttachmentResponseInfo(fileName, IOUtils.toByteArray(response.getEntity().getContent()));
                     } else {

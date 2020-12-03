@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+            xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+            xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+            targetNamespace="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xsd:import namespace="http://www.omg.org/spec/DMN/20180521/DC/"
+	            schemaLocation="DC.xsd"/>
+	<xsd:import namespace="http://www.omg.org/spec/DMN/20180521/DI/"
+	            schemaLocation="DI.xsd"/>
+
+	<xsd:element name="DMNDI" type="dmndi:DMNDI"/>
+	<xsd:element name="DMNDiagram" type="dmndi:DMNDiagram"/>
+	<xsd:element name="DMNDiagramElement" type="di:DiagramElement">
+		<xsd:annotation>
+			<xsd:documentation>This element should never be instantiated directly, but rather concrete implementation should. It is placed there only to be referred in the sequence</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DMNShape" type="dmndi:DMNShape" substitutionGroup="dmndi:DMNDiagramElement"/>
+	<xsd:element name="DMNEdge" type="dmndi:DMNEdge" substitutionGroup="dmndi:DMNDiagramElement"/>
+	<xsd:element name="DMNStyle" type="dmndi:DMNStyle" substitutionGroup="di:Style"/>
+	<xsd:element name="DMNLabel" type="dmndi:DMNLabel"/>
+	<xsd:element name="DMNDecisionServiceDividerLine" type="dmndi:DMNDecisionServiceDividerLine"/>
+
+	<xsd:complexType name="DMNDI">
+		<xsd:sequence>
+			<xsd:element ref="dmndi:DMNDiagram" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="dmndi:DMNStyle" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DMNDiagram">
+		<xsd:complexContent>
+			<xsd:extension base="di:Diagram">
+				<xsd:sequence>
+					<xsd:element name="Size" type="dc:Dimension" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="dmndi:DMNDiagramElement" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DMNShape">
+		<xsd:complexContent>
+			<xsd:extension base="di:Shape">
+				<xsd:sequence>
+					<xsd:element ref="dmndi:DMNLabel" minOccurs="0" maxOccurs="1"/>
+					<xsd:element ref="dmndi:DMNDecisionServiceDividerLine" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="dmnElementRef" type="xsd:QName" use="required"/>
+				<xsd:attribute name="isListedInputData" type="xsd:boolean" use="optional"/>
+				<xsd:attribute name="isCollapsed" type="xsd:boolean" use="optional" default="false"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+		<xsd:complexType name="DMNDecisionServiceDividerLine">
+		<xsd:complexContent>
+			<xsd:extension base="di:Edge"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DMNEdge">
+		<xsd:complexContent>
+			<xsd:extension base="di:Edge">
+				<xsd:sequence>
+					<xsd:element ref="dmndi:DMNLabel" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="dmnElementRef" type="xsd:QName" use="required"/>
+				<xsd:attribute name="sourceElement" type="xsd:QName" use="optional"/>
+				<xsd:attribute name="targetElement" type="xsd:QName" use="optional"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DMNLabel">
+		<xsd:complexContent>
+			<xsd:extension base="di:Shape">
+				<xsd:sequence>
+					<xsd:element name="Text" type="xsd:string" minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DMNStyle">
+		<xsd:complexContent>
+			<xsd:extension base="di:Style">
+				<xsd:sequence>
+					<xsd:element name="FillColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="StrokeColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+					<xsd:element name="FontColor" type="dc:Color" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
+				<xsd:attribute name="fontFamily" type="xsd:string"/>
+				<xsd:attribute name="fontSize" type="xsd:double"/>
+				<xsd:attribute name="fontItalic" type="xsd:boolean"/>
+				<xsd:attribute name="fontBold" type="xsd:boolean"/>
+				<xsd:attribute name="fontUnderline" type="xsd:boolean"/>
+				<xsd:attribute name="fontStrikeThrough" type="xsd:boolean"/>
+				<xsd:attribute name="labelHorizontalAlignement" type="dc:AlignmentKind"/>
+				<xsd:attribute name="labelVerticalAlignment" type="dc:AlignmentKind"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+</xsd:schema>

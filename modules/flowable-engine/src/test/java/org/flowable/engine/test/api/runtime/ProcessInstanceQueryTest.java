@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -40,6 +41,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -521,6 +523,63 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(subProcessInstance).isNotNull();
         assertThat(query.list()).hasSize(1);
         assertThat(query.count()).isEqualTo(1);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/currentActivityTestProcess.bpmn20.xml" })
+    public void testQueryByActiveActivityId() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("currentActivityProcessTest");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("currentActivityProcessTest");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("currentActivityProcessTest");
+        
+        List<String> queryIds = runtimeService.createProcessInstanceQuery().activeActivityId("task1").list().stream()
+            .map(ProcessInstance::getId)
+            .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(2);
+        assertThat(queryIds.contains(processInstance2.getId())).isTrue();
+        assertThat(queryIds.contains(processInstance3.getId())).isTrue();
+        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance1.getId()).activeActivityId("task1").count()).isZero();
+        
+        queryIds = runtimeService.createProcessInstanceQuery().activeActivityId("task3").list().stream()
+                .map(ProcessInstance::getId)
+                .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(1);
+        assertThat(queryIds.contains(processInstance1.getId())).isTrue();
+        
+        Set<String> activityIds = new HashSet<>();
+        activityIds.add("task1");
+        activityIds.add("task3");
+        
+        queryIds = runtimeService.createProcessInstanceQuery().activeActivityIds(activityIds).list().stream()
+                .map(ProcessInstance::getId)
+                .collect(Collectors.toList());
+     
+        assertThat(queryIds.size()).isEqualTo(3);
+        assertThat(queryIds.contains(processInstance1.getId())).isTrue();
+        assertThat(queryIds.contains(processInstance2.getId())).isTrue();
+        assertThat(queryIds.contains(processInstance3.getId())).isTrue();
+        
+        activityIds = new HashSet<>();
+        activityIds.add("task2");
+        activityIds.add("task3");
+        
+        queryIds = runtimeService.createProcessInstanceQuery().activeActivityIds(activityIds).list().stream()
+                .map(ProcessInstance::getId)
+                .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(1);
+        assertThat(queryIds.contains(processInstance1.getId())).isTrue();
+        
+        activityIds = new HashSet<>();
+        activityIds.add("task2");
+        activityIds.add("task4");
+        assertThat(runtimeService.createProcessInstanceQuery().activeActivityIds(activityIds).count()).isZero();
     }
 
     @Test

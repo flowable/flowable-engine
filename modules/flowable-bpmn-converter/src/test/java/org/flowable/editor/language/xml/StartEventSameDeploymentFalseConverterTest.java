@@ -17,32 +17,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.StartEvent;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * @author Filip Hrisafov
  */
-public class StartEventSameDeploymentFalseConverterTest extends AbstractConverterTest {
+class StartEventSameDeploymentFalseConverterTest {
 
-    @Override
-    protected String getResource() {
-        return "startEventSameDeploymentFalse.bpmn";
-    }
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    protected void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("startEventSameDeploymentFalse.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(StartEvent.class, start -> {

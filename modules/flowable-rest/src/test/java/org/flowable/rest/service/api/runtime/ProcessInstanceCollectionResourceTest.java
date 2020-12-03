@@ -42,6 +42,7 @@ import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -206,7 +207,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
      */
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
-    public void testGetCaseInstancesSorted() throws Exception {
+    public void testGetProcessInstancesSorted() throws Exception {
         Instant initialTime = Instant.now();
         processEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime));
         String nowInstanceId = runtimeService.startProcessInstanceByKey("processOne", "now").getId();
@@ -721,5 +722,57 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
             assertThat(historicProcessInstance.getStartUserId()).isEqualTo("kermit");
         }
 
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testGetProcessInstancesByActiveActivityId() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+        // check that the right process is returned with no variables
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask";
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "   id: '" + processInstance.getId() + "',"
+                        + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                        + "} ]"
+                        + "}");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask2";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: []"
+                        + "}");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask2";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+        .when(Option.IGNORING_EXTRA_FIELDS)
+        .isEqualTo("{"
+                + "data: [ {"
+                + "   id: '" + processInstance.getId() + "',"
+                + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                + "} ]"
+                + "}");
     }
 }

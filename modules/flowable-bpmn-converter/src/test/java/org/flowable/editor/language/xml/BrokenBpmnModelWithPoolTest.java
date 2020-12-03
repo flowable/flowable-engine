@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.exportAndReadXMLFile;
 
 import java.util.Arrays;
 
@@ -24,10 +25,10 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.junit.jupiter.api.Test;
 
-public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
+class BrokenBpmnModelWithPoolTest {
 
     @Test
-    public void getMainProcessWithBrokenPool() throws Exception {
+    public void getMainProcessWithBrokenPool() {
         BpmnModel bpmnModel = new BpmnModel();
         Process process = new Process();
         process.setId("myProcess");
@@ -57,7 +58,7 @@ public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
     }
     
     @Test
-    public void getMainProcessWithTwoBrokenPools() throws Exception {
+    public void getMainProcessWithTwoBrokenPools() {
         BpmnModel bpmnModel = new BpmnModel();
         Process process = new Process();
         process.setId("myProcess");
@@ -98,10 +99,5 @@ public class BrokenBpmnModelWithPoolTest extends AbstractConverterTest {
 
         assertThat(mainProcess).isNotNull();
         assertThat(mainProcess.getFlowElements()).hasSize(3);
-    }
-
-    @Override
-    protected String getResource() {
-        return null;
     }
 }

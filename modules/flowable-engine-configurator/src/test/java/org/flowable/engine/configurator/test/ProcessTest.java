@@ -20,6 +20,9 @@ import java.util.Map;
 
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -179,6 +182,47 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
+        }
+    }
+    
+    @Test
+    public void testCompleteProcessUserTaskWithCmmnEngine() throws Exception {
+        ProcessEngineConfiguration processEngineConfiguration = (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+        TaskService taskService = processEngineConfiguration.getTaskService();
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        CmmnTaskService cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        
+        AppDeployment deployment = appRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/configurator/test/oneTaskProcess.bpmn20.xml").deploy();
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+            
+            assertThatThrownBy(() -> cmmnTaskService.complete(task.getId())).isInstanceOf(FlowableException.class)
+                .hasMessageContaining("created by the process engine");
+            
+            assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), null, null, null)).isInstanceOf(FlowableException.class)
+                .hasMessageContaining("created by the process engine");
+
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+            
+            taskService.complete(task.getId());
+            
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        } finally {
+            appRepositoryService.deleteDeployment(deployment.getId(), true);
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
         }
     }
 }

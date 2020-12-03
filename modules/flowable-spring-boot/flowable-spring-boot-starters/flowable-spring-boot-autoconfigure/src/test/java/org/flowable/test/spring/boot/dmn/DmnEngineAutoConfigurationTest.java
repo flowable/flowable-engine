@@ -343,7 +343,8 @@ public class DmnEngineAutoConfigurationTest {
                 tuple("RiskRating", "Risk Rating Decision Table"),
                 tuple("simple", "Full Decision"),
                 tuple("strings1", "Simple decision"),
-                tuple("strings2", "Simple decision")
+                tuple("strings2", "Simple decision"),
+                tuple("decisionService13", "Decision Service 1_3")
             );
     }
 
@@ -357,7 +358,8 @@ public class DmnEngineAutoConfigurationTest {
                 tuple("simple", "Full Decision"),
                 tuple("strings1", "Simple decision"),
                 tuple("strings2", "Simple decision"),
-                tuple("managerApprovalNeeded", "Manager approval needed2")
+                tuple("managerApprovalNeeded", "Manager approval needed2"),
+                tuple("decisionService13", "Decision Service 1_3")
             );
         
         DmnDecision definition = repositoryService.createDecisionQuery().latestVersion().decisionKey("strings1").singleResult();

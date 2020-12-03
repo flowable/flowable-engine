@@ -24,29 +24,12 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class UserTaskConverterTest extends AbstractConverterTest {
+class UserTaskConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "usertaskmodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("usertaskmodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("usertask");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(UserTask.class, userTask -> {

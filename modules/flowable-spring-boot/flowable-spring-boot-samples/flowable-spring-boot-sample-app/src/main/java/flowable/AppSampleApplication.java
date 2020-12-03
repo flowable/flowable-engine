@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(proxyBeanMethods = false)
 public class AppSampleApplication {
 
-   public static void main(String args[]) {
+   public static void main(String[] args) {
         SpringApplication.run(AppSampleApplication.class, args);
     }
 

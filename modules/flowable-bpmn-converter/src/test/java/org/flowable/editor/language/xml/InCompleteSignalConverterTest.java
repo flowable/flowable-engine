@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.readXMLFile;
 
 import java.util.List;
 
@@ -24,17 +25,12 @@ import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
 import org.junit.jupiter.api.Test;
 
-public class InCompleteSignalConverterTest extends AbstractConverterTest {
+class InCompleteSignalConverterTest {
 
     @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
+    void convertXMLToModel() {
+        BpmnModel bpmnModel = readXMLFile("incompletesignalmodel.bpmn");
         validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "incompletesignalmodel.bpmn";
     }
 
     private void validateModel(BpmnModel model) {

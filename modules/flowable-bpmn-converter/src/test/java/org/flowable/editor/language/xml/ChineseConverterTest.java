@@ -15,25 +15,14 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.junit.jupiter.api.Test;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ChineseConverterTest extends AbstractConverterTest {
+class ChineseConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
+    @BpmnXmlConverterTest("chinese.bpmn")
+    void validateModel(BpmnModel bpmnModel) {
         assertThat(bpmnModel).isNotNull();
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        assertThat(parsedModel).isNotNull();
-    }
-
-    @Override
-    protected String getResource() {
-        return "chinese.bpmn";
+        assertThat(bpmnModel.getMainProcess().findFlowElementsOfType(UserTask.class).get(0).getName()).isEqualTo("中文名称去");
     }
 }

@@ -22,12 +22,12 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * @see <a href="https://github.com/flowable/flowable-engine/issues/474">Issue 474</a>
  */
-public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
+class MultiInstanceTaskConverterTest {
 	private static final String PARTICIPANT_VALUE = "[\n" +
 "                   {\n" +
 "                     \"principalType\" : \"User\",\n" +
@@ -43,25 +43,8 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
 "                   }\n" +
 "                 ]";
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "multiinstancemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("multiinstancemodel.bpmn")
+    void validateModel(BpmnModel model) {
         Process main = model.getMainProcess();
 
         // verify start
