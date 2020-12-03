@@ -287,9 +287,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         FlowElement flowNode = execution.getCurrentFlowElement();
 
         return FlowableEventBuilder.createMultiInstanceActivityCompletedEvent(eventType,
-                (int) execution.getVariable(NUMBER_OF_INSTANCES),
-                (int) execution.getVariable(NUMBER_OF_ACTIVE_INSTANCES),
-                (int) execution.getVariable(NUMBER_OF_COMPLETED_INSTANCES),
+                getLoopVariable(execution, NUMBER_OF_INSTANCES),
+                getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES),
+                getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES),
                 flowNode.getId(),
                 flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode);
     }
