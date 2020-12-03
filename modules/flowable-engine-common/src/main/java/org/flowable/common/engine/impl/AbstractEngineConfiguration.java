@@ -981,7 +981,8 @@ public abstract class AbstractEngineConfiguration {
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
+                allConfigurators.sort(new Comparator<EngineConfigurator>() {
+
                     @Override
                     public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
                         int priority1 = configurator1.getPriority();
