@@ -55,12 +55,6 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
 
-        <!-- JSON -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-json-org</artifactId>
-        </dependency>
-
         <!-- COMMON dependencies -->
         <dependency>
             <groupId>org.apache.commons</groupId>
