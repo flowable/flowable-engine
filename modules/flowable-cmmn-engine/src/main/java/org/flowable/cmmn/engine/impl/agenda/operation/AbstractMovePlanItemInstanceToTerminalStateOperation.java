@@ -293,7 +293,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                 .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
                 .list();
 
-        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity, aggregations, cmmnEngineConfiguration);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity, aggregations.getAggregations(), cmmnEngineConfiguration);
 
         Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
 
@@ -313,7 +313,11 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
                 Object value = aggregator.aggregateMulti(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
 
-                planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+                if (aggregation.isStoreAsTransientVariable()) {
+                    planItemInstanceEntity.getParentVariableScope().setTransientVariable(varName, value);
+                } else {
+                    planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+                }
             } else {
                 planItemInstanceEntity.getParentVariableScope().removeVariable(varName);
             }

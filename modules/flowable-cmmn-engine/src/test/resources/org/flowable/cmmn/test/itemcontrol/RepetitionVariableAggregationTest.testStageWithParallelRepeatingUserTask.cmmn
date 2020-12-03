@@ -11,7 +11,7 @@
                         <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
                                         flowable:elementIndexVariable="itemIndex">
                             <extensionElements>
-                                <flowable:variableAggregation target="reviews">
+                                <flowable:variableAggregation target="reviews" createOverviewVariable="true">
                                     <variable source="approved"/>
                                     <variable source="description"/>
                                     <variable sourceExpression="${repetitionCounter}" target="task"/>

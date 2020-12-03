@@ -171,6 +171,147 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     }
 
     @Test
+    @Deployment
+    public void testParallelMultiInstanceUserTaskWithoutCreateOverview() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        VariableInstance reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        taskService.complete(tasks.get(1).getId(), variables);
+
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        taskService.complete(tasks.get(2).getId(), variables);
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviews).isNotNull();
+        assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviews.getValue())
+            .isEqualTo(
+                "["
+                + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
+                + "]");
+
+        assertNoAggregatedVariables();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceUserTaskStoreAsTransient() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        VariableInstance reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        taskService.complete(tasks.get(1).getId(), variables);
+
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        taskService.complete(tasks.get(2).getId(), variables);
+
+        assertVariablesNotVisibleForProcessInstance(processInstance);
+
+        reviews = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "firstDescription")).isEqualTo("description task 0");
+
+        assertNoAggregatedVariables();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+
+            HistoricVariableInstance historicFirstDescription = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("firstDescription")
+                    .singleResult();
+            assertThat(historicFirstDescription).isNotNull();
+            assertThat(historicFirstDescription.getValue()).isEqualTo("description task 0");
+        }
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
     public void testParallelMultiInstanceUserTaskWithBoundaryEventCancel() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()

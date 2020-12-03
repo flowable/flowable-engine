@@ -1,6 +1,7 @@
 package org.flowable.engine.impl.variable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -172,7 +173,7 @@ public class BpmnAggregation {
 
         String elementIndexVariable = StringUtils.defaultIfBlank(loopCharacteristics.getElementIndexVariable(), "loopCounter");
 
-        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(parentExecution, aggregations, processEngineConfiguration);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(parentExecution, aggregations.getOverviewAggregations(), processEngineConfiguration);
         VariableAggregationDefinition aggregation = aggregationsByTarget.get(targetVarName);
         VariableAggregator aggregator = resolveVariableAggregator(aggregation, parentExecution);
 
@@ -271,11 +272,11 @@ public class BpmnAggregation {
     }
 
     public static Map<String, VariableAggregationDefinition> groupAggregationsByTarget(DelegateExecution multiInstanceRootExecution,
-            VariableAggregationDefinitions aggregations, ProcessEngineConfigurationImpl processEngineConfiguration) {
+            Collection<VariableAggregationDefinition> aggregations, ProcessEngineConfigurationImpl processEngineConfiguration) {
 
         Map<String, VariableAggregationDefinition> aggregationsByTarget = new HashMap<>();
 
-        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+        for (VariableAggregationDefinition aggregation : aggregations) {
             String targetVarName = getAggregationTargetVarName(aggregation, multiInstanceRootExecution, processEngineConfiguration);
             aggregationsByTarget.put(targetVarName, aggregation);
         }

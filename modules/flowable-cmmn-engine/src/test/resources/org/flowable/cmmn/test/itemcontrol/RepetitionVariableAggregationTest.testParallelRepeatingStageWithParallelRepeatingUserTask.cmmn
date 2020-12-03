@@ -8,7 +8,7 @@
                     <repetitionRule flowable:collectionVariable="myCollection" flowable:elementVariable="item" flowable:elementIndexVariable="itemIndex"
                                     flowable:counterVariable="stageRepetitionCounter">
                         <extensionElements>
-                            <flowable:variableAggregation target="reviews">
+                            <flowable:variableAggregation target="reviews" createOverviewVariable="true">
                                 <variable source="taskOneReviews" target="first"/>
                                 <variable source="taskTwoReviews" target="second"/>
                             </flowable:variableAggregation>
@@ -23,7 +23,7 @@
                         <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
                                         flowable:elementIndexVariable="itemIndex">
                             <extensionElements>
-                                <flowable:variableAggregation target="taskOneReviews">
+                                <flowable:variableAggregation target="taskOneReviews" createOverviewVariable="true">
                                     <variable source="approved"/>
                                     <variable source="description"/>
                                     <variable sourceExpression="${stageRepetitionCounter * 10 + repetitionCounter}" target="task"/>
@@ -37,7 +37,7 @@
                         <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
                                         flowable:elementIndexVariable="itemIndex">
                             <extensionElements>
-                                <flowable:variableAggregation target="taskTwoReviews">
+                                <flowable:variableAggregation target="taskTwoReviews" createOverviewVariable="true">
                                     <variable sourceExpression="${vars:getOrDefault(myScore, 0) * 2}" target="score"/>
                                 </flowable:variableAggregation>
                             </extensionElements>

@@ -128,6 +128,12 @@ public class PlanItemControlExport implements CmmnXmlConstants {
 
                 CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, aggregation.getTarget(), xtw);
                 CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, aggregation.getTargetExpression(), xtw);
+                if (aggregation.isStoreAsTransientVariable()) {
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE, "true", xtw);
+                }
+                if (aggregation.isCreateOverviewVariable()) {
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW, "true", xtw);
+                }
                 if (StringUtils.isNotEmpty(aggregation.getImplementationType())) {
                     CmmnXmlUtil.writeDefaultAttribute(aggregation.getImplementationType(), aggregation.getImplementation(), xtw);
                 }

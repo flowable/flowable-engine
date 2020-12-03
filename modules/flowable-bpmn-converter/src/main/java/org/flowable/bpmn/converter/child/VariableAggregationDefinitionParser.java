@@ -48,6 +48,8 @@ public class VariableAggregationDefinitionParser extends BaseChildElementParser 
 
         aggregationDefinition.setTarget(xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET));
         aggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+        aggregationDefinition.setStoreAsTransientVariable(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE)));
+        aggregationDefinition.setCreateOverviewVariable(Boolean.parseBoolean(xtr.getAttributeValue(null, ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW)));
 
         multiInstanceLoopCharacteristics.addAggregation(aggregationDefinition);
 

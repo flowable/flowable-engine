@@ -28,6 +28,9 @@ public class VariableAggregationDefinition {
     protected String targetExpression;
     protected List<Variable> definitions;
 
+    protected boolean storeAsTransientVariable;
+    protected boolean createOverviewVariable;
+
     public String getImplementationType() {
         return implementationType;
     }
@@ -76,6 +79,22 @@ public class VariableAggregationDefinition {
         definitions.add(definition);
     }
 
+    public boolean isStoreAsTransientVariable() {
+        return storeAsTransientVariable;
+    }
+
+    public void setStoreAsTransientVariable(boolean storeAsTransientVariable) {
+        this.storeAsTransientVariable = storeAsTransientVariable;
+    }
+
+    public boolean isCreateOverviewVariable() {
+        return createOverviewVariable;
+    }
+
+    public void setCreateOverviewVariable(boolean createOverviewVariable) {
+        this.createOverviewVariable = createOverviewVariable;
+    }
+
     @Override
     public VariableAggregationDefinition clone() {
         VariableAggregationDefinition aggregation = new VariableAggregationDefinition();
@@ -97,6 +116,8 @@ public class VariableAggregationDefinition {
 
             setDefinitions(newDefinitions);
         }
+        setStoreAsTransientVariable(otherVariableDefinitionAggregation.isStoreAsTransientVariable());
+        setCreateOverviewVariable(otherVariableDefinitionAggregation.isCreateOverviewVariable());
     }
 
     public static class Variable {

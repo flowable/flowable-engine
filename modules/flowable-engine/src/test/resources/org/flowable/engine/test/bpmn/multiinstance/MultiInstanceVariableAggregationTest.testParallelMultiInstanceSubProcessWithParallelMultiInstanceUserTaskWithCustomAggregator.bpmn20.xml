@@ -14,7 +14,7 @@
 
             <multiInstanceLoopCharacteristics isSequential="false" flowable:elementIndexVariable="subProcessLoopCounter">
                 <extensionElements>
-                    <flowable:variableAggregation target="reviews" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceVariableAggregationTest$CustomVariableAggregator">
+                    <flowable:variableAggregation target="reviews" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceVariableAggregationTest$CustomVariableAggregator" createOverviewVariable="true">
                         <variable source="taskOneReviews" />
                         <variable source="taskTwoReviews" />
                     </flowable:variableAggregation>
@@ -28,7 +28,7 @@
             <userTask id="userTaskOne" name="task one" flowable:category="Category ${subProcessLoopCounter * 10 + loopCounter}" >
                 <multiInstanceLoopCharacteristics isSequential="false">
                     <extensionElements>
-                        <flowable:variableAggregation target="taskOneReviews">
+                        <flowable:variableAggregation target="taskOneReviews" createOverviewVariable="true">
                             <variable source="approved"  />
                             <variable source="description" />
                             <variable sourceExpression="${subProcessLoopCounter * 10 + loopCounter}" target="task" />
@@ -43,7 +43,7 @@
             <userTask id="userTaskTwo" name="task two" flowable:category="Category ${subProcessLoopCounter * 10 + loopCounter}" >
                 <multiInstanceLoopCharacteristics isSequential="false">
                     <extensionElements>
-                        <flowable:variableAggregation target="taskTwoReviews">
+                        <flowable:variableAggregation target="taskTwoReviews" createOverviewVariable="true">
                             <variable sourceExpression="${vars:getOrDefault(myScore, 0) * 2}" target="score" />
                         </flowable:variableAggregation>
                     </extensionElements>

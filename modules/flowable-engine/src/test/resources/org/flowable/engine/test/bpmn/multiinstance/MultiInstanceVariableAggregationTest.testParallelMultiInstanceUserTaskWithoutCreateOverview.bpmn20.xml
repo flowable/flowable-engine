@@ -14,7 +14,7 @@
 
             <multiInstanceLoopCharacteristics isSequential="false">
                 <extensionElements>
-                    <flowable:variableAggregation target="reviews" createOverviewVariable="true">
+                    <flowable:variableAggregation target="reviews">
                         <variable sourceExpression="${task:get(taskId).assignee}" target="userId" />
                         <variable source="approved"  />
                         <variable source="description" />

@@ -12,8 +12,6 @@
  */
 package org.flowable.bpmn.converter.export;
 
-import static org.flowable.bpmn.constants.BpmnXMLConstants.ATTRIBUTE_IOPARAMETER_TARGET;
-
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +98,12 @@ public class MultiInstanceExport implements BpmnXMLConstants {
 
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, aggregation.getTarget(), xtw);
                         BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, aggregation.getTargetExpression(), xtw);
+                        if (aggregation.isStoreAsTransientVariable()) {
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE, "true", xtw);
+                        }
+                        if (aggregation.isCreateOverviewVariable()) {
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW, "true", xtw);
+                        }
                         if (StringUtils.isNotEmpty(aggregation.getImplementationType())) {
                             BpmnXMLUtil.writeDefaultAttribute(aggregation.getImplementationType(), aggregation.getImplementation(), xtw);
                         }

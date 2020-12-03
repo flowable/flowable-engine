@@ -135,7 +135,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             int nrOfInstances = 0;
             if (hasVariableAggregationDefinitions(delegateExecution)) {
                 // If there are aggregations we need to create an overview variable for every aggregation
-                Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(delegateExecution, aggregations,
+                Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(delegateExecution, aggregations.getOverviewAggregations(),
                         CommandContextUtil.getProcessEngineConfiguration());
 
                 for (String variableName : aggregationsByTarget.keySet()) {
@@ -216,7 +216,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 .scopeType(ScopeTypes.BPMN_VARIABLE_AGGREGATION)
                 .list();
 
-        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(multiInstanceRootExecution, aggregations, processEngineConfiguration);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(multiInstanceRootExecution, aggregations.getAggregations(), processEngineConfiguration);
 
         Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(instances);
 
@@ -231,7 +231,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             sortVariablesByCounter(varValues, counterVariables);
 
             Object value = aggregator.aggregateMulti(multiInstanceRootExecution, varValues, BaseVariableAggregatorContext.complete(aggregation));
-            multiInstanceRootExecution.getParent().setVariable(varName, value);
+            if (aggregation.isStoreAsTransientVariable()) {
+                multiInstanceRootExecution.getParent().setTransientVariable(varName, value);
+            } else {
+                multiInstanceRootExecution.getParent().setVariable(varName, value);
+            }
         }
     }
 
@@ -334,7 +338,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @Override
     public void interrupted(DelegateExecution execution) {
         if (hasVariableAggregationDefinitions(execution)) {
-            Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(execution, aggregations,
+            Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(execution, aggregations.getOverviewAggregations(),
                     CommandContextUtil.getProcessEngineConfiguration());
 
             for (String variableName : aggregationsByTarget.keySet()) {

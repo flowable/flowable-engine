@@ -14,6 +14,7 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @author Filip Hrisafov
@@ -24,6 +25,13 @@ public class VariableAggregationDefinitions {
 
     public Collection<VariableAggregationDefinition> getAggregations() {
         return aggregations;
+    }
+
+    public Collection<VariableAggregationDefinition> getOverviewAggregations() {
+        return aggregations.stream()
+                // An aggregation is an overview aggregation when it is explicitly set and it is not stored as transient
+                .filter(agg -> agg.isCreateOverviewVariable() && !agg.isStoreAsTransientVariable())
+                .collect(Collectors.toList());
     }
 
     public void setAggregations(Collection<VariableAggregationDefinition> aggregations) {

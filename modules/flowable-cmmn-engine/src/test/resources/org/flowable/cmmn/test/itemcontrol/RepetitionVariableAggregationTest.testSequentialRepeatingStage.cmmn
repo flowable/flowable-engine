@@ -12,7 +12,7 @@
                 <itemControl>
                     <repetitionRule flowable:counterVariable="repetitionCounter">
                         <extensionElements>
-                            <flowable:variableAggregation target="reviews">
+                            <flowable:variableAggregation target="reviews" createOverviewVariable="true">
                                 <variable source="myScore" target="score" />
                                 <variable source="approved" />
                                 <variable source="description" />

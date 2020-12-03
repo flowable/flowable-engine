@@ -395,6 +395,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
             aggregationDefinition.setTarget(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET));
             aggregationDefinition.setTargetExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION));
+            aggregationDefinition.setStoreAsTransientVariable(Boolean.parseBoolean(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE)));
+            aggregationDefinition.setCreateOverviewVariable(Boolean.parseBoolean(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW)));
 
             repetitionRule.addAggregation(aggregationDefinition);
 

@@ -162,6 +162,155 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment
+    public void testSequentialRepeatingUserTaskWithoutCreateOverview() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("repeatingTask")
+            .variable("nrOfLoops", 3)
+            .variable("otherVariable", "Hello World")
+            .start();
+
+        VariableInstance reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 0");
+        cmmnTaskService.setAssignee(task.getId(), "userOne");
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        cmmnTaskService.complete(task.getId(), variables);
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNull();
+
+        assertVariablesNotVisible(caseInstance);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        cmmnTaskService.setAssignee(task.getId(), "userTwo");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        cmmnTaskService.setAssignee(task.getId(), "userThree");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        assertVariablesNotVisible(caseInstance);
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+
+        assertThat(reviews).isNotNull();
+        assertThat(reviews.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThatJson(reviews.getValue())
+            .isEqualTo("["
+                    + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
+                    + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                    + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
+                    + "]");
+
+        assertNoAggregatedVariables();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
+                            + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
+                            + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
+                            + "]");
+        }
+
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testSequentialRepeatingUserTaskStoreAsTransient() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("repeatingTask")
+            .variable("nrOfLoops", 3)
+            .variable("otherVariable", "Hello World")
+            .start();
+
+        VariableInstance reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false);
+        variables.put("description", "description task 0");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        variables.put("approved", true);
+        variables.put("description", "description task 1");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
+        variables.put("approved", false);
+        variables.put("description", "description task 2");
+        cmmnTaskService.complete(task.getId(), variables);
+
+        assertVariablesNotVisible(caseInstance);
+
+        reviews = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
+        assertThat(reviews).isNull();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "firstDescription")).isEqualTo("description task 0");
+
+        assertNoAggregatedVariables();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+
+            HistoricVariableInstance historicFirstDescription = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .variableName("firstDescription")
+                    .singleResult();
+            assertThat(historicFirstDescription).isNotNull();
+            assertThat(historicFirstDescription.getValue()).isEqualTo("description task 0");
+        }
+
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testStageWithSequentialRepeatingUserTask.cmmn")
     public void testTerminateStateWithSequentialRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

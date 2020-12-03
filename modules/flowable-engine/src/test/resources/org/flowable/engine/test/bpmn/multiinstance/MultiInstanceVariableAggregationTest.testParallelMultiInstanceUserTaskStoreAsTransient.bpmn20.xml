@@ -14,8 +14,7 @@
 
             <multiInstanceLoopCharacteristics isSequential="false">
                 <extensionElements>
-                    <flowable:variableAggregation target="reviews" createOverviewVariable="true">
-                        <variable sourceExpression="${task:get(taskId).assignee}" target="userId" />
+                    <flowable:variableAggregation target="reviews" storeAsTransientVariable="true">
                         <variable source="approved"  />
                         <variable source="description" />
                     </flowable:variableAggregation>
@@ -25,10 +24,13 @@
 
         </userTask>
 
-        <sequenceFlow id="flow4" sourceRef="miTasks" targetRef="afterMiTasks" />
+        <sequenceFlow id="flow4" sourceRef="miTasks" targetRef="afterMiService" />
+        <serviceTask id="afterMiService" flowable:expression="${reviews[0].description}" flowable:resultVariableName="firstDescription" />
+
+        <sequenceFlow id="flow5" sourceRef="afterMiService" targetRef="afterMiTasks" />
         <userTask id="afterMiTasks" />
 
-        <sequenceFlow id="flow5" sourceRef="afterMiTasks" targetRef="theEnd" />
+        <sequenceFlow id="flow6" sourceRef="afterMiTasks" targetRef="theEnd" />
         <endEvent id="theEnd" />
 
     </process>

@@ -200,6 +200,8 @@ public interface CmmnXmlConstants {
 
     String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
     String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";
+    String ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE = "storeAsTransientVariable";
+    String ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW = "createOverviewVariable";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

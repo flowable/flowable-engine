@@ -1,6 +1,7 @@
 package org.flowable.cmmn.engine.impl.variable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -171,7 +172,7 @@ public class CmmnAggregation {
 
         VariableScope parentVariableScope = planItemInstance.getParentVariableScope();
 
-        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(parentVariableScope, aggregations, cmmnEngineConfiguration);
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(parentVariableScope, aggregations.getOverviewAggregations(), cmmnEngineConfiguration);
         VariableAggregationDefinition aggregation = aggregationsByTarget.get(targetVarName);
         PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstance);
 
@@ -266,10 +267,10 @@ public class CmmnAggregation {
     }
 
     public static Map<String, VariableAggregationDefinition> groupAggregationsByTarget(VariableScope scope,
-            VariableAggregationDefinitions aggregations, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            Collection<VariableAggregationDefinition> aggregations, CmmnEngineConfiguration cmmnEngineConfiguration) {
         Map<String, VariableAggregationDefinition> aggregationsByTarget = new HashMap<>();
 
-        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+        for (VariableAggregationDefinition aggregation : aggregations) {
             String targetVarName = getAggregationTargetVarName(aggregation, scope, cmmnEngineConfiguration);
             aggregationsByTarget.put(targetVarName, aggregation);
         }

@@ -48,7 +48,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
                 // This is the first repetition counter so we need to create the aggregated overview values
                 // If there are aggregations we need to create an overview variable for every aggregation
                 Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity,
-                        repetitionRule.getAggregations(), CommandContextUtil.getCmmnEngineConfiguration(commandContext));
+                        repetitionRule.getAggregations().getOverviewAggregations(), CommandContextUtil.getCmmnEngineConfiguration(commandContext));
 
                 for (String variableName : aggregationsByTarget.keySet()) {
                     CmmnAggregation bpmnAggregation = new CmmnAggregation(planItemInstanceEntity.getId());
