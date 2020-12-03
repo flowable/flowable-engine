@@ -51,7 +51,7 @@ public abstract class AppEngines {
     public static synchronized void init() {
         if (!isInitialized()) {
             if (appEngines == null) {
-                // Create new map to store CMMN engines if current map is null
+                // Create new map to store App engines if current map is null
                 appEngines = new HashMap<>();
             }
             ClassLoader classLoader = AppEngines.class.getClassLoader();
@@ -59,7 +59,7 @@ public abstract class AppEngines {
             try {
                 resources = classLoader.getResources("flowable.app.cfg.xml");
             } catch (IOException e) {
-                throw new FlowableException("problem retrieving flowable.cmmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+                throw new FlowableException("problem retrieving flowable.app.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
             }
 
             // Remove duplicated configuration URL's using set. Some

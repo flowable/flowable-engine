@@ -145,7 +145,7 @@ public class SpringAutoDeployTest {
         assertThat(appDefinitionQuery.count()).isEqualTo(1);
     }
 
-    // Updating the form file should lead to a new deployment when restarting the Spring container
+    // Updating the app file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterAppDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
@@ -170,7 +170,7 @@ public class SpringAutoDeployTest {
             IoUtil.writeStringToFile(originalAppFileContent, filePath);
         }
 
-        // Assertions come AFTER the file write! Otherwise the form file is
+        // Assertions come AFTER the file write! Otherwise the app file is
         // messed up if the assertions fail.
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
         assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(2);

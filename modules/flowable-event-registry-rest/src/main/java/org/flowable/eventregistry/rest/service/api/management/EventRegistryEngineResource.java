@@ -37,7 +37,7 @@ public class EventRegistryEngineResource {
     @Autowired(required=false)
     protected EventRegistryRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Get engine info", tags = { "Cmmn Engine" })
+    @ApiOperation(value = "Get engine info", tags = { "Event Registry Engine" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })

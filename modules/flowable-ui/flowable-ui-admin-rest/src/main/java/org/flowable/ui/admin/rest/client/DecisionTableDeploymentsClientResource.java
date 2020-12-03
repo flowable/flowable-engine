@@ -70,7 +70,7 @@ public class DecisionTableDeploymentsClientResource extends AbstractClientResour
     }
 
     /**
-     * POST /rest/admin/decision-table-deployments: upload a form deployment
+     * POST /rest/admin/decision-table-deployments: upload a DMN deployment
      */
     @PostMapping(produces = "application/json")
     public JsonNode handleDmnFileUpload(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
