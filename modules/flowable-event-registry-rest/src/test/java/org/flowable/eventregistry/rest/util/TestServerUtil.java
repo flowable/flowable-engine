@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.session.HashSessionIdManager;
-import org.eclipse.jetty.server.session.HashSessionManager;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.flowable.eventregistry.rest.WebConfigurer;
 import org.slf4j.Logger;
@@ -40,9 +37,6 @@ public class TestServerUtil {
         int port = NEXT_PORT.incrementAndGet();
         Server server = new Server(port);
 
-        HashSessionIdManager idmanager = new HashSessionIdManager();
-        server.setSessionIdManager(idmanager);
-
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(configClasses);
         applicationContext.refresh();
@@ -62,11 +56,6 @@ public class TestServerUtil {
         WebConfigurer configurer = new WebConfigurer();
         configurer.setContext(context);
         contextHandler.addEventListener(configurer);
-
-        // Create the SessionHandler (wrapper) to handle the sessions
-        HashSessionManager manager = new HashSessionManager();
-        SessionHandler sessions = new SessionHandler(manager);
-        contextHandler.setHandler(sessions);
 
         return contextHandler;
     }
