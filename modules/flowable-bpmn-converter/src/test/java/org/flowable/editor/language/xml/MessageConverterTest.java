@@ -16,24 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Message;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class MessageConverterTest extends AbstractConverterTest {
+class MessageConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("message.bpmn")
+    void validateModel(BpmnModel model) {
         Message message = model.getMessage("writeReport");
         assertThat(message).isNotNull();
         assertThat(message)
@@ -45,10 +33,5 @@ public class MessageConverterTest extends AbstractConverterTest {
         assertThat(message2)
                 .extracting(Message::getItemRef, Message::getName, Message::getId)
                 .containsExactly("http://foo.bar.com/Examples:writeReportItem2", "newWriteReport2", "writeReport2");
-    }
-
-    @Override
-    protected String getResource() {
-        return "message.bpmn";
     }
 }

@@ -15,7 +15,7 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.3.6.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.10.RELEASE</spring.framework.version>
+		<spring.framework.version>5.2.11.RELEASE</spring.framework.version>
 		<spring.security.version>5.3.5.RELEASE</spring.security.version>
 		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
 		<spring.kafka.version>2.5.8.RELEASE</spring.kafka.version>
@@ -26,6 +26,7 @@
     <camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
+		<groovy.version>3.0.6</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13</junit.version>
@@ -779,7 +780,12 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-jsr223</artifactId>
-				<version>3.0.6</version>
+				<version>${groovy.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.groovy</groupId>
+				<artifactId>groovy</artifactId>
+				<version>${groovy.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -1023,11 +1029,6 @@
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-json-org</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
@@ -1077,7 +1078,7 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.17.2</version>
+				<version>3.18.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

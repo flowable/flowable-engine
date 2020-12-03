@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.bpmn.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,8 @@ public class ScopeUtil {
         }
 
         // signal compensation events in reverse order of their 'created' timestamp
-        Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
+        eventSubscriptions.sort(new Comparator<EventSubscriptionEntity>() {
+
             @Override
             public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
                 return o2.getCreated().compareTo(o1.getCreated());

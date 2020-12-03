@@ -22,29 +22,12 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.ServiceTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ServiceTaskConverterTest extends AbstractConverterTest {
+class ServiceTaskConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "servicetaskmodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("servicetaskmodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {

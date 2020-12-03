@@ -522,7 +522,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
 
                 if (StringUtils.isNotEmpty(userStarterValue)) {
-                    String userStartArray[] = userStarterValue.split(",");
+                    String[] userStartArray = userStarterValue.split(",");
 
                     List<String> userStarters = new ArrayList<>(Arrays.asList(userStartArray));
 
@@ -530,7 +530,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 }
 
                 if (StringUtils.isNotEmpty(groupStarterValue)) {
-                    String groupStarterArray[] = groupStarterValue.split(",");
+                    String[] groupStarterArray = groupStarterValue.split(",");
 
                     List<String> groupStarters = new ArrayList<>(Arrays.asList(groupStarterArray));
 
@@ -654,7 +654,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
 
             if (StringUtils.isNotEmpty(userStarterValue)) {
-                String userStartArray[] = userStarterValue.split(",");
+                String[] userStartArray = userStarterValue.split(",");
 
                 List<String> userStarters = new ArrayList<>(Arrays.asList(userStartArray));
 
@@ -662,7 +662,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             }
 
             if (StringUtils.isNotEmpty(groupStarterValue)) {
-                String groupStarterArray[] = groupStarterValue.split(",");
+                String[] groupStarterArray = groupStarterValue.split(",");
 
                 List<String> groupStarters = new ArrayList<>(Arrays.asList(groupStarterArray));
 

@@ -22,29 +22,12 @@ import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CallActivityConverterTest extends AbstractConverterTest {
+class CallActivityConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "callactivity.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("callactivity.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
         assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;

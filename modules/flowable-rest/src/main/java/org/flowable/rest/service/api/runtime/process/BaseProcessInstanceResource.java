@@ -129,6 +129,12 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getStartedAfter() != null) {
             query.startedAfter(queryRequest.getStartedAfter());
         }
+        if (queryRequest.getActiveActivityId() != null) {
+            query.activeActivityId(queryRequest.getActiveActivityId());
+        }
+        if (queryRequest.getActiveActivityIds() != null) {
+            query.activeActivityIds(queryRequest.getActiveActivityIds());
+        }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
         }

@@ -1,0 +1,2521 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<semantic:definitions xmlns:semantic="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:include1="http://www.trisotech.com/dmn/definitions/_5e8e877a-af87-434b-9c36-ed51c8d6b514" xmlns="http://www.trisotech.com/definitions/_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4" id="_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4" namespace="http://www.trisotech.com/definitions/_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4" exporter="DMN Modeler" exporterVersion="6.0.7" name="Chapter 11 Example">
+	<semantic:extensionElements/>
+	<semantic:import namespace="http://www.trisotech.com/dmn/definitions/_5e8e877a-af87-434b-9c36-ed51c8d6b514" name="Financial" importType="http://www.omg.org/spec/DMN/20180521/MODEL/"/>
+	<semantic:itemDefinition isCollection="false" name="tStrategy" label="tStrategy">
+		<semantic:typeRef>feel:string</semantic:typeRef>
+		<semantic:allowedValues>
+			<semantic:text>"DECLINE","BUREAU","THROUGH"</semantic:text>
+		</semantic:allowedValues>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tEligibility" label="tEligibility">
+		<semantic:typeRef>feel:string</semantic:typeRef>
+		<semantic:allowedValues>
+			<semantic:text>"INELIGIBLE","ELIGIBLE"</semantic:text>
+		</semantic:allowedValues>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tBureauCallType" label="tBureauCallType">
+		<semantic:typeRef>feel:string</semantic:typeRef>
+		<semantic:allowedValues>
+			<semantic:text>"FULL","MINI","NONE"</semantic:text>
+		</semantic:allowedValues>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tRiskCategory" label="tRiskCategory">
+		<semantic:typeRef>feel:string</semantic:typeRef>
+		<semantic:allowedValues>
+			<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+		</semantic:allowedValues>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tApplicantData" label="tApplicantData">
+		<semantic:itemComponent isCollection="false" name="Age" id="_df3aab6f-1610-41fa-a407-09678a89d6da">
+			<semantic:typeRef>feel:number</semantic:typeRef>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="MartitalStatus" id="_d39ad810-7781-4ffb-9644-de51d1ca7f7a">
+			<semantic:typeRef>feel:string</semantic:typeRef>
+			<semantic:allowedValues>
+				<semantic:text>"S","M"</semantic:text>
+			</semantic:allowedValues>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="EmploymentStatus" id="_9242f7aa-a9fc-451e-a8ee-60f1ff992664">
+			<semantic:typeRef>feel:string</semantic:typeRef>
+			<semantic:allowedValues>
+				<semantic:text>"EMPLOYED","SELF-EMPLOYED","STUDENT","UNEMPLOYED"</semantic:text>
+			</semantic:allowedValues>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="ExistingCustomer" id="_5b4cce4a-bb99-41d5-99f2-0b2d7deeea8e">
+			<semantic:typeRef>feel:boolean</semantic:typeRef>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="Monthly" id="_c3ad187d-246f-4707-aa05-b9d5d8da1f58">
+			<semantic:itemComponent isCollection="false" name="Income" id="_0ff9ec7c-ef0f-425a-af5c-d251135e3631">
+				<semantic:typeRef>feel:number</semantic:typeRef>
+			</semantic:itemComponent>
+			<semantic:itemComponent isCollection="false" name="Repayments" id="_d4389c69-0a87-4db9-96fa-99674bff6b97">
+				<semantic:typeRef>feel:number</semantic:typeRef>
+			</semantic:itemComponent>
+			<semantic:itemComponent isCollection="false" name="Expenses" id="_c0bd1a20-826f-4fe4-86bc-b6cca2af06a1">
+				<semantic:typeRef>feel:number</semantic:typeRef>
+			</semantic:itemComponent>
+		</semantic:itemComponent>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tBureauData" label="tBureauData">
+		<semantic:itemComponent isCollection="false" name="Bankrupt" id="_4b58e0c0-649b-472a-8a28-f8dde1e40068">
+			<semantic:typeRef>feel:boolean</semantic:typeRef>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="CreditScore" id="_42350ffd-8f82-4500-b9cb-696758cc287e">
+			<semantic:typeRef>feel:number</semantic:typeRef>
+			<semantic:allowedValues>
+				<semantic:text>[0..999], null</semantic:text>
+			</semantic:allowedValues>
+		</semantic:itemComponent>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tRouting" label="tRouting">
+		<semantic:typeRef>feel:string</semantic:typeRef>
+		<semantic:allowedValues>
+			<semantic:text>"DECLINE","REFER","ACCEPT"</semantic:text>
+		</semantic:allowedValues>
+	</semantic:itemDefinition>
+	<semantic:itemDefinition isCollection="false" name="tRequestedProduct" label="tRequestedProduct">
+		<semantic:itemComponent isCollection="false" name="ProductType" id="_c993adad-698b-477d-a395-f4021d38ef8b">
+			<semantic:typeRef>feel:string</semantic:typeRef>
+			<semantic:allowedValues>
+				<semantic:text>"STANDARD LOAN","SPECIAL LOAN"</semantic:text>
+			</semantic:allowedValues>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="Rate" id="_5ddc6d4c-67d2-4a00-a9c0-3614d228964b">
+			<semantic:typeRef>feel:number</semantic:typeRef>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="Term" id="_4e47a0e8-ab4a-46a2-ae8c-209401ebdd8f">
+			<semantic:typeRef>feel:number</semantic:typeRef>
+		</semantic:itemComponent>
+		<semantic:itemComponent isCollection="false" name="Amount" id="_24103ee1-2867-4e01-abfc-d40b3aed0ce5">
+			<semantic:typeRef>feel:number</semantic:typeRef>
+		</semantic:itemComponent>
+	</semantic:itemDefinition>
+	<semantic:decision id="_4bd33d4a-741b-444a-968b-64e1841211e7" name="Adjudication">
+		<semantic:variable name="Adjudication" id="_12f285f8-ae4e-4421-98bd-d9b1fd236e10"/>
+		<semantic:informationRequirement id="_290b4df4-ffe6-4106-9e22-07a339146161">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_5046fe50-d2f2-4e54-b1e4-e7de5ffd4bb2">
+			<semantic:requiredInput href="#_e91de815-22ba-431c-8b46-55891f2a1ef6"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_3a4e82d4-7a7a-43c7-9528-efa8b9e69e7c">
+			<semantic:requiredDecision href="#_ca1e6032-12eb-428a-a80b-49028a88c0b5"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_7fc499b6-a180-4e16-80cd-58df441f4d38">
+			<semantic:requiredInput href="#_34cd3187-8764-4249-959d-2664bf9f1847"/>
+		</semantic:informationRequirement>
+		<semantic:authorityRequirement id="_dabc7bb7-b8be-4654-9f7e-455481cb1c4e">
+			<semantic:requiredAuthority href="#_989d137f-86ff-4249-813f-af67c08a2762"/>
+		</semantic:authorityRequirement>
+	</semantic:decision>
+	<semantic:knowledgeSource id="_989d137f-86ff-4249-813f-af67c08a2762" name="Credit officer"/>
+	<semantic:inputData id="_34cd3187-8764-4249-959d-2664bf9f1847" name="Supporting documents">
+		<semantic:variable name="Supporting documents" id="_d996b907-be17-4ff1-a54e-6fe7d62f55b1" typeRef="feel:string"/>
+	</semantic:inputData>
+	<semantic:decision id="_5b8356f3-2cf2-40e8-8f80-324937e8b276" name="Bureau call type">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Bureau call type&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;invokes the Bureau call type&amp;nbsp;&lt;/span&gt;table, passing the output of the Pre-bureau risk category decision as the Pre-Bureau Risk Category parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Bureau call type" id="_207da57c-29a0-487b-b591-751807636337" typeRef="tBureauCallType"/>
+		<semantic:informationRequirement id="_a34e38e6-5d10-46d5-ae80-41c3045c73df">
+			<semantic:requiredDecision href="#_9997fcfd-0f50-4933-939e-88a235b5e2a0"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_18fda7ab-ca43-4860-a94b-760d3cd68ce2">
+			<semantic:requiredKnowledge href="#_a654be71-b54d-4d6e-90f0-ae505125e9a6"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_af620f30-1376-4a5d-b6b8-42ec7ebc48bd">
+			<semantic:literalExpression id="literal__af620f30-1376-4a5d-b6b8-42ec7ebc48bd">
+				<semantic:text>Bureau call type table</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_8f5b7ce8-b4f9-4af4-8aa5-5580682382c6" name="Pre-Bureau Risk Category"/>
+				<semantic:literalExpression id="_40020f96-0afd-405c-828a-0aa6684d150d">
+					<semantic:text>Pre-bureau risk category</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:decision id="_8b838f06-968a-4c66-875e-f5412fd692cf" name="Strategy">
+		<semantic:description>&lt;p&gt;&lt;span style="font-size: 10pt; font-family: arial, helvetica, sans-serif;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Strategy&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;defines a complete, unique-hit decision table deriving Strategy from&amp;nbsp;&lt;/span&gt;Eligibility and Bureau call type.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Strategy" id="_80c9b3dd-f6c3-412b-9ee9-48e3e0812746" typeRef="tStrategy"/>
+		<semantic:informationRequirement id="_114baf7e-1b8f-489a-98c9-e7d26d330119">
+			<semantic:requiredDecision href="#_5b8356f3-2cf2-40e8-8f80-324937e8b276"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_b7de8dff-4db7-4ef0-8412-0d3fe09955d7">
+			<semantic:requiredDecision href="#_b5e759df-f662-44cd-94f5-55c3c81f0ee3"/>
+		</semantic:informationRequirement>
+		<semantic:decisionTable id="_0991d970-7c58-4669-89ec-a5e3e9d264df" hitPolicy="UNIQUE" outputLabel="Strategy">
+			<semantic:input id="_661471d5-5028-4910-b070-1e3bad0125c7">
+				<semantic:inputExpression typeRef="tEligibility">
+					<semantic:text>Eligibility</semantic:text>
+				</semantic:inputExpression>
+				<semantic:inputValues>
+					<semantic:text>"INELIGIBLE","ELIGIBLE"</semantic:text>
+				</semantic:inputValues>
+			</semantic:input>
+			<semantic:input id="_b48e30f7-0a90-42d0-ba06-ad931fdfe5da">
+				<semantic:inputExpression typeRef="tBureauCallType">
+					<semantic:text>Bureau call type</semantic:text>
+				</semantic:inputExpression>
+				<semantic:inputValues>
+					<semantic:text>"FULL","MINI","NONE"</semantic:text>
+				</semantic:inputValues>
+			</semantic:input>
+			<semantic:output id="_f722c4f0-299d-4492-9b0c-fa0177239d08">
+				<semantic:outputValues>
+					<semantic:text>"DECLINE","BUREAU","THROUGH"</semantic:text>
+				</semantic:outputValues>
+			</semantic:output>
+			<semantic:rule id="_799a874e-d695-4683-9774-a4a911bbda7c">
+				<semantic:inputEntry id="_a1e93932-14d9-41aa-b408-418df532584e">
+					<semantic:text>"INELIGIBLE"</semantic:text>
+				</semantic:inputEntry>
+				<semantic:inputEntry id="_46a2c9c2-10ba-4ebd-b596-d8d50ef4e27d">
+					<semantic:text>-</semantic:text>
+				</semantic:inputEntry>
+				<semantic:outputEntry id="_ddad297d-4a7e-45b4-bfc5-78cfc1504f8e">
+					<semantic:text>"DECLINE"</semantic:text>
+				</semantic:outputEntry>
+			</semantic:rule>
+			<semantic:rule id="_8e10bf87-3308-4cb5-84fd-231656eb15f3">
+				<semantic:inputEntry id="_27b85f52-29db-4114-8393-4c307fda69de">
+					<semantic:text>"ELIGIBLE"</semantic:text>
+				</semantic:inputEntry>
+				<semantic:inputEntry id="_658b9e6d-4039-4a30-a14f-b9af59e9ff3e">
+					<semantic:text>"FULL", "MINI"</semantic:text>
+				</semantic:inputEntry>
+				<semantic:outputEntry id="_4099772e-6ec4-48e2-a4ac-daa6d7aa1148">
+					<semantic:text>"BUREAU"</semantic:text>
+				</semantic:outputEntry>
+			</semantic:rule>
+			<semantic:rule id="_cec87cd2-9715-47b2-97df-087698d8fc70">
+				<semantic:inputEntry id="_617a19de-dd6d-4448-be7b-dc5c0f57de9c">
+					<semantic:text>"ELIGIBLE"</semantic:text>
+				</semantic:inputEntry>
+				<semantic:inputEntry id="_0600d1e9-3293-4c91-b0f1-f1fecb10f422">
+					<semantic:text>"NONE"</semantic:text>
+				</semantic:inputEntry>
+				<semantic:outputEntry id="_f17c18da-fb15-401b-88a5-550d1918583b">
+					<semantic:text>"THROUGH"</semantic:text>
+				</semantic:outputEntry>
+			</semantic:rule>
+		</semantic:decisionTable>
+	</semantic:decision>
+	<semantic:decision id="_b5e759df-f662-44cd-94f5-55c3c81f0ee3" name="Eligibility">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Eligibility&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the Eligibility rules business&amp;nbsp;&lt;/span&gt;knowledge model, passing Applicant data.Age as the Age parameter, the output of the Pre-bureau risk category decision as the Pre-Bureau Risk Category parameter, and the output of the Pre-bureau affordability decision as the Pre-Bureau Affordability parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Eligibility" id="_a160fe23-8110-4242-9944-86278d32000e" typeRef="tEligibility"/>
+		<semantic:informationRequirement id="_94475973-9022-46d7-a520-756538ba9c00">
+			<semantic:requiredDecision href="#_9997fcfd-0f50-4933-939e-88a235b5e2a0"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_f9db6cb4-f2d6-4e7f-8b04-37f9139dd6c3">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_a1f0d284-033d-4683-9a0c-13f1184e0503">
+			<semantic:requiredDecision href="#_ed60265c-25e2-400f-a99f-fafd3b489838"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_1c3489b1-44dd-4137-883a-35da157f0c1d">
+			<semantic:requiredKnowledge href="#_dc2ca64d-2044-4806-9d0e-e705b3b14447"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_6c6672bd-8f05-447c-aa7d-29f8d1b7f979">
+			<semantic:literalExpression id="literal__6c6672bd-8f05-447c-aa7d-29f8d1b7f979">
+				<semantic:text>Eligibility rules</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_07fdfb40-acac-4098-8a66-f09f216cd9ec" name="Age"/>
+				<semantic:literalExpression id="_bbbe553d-dae6-4e29-bbb4-fe602994e8ca">
+					<semantic:text>Applicant data.Age</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_a2bc5321-7041-40c0-be9d-4e53c22442d1" name="Pre-Bureau Risk Category"/>
+				<semantic:literalExpression id="_91986b6f-d45e-4aa7-926d-00b35a47686f">
+					<semantic:text>Pre-bureau risk category</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_c3432a72-40b0-4213-9f94-7f5e8e15ee85" name="Pre-Bureau Affordability"/>
+				<semantic:literalExpression id="_719504be-6121-4c16-9c00-1480b58f2ecb">
+					<semantic:text>Pre-bureau affordability</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:businessKnowledgeModel id="_dc2ca64d-2044-4806-9d0e-e705b3b14447" name="Eligibility rules">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Eligibility rules&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;defines a complete, priority-ordered single hit decision table&amp;nbsp;&lt;/span&gt;deriving Eligibility from Pre-Bureau Risk Category, Pre-Bureau Affordability and Age.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Eligibility rules" id="_fe2d2049-704b-4a88-88be-3d1a56c3d376" typeRef="tEligibility"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Pre-Bureau Risk Category" typeRef="tRiskCategory"/>
+			<semantic:formalParameter name="Pre-Bureau Affordability" typeRef="feel:boolean"/>
+			<semantic:formalParameter name="Age" typeRef="feel:number"/>
+			<semantic:decisionTable id="_7d663660-b2e1-47d1-9870-777b5a695e7f" hitPolicy="PRIORITY" outputLabel="Eligibility rules">
+				<semantic:input id="_2bab5dc0-be18-4098-b9b4-6b3486955d1b">
+					<semantic:inputExpression typeRef="tRiskCategory">
+						<semantic:text>Pre-Bureau Risk Category</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:input id="_836645fe-83ba-4f36-9b6d-279b017c59ea">
+					<semantic:inputExpression typeRef="feel:boolean">
+						<semantic:text>Pre-Bureau Affordability</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_4946be73-cb1e-43b4-ac03-b01e378c298a">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Age</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:output id="_81aab6dd-d832-4c9e-8a3c-55f5f4a89cc7">
+					<semantic:outputValues>
+						<semantic:text>"INELIGIBLE","ELIGIBLE"</semantic:text>
+					</semantic:outputValues>
+				</semantic:output>
+				<semantic:rule id="_3352c79c-5aa5-4f2a-bf7e-c1e24f72a7ed">
+					<semantic:inputEntry id="_51fa1535-776a-411f-ba5d-4915f04adf46">
+						<semantic:text>"DECLINE"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_209c0b4c-7e1f-4758-bb2d-ff56116ebf70">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_e5e44a50-b664-4ce1-8b48-a7c5b73bec50">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f506afa7-a3fe-48d5-8ec6-4bf2cc2dd28b">
+						<semantic:text>"INELIGIBLE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_1e4a3e10-0d85-4160-85eb-6d3ad7adee82">
+					<semantic:inputEntry id="_0366fd41-b16b-4848-8759-1c1b2f5defc9">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_4c4d51a8-0927-47d1-bf5d-732eeaf9af50">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_bc0c7201-97b5-41ea-8427-31a3923d674c">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_3611f774-9b66-468d-be7f-06bf14407161">
+						<semantic:text>"INELIGIBLE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_c871d706-98a2-4d65-903c-7cbd1571f17c">
+					<semantic:inputEntry id="_4e174888-d7ca-4561-aba8-5fd8dfb3b35b">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_6e1f9fc4-69b2-4e8c-bcf9-8878ec8bd455">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a120264e-f028-4b2b-8b94-b29b68aa5499">
+						<semantic:text>&lt; 18</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_504ac7aa-2538-48d1-b518-f10a5ff1d87c">
+						<semantic:text>"INELIGIBLE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_11673d64-2390-42c1-bc6f-43074ee90097">
+					<semantic:inputEntry id="_d1ca6c94-6088-43be-bcfe-83b9de492d8a">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_c19d2814-6733-46dc-92cc-48c7b0e59fa8">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_bac13f3d-00eb-49f7-b715-0d379562c1c3">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_0d0dd4a4-0468-44cc-97fc-6cf243ee28b9">
+						<semantic:text>"ELIGIBLE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_e8e3eaaf-3f57-49d7-b5c3-41eb57ecbbe7">
+			<semantic:requiredAuthority href="#_a5f9b126-7853-4037-9e23-3dd7e93c4032"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:knowledgeSource id="_a5f9b126-7853-4037-9e23-3dd7e93c4032" name="Product specification"/>
+	<semantic:businessKnowledgeModel id="_536d7a39-87a6-4651-b743-6ee03e16e535" name="Routing rules">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Routing Rules&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic defines a complete, priority-ordered single hit decision table&amp;nbsp;&lt;/span&gt;deriving Routing from Post-Bureau Risk Category, Post-Bureau Affordability, Bankrupt and Credit Score.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Routing rules" id="_08f4f63e-54e4-4b19-b0d2-08aeed21605c" typeRef="tRouting"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Post-bureau risk category" typeRef="tRiskCategory"/>
+			<semantic:formalParameter name="Post-bureau affordability" typeRef="feel:boolean"/>
+			<semantic:formalParameter name="Bankrupt" typeRef="feel:boolean"/>
+			<semantic:formalParameter name="Credit score" typeRef="feel:number"/>
+			<semantic:decisionTable id="_4dfddea8-3c8e-400a-97bc-dcba00876c34" hitPolicy="PRIORITY" outputLabel="Routing rules">
+				<semantic:input id="_b3bde44f-2274-41d5-8e04-5cb2f7529e6c">
+					<semantic:inputExpression typeRef="tRiskCategory">
+						<semantic:text>Post-bureau risk category</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:input id="_edb3efb0-2fea-4d55-9b5f-ae279ad5ecaa">
+					<semantic:inputExpression typeRef="feel:boolean">
+						<semantic:text>Post-bureau affordability</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_1fbd45e7-99d5-497d-beb0-a643dd558b63">
+					<semantic:inputExpression typeRef="feel:boolean">
+						<semantic:text>Bankrupt</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_83878ad8-a1fc-43b0-b601-f1b093e39b48">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Credit score</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>null, [0..999]</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:output id="_109021ab-349a-47f0-9c9e-564a9fbc20e8">
+					<semantic:outputValues>
+						<semantic:text>"DECLINE","REFER","ACCEPT"</semantic:text>
+					</semantic:outputValues>
+				</semantic:output>
+				<semantic:rule id="_b9e04531-35ba-4562-9c9e-2a6900315e1c">
+					<semantic:inputEntry id="_2844a3b1-bdcf-49f0-9c5c-f80990077a43">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_7ac71a80-a65f-4b42-b125-682fec1c0cda">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_e3ef460f-b05e-4d54-af1e-355c2d6d191e">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_ec772f81-1eee-475c-872a-596fb40c650c">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_27239ae2-8529-4afd-8981-043bb51d2fb2">
+						<semantic:text>"DECLINE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_3ed8ac44-80a1-4e64-b610-f84d79c5b875">
+					<semantic:inputEntry id="_64077b12-6193-4842-86e2-896290756562">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_07978900-95e3-4102-8916-eb439316c4e1">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_2e822dc4-cba8-4594-82bd-b48b4be2180d">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_b3856c1d-2067-483a-b6ca-ba3c8080f12c">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_684c798b-7ade-4155-ad42-cc111cf920a9">
+						<semantic:text>"DECLINE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_0e511735-f478-4041-97f8-158ea173668b">
+					<semantic:inputEntry id="_9ee5cc2a-42ce-4fc6-b4a2-b6ae3c6590c4">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_be5739cd-c1c9-47ca-af91-47109d2c288a">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_f4f9d322-ca0a-4a24-a967-916aa32f5136">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_fda948c5-43a7-4023-9c52-4020007ca482">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_000ea279-76af-4c1a-a2d6-b8eda969df7a">
+						<semantic:text>"REFER"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_06c90e6c-99d1-4c99-a443-374ab1288c1b">
+					<semantic:inputEntry id="_c87517c4-b47d-4653-a884-3a265dba1ec7">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_0fc27099-c992-4041-b164-9c4d1dddb462">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_527df004-e723-46de-9475-aa2db4e0f4f7">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_dbc688c4-064b-4fe1-ab7e-6992d6cbaf61">
+						<semantic:text>&lt; 580</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_20941825-2c8b-4d94-9fde-0b3039b12a3c">
+						<semantic:text>"REFER"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_3a1673bb-17ae-4b62-b686-d8ecc0f4657b">
+					<semantic:inputEntry id="_7e258e45-824d-402b-b6e5-a46088e90e1e">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_2f51bdea-d5bc-4b8e-ac34-ae093f1ae170">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_913c21a5-d028-4c3b-8482-83d2a5eae2c6">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_4665c331-032d-4489-97bf-4e19eead103e">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f77e29ae-79a3-4f1d-9eed-7b3795031861">
+						<semantic:text>"ACCEPT"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_57d99f5f-48e1-456c-ab7c-4247e840a7fc">
+			<semantic:requiredAuthority href="#_a5f9b126-7853-4037-9e23-3dd7e93c4032"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:decision id="_ca1e6032-12eb-428a-a80b-49028a88c0b5" name="Routing">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Routing&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the Routing rules business&amp;nbsp;&lt;/span&gt;knowledge model, passing Bureau data . Bankrupt as the Bankrupt parameter, Bureau data . CreditScore as the Credit Score parameter, the output of the Post-bureau risk category decision as the Post-Bureau Risk Category parameter, and the output of the Post-bureau affordability decision as the Post-Bureau Affordability parameter. Note that if Bureau data is null (due to the THROUGH strategy bypassing the Collect bureau data task) the Bankrupt and Credit Score parameters will be null.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Routing" id="_da1b4341-41b8-4b67-b33a-f54d2782cf4e" typeRef="tRouting"/>
+		<semantic:informationRequirement id="_132debf9-e318-4710-a226-982da98dd278">
+			<semantic:requiredDecision href="#_728e3a50-f00f-42c0-b3ee-1ee5aabd5474"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_78acd4f1-cd28-4e53-aeaf-594a006a0f1d">
+			<semantic:requiredDecision href="#_40b45659-9299-43a6-af30-04c948c5c0ec"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_ffe200eb-8e0d-4941-9707-9a100fc8e123">
+			<semantic:requiredInput href="#_e91de815-22ba-431c-8b46-55891f2a1ef6"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_839ccfec-8902-40ca-8767-df9073f797e5">
+			<semantic:requiredKnowledge href="#_536d7a39-87a6-4651-b743-6ee03e16e535"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_78ce14d2-2c68-454a-b772-075b3f1395c3">
+			<semantic:literalExpression id="literal__78ce14d2-2c68-454a-b772-075b3f1395c3">
+				<semantic:text>Routing rules</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_8a009394-dc06-4ee6-b039-dde94390bf6b" name="Bankrupt"/>
+				<semantic:literalExpression id="_32742ced-8b58-4be0-a6be-d48ab1126f69">
+					<semantic:text>Bureau data.Bankrupt</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_5b79a0ff-62ed-4d3d-b512-ea706cc06f62" name="Credit score"/>
+				<semantic:literalExpression id="_d0e623e6-f72e-47fc-8c2b-5729a72fcf3a">
+					<semantic:text>Bureau data.CreditScore</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_79216390-7bf1-4b14-9b3e-91ee83a5cd4a" name="Post-bureau risk category"/>
+				<semantic:literalExpression id="_30a91838-0f0a-4843-a6d0-6b5a655f36b2">
+					<semantic:text>Post-bureau risk category</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_6edce48a-be0d-4896-af06-f5c05980970b" name="Post-bureau affordability"/>
+				<semantic:literalExpression id="_7a672677-fd20-4174-87f9-ba5e9146ddba">
+					<semantic:text>Post-bureau affordability</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:businessKnowledgeModel id="_a654be71-b54d-4d6e-90f0-ae505125e9a6" name="Bureau call type table">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Bureau call type table&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic defines a complete, unique-hit decision table deriving&amp;nbsp;&lt;/span&gt;Bureau Call Type from Pre-Bureau Risk Category.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Bureau call type table" id="_86c4fcfd-1e5a-41ec-9b62-966cf0eed2d3" typeRef="tBureauCallType"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Pre-Bureau Risk Category" typeRef="tRiskCategory"/>
+			<semantic:decisionTable id="_ebd84888-6db0-4b91-94f4-b3a228bb2901" hitPolicy="UNIQUE" outputLabel="Bureau call type table">
+				<semantic:input id="_92e35546-27e5-43a5-b8e6-85a692f42eb8">
+					<semantic:inputExpression typeRef="tRiskCategory">
+						<semantic:text>Pre-Bureau Risk Category</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:output id="_6254d113-6c92-400f-88d5-fdb340519336">
+					<semantic:outputValues>
+						<semantic:text>"FULL","MINI","NONE"</semantic:text>
+					</semantic:outputValues>
+				</semantic:output>
+				<semantic:rule id="_49d3d12b-8572-4341-9102-6f68667bf81a">
+					<semantic:inputEntry id="_7abba955-f604-4995-aea5-842f7eefa839">
+						<semantic:text>"HIGH", "MEDIUM"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_573aec0a-0759-435a-ba0c-5f27498897a0">
+						<semantic:text>"FULL"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_db49e5ea-da50-4b07-ae82-9db29f3730b9">
+					<semantic:inputEntry id="_1f21c493-c6f2-4b81-92f0-59b6511f9ddd">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_9aa8475c-4b5e-4da3-8f3e-aae70f694f83">
+						<semantic:text>"MINI"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_304ebea6-617f-4f47-949d-aa9ac1dd1227">
+					<semantic:inputEntry id="_d3f0c96c-521d-4228-b073-c945aca7483d">
+						<semantic:text>"VERY LOW", "DECLINE"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_2174bcfa-2d27-44ad-8525-56fce28fb75e">
+						<semantic:text>"NONE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_2cad5b1f-59de-4cf2-9216-b662b2760bff">
+			<semantic:requiredAuthority href="#_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:knowledgeSource id="_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9" name="Risk manager"/>
+	<semantic:businessKnowledgeModel id="_b982a42a-0b62-47fa-8911-6c9d1145d982" name="Credit contingency factor table">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;/span&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Credit contingency factor table&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;&lt;span style="font-size: 10pt; font-family: arial, helvetica, sans-serif;"&gt;decision&lt;/span&gt; logic defines a complete, unique-hit decision table&amp;nbsp;&lt;/span&gt;deriving Credit contingency factor from Risk Category.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Credit contingency factor table" id="_40c0f987-7b90-4c3e-9dcd-411e56f66c92" typeRef="feel:number"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Risk Category" typeRef="tRiskCategory"/>
+			<semantic:decisionTable id="_ad7c587e-64cc-47ec-adc4-515b586f9474" hitPolicy="UNIQUE" outputLabel="Credit contingency factor table">
+				<semantic:input id="_2b8fecfd-e00f-4d4b-acf3-660ca3560ca0">
+					<semantic:inputExpression typeRef="tRiskCategory">
+						<semantic:text>Risk Category</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:output id="_8d0d6fe3-a352-48a7-a35e-1fc1dd192039"/>
+				<semantic:rule id="_21ec60ae-6137-41e2-b8b5-37447708c47b">
+					<semantic:inputEntry id="_8c7e14f8-23db-4645-8b2a-2c69aada207d">
+						<semantic:text>"HIGH", "DECLINE"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_6052bbc0-6f0e-45db-bdd3-3c0ac4c45793">
+						<semantic:text>0.6</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_8c5eb4e3-1902-4bf5-8257-1e21636fc978">
+					<semantic:inputEntry id="_fe0190b4-e2f3-441f-a989-f22e1d425fd8">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_6320ae5d-459e-4775-b492-f9c0d0d492bb">
+						<semantic:text>0.7</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_93e2a1a2-b281-42a4-8e34-865c28557929">
+					<semantic:inputEntry id="_cd63cc67-53a5-480f-abcd-f394e606a7bd">
+						<semantic:text>"LOW", "VERY LOW"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_fdcb46a5-a23c-4e29-93f1-66ce4e3c25da">
+						<semantic:text>0.8</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_07b3ea4d-1eee-4551-b148-b40052f1407a">
+			<semantic:requiredAuthority href="#_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:knowledgeSource id="_18d836e7-6d61-490c-b9a8-be3ce0c60c1e" name="Affordability spreadsheet"/>
+	<semantic:businessKnowledgeModel id="_ee893e8d-f393-4e2c-b871-611a9cd30bf5" name="Affordability calculation">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Affordability calculation&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic defines a boxed function deriving Affordability from&amp;nbsp;&lt;/span&gt;Monthly Income, Monthly Repayments, Monthly Expenses and Required Monthly Installment. One step in this calculation derives Credit contingency factor by invoking the Credit contingency factor table business&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Affordability calculation" id="_80af1aa7-e29c-47fc-9cce-1959a3e1e717" typeRef="feel:boolean"/>
+		<semantic:encapsulatedLogic id="_b3f131dd-5572-4d63-a693-05af46940267" kind="FEEL">
+			<semantic:formalParameter name="Monthly Income" typeRef="feel:number" id="_f916b091-cd6d-44cb-b32b-cc83cc27e333"/>
+			<semantic:formalParameter name="Monthly Repayments" typeRef="feel:number" id="_d68b6438-cba5-4c02-a708-bce0d2762d35"/>
+			<semantic:formalParameter name="Monthly Expenses" typeRef="feel:number" id="_5fd5609d-89ce-463e-a882-6827921edf54"/>
+			<semantic:formalParameter name="Risk Category" typeRef="tRiskCategory" id="_2acfe2aa-892f-4a5c-b9ab-111c7a8bbd40"/>
+			<semantic:formalParameter name="Required Monthly Installment" typeRef="feel:number" id="_3a423c76-11c7-4b66-b86a-07928181a631"/>
+			<semantic:context id="_2f1ed114-938b-49ac-b696-9c1a1ceb0256">
+				<semantic:contextEntry id="_ec37158d-b49b-4ffd-88e0-1e2f05c9a023">
+					<semantic:variable name="Disposable Income" id="_3cc56162-97c1-416e-acb9-3ae81d692e58" typeRef="feel:number"/>
+					<semantic:literalExpression id="_2fcda742-6d7b-49c5-afe6-6b334c8f049b">
+						<semantic:text>Monthly Income - (Monthly Repayments + Monthly Expenses)</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+				<semantic:contextEntry id="_fccafa17-121e-436a-bbed-1927f01a898d">
+					<semantic:variable name="Credit Contingency Factor" id="_0f406bed-56f5-422e-b6c3-ad4892a38291" typeRef="feel:number"/>
+					<semantic:invocation id="_78bc74d6-25a4-4639-8509-186534b3c67a">
+						<semantic:literalExpression id="literal__78bc74d6-25a4-4639-8509-186534b3c67a">
+							<semantic:text>Credit contingency factor table</semantic:text>
+						</semantic:literalExpression>
+						<semantic:binding>
+							<semantic:parameter id="_7fed77e8-7d20-4f3f-9504-2c0c0706bd39" name="Risk Category"/>
+							<semantic:literalExpression id="_a02265a9-3dd1-48cd-a254-84531f28a058">
+								<semantic:text>Risk Category</semantic:text>
+							</semantic:literalExpression>
+						</semantic:binding>
+					</semantic:invocation>
+				</semantic:contextEntry>
+				<semantic:contextEntry id="_7ef4d2b6-c294-4f9c-a483-99d1923daa31">
+					<semantic:variable name="Affordability" id="_efb9411e-34c6-4e72-a664-85a30197f5d0" typeRef="feel:boolean"/>
+					<semantic:literalExpression id="_3051a016-282e-4f83-8cfa-4c57084e559f">
+						<semantic:text>if Disposable Income * Credit Contingency Factor &gt; Required Monthly Installment
+then true
+else false</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+				<semantic:contextEntry id="_56470ec7-03b0-4ce2-bf7f-32c2ad584d37">
+					<semantic:literalExpression id="_25e6d6ce-f19a-48b5-bd00-84baa88d2f55">
+						<semantic:text>Affordability</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+			</semantic:context>
+		</semantic:encapsulatedLogic>
+		<semantic:knowledgeRequirement id="_7f7c177a-5acb-4941-9654-23f9408200b3">
+			<semantic:requiredKnowledge href="#_b982a42a-0b62-47fa-8911-6c9d1145d982"/>
+		</semantic:knowledgeRequirement>
+		<semantic:authorityRequirement id="_c8f97eed-f12b-4d72-8c42-7edeeced9527">
+			<semantic:requiredAuthority href="#_18d836e7-6d61-490c-b9a8-be3ce0c60c1e"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:decision id="_ed60265c-25e2-400f-a99f-fafd3b489838" name="Pre-bureau affordability">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Pre-bureau affordability&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;invokes the&amp;nbsp;&lt;/span&gt;Affordability calculation business knowledge model, passing Applicant data.Monthly.Income as the Monthly Income parameter, Applicant data.Monthly.Repayments as the Monthly Repayments parameter, Applicant data.Monthly.Expenses as the Monthly Expenses parameter, the output of the Pre-bureau risk category decision as the Risk Category parameter, and the output of the Required monthly installment decision as the Required Monthly Installment parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Pre-bureau affordability" id="_bd744aca-06aa-4438-81de-0754fc15a44e" typeRef="feel:boolean"/>
+		<semantic:informationRequirement id="_00c137a3-a81c-42ff-af6d-5c3247151273">
+			<semantic:requiredDecision href="#_9997fcfd-0f50-4933-939e-88a235b5e2a0"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_828b316c-d2e4-4c68-8797-9fb6077d10ba">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_b8cf27f2-7b58-4490-8dac-0e6ff99a517b">
+			<semantic:requiredDecision href="#_3c8cee68-99dd-418c-847d-0b54697354f2"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_0c8ff057-3467-4ad0-a3ab-a9a3f3d95032">
+			<semantic:requiredKnowledge href="#_ee893e8d-f393-4e2c-b871-611a9cd30bf5"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_7fea3599-f557-487a-bc0c-6aad2e8e6c86">
+			<semantic:literalExpression id="literal__7fea3599-f557-487a-bc0c-6aad2e8e6c86">
+				<semantic:text>Affordability calculation</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_ea45f34e-c7f7-41fe-a2fa-c9329dc03ead" name="Monthly Income"/>
+				<semantic:literalExpression id="_63cbd20f-fab4-480e-9471-1367b2e1fc6c">
+					<semantic:text>Applicant data.Monthly.Income</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_28b8d43b-e005-42f0-a432-5ea3c6547247" name="Monthly Repayments"/>
+				<semantic:literalExpression id="_c35a57bf-208c-4333-973f-c8a9e9ce85f4">
+					<semantic:text>Applicant data.Monthly.Repayments</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_650b93d6-d6cd-46dc-8ebc-d1d80c5c4fa7" name="Monthly Expenses"/>
+				<semantic:literalExpression id="_174c9fb3-c940-455f-ab97-035989e83446">
+					<semantic:text>Applicant data.Monthly.Expenses</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_70836844-402b-49b0-b07a-347c81e0f345" name="Risk Category"/>
+				<semantic:literalExpression id="_34d3db82-c899-45f6-b46c-ef7cb2f550c3">
+					<semantic:text>Pre-bureau risk category</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_b94f43b0-69d0-4f20-9698-5f91b85f026a" name="Required Monthly Installment"/>
+				<semantic:literalExpression id="_47e0147f-030a-4020-a5d3-728c563c0bd2">
+					<semantic:text>Required monthly installment</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:decision id="_728e3a50-f00f-42c0-b3ee-1ee5aabd5474" name="Post-bureau affordability">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Post-bureau affordability&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the&amp;nbsp;&lt;/span&gt;Affordability calculation business knowledge model, passing Applicant data.Monthly.Income as the Monthly Income parameter, Applicant data.Monthly.Repayments as the Monthly Repayments parameter, Applicant data.Monthly.Expenses as the Monthly Expenses parameter, the output of the Post-bureau risk category decision as the Risk Category parameter, and the output of the Required monthly installment decision as the Required Monthly Installment parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Post-bureau affordability" id="_b6f25146-5302-470e-a242-3d71c4311add" typeRef="feel:boolean"/>
+		<semantic:informationRequirement id="_f7991b2e-6fee-4e49-a79e-fcc667dc8e84">
+			<semantic:requiredDecision href="#_40b45659-9299-43a6-af30-04c948c5c0ec"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_9eeef063-346f-44d4-b722-2d8071d3d994">
+			<semantic:requiredDecision href="#_3c8cee68-99dd-418c-847d-0b54697354f2"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_466b70d3-035a-413d-93bd-ae28c778d02d">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_8c6d88aa-7775-4b03-8ee2-6455f1eeb4d1">
+			<semantic:requiredKnowledge href="#_ee893e8d-f393-4e2c-b871-611a9cd30bf5"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_3e5d9f10-9433-4853-b084-33790988de2a">
+			<semantic:literalExpression id="literal__3e5d9f10-9433-4853-b084-33790988de2a">
+				<semantic:text>Affordability calculation</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_ecb484a1-1ca6-40d8-863f-ba95fea13779" name="Monthly Income"/>
+				<semantic:literalExpression id="_610d5776-9163-4707-85c4-c4f0ff35db0a">
+					<semantic:text>Applicant data.Monthly.Income</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_b5f0835b-4dba-418b-a11c-3a23a76f3ae6" name="Monthly Repayments"/>
+				<semantic:literalExpression id="_309f04dc-a3cf-483c-98e0-65dbd1ed8c36">
+					<semantic:text>Applicant data.Monthly.Repayments</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_f8edc4a3-5000-4558-80f0-45efaee7e339" name="Monthly Expenses"/>
+				<semantic:literalExpression id="_3d3c099c-c287-45ff-82de-ca3079da67b0">
+					<semantic:text>Applicant data.Monthly.Expenses</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_a8c6984b-8bca-41cc-b284-d056a18b43af" name="Risk Category"/>
+				<semantic:literalExpression id="_45a5cc86-5fe5-422c-ab9d-b2c73dc52113">
+					<semantic:text>Post-bureau risk category</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_cac9db30-48f9-4b43-b9fa-699171ac858b" name="Required Monthly Installment"/>
+				<semantic:literalExpression id="_8b2bd0c8-28eb-4e2d-91d9-80fc07f81227">
+					<semantic:text>Required monthly installment</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:decision id="_40b45659-9299-43a6-af30-04c948c5c0ec" name="Post-bureau risk category">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Post-bureau risk category&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the Post-bureau&amp;nbsp;&lt;/span&gt;risk category business knowledge model, passing Applicant data.ExistingCustomer as the Existing Customer parameter, Bureau data.CreditScore as the Credit Score parameter, and the output of the Application risk score decision as the Application Risk Score parameter. Note that if Bureau data is null (due to the THROUGH strategy bypassing the Collect bureau data task) the Credit Score parameter will be null.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Post-bureau risk category" id="_34b85411-de9d-4d9a-8b03-ad1b1cec8777" typeRef="tRiskCategory"/>
+		<semantic:informationRequirement id="_afa8490a-52e3-48cd-94a6-1602e00ffe59">
+			<semantic:requiredInput href="#_e91de815-22ba-431c-8b46-55891f2a1ef6"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_668fa95d-373d-4430-b833-7c27308d2a80">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_655fba60-b529-4c21-bd96-9c778998d3fb">
+			<semantic:requiredDecision href="#_e905f02c-c5d9-4f2a-ba57-7912ff523b46"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_dc094e13-abbd-4164-bc95-a61b433a7be4">
+			<semantic:requiredKnowledge href="#_1c72ed95-ec72-47b4-8639-5ed14ccb77df"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_cc1e6b62-9878-4f6c-978d-ec6d16bd223b">
+			<semantic:literalExpression id="literal__cc1e6b62-9878-4f6c-978d-ec6d16bd223b">
+				<semantic:text>Post-bureau risk category table</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_a7faf416-0247-43c1-8827-9346540d13c3" name="Existing Customer"/>
+				<semantic:literalExpression id="_9eb92498-0de3-44b1-a8e2-301a2bc091d4">
+					<semantic:text>Applicant data.ExistingCustomer</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_b0bb0d61-0ea4-4c10-8a97-94be610bee0b" name="Credit Score"/>
+				<semantic:literalExpression id="_ad652244-9438-4a76-9637-2ca8dde2cee4">
+					<semantic:text>Bureau data.CreditScore</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_4bb7604e-18d8-4d57-8097-cd2585c59266" name="Application Risk Score"/>
+				<semantic:literalExpression id="_9ead8557-599e-4900-80b8-7157c0653d82">
+					<semantic:text>Application risk score</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:inputData id="_e91de815-22ba-431c-8b46-55891f2a1ef6" name="Bureau data">
+		<semantic:variable name="Bureau data" id="_aa8440f8-8f48-4e37-b775-ab8d771d24eb" typeRef="tBureauData"/>
+	</semantic:inputData>
+	<semantic:businessKnowledgeModel id="_1c72ed95-ec72-47b4-8639-5ed14ccb77df" name="Post-bureau risk category table">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Post-bureau risk category table&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic defines a complete, unique-hit decision table&amp;nbsp;&lt;/span&gt;deriving Post-Bureau Risk Category from Existing Customer, Application Risk Score and Credit Score.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Post-bureau risk category table" id="_689c96f3-6dd3-4c74-9a8f-721a966eb1af" typeRef="tRiskCategory"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Existing Customer" typeRef="feel:boolean"/>
+			<semantic:formalParameter name="Application Risk Score" typeRef="feel:number"/>
+			<semantic:formalParameter name="Credit Score" typeRef="feel:number"/>
+			<semantic:decisionTable id="_c494b824-7c60-4115-8773-00f103b636a0" hitPolicy="UNIQUE" outputLabel="Post-bureau risk category table">
+				<semantic:input id="_fc4cfa6b-926b-4751-81d9-d363b6f19299">
+					<semantic:inputExpression typeRef="feel:boolean">
+						<semantic:text>Existing Customer</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_77a90f33-64d6-4050-a932-a9c8454b10ab">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Application Risk Score</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_129a63ca-ea08-460a-98f3-bbb9b9a11121">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Credit Score</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:output id="_44033e77-5b86-4040-83a3-63629ae25983">
+					<semantic:outputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:outputValues>
+				</semantic:output>
+				<semantic:rule id="_22d41220-e512-4248-bed3-935266abfac6">
+					<semantic:inputEntry id="_2c44dae4-55da-4aad-8dca-6db78b1463ff">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_f75f53c2-d798-4b12-bfbb-f3c2dcbb7d13">
+						<semantic:text>&lt; 120</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_19694f9e-0022-42bd-a10c-8ec5855d2608">
+						<semantic:text>&lt; 590</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_04e9777f-143b-44f5-be3e-a17710658417">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_ca0d34ce-5f88-489f-b07d-c153cfcc9a9f">
+					<semantic:inputEntry id="_1a227ae6-84eb-46b5-a355-e9414e2b4c68">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_d571de40-d13c-40d1-b4d8-7c9ef4f3d405">
+						<semantic:text>&lt; 120</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_eaad5ff9-9a13-4321-b1ed-b9b81a6bc7c3">
+						<semantic:text>[590..610]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_e47b1857-760e-4a6a-ab76-575d57ed3d75">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_731cfff1-8846-4204-b2d8-d4273e7caf6d">
+					<semantic:inputEntry id="_9398558c-7346-41e6-b466-6db6a65a6886">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_69198768-fbd1-48f4-a233-6a237f8759d3">
+						<semantic:text>&lt; 120</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_9853a883-301b-4134-8411-11fcc78cca01">
+						<semantic:text>&gt; 610</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_e56ad1e0-521d-4648-9209-81909e453bec">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_7124ae55-0a5c-40a5-858a-2e97d3fcee2b">
+					<semantic:inputEntry id="_d66444ed-d5af-47e9-9425-d41c72eab9d8">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a24e787d-5735-4086-b27e-b536108f0cab">
+						<semantic:text>[120..130]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_801d5239-537e-4147-80ce-2226cf9bb6dd">
+						<semantic:text>&lt; 600</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_27df9777-129b-4e9a-8e01-1c016b90f049">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_6849c070-ffaf-4afd-b739-c9516e093a2d">
+					<semantic:inputEntry id="_d7cdde1c-c04e-4cf6-9c6e-58e73ceb48e4">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_79cd3d7c-5e16-48c1-bb40-b5f30dec9830">
+						<semantic:text>[120..130]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_1c63b959-c10b-4c66-b024-684fb3773c13">
+						<semantic:text>[600..625]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_ad886bab-7ca9-466a-873e-a7fdc7dc0e29">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_abe53d6c-0c5e-4de6-8835-452442e07761">
+					<semantic:inputEntry id="_8a73641d-2a45-423e-ba92-cc6463dcdefe">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a4131075-a73f-46cf-9e6b-4cf014f95567">
+						<semantic:text>[120..130]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_d81f0359-dab6-4813-a818-62bebe59d2c6">
+						<semantic:text>&gt; 625</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_28527dae-a87d-4cd3-9f2e-7d244c617b17">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_1a267a70-0937-42cd-a778-9ef369309660">
+					<semantic:inputEntry id="_6d4e7030-c29d-4f31-b1a5-8e57323425fd">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_d0be0dbe-0ef4-4198-b612-7a415e569e73">
+						<semantic:text>&gt; 130</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_ffb1d0e3-4ecb-4497-8df0-6262f0e56ff2">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_3de03ecf-f018-4135-add5-fd54737cee48">
+						<semantic:text>"VERY LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_4ec01cc3-2dce-453f-a195-e8a598be44ab">
+					<semantic:inputEntry id="_69c5f5cb-c384-4596-8fd7-615cdcc4abf4">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_86661a8a-4179-4df7-9556-5e5937b676b9">
+						<semantic:text>&lt;= 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_7580e93d-f53b-405c-b6ab-87d9cb1f5fa1">
+						<semantic:text>&lt; 580</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_00ef5d95-f613-41c8-8bf5-35aeee1e55e8">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_2ca1a47c-33b0-426d-87b4-d1dd23de3e30">
+					<semantic:inputEntry id="_d9bafc07-3e85-442e-bb8a-99f7f2b7488a">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_005e60af-83b1-471c-aa1c-1a1bc9e8f197">
+						<semantic:text>&lt;= 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_0a6e9560-ff9a-4b30-b5e4-1f218b8ea6c2">
+						<semantic:text>[580..600]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_2bd1761e-b0f6-4eed-8df0-0f3bedf84817">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_4ad8a80e-0e44-4512-8925-6f3ef0bcf67e">
+					<semantic:inputEntry id="_25c987a9-40dd-4f40-a7b2-7b6b7020f729">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a8c73104-1d46-4c4d-ba3b-25ac8b812a4b">
+						<semantic:text>&lt;= 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_295d25f5-f29a-456e-a000-7b26c3a3ba1d">
+						<semantic:text>&gt; 600</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_ae145544-b4e9-4c07-95d4-9e77237813f6">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_a14b851e-8b11-416e-806b-59222b4b0cc9">
+					<semantic:inputEntry id="_77185ff7-c946-46cc-b93a-dabdc111f5dd">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_be1969ad-6a34-4e7f-8e14-cfabf84c9d33">
+						<semantic:text>&gt; 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_b93f37d5-afe8-40e1-aa4f-272d19da02d9">
+						<semantic:text>&lt; 590</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_d7479784-014d-497f-9d06-1b111fa9c29f">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_4377ced8-b8d9-4069-9dcf-098007969563">
+					<semantic:inputEntry id="_28eee2fe-8a48-4a73-8488-10c506a7add5">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_7c50c99a-c045-42c5-a647-22a4eae50036">
+						<semantic:text>&gt; 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a71f7fc4-f200-4694-9738-23b01485ba78">
+						<semantic:text>[590..615]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_02efcf34-86b8-411c-81bc-98668fe07bb3">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_20a9e6e8-bab5-4d49-803c-12d3b574fdd3">
+					<semantic:inputEntry id="_2ba73fd9-c951-45dc-ac77-f6904c26e37c">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_cf3a2739-9a36-4702-b0f3-e8b0a0338db1">
+						<semantic:text>&gt; 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_56cc9c15-43a9-4d81-975a-ab69f53a528b">
+						<semantic:text>&gt; 615</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_13bc4965-9c91-44bd-973c-25dd9c1bebab">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_aa1fbb92-27fc-4108-9257-2017c2dbc601">
+			<semantic:requiredAuthority href="#_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:decision id="_9997fcfd-0f50-4933-939e-88a235b5e2a0" name="Pre-bureau risk category">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Pre-Bureau Risk Category&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;invokes the Pre-bureau&amp;nbsp;&lt;/span&gt;risk category table business knowledge model, passing Applicant data.ExistingCustomer as the Existing Customer parameter and the output of the Application risk score decision as the Application Risk Score parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Pre-bureau risk category" id="_a739014d-8c5e-438b-b76a-805e3689c977" typeRef="tRiskCategory"/>
+		<semantic:informationRequirement id="_7b60cf6f-1265-4460-bf43-8d10272fe9f2">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:informationRequirement id="_2f70ff15-13ec-4104-8256-2a6c3d240a56">
+			<semantic:requiredDecision href="#_e905f02c-c5d9-4f2a-ba57-7912ff523b46"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_d37ce038-f9cc-4576-92a7-dd64eea28a2d">
+			<semantic:requiredKnowledge href="#_51cc9510-3bfa-4e5a-a119-9bf83efdd266"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_04337ddb-db98-40e9-81cd-12802e74401e">
+			<semantic:literalExpression id="literal__04337ddb-db98-40e9-81cd-12802e74401e">
+				<semantic:text>Pre-bureau risk category table</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_74d8aa6b-838e-4d87-8d64-8b734146aac6" name="Existing Customer"/>
+				<semantic:literalExpression id="_4b5e5cfb-d6fa-4d41-a13a-783170887126">
+					<semantic:text>Applicant data.ExistingCustomer</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_929d5796-6174-41eb-b27c-52f956fd44dd" name="Application Risk Score"/>
+				<semantic:literalExpression id="_b93f253e-7f93-4356-a98b-3fae510485e3">
+					<semantic:text>Application risk score</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:businessKnowledgeModel id="_51cc9510-3bfa-4e5a-a119-9bf83efdd266" name="Pre-bureau risk category table">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Pre-bureau risk category table&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic defines a complete, unique-hit decision table&amp;nbsp;&lt;/span&gt;deriving Pre-bureau risk category from Existing Customer and Application Risk Score.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Pre-bureau risk category table" id="_cfb1bb8c-ad27-42e2-b52a-50eadea198a6" typeRef="tRiskCategory"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Existing Customer" typeRef="feel:boolean"/>
+			<semantic:formalParameter name="Application Risk Score" typeRef="feel:number"/>
+			<semantic:decisionTable id="_3f0a3259-2862-44d3-baff-5bd71f4dd24f" hitPolicy="UNIQUE" outputLabel="Pre-bureau risk category table">
+				<semantic:input id="_1ee6291f-423f-47d9-8774-858b392d4762">
+					<semantic:inputExpression typeRef="feel:boolean">
+						<semantic:text>Existing Customer</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:input id="_22607edc-31dd-4d18-982f-b3d4b4606804">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Application Risk Score</semantic:text>
+					</semantic:inputExpression>
+				</semantic:input>
+				<semantic:output id="_f482a2b4-eed1-4dfc-84b6-4860edec088d">
+					<semantic:outputValues>
+						<semantic:text>"DECLINE","HIGH","MEDIUM","LOW","VERY LOW"</semantic:text>
+					</semantic:outputValues>
+				</semantic:output>
+				<semantic:rule id="_05c9836c-6f21-49e9-8e4b-0ad029d1a38c">
+					<semantic:inputEntry id="_5dc5082d-6dc3-46ce-821f-3fe0981a0407">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_f9c9f1c0-dba5-4adc-8764-c740d55abc5e">
+						<semantic:text>&lt; 100</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_520b6480-8c90-4ab0-bfd2-2e6107c9c2aa">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_7d1fbf47-e150-44d1-aa1c-b6c15ccc92c3">
+					<semantic:inputEntry id="_2c0451d5-f065-41a4-ada7-4a3fb29a668d">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_e7f1fb9b-32d4-4a45-95f3-8390801435a8">
+						<semantic:text>[100..120)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_699696bd-226d-4dca-bba3-1a5b7ad0a8f0">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_da654f4f-3a18-44ec-8087-f27715c1e12b">
+					<semantic:inputEntry id="_5df3c3df-0bed-4171-b915-e084fce11e51">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_dd71d0af-cfb7-4472-a745-28a36251b945">
+						<semantic:text>[120..130]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_331e4bd4-397e-44dd-a403-44b3cf4ad15d">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_524a197c-3981-41ee-baed-1de02c55fac3">
+					<semantic:inputEntry id="_a76ff1d9-f651-4833-8773-7d75925b5fe4">
+						<semantic:text>false</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_123b03ad-4815-4f98-8870-9c25e06fac6b">
+						<semantic:text>&gt; 130</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f33f040b-a116-43c1-9791-bef711299be6">
+						<semantic:text>"VERY LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_ab1dfe10-5fbc-47fc-8ade-fd56c0a334c5">
+					<semantic:inputEntry id="_acf40b4c-d68c-49d6-a2a4-2a88ace33016">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_ce80bf8c-6cad-400b-8b18-23c920d6f594">
+						<semantic:text>&lt; 80</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_44ea4ff9-e85c-40b6-b1a8-c9a76b1ae13e">
+						<semantic:text>"DECLINE"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_a297a507-5206-4903-94f6-9b6fd6619195">
+					<semantic:inputEntry id="_9a3f8732-e85f-4111-a3f1-2284065f64fe">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_7d398c94-e4c1-4d9c-bf06-cf40f2c04d64">
+						<semantic:text>[80..90)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f54b6b94-ec25-451d-8d7d-1049155b3e2b">
+						<semantic:text>"HIGH"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_740e7ddb-0834-4705-bbb3-7b092e9570dc">
+					<semantic:inputEntry id="_7fe40ffd-bd8e-4405-8719-0bd706933fd5">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_4b77407a-565f-40ad-b324-6e3940134518">
+						<semantic:text>[90..110]</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_894b1284-9923-4727-bbc4-fc621b47a28b">
+						<semantic:text>"MEDIUM"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_95fb462f-6435-44b7-8c21-84427ce71bc9">
+					<semantic:inputEntry id="_3e033f1d-a632-41d4-9eb9-63d66e5e4380">
+						<semantic:text>true</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_753f756e-cdee-49d2-8953-dfad7aa9b092">
+						<semantic:text>&gt; 110</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_2fb8f713-e746-4a65-aff0-fa1de216f57a">
+						<semantic:text>"LOW"</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_b752b8ba-8fab-4658-94d9-1aaaa51af3a2">
+			<semantic:requiredAuthority href="#_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:decision id="_e905f02c-c5d9-4f2a-ba57-7912ff523b46" name="Application risk score">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Application Risk Score&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the Application&amp;nbsp;&lt;/span&gt;risk score model business knowledge model, passing Applicant data.Age as the Age parameter, Applicant data.MaritalStatus as the Marital Status parameter and Applicant data.EmploymentStatus as the Employment Status parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Application risk score" id="_f2abe78f-d5d0-4b9e-8d05-f1ea2bd7fc9b" typeRef="feel:number"/>
+		<semantic:informationRequirement id="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+			<semantic:requiredInput href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_c94de723-def1-49e4-9aae-5270fe39630f">
+			<semantic:requiredKnowledge href="#_e9e07f04-0ff2-40c4-bd14-e5f06a91f942"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_348139f6-7fd0-40be-952d-66a8bb83d59c">
+			<semantic:literalExpression id="literal__348139f6-7fd0-40be-952d-66a8bb83d59c">
+				<semantic:text>Application risk score model</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_aba556aa-0e5b-4d01-bd6e-d25b780bbf28" name="Age"/>
+				<semantic:literalExpression id="_9c3009af-9a1b-4821-8901-7edf800ac60b">
+					<semantic:text>Applicant data.Age</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_259966f2-bf40-4139-b587-6c9b989f1aa0" name="Marital Status"/>
+				<semantic:literalExpression id="_610941db-8c4e-483c-9d75-789b3d5c2333">
+					<semantic:text>Applicant data.MartitalStatus</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_dc6d2bc7-3bde-4994-838d-b3fa1fe1ab2c" name="Employment Status"/>
+				<semantic:literalExpression id="_c08280b8-beb0-4eb1-a0d0-f022de521d25">
+					<semantic:text>Applicant data.EmploymentStatus</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:knowledgeSource id="_821a6840-e910-418f-809e-4c7d60b0b21a" name="Analytics"/>
+	<semantic:businessKnowledgeModel id="_e9e07f04-0ff2-40c4-bd14-e5f06a91f942" name="Application risk score model">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Application risk score model&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;defines a complete, no-order multiple-hit table&amp;nbsp;&lt;/span&gt;with aggregation, deriving Application risk score from Age, Marital Status and Employment Status, as the sum of the Partial scores of all matching rows (this is therefore a predictive scorecard represented as a decision table).&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Application risk score model" id="_645f4911-6a95-4dbd-8efb-13fac8154fa2" typeRef="feel:number"/>
+		<semantic:encapsulatedLogic>
+			<semantic:formalParameter name="Age" typeRef="feel:number"/>
+			<semantic:formalParameter name="Marital Status" typeRef="feel:string"/>
+			<semantic:formalParameter name="Employment Status" typeRef="feel:string"/>
+			<semantic:decisionTable id="_26378922-484b-42f3-a609-5aecb81afbd2" hitPolicy="COLLECT" outputLabel="Application risk score model" aggregation="SUM">
+				<semantic:input id="_09b90043-cccb-4cf7-b8bc-44e97787443f">
+					<semantic:inputExpression typeRef="feel:number">
+						<semantic:text>Age</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>[18..120]</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:input id="_803f1aa0-731a-4541-bfba-6211a564af69">
+					<semantic:inputExpression typeRef="feel:string">
+						<semantic:text>Marital Status</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"S","M"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:input id="_e32f7b2c-5837-4e18-acea-a100115f412d">
+					<semantic:inputExpression typeRef="feel:string">
+						<semantic:text>Employment Status</semantic:text>
+					</semantic:inputExpression>
+					<semantic:inputValues>
+						<semantic:text>"UNEMPLOYED","STUDENT","EMPLOYED","SELF-EMPLOYED"</semantic:text>
+					</semantic:inputValues>
+				</semantic:input>
+				<semantic:output id="_e7b50872-4ad3-496a-ac06-15dc98c9d526"/>
+				<semantic:rule id="_cd986c20-a58b-413e-96c3-37d2f48fe361">
+					<semantic:inputEntry id="_b5fa1bbc-0cc3-462c-b978-429e932a83ab">
+						<semantic:text>[18..22)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_43189918-aecd-4713-8e23-231b35b299d7">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_f8be0751-2823-46d8-8007-c4fb601fcba8">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_dab1ccbe-edc2-4cc2-9167-1d452b4ad0c2">
+						<semantic:text>32</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_271d1521-3fb9-4b1d-a74d-0abf1c131186">
+					<semantic:inputEntry id="_57a0f913-e95b-4941-b868-e306d484f045">
+						<semantic:text>[22..26)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_23b572c3-9c6f-4e17-8bdb-95fd58f404d5">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_85a87989-40c4-4027-b674-6d21b6d5bb64">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_8f6c2458-a000-4d1f-b6a1-a553f8b3c4db">
+						<semantic:text>35</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_558f8923-cd42-484a-b6b0-7cb28bfa7480">
+					<semantic:inputEntry id="_795dc738-ca79-4c60-9746-e44bc1b34663">
+						<semantic:text>[26..36)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_8492546f-c66a-46e5-9e86-9b0a79ec99d6">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_2efe9985-1475-426d-abb3-760fed744a14">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_7146afbc-d68f-415d-9abf-da3ad5a87527">
+						<semantic:text>40</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_389ee4a2-47d3-42fc-ad04-e8798d638d33">
+					<semantic:inputEntry id="_cf08fa6c-084d-4f2c-ae60-aa0abb5d7b2a">
+						<semantic:text>[36..50)</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_7b81f517-a79a-4213-b74b-4cf01ee9a7c3">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_1101bb57-178a-4c25-9d79-7759553e9d7d">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_10c870e9-f72d-45f0-bcfd-bc6bcc0d2315">
+						<semantic:text>43</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_8c355a92-0f8b-4d41-ada2-b98b05237249">
+					<semantic:inputEntry id="_c28cca26-4eda-4d37-a056-15b23eec9690">
+						<semantic:text>&gt;=50</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_29ab6240-13dd-478f-ac73-0805778efe30">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_3ddc0313-cd5b-40f3-8858-87a384ee1f23">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_c2fe72a6-2591-413b-b4e8-a73a3fca33bc">
+						<semantic:text>48</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_ffdf62cd-9909-4dd0-a15e-19fcb5a5ce6f">
+					<semantic:inputEntry id="_90065ca5-703d-4b29-9924-c949f210683e">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_5167d8a0-f82c-4f9b-b948-94ee8ef9b753">
+						<semantic:text>"S"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_d9f2e10b-80c2-4f8e-af9b-83d3317e14b9">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f1dd8303-3db4-4fe2-879c-fd5b0ecd970d">
+						<semantic:text>25</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_cf192d51-2d52-4280-a41f-4941f1611b60">
+					<semantic:inputEntry id="_b1e8abb2-ecee-4fdf-8d75-a292d8bf8b0f">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_35f4590a-63a0-4a46-a875-9b37b6e8ada2">
+						<semantic:text>"M"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_e50ee6a1-78bc-4ee0-8030-6f9654057e9a">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_f36c68f8-b188-4675-bb7b-ea5347a08fff">
+						<semantic:text>45</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_90b8f62c-6ca6-4234-97c4-4de2011374b9">
+					<semantic:inputEntry id="_a1de40fe-8951-4ecb-bfc7-516a2d77bf55">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_63f774ad-98ab-44e6-8ebf-83a00437e7d6">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_9e4a3948-ec86-4987-a80d-2f0bc9c63530">
+						<semantic:text>"UNEMPLOYED"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_3f14a6c0-3829-41c2-a57c-154574752788">
+						<semantic:text>15</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_bc447e0a-a445-4029-804b-138b76a766ef">
+					<semantic:inputEntry id="_9196a27c-a829-43d7-b973-73bf13915ec3">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_1d672363-4080-4dd8-82cd-d30ff16d4383">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_28ca5667-24ac-4c8c-8557-ede60e51b461">
+						<semantic:text>"STUDENT"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_90a363e8-d80d-4d78-9e33-2be7cbb9fd05">
+						<semantic:text>18</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_5651d55b-18a5-4ff4-bc28-30ce10385a2d">
+					<semantic:inputEntry id="_93400b3b-bdda-4370-878b-e221bf8521c6">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_df5d20cf-6971-4911-832f-683d2a790c11">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_a0b06347-1422-4b9d-bdd0-ede06b7e5d0b">
+						<semantic:text>"EMPLOYED"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_78582066-9c90-4b16-88a3-1709b784a4ff">
+						<semantic:text>45</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+				<semantic:rule id="_07c9f995-1814-4a77-9ab1-f03c21337165">
+					<semantic:inputEntry id="_b377eba2-90f6-4913-8a84-e0e358cb4ae5">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_c515456a-3519-4446-aeaa-6f3f613a8812">
+						<semantic:text>-</semantic:text>
+					</semantic:inputEntry>
+					<semantic:inputEntry id="_6d9fc071-2870-4397-83de-802aa5f398a5">
+						<semantic:text>"SELF-EMPLOYED"</semantic:text>
+					</semantic:inputEntry>
+					<semantic:outputEntry id="_233be7af-2d3f-4b9c-bb69-561f8378e870">
+						<semantic:text>36</semantic:text>
+					</semantic:outputEntry>
+				</semantic:rule>
+			</semantic:decisionTable>
+		</semantic:encapsulatedLogic>
+		<semantic:authorityRequirement id="_5bccc005-33ba-40e9-8514-3fa3444ac11d">
+			<semantic:requiredAuthority href="#_821a6840-e910-418f-809e-4c7d60b0b21a"/>
+		</semantic:authorityRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:inputData id="_d14df033-f4a2-47e3-9590-84e9ff04db4e" name="Applicant data">
+		<semantic:variable name="Applicant data" id="_76597f43-a435-4d85-bc82-98007b9e0d1d" typeRef="tApplicantData"/>
+	</semantic:inputData>
+	<semantic:decision id="_3c8cee68-99dd-418c-847d-0b54697354f2" name="Required monthly installment">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Required monthly installment&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic invokes the&amp;nbsp;&lt;/span&gt;Installment calculation business knowledge model, passing Requested product.ProductType as the Product Type parameter, Requested product.Rate as the Rate parameter, Requested product.Term as the Term parameter, and Requested product.Amount as the Amount parameter.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Required monthly installment" id="_f581169e-828d-45cd-9af5-e401eebc8f27" typeRef="feel:number"/>
+		<semantic:informationRequirement id="_c5e79286-ea8f-4340-bd38-e878054891f2">
+			<semantic:requiredInput href="#_fe938494-ee59-425e-8728-2347ea703563"/>
+		</semantic:informationRequirement>
+		<semantic:knowledgeRequirement id="_c40b08f2-613a-4a46-841c-c9d2d117578e">
+			<semantic:requiredKnowledge href="#_7235d875-2426-4869-b6df-92ca06ae80c5"/>
+		</semantic:knowledgeRequirement>
+		<semantic:invocation id="_2cc659df-0249-417c-8074-d3a375c6b5f5">
+			<semantic:literalExpression id="literal__2cc659df-0249-417c-8074-d3a375c6b5f5">
+				<semantic:text>Installment calculation</semantic:text>
+			</semantic:literalExpression>
+			<semantic:binding>
+				<semantic:parameter id="_fa5953c6-c8f2-449e-ac2b-4bc04cb000c2" name="Product Type"/>
+				<semantic:literalExpression id="_87dccb4c-d416-42ca-9c72-a0b591b4ba88">
+					<semantic:text>Requested product.ProductType</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_78623557-831b-47e4-81fe-349a0743fc5a" name="Rate"/>
+				<semantic:literalExpression id="_3ba44309-b466-42d8-8126-bb2ef2d0544e">
+					<semantic:text>Requested product.Rate</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_48ac3dfb-dc98-420f-b051-2a9a3035e5f3" name="Term"/>
+				<semantic:literalExpression id="_4e7fdc53-9928-4a0a-8ba4-59c22289a1ce">
+					<semantic:text>Requested product.Term</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+			<semantic:binding>
+				<semantic:parameter id="_a8c6ca38-2e6c-42cb-8d5d-2e40469a4e4a" name="Amount"/>
+				<semantic:literalExpression id="_df160506-5551-4fe3-bf04-1fcb462bcaec">
+					<semantic:text>Requested product.Amount</semantic:text>
+				</semantic:literalExpression>
+			</semantic:binding>
+		</semantic:invocation>
+	</semantic:decision>
+	<semantic:inputData id="_fe938494-ee59-425e-8728-2347ea703563" name="Requested product">
+		<semantic:variable name="Requested product" id="_480bcfd2-2643-4d1c-852b-3034dfa62790" typeRef="tRequestedProduct"/>
+	</semantic:inputData>
+	<semantic:businessKnowledgeModel id="_7235d875-2426-4869-b6df-92ca06ae80c5" name="Installment calculation">
+		<semantic:description>&lt;p&gt;&lt;span style="font-family: arial, helvetica, sans-serif; font-size: 10pt;"&gt;&lt;span lang="JA"&gt;The&amp;nbsp;&lt;/span&gt;&lt;strong&gt;&lt;span lang="JA"&gt;Installment calculation&amp;nbsp;&lt;/span&gt;&lt;/strong&gt;&lt;span lang="JA"&gt;decision logic&amp;nbsp;defines a boxed function deriving monthly installment&amp;nbsp;&lt;/span&gt;from Product Type, Rate, Term and Amount.&lt;/span&gt;&lt;/p&gt;</semantic:description>
+		<semantic:variable name="Installment calculation" id="_c02274e9-a6c8-4498-9d43-eaa33be7a0d9" typeRef="feel:number"/>
+		<semantic:encapsulatedLogic id="_5362b6d5-9520-4081-809c-ee85881e2dfa" kind="FEEL">
+			<semantic:formalParameter name="Product Type" typeRef="feel:string" id="_f6831cd9-3eab-4399-8d29-42b141fd9968"/>
+			<semantic:formalParameter name="Rate" typeRef="feel:number" id="_c6f48aeb-b65d-4307-8722-dd44f7335566"/>
+			<semantic:formalParameter name="Term" typeRef="feel:number" id="_708eb9af-fe19-418c-8547-1647cb50f596"/>
+			<semantic:formalParameter name="Amount" typeRef="feel:number" id="_fddc99bb-3be6-45b0-bf8c-d8d4c016a90b"/>
+			<semantic:context id="_2661f418-77f3-4bab-824a-a4968b8a96d4">
+				<semantic:contextEntry id="_d773da17-a45c-4a3b-8b70-565058cb6e1d">
+					<semantic:variable name="Monthly Fee" id="_2db6ada1-2a67-4c84-bb31-e78178cf6b32" typeRef="feel:number"/>
+					<semantic:literalExpression id="_ad1e4499-e806-42f1-8069-254e98f5d498">
+						<semantic:text>if Product Type = "STANDARD LOAN"
+then 20.00
+else if Product Type = "SPECIAL LOAN"
+then 25.00
+else null</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+				<semantic:contextEntry id="_f4156a0c-ea28-475d-8025-9e209280bd2c">
+					<semantic:variable name="Monthly Repayment" id="_594996b3-1aea-4557-bf8e-f3bc91470fee" typeRef="feel:number"/>
+					<semantic:literalExpression id="_27a56668-bc99-4a6a-8f4f-5b67ab4e3df3">
+						<semantic:text>Financial.PMT(Rate, Term, Amount)</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+				<semantic:contextEntry id="_cebe4ac7-7aa7-4ef9-ae70-b6caf6cbb593">
+					<semantic:literalExpression id="_f6293695-dc2e-4e16-9dc7-1595423f0f91">
+						<semantic:text>Monthly Repayment + Monthly Fee</semantic:text>
+					</semantic:literalExpression>
+				</semantic:contextEntry>
+			</semantic:context>
+		</semantic:encapsulatedLogic>
+		<semantic:knowledgeRequirement id="_f0a6536d-0e7f-44d3-a9bb-5213478173da">
+			<semantic:requiredKnowledge href="http://www.trisotech.com/dmn/definitions/_5e8e877a-af87-434b-9c36-ed51c8d6b514#_a30c75ec-7d81-4606-802c-b31ea308392d"/>
+		</semantic:knowledgeRequirement>
+	</semantic:businessKnowledgeModel>
+	<semantic:decisionServize id="_7befd964-eefa-4d8f-908d-8f6ad8d22c67" name="Bureau Strategy Decision Service">
+		<semantic:outputDecision href="#_8b838f06-968a-4c66-875e-f5412fd692cf"/>
+		<semantic:outputDecision href="#_5b8356f3-2cf2-40e8-8f80-324937e8b276"/>
+		<semantic:encapsulatedDecision href="#_ed60265c-25e2-400f-a99f-fafd3b489838"/>
+		<semantic:encapsulatedDecision href="#_9997fcfd-0f50-4933-939e-88a235b5e2a0"/>
+		<semantic:encapsulatedDecision href="#_e905f02c-c5d9-4f2a-ba57-7912ff523b46"/>
+		<semantic:encapsulatedDecision href="#_3c8cee68-99dd-418c-847d-0b54697354f2"/>
+		<semantic:encapsulatedDecision href="#_b5e759df-f662-44cd-94f5-55c3c81f0ee3"/>
+		<semantic:inputData href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		<semantic:inputData href="#_fe938494-ee59-425e-8728-2347ea703563"/>
+	</semantic:decisionService>
+	<semantic:decisionService id="_4d91e3a5-acec-4254-81e4-8535a1d336ee" name="Routing Decision Service">
+		<semantic:outputDecision href="#_ca1e6032-12eb-428a-a80b-49028a88c0b5"/>
+		<semantic:encapsulatedDecision href="#_40b45659-9299-43a6-af30-04c948c5c0ec"/>
+		<semantic:encapsulatedDecision href="#_e905f02c-c5d9-4f2a-ba57-7912ff523b46"/>
+		<semantic:encapsulatedDecision href="#_3c8cee68-99dd-418c-847d-0b54697354f2"/>
+		<semantic:encapsulatedDecision href="#_728e3a50-f00f-42c0-b3ee-1ee5aabd5474"/>
+		<semantic:inputData href="#_e91de815-22ba-431c-8b46-55891f2a1ef6"/>
+		<semantic:inputData href="#_d14df033-f4a2-47e3-9590-84e9ff04db4e"/>
+		<semantic:inputData href="#_fe938494-ee59-425e-8728-2347ea703563"/>
+	</semantic:decisionService>
+	<dmndi:DMNDI>
+		<dmndi:DMNDiagram id="_ce4a4c00-c3a3-46a6-8938-055239f6b326" name="DRD of all automated decision-making">
+			<dmndi:Size height="1050.9786834716797" width="1411.2411708831787"/>
+			<dmndi:DMNShape id="_71b16a12-bf83-47a5-ad8b-68c0d302beec" dmnElementRef="_4bd33d4a-741b-444a-968b-64e1841211e7">
+				<dc:Bounds x="1069" y="54.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_679112c3-6972-441f-b33c-04fac539b373" dmnElementRef="_989d137f-86ff-4249-813f-af67c08a2762">
+				<dc:Bounds x="893.5" y="50" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_05c030a4-e19b-45d0-991a-864c3590cb59" dmnElementRef="_34cd3187-8764-4249-959d-2664bf9f1847">
+				<dc:Bounds x="1225.7588291168213" y="262.97867584228516" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_446c9f43-6c05-4bb6-b256-9f9a7c15bddb" dmnElementRef="_5b8356f3-2cf2-40e8-8f80-324937e8b276">
+				<dc:Bounds x="177" y="262.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_d29344c2-6e50-4b8c-a5b3-a40ffea37690" dmnElementRef="_8b838f06-968a-4c66-875e-f5412fd692cf">
+				<dc:Bounds x="277" y="142.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_11d165e6-b609-483c-a6c8-3b29d0f57007" dmnElementRef="_b5e759df-f662-44cd-94f5-55c3c81f0ee3">
+				<dc:Bounds x="374" y="262.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_d9aca572-c374-446b-858b-cb4ab805e3e8" dmnElementRef="_dc2ca64d-2044-4806-9d0e-e705b3b14447">
+				<dc:Bounds x="591.5" y="263.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_5d3ed3ec-3569-4871-80a0-ca6463ff4822" dmnElementRef="_a5f9b126-7853-4037-9e23-3dd7e93c4032">
+				<dc:Bounds x="721.5" y="150" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_a1b2549e-ebfd-48f9-9eb9-26cf2a633197" dmnElementRef="_536d7a39-87a6-4651-b743-6ee03e16e535">
+				<dc:Bounds x="810.5" y="263.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_c52f4be2-14a9-492d-b43c-414509221ef1" dmnElementRef="_ca1e6032-12eb-428a-a80b-49028a88c0b5">
+				<dc:Bounds x="1024" y="262.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_ce794d2d-6915-4449-94f3-6c696f13735f" dmnElementRef="_a654be71-b54d-4d6e-90f0-ae505125e9a6">
+				<dc:Bounds x="88.5" y="370.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_740df4b9-aae6-48c2-a043-2afd5c49f652" dmnElementRef="_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9">
+				<dc:Bounds x="50" y="476.4786796569824" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_1a770b99-fccb-4815-89f9-81f5e095745e" dmnElementRef="_b982a42a-0b62-47fa-8911-6c9d1145d982">
+				<dc:Bounds x="567" y="365" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_3c91f051-3f67-4cc8-b264-1a2cc439a21f" dmnElementRef="_18d836e7-6d61-490c-b9a8-be3ce0c60c1e">
+				<dc:Bounds x="789" y="365" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_b1693c26-379c-4de0-b67e-bea8432e6952" dmnElementRef="_ee893e8d-f393-4e2c-b871-611a9cd30bf5">
+				<dc:Bounds x="695.5" y="476.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_4f00c139-48a7-4bb4-8e10-972ce790bbd9" dmnElementRef="_ed60265c-25e2-400f-a99f-fafd3b489838">
+				<dc:Bounds x="494.5" y="475.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_22d6f112-9f15-4326-8412-6db0a794275e" dmnElementRef="_728e3a50-f00f-42c0-b3ee-1ee5aabd5474">
+				<dc:Bounds x="918.5" y="475.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_e1b06a01-5f9e-4212-8814-019fbcf06122" dmnElementRef="_40b45659-9299-43a6-af30-04c948c5c0ec">
+				<dc:Bounds x="1024" y="587.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_68899272-8eb1-48e2-815e-707a9ecd8083" dmnElementRef="_e91de815-22ba-431c-8b46-55891f2a1ef6">
+				<dc:Bounds x="1225.7588291168213" y="715.9786758422852" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_a82d0133-35e7-43d1-a642-60caa2d04b90" dmnElementRef="_1c72ed95-ec72-47b4-8639-5ed14ccb77df">
+				<dc:Bounds x="1024.5" y="716.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_662479c8-e054-4e52-9db4-6ef922c56c39" dmnElementRef="_9997fcfd-0f50-4933-939e-88a235b5e2a0">
+				<dc:Bounds x="277" y="587.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_3fd27363-f5e5-4374-93c8-7067576ed30b" dmnElementRef="_51cc9510-3bfa-4e5a-a119-9bf83efdd266">
+				<dc:Bounds x="138" y="716.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_343c2b83-2e04-4f08-8dfa-dac81d2b0331" dmnElementRef="_e905f02c-c5d9-4f2a-ba57-7912ff523b46">
+				<dc:Bounds x="277" y="822.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_9152652c-9f2a-4b64-9ff3-f136cb69dbe7" dmnElementRef="_821a6840-e910-418f-809e-4c7d60b0b21a">
+				<dc:Bounds x="50" y="818" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_c98a40a9-1e93-4fe0-96db-719739d88bbe" dmnElementRef="_e9e07f04-0ff2-40c4-bd14-e5f06a91f942">
+				<dc:Bounds x="138" y="941.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_99a17d09-ffa6-4b9f-be2b-4506aaf73b34" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="503.2588291168213" y="940.9786758422852" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_317dd163-3d23-4ea3-b027-8ce87da1cad1" dmnElementRef="_3c8cee68-99dd-418c-847d-0b54697354f2">
+				<dc:Bounds x="840.5" y="822.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_96ac6a43-4e04-4ceb-be85-89ffd1dc3006" dmnElementRef="_fe938494-ee59-425e-8728-2347ea703563">
+				<dc:Bounds x="736.2588291168213" y="940.9786758422852" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_254ffe68-6cd4-432e-bc44-2de5252d947f" dmnElementRef="_7235d875-2426-4869-b6df-92ca06ae80c5">
+				<dc:Bounds x="945" y="941.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_ed20d744-541f-44b7-a3f9-45d10371c6d6" dmnElementRef="include1:_a30c75ec-7d81-4606-802c-b31ea308392d">
+				<dc:Bounds x="1157" y="941.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_ff5e52a4-5bea-448c-bd90-bda28eec9323" dmnElementRef="_dabc7bb7-b8be-4654-9f7e-455481cb1c4e">
+				<di:waypoint x="993.5" y="84.5"/>
+				<di:waypoint x="1069" y="84.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_92d9b87b-d396-448f-a004-349cf0ca6f45" dmnElementRef="_7fc499b6-a180-4e16-80cd-58df441f4d38">
+				<di:waypoint x="1293.4968013763428" y="262.97867584228516"/>
+				<di:waypoint x="1195.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_8ddc01e9-ef2c-4f20-a070-e0a9b45c47b9" dmnElementRef="_839ccfec-8902-40ca-8767-df9073f797e5">
+				<di:waypoint x="962.5" y="292.4786796569824"/>
+				<di:waypoint x="1024" y="292.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_06486f6d-6994-41ef-a8db-81770fc7e9b7" dmnElementRef="_3a4e82d4-7a7a-43c7-9528-efa8b9e69e7c">
+				<di:waypoint x="1100.5" y="262.9786796569824"/>
+				<di:waypoint x="1135.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_21562fd6-873a-4e83-b8cc-a16df4057da6" dmnElementRef="_57d99f5f-48e1-456c-ab7c-4247e840a7fc">
+				<di:waypoint x="784" y="203"/>
+				<di:waypoint x="885.5" y="263.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_c4a7713d-e0d0-4764-bae8-e63f3537b42a" dmnElementRef="_e8e3eaaf-3f57-49d7-b5c3-41eb57ecbbe7">
+				<di:waypoint x="734" y="217"/>
+				<di:waypoint x="666.5" y="263.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_79cc7227-2172-46cd-8376-e6db749153ef" dmnElementRef="_114baf7e-1b8f-489a-98c9-e7d26d330119">
+				<di:waypoint x="253.5" y="262.9786796569824"/>
+				<di:waypoint x="323.5" y="202.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_f7b69077-9a1f-439b-ba5c-c5ddd7e9dea9" dmnElementRef="_b7de8dff-4db7-4ef0-8412-0d3fe09955d7">
+				<di:waypoint x="440.5" y="262.9786796569824"/>
+				<di:waypoint x="373.5" y="202.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_90f39c58-82a0-405e-ad2f-9c6f8ffa5bdd" dmnElementRef="_1c3489b1-44dd-4137-883a-35da157f0c1d">
+				<di:waypoint x="591.5" y="292.4786796569824"/>
+				<di:waypoint x="527" y="292.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_7987705d-5788-4ff1-9497-819e523b8ac1" dmnElementRef="_7f7c177a-5acb-4941-9654-23f9408200b3">
+				<di:waypoint x="692" y="424"/>
+				<di:waypoint x="740.5" y="476.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_57295a64-8277-4df4-9054-5c99cbd13b9c" dmnElementRef="_c8f97eed-f12b-4d72-8c42-7edeeced9527">
+				<di:waypoint x="826.5" y="432"/>
+				<di:waypoint x="800.5" y="476.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_1a9b2354-b389-47d9-8d38-a81e2da67f46" dmnElementRef="_18fda7ab-ca43-4860-a94b-760d3cd68ce2">
+				<di:waypoint x="173.5" y="370.4786796569824"/>
+				<di:waypoint x="223.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_810cbec7-bd9e-4d9b-898c-47161d5162cf" dmnElementRef="_a34e38e6-5d10-46d5-ae80-41c3045c73df">
+				<di:waypoint x="333.5" y="587.9786796569824"/>
+				<di:waypoint x="253.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_97a3b1e2-1eba-4a28-9812-358358f94d0b" dmnElementRef="_2cad5b1f-59de-4cf2-9216-b662b2760bff">
+				<di:waypoint x="100" y="476.4786796569824"/>
+				<di:waypoint x="153.5" y="429.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_788d6f7c-bbfa-4040-bd8d-e401f65f3fe0" dmnElementRef="_94475973-9022-46d7-a520-756538ba9c00">
+				<di:waypoint x="353.5" y="587.9786796569824"/>
+				<di:waypoint x="440.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_3b1a8ae8-d120-454c-8607-e0893ef2d352" dmnElementRef="_00c137a3-a81c-42ff-af6d-5c3247151273">
+				<di:waypoint x="383.5" y="587.9786796569824"/>
+				<di:waypoint x="531" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b9c4734a-bf1e-4873-91fb-17603b453dda" dmnElementRef="_07b3ea4d-1eee-4551-b148-b40052f1407a">
+				<di:waypoint x="150" y="490.9786796569824"/>
+				<di:waypoint x="567" y="394"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_19f3493f-378f-4b01-9e8f-6c947e2a1c92" dmnElementRef="_8c6d88aa-7775-4b03-8ee2-6455f1eeb4d1">
+				<di:waypoint x="847.5" y="505.4786796569824"/>
+				<di:waypoint x="918.5" y="505.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_79b6d42a-a88d-4bbe-af92-7eb43530f212" dmnElementRef="_0c8ff057-3467-4ad0-a3ab-a9a3f3d95032">
+				<di:waypoint x="695.5" y="505.4786796569824"/>
+				<di:waypoint x="647.5" y="505.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_7d9886a9-b720-449b-a9ee-b9ff19214215" dmnElementRef="_132debf9-e318-4710-a226-982da98dd278">
+				<di:waypoint x="995" y="475.9786796569824"/>
+				<di:waypoint x="1080.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_7a184012-35d0-4ccd-bab4-75b682532e75" dmnElementRef="_78acd4f1-cd28-4e53-aeaf-594a006a0f1d">
+				<di:waypoint x="1100.5" y="587.9786796569824"/>
+				<di:waypoint x="1100.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_28f25ecb-1438-4c3f-b479-409dc62e8ea3" dmnElementRef="_5046fe50-d2f2-4e54-b1e4-e7de5ffd4bb2">
+				<di:waypoint x="1293.4968013763428" y="715.9786758422852"/>
+				<di:waypoint x="1155.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0592b263-628a-4188-84fa-ebcb5db3f7ae" dmnElementRef="_290b4df4-ffe6-4106-9e22-07a339146161">
+				<di:waypoint x="590.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="1105.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_dd46ade9-b5f3-4c69-be62-2fba4d2ccad3" dmnElementRef="_dc094e13-abbd-4164-bc95-a61b433a7be4">
+				<di:waypoint x="1099.5" y="716.4786796569824"/>
+				<di:waypoint x="1100.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_1e2df774-a85d-47d3-9b69-e9b658a5c7de" dmnElementRef="_afa8490a-52e3-48cd-94a6-1602e00ffe59">
+				<di:waypoint x="1263.4968013763428" y="715.9786758422852"/>
+				<di:waypoint x="1140.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_98bf15a8-c171-408c-8640-7ef2614ff482" dmnElementRef="_ffe200eb-8e0d-4941-9707-9a100fc8e123">
+				<di:waypoint x="1283.4968013763428" y="715.9786758422852"/>
+				<di:waypoint x="1120.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_10c5c589-256f-4a8b-a30d-94d4f77112a6" dmnElementRef="_828b316c-d2e4-4c68-8797-9fb6077d10ba">
+				<di:waypoint x="570.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="571" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b02f656c-ac89-403c-940b-5e737be2b638" dmnElementRef="_c5e79286-ea8f-4340-bd38-e878054891f2">
+				<di:waypoint x="813.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="887" y="882.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_d5609aac-93d8-466d-955a-9c322f903260" dmnElementRef="_c40b08f2-613a-4a46-841c-c9d2d117578e">
+				<di:waypoint x="1010" y="941.4786796569824"/>
+				<di:waypoint x="937" y="882.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b8b060fc-0deb-4079-8d6b-b93daf1133bc" dmnElementRef="_f7991b2e-6fee-4e49-a79e-fcc667dc8e84">
+				<di:waypoint x="1090.5" y="587.9786796569824"/>
+				<di:waypoint x="995" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0e6ee14b-6806-4593-b398-efc4da3e1feb" dmnElementRef="_9eeef063-346f-44d4-b722-2d8071d3d994">
+				<di:waypoint x="927" y="822.9786796569824"/>
+				<di:waypoint x="985" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_fc769965-b6c4-4f77-9d11-33ff625cf58a" dmnElementRef="_466b70d3-035a-413d-93bd-ae28c778d02d">
+				<di:waypoint x="610.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="965" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_44deed7d-0ca8-4e9c-a972-7f4e8397e064" dmnElementRef="_668fa95d-373d-4430-b833-7c27308d2a80">
+				<di:waypoint x="632.4968013763428" y="950.9786758422852"/>
+				<di:waypoint x="1060.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2465cbb3-0279-4117-9a10-27172b9c3a28" dmnElementRef="_b752b8ba-8fab-4658-94d9-1aaaa51af3a2">
+				<di:waypoint x="87.5" y="543.4786796569824"/>
+				<di:waypoint x="146.5" y="724.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_54e9b93b-7633-4983-9150-232a3565b0a3" dmnElementRef="_d37ce038-f9cc-4576-92a7-dd64eea28a2d">
+				<di:waypoint x="213" y="716.4786796569824"/>
+				<di:waypoint x="313.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_e0f5f874-01e6-4730-8f0b-61376728eb86" dmnElementRef="_5bccc005-33ba-40e9-8514-3fa3444ac11d">
+				<di:waypoint x="87.5" y="885"/>
+				<di:waypoint x="138" y="980.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b14c232b-e4ea-41aa-9f67-6413c8423675" dmnElementRef="_c94de723-def1-49e4-9aae-5270fe39630f">
+				<di:waypoint x="223" y="941.4786796569824"/>
+				<di:waypoint x="323.5" y="882.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2cafac50-1bf7-4841-bb88-7eb1400af07a" dmnElementRef="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+				<di:waypoint x="510.4968013763428" y="950.9786758422852"/>
+				<di:waypoint x="403.5" y="882.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_d8760f3a-1108-4efd-ba5f-2bdf21f90a81" dmnElementRef="_7b60cf6f-1265-4460-bf43-8d10272fe9f2">
+				<di:waypoint x="530.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="373.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_097af913-509c-4cd8-bdd6-45fce884bbab" dmnElementRef="_2f70ff15-13ec-4104-8256-2a6c3d240a56">
+				<di:waypoint x="353.5" y="822.9786796569824"/>
+				<di:waypoint x="353.5" y="647.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2819cfea-477d-4652-8ebf-4c90456ccef1" dmnElementRef="_aa1fbb92-27fc-4108-9257-2017c2dbc601">
+				<di:waypoint x="150" y="510.9786796569824"/>
+				<di:waypoint x="1024.5" y="735.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0093086e-95dc-4ba9-9edb-2e249d1cf967" dmnElementRef="_b8cf27f2-7b58-4490-8dac-0e6ff99a517b">
+				<di:waypoint x="907" y="822.9786796569824"/>
+				<di:waypoint x="601" y="535.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_972a19bf-350a-47be-8afe-74540f14a4d0" dmnElementRef="_f9db6cb4-f2d6-4e7f-8b04-37f9139dd6c3">
+				<di:waypoint x="550.9968013763428" y="940.9786758422852"/>
+				<di:waypoint x="450.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_71fe7cd9-0e0d-4a6a-989f-3842a965bb64" dmnElementRef="_a1f0d284-033d-4683-9a0c-13f1184e0503">
+				<di:waypoint x="571" y="475.9786796569824"/>
+				<di:waypoint x="460.5" y="322.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_a770742b-4ff3-40a5-95be-92d8d9e470f0" dmnElementRef="_655fba60-b529-4c21-bd96-9c778998d3fb">
+				<di:waypoint x="430" y="842.9786796569824"/>
+				<di:waypoint x="1024" y="617.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2de39711-33bb-4aad-94be-036606811a00" dmnElementRef="_f0a6536d-0e7f-44d3-a9bb-5213478173da">
+				<di:waypoint x="1157" y="970.4786796569824"/>
+				<di:waypoint x="1097" y="970.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNDiagram id="_0e22b6cf-0a6e-40e1-a81e-44b31ad86262" name="DRD for Decide bureau strategy decision point">
+			<dmndi:Size height="967.0000038146973" width="979.8080854415894"/>
+			<dmndi:DMNShape id="_80a2a8fd-9bc7-49cb-8b91-bea566d2324b" dmnElementRef="_fe938494-ee59-425e-8728-2347ea703563">
+				<dc:Bounds x="594" y="740.9999923706055" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_119017a3-7e0d-4324-800f-3e088e498c75" dmnElementRef="_3c8cee68-99dd-418c-847d-0b54697354f2">
+				<dc:Bounds x="698.2411708831787" y="622.9999961853027" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_3b1d8f15-d493-4fa9-bcfb-42fcbd6a7287" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="513.7588291168213" y="856.9999961853027" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_68dc56c3-7930-4816-b843-089a9de5c1a6" dmnElementRef="_e9e07f04-0ff2-40c4-bd14-e5f06a91f942">
+				<dc:Bounds x="148.5" y="857.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_9f98c1ca-1354-49dc-95a7-c5dd85cac42d" dmnElementRef="_821a6840-e910-418f-809e-4c7d60b0b21a">
+				<dc:Bounds x="29.5" y="736.0213203430176" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_0f1008a0-ae96-4e27-aa5d-b3bc11c05fac" dmnElementRef="_e905f02c-c5d9-4f2a-ba57-7912ff523b46">
+				<dc:Bounds x="275.5" y="741" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_191faa22-22f9-4c0e-a7d7-b16b8a44d560" dmnElementRef="_51cc9510-3bfa-4e5a-a119-9bf83efdd266">
+				<dc:Bounds x="148.5" y="623.4999961853027" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_3ee31f31-9681-4389-8bfa-4a3643ee85db" dmnElementRef="_9997fcfd-0f50-4933-939e-88a235b5e2a0">
+				<dc:Bounds x="287.5" y="532" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_6943ac13-5ec7-47f5-a93e-00df738f8362" dmnElementRef="_ed60265c-25e2-400f-a99f-fafd3b489838">
+				<dc:Bounds x="505" y="383" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_cec4eba7-8505-4ef2-ab1f-a6b997f4d43e" dmnElementRef="_ee893e8d-f393-4e2c-b871-611a9cd30bf5">
+				<dc:Bounds x="706" y="383.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_65f0b61c-ece5-4d43-9fb0-57288f3900c3" dmnElementRef="_18d836e7-6d61-490c-b9a8-be3ce0c60c1e">
+				<dc:Bounds x="799.5" y="272.0213203430176" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_0cc08173-136b-42d3-9fa1-09c690920b37" dmnElementRef="_b982a42a-0b62-47fa-8911-6c9d1145d982">
+				<dc:Bounds x="572.5" y="290.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_c1903235-a689-4c6c-9dcc-479e982b57d8" dmnElementRef="_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9">
+				<dc:Bounds x="29.5" y="417.0213203430176" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_6d63627c-90c4-49fd-9230-c3eb47926594" dmnElementRef="_a654be71-b54d-4d6e-90f0-ae505125e9a6">
+				<dc:Bounds x="89" y="290.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_4a8fd722-4d10-4234-b2d2-e8408a4e65fa" dmnElementRef="_a5f9b126-7853-4037-9e23-3dd7e93c4032">
+				<dc:Bounds x="732" y="57.02132034301758" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_641f3b03-7f81-468a-b326-e89b881e9c9b" dmnElementRef="_dc2ca64d-2044-4806-9d0e-e705b3b14447">
+				<dc:Bounds x="602" y="170.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_7076cd45-5bf9-47a2-9fed-6df474257bfb" dmnElementRef="_b5e759df-f662-44cd-94f5-55c3c81f0ee3">
+				<dc:Bounds x="384.5" y="170" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_fe28b5fd-85bb-4254-a3a3-22f5feff055e" dmnElementRef="_8b838f06-968a-4c66-875e-f5412fd692cf">
+				<dc:Bounds x="287.5" y="50" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_d3099e88-e780-4a4f-affc-c8169158a5e8" dmnElementRef="_5b8356f3-2cf2-40e8-8f80-324937e8b276">
+				<dc:Bounds x="187.5" y="170" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_e935455f-efe1-494c-b9a5-1d8c37219e06" dmnElementRef="include1:_a30c75ec-7d81-4606-802c-b31ea308392d">
+				<dc:Bounds x="777.8080854415894" y="857.5" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_326709ad-71e2-4e73-ace4-0cc197b3f536" dmnElementRef="_7235d875-2426-4869-b6df-92ca06ae80c5">
+				<dc:Bounds x="777.8080854415894" y="741.4999961853027" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_9af973d8-43d2-4c7e-a1b8-073379713699" dmnElementRef="_a1f0d284-033d-4683-9a0c-13f1184e0503">
+				<di:waypoint x="581.5" y="383"/>
+				<di:waypoint x="471" y="230"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_df0420fd-e9e5-4e41-935a-16ef8dc7e88c" dmnElementRef="_f9db6cb4-f2d6-4e7f-8b04-37f9139dd6c3">
+				<di:waypoint x="551.4968013763428" y="856.9999961853027"/>
+				<di:waypoint x="461" y="230"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_91bbd80d-6ea4-41e2-883f-2e8acf5ba7a5" dmnElementRef="_b8cf27f2-7b58-4490-8dac-0e6ff99a517b">
+				<di:waypoint x="764.7411708831787" y="622.9999961853027"/>
+				<di:waypoint x="611.5" y="443"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_3d004781-db04-4465-8cfb-302ea51eb8d1" dmnElementRef="_2f70ff15-13ec-4104-8256-2a6c3d240a56">
+				<di:waypoint x="352" y="741"/>
+				<di:waypoint x="354" y="592"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_a2dad098-4b9a-4131-8a0c-1be284eb0539" dmnElementRef="_7b60cf6f-1265-4460-bf43-8d10272fe9f2">
+				<di:waypoint x="541.4968013763428" y="856.9999961853027"/>
+				<di:waypoint x="384" y="592"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2880c9ff-4f28-421e-8fae-34b89b06c204" dmnElementRef="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+				<di:waypoint x="520.9968013763428" y="866.9999961853027"/>
+				<di:waypoint x="402" y="801"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_024c0689-9ed4-491b-a2e1-2d02b7d42383" dmnElementRef="_c94de723-def1-49e4-9aae-5270fe39630f">
+				<di:waypoint x="233.5" y="857.5"/>
+				<di:waypoint x="322" y="801"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_39fbc611-0e1b-4af1-883b-aa77e1e2061f" dmnElementRef="_5bccc005-33ba-40e9-8514-3fa3444ac11d">
+				<di:waypoint x="67" y="803.0213203430176"/>
+				<di:waypoint x="148.5" y="886.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_8f610d6c-98f2-45b3-85f6-312ff212bc7b" dmnElementRef="_d37ce038-f9cc-4576-92a7-dd64eea28a2d">
+				<di:waypoint x="223.5" y="623.4999961853027"/>
+				<di:waypoint x="324" y="592"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_bd8e70ee-0662-4e8a-8f9a-a7ebf404a46b" dmnElementRef="_b752b8ba-8fab-4658-94d9-1aaaa51af3a2">
+				<di:waypoint x="67" y="484.0213203430176"/>
+				<di:waypoint x="148.5" y="662.4999961853027"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_cb7eaa51-8619-48c6-a0d6-3b10f40a1eac" dmnElementRef="_c40b08f2-613a-4a46-841c-c9d2d117578e">
+				<di:waypoint x="852.8080854415894" y="741.4999961853027"/>
+				<di:waypoint x="794.7411708831787" y="682.9999961853027"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2533deda-855f-48ba-8fdc-3675fb2df3ce" dmnElementRef="_c5e79286-ea8f-4340-bd38-e878054891f2">
+				<di:waypoint x="671.7379722595215" y="740.9999923706055"/>
+				<di:waypoint x="744.7411708831787" y="682.9999961853027"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_e786b1f0-c3ef-4060-a3b7-eb16e0edf2ea" dmnElementRef="_828b316c-d2e4-4c68-8797-9fb6077d10ba">
+				<di:waypoint x="581.4968013763428" y="856.9999961853027"/>
+				<di:waypoint x="581.5" y="443"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_effc3ae5-2fca-402b-aece-4e9fa58f9812" dmnElementRef="_0c8ff057-3467-4ad0-a3ab-a9a3f3d95032">
+				<di:waypoint x="706" y="412.5"/>
+				<di:waypoint x="658" y="413"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2d19fb5f-d272-4cd3-8297-6fb9740f4342" dmnElementRef="_07b3ea4d-1eee-4551-b148-b40052f1407a">
+				<di:waypoint x="129.5" y="431.5213203430176"/>
+				<di:waypoint x="572.5" y="319.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_ad0db5e4-a620-4a97-872f-a8c9289a538c" dmnElementRef="_00c137a3-a81c-42ff-af6d-5c3247151273">
+				<di:waypoint x="394" y="532"/>
+				<di:waypoint x="541.5" y="443"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_64bf8314-a651-4f52-a99e-e6457550ad59" dmnElementRef="_94475973-9022-46d7-a520-756538ba9c00">
+				<di:waypoint x="364" y="532"/>
+				<di:waypoint x="451" y="230"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_20e13ac5-c830-4bd4-bce5-2ce61c3963a9" dmnElementRef="_2cad5b1f-59de-4cf2-9216-b662b2760bff">
+				<di:waypoint x="79.5" y="417.0213203430176"/>
+				<di:waypoint x="154" y="349.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_89190762-0fd1-4cf5-a43b-1b072a8640a0" dmnElementRef="_a34e38e6-5d10-46d5-ae80-41c3045c73df">
+				<di:waypoint x="344" y="532"/>
+				<di:waypoint x="264" y="230"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_9b46cfcc-256b-4660-8763-36e297fb8800" dmnElementRef="_18fda7ab-ca43-4860-a94b-760d3cd68ce2">
+				<di:waypoint x="174" y="290.5"/>
+				<di:waypoint x="234" y="230"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_3cdffa98-f7e4-4ea3-a65f-2cfb83d58f2c" dmnElementRef="_c8f97eed-f12b-4d72-8c42-7edeeced9527">
+				<di:waypoint x="837" y="339.0213203430176"/>
+				<di:waypoint x="811" y="383.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b7a08e14-77cf-489c-bd66-df8e548beacf" dmnElementRef="_7f7c177a-5acb-4941-9654-23f9408200b3">
+				<di:waypoint x="697.5" y="349.5"/>
+				<di:waypoint x="751" y="383.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_93a83c4a-576a-47ec-bc9d-d8b0c1a95b97" dmnElementRef="_1c3489b1-44dd-4137-883a-35da157f0c1d">
+				<di:waypoint x="602" y="199.5"/>
+				<di:waypoint x="537.5" y="200"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_16370eb0-b28e-481e-bb2b-ae0466659220" dmnElementRef="_b7de8dff-4db7-4ef0-8412-0d3fe09955d7">
+				<di:waypoint x="451" y="170"/>
+				<di:waypoint x="384" y="110"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_9f4799aa-52da-4bc5-a5e3-8bd8e6ae0d78" dmnElementRef="_114baf7e-1b8f-489a-98c9-e7d26d330119">
+				<di:waypoint x="264" y="170"/>
+				<di:waypoint x="334" y="110"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0cfb20a2-fd2a-4911-b754-bab4f138c1d6" dmnElementRef="_e8e3eaaf-3f57-49d7-b5c3-41eb57ecbbe7">
+				<di:waypoint x="744.5" y="124.02132034301758"/>
+				<di:waypoint x="677" y="170.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_ee239df9-d8a4-461c-9ba7-43105f3c5a12" dmnElementRef="_f0a6536d-0e7f-44d3-a9bb-5213478173da">
+				<di:waypoint x="852.8080854415894" y="857.5"/>
+				<di:waypoint x="853.8080854415894" y="800.4999961853027"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNDiagram id="_3275163a-921d-48f8-967a-21c4373b1197" name="DRD for Decide routing decision point">
+			<dmndi:Size height="768.4786834716797" width="1140.5"/>
+			<dmndi:DMNShape id="_7b4cf31d-6e5e-4654-9dc6-44fbaa21b105" dmnElementRef="_7235d875-2426-4869-b6df-92ca06ae80c5">
+				<dc:Bounds x="338.2411708831787" y="658.9786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_8841d4b9-1fe6-4238-b473-9500efb152c9" dmnElementRef="_fe938494-ee59-425e-8728-2347ea703563">
+				<dc:Bounds x="129.5" y="658.4786758422852" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_e25734f2-0621-4de4-a551-7a2e3ff4b4e3" dmnElementRef="_3c8cee68-99dd-418c-847d-0b54697354f2">
+				<dc:Bounds x="233.7411708831787" y="528.4786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_7106a296-cf23-402e-ba5a-da68d3b2cbf6" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="542.7588291168213" y="658.4786758422852" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_85ca2722-c63d-4bee-b4a2-20865788790b" dmnElementRef="_e9e07f04-0ff2-40c4-bd14-e5f06a91f942">
+				<dc:Bounds x="938.5" y="528.9786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_c5b281c8-65f9-4170-8d91-bc4356eb0199" dmnElementRef="_821a6840-e910-418f-809e-4c7d60b0b21a">
+				<dc:Bounds x="990.5" y="393" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_12e52af3-c2f4-4838-9312-77ae9d9367e2" dmnElementRef="_e905f02c-c5d9-4f2a-ba57-7912ff523b46">
+				<dc:Bounds x="716" y="528.4786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_cdf6ea09-1597-4ce6-baad-32bd9bfab22a" dmnElementRef="_1c72ed95-ec72-47b4-8639-5ed14ccb77df">
+				<dc:Bounds x="233.87058544158936" y="398.4786796569824" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_3668effc-4c16-48eb-af14-8807dcae39ef" dmnElementRef="_e91de815-22ba-431c-8b46-55891f2a1ef6">
+				<dc:Bounds x="815.7588291168213" y="397.97867584228516" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_8bc5b940-7c9b-4ad4-ba19-3c8ca4fbfd15" dmnElementRef="_40b45659-9299-43a6-af30-04c948c5c0ec">
+				<dc:Bounds x="598" y="397.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_644f0ba0-4030-4fe1-8719-e2a96687da4b" dmnElementRef="_728e3a50-f00f-42c0-b3ee-1ee5aabd5474">
+				<dc:Bounds x="482.5" y="248.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_b9c5cd5a-548c-4616-9969-1a9612959967" dmnElementRef="_ee893e8d-f393-4e2c-b871-611a9cd30bf5">
+				<dc:Bounds x="259.5" y="249.47867965698242" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_c9bf39d1-bbb8-4229-a138-bf899e6c35ba" dmnElementRef="_18d836e7-6d61-490c-b9a8-be3ce0c60c1e">
+				<dc:Bounds x="363.87058544158936" y="142" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_2dd25d60-5458-4699-91d3-61afb5bdc9f4" dmnElementRef="_b982a42a-0b62-47fa-8911-6c9d1145d982">
+				<dc:Bounds x="50" y="249.47867965698242" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_7a72af18-3e24-42c0-9e88-782c7d298182" dmnElementRef="_974b09c2-2ff1-4eb4-bb7c-2b68fa24ddf9">
+				<dc:Bounds x="76" y="393" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_18491c1e-7e4f-4930-8e41-96fea4126b9f" dmnElementRef="_ca1e6032-12eb-428a-a80b-49028a88c0b5">
+				<dc:Bounds x="598" y="54.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_85bcfbfb-3697-42f8-86d5-e09f06265ceb" dmnElementRef="_536d7a39-87a6-4651-b743-6ee03e16e535">
+				<dc:Bounds x="374.5" y="55.47867965698242" width="152" height="59"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_86c8b375-241a-422b-b7ee-0aa92acdf4f3" dmnElementRef="_a5f9b126-7853-4037-9e23-3dd7e93c4032">
+				<dc:Bounds x="192.5" y="50" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_e70a052a-708c-4039-af18-6c7cc2c5cc0d" dmnElementRef="_655fba60-b529-4c21-bd96-9c778998d3fb">
+				<di:waypoint x="792.5" y="528.4786796569824"/>
+				<di:waypoint x="714.5" y="457.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_9df5af62-acc5-4bd6-8bde-1844b9898b1a" dmnElementRef="_aa1fbb92-27fc-4108-9257-2017c2dbc601">
+				<di:waypoint x="176" y="427.5"/>
+				<di:waypoint x="233.87058544158936" y="427.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_bcc15c66-942e-444f-9622-0b46e4bb9452" dmnElementRef="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+				<di:waypoint x="620.4968013763428" y="658.4786758422852"/>
+				<di:waypoint x="792.5" y="588.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_75625c72-7057-4063-aad5-51c1b2fba93b" dmnElementRef="_c94de723-def1-49e4-9aae-5270fe39630f">
+				<di:waypoint x="938.5" y="557.9786796569824"/>
+				<di:waypoint x="869" y="558.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0f4486ba-53a9-44b1-bfca-1c5ffb4cb6b3" dmnElementRef="_5bccc005-33ba-40e9-8514-3fa3444ac11d">
+				<di:waypoint x="1028" y="460"/>
+				<di:waypoint x="1023.5" y="528.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2c2611a4-223c-4066-a90a-e676fd9bcac8" dmnElementRef="_668fa95d-373d-4430-b833-7c27308d2a80">
+				<di:waypoint x="610.4968013763428" y="658.4786758422852"/>
+				<di:waypoint x="664.5" y="457.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_0a1d74e7-65e1-4e55-977a-cf3c6d3259fe" dmnElementRef="_466b70d3-035a-413d-93bd-ae28c778d02d">
+				<di:waypoint x="600.4968013763428" y="658.4786758422852"/>
+				<di:waypoint x="549" y="308.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_110dc4e7-e6f6-4ed3-a99f-5360386496e6" dmnElementRef="_9eeef063-346f-44d4-b722-2d8071d3d994">
+				<di:waypoint x="320.2411708831787" y="528.4786796569824"/>
+				<di:waypoint x="509" y="308.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_2d5b24a8-4a8b-4e16-8b84-c0d4a8345335" dmnElementRef="_f7991b2e-6fee-4e49-a79e-fcc667dc8e84">
+				<di:waypoint x="664.5" y="397.9786796569824"/>
+				<di:waypoint x="609" y="308.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_a5d92ccd-57bd-4b21-a415-caf534fe7e73" dmnElementRef="_c40b08f2-613a-4a46-841c-c9d2d117578e">
+				<di:waypoint x="403.2411708831787" y="658.9786796569824"/>
+				<di:waypoint x="330.2411708831787" y="588.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_7d743acb-874e-4b70-a1ed-fedf58bb3362" dmnElementRef="_c5e79286-ea8f-4340-bd38-e878054891f2">
+				<di:waypoint x="207.23797225952148" y="658.4786758422852"/>
+				<di:waypoint x="280.2411708831787" y="588.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_cd1178b0-dbee-4718-8393-227565d10f7d" dmnElementRef="_ffe200eb-8e0d-4941-9707-9a100fc8e123">
+				<di:waypoint x="873.4968013763428" y="397.97867584228516"/>
+				<di:waypoint x="694.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_ca2d3a25-e73e-4416-9f52-cc2505773bf2" dmnElementRef="_afa8490a-52e3-48cd-94a6-1602e00ffe59">
+				<di:waypoint x="815.9968013763428" y="427.97867584228516"/>
+				<di:waypoint x="751" y="427.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_ca70ee2f-e133-4214-b0ff-955d68df06f1" dmnElementRef="_dc094e13-abbd-4164-bc95-a61b433a7be4">
+				<di:waypoint x="385.87058544158936" y="427.4786796569824"/>
+				<di:waypoint x="598" y="427.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_f0f2802e-aea3-48ce-bec1-82ed35845063" dmnElementRef="_78acd4f1-cd28-4e53-aeaf-594a006a0f1d">
+				<di:waypoint x="674.5" y="397.9786796569824"/>
+				<di:waypoint x="674.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_e817868c-79fa-4b31-8903-10b612c6470c" dmnElementRef="_132debf9-e318-4710-a226-982da98dd278">
+				<di:waypoint x="559" y="248.97867965698242"/>
+				<di:waypoint x="654.5" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_1b100239-3889-4410-b03f-85577ad57026" dmnElementRef="_8c6d88aa-7775-4b03-8ee2-6455f1eeb4d1">
+				<di:waypoint x="411.5" y="278.4786796569824"/>
+				<di:waypoint x="482.5" y="278.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_f83178d6-4e9d-4751-ad72-78932a93e2f7" dmnElementRef="_07b3ea4d-1eee-4551-b148-b40052f1407a">
+				<di:waypoint x="126" y="393"/>
+				<di:waypoint x="126" y="308.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_91491d86-be6e-4b14-8795-dff66e50c320" dmnElementRef="_c8f97eed-f12b-4d72-8c42-7edeeced9527">
+				<di:waypoint x="401.37058544158936" y="209"/>
+				<di:waypoint x="364.5" y="249.47867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_f3bd7301-1563-482b-89d7-8fdd2354f121" dmnElementRef="_7f7c177a-5acb-4941-9654-23f9408200b3">
+				<di:waypoint x="202" y="278.4786796569824"/>
+				<di:waypoint x="259.5" y="278.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_afc6bacd-7d75-4c22-9379-87dae05a7ec3" dmnElementRef="_57d99f5f-48e1-456c-ab7c-4247e840a7fc">
+				<di:waypoint x="292.5" y="84.5"/>
+				<di:waypoint x="374.5" y="84.47867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_919da30d-975c-4b80-b974-5ce79d1f8c0a" dmnElementRef="_839ccfec-8902-40ca-8767-df9073f797e5">
+				<di:waypoint x="526.5" y="84.47867965698242"/>
+				<di:waypoint x="598" y="84.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNDiagram id="_a35ef6e9-0408-4288-b8f2-d28ac4baca3b" name="DRD for Review application decision point">
+			<dmndi:Size height="430.9786834716797" width="665.7411708831787"/>
+			<dmndi:DMNShape id="_8753a9cc-cdac-4090-93e3-27e9b1080619" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="57.75882911682129" y="222.97867584228516" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_b2b2db6e-d9b3-4fa5-bb7d-42ecf849a6a6" dmnElementRef="_e91de815-22ba-431c-8b46-55891f2a1ef6">
+				<dc:Bounds x="382.2588291168213" y="320.97867584228516" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_031ba6ca-c73e-42ae-917b-70726dab086c" dmnElementRef="_ca1e6032-12eb-428a-a80b-49028a88c0b5">
+				<dc:Bounds x="179.5" y="320.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_6dc46488-4b09-4ca2-a116-31b1dd57ec22" dmnElementRef="_34cd3187-8764-4249-959d-2664bf9f1847">
+				<dc:Bounds x="480.2588291168213" y="222.97867584228516" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_1ee7ca06-5141-461b-8df0-6396c924f424" dmnElementRef="_989d137f-86ff-4249-813f-af67c08a2762">
+				<dc:Bounds x="50" y="50" width="100" height="69.95735931396484"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_fa882c2e-c721-42e2-927b-629c58481dc9" dmnElementRef="_4bd33d4a-741b-444a-968b-64e1841211e7">
+				<dc:Bounds x="225.5" y="54.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_997dab16-04be-4787-ae98-b893a7731df9" dmnElementRef="_290b4df4-ffe6-4106-9e22-07a339146161">
+				<di:waypoint x="135.49680137634277" y="222.97867584228516"/>
+				<di:waypoint x="272" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_87998c24-d099-4504-8f7d-d85d0d25aa87" dmnElementRef="_5046fe50-d2f2-4e54-b1e4-e7de5ffd4bb2">
+				<di:waypoint x="449.9968013763428" y="320.97867584228516"/>
+				<di:waypoint x="302" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_45119ce3-3629-49af-8b1a-735ab94ec94c" dmnElementRef="_3a4e82d4-7a7a-43c7-9528-efa8b9e69e7c">
+				<di:waypoint x="256" y="320.9786796569824"/>
+				<di:waypoint x="292" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_9aad460e-772e-44b4-a8b0-956fc8a63bdf" dmnElementRef="_7fc499b6-a180-4e16-80cd-58df441f4d38">
+				<di:waypoint x="547.9968013763428" y="222.97867584228516"/>
+				<di:waypoint x="322" y="114.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_137fbdfd-56c6-4c13-8ee1-b9fd8f6438d3" dmnElementRef="_dabc7bb7-b8be-4654-9f7e-455481cb1c4e">
+				<di:waypoint x="150" y="84.5"/>
+				<di:waypoint x="225.5" y="84.97867965698242"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNDiagram id="_5c111794-4c6b-4747-8dfc-99d2ad0b6313" name="Bureau Strategy Decision Service">
+			<dmndi:Size height="893.0000038146973" width="743.8705854415894"/>
+			<dmndi:DMNShape id="_58aa9ca2-9b70-489b-a992-ab9a11c7cbc9" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="308.1470727920532" y="782.9999961853027" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_58f9e0e3-cfcc-4f08-aef4-e192d06975f4" dmnElementRef="_fe938494-ee59-425e-8728-2347ea703563">
+				<dc:Bounds x="524.6294145584106" y="782.9999961853027" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_392bc431-eb67-4350-9671-2a0677db09f4" dmnElementRef="_7befd964-eefa-4d8f-908d-8f6ad8d22c67" isCollapsed="false">
+				<dc:Bounds x="50" y="50" width="643.8705854415894" height="670"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+				<dmndi:DMNDecisionServiceDividerLine>
+					<di:waypoint x="50" y="275"/>
+					<di:waypoint x="693.8705854415894" y="275"/>
+				</dmndi:DMNDecisionServiceDividerLine>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_9e34a4d1-45da-4831-badc-73d8677348c0" dmnElementRef="_8b838f06-968a-4c66-875e-f5412fd692cf">
+				<dc:Bounds x="299.38824367523193" y="88" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_eca64fdc-9a9b-4437-a09c-985f20e5aa97" dmnElementRef="_5b8356f3-2cf2-40e8-8f80-324937e8b276">
+				<dc:Bounds x="136" y="197" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_5f9bf062-d0e9-447f-89c9-77e4c469182e" dmnElementRef="_b5e759df-f662-44cd-94f5-55c3c81f0ee3">
+				<dc:Bounds x="299.38824367523193" y="307" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_6afc8123-61b9-4532-beeb-47ef0a188d18" dmnElementRef="_ed60265c-25e2-400f-a99f-fafd3b489838">
+				<dc:Bounds x="479.5" y="461.5" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_502c37dd-dea7-4fde-b8df-8837fba3d41b" dmnElementRef="_9997fcfd-0f50-4933-939e-88a235b5e2a0">
+				<dc:Bounds x="136" y="461.5" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_587c02f7-6b33-4183-a2a7-7b66ea54c018" dmnElementRef="_e905f02c-c5d9-4f2a-ba57-7912ff523b46">
+				<dc:Bounds x="79" y="600" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_4319ac14-8191-4f5b-90ed-143062b9b6b2" dmnElementRef="_3c8cee68-99dd-418c-847d-0b54697354f2">
+				<dc:Bounds x="515.8705854415894" y="583" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_949bf535-e11a-49e9-9ce8-e3ad4840ea27" dmnElementRef="_114baf7e-1b8f-489a-98c9-e7d26d330119">
+				<di:waypoint x="212.5" y="197"/>
+				<di:waypoint x="345.88824367523193" y="148"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_648d510e-45f5-4f6b-85ce-f6c0d78bd2cf" dmnElementRef="_b7de8dff-4db7-4ef0-8412-0d3fe09955d7">
+				<di:waypoint x="375.88824367523193" y="307"/>
+				<di:waypoint x="375.88824367523193" y="148"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_b10bc203-1c9c-40d0-bf3d-3c2bb420ca22" dmnElementRef="_a34e38e6-5d10-46d5-ae80-41c3045c73df">
+				<di:waypoint x="212.5" y="461.5"/>
+				<di:waypoint x="212.5" y="257"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_d2e1b2a4-8675-4791-a021-b037a51db9cd" dmnElementRef="_94475973-9022-46d7-a520-756538ba9c00">
+				<di:waypoint x="232.5" y="461.5"/>
+				<di:waypoint x="365.88824367523193" y="367"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_19ae4b52-8660-46d8-8c20-3321766662ee" dmnElementRef="_00c137a3-a81c-42ff-af6d-5c3247151273">
+				<di:waypoint x="289" y="491.5"/>
+				<di:waypoint x="479.5" y="491.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_6b91c9bc-cb17-4f49-824d-ed044d77345c" dmnElementRef="_828b316c-d2e4-4c68-8797-9fb6077d10ba">
+				<di:waypoint x="415.8850450515747" y="782.9999961853027"/>
+				<di:waypoint x="496" y="521.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_077dfe7c-521b-472e-b93e-9037c54103ea" dmnElementRef="_c5e79286-ea8f-4340-bd38-e878054891f2">
+				<di:waypoint x="592.3673868179321" y="782.9999961853027"/>
+				<di:waypoint x="592.3705854415894" y="643"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_56de7caf-fbd7-440c-ba61-82db11f56f89" dmnElementRef="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+				<di:waypoint x="335.8850450515747" y="782.9999961853027"/>
+				<di:waypoint x="155.5" y="660"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_3478b12f-259d-4a1a-8a9e-63c6633d2d17" dmnElementRef="_7b60cf6f-1265-4460-bf43-8d10272fe9f2">
+				<di:waypoint x="365.8850450515747" y="782.9999961853027"/>
+				<di:waypoint x="232.5" y="521.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_4fd6e1df-93a4-422c-9cd5-816a0a9f54ae" dmnElementRef="_2f70ff15-13ec-4104-8256-2a6c3d240a56">
+				<di:waypoint x="155.5" y="600"/>
+				<di:waypoint x="212.5" y="521.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_4dac9a2f-c185-429a-8a34-ed4df45333c2" dmnElementRef="_b8cf27f2-7b58-4490-8dac-0e6ff99a517b">
+				<di:waypoint x="592.3705854415894" y="583"/>
+				<di:waypoint x="556" y="521.5"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_86e67447-9abc-411f-9e0c-7f96590ae288" dmnElementRef="_f9db6cb4-f2d6-4e7f-8b04-37f9139dd6c3">
+				<di:waypoint x="375.8850450515747" y="782.9999961853027"/>
+				<di:waypoint x="375.88824367523193" y="367"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_580f903e-7d68-42db-8a25-5349993b2c25" dmnElementRef="_a1f0d284-033d-4683-9a0c-13f1184e0503">
+				<di:waypoint x="556" y="461.5"/>
+				<di:waypoint x="385.88824367523193" y="367"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNDiagram id="_69750f88-f46f-4b47-bb3c-fb77f574f2b3" name="Routing Decision Service">
+			<dmndi:Size height="789.4573631286621" width="793"/>
+			<dmndi:DMNShape id="_9796f837-6893-4090-8b2e-2a7683cc76b5" dmnElementRef="_e91de815-22ba-431c-8b46-55891f2a1ef6">
+				<dc:Bounds x="607.5176582336426" y="679.4573554992676" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_7544fd3e-8acb-4f69-8c9f-10f617ed28ac" dmnElementRef="_d14df033-f4a2-47e3-9590-84e9ff04db4e">
+				<dc:Bounds x="269.7588291168213" y="679.4573554992676" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_7a126b99-6aa3-4152-b7f5-c8a62b928c51" dmnElementRef="_fe938494-ee59-425e-8728-2347ea703563">
+				<dc:Bounds x="83.75882911682129" y="679.4573554992676" width="135.48234176635742" height="60.00000762939453"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_448a6614-664f-4aa1-b68f-b8e5286db1b3" dmnElementRef="_4d91e3a5-acec-4254-81e4-8535a1d336ee" isCollapsed="false">
+				<dc:Bounds x="50" y="50" width="693" height="562.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+				<dmndi:DMNDecisionServiceDividerLine>
+					<di:waypoint x="50" y="190"/>
+					<di:waypoint x="743" y="190"/>
+				</dmndi:DMNDecisionServiceDividerLine>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_0cc014c9-e77f-42b7-9db9-d191dc1282b3" dmnElementRef="_ca1e6032-12eb-428a-a80b-49028a88c0b5">
+				<dc:Bounds x="400.62941455841064" y="82" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_06d6329b-0290-40a8-afa7-9c013a5c11ef" dmnElementRef="_728e3a50-f00f-42c0-b3ee-1ee5aabd5474">
+				<dc:Bounds x="179.62941455841064" y="219.97867965698242" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_08ff0bda-72ca-4f4f-b97c-8086e256dc37" dmnElementRef="_40b45659-9299-43a6-af30-04c948c5c0ec">
+				<dc:Bounds x="400.62941455841064" y="369.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_918c03e8-0a27-402a-bcb6-c73ce6bf7b68" dmnElementRef="_e905f02c-c5d9-4f2a-ba57-7912ff523b46">
+				<dc:Bounds x="400.62941455841064" y="496.4786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNShape id="_1736d75d-d232-49ef-b240-40f54606c120" dmnElementRef="_3c8cee68-99dd-418c-847d-0b54697354f2">
+				<dc:Bounds x="75" y="369.9786796569824" width="153" height="60"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNShape>
+			<dmndi:DMNEdge id="_10959e18-49b9-47f2-9857-616a5475f978" dmnElementRef="_132debf9-e318-4710-a226-982da98dd278">
+				<di:waypoint x="256.12941455841064" y="219.97867965698242"/>
+				<di:waypoint x="427.12941455841064" y="142"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_4954a232-9bb2-4b69-aa27-980d05026a6a" dmnElementRef="_78acd4f1-cd28-4e53-aeaf-594a006a0f1d">
+				<di:waypoint x="477.12941455841064" y="369.9786796569824"/>
+				<di:waypoint x="477.12941455841064" y="142"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_e943ad5c-b09f-497e-b27b-897baa3821cb" dmnElementRef="_afa8490a-52e3-48cd-94a6-1602e00ffe59">
+				<di:waypoint x="655.2556304931641" y="679.4573554992676"/>
+				<di:waypoint x="527.1294145584106" y="429.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_20993320-b2cc-4c5f-a70b-41c76e8fe5de" dmnElementRef="_ffe200eb-8e0d-4941-9707-9a100fc8e123">
+				<di:waypoint x="675.2556304931641" y="679.4573554992676"/>
+				<di:waypoint x="527.1294145584106" y="142"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_4c9ff6d6-e7cd-4026-9613-fc79c17bf9f3" dmnElementRef="_c5e79286-ea8f-4340-bd38-e878054891f2">
+				<di:waypoint x="151.49680137634277" y="679.4573554992676"/>
+				<di:waypoint x="151.5" y="429.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_7ca313c0-de73-455a-98ba-3bc5ff24ce8f" dmnElementRef="_f7991b2e-6fee-4e49-a79e-fcc667dc8e84">
+				<di:waypoint x="467.12941455841064" y="369.9786796569824"/>
+				<di:waypoint x="306.12941455841064" y="279.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_f7a5e094-bbf5-492e-89a7-069a267f8a32" dmnElementRef="_9eeef063-346f-44d4-b722-2d8071d3d994">
+				<di:waypoint x="161.5" y="369.9786796569824"/>
+				<di:waypoint x="206.12941455841064" y="279.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_ec68e6ae-4cbd-44b4-9102-7239b40c83d9" dmnElementRef="_466b70d3-035a-413d-93bd-ae28c778d02d">
+				<di:waypoint x="327.4968013763428" y="679.4573554992676"/>
+				<di:waypoint x="256.12941455841064" y="279.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_1d2a10bb-7892-47b4-88cf-d8c3bccb62a4" dmnElementRef="_668fa95d-373d-4430-b833-7c27308d2a80">
+				<di:waypoint x="337.4968013763428" y="679.4573554992676"/>
+				<di:waypoint x="407.12941455841064" y="429.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_1cafa890-64c6-456f-b7e6-44f7779d6155" dmnElementRef="_fb44eebf-50e6-47db-9894-cd3fd2e135d4">
+				<di:waypoint x="347.4968013763428" y="679.4573554992676"/>
+				<di:waypoint x="477.12941455841064" y="556.4786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+			<dmndi:DMNEdge id="_582cea04-bab2-44de-991d-b7f4335b0a1e" dmnElementRef="_655fba60-b529-4c21-bd96-9c778998d3fb">
+				<di:waypoint x="477.12941455841064" y="496.4786796569824"/>
+				<di:waypoint x="477.12941455841064" y="429.9786796569824"/>
+				<dmndi:DMNLabel sharedStyle="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0"/>
+			</dmndi:DMNEdge>
+		</dmndi:DMNDiagram>
+		<dmndi:DMNStyle id="LS_9d01a0c4-f529-4ad8-ad8e-ec5fb5d96ad4_0" fontFamily="arial,helvetica,sans-serif" fontSize="14" fontBold="false" fontItalic="false" fontUnderline="false" fontStrikeThrough="false"/>
+	</dmndi:DMNDI>
+</semantic:definitions>

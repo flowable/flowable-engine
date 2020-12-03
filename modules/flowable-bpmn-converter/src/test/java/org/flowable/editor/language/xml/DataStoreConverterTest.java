@@ -19,29 +19,12 @@ import org.flowable.bpmn.model.DataStore;
 import org.flowable.bpmn.model.DataStoreReference;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Pool;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class DataStoreConverterTest extends AbstractConverterTest {
+class DataStoreConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "datastore.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("datastore.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getDataStores())
                 .containsOnlyKeys("DataStore_1");
         DataStore dataStore = model.getDataStore("DataStore_1");

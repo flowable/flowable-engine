@@ -126,6 +126,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Exclude sub processes from the query result;
      */
     ProcessInstanceQuery excludeSubprocesses(boolean excludeSubprocesses);
+    
+    /**
+     * Select the process instances which have an active activity instance like the provided id.
+     */
+    ProcessInstanceQuery activeActivityId(String activityId);
+    
+    /**
+     * Select the process instances which have an active activity instance like the provided ids.
+     */
+    ProcessInstanceQuery activeActivityIds(Set<String> activityIds);
 
     /**
      * Select the process instances with which the user with the given id is involved.

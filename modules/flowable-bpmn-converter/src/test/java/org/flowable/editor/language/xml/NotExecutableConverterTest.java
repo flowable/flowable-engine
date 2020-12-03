@@ -15,29 +15,12 @@ package org.flowable.editor.language.xml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class NotExecutableConverterTest extends AbstractConverterTest {
+class NotExecutableConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "notexecutablemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("notexecutablemodel.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getMainProcess().getId()).isEqualTo("simpleProcess");
         assertThat(model.getMainProcess().getName()).isEqualTo("Simple process");
         assertThat(model.getMainProcess().isExecutable()).isFalse();

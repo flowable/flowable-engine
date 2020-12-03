@@ -203,7 +203,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         // multiple rule results
         // put on execution as JSON array; each entry contains output id (key) and output value (value)
         // this should be always done for decision tables of type rule order and output order
-        if (executionResult.size() > 1 || multipleResults) {
+        if (hasMultipleResults(executionResult) || multipleResults) {
             ObjectNode decisionResultNode = objectMapper.createObjectNode();
 
             for (Map.Entry<String, List<Map<String, Object>>> decisionExecutionResult : executionResult.entrySet()) {
@@ -221,9 +221,11 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
             execution.setVariable(decisionServiceKey, decisionResultNode);
         } else {
-            // single rule result
+            // single rule result (also in multiple decisions)
             // put on execution output id (key) and output value (value)
-            executionResult.values().forEach(decisionResult -> {
+            // mind: when using the same variable multiple times (f.e. in multiple decisions)
+            // the last value will be set on the execution.
+                executionResult.values().forEach(decisionResult -> {
                 for (Map.Entry<String, Object> outputResult : decisionResult.get(0).entrySet()) {
                     execution.setVariable(outputResult.getKey(), outputResult.getValue());
                 }
@@ -263,5 +265,20 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
                 execution.setVariable(outputResult.getKey(), outputResult.getValue());
             }
         }
+    }
+
+    protected boolean hasMultipleResults(Map<String, List<Map<String, Object>>> executionResult) {
+        boolean hasMultipleResults = false;
+
+        // check if at least one of the decisions in the decision service result has more than 1 rule result.
+        for (Map.Entry<String, List<Map<String, Object>>> entry : executionResult.entrySet()) {
+            List<Map<String, Object>> decisionResult = entry.getValue();
+            if (decisionResult.size() > 1) {
+                hasMultipleResults = true;
+                break;
+            }
+        }
+
+        return hasMultipleResults;
     }
 }

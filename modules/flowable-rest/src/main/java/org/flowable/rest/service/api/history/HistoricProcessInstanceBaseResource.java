@@ -101,7 +101,7 @@ public class HistoricProcessInstanceBaseResource {
             query.processDefinitionName(queryRequest.getProcessDefinitionName());
         }
         if (queryRequest.getProcessDefinitionVersion() != null) {
-            query.processDefinitionVersion(Integer.valueOf(queryRequest.getProcessDefinitionVersion()));
+            query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
         }
         if (queryRequest.getProcessDefinitionCategory() != null) {
             query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());

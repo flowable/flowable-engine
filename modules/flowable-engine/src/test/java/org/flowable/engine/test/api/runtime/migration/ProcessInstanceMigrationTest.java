@@ -3082,7 +3082,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         List<HistoricDetail> updateList = historyService.createHistoricDetailQuery().processInstanceId(processInstanceToMigrate.getId()).variableUpdates()
                 .list();
 
-        Collections.sort(updateList, Comparator.comparingInt(histDetail -> Integer.parseInt(histDetail.getId())));
+        updateList.sort(Comparator.comparingInt(histDetail -> Integer.parseInt(histDetail.getId())));
         assertThat(updateList)
                 .extracting(historicDetail -> ((HistoricDetailVariableInstanceUpdateEntity) historicDetail).getVariableType().getTypeName())
                 .containsExactly(values);

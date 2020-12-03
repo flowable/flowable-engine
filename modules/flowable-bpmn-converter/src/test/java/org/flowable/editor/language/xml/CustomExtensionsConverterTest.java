@@ -30,29 +30,12 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CustomExtensionsConverterTest extends AbstractConverterTest {
+class CustomExtensionsConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "customextensionsmodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("customextensionsmodel.bpmn")
+    void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
         assertThat(process.getAttributes()).hasSize(1);
         List<ExtensionAttribute> attributes = process.getAttributes().get("version");

@@ -25,30 +25,12 @@ import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.FormValue;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class FormPropertiesConverterTest extends AbstractConverterTest {
+class FormPropertiesConverterTest {
 
-    @Test
-    public void convertJsonToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void doubleConversionValidation() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-        bpmnModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "formPropertiesProcess.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("formPropertiesProcess.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getMainProcess().getId()).isEqualTo("formPropertiesProcess");
         assertThat(model.getMainProcess().getName()).isEqualTo("User registration");
         assertThat(model.getMainProcess().isExecutable()).isTrue();

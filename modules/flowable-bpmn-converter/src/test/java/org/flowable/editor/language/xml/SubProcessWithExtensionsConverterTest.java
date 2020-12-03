@@ -27,12 +27,12 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * @see <a href="https://activiti.atlassian.net/browse/ACT-2055">https://activiti.atlassian.net/browse/ACT-2055</a>
  */
-public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest {
+class SubProcessWithExtensionsConverterTest {
 
     protected static final String YOURCO_EXTENSIONS_NAMESPACE = "http://yourco/bpmn";
     protected static final String YOURCO_EXTENSIONS_PREFIX = "yourco";
@@ -109,25 +109,8 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
      * End of inner classes
      */
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "subprocessmodel_with_extensions.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("subprocessmodel_with_extensions.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
         assertThat(flowElement)
                 .isInstanceOfSatisfying(StartEvent.class, startEvent -> {

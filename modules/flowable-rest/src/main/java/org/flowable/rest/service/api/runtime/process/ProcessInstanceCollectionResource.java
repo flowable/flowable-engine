@@ -83,6 +83,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return process instances started by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return process instances started before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return process instances started after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "activeActivityId", dataType = "string", value = "Only return process instances which have an active activity instance with the provided activity id.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return process instances in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only return process instance which are suspended. If false, only return process instances which are not suspended (active).", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "Only return process instances which have the given super process-instance id (for processes that have a call-activities).", paramType = "query"),
@@ -159,6 +160,10 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         
         if (allRequestParams.containsKey("startedAfter")) {
             queryRequest.setStartedAfter(RequestUtil.getDate(allRequestParams, "startedAfter"));
+        }
+        
+        if (allRequestParams.containsKey("activeActivityId")) {
+            queryRequest.setActiveActivityId(allRequestParams.get("activeActivityId"));
         }
 
         if (allRequestParams.containsKey("involvedUser")) {
