@@ -63,7 +63,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ }"
+                        + "{ userId: null }"
                         + "]");
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("My Task").singleResult();
@@ -99,7 +99,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         assertThatJson(reviews)
                 .isEqualTo("["
                         + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
-                        + "{ }"
+                        + "{ userId: null }"
                         + "]");
 
         assertVariablesNotVisible(caseInstance);
@@ -113,7 +113,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             assertThatJson(historicReviews.getValue())
                     .isEqualTo("["
                             + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
-                            + "{ }"
+                            + "{ userId: null }"
                             + "]");
         }
 
@@ -254,10 +254,10 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ },"
-                        + "{ },"
-                        + "{ },"
-                        + "{ }"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null }"
                         + "]");
 
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B")
@@ -274,9 +274,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ },"
-                        + "{ },"
-                        + "{ },"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
                         + "{ userId: 'userThree' }"
                         + "]");
 
@@ -286,9 +286,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ },"
-                        + "{ },"
-                        + "{ },"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
                         + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
                         + "]");
 
@@ -300,9 +300,9 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             assertThat(historicReviews.getVariableTypeName()).isEqualTo(CmmnAggregatedVariableType.TYPE_NAME);
             assertThatJson(historicReviews.getValue())
                     .isEqualTo("["
-                            + "{ },"
-                            + "{ },"
-                            + "{ },"
+                            + "{ userId: null },"
+                            + "{ userId: null },"
+                            + "{ userId: null },"
                             + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
                             + "]");
         }

@@ -70,6 +70,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
+import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -1032,6 +1033,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
 
             flowableFunctionDelegates.add(new IsStageCompletableExpressionFunction());
+            flowableFunctionDelegates.add(new TaskGetFunctionDelegate());
         }
         
         if (customFlowableFunctionDelegates != null) {

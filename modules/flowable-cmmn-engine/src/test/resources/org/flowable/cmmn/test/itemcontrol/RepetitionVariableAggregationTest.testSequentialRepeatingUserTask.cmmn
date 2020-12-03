@@ -12,7 +12,7 @@
                     <repetitionRule>
                         <extensionElements>
                             <flowable:variableAggregation target="reviews">
-                                <variable source="taskAssignee" target="userId" />
+                                <variable sourceExpression="${task:get(taskId).assignee}" target="userId" />
                                 <variable source="approved" />
                                 <variable source="description" />
                             </flowable:variableAggregation>
@@ -24,7 +24,7 @@
 
             <planItem id="planItem2" name="My Task 2" definitionRef="humanTask2" />
 
-            <humanTask id="humanTask1" name="My Task" flowable:assigneeVariableName="taskAssignee"/>
+            <humanTask id="humanTask1" name="My Task" flowable:taskIdVariableName="taskId"/>
 
             <humanTask id="humanTask2" name="My Task"></humanTask>
 

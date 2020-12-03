@@ -69,9 +69,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ },"
-                    + "{ },"
-                    + "{ }"
+                    + "{ userId: null },"
+                    + "{ userId: null },"
+                    + "{ userId: null }"
                     + "]");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
@@ -182,9 +182,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ },"
-                    + "{ },"
-                    + "{ }"
+                    + "{ userId: null },"
+                    + "{ userId: null },"
+                    + "{ userId: null }"
                     + "]");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
@@ -262,9 +262,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ },"
-                    + "{ },"
-                    + "{ }"
+                    + "{ userId: null },"
+                    + "{ userId: null },"
+                    + "{ userId: null }"
                     + "]");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
@@ -335,9 +335,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ },"
-                        + "{ },"
-                        + "{ }"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null }"
                         + "]");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
@@ -442,9 +442,9 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
                 .isEqualTo("["
-                        + "{ },"
-                        + "{ },"
-                        + "{ }"
+                        + "{ userId: null },"
+                        + "{ userId: null },"
+                        + "{ userId: null }"
                         + "]");
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
@@ -588,7 +588,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ }"
+                    + "{ userId: null }"
                     + "]");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -612,7 +612,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertThatJson(reviews)
             .isEqualTo("["
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
@@ -645,7 +645,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
                 + "{ userId: 'userTwo', approved : false, description : 'b' },"
                 + "{ userId: 'userThree', approved : true, description : 'c' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -694,7 +694,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ }"
+                    + "{ userId: null }"
                     + "]");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -718,7 +718,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertThatJson(reviews)
             .isEqualTo("["
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -761,7 +761,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ }"
+                    + "{ userId: null }"
                     + "]");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -785,7 +785,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertThatJson(reviews)
             .isEqualTo("["
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -820,7 +820,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         assertThatJson(reviews)
             .isEqualTo("["
-                    + "{ }"
+                    + "{ userId: null }"
                     + "]");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -844,7 +844,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         assertThatJson(reviews)
             .isEqualTo("["
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         assertVariablesNotVisibleForProcessInstance(processInstance);
@@ -877,7 +877,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                 + "{ userId: 'userOne', approved : false, description : 'a' },"
                 + "{ userId: 'userTwo', approved : false, description : 'b' },"
                 + "{ userId: 'userThree', approved : true, description : 'c' },"
-                + "{ }"
+                + "{ userId: null }"
                 + "]");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

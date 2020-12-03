@@ -12,12 +12,12 @@
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
 
-        <userTask id="miTasks" name="My Task" flowable:assigneeVariableName="taskAssignee">
+        <userTask id="miTasks" name="My Task" flowable:taskIdVariableName="taskId">
 
             <multiInstanceLoopCharacteristics isSequential="true">
                 <extensionElements>
                     <flowable:variableAggregation target="reviews">
-                        <variable source="taskAssignee" target="userId" />
+                        <variable sourceExpression="${task:get(taskId).assignee}" target="userId" />
                         <variable source="approved"  />
                         <variable source="description" />
                     </flowable:variableAggregation>

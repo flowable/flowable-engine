@@ -188,23 +188,6 @@ public class TaskHelper {
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity);
             }
-
-            if (taskEntity.getProcessDefinitionId() != null) {
-                FlowElement flowElement = ProcessDefinitionUtil.getProcess(taskEntity.getProcessDefinitionId())
-                    .getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-                if (flowElement instanceof UserTask) {
-                    UserTask userTask = (UserTask) flowElement;
-
-                    String assigneeVariableName = userTask.getAssigneeVariableName();
-                    if (StringUtils.isNotEmpty(assigneeVariableName)) {
-                        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-                        Expression expression = expressionManager.createExpression(assigneeVariableName);
-
-                        // TODO: needs to be configurable local/instance and transient/non-transient
-                        taskEntity.setVariable(expression.getValue(taskEntity).toString(), assignee);
-                    }
-                }
-            }
         }
     }
 
@@ -216,23 +199,6 @@ public class TaskHelper {
             processEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskOwner(taskEntity, owner);
             if (taskEntity.getId() != null) {
                 addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
-            }
-
-            if (taskEntity.getProcessDefinitionId() != null) {
-                FlowElement flowElement = ProcessDefinitionUtil.getProcess(taskEntity.getProcessDefinitionId())
-                    .getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-                if (flowElement instanceof UserTask) {
-                    UserTask userTask = (UserTask) flowElement;
-
-                    String ownerVariableName = userTask.getOwnerVariableName();
-                    if (StringUtils.isNotEmpty(ownerVariableName)) {
-                        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-                        Expression expression = expressionManager.createExpression(ownerVariableName);
-
-                        // TODO: needs to be configurable local/instance and transient/non-transient
-                        taskEntity.setVariable(expression.getValue(taskEntity).toString(), owner);
-                    }
-                }
             }
         }
     }

@@ -212,6 +212,7 @@ import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
+import org.flowable.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
@@ -2646,6 +2647,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsExpressionFunction());
 
             flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
+
+            flowableFunctionDelegates.add(new TaskGetFunctionDelegate());
         }
 
         if (this.customFlowableFunctionDelegates != null) {
