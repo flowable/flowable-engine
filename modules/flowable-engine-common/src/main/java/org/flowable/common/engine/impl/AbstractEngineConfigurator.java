@@ -254,7 +254,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (engineConfiguration.getDataSource() != null) {
             targetEngineConfiguration.setDataSource(engineConfiguration.getDataSource());
         } else {
-            throw new FlowableException("A datasource is required for initializing the IDM engine ");
+            throw new FlowableException("A datasource is required for initializing the engine ");
         }
     }
 
