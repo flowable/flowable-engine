@@ -44,6 +44,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
@@ -204,6 +205,10 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count())
                 .as("Process is started, but its execution waits on the job").isZero();
+
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isFalse();
 
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).as("The task is created from the job execution")

@@ -204,7 +204,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         }
         
         job.setTenantId(caseInstance.getTenantId());
-        jobService.createAsyncJob(job, true);
+        jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);
     }
     
