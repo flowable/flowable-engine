@@ -36,7 +36,7 @@ public class ReleaseLockCmd implements Command<Void> {
         PropertyEntityManager propertyEntityManager = commandContext.getEngineConfigurations().get(engineType).getPropertyEntityManager();
         PropertyEntity property = propertyEntityManager.findById(lockName);
         if (property != null) {
-            propertyEntityManager.delete(property);
+            property.setValue(null);
             return null;
         } else {
             throw new FlowableObjectNotFoundException("Lock with name " + lockName + " does not exist");

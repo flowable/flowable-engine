@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.history.caze;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.common.rest.api.PaginateRequest;
@@ -40,6 +41,8 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String activePlanItemDefinitionId;
+    private Set<String> activePlanItemDefinitionIds;
     private Boolean includeCaseVariables;
     private List<QueryVariable> variables;
     private String tenantId;
@@ -147,6 +150,22 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
 
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
+    }
+    
+    public String getActivePlanItemDefinitionId() {
+        return activePlanItemDefinitionId;
+    }
+
+    public void setActivePlanItemDefinitionId(String activePlanItemDefinitionId) {
+        this.activePlanItemDefinitionId = activePlanItemDefinitionId;
+    }
+
+    public Set<String> getActivePlanItemDefinitionIds() {
+        return activePlanItemDefinitionIds;
+    }
+
+    public void setActivePlanItemDefinitionIds(Set<String> activePlanItemDefinitionIds) {
+        this.activePlanItemDefinitionIds = activePlanItemDefinitionIds;
     }
 
     public Boolean getIncludeCaseVariables() {

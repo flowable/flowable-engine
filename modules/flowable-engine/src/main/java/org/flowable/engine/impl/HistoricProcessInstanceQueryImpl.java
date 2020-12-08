@@ -76,6 +76,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String processDefinitionName;
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
+    protected String activeActivityId;
+    protected Set<String> activeActivityIds;
     protected String involvedUser;
     protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
@@ -357,6 +359,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.excludeSubprocesses = excludeSubprocesses;
         } else {
             this.excludeSubprocesses = excludeSubprocesses;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery activeActivityId(String activityId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.activeActivityId = activityId;
+        } else {
+            this.activeActivityId = activityId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery activeActivityIds(Set<String> activityIds) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.activeActivityIds = activityIds;
+        } else {
+            this.activeActivityIds = activityIds;
         }
         return this;
     }
@@ -962,6 +984,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public Date getFinishedBefore() {
         return finishedBefore;
+    }
+
+    public String getActiveActivityId() {
+        return activeActivityId;
+    }
+
+    public Set<String> getActiveActivityIds() {
+        return activeActivityIds;
     }
 
     public String getInvolvedUser() {

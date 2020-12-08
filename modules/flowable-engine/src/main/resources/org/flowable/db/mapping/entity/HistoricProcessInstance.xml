@@ -457,7 +457,7 @@
   <sql id="commonSelectHistoricProcessInstancesByQueryCriteriaSql">
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
       <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-        inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+        inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
       </if>
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
@@ -773,6 +773,16 @@
       <if test="deleted">
         and ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
       </if>
+      <if test="activeActivityId != null">
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+      </if>
+      <if test="activeActivityIds != null">
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
+        <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+            #{activeActivityId}
+        </foreach>
+        and A.END_TIME_ is null)
+      </if>
       <if test="involvedUser != null">
         and (exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_))
       </if>
@@ -875,6 +885,16 @@
       </if>
       <if test="orQueryObject.deleted">
         or ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
+      </if>
+      <if test="activeActivityId != null">
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+      </if>
+      <if test="activeActivityIds != null">
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
+        <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+            #{activeActivityId}
+        </foreach>
+        and A.END_TIME_ is null)
       </if>
       <if test="orQueryObject.involvedUser != null">
         or (exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_))

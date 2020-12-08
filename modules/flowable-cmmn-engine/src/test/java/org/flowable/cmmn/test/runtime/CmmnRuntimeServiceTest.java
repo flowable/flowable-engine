@@ -35,6 +35,7 @@ import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.job.api.Job;
 import org.junit.Test;
 
 /**
@@ -152,6 +153,10 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(caseInstance).isNotNull();
         assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count())
                 .as("Plan items are created asynchronously").isZero();
+
+        Job job = this.cmmnManagementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isFalse();
 
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200, true);
         assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);

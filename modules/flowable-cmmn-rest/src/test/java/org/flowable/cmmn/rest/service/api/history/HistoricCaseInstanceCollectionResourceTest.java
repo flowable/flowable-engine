@@ -151,6 +151,31 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         }
         assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
     }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testGetCaseInstancesByActivePlanItemDefinitionId() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        String id = caseInstance.getId();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES);
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url);
+
+        Task task = taskService.createTaskQuery().caseInstanceId(id).singleResult();
+        taskService.complete(task.getId());
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url);
+    }
 
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables)
             throws IOException {

@@ -190,4 +190,124 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
                         + "}"
                         + "]");
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testQueryProcessInstancesByActiveActivityId() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("activeActivityId", "processTask");
+        
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "   id: '" + processInstance.getId() + "',"
+                        + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                        + "} ]"
+                        + "}");
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("activeActivityId", "processTask2");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: []"
+                        + "}");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("activeActivityId", "processTask2");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+        .when(Option.IGNORING_EXTRA_FIELDS)
+        .isEqualTo("{"
+                + "data: [ {"
+                + "   id: '" + processInstance.getId() + "',"
+                + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                + "} ]"
+                + "}");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testQueryProcessInstancesByActiveActivityIds() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode activityIdArray = requestNode.putArray("activeActivityIds");
+        activityIdArray.add("processTask");
+        activityIdArray.add("processTask3");
+        
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "   id: '" + processInstance.getId() + "',"
+                        + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                        + "} ]"
+                        + "}");
+        
+        requestNode = objectMapper.createObjectNode();
+        activityIdArray = requestNode.putArray("activeActivityIds");
+        activityIdArray.add("processTask2");
+        activityIdArray.add("processTask3");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: []"
+                        + "}");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        activityIdArray = requestNode.putArray("activeActivityIds");
+        activityIdArray.add("processTask2");
+        activityIdArray.add("processTask3");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+        .when(Option.IGNORING_EXTRA_FIELDS)
+        .isEqualTo("{"
+                + "data: [ {"
+                + "   id: '" + processInstance.getId() + "',"
+                + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                + "} ]"
+                + "}");
+    }
 }

@@ -170,13 +170,14 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
             }
 
             executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId(), lockOwner, lockExpirationTime);
+
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                FlowElement flowElement = execution.getCurrentFlowElement();
+                BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + flowElement.getId() + ", with job id " + job.getId(),
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, flowElement, execution);
+            }
         }
-        
-        if (processEngineConfiguration.isLoggingSessionEnabled()) {
-            FlowElement flowElement = execution.getCurrentFlowElement();
-            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + flowElement.getId() + ", with job id " + job.getId(),
-                            LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, flowElement, execution);
-        }
+
     }
 
     @Override

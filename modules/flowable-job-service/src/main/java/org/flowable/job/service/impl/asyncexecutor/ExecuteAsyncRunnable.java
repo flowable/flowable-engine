@@ -124,19 +124,8 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     protected void executeJob(final boolean unlock) {
         try {
-            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    new ExecuteAsyncRunnableJobCmd(jobId, jobEntityManager, jobServiceConfiguration).execute(commandContext);
-                    if (unlock) {
-                        // Part of the same transaction to avoid a race condition with the
-                        // potentially new jobs (wrt process instance locking) that are created 
-                        // during the execution of the original job 
-                        new UnlockExclusiveJobCmd((Job) job, jobServiceConfiguration).execute(commandContext);
-                    }
-                    return null;
-                }
-            });
+            jobServiceConfiguration.getCommandExecutor().execute(
+                new ExecuteAsyncRunnableJobCmd(jobId, jobEntityManager, jobServiceConfiguration, unlock));
 
         } catch (final FlowableOptimisticLockingException e) {
 
