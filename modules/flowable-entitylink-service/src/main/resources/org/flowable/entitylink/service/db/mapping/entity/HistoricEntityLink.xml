@@ -96,7 +96,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricCaseEntityLinks" parameterType="java.util.Map">
-    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'cmmn' and NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where SCOPE_ID_ = CASEINST.ID_)
+    delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_TYPE_ = 'cmmn' and NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where SCOPE_ID_ = CASEINST.ID_)
   </delete>
   
   <!-- HISTORIC ENTITY LINK RESULTMAP -->

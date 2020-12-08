@@ -774,10 +774,10 @@
         and ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
       </if>
       <if test="activeActivityId != null">
-        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
       </if>
       <if test="activeActivityIds != null">
-        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ in 
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
         <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
             #{activeActivityId}
         </foreach>
@@ -887,10 +887,10 @@
         or ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
       </if>
       <if test="activeActivityId != null">
-        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
       </if>
       <if test="activeActivityIds != null">
-        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ in 
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
         <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
             #{activeActivityId}
         </foreach>
