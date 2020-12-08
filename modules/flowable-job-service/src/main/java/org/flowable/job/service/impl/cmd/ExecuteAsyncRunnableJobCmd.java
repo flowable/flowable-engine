@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -41,13 +42,15 @@ public class ExecuteAsyncRunnableJobCmd implements Command<Object>, Serializable
     protected String jobId;
     protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
     protected JobServiceConfiguration jobServiceConfiguration;
+    protected boolean unlock;
 
     public ExecuteAsyncRunnableJobCmd(String jobId, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
-            JobServiceConfiguration jobServiceConfiguration) {
+            JobServiceConfiguration jobServiceConfiguration, boolean unlock) {
         
         this.jobId = jobId;
         this.jobEntityManager = jobEntityManager;
         this.jobServiceConfiguration = jobServiceConfiguration;
+        this.unlock = unlock;
     }
 
     @Override
@@ -88,6 +91,13 @@ public class ExecuteAsyncRunnableJobCmd implements Command<Object>, Serializable
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job),
                     jobServiceConfiguration.getEngineName());
+        }
+
+        if (unlock) {
+            // Part of the same transaction to avoid a race condition with the
+            // potentially new jobs (wrt process instance locking) that are created
+            // during the execution of the original job
+            new UnlockExclusiveJobCmd((Job) job, jobServiceConfiguration).execute(commandContext);
         }
 
         return null;
