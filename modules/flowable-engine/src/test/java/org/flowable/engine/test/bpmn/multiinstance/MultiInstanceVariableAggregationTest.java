@@ -16,6 +16,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,13 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.VariableAggregationDefinition;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.variable.VariableAggregatorContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.delegate.VariableAggregator;
+import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -37,13 +42,13 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.api.variables.VariablesTest;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -309,6 +314,150 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             assertThat(historicFirstDescription).isNotNull();
             assertThat(historicFirstDescription.getValue()).isEqualTo("description task 0");
         }
+    }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceUserTaskVariableTypes() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 4)
+                .start();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDate");
+        variables.put("score", 10);
+        variables.put("passed", true);
+        variables.put("location", "Springfield");
+        variables.put("startTime", LocalDate.of(2020, Month.DECEMBER, 8));
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDateTime");
+        variables.put("score", 60.55);
+        variables.put("passed", false);
+        variables.put("location", null);
+        variables.put("startTime", LocalDate.of(2020, Month.DECEMBER, 8).atTime(10, 20, 30));
+        taskService.complete(tasks.get(1).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with Instant");
+        variables.put("score", (short) 100);
+        variables.put("passed", true);
+        variables.put("location", "Zurich");
+        variables.put("startTime", Instant.parse("2020-12-08T08:20:45.585Z"));
+        taskService.complete(tasks.get(2).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with Date");
+        variables.put("score", 1234L);
+        variables.put("passed", true);
+        variables.put("location", "Test Valley");
+        variables.put("startTime", Instant.parse("2020-12-12T12:24:15.155Z"));
+        taskService.complete(tasks.get(3).getId(), variables);
+
+        assertNoAggregatedVariables();
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "results"))
+                .isEqualTo("["
+                        + "  {"
+                        + "    description: 'Description for task with LocalDate',"
+                        + "    score: 10,"
+                        + "    passed: true,"
+                        + "    location: 'Springfield',"
+                        + "    startTime: '2020-12-08'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with LocalDateTime',"
+                        + "    score: 60.55,"
+                        + "    passed: false,"
+                        + "    location: null,"
+                        + "    startTime: '2020-12-08T10:20:30'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with Instant',"
+                        + "    score: 100,"
+                        + "    passed: true,"
+                        + "    location: 'Zurich',"
+                        + "    startTime: '2020-12-08T08:20:45.585Z'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with Date',"
+                        + "    score: 1234,"
+                        + "    passed: true,"
+                        + "    location: 'Test Valley',"
+                        + "    startTime: '2020-12-12T12:24:15.155Z'"
+                        + "  }"
+                        + "]");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicResults = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("results")
+                    .singleResult();
+            assertThat(historicResults).isNotNull();
+            assertThatJson(historicResults.getValue())
+                    .isEqualTo("["
+                            + "  {"
+                            + "    description: 'Description for task with LocalDate',"
+                            + "    score: 10,"
+                            + "    passed: true,"
+                            + "    location: 'Springfield',"
+                            + "    startTime: '2020-12-08'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with LocalDateTime',"
+                            + "    score: 60.55,"
+                            + "    passed: false,"
+                            + "    location: null,"
+                            + "    startTime: '2020-12-08T10:20:30'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with Instant',"
+                            + "    score: 100,"
+                            + "    passed: true,"
+                            + "    location: 'Zurich',"
+                            + "    startTime: '2020-12-08T08:20:45.585Z'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with Date',"
+                            + "    score: 1234,"
+                            + "    passed: true,"
+                            + "    location: 'Test Valley',"
+                            + "    startTime: '2020-12-12T12:24:15.155Z'"
+                            + "  }"
+                            + "]");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskVariableTypes.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskUnsupportedVariableTypes() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 2)
+                .start();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(2);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDate");
+        variables.put("score", 10);
+        variables.put("passed", true);
+        variables.put("location", "Springfield");
+        variables.put("startTime", new VariablesTest.TestSerializableVariable(19));
+
+        assertThatThrownBy(() -> taskService.complete(tasks.get(0).getId(), variables))
+            .isExactlyInstanceOf(FlowableException.class)
+            .hasMessageContaining("Cannot aggregate variable: ")
+            .hasMessageContaining("startTime");
     }
 
     @Test
@@ -1595,7 +1744,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     public static class CustomVariableAggregator implements VariableAggregator {
 
         @Override
-        public Object aggregateSingle(DelegateExecution execution, Context context) {
+        public Object aggregateSingle(DelegateExecution execution, VariableAggregatorContext context) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
@@ -1625,7 +1774,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         }
 
         @Override
-        public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, Context context) {
+        public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableInstance instance : instances) {
                 arrayNode.addAll((ArrayNode) instance.getValue());

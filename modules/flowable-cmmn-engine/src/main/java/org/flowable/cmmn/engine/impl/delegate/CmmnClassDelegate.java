@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -147,12 +148,12 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
     }
 
     @Override
-    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context) {
+    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
         return getPlanItemVariableAggregator().aggregateSingle(planItemInstance, context);
     }
 
     @Override
-    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context) {
+    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
         return getPlanItemVariableAggregator().aggregateMulti(planItemInstance, instances, context);
     }
 

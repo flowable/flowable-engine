@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.delegate.BaseVariableAggregatorContext;
@@ -73,7 +74,7 @@ public class CmmnAggregation {
      * @return the created variables (not yet saved), or {@code null} if no name could be resolved for the variable
      */
     public static VariableInstanceEntity aggregate(DelegatePlanItemInstance planItemInstance,
-            PlanItemVariableAggregator.Context aggregationContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
+            PlanItemVariableAggregatorContext aggregationContext, CmmnEngineConfiguration cmmnEngineConfiguration) {
         VariableAggregationDefinition aggregation = aggregationContext.getDefinition();
         PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstance);
         String targetVarName = getAggregationTargetVarName(aggregation, planItemInstance, cmmnEngineConfiguration);
@@ -94,7 +95,7 @@ public class CmmnAggregation {
      * @return the created variables (not yet saved), or {@code null} if no name could be resolved for the variable
      */
     public static VariableInstanceEntity aggregate(DelegatePlanItemInstance planItemInstance,
-            PlanItemVariableAggregator.Context aggregationContext, CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemVariableAggregator aggregator,
+            PlanItemVariableAggregatorContext aggregationContext, CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemVariableAggregator aggregator,
             String targetVarName) {
 
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
@@ -176,7 +177,7 @@ public class CmmnAggregation {
         VariableAggregationDefinition aggregation = aggregationsByTarget.get(targetVarName);
         PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstance);
 
-        PlanItemVariableAggregator.Context aggregationContext = BaseVariableAggregatorContext.overview(aggregation);
+        PlanItemVariableAggregatorContext aggregationContext = BaseVariableAggregatorContext.overview(aggregation);
 
         for (PlanItemInstanceEntity repetitionPlanItem : repetitionPlanItems) {
             // We need to create overview values for every single active child plan item

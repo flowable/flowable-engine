@@ -14,7 +14,6 @@ package org.flowable.cmmn.api.delegate;
 
 import java.util.List;
 
-import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -27,50 +26,24 @@ public interface PlanItemVariableAggregator {
     /**
      * Create a single variable value based on the provided aggregation definition.
      *
+     * This is called after a single repeatable plan item instance is completed, or an overview for a non completed repeatable plan item instance is needed.
+     *
      * @param planItemInstance the delegate planItemInstance from where we need to get data from
      * @param context the aggregation context
      * @return the value for the aggregated variable
      */
-    Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context);
+    Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context);
 
     /**
      * Aggregated the provide variable instances into one variable value.
      *
+     * This is called when all repeatable plan item instances are complete, or an overview for repeatable plan item insatnces is needed.
+     *
      * @param planItemInstance the delegated planItemInstance for which we need to do the aggregation
-     * @param instances the variable values that should be aggregated
+     * @param instances the variable values that should be aggregated (this variables are created based on the value from {@link #aggregateSingle(DelegatePlanItemInstance, PlanItemVariableAggregatorContext)})
      * @param context the aggregation context
      * @return the aggregated value
      */
-    Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context);
+    Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context);
 
-    interface Context {
-
-        VariableAggregationDefinition getDefinition();
-
-        String getState();
-    }
-
-    interface ContextStates {
-
-        /**
-         * State when a plan item instance is completed and the aggregation needs to be prepared.
-         * e.g. This can be done for different executions:
-         * <ul>
-         *     <li>After a repeatable plan item instance completes</li>
-         *     <li>After all repeatable plan item instances complete</li>
-         *     <li>After any plan item instance completes</li>
-         * </ul>
-         */
-        String COMPLETE = "complete";
-
-        /**
-         * State when the plan item instance is not yet completed and we need to see an overview state.
-         * e.g. This can be done for different executions:
-         * <ul>
-         *     <li>For an active plan item instance part of a repeatable set of instances </li>
-         *     <li>For any plan item</li>
-         * </ul>
-         */
-        String OVERVIEW = "overview";
-    }
 }

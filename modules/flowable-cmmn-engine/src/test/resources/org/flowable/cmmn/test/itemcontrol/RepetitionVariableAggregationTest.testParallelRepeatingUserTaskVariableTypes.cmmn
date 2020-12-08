@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" xmlns:design="http://flowable.org/design"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="repeatingTask" name="Repetition with collection variable test one" flowable:initiatorVariableName="initiator"
+          flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+
+            <planItem id="planItem1" name="Task A" definitionRef="humanTask1" />
+            <planItem id="planItem2" name="Task B" definitionRef="humanTask2">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
+                                    flowable:elementIndexVariable="itemIndex">
+                        <extensionElements>
+                            <flowable:variableAggregation target="results">
+                                <variable source="description" />
+                                <variable source="score"  />
+                                <variable source="passed" />
+                                <variable source="location" />
+                                <variable source="startTime" />
+                            </flowable:variableAggregation>
+                        </extensionElements>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <planItem id="planItem3" name="Task C" definitionRef="humanTask1" />
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="humanTask1" name="Task A" flowable:assignee="${initiator}"></humanTask>
+            <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:taskIdVariableName="taskId" flowable:priority="${itemIndex}"></humanTask>
+            <humanTask id="humanTask3" name="Task C" flowable:assignee="${initiator}"></humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

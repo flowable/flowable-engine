@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
-import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 
 /**
  * @author Filip Hrisafov
  */
-public class BaseVariableAggregatorContext implements PlanItemVariableAggregator.Context {
+public class BaseVariableAggregatorContext implements PlanItemVariableAggregatorContext {
 
     protected final VariableAggregationDefinition definition;
     protected final String state;
@@ -38,11 +38,11 @@ public class BaseVariableAggregatorContext implements PlanItemVariableAggregator
         return state;
     }
 
-    public static PlanItemVariableAggregator.Context complete(VariableAggregationDefinition definition) {
-        return new BaseVariableAggregatorContext(definition, PlanItemVariableAggregator.ContextStates.COMPLETE);
+    public static PlanItemVariableAggregatorContext complete(VariableAggregationDefinition definition) {
+        return new BaseVariableAggregatorContext(definition, PlanItemVariableAggregatorContext.COMPLETE);
     }
 
-    public static PlanItemVariableAggregator.Context overview(VariableAggregationDefinition definition) {
-        return new BaseVariableAggregatorContext(definition, PlanItemVariableAggregator.ContextStates.OVERVIEW);
+    public static PlanItemVariableAggregatorContext overview(VariableAggregationDefinition definition) {
+        return new BaseVariableAggregatorContext(definition, PlanItemVariableAggregatorContext.OVERVIEW);
     }
 }

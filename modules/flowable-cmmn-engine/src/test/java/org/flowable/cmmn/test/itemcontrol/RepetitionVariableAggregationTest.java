@@ -14,7 +14,12 @@ package org.flowable.cmmn.test.itemcontrol;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,6 +28,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -31,6 +37,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
@@ -506,6 +513,159 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
     }
+
+    @Test
+    @CmmnDeployment
+    public void testParallelRepeatingUserTaskVariableTypes() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .variable("otherVariable", "Hello World")
+                .variable("myCollection", Arrays.asList("a", "b", "c", "d"))
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(4);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDate");
+        variables.put("score", 10);
+        variables.put("passed", true);
+        variables.put("location", "Springfield");
+        variables.put("startTime", LocalDate.of(2020, Month.DECEMBER, 8));
+        cmmnTaskService.complete(tasks.get(0).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDateTime");
+        variables.put("score", 60.55);
+        variables.put("passed", false);
+        variables.put("location", null);
+        variables.put("startTime", LocalDate.of(2020, Month.DECEMBER, 8).atTime(10, 20, 30));
+        cmmnTaskService.complete(tasks.get(1).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with Instant");
+        variables.put("score", (short) 100);
+        variables.put("passed", true);
+        variables.put("location", "Zurich");
+        variables.put("startTime", Instant.parse("2020-12-08T08:20:45.585Z"));
+        cmmnTaskService.complete(tasks.get(2).getId(), variables);
+
+        variables = new HashMap<>();
+        variables.put("description", "Description for task with Date");
+        variables.put("score", 1234L);
+        variables.put("passed", true);
+        variables.put("location", "Test Valley");
+        variables.put("startTime", Instant.parse("2020-12-12T12:24:15.155Z"));
+        cmmnTaskService.complete(tasks.get(3).getId(), variables);
+
+        assertNoAggregatedVariables();
+        assertThatJson(cmmnRuntimeService.getVariable(caseInstance.getId(), "results"))
+                .isEqualTo("["
+                        + "  {"
+                        + "    description: 'Description for task with LocalDate',"
+                        + "    score: 10,"
+                        + "    passed: true,"
+                        + "    location: 'Springfield',"
+                        + "    startTime: '2020-12-08'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with LocalDateTime',"
+                        + "    score: 60.55,"
+                        + "    passed: false,"
+                        + "    location: null,"
+                        + "    startTime: '2020-12-08T10:20:30'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with Instant',"
+                        + "    score: 100,"
+                        + "    passed: true,"
+                        + "    location: 'Zurich',"
+                        + "    startTime: '2020-12-08T08:20:45.585Z'"
+                        + "  },"
+                        + "  {"
+                        + "    description: 'Description for task with Date',"
+                        + "    score: 1234,"
+                        + "    passed: true,"
+                        + "    location: 'Test Valley',"
+                        + "    startTime: '2020-12-12T12:24:15.155Z'"
+                        + "  }"
+                        + "]");
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("results")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "  {"
+                            + "    description: 'Description for task with LocalDate',"
+                            + "    score: 10,"
+                            + "    passed: true,"
+                            + "    location: 'Springfield',"
+                            + "    startTime: '2020-12-08'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with LocalDateTime',"
+                            + "    score: 60.55,"
+                            + "    passed: false,"
+                            + "    location: null,"
+                            + "    startTime: '2020-12-08T10:20:30'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with Instant',"
+                            + "    score: 100,"
+                            + "    passed: true,"
+                            + "    location: 'Zurich',"
+                            + "    startTime: '2020-12-08T08:20:45.585Z'"
+                            + "  },"
+                            + "  {"
+                            + "    description: 'Description for task with Date',"
+                            + "    score: 1234,"
+                            + "    passed: true,"
+                            + "    location: 'Test Valley',"
+                            + "    startTime: '2020-12-12T12:24:15.155Z'"
+                            + "  }"
+                            + "]");
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testParallelRepeatingUserTaskVariableTypes.cmmn")
+    public void testParallelRepeatingUserTaskVariableTypesUnsupportedVariableTypes() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .variable("otherVariable", "Hello World")
+                .variable("myCollection", Arrays.asList("a", "b"))
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B")
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(2);
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("description", "Description for task with LocalDate");
+        variables.put("score", 10);
+        variables.put("passed", true);
+        variables.put("location", "Springfield");
+        variables.put("startTime", new TestSerializableVariable());
+
+        assertThatThrownBy(() -> cmmnTaskService.complete(tasks.get(0).getId(), variables))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot aggregate variable: ")
+                .hasMessageContaining("startTime");
+    }
+
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testStageWithParallelRepeatingUserTask.cmmn")
@@ -1111,7 +1271,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     public static class CustomVariableAggregator implements PlanItemVariableAggregator {
 
         @Override
-        public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context) {
+        public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = planItemInstance.getVariable(variable.getSource());
@@ -1138,13 +1298,28 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
         @Override
-        public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, Context context) {
+        public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableInstance instance : instances) {
                 arrayNode.addAll((ArrayNode) instance.getValue());
             }
 
             return arrayNode;
+        }
+    }
+
+    public static class TestSerializableVariable implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private String someField;
+
+        public String getSomeField() {
+            return someField;
+        }
+
+        public void setSomeField(String someField) {
+            this.someField = someField;
         }
     }
 

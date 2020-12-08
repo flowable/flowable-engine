@@ -12,27 +12,37 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.variable.CmmnAggregatedVariableType;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.JodaDateTimeType;
+import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LocalDateTimeType;
+import org.flowable.variable.service.impl.types.LocalDateType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,7 +61,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
     }
 
     @Override
-    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, Context context) {
+    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
         ObjectNode objectNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
 
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
@@ -88,36 +98,62 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
 
                 if (varInstance != null) {
 
-                    if (StringType.TYPE_NAME.equals(varInstance.getTypeName()) || LongStringType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (String) varInstance.getValue());
-                    } else if (JsonType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.set(targetVarName, (JsonNode) varInstance.getValue());
-                    } else if (BooleanType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (Boolean) varInstance.getValue());
-                    } else if (ShortType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (Short) varInstance.getValue());
-                    } else if (IntegerType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (Integer) varInstance.getValue());
-                    } else if (LongType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (Long) varInstance.getValue());
-                    } else if (DoubleType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (Double) varInstance.getValue());
-                    } else if (ShortType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.put(targetVarName, (String) varInstance.getValue());
-                    } else if (NullType.TYPE_NAME.equals(varInstance.getTypeName())) {
-                        objectNode.putNull(targetVarName);
-                    } else if (ContextStates.OVERVIEW.equals(context.getState())) {
-                        // We can only use the aggregated variable if we are in an overview state
-                        Object value = varInstance.getValue();
-                        if (value instanceof JsonNode) {
-                            objectNode.set(targetVarName, (JsonNode) value);
-                        }
+                    String varInstanceTypeName = varInstance.getTypeName();
+
+                    switch (varInstanceTypeName) {
+                        case StringType.TYPE_NAME:
+                        case LongStringType.TYPE_NAME:
+                            objectNode.put(targetVarName, (String) varInstance.getValue());
+                            break;
+                        case JsonType.TYPE_NAME:
+                            objectNode.set(targetVarName, (JsonNode) varInstance.getValue());
+                            break;
+                        case BooleanType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Boolean) varInstance.getValue());
+                            break;
+                        case ShortType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Short) varInstance.getValue());
+                            break;
+                        case IntegerType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Integer) varInstance.getValue());
+                            break;
+                        case LongType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Long) varInstance.getValue());
+                            break;
+                        case DoubleType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Double) varInstance.getValue());
+                            break;
+                        case DateType.TYPE_NAME:
+                            objectNode.put(targetVarName, ((Date) varInstance.getValue()).toInstant().toString());
+                            break;
+                        case NullType.TYPE_NAME:
+                            objectNode.putNull(targetVarName);
+                            break;
+                        case InstantType.TYPE_NAME:
+                        case LocalDateType.TYPE_NAME:
+                        case LocalDateTimeType.TYPE_NAME:
+                        case JodaDateType.TYPE_NAME:
+                        case JodaDateTimeType.TYPE_NAME:
+                        case UUIDType.TYPE_NAME:
+                            // For all these types it is OK to use toString as their string representation is what we want to have
+                            objectNode.put(targetVarName, varInstance.getValue().toString());
+                            break;
+                        case ByteArrayType.TYPE_NAME:
+                            objectNode.put(targetVarName, (byte[]) varInstance.getValue());
+                            break;
+                        default:
+                            if (PlanItemVariableAggregatorContext.OVERVIEW.equals(context.getState())) {
+                                // We can only use the aggregated variable if we are in an overview state
+                                Object value = varInstance.getValue();
+                                if (value instanceof JsonNode) {
+                                    objectNode.set(targetVarName, (JsonNode) value);
+                                } else {
+                                    throw new FlowableException("Cannot aggregate overview variable: " + varInstance);
+                                }
+                            } else {
+                                throw new FlowableException("Cannot aggregate variable: " + varInstance);
+                            }
                     }
-
-                    //TODO other types
-
-                    //TODO what if we support collection of content items, data objects etc.
-                    // i.e. collection of the var instance type, for unknown types.
                 }
 
             }
@@ -128,7 +164,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
 
     @Override
     public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances,
-            Context context) {
+            PlanItemVariableAggregatorContext context) {
         ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {

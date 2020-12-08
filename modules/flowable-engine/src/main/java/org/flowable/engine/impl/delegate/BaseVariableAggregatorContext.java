@@ -13,11 +13,12 @@
 package org.flowable.engine.impl.delegate;
 
 import org.flowable.bpmn.model.VariableAggregationDefinition;
+import org.flowable.engine.delegate.variable.VariableAggregatorContext;
 
 /**
  * @author Filip Hrisafov
  */
-public class BaseVariableAggregatorContext implements VariableAggregator.Context {
+public class BaseVariableAggregatorContext implements VariableAggregatorContext {
 
     protected final VariableAggregationDefinition definition;
     protected final String state;
@@ -37,11 +38,11 @@ public class BaseVariableAggregatorContext implements VariableAggregator.Context
         return state;
     }
 
-    public static VariableAggregator.Context complete(VariableAggregationDefinition definition) {
-        return new BaseVariableAggregatorContext(definition, VariableAggregator.ContextStates.COMPLETE);
+    public static VariableAggregatorContext complete(VariableAggregationDefinition definition) {
+        return new BaseVariableAggregatorContext(definition, VariableAggregatorContext.COMPLETE);
     }
 
-    public static VariableAggregator.Context overview(VariableAggregationDefinition definition) {
-        return new BaseVariableAggregatorContext(definition, VariableAggregator.ContextStates.OVERVIEW);
+    public static VariableAggregatorContext overview(VariableAggregationDefinition definition) {
+        return new BaseVariableAggregatorContext(definition, VariableAggregatorContext.OVERVIEW);
     }
 }

@@ -21,11 +21,12 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.variable.VariableAggregator;
+import org.flowable.engine.delegate.variable.VariableAggregatorContext;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateUtil;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.BaseVariableAggregatorContext;
-import org.flowable.engine.impl.delegate.VariableAggregator;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -76,7 +77,7 @@ public class BpmnAggregation {
      * @return the created variables (not yet saved), or {@code null} if no name could be resolved for the variable
      */
     public static VariableInstanceEntity aggregate(DelegateExecution execution, DelegateExecution parentExecution,
-            VariableAggregator.Context aggregationContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
+            VariableAggregatorContext aggregationContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
         VariableAggregationDefinition aggregation = aggregationContext.getDefinition();
         VariableAggregator aggregator = resolveVariableAggregator(aggregation, execution);
         String targetVarName = getAggregationTargetVarName(aggregation, execution, processEngineConfiguration);
@@ -98,7 +99,7 @@ public class BpmnAggregation {
      * @return the created variables (not yet saved), or {@code null} if no name could be resolved for the variable
      */
     public static VariableInstanceEntity aggregate(DelegateExecution execution, DelegateExecution parentExecution,
-            VariableAggregator.Context aggregationContext, ProcessEngineConfigurationImpl processEngineConfiguration, VariableAggregator aggregator,
+            VariableAggregatorContext aggregationContext, ProcessEngineConfigurationImpl processEngineConfiguration, VariableAggregator aggregator,
             String targetVarName) {
 
         VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
@@ -177,7 +178,7 @@ public class BpmnAggregation {
         VariableAggregationDefinition aggregation = aggregationsByTarget.get(targetVarName);
         VariableAggregator aggregator = resolveVariableAggregator(aggregation, parentExecution);
 
-        VariableAggregator.Context aggregationContext = BaseVariableAggregatorContext.overview(aggregation);
+        VariableAggregatorContext aggregationContext = BaseVariableAggregatorContext.overview(aggregation);
 
         for (ExecutionEntity childExecution : parentExecution.getExecutions()) {
             // We need to create overview values for every single active child execution
