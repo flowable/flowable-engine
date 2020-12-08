@@ -118,6 +118,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessBusinessKeyLike() != null) {
             query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
         }
+        if (queryRequest.getActiveActivityId() != null) {
+            query.activeActivityId(queryRequest.getActiveActivityId());
+        }
+        if (queryRequest.getActiveActivityIds() != null) {
+            query.activeActivityIds(queryRequest.getActiveActivityIds());
+        }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
         }

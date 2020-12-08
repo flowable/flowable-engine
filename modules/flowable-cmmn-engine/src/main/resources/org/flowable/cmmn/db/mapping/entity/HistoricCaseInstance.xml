@@ -674,6 +674,16 @@
         <if test="withoutTenantId">
             and (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
         </if>
+        <if test="activePlanItemDefinitionId != null">
+            and EXISTS(select ID_ from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ = #{activePlanItemDefinitionId} and P.STATE_ = 'active')
+        </if>
+        <if test="activePlanItemDefinitionIds != null">
+            and EXISTS(select ID_ from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ in
+            <foreach item="activePlanItemDefinitionId" index="index" collection="activePlanItemDefinitionIds" open="(" separator="," close=")">
+                #{activePlanItemDefinitionId}
+            </foreach>
+            and P.STATE_ = 'active')
+        </if>
         <if test="involvedUser != null">
             and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ = #{involvedUser})
         </if>
@@ -759,6 +769,16 @@
         </if>
         <if test="orQueryObject.withoutTenantId">
             or (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
+        </if>
+        <if test="activePlanItemDefinitionId != null">
+            or EXISTS(select ID_ from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ = #{activePlanItemDefinitionId} and P.STATE_ = 'active')
+        </if>
+        <if test="activePlanItemDefinitionIds != null">
+            or EXISTS(select ID_ from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST P where P.CASE_INST_ID_ = RES.ID_ and P.ITEM_DEFINITION_ID_ in
+            <foreach item="activePlanItemDefinitionId" index="index" collection="activePlanItemDefinitionIds" open="(" separator="," close=")">
+                #{activePlanItemDefinitionId}
+            </foreach>
+            and P.STATE_ = 'active')
         </if>
         <if test="orQueryObject.involvedUser != null">
             or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =

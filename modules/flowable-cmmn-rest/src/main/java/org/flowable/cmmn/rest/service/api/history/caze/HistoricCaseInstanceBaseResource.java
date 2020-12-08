@@ -105,6 +105,12 @@ public class HistoricCaseInstanceBaseResource {
                 query.unfinished();
             }
         }
+        if (queryRequest.getActivePlanItemDefinitionId() != null) {
+            query.activePlanItemDefinitionId(queryRequest.getActivePlanItemDefinitionId());
+        }
+        if (queryRequest.getActivePlanItemDefinitionIds() != null) {
+            query.activePlanItemDefinitionIds(queryRequest.getActivePlanItemDefinitionIds());
+        }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
                 query.includeCaseVariables();

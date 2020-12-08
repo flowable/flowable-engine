@@ -15,7 +15,9 @@ package org.flowable.engine.test.api.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -23,6 +25,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -124,6 +127,43 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceReferenceId("invalid").list()).isEmpty();
         }
 
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/currentActivityTestProcess.bpmn20.xml" })
+    public void testQueryByActiveActivityId() {
+        ProcessInstance processInstance1 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("currentActivityProcessTest")
+                .start();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ProcessInstance processInstance2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("currentActivityProcessTest")
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityId("task3").singleResult().getId()).isEqualTo(processInstance1.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityId("task1").singleResult().getId()).isEqualTo(processInstance2.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityId("task2").count()).isZero();
+            
+            Set<String> activityIds = new HashSet<String>();
+            activityIds.add("task1");
+            activityIds.add("task2");
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).singleResult().getId()).isEqualTo(processInstance2.getId());
+        
+            activityIds = new HashSet<String>();
+            activityIds.add("task1");
+            activityIds.add("task3");
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).count()).isEqualTo(2);
+            
+            activityIds = new HashSet<String>();
+            activityIds.add("task2");
+            activityIds.add("task3");
+            assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).singleResult().getId()).isEqualTo(processInstance1.getId());
+        }
     }
     
     @Test
