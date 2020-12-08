@@ -18,10 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
