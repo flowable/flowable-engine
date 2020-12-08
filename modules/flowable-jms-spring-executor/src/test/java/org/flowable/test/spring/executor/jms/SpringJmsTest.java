@@ -82,7 +82,7 @@ public class SpringJmsTest {
                 () -> assertEquals(1, processEngine.getManagementService().createTimerJobQuery().count()));
 
             // Async service task expression fails -> is moved to timer
-            assertEquals(3, - (i+1), processEngine.getManagementService().createTimerJobQuery().singleResult().getRetries());
+            assertEquals(3 - (i+1), processEngine.getManagementService().createTimerJobQuery().singleResult().getRetries());
             processEngine.getManagementService().moveTimerToExecutableJob(processEngine.getManagementService().createTimerJobQuery().singleResult().getId());
         }
 

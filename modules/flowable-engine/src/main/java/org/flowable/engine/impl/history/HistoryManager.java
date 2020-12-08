@@ -92,6 +92,8 @@ public interface HistoryManager {
 
     /**
      * Record activity end in the case when runtime activity instance does not exist.
+     * @deprecated Shouldn't be used anymore, as an execution is not unique to an activity instance.
+     *             Use {@link HistoryManager#recordActivityEnd(ActivityInstance)} instead.
      */
     void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime);
 

@@ -125,7 +125,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
     protected void addCommonEntityLinkFields(EntityLinkEntity entityLink, ObjectNode data) {
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, entityLink.getId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ENTITY_LINK_TYPE, entityLink.getLinkType());
-        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, entityLink.getLinkType());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CREATE_TIME, entityLink.getCreateTime());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_ID, entityLink.getScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SUB_SCOPE_ID, entityLink.getSubScopeId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_SCOPE_TYPE, entityLink.getScopeType());

@@ -33,24 +33,22 @@ import org.junit.Test;
 public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase {
 
     private Map<String, List<PlanItemInstanceLifecycleListener>> originalLifeCycleListeners;
-    private String deploymentId;
 
     private AbstractTestLifecycleListener testLifeCycleListener;
+
 
     @Before
     public void addListeners() {
         this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/listener/PlanItemInstanceLifeCycleListenerTest.cmmn")
-            .deploy()
-            .getId();
+            .deploy());
     }
 
     @After
     public void removeListeners() {
         cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

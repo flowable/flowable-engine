@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -287,17 +288,30 @@ public class JobResource extends JobBaseResource {
     })
     @PostMapping("/cmmn-management/deadletter-jobs/{jobId}")
     public void executeDeadLetterJobAction(@ApiParam(name = "jobId") @PathVariable String jobId, @RequestBody RestActionRequest actionRequest, HttpServletResponse response) {
-        if (actionRequest == null || !MOVE_ACTION.equals(actionRequest.getAction()) || !MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction())) {
+        if (actionRequest == null || !(MOVE_ACTION.equals(actionRequest.getAction()) || MOVE_TO_HISTORY_JOB_ACTION.equals(actionRequest.getAction()))) {
             throw new FlowableIllegalArgumentException("Invalid action, only 'move' or 'moveToHistoryJob' is supported.");
         }
         
         Job deadLetterJob = getDeadLetterJobById(jobId);
 
         if (MOVE_ACTION.equals(actionRequest.getAction())) {
+
+            /*
+             * Note that the jobType is checked to know which kind of move that needs to be done.
+             * The MOVE_TO_HISTORY_JOB_ACTION allows to specifically force the move to a history job and trigger the else part below.
+             */
+
             try {
-                managementService.moveDeadLetterJobToExecutableJob(deadLetterJob.getId(), cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+                if (HistoryJobEntity.HISTORY_JOB_TYPE.equals(deadLetterJob.getJobType())) {
+                    managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
+                } else {
+                    managementService.moveDeadLetterJobToExecutableJob(deadLetterJob.getId(), cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
+
+                }
+
             } catch (FlowableObjectNotFoundException aonfe) {
-                // Re-throw to have consistent error-messaging across REST-api
+                // Re-throw to have consistent error-messaging across REST-API
                 throw new FlowableObjectNotFoundException("Could not find a dead letter job with id '" + jobId + "'.", Job.class);
             }
 

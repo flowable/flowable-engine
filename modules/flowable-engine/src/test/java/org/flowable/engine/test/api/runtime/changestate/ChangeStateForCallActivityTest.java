@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,6 +31,7 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,6 +114,11 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getTaskDefinitionKey()).isEqualTo("secondTask");
+        }
 
         assertThat(runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).count()).isZero();
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
@@ -195,6 +203,11 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
 
         Task firstSecondTask = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(firstSecondTask.getTaskDefinitionKey()).isEqualTo("secondTask");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(firstSecondTask.getId()).singleResult();
+            assertThat(historicTaskInstance.getTaskDefinitionKey()).isEqualTo("secondTask");
+        }
 
         assertThat(runtimeService.getEntityLinkChildrenForProcessInstance(processInstance.getId()))
                 .extracting(EntityLink::getHierarchyType, EntityLink::getReferenceScopeId,

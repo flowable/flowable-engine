@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.Test;
@@ -78,7 +79,7 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEventListenerPlanItemLifecycleListener").start();
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat((Boolean) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("available").singleResult().getValue()).isTrue();
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("completed").singleResult()).isNull();
             assertThat((Boolean) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("terminate").singleResult().getValue()).isTrue();

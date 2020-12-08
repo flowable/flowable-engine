@@ -32,9 +32,11 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -200,9 +202,11 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("myCase").variables(variables).start();
         assertCaseInstanceEnded(caseInstance);
 
-        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
+            assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
+        }
     }
 
     @Test
@@ -216,25 +220,35 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
         // verify variables
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("test");
-        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult();
-        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
-        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
-        assertThat(historicVariableInstance.getValue()).isEqualTo("test");
-        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar")
+                .singleResult();
+            assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+            assertThat(historicVariableInstance.getSubScopeId()).isNull();
+        }
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).isEqualTo(123);
-        historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
-        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
-        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
-        assertThat(historicVariableInstance.getValue()).isEqualTo(123);
-        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
+            assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(historicVariableInstance.getValue()).isEqualTo(123);
+            assertThat(historicVariableInstance.getSubScopeId()).isNull();
+        }
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar")).isEqualTo(123.123);
-        historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
-        assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
-        assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
-        assertThat(historicVariableInstance.getValue()).isEqualTo(123.123);
-        assertThat(historicVariableInstance.getSubScopeId()).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
+            assertThat(historicVariableInstance.getScopeId()).isEqualTo(caseInstance.getId());
+            assertThat(historicVariableInstance.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+            assertThat(historicVariableInstance.getValue()).isEqualTo(123.123);
+            assertThat(historicVariableInstance.getSubScopeId()).isNull();
+        }
 
         // Update variables
         Map<String, Object> newVariables = new HashMap<>();
@@ -243,15 +257,21 @@ public class VariablesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariables(caseInstance.getId(), newVariables);
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("newValue");
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult().getValue()).isEqualTo("newValue");
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult().getValue())
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult().getValue()).isEqualTo("newValue");
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult().getValue())
                 .isEqualTo("test number 2");
+        }
 
         // Delete variables
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult()).isNull();
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult()).isNotNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult()).isNull();
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult()).isNotNull();
+        }
     }
 
     @Test
@@ -262,13 +282,17 @@ public class VariablesTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase").transientVariables(variables).start();
 
-        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
+            assertThat(historicMilestoneInstance.getName()).isEqualTo("Milestone Hello from test and delegate");
+
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        }
 
         // Variables should not be persisted
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     @Test

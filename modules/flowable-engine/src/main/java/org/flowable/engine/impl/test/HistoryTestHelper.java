@@ -31,7 +31,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 public class HistoryTestHelper {
     
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        return isHistoryLevelAtLeast(historyLevel, processEngineConfiguration, 10000);
+        return isHistoryLevelAtLeast(historyLevel, processEngineConfiguration, 20000);
     }
     
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration, long time) {

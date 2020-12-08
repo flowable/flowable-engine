@@ -28,21 +28,14 @@ import org.junit.Test;
  */
 public class PlanItemInstanceCriterionTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
     protected CaseInstance caseInstance;
 
     @Before
     public void deployTestCaseInstance() {
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceCriterionTest.testCriterionSaved.cmmn")
-            .deploy()
-            .getId();
+            .deploy());
         this.caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("criterions").start();
-    }
-
-    @After
-    public void removeDeployment() {
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

@@ -27,10 +27,12 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -171,16 +173,19 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(caseInstance.getCaseDefinitionId())
                 .list();
 
-        assertThat(historicPlanItemInstances).isNotNull();
-        assertThat(historicPlanItemInstances)
+            assertThat(historicPlanItemInstances).isNotNull();
+            assertThat(historicPlanItemInstances)
                 .extracting(HistoricPlanItemInstance::getName)
                 .containsExactly("Injected Task A");
+        }
     }
 
     @Test
@@ -253,14 +258,16 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).isNotNull();
-        assertThat(historicPlanItemInstances)
+            assertThat(historicPlanItemInstances).isNotNull();
+            assertThat(historicPlanItemInstances)
                 .extracting(HistoricPlanItemInstance::getName)
                 .containsExactly("Injected Task A");
+        }
     }
 
     @Test
@@ -336,16 +343,19 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).isNotNull();
-        assertThat(historicPlanItemInstances)
+            assertThat(historicPlanItemInstances).isNotNull();
+            assertThat(historicPlanItemInstances)
                 .extracting(HistoricPlanItemInstance::getName)
                 .containsExactly("Injected Task A");
+        }
     }
 
     @Test
@@ -428,11 +438,13 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Stage B", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).hasSize(3);
+            assertThat(historicPlanItemInstances).hasSize(3);
+        }
     }
 
     @Test
@@ -519,13 +531,16 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).hasSize(3);
+            assertThat(historicPlanItemInstances).hasSize(3);
+        }
     }
 
     @Test
@@ -699,13 +714,16 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).hasSize(3);
+            assertThat(historicPlanItemInstances).hasSize(3);
+        }
     }
 
     @Test
@@ -891,13 +909,16 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceDerivedCaseDefinitionId(dynamicPlanItemCase.getId())
                 .list();
 
-        assertThat(historicPlanItemInstances).hasSize(3);
+            assertThat(historicPlanItemInstances).hasSize(3);
+        }
     }
 
     @Override

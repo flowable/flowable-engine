@@ -52,6 +52,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
+    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
+
     /* Find (generic) */
 
     List<EventSubscriptionEntity> findEventSubscriptionsByName(String type, String eventName, String tenantId);

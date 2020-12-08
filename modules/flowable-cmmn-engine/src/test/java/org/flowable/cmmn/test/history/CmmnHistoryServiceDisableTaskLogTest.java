@@ -15,7 +15,9 @@ package org.flowable.cmmn.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
 import org.junit.After;
@@ -41,8 +43,16 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
     @After
     public void deleteTasks() {
         if (task != null) {
-            assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
+            }
+
             cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
+            }
+
             cmmnTaskService.deleteTask(task.getId());
         }
     }
@@ -80,7 +90,10 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
         task = cmmnTaskService.createTaskBuilder()
                 .assignee("testAssignee")
                 .create();
-        cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).create();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            cmmnHistoryService.createHistoricTaskLogEntryBuilder().taskId(task.getId()).create();
+        }
     }
 
 }

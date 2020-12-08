@@ -1547,7 +1547,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (this.internalTaskAssignmentManager != null) {
             this.taskServiceConfiguration.setInternalTaskAssignmentManager(this.internalTaskAssignmentManager);
         } else {
-            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager(this));
+            this.taskServiceConfiguration.setInternalTaskAssignmentManager(new DefaultTaskAssignmentManager());
         }
 
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
@@ -1942,6 +1942,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
                 // In case an async history executor was injected, only the job handlers are set. 
                 // In the normal case, these are set on the jobServiceConfiguration, but these are not shared between instances
                 if (historyJobHandlers != null) {
+                    if (asyncHistoryExecutor.getJobServiceConfiguration() == null) {
+                        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+                    }
                     historyJobHandlers.forEach((type, handler) -> { asyncHistoryExecutor.getJobServiceConfiguration().mergeHistoryJobHandler(handler); });
                 }
                 
@@ -2068,7 +2071,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+    	IdmIdentityService idmIdentityService = null;
+    	IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    	if (idmEngineConfiguration != null) {
+    		idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+    	}
+    	
+    	return idmIdentityService;
     }
 
     public CmmnEngineAgendaFactory getCmmnEngineAgendaFactory() {

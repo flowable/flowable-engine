@@ -24,6 +24,8 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -119,7 +121,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
                 } finally {
 
                     if (deploymentId != null) {
-                        deleteDeployment(deploymentId);
+                        CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
                         deploymentId = null;
                     }
 
@@ -133,6 +135,28 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
 
                     if (errors == null || errors.isEmpty()) {
                         assertDatabaseEmpty(method);
+
+                        // Delete any remaining data after outputting the tables which weren't empty
+
+                        List<org.flowable.cmmn.api.repository.CmmnDeployment> cmmnDeployments = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery().list();
+                        for (org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment : cmmnDeployments) {
+                            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cmmnDeployment.getId());
+                        }
+
+                        List<HistoryJob> historyJobs = cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().list();
+                        for (HistoryJob historyJob : historyJobs) {
+                            cmmnEngineConfiguration.getCmmnManagementService().deleteHistoryJob(historyJob.getId());
+                        }
+
+                        List<Task> tasks = cmmnEngineConfiguration.getCmmnTaskService().createTaskQuery().list();
+                        for (Task task : tasks) {
+                            if (task.getScopeId() == null && task.getScopeType() == null
+                                    && task.getExecutionId() == null && task.getProcessInstanceId() == null) {
+                                CmmnTestHelper.deleteWithoutGeneratingHistoryJobs(cmmnEngineConfiguration,
+                                    configuration -> configuration.getCmmnTaskService().deleteTask(task.getId()));
+                            }
+                        }
+
                     }
 
                 }
@@ -187,10 +211,6 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             }
         }
         return className + "." + method.getName() + ".cmmn";
-    }
-    
-    protected void deleteDeployment(String deploymentId) {
-        cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {

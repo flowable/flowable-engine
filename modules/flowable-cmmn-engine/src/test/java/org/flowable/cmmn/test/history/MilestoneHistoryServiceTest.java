@@ -25,6 +25,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.Test;
 
 /**
@@ -45,9 +47,11 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
         assertThat(planItemInstances.stream().filter(p -> PlanItemDefinitionType.USER_EVENT_LISTENER.equals(p.getPlanItemDefinitionType()))
                 .filter(p -> PlanItemInstanceState.AVAILABLE.equals(p.getState())).count()).isEqualTo(4);
 
-        List<HistoricMilestoneInstance> historicMilestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery().list();
-        assertThat(historicMilestoneInstances).isNotNull();
-        assertThat(historicMilestoneInstances).isEmpty();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricMilestoneInstance> historicMilestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery().list();
+            assertThat(historicMilestoneInstances).isNotNull();
+            assertThat(historicMilestoneInstances).isEmpty();
+        }
 
         //event triggering
         setClockTo(new Date(System.currentTimeMillis() + 60_000L));
@@ -82,10 +86,14 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
 
         //Milestone query is in sync with HistoricMilestone
         assertCaseInstanceNotEnded(caseInstance);
+
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().count()).isEqualTo(3);
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().list()).hasSize(1);
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(3);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(3);
+        }
 
         //Finish Case by triggering the last event
         event = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("event4").singleResult();
@@ -94,52 +102,60 @@ public class MilestoneHistoryServiceTest extends FlowableCmmnTestCase {
         //Milestone history is retained after the case ends
         assertCaseInstanceEnded(caseInstance);
         assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().count())
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()).isEqualTo(3);
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().count())
                 .isEqualTo(1);
-        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().list()).hasSize(1);
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").milestoneInstanceWithoutTenantId().list())
+                .hasSize(1);
+        }
 
         //There are two named milestones
-        HistoricMilestoneInstance abcMilestone = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("abcMilestone").singleResult();
-        assertThat(abcMilestone).isNotNull();
-        assertThat(abcMilestone.getName()).isEqualTo("abcMilestone");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricMilestoneInstance abcMilestone = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("abcMilestone")
+                .singleResult();
+            assertThat(abcMilestone).isNotNull();
+            assertThat(abcMilestone.getName()).isEqualTo("abcMilestone");
 
-        HistoricMilestoneInstance xyzMilestone = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("xyzMilestone").singleResult();
-        assertThat(xyzMilestone).isNotNull();
-        assertThat(xyzMilestone.getName()).isEqualTo("xyzMilestone");
+            HistoricMilestoneInstance xyzMilestone = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("xyzMilestone")
+                .singleResult();
+            assertThat(xyzMilestone).isNotNull();
+            assertThat(xyzMilestone.getName()).isEqualTo("xyzMilestone");
 
-        HistoricMilestoneInstance one = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").singleResult();
-        assertThat(one).isNotNull();
-        assertThat(one.getName()).isEqualTo("1");
+            HistoricMilestoneInstance one = cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceName("1").singleResult();
+            assertThat(one).isNotNull();
+            assertThat(one.getName()).isEqualTo("1");
 
-        List<HistoricMilestoneInstance> list = cmmnHistoryService.createHistoricMilestoneInstanceQuery().orderByMilestoneName().asc().list();
-        assertThat(list)
+            List<HistoricMilestoneInstance> list = cmmnHistoryService.createHistoricMilestoneInstanceQuery().orderByMilestoneName().asc().list();
+            assertThat(list)
                 .extracting(HistoricMilestoneInstance::getName)
                 .containsExactly("1", "abcMilestone", "xyzMilestone");
 
-        //Query timestamps
-        HistoricMilestoneInstance milestone1 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+            //Query timestamps
+            HistoricMilestoneInstance milestone1 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeFirstTrigger)
                 .milestoneInstanceReachedBefore(afterFirstTrigger)
                 .singleResult();
-        assertThat(milestone1).isNotNull();
-        assertThat(milestone1.getElementId()).isEqualTo("milestonePlanItem1");
-        HistoricMilestoneInstance milestone2 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+            assertThat(milestone1).isNotNull();
+            assertThat(milestone1.getElementId()).isEqualTo("milestonePlanItem1");
+            HistoricMilestoneInstance milestone2 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeSecondTrigger)
                 .milestoneInstanceReachedBefore(afterSecondTrigger)
                 .singleResult();
-        assertThat(milestone2).isNotNull();
-        assertThat(milestone2.getElementId()).isEqualTo("milestonePlanItem2");
-        HistoricMilestoneInstance milestone3 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+            assertThat(milestone2).isNotNull();
+            assertThat(milestone2.getElementId()).isEqualTo("milestonePlanItem2");
+            HistoricMilestoneInstance milestone3 = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceReachedAfter(beforeThirdTrigger)
                 .milestoneInstanceReachedBefore(afterThirdTrigger)
                 .singleResult();
-        assertThat(milestone3).isNotNull();
-        assertThat(milestone3.getElementId()).isEqualTo("milestonePlanItem3");
+            assertThat(milestone3).isNotNull();
+            assertThat(milestone3.getElementId()).isEqualTo("milestonePlanItem3");
 
-        list = cmmnHistoryService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().desc().list();
-        assertThat(list)
+            list = cmmnHistoryService.createHistoricMilestoneInstanceQuery().orderByTimeStamp().desc().list();
+            assertThat(list)
                 .extracting(HistoricMilestoneInstance::getElementId)
                 .containsExactly("milestonePlanItem3", "milestonePlanItem2", "milestonePlanItem1");
+        }
     }
 }

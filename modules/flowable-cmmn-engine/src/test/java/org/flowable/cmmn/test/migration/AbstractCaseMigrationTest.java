@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.FlowableCmmnTest;
+import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -54,7 +55,7 @@ public class AbstractCaseMigrationTest {
     void tearDown() {
         List<CmmnDeployment> deployments = this.cmmnRepositoryService.createDeploymentQuery().list();
         for (CmmnDeployment deployment : deployments) {
-            this.cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deployment.getId());
         }
     }
 

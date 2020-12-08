@@ -14,6 +14,9 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -449,6 +452,32 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .includeEnded().singleResult();
         assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/TimerEventListenerTest.testTimerWithVariableExpression.cmmn")
+    public void testTimerWithInstantVariableExpression() {
+        setClockTo(Date.from(Instant.parse("2020-10-21T08:31:45.585Z")));
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testVariable")
+                .variable("startTime", Instant.parse("2020-10-21T08:31:46.585Z"))
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.STAGE).count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count())
+                .isEqualTo(2);
+
+        setClockTo(Date.from(Instant.parse("2020-10-21T08:31:47.585Z")));
+        waitForJobExecutorToProcessAllJobs();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("A");
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
     }
 
 }

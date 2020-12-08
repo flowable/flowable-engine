@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.event.signal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.data.MapEntry.entry;
 
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class SignalEventTest extends PluggableFlowableTestCase {
 
@@ -565,9 +568,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskName("Task after signal").count()).isEqualTo(1);
 
         // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        cleanup();
 
     }
 
@@ -616,9 +617,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskName("Task after signal").count()).isEqualTo(1);
 
         // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        cleanup();
 
     }
 
@@ -654,9 +653,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskName("Task after signal").count()).isEqualTo(1);
 
         // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        cleanup();
 
     }
 
@@ -699,9 +696,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskName("Task after signal").count()).isEqualTo(1);
 
         // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        cleanup();
 
     }
 
@@ -825,9 +820,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
 
         // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+        cleanup();
 
     }
 
@@ -848,11 +841,31 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         // This used to be two, due to subscriptions not being cleaned up
         runtimeService.signalEventReceived("The Signal");
         assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(3);
+        cleanup();
 
-        // Cleanup
-        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
+    }
+
+    @Test
+    public void testRedeployWithRuntimeEventSubscription() {
+        org.flowable.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalBoundaryOnSubProcess.bpmn20.xml").deploy();
+        ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition1.getId());
+
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(SignalEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), processInstance.getId()));
+
+        org.flowable.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalBoundaryOnSubProcess.bpmn20.xml").deploy();
+        ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
+
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple(SignalEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), processInstance.getId())); // definition should have remained the same
+
+        cleanup();
     }
 
     @Test
@@ -995,5 +1008,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().taskName("Task B").count()).isEqualTo(taskBCount);
         assertThat(taskService.createTaskQuery().taskName("Task C").count()).isEqualTo(taskCCount);
     }
+
+    protected void cleanup() {
+        for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
 
 }

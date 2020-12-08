@@ -25,6 +25,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -89,15 +91,18 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+            HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceCaseInstanceId(caseInstance.getId())
                 .planItemInstanceFormKey("myFormKeyValue")
                 .singleResult();
-        assertThat(historicPlanItemInstance).isNotNull();
-        assertThat(historicPlanItemInstance.getFormKey()).isEqualTo("myFormKeyValue");
-        assertThat(historicPlanItemInstance.getExtraValue()).isEqualTo("myFormKeyValue");
+            assertThat(historicPlanItemInstance).isNotNull();
+            assertThat(historicPlanItemInstance.getFormKey()).isEqualTo("myFormKeyValue");
+            assertThat(historicPlanItemInstance.getExtraValue()).isEqualTo("myFormKeyValue");
+        }
     }
 
     @Test
@@ -130,7 +135,10 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
 
     @Test
@@ -224,35 +232,38 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
-        assertThat(historicIdentityLinks).hasSize(5);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
 
-        List<HistoricIdentityLink> historicAssigneeLink = historicIdentityLinks.stream()
+            List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
+            assertThat(historicIdentityLinks).hasSize(5);
+
+            List<HistoricIdentityLink> historicAssigneeLink = historicIdentityLinks.stream()
                 .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.ASSIGNEE)).collect(Collectors.toList());
-        assertThat(historicAssigneeLink)
+            assertThat(historicAssigneeLink)
                 .extracting(HistoricIdentityLink::getUserId)
                 .containsExactly("johndoe");
 
-        List<HistoricIdentityLink> historicOwnerLink = historicIdentityLinks.stream()
+            List<HistoricIdentityLink> historicOwnerLink = historicIdentityLinks.stream()
                 .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.OWNER)).collect(Collectors.toList());
-        assertThat(historicOwnerLink)
+            assertThat(historicOwnerLink)
                 .extracting(HistoricIdentityLink::getUserId)
                 .containsExactly("janedoe");
 
-        List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream()
+            List<HistoricIdentityLink> historicCandidateUserLinks = historicIdentityLinks.stream()
                 .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                        identityLink.getUserId() != null).collect(Collectors.toList());
-        assertThat(historicCandidateUserLinks)
+                    identityLink.getUserId() != null).collect(Collectors.toList());
+            assertThat(historicCandidateUserLinks)
                 .extracting(HistoricIdentityLink::getUserId)
                 .containsExactlyInAnyOrder("johndoe", "janedoe");
 
-        List<HistoricIdentityLink> historicGroupLink = historicIdentityLinks.stream()
+            List<HistoricIdentityLink> historicGroupLink = historicIdentityLinks.stream()
                 .filter(identityLink -> identityLink.getType().equals(IdentityLinkType.CANDIDATE) &&
-                        identityLink.getGroupId() != null).collect(Collectors.toList());
-        assertThat(historicGroupLink)
+                    identityLink.getGroupId() != null).collect(Collectors.toList());
+            assertThat(historicGroupLink)
                 .extracting(HistoricIdentityLink::getGroupId)
                 .containsExactly("sales");
+        }
     }
 }

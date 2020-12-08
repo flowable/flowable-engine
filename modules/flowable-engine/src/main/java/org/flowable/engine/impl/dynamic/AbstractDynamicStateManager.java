@@ -769,6 +769,8 @@ public abstract class AbstractDynamicStateManager {
             childExecutionEntity.setCurrentFlowElement(boundaryEvent);
             childExecutionEntity.setScope(false);
 
+            CommandContextUtil.getProcessEngineConfiguration().getActivityInstanceEntityManager().recordActivityStart(childExecutionEntity);
+
             ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
             LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), childExecutionEntity.getId());
             boundaryEventBehavior.execute(childExecutionEntity);
