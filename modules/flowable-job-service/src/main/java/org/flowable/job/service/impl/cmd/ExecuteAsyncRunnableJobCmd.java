@@ -102,4 +102,37 @@ public class ExecuteAsyncRunnableJobCmd implements Command<Object>, Serializable
 
         return null;
     }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    public JobInfoEntityManager<? extends JobInfoEntity> getJobEntityManager() {
+        return jobEntityManager;
+    }
+
+    public void setJobEntityManager(JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+        this.jobEntityManager = jobEntityManager;
+    }
+
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        return jobServiceConfiguration;
+    }
+
+    public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
+
+    public boolean isUnlock() {
+        return unlock;
+    }
+
+    public void setUnlock(boolean unlock) {
+        this.unlock = unlock;
+    }
+
 }
