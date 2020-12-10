@@ -33,6 +33,8 @@ public class JobResponse {
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
     protected String planItemInstanceId;
+    protected String elementId;
+    protected String elementName;
     protected Integer retries;
     protected String exceptionMessage;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -101,6 +103,24 @@ public class JobResponse {
 
     public void setPlanItemInstanceId(String planItemInstanceId) {
         this.planItemInstanceId = planItemInstanceId;
+    }
+
+    @ApiModelProperty(example = "scriptTask1")
+    public String getElementId() {
+        return elementId;
+    }
+
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    @ApiModelProperty(example = "Script task")
+    public String getElementName() {
+        return elementName;
+    }
+
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
     }
 
     @ApiModelProperty(example = "3")
