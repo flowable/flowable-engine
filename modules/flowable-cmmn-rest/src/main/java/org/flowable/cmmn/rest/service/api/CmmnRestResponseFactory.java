@@ -870,6 +870,8 @@ public class CmmnRestResponseFactory {
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
+        response.setElementId(job.getElementId());
+        response.setElementName(job.getElementName());
 
         response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_JOB, job.getId()));
 
