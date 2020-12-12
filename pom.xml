@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<name>Flowable</name>
@@ -14,16 +14,16 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.3.6.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.11.RELEASE</spring.framework.version>
-		<spring.security.version>5.3.5.RELEASE</spring.security.version>
-		<spring.amqp.version>2.2.11.RELEASE</spring.amqp.version>
-		<spring.kafka.version>2.5.8.RELEASE</spring.kafka.version>
+		<spring.boot.version>2.3.7.RELEASE</spring.boot.version>
+		<spring.framework.version>5.2.12.RELEASE</spring.framework.version>
+		<spring.security.version>5.3.6.RELEASE</spring.security.version>
+		<spring.amqp.version>2.2.13.RELEASE</spring.amqp.version>
+		<spring.kafka.version>2.5.10.RELEASE</spring.kafka.version>
 		<reactor-netty.version>0.9.12.RELEASE</reactor-netty.version>
 		<jackson.version>2.11.2</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
-    <camel.version>2.25.0</camel.version>
+		<camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.0</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<groovy.version>3.0.6</groovy.version>
@@ -129,11 +129,11 @@
 				<artifactId>httpclient</artifactId>
 				<version>4.5.12</version>
 			</dependency>
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpcore</artifactId>
-                <version>4.4.13</version>
-            </dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.14</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
@@ -227,7 +227,7 @@
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.0.0</version>
+				<version>11.5.5.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -348,7 +348,7 @@
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-idm-rest</artifactId>
                 <version>${project.version}</version>
-            </dependency>    
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-dmn-api</artifactId>
@@ -775,7 +775,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.3.5.Final</version>
+				<version>5.4.25.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
