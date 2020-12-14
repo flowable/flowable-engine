@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Test;
  * @author Joram Barrez
  * @author Nils Preusker
  * @author Bernd Ruecker
- * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
@@ -844,6 +844,109 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
         assertThat(runtimeService.createExecutionQuery().list()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testMultiInstanceSequentialSubProcessDataInputOutput.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testMultiInstanceSequentialSubProcessWithDataInputOutput() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("subProcessDataInputOutput")
+                .variable("superVariable", "Hello from the super process.")
+                .variable("nrOfLoops", 2)
+                .start();
+
+        // There should be one sub process instances active after starting the process instance
+        Task taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task in subprocess");
+        assertThat(runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable")).isEqualTo("Hello from the super process.");
+        assertThat(taskService.getVariable(taskBeforeSubProcess.getId(), "subVariable")).isEqualTo("Hello from the super process.");
+
+        runtimeService.setVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable", "Hello from sub process.");
+
+        // super variable is unchanged
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from the super process.");
+
+        // Completing the first task ends the first subprocess which leads to the super process having an updated sub variable
+        taskService.complete(taskBeforeSubProcess.getId());
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from sub process.");
+
+        // The second instance should now be started
+        taskBeforeSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task in subprocess");
+        assertThat(runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable")).isEqualTo("Hello from sub process.");
+        assertThat(taskService.getVariable(taskBeforeSubProcess.getId(), "subVariable")).isEqualTo("Hello from sub process.");
+
+        runtimeService.setVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable", "Hello from second iteration sub process.");
+
+        // Completing the second task ends the first subprocess which leads to the super process having an updated sub variable
+        taskService.complete(taskBeforeSubProcess.getId());
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
+
+        // one task in the subprocess should be active after starting the process instance
+        Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskAfterSubProcess.getName()).isEqualTo("Task in super process");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
+        assertThat(taskService.getVariable(taskAfterSubProcess.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testMultiInstanceParallelSubProcessDataInputOutput.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testMultiInstanceParallelSubProcessWithDataInputOutput() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("subProcessDataInputOutput")
+                .variable("superVariable", "Hello from the super process.")
+                .variable("nrOfLoops", 2)
+                .start();
+
+        // There should be 2 sub process instances active after starting the process instance
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks)
+                .hasSize(2)
+                .extracting(Task::getName)
+                .containsOnly("Task in subprocess");
+
+        Task taskBeforeSubProcess = tasks.get(0);
+        assertThat(runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable")).isEqualTo("Hello from the super process.");
+        assertThat(taskService.getVariable(taskBeforeSubProcess.getId(), "subVariable")).isEqualTo("Hello from the super process.");
+
+        runtimeService.setVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable", "Hello from sub process.");
+
+        // super variable is unchanged
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from the super process.");
+
+        // Completing the first task ends the first subprocess which leads to the super process having an updated sub variable
+        taskService.complete(taskBeforeSubProcess.getId());
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from sub process.");
+
+        // The second instance should have the same data as the first one
+        taskBeforeSubProcess = tasks.get(1);
+        assertThat(runtimeService.getVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable")).isEqualTo("Hello from the super process.");
+        assertThat(taskService.getVariable(taskBeforeSubProcess.getId(), "subVariable")).isEqualTo("Hello from the super process.");
+
+        runtimeService.setVariable(taskBeforeSubProcess.getProcessInstanceId(), "subVariable", "Hello from second iteration sub process.");
+
+        // Completing the second task ends the second subprocess which leads to the super process having an updated sub variable
+        taskService.complete(taskBeforeSubProcess.getId());
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
+
+
+        // one task in the subprocess should be active after starting the process instance
+        Task taskAfterSubProcess = taskService.createTaskQuery().singleResult();
+        assertThat(taskAfterSubProcess.getName()).isEqualTo("Task in super process");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
+        assertThat(taskService.getVariable(taskAfterSubProcess.getId(), "superVariable")).isEqualTo("Hello from second iteration sub process.");
     }
 
     /**

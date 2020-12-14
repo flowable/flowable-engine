@@ -26,10 +26,12 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.delegate.ReadOnlyDelegatePlanItemInstanceImpl;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -86,7 +88,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
-    
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -469,7 +471,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    protected VariableScopeImpl getParentVariableScope() {
+    public VariableScopeImpl getParentVariableScope() {
+        PlanItemInstanceEntity stagePlanItem = getStagePlanItemInstanceEntity();
+        if (stagePlanItem != null) {
+            return (VariableScopeImpl) stagePlanItem;
+        }
         if (caseInstanceId != null) {
             return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
         }
@@ -482,7 +488,23 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
     }
-    
+
+    @Override
+    protected boolean storeVariableLocal(String variableName) {
+        if (super.storeVariableLocal(variableName)) {
+            return true;
+        }
+
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(this);
+        if (repetitionRule != null && repetitionRule.getAggregations() != null) {
+            // If this is a plan item with a repetition rule and has aggregations then we need to store the variables locally
+            // Checking for the aggregations is for backwards compatibility
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         // TODO

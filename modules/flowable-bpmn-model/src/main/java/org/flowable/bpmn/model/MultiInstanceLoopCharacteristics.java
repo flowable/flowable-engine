@@ -26,6 +26,8 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     protected String elementIndexVariable;
     protected boolean sequential;
 
+    protected VariableAggregationDefinitions aggregations;
+
     public String getInputDataItem() {
         return inputDataItem;
     }
@@ -90,6 +92,22 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.sequential = sequential;
     }
 
+    public VariableAggregationDefinitions getAggregations() {
+        return aggregations;
+    }
+
+    public void setAggregations(VariableAggregationDefinitions aggregations) {
+        this.aggregations = aggregations;
+    }
+
+    public void addAggregation(VariableAggregationDefinition aggregation) {
+        if (this.aggregations == null) {
+            this.aggregations = new VariableAggregationDefinitions();
+        }
+
+        this.aggregations.getAggregations().add(aggregation);
+    }
+
     @Override
     public MultiInstanceLoopCharacteristics clone() {
         MultiInstanceLoopCharacteristics clone = new MultiInstanceLoopCharacteristics();
@@ -108,5 +126,9 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         setElementVariable(otherLoopCharacteristics.getElementVariable());
         setElementIndexVariable(otherLoopCharacteristics.getElementIndexVariable());
         setSequential(otherLoopCharacteristics.isSequential());
+
+        if (otherLoopCharacteristics.getAggregations() != null) {
+            setAggregations(otherLoopCharacteristics.getAggregations().clone());
+        }
     }
 }

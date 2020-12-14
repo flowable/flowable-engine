@@ -124,7 +124,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
         callActivityEndListeners(execution);
-        
+
         logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
 
         if (zeroNrOfInstances) {
@@ -136,6 +136,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
             executionEntity.inactivate();
             lockFirstParentScope(executionEntity);
+
+            // When leaving one of the child executions we need to aggregate the information for it
+            // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+            aggregateVariablesForChildExecution(execution, miRootExecution);
 
             boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
             if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {

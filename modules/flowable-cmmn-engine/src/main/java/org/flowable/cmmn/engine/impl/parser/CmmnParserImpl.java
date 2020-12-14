@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CmmnParserImpl implements CmmnParser {
 
-    private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
 
     protected CmmnParseHandlers cmmnParseHandlers;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;

@@ -179,6 +179,11 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS = "class";
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
 
+    public static final String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE = "storeAsTransientVariable";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW = "createOverviewVariable";
+
     public static final String ATTRIBUTE_TASK_IMPLEMENTATION = "implementation";
     public static final String ATTRIBUTE_TASK_OPERATION_REF = "operationRef";
 

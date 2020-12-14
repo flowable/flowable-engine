@@ -369,6 +369,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             // Dependents
             planItem.getEntryDependencies().forEach(entryDependency -> entryDependency.addEntryDependentPlanItem(planItem));
             planItem.getExitDependencies().forEach(exitDependency -> exitDependency.addExitDependentPlanItem(planItem));
+
         }
 
         processCriteria(cmmnModel, conversionHelper.getEntryCriteria());

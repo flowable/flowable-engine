@@ -36,6 +36,21 @@ public interface VariableTypes {
     VariableTypes addType(VariableType type);
 
     /**
+     * Add the variable type before the type with the given name.
+     * When a type with the requested name is not registered then use {@link #addType(VariableType)}
+     * @param type the type to add
+     * @param afterTypeName the name of the other type
+     */
+    default VariableTypes addTypeBefore(VariableType type, String afterTypeName) {
+        int afterTypeIndex = getTypeIndex(afterTypeName);
+        if (afterTypeIndex > -1) {
+            return addType(type, afterTypeIndex);
+        } else {
+            return addType(type);
+        }
+    }
+
+    /**
      * Add type at the given index. The index is used when finding a type for an object. When different types can store a specific object value, the one with the smallest index will be used.
      */
     VariableTypes addType(VariableType type, int index);

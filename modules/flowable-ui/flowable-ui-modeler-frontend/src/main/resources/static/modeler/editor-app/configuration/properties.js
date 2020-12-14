@@ -199,5 +199,13 @@ FLOWABLE.PROPERTY_CONFIG =
     "flowable-channeltype" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/event-channel-type-property-write-template.html"
-    }
+    },
+    "oryx-multiinstance_variableaggregations-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/variable-aggregations-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/variable-aggregations-write-template.html"
+    },
+    "oryx-repetition_variableaggregations-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/variable-aggregations-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/variable-aggregations-write-template.html"
+    },
 };

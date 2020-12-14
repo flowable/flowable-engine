@@ -38,6 +38,9 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     protected PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher =
         new PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher();
 
+    protected PlanItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher planItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher =
+        new PlanItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher();
+
     protected PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher planItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher =
         new PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher();
     
@@ -97,6 +100,14 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("stageInstanceId", stageInstanceId);
+        params.put("planItemId", planItemId);
+        return getList("selectPlanItemInstancesByStageInstanceIdAndPlanItemId", params, planItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher);
+    }
+
+    @Override
     public long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         return (Long) getDbSqlSession().selectOne("selectPlanItemInstanceCountByQueryCriteria", planItemInstanceQuery);
     }
@@ -146,6 +157,18 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             String caseInstanceId = (String) map.get("caseInstanceId");
             String planItemId = (String) map.get("planItemId");
             return caseInstanceId.equals(entity.getCaseInstanceId()) && planItemId.equals(entity.getPlanItem().getId());
+        }
+
+    }
+
+    public static class PlanItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            Map<String, Object> map = (Map<String, Object>) param;
+            String stageInstanceId = (String) map.get("stageInstanceId");
+            String planItemId = (String) map.get("planItemId");
+            return stageInstanceId.equals(entity.getStageInstanceId()) && planItemId.equals(entity.getPlanItem().getId());
         }
 
     }

@@ -992,7 +992,15 @@
           "value" : "",
           "description" : "CMMN.PROPERTYPACKAGES.REPETITIONRULEPACKAGE.REPETITIONCOUNTERVARIABLENAME.DESCRIPTION",
           "popular" : true
-        } ]
+        },
+        {
+          "id" : "repetition_variableaggregations",
+          "type" : "Complex",
+          "title" : "CMMN.PROPERTYPACKAGES.REPETITIONRULEPACKAGE.VARIABLE_AGGREGATIONS.TITLE",
+          "value" : "",
+          "description" : "CMMN.PROPERTYPACKAGES.REPETITIONRULEPACKAGE.VARIABLE_AGGREGATIONS.DESCRIPTION",
+          "popular" : true
+        }]
     }, {
       "name" : "manualactivationrulepackage",
       "properties" : [ {

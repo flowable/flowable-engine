@@ -25,6 +25,8 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
+import org.flowable.bpmn.model.VariableAggregationDefinition;
+import org.flowable.bpmn.model.VariableAggregationDefinitions;
 
 public class MultiInstanceExport implements BpmnXMLConstants {
 
@@ -77,6 +79,51 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                     
                     // end collection element
                     xtw.writeEndElement();
+                }
+
+                // check for variable aggregations
+                VariableAggregationDefinitions aggregations = multiInstanceObject.getAggregations();
+                if (aggregations != null) {
+
+                    if (!didWriteExtensionStartElement) {
+                        // start extensions
+                        xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                        didWriteExtensionStartElement = true;
+                    }
+
+                    for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+
+                        // start variable aggregation element
+                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_VARIABLE_AGGREGATION);
+
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, aggregation.getTarget(), xtw);
+                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, aggregation.getTargetExpression(), xtw);
+                        if (aggregation.isStoreAsTransientVariable()) {
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE, "true", xtw);
+                        }
+                        if (aggregation.isCreateOverviewVariable()) {
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW, "true", xtw);
+                        }
+                        if (StringUtils.isNotEmpty(aggregation.getImplementationType())) {
+                            BpmnXMLUtil.writeDefaultAttribute(aggregation.getImplementationType(), aggregation.getImplementation(), xtw);
+                        }
+
+                        for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+                            // start variable element
+                            xtw.writeStartElement(ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE);
+
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, definition.getSource(), xtw);
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, definition.getSourceExpression(), xtw);
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, definition.getTarget(), xtw);
+                            BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, definition.getTargetExpression(), xtw);
+
+                            // end variable element
+                            xtw.writeEndElement();
+                        }
+
+                        // end variable aggregation element
+                        xtw.writeEndElement();
+                    }
                 }
                 
             	

@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Activity;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
@@ -617,7 +620,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     // VariableScopeImpl methods //////////////////////////////////////////////////////////////////
 
-    // TODO: this should ideally move to another place
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         if (processInstanceId != null) {
@@ -627,6 +629,33 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         }
         variableInstance.setExecutionId(id);
         variableInstance.setProcessDefinitionId(processDefinitionId);
+    }
+
+    @Override
+    protected boolean storeVariableLocal(String variableName) {
+        if (super.storeVariableLocal(variableName)) {
+            return true;
+        }
+
+        ExecutionEntityImpl parent = getParent();
+        if (parent != null && parent.isMultiInstanceRoot()) {
+
+            if (getCurrentFlowElement() instanceof BoundaryEvent) {
+                // Executions for boundary events should not store variables locally
+                return false;
+            }
+
+            // If the parent is a multi instance root then the variable should be stored in this execution
+            // the multi instance behaviour will collect this variables once it is done
+            // For backwards compatibility we store the variable locally only if the loop characteristics has aggregations
+            FlowElement parentFlowElement = parent.getCurrentFlowElement();
+            if (parentFlowElement instanceof Activity) {
+                MultiInstanceLoopCharacteristics loopCharacteristics = ((Activity) parentFlowElement).getLoopCharacteristics();
+                return loopCharacteristics != null && loopCharacteristics.getAggregations() != null;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -661,7 +690,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             }
 
             // If the variable exists on this scope, replace it
-            if (hasVariableLocal(variableName)) {
+            if (storeVariableLocal(variableName)) {
                 setVariableLocal(variableName, value, sourceExecution, true);
                 return;
             }
@@ -867,7 +896,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         if (commandContext == null) {
             throw new FlowableException("lazy loading outside command context");
         }
-        
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         return processEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
@@ -1388,7 +1417,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         }
         return activityInstanceId;
     }
-    
+
     protected void resolveProcessDefinitionInfo() {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration == null) {
@@ -1399,7 +1428,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         if (processDefinition == null) {
             throw new FlowableException("Cannot get process definition for id " + processDefinitionId);
         }
-        
+
         this.processDefinitionKey = processDefinition.getKey();
         this.processDefinitionName = processDefinition.getName();
         this.processDefinitionVersion = processDefinition.getVersion();

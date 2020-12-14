@@ -213,8 +213,20 @@
             <if test="parameter.scopeId != null">
                 AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
             </if>
+            <if test="parameter.scopeIds != null and !parameter.scopeIds.isEmpty()">
+                AND SCOPE_ID_ in
+                <foreach collection="parameter.scopeIds" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
+            </if>
             <if test="parameter.subScopeId != null">
                 AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.subScopeIds != null and !parameter.subScopeIds.isEmpty()">
+                AND SUB_SCOPE_ID_ in
+                <foreach collection="parameter.subScopeIds" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
             </if>
             <if test="parameter.withoutSubScopeId">
                 AND SUB_SCOPE_ID_ is null

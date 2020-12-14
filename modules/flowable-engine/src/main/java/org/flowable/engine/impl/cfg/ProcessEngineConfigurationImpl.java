@@ -124,6 +124,7 @@ import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFac
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
+import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DefaultProcessJobParentStateResolver;
@@ -206,6 +207,7 @@ import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
+import org.flowable.engine.impl.delegate.JsonVariableAggregator;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
@@ -226,6 +228,7 @@ import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.formhandler.DefaultFormFieldHandler;
+import org.flowable.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
 import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
 import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
@@ -340,6 +343,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceData
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
@@ -529,6 +533,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BatchServiceConfiguration batchServiceConfiguration;
 
     protected boolean enableEntityLinks;
+
+    // Variable Aggregation
+
+    protected VariableAggregator variableAggregator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -1064,6 +1072,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDataManagers();
         initEntityManagers();
         initCandidateManager();
+        initVariableAggregator();
         initHistoryManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
@@ -1354,6 +1363,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initCandidateManager() {
         if (candidateManager == null) {
             candidateManager = new DefaultCandidateManager(this);
+        }
+    }
+
+    // Variable Aggregator
+
+    public void initVariableAggregator() {
+        if (variableAggregator == null) {
+            variableAggregator = new JsonVariableAggregator(this);
         }
     }
 
@@ -2439,12 +2456,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
                 }
+            }
+        } else {
+            if (variableTypes.getVariableType(BpmnAggregatedVariableType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new BpmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
             }
         }
     }
@@ -2625,6 +2647,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             flowableFunctionDelegates.add(new VariableGreaterThanOrEqualsExpressionFunction());
 
             flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
+
+            flowableFunctionDelegates.add(new TaskGetFunctionDelegate());
         }
 
         if (this.customFlowableFunctionDelegates != null) {
@@ -4476,6 +4500,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableEntityLinks(boolean enableEntityLinks) {
         this.enableEntityLinks = enableEntityLinks;
+        return this;
+    }
+
+    public VariableAggregator getVariableAggregator() {
+        return variableAggregator;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableAggregator(VariableAggregator variableAggregator) {
+        this.variableAggregator = variableAggregator;
         return this;
     }
 

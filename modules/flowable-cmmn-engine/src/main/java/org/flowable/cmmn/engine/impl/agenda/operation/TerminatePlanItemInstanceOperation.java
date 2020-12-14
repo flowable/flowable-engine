@@ -48,6 +48,16 @@ public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInst
     }
     
     @Override
+    protected boolean shouldAggregateForSingleInstance() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldAggregateForMultipleInstances() {
+        return false;
+    }
+
+    @Override
     protected void internalExecute() {
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
         planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());

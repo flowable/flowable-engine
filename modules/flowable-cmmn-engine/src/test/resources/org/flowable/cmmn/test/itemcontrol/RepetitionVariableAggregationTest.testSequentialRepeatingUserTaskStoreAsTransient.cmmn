@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="repeatingTask" name="repeatingTask" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItem1" name="My Task" definitionRef="humanTask1">
+                <itemControl>
+                    <repetitionRule>
+                        <extensionElements>
+                            <flowable:variableAggregation target="reviews" storeAsTransientVariable="true">
+                                <variable source="approved"/>
+                                <variable source="description"/>
+                            </flowable:variableAggregation>
+                        </extensionElements>
+                        <condition><![CDATA[${repetitionCounter < nrOfLoops}]]></condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+
+            <planItem id="planItem2" name="My Task 2" definitionRef="humanTask2"/>
+
+            <planItem id="planItem3" name="After Repetition Service" definitionRef="serviceTask1">
+                <entryCriterion id="entryCriterion1" sentryRef="sentry1"/>
+            </planItem>
+            <sentry id="sentry1" flowable:triggerMode="onEvent">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <ifPart>
+                    <condition><![CDATA[${vars:exists('reviews')}]]></condition>
+                </ifPart>
+            </sentry>
+
+
+            <humanTask id="humanTask1" name="My Task" flowable:taskIdVariableName="taskId"/>
+
+            <humanTask id="humanTask2" name="My Task"/>
+
+            <task id="serviceTask1" name="Service" flowable:type="java" flowable:expression="${reviews[0].description}"
+                  flowable:resultVariableName="firstDescription"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>
