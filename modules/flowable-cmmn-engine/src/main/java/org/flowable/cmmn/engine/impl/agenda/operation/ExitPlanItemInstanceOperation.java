@@ -142,12 +142,12 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     }
 
     @Override
-    protected boolean shouldAggregateForOneInstance() {
+    protected boolean shouldAggregateForSingleInstance() {
         return false;
     }
 
     @Override
-    protected boolean shouldAggregateMulti() {
+    protected boolean shouldAggregateForMultipleInstances() {
         return false;
     }
 

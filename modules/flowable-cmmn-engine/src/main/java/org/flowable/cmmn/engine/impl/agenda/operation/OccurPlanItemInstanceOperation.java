@@ -45,12 +45,12 @@ public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstance
     }
     
     @Override
-    protected boolean shouldAggregateForOneInstance() {
+    protected boolean shouldAggregateForSingleInstance() {
         return true;
     }
 
     @Override
-    protected boolean shouldAggregateMulti() {
+    protected boolean shouldAggregateForMultipleInstances() {
         return true;
     }
 

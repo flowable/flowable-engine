@@ -33,7 +33,7 @@ public interface VariableAggregator {
      * @param context the aggregation context
      * @return the value for the aggregated variable
      */
-    Object aggregateSingle(DelegateExecution execution, VariableAggregatorContext context);
+    Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context);
 
     /**
      * Aggregated the provide variable instances into one variable value.
@@ -41,10 +41,10 @@ public interface VariableAggregator {
      * This is called when a multi instance execution and all its children is complete, or an overview for a multi instance execution is needed.
      *
      * @param execution the delegated execution for which we need to do the aggregation
-     * @param instances the variable values that should be aggregated (this variables are created based on the value from {@link #aggregateSingle(DelegateExecution, VariableAggregatorContext)})
+     * @param instances the variable values that should be aggregated (this variables are created based on the value from {@link #aggregateSingleVariable(DelegateExecution, VariableAggregatorContext)})
      * @param context the aggregation context
      * @return the aggregated value
      */
-    Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context);
+    Object aggregateMultiVariables(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context);
 
 }

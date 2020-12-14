@@ -61,7 +61,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
     }
 
     @Override
-    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
+    public Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
         ObjectNode objectNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
 
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
@@ -163,7 +163,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
     }
 
     @Override
-    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances,
+    public Object aggregateMultiVariables(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances,
             PlanItemVariableAggregatorContext context) {
         ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();

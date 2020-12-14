@@ -48,12 +48,12 @@ public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInst
     }
     
     @Override
-    protected boolean shouldAggregateForOneInstance() {
+    protected boolean shouldAggregateForSingleInstance() {
         return false;
     }
 
     @Override
-    protected boolean shouldAggregateMulti() {
+    protected boolean shouldAggregateForMultipleInstances() {
         return false;
     }
 

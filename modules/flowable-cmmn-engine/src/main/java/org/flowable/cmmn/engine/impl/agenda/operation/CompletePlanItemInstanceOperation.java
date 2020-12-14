@@ -43,12 +43,12 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
-    protected boolean shouldAggregateForOneInstance() {
+    protected boolean shouldAggregateForSingleInstance() {
         return true;
     }
 
     @Override
-    protected boolean shouldAggregateMulti() {
+    protected boolean shouldAggregateForMultipleInstances() {
         return true;
     }
 

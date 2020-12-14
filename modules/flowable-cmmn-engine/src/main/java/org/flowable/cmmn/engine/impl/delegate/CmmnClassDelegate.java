@@ -148,13 +148,13 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
     }
 
     @Override
-    public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
-        return getPlanItemVariableAggregator().aggregateSingle(planItemInstance, context);
+    public Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
+        return getPlanItemVariableAggregator().aggregateSingleVariable(planItemInstance, context);
     }
 
     @Override
-    public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
-        return getPlanItemVariableAggregator().aggregateMulti(planItemInstance, instances, context);
+    public Object aggregateMultiVariables(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
+        return getPlanItemVariableAggregator().aggregateMultiVariables(planItemInstance, instances, context);
     }
 
     protected PlanItemVariableAggregator getPlanItemVariableAggregator() {

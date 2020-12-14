@@ -1271,7 +1271,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     public static class CustomVariableAggregator implements PlanItemVariableAggregator {
 
         @Override
-        public Object aggregateSingle(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
+        public Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = planItemInstance.getVariable(variable.getSource());
@@ -1298,7 +1298,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         }
 
         @Override
-        public Object aggregateMulti(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
+        public Object aggregateMultiVariables(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances, PlanItemVariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableInstance instance : instances) {
                 arrayNode.addAll((ArrayNode) instance.getValue());

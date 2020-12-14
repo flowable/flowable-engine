@@ -230,7 +230,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
             sortVariablesByCounter(varValues, counterVariables);
 
-            Object value = aggregator.aggregateMulti(multiInstanceRootExecution, varValues, BaseVariableAggregatorContext.complete(aggregation));
+            Object value = aggregator.aggregateMultiVariables(multiInstanceRootExecution, varValues, BaseVariableAggregatorContext.complete(aggregation));
             if (aggregation.isStoreAsTransientVariable()) {
                 multiInstanceRootExecution.getParent().setTransientVariable(varName, value);
             } else {

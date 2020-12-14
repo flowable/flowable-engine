@@ -75,8 +75,8 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         // There is a fake plan item instance created for waiting for repetition
         // This instance does not follow the same lifecycle and thus we should not aggregate variables for it
         boolean shouldAggregate = aggregations != null && PlanItemInstanceState.ACTIVE_STATES.contains(originalState);
-        if (shouldAggregate && shouldAggregateForOneInstance()) {
-            aggregateVariablesForOneInstance(planItemInstanceEntity, aggregations);
+        if (shouldAggregate && shouldAggregateForSingleInstance()) {
+            aggregateVariablesForSingleInstance(planItemInstanceEntity, aggregations);
         }
 
         if (!isNoop) {  // The super.run() could have marked this as a no-op. No point in continuing.
@@ -231,7 +231,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         }
     }
 
-    protected void aggregateVariablesForOneInstance(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
+    protected void aggregateVariablesForSingleInstance(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
         // Gathered variables are stored on the finished plan item instances
@@ -297,7 +297,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
 
-        boolean aggregateMulti = shouldAggregateMulti();
+        boolean aggregateMulti = shouldAggregateForMultipleInstances();
 
         for (Map.Entry<String, VariableAggregationDefinition> entry : aggregationsByTarget.entrySet()) {
             String varName = entry.getKey();
@@ -311,7 +311,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
                 sortVariablesByCounter(varValues, counterVariables);
 
-                Object value = aggregator.aggregateMulti(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
+                Object value = aggregator.aggregateMultiVariables(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
 
                 if (aggregation.isStoreAsTransientVariable()) {
                     planItemInstanceEntity.getParentVariableScope().setTransientVariable(varName, value);
@@ -333,7 +333,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
      * that is the same for all instances.
      * e.g. When an instance completes normally we should aggregate the data, but if it terminates we shouldn't
      */
-    protected abstract boolean shouldAggregateForOneInstance();
+    protected abstract boolean shouldAggregateForSingleInstance();
 
     /**
      * Whether multi aggregation needs to be done.
@@ -341,7 +341,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
      * that is the same for all instances.
      * e.g. Multi aggregation needs to be done when we do a normal completion, but not when the plan items are terminated
      */
-    protected abstract boolean shouldAggregateMulti();
+    protected abstract boolean shouldAggregateForMultipleInstances();
 
     public abstract boolean isEvaluateRepetitionRule();
     

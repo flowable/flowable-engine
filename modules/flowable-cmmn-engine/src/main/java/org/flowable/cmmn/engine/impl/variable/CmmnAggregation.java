@@ -100,7 +100,7 @@ public class CmmnAggregation {
 
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
 
-        Object aggregatedValue = aggregator.aggregateSingle(planItemInstance, aggregationContext);
+        Object aggregatedValue = aggregator.aggregateSingleVariable(planItemInstance, aggregationContext);
 
         String caseInstanceId = planItemInstance.getCaseInstanceId();
         String subScopeId = planItemInstance.getStageInstanceId();
@@ -208,7 +208,7 @@ public class CmmnAggregation {
 
             sortVariablesByCounter(targetVariableInstances, counterVariables);
 
-            return aggregator.aggregateMulti(planItemInstance, targetVariableInstances, aggregationContext);
+            return aggregator.aggregateMultiVariables(planItemInstance, targetVariableInstances, aggregationContext);
         }
 
         return null;

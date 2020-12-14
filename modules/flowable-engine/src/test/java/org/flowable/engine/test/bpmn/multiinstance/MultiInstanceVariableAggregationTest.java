@@ -1744,7 +1744,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
     public static class CustomVariableAggregator implements VariableAggregator {
 
         @Override
-        public Object aggregateSingle(DelegateExecution execution, VariableAggregatorContext context) {
+        public Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
@@ -1774,7 +1774,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         }
 
         @Override
-        public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
+        public Object aggregateMultiVariables(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
             ArrayNode arrayNode = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableInstance instance : instances) {
                 arrayNode.addAll((ArrayNode) instance.getValue());

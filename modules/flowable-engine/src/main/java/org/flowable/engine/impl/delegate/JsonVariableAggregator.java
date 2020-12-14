@@ -61,7 +61,7 @@ public class JsonVariableAggregator implements VariableAggregator {
     }
 
     @Override
-    public Object aggregateSingle(DelegateExecution execution, VariableAggregatorContext context) {
+    public Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context) {
         ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
 
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
@@ -163,7 +163,7 @@ public class JsonVariableAggregator implements VariableAggregator {
     }
 
     @Override
-    public Object aggregateMulti(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
+    public Object aggregateMultiVariables(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {

@@ -104,7 +104,7 @@ public class BpmnAggregation {
 
         VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
 
-        Object aggregatedValue = aggregator.aggregateSingle(execution, aggregationContext);
+        Object aggregatedValue = aggregator.aggregateSingleVariable(execution, aggregationContext);
 
         String processInstanceId = execution.getProcessInstanceId();
         String parentExecutionId = parentExecution.getId();
@@ -209,7 +209,7 @@ public class BpmnAggregation {
 
             sortVariablesByCounter(targetVariableInstances, counterVariables);
 
-            return aggregator.aggregateMulti(parentExecution, targetVariableInstances, aggregationContext);
+            return aggregator.aggregateMultiVariables(parentExecution, targetVariableInstances, aggregationContext);
         }
 
         return null;
