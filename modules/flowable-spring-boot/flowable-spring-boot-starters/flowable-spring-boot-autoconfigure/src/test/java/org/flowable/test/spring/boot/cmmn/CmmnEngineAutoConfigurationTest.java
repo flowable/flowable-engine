@@ -41,13 +41,16 @@ import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -57,17 +60,20 @@ import org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
+import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Filip Hrisafov
@@ -480,6 +486,29 @@ public class CmmnEngineAutoConfigurationTest {
                     CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
                     assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
                             .isEqualTo(context.getBean(FlowableAsyncHttpClient.class));
+                });
+    }
+
+    @Test
+    void cmmnEngineShouldUseSpringTaskExecutor() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(TaskExecutionAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(CmmnEngineConfiguration.class)
+                            .hasSingleBean(TaskExecutor.class);
+
+                    CmmnEngineConfiguration configuration = context.getBean(CmmnEngineConfiguration.class);
+
+                    AsyncExecutor asyncExecutor = configuration.getAsyncExecutor();
+                    assertThat(asyncExecutor).isInstanceOf(SpringAsyncExecutor.class);
+
+                    AsyncTaskExecutor asyncTaskExecutor = configuration.getAsyncTaskExecutor();
+                    assertThat(asyncTaskExecutor).isInstanceOf(SpringAsyncTaskExecutor.class);
+                    assertThat(asyncExecutor.getTaskExecutor()).isEqualTo(asyncTaskExecutor);
+                    assertThat(configuration.getAsyncHistoryTaskExecutor()).isEqualTo(asyncTaskExecutor);
+                    assertThat(((SpringAsyncTaskExecutor) asyncTaskExecutor).getAsyncTaskExecutor())
+                            .isEqualTo(context.getBean(TaskExecutor.class));
                 });
     }
 
