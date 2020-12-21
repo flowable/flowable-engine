@@ -12,6 +12,8 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -38,10 +40,7 @@ public class DefaultAsyncRunnableExecutionExceptionHandler implements AsyncRunna
 
             @Override
             public Void execute(CommandContext commandContext) {
-
-                // Finally, Throw the exception to indicate the ExecuteAsyncJobCmd failed
-                String message = "Job " + job.getId() + " failed";
-                LOGGER.error(message, exception);
+                logException(job, exception);
 
                 if (job instanceof AbstractRuntimeJobEntity) {
                     AbstractRuntimeJobEntity runtimeJob = (AbstractRuntimeJobEntity) job;
@@ -77,6 +76,27 @@ public class DefaultAsyncRunnableExecutionExceptionHandler implements AsyncRunna
         });
 
         return true;
+    }
+
+    /**
+     * See also {@link CommandContext#logException()}
+     */
+    protected void logException(JobInfo job, Throwable exception) {
+        if (exception instanceof FlowableException && !((FlowableException) exception).isLogged()) {
+            return;
+        }
+
+        String message = "Job " + job.getId() + " failed";
+
+        if (exception instanceof FlowableOptimisticLockingException) {
+            // reduce log level, as normally we're not interested in logging this exception
+            LOGGER.debug(message, exception);
+        } else if (exception instanceof FlowableException && ((FlowableException) exception).isReduceLogLevel()) {
+            // reduce log level, because this may have been caused because of job deletion due to cancelActiviti="true"
+            LOGGER.info(message, exception);
+        } else {
+            LOGGER.error(message, exception);
+        }
     }
 
 
