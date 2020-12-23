@@ -98,6 +98,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String taskAssignee;
     protected String taskAssigneeLike;
     protected String taskAssigneeLikeIgnoreCase;
+    protected boolean withAssignee;
+    protected boolean withoutAssignee;
     protected Collection<String> taskAssigneeIds;
     protected String taskDefinitionKey;
     protected String taskDefinitionKeyLike;
@@ -818,6 +820,28 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.taskAssigneeLikeIgnoreCase = taskAssigneeLikeIgnoreCase.toLowerCase();
         } else {
             this.taskAssigneeLikeIgnoreCase = taskAssigneeLikeIgnoreCase.toLowerCase();
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskUnassigned() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutAssignee = true;
+        }
+        else {
+            this.withoutAssignee = true;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery taskAssigned() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.withAssignee = true;
+        }
+        else {
+            this.withAssignee = true;
         }
         return this;
     }
@@ -2040,6 +2064,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getTaskAssigneeLike() {
         return taskAssigneeLike;
+    }
+    
+    public boolean isWithAssignee() {
+        return withAssignee;
+    }
+    
+    public boolean isWithoutAssignee() {
+        return withoutAssignee;
     }
 
     public Collection<String> getTaskAssigneeIds() {

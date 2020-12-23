@@ -107,6 +107,12 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * executed.
      */
     T taskAssigneeLikeIgnoreCase(String assigneeLikeIgnoreCase);
+    
+    /** Only select tasks which don't have an assignee. */
+    T taskUnassigned();
+    
+    /** Only select tasks which are assigned to any user */
+    T taskAssigned();
 
     /**
      * Only select tasks with an assignee that is in the given list
