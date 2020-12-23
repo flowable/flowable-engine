@@ -103,5 +103,15 @@ public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskIns
      * Order by task delete reason (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     HistoricTaskInstanceQuery orderByDeleteReason();
+    
+    /**
+     * Only select historic task instances which are not assigned to any users
+     */
+    HistoricTaskInstanceQuery taskUnassigned();
+    
+    /**
+     * Only select historic task instances which are assigned to any user
+     */
+    HistoricTaskInstanceQuery taskAssigned();
 
 }

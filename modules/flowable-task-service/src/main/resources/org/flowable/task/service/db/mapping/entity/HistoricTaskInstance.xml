@@ -1159,6 +1159,12 @@
           #{assigneeId}
         </foreach>
       </if>
+      <if test="withAssignee">
+        and ${queryTablePrefix}ASSIGNEE_ IS NOT NULL
+      </if>
+      <if test="withoutAssignee">
+        and ${queryTablePrefix}ASSIGNEE_ IS NULL
+      </if>
       <if test="taskPriority != null">
         and ${queryTablePrefix}PRIORITY_ = #{taskPriority}
       </if>
@@ -1383,6 +1389,12 @@
       </if>
        <if test="orQueryObject.taskAssigneeLikeIgnoreCase != null">
         or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.withAssignee">
+        or ${queryTablePrefix}ASSIGNEE_ IS NOT NULL
+      </if>
+      <if test="orQueryObject.withoutAssignee">
+        or ${queryTablePrefix}ASSIGNEE_ IS NULL
       </if>
       <if test="orQueryObject.taskAssigneeIds != null &amp;&amp; orQueryObject.taskAssigneeIds.size() &gt; 0">
         or ${queryTablePrefix}ASSIGNEE_ IN
