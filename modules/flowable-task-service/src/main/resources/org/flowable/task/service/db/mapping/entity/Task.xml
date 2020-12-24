@@ -660,6 +660,9 @@
       <if test="unassigned">
         and RES.ASSIGNEE_ IS NULL
       </if>
+      <if test="withAssignee">
+        and RES.ASSIGNEE_ IS NOT NULL
+      </if>
       <if test="noDelegationState">
         and RES.DELEGATION_ IS NULL
       </if>
@@ -1123,6 +1126,9 @@
             <if test="orQueryObject.unassigned">
               or RES.ASSIGNEE_ IS NULL
             </if>
+            <if test="orQueryObject.withAssignee">
+              and RES.ASSIGNEE_ IS NOT NULL
+      		</if>
             <if test="orQueryObject.noDelegationState">
               or RES.DELEGATION_ IS NULL
             </if>

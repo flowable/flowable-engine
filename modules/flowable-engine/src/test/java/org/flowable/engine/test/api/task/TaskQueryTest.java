@@ -1268,6 +1268,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(11);
         assertThat(query.list()).hasSize(11);
     }
+    
+    @Test
+    public void testQueryByAssigned() {
+        TaskQuery query = taskService.createTaskQuery().taskAssigned();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).hasSize(1);
+    }
+
+    @Test
+    public void testQueryByAssignedOr() {
+        TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskAssigned();
+        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.list()).hasSize(0);
+    }
 
     @Test
     public void testQueryByCandidateUser() {
