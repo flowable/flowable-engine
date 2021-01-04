@@ -48,6 +48,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
@@ -452,6 +453,33 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
         waitForJobExecutorToProcessAllJobs(10000L, 250);
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncTasks() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testAsyncTasks")
+            .variable("counter", 0L)
+            .start();
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        // There should be 2 jobs, one for each excution arriving in the join
+        jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        // There was a bug that async inclusive gw joins would lead to two executions leaving the gateway
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter")).isEqualTo(1L);
     }
 
     @Test
