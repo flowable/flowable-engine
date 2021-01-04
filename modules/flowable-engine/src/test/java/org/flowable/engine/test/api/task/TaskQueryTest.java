@@ -1279,8 +1279,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQueryByAssignedOr() {
         TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskAssigned();
-        assertThat(query.count()).isEqualTo(0);
-        assertThat(query.list()).hasSize(0);
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).hasSize(1);
     }
 
     @Test

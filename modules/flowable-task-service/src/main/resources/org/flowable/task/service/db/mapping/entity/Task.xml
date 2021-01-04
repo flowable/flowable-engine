@@ -1127,7 +1127,7 @@
               or RES.ASSIGNEE_ IS NULL
             </if>
             <if test="orQueryObject.withAssignee">
-              and RES.ASSIGNEE_ IS NOT NULL
+              or RES.ASSIGNEE_ IS NOT NULL
       		</if>
             <if test="orQueryObject.noDelegationState">
               or RES.DELEGATION_ IS NULL
