@@ -571,41 +571,23 @@ public class RestResponseFactory {
     }
 
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
-        ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
-        if (processInstance.getProcessVariables() != null) {
-            Map<String, Object> variableMap = processInstance.getProcessVariables();
-            for (String name : variableMap.keySet()) {
-                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
-            }
-        }
-
-        return result;
+        return createProcessInstanceResponse(processInstance, processInstance.getProcessVariables(), urlBuilder);
     }
 
-    public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, boolean returnVariables,
-            Map<String, Object> runtimeVariableMap, List<HistoricVariableInstance> historicVariableList) {
+    public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, Map<String, Object> variableMap) {
+        return createProcessInstanceResponse(processInstance, variableMap, createUrlBuilder());
+    }
 
-        RestUrlBuilder urlBuilder = createUrlBuilder();
+    public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, Map<String, Object> variableMap, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
 
-        if (returnVariables) {
-
-            if (processInstance.isEnded()) {
-                if (historicVariableList != null) {
-                    for (HistoricVariableInstance historicVariable : historicVariableList) {
-                        result.addVariable(createRestVariable(historicVariable.getVariableName(), historicVariable.getValue(), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false,
-                                urlBuilder));
-                    }
-                }
-
-            } else {
-                if (runtimeVariableMap != null) {
-                    for (String name : runtimeVariableMap.keySet()) {
-                        result.addVariable(createRestVariable(name, runtimeVariableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
-                    }
-                }
-            }
+        if (variableMap != null && !variableMap.isEmpty()) {
+            variableMap.entrySet().stream().map(
+                entry -> createRestVariable(
+                    entry.getKey(), entry.getValue(), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder))
+            .forEach(result::addVariable);
         }
+
         return result;
     }
 

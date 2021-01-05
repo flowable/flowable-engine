@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -327,21 +326,20 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
             response.setStatus(HttpStatus.CREATED.value());
 
-            ProcessInstanceResponse processInstanceResponse = null;
+            Map<String, Object> variableMap;
             if (request.getReturnVariables()) {
-                Map<String, Object> runtimeVariableMap = null;
-                List<HistoricVariableInstance> historicVariableList = null;
                 if (instance.isEnded()) {
-                    historicVariableList = historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list();
+                    variableMap = historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list().stream().collect(
+                        HashMap::new, (m, v) -> m.put(v.getVariableName(), v.getValue()), HashMap::putAll);
                 } else {
-                    runtimeVariableMap = runtimeService.getVariables(instance.getId());
+                    variableMap = runtimeService.getVariables(instance.getId());
                 }
-                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance, true, runtimeVariableMap, historicVariableList);
-
             } else {
-                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance);
+                variableMap = Collections.emptyMap();
             }
-            
+
+            ProcessInstanceResponse processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance, variableMap);
+
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
             
             if (processDefinition != null) {

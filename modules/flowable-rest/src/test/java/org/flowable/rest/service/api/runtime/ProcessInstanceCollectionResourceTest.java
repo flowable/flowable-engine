@@ -436,7 +436,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                         + "   ended: false"
                         + "}");
         JsonNode variablesArrayNode = responseNode.get("variables");
-        assertThat(variablesArrayNode).hasSize(7);
+        assertThat(variablesArrayNode).hasSize(0);
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertThat(processInstance).isNotNull();
