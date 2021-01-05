@@ -197,7 +197,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     
     protected void validateToCcBcc(String to, String cc, String bcc, String tenantId) {
         
-        if(to == null && cc == null && bcc == null) {
+        if (to == null && cc == null && bcc == null) {
             throw new FlowableException("No recipient could be found for sending email");
         }
         
@@ -218,7 +218,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         
         String[] bccs = splitAndTrim(newBcc);
-        if(tos == null && ccs == null && bccs == null) {
+        if (tos == null && ccs == null && bccs == null) {
             throw new FlowableException("No recipient could be found for sending email");
         }
     }
