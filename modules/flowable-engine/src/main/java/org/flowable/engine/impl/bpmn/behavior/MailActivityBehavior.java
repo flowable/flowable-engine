@@ -107,6 +107,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     
                 email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
                 addHeader(email, headersStr);
+                validateToCcBcc(toStr, ccStr, bccStr, execution.getTenantId());
                 addTo(email, toStr, execution.getTenantId());
                 setFrom(email, fromStr, execution.getTenantId());
                 addCc(email, ccStr, execution.getTenantId());
@@ -193,11 +194,38 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             throw new FlowableException("Could not create text-only email", e);
         }
     }
-
+    
+    protected void validateToCcBcc(String to, String cc, String bcc, String tenantId) {
+        
+        if(to == null && cc == null && bcc == null) {
+            throw new FlowableException("No recipient could be found for sending email");
+        }
+        
+        String newTo, newCc, newBcc;
+        newTo = newCc = newBcc = getForceTo(tenantId);
+        if (newTo == null) {
+            newTo = to;
+        }
+        
+        String[] tos = splitAndTrim(newTo);
+        if (newCc == null) {
+            newCc = cc;
+        }
+        
+        String[] ccs = splitAndTrim(newCc);
+        if (newBcc == null) {
+            newBcc = bcc;
+        }
+        
+        String[] bccs = splitAndTrim(newBcc);
+        if(tos == null && ccs == null && bccs == null) {
+            throw new FlowableException("No recipient could be found for sending email");
+        }
+    }
+    
     protected void addTo(Email email, String to, String tenantId) {
         if (to == null) {
-            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
-            throw new FlowableException("No recipient could be found for sending email");
+            return;
         }
         String newTo = getForceTo(tenantId);
         if (newTo == null) {
@@ -212,8 +240,6 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                     throw new FlowableException("Could not add " + t + " as recipient", e);
                 }
             }
-        } else {
-            throw new FlowableException("No recipient could be found for sending email");
         }
     }
 
