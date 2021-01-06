@@ -136,6 +136,29 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             );
 
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testCcBccWithoutTo() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionKey("testCcBccWithoutToMail")
+            .start();
+
+        List<WiserMessage> messages = wiser.getMessages();
+
+        assertEmailSend(messages.get(0), false, "Hello!", "This is a test",
+            "flowable@localhost",
+            null,
+            Collections.singletonList("cc@flowable.org"));
+
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "cc@flowable.org"),
+                tuple("flowable@localhost", "bcc@flowable.org")
+            );
+
+    }
 
     @Test
     @CmmnDeployment
@@ -175,8 +198,10 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
             assertThat(getMessage(mimeMessage).contains(message));
 
-            for (String t : to) {
-                assertThat(mimeMessage.getHeader("To", null).contains(t));
+            if (to != null) {
+                for (String t : to) {
+                    assertThat(mimeMessage.getHeader("To", null).contains(t));
+                }
             }
 
             if (cc != null) {

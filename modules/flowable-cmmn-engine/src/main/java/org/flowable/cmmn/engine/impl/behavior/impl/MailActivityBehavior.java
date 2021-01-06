@@ -97,7 +97,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
             addHeader(email, headersStr);
-            validateToCcBcc(commandContext, toStr, ccStr, bccStr, planItemInstanceEntity.getTenantId());
+            validateToCcBcc(toStr, ccStr, bccStr);
             addTo(commandContext, email, toStr, planItemInstanceEntity.getTenantId());
             setFrom(commandContext, email, fromStr, planItemInstanceEntity.getTenantId());
             addCc(commandContext, email, ccStr, planItemInstanceEntity.getTenantId());
@@ -185,41 +185,17 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
     
-    protected void validateToCcBcc(CommandContext commandContext, String to, String cc, String bcc, String tenantId) {
-        
+    protected void validateToCcBcc(String to, String cc, String bcc) {
         if (to == null && cc == null && bcc == null) {
-            throw new FlowableException("No recipient could be found for sending email");
-        }
-        
-        String newTo, newCc, newBcc;
-        newTo = newCc = newBcc = getForceTo(commandContext, tenantId);
-        if (newTo == null) {
-            newTo = to;
-        }
-        
-        String[] tos = splitAndTrim(newTo);
-        if (newCc == null) {
-            newCc = cc;
-        }
-        
-        String[] ccs = splitAndTrim(newCc);
-        if (newBcc == null) {
-            newBcc = bcc;
-        }
-        
-        String[] bccs = splitAndTrim(newBcc);
-        if (tos == null && ccs == null && bccs == null) {
             throw new FlowableException("No recipient could be found for sending email");
         }
     }
 
     protected void addTo(CommandContext commandContext, Email email, String to, String tenantId) {
-        if (to == null) {
-           return;
-        }
-        String newTo = getForceTo(commandContext, tenantId);
+        String forceTo = getForceTo(commandContext, tenantId);
+        String newTo = forceTo == null ? to : forceTo;
         if (newTo == null) {
-            newTo = to;
+            return;
         }
         String[] tos = splitAndTrim(newTo);
         if (tos != null) {
