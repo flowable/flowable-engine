@@ -53,6 +53,7 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
             taskExecutor.execute(createRunnableForJob(job));
             return true;
         } catch (RejectedExecutionException e) {
+            sendRejectedEvent(job);
             if (rejectedJobsHandler == null) {
                 unacquireJobAfterRejection(job);
             } else {
