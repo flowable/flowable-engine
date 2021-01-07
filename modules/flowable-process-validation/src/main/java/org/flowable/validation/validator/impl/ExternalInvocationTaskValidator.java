@@ -32,20 +32,20 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         boolean textOrHtmlDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
-            if ("to".equals(fieldExtension.getFieldName()) || "cc".equals(fieldExtension.getFieldName()) || "bcc".equals(fieldExtension.getFieldName())) {
-                toDefined = true;
-            }
-            if ("html".equals(fieldExtension.getFieldName())) {
-                textOrHtmlDefined = true;
-            }
-            if ("htmlVar".equals(fieldExtension.getFieldName())) {
-                textOrHtmlDefined = true;
-            }
-            if ("text".equals(fieldExtension.getFieldName())) {
-                textOrHtmlDefined = true;
-            }
-            if ("textVar".equals(fieldExtension.getFieldName())) {
-                textOrHtmlDefined = true;
+            switch (fieldExtension.getFieldName()) {
+                case "to":
+                case "cc":
+                case "bcc": {
+                    toDefined = true;
+                    break;
+                }
+                case "html":
+                case "htmlVar":
+                case "text":
+                case "textVar": {
+                    textOrHtmlDefined = true;
+                    break;
+                }
             }
         }
 
