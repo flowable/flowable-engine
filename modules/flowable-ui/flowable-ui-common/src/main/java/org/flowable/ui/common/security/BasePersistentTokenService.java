@@ -81,10 +81,10 @@ public abstract class BasePersistentTokenService implements PersistentTokenServi
         try {
             return tokenCache.get(tokenId);
         } catch (FlowableObjectNotFoundException e) {
-            logger.warn("Token id {} does not exist in cache.", tokenId);
+            logger.info("Token id {} does not exist in cache.", tokenId);
             return null;
         } catch (Exception e) {
-            logger.error("Error loading token id {} from cache", tokenId, e);
+            logger.info("Error loading token id {} from cache", tokenId, e);
             return null;
         }
     }
