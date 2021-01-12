@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -68,6 +69,11 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
         AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncHistoryExecutor();
         assertThat(processEngineAsyncExecutor).isNotNull();
         assertThat(cmmnEngineAsyncExecutor).isSameAs(processEngineAsyncExecutor);
+
+        AsyncTaskExecutor processEngineAsyncHistoryTaskExecutor = processEngine.getProcessEngineConfiguration().getAsyncHistoryTaskExecutor();
+        AsyncTaskExecutor cmmnEngineAsyncHistoryTaskExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncHistoryTaskExecutor();
+        assertThat(processEngineAsyncHistoryTaskExecutor).isNotNull();
+        assertThat(cmmnEngineAsyncHistoryTaskExecutor).isSameAs(processEngineAsyncHistoryTaskExecutor);
 
         // Running them together should have moved the job execution scope to 'all' (from process which is null)
         assertThat(processEngine.getProcessEngineConfiguration().getAsyncHistoryExecutor().getJobServiceConfiguration().getHistoryJobExecutionScope())

@@ -33,20 +33,24 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.cfg.HttpClientConfig;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
@@ -59,11 +63,14 @@ import org.flowable.spring.boot.process.Process;
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
+import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -72,6 +79,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * @author Filip Hrisafov
@@ -472,6 +480,29 @@ public class ProcessEngineAutoConfigurationTest {
                     ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
                     assertThat(engineConfiguration.getHttpClientConfig().getHttpClient())
                             .isEqualTo(context.getBean(FlowableAsyncHttpClient.class));
+                });
+    }
+
+    @Test
+    void processEngineShouldUseSpringTaskExecutor() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(TaskExecutionAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class)
+                            .hasSingleBean(TaskExecutor.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+
+                    AsyncExecutor asyncExecutor = configuration.getAsyncExecutor();
+                    assertThat(asyncExecutor).isInstanceOf(SpringAsyncExecutor.class);
+
+                    AsyncTaskExecutor asyncTaskExecutor = configuration.getAsyncTaskExecutor();
+                    assertThat(asyncTaskExecutor).isInstanceOf(SpringAsyncTaskExecutor.class);
+                    assertThat(asyncExecutor.getTaskExecutor()).isEqualTo(asyncTaskExecutor);
+                    assertThat(configuration.getAsyncHistoryTaskExecutor()).isEqualTo(asyncTaskExecutor);
+                    assertThat(((SpringAsyncTaskExecutor) asyncTaskExecutor).getAsyncTaskExecutor())
+                            .isEqualTo(context.getBean(TaskExecutor.class));
                 });
     }
 
