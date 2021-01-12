@@ -41,6 +41,22 @@ public class ActivityEndHistoryJsonTransformer extends AbstractNeedsUnfinishedHi
     }
 
     @Override
+    public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
+        boolean isApplicable = super.isApplicable(historicalData, commandContext);
+
+        if (!isApplicable
+                && !historicalData.has(HistoryJsonConstants.RUNTIME_ACTIVITY_INSTANCE_ID)
+                && historicalData.has(HistoryJsonConstants.EXECUTION_ID)
+                && historicalData.has(HistoryJsonConstants.ACTIVITY_ID)) {
+            // This is old data, before the runtime activities were used.
+            // As such, the transformJson can be tried (the null check will make sure no wrong instance is changed)
+            isApplicable = true;
+        }
+
+        return isApplicable;
+    }
+
+    @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);

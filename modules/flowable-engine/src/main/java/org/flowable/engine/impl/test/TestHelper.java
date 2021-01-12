@@ -106,6 +106,13 @@ public abstract class TestHelper {
                 deploymentBuilder.addClasspathResource(resource);
             }
 
+            String[] extraResources = deploymentAnnotation.extraResources();
+            if (extraResources != null && extraResources.length > 0) {
+                for (String extraResource : extraResources) {
+                    deploymentBuilder.addClasspathResource(extraResource);
+                }
+            }
+
             if (deploymentAnnotation.tenantId() != null
                     && deploymentAnnotation.tenantId().length() > 0) {
                 deploymentBuilder.tenantId(deploymentAnnotation.tenantId());

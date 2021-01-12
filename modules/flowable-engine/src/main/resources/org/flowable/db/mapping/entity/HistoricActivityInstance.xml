@@ -190,6 +190,17 @@
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
   </delete>
+
+  <delete id="deleteHistoricActivityInstance">
+    delete from ${prefix}ACT_HI_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstance" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_HI_ACTINST where
+        <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+            ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+        </foreach>
+  </delete>
   
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->
 

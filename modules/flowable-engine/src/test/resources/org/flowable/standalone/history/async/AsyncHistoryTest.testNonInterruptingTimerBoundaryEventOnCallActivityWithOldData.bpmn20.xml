@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test">
+    <process id="myProcess" isExecutable="true">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        </startEvent>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="theCallActivity"/>
+        <callActivity id="theCallActivity" name="Call activity" calledElement="oneTaskProcess" />
+        <sequenceFlow id="sequenceFlow2" sourceRef="theCallActivity" targetRef="endNoneEvent1" />
+        <endEvent id="endNoneEvent1">
+        </endEvent>
+        <sequenceFlow id="sequenceFlow4" sourceRef="timerBoundaryEvent" targetRef="endNoneEvent1">
+        </sequenceFlow>
+        <boundaryEvent id="timerBoundaryEvent" attachedToRef="theCallActivity" cancelActivity="false">
+            <timerEventDefinition>
+                <timeDuration>PT1S</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+    </process>
+</definitions>
