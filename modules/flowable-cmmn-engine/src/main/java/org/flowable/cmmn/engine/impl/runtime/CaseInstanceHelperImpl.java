@@ -19,7 +19,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -253,7 +252,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
 
-        callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
+        CallbackData callbackData = new CallbackData(caseInstanceEntity.getCallbackId(), caseInstanceEntity.getCallbackType(),
+            caseInstanceEntity.getId(), null, CaseInstanceState.ACTIVE);
+        callCaseInstanceStateChangeCallbacks(callbackData);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
         
         FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
@@ -439,13 +440,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     }
 
     @Override
-    public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
-        if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
+    public void callCaseInstanceStateChangeCallbacks(CallbackData callbackData) {
+        String callbackId = callbackData.getCallbackId();
+        String callbackType = callbackData.getCallbackType();
+        if (callbackId != null && callbackType != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = cmmnEngineConfiguration.getCaseInstanceStateChangeCallbacks();
-            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(caseInstance.getCallbackType())) {
-                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(caseInstance.getCallbackType())) {
-                    CallbackData callBackData = new CallbackData(caseInstance.getCallbackId(), caseInstance.getCallbackType(), caseInstance.getId(), oldState, newState);
-                    caseInstanceCallback.stateChanged(callBackData);
+            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(callbackType)) {
+                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(callbackType)) {
+                    caseInstanceCallback.stateChanged(callbackData);
                 }
             }
         }

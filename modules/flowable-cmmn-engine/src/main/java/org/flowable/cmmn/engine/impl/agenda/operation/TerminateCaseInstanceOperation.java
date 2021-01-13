@@ -15,13 +15,17 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
 
+import java.util.HashMap;
+
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -48,11 +52,10 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
      * Overridden to check, if the optional exit event type is set to 'complete' and if so, throw an exception, if the case is not yet completable.
      */
     @Override
-    public void run() {
+    public void preRunCheck() {
         if (EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType)) {
             checkCaseToBeCompletable();
         }
-        super.run();
     }
 
     /**
@@ -87,7 +90,7 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     }
     
     @Override
-    protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         // we don't propagate the exit and exit event type to the children, they will always be terminated / exited the same way, regardless of its case being
         // completed or terminated
         if (manualTermination) {
@@ -100,6 +103,16 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     @Override
     public String getDeleteReason() {
         return "cmmn-state-transition-terminate-case";
+    }
+
+    @Override
+    public void addAdditionalCallbackData(CallbackData callbackData) {
+        if (callbackData.getAdditionalData() == null) {
+            callbackData.setAdditionalData(new HashMap<>());
+        }
+        callbackData.getAdditionalData().put(CallbackConstants.EXIT_TYPE, exitType);
+        callbackData.getAdditionalData().put(CallbackConstants.EXIT_EVENT_TYPE, exitEventType);
+        callbackData.getAdditionalData().put(CallbackConstants.MANUAL_TERMINATION, manualTermination);
     }
 
     public boolean isManualTermination() {

@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Objects;
+
 import org.flowable.cmmn.engine.impl.listener.CaseInstanceLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -32,14 +34,28 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
 
     @Override
     public void run() {
+        preRunCheck();
+
         super.run();
+
+        String oldState = caseInstanceEntity.getState();
         String newState = getNewState();
-        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, caseInstanceEntity.getState(), newState);
-        caseInstanceEntity.setState(newState);
+        if (!Objects.equals(oldState, newState)) {
+            CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, caseInstanceEntity.getState(), newState);
+            caseInstanceEntity.setState(newState);
+
+            internalExecute();
+        }
+    }
+
+    public void preRunCheck() {
+        // Meant to be overridden
     }
     
     public abstract String getNewState();
-    
-    protected abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    public abstract void internalExecute();
+
+    public abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
 }

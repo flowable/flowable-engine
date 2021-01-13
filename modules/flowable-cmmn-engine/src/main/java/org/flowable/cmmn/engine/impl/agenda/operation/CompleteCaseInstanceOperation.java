@@ -37,7 +37,7 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     }
     
     @Override
-    protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
     
@@ -45,7 +45,7 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     public String getDeleteReason() {
         return "cmmn-state-transition-complete-case";
     }
-    
+
     @Override
     public String toString() {
         StringBuilder strb = new StringBuilder();
