@@ -453,7 +453,7 @@ public class DbSqlSession implements Session {
     }
 
     public boolean isEntityInserted(Entity entity) {
-        return isEntityInserted(entity.getClass(), entity.getId());
+        return isEntityInserted(entity.getClass(), entity.getId()) || entity.isInserted();
     }
     
     public boolean isEntityInserted(Class<?> entityClass, String entityId) {

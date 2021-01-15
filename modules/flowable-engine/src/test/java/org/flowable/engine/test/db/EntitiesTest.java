@@ -15,6 +15,7 @@ package org.flowable.engine.test.db;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,11 +38,18 @@ import org.w3c.dom.NodeList;
  */
 public class EntitiesTest {
 
+    protected static final Set<String> RESOURCES_TO_IGNORE = new HashSet<>(Arrays.asList(
+            "CountingExecution"
+    ));
+
     @Test
     public void verifyMappedEntitiesExist() {
         Set<String> mappedResources = getEngineEntityMappingResources();
         assertThat(mappedResources.size()).isPositive();
         for (String mappedResource : mappedResources) {
+            if (RESOURCES_TO_IGNORE.contains(mappedResource)) {
+                continue;
+            }
             getAndAssertEntityInterfaceClass(mappedResource);
             getAndAssertEntityImplClass(mappedResource);
         }
@@ -51,6 +59,9 @@ public class EntitiesTest {
     public void verifyEntitiesInEntityDependencyOrder() {
         Set<String> mappedResources = getEngineEntityMappingResources();
         for (String mappedResource : mappedResources) {
+            if (RESOURCES_TO_IGNORE.contains(mappedResource)) {
+                continue;
+            }
             assertThat(EntityDependencyOrder.INSERT_ORDER)
                     .as("No insert entry in EntityDependencyOrder for " + mappedResource)
                     .contains(getAndAssertEntityImplClass(mappedResource));
@@ -64,6 +75,9 @@ public class EntitiesTest {
     public void verifyEntitiesInTableDataManager() {
         Set<String> mappedResources = getEngineEntityMappingResources();
         for (String mappedResource : mappedResources) {
+            if (RESOURCES_TO_IGNORE.contains(mappedResource)) {
+                continue;
+            }
             assertThat(EntityToTableMap.entityToTableNameMap)
                     .as("No entry in TableDataManagerImpl for " + mappedResource)
                     .containsKey(getAndAssertEntityInterfaceClass(mappedResource));
