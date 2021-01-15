@@ -25,6 +25,7 @@
         <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Comment.xml" />
+        <mapper resource="org/flowable/db/mapping/entity/CountingExecution.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Deployment.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Execution.xml" />

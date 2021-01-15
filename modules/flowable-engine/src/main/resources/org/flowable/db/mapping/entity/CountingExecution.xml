@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.engine.impl.persistence.entity.CommentEntityImpl">
+
+  <!-- There is no insert, since they are inserted with the Execution -->
+
+  <!-- CountingExecution UPDATE -->
+
+  <update id="updateCountingExecution" parameterType="org.flowable.engine.impl.persistence.entity.CountingExecutionEntityImpl">
+    update ${prefix}ACT_RU_EXECUTION
+    <set>
+      <if test="originalPersistentState.eventSubscriptionDeltaCount != eventSubscriptionDeltaCount">
+        EVT_SUBSCR_COUNT_ = EVT_SUBSCR_COUNT_ + #{eventSubscriptionDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.taskDeltaCount != taskDeltaCount">
+        TASK_COUNT_ = TASK_COUNT_ + #{taskDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.jobDeltaCount != jobDeltaCount">
+        JOB_COUNT_ = JOB_COUNT_ + #{jobDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.timerJobDeltaCount != timerJobDeltaCount">
+        TIMER_JOB_COUNT_ = TIMER_JOB_COUNT_ + #{timerJobDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.suspendedJobDeltaCount != suspendedJobDeltaCount">
+        SUSP_JOB_COUNT_ = SUSP_JOB_COUNT_ + #{suspendedJobDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.deadLetterJobDeltaCount != deadLetterJobDeltaCount">
+        DEADLETTER_JOB_COUNT_ = DEADLETTER_JOB_COUNT_ + #{deadLetterJobDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.externalWorkerJobDeltaCount != externalWorkerJobDeltaCount">
+        EXTERNAL_WORKER_JOB_COUNT_ = EXTERNAL_WORKER_JOB_COUNT_+ #{externalWorkerJobDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.variableDeltaCount != variableDeltaCount">
+        VAR_COUNT_ = VAR_COUNT_ + #{variableDeltaCount, jdbcType=INTEGER},
+      </if>
+      <if test="originalPersistentState.identityLinkDeltaCount != identityLinkDeltaCount">
+        ID_LINK_COUNT_ = ID_LINK_COUNT_ + #{identityLinkDeltaCount, jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- There is no delete, since they are deleted with the Execution -->
+</mapper>

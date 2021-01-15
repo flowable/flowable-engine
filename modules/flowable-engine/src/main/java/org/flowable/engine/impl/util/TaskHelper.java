@@ -217,9 +217,9 @@ public class TaskHelper {
 
         if (execution != null) {
 
-            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
-                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
-                countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() + 1);
+            CountingExecutionEntity countingExecutionEntity = execution.getCountingExecutionEntity();
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+                countingExecutionEntity.incrementTaskCount();
             }
 
             if (addEntityLinks) {
@@ -419,10 +419,10 @@ public class TaskHelper {
         processEngineConfiguration.getTaskServiceConfiguration().getTaskService().deleteTask(task, false); // false: event will be sent out later
    
         if (task.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) CommandContextUtil
-                    .getExecutionEntityManager(commandContext).findById(task.getExecutionId());
+            CountingExecutionEntity countingExecutionEntity = CommandContextUtil
+                    .getExecutionEntityManager(commandContext).findById(task.getExecutionId()).getCountingExecutionEntity();
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
-                countingExecutionEntity.setTaskCount(countingExecutionEntity.getTaskCount() - 1);
+                countingExecutionEntity.decrementTaskCount();
             }
         }
     }

@@ -81,32 +81,32 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                     ((AbstractRuntimeJobEntity) job).setTenantId(execution.getTenantId());
                 }
                 
-                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+                CountingExecutionEntity countingExecutionEntity = execution.getCountingExecutionEntity();
                 
                 if (job instanceof TimerJobEntity) {
                     TimerJobEntity timerJobEntity = (TimerJobEntity) job;
                     execution.getTimerJobs().add(timerJobEntity);
     
-                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
-                        countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() + 1);
+                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+                        countingExecutionEntity.incrementTimerJobCount();
                     }
                     
                 } else if (job instanceof JobEntity) {
                     JobEntity jobEntity = (JobEntity) job;
                     execution.getJobs().add(jobEntity);
 
-                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
-                        countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
+                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
+                        countingExecutionEntity.incrementJobCount();
                     }
                 
                 } else {
-                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
+                    if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
                         if (job instanceof SuspendedJobEntity) {
-                            countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() + 1);
+                            countingExecutionEntity.incrementSuspendedJobCount();
                         } else if (job instanceof DeadLetterJobEntity) {
-                            countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() + 1);
+                            countingExecutionEntity.incrementDeadLetterJobCount();
                         } else if (job instanceof ExternalWorkerJobEntity) {
-                            countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() + 1);
+                            countingExecutionEntity.incrementExternalWorkerJobCount();
                         }
                     }
                 }
@@ -126,23 +126,23 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     protected void handleJobDeleteInternal(Job job) {
         if (job.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(job.getExecutionId());
-            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) executionEntity;
+            CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
                 if (job instanceof JobEntity) {
                     executionEntity.getJobs().remove(job);
-                    countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() - 1);
+                    countingExecutionEntity.decrementJobCount();
                 
                 } else if (job instanceof TimerJobEntity) {
                     executionEntity.getTimerJobs().remove(job);
-                    countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() - 1);
+                    countingExecutionEntity.decrementTimerJobCount();
                 
                 } else if (job instanceof SuspendedJobEntity) {
-                    countingExecutionEntity.setSuspendedJobCount(countingExecutionEntity.getSuspendedJobCount() - 1);
+                    countingExecutionEntity.decrementSuspendedJobCount();
                 
                 } else if (job instanceof DeadLetterJobEntity) {
-                    countingExecutionEntity.setDeadLetterJobCount(countingExecutionEntity.getDeadLetterJobCount() - 1);
+                    countingExecutionEntity.decrementDeadLetterJobCount();
                 } else if (job instanceof ExternalWorkerJobEntity) {
-                    countingExecutionEntity.setExternalWorkerJobCount(countingExecutionEntity.getExternalWorkerJobCount() - 1);
+                    countingExecutionEntity.decrementExternalWorkerJobCount();
                 }
             }
         }

@@ -31,6 +31,8 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.cache.CacheAwareEntity;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
@@ -62,7 +64,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 
-public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity implements ExecutionEntity, CountingExecutionEntity {
+public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity implements ExecutionEntity, CacheAwareEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -136,16 +138,8 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected Date startTime;
 
     // CountingExecutionEntity
-    protected int eventSubscriptionCount;
-    protected int taskCount;
-    protected int jobCount;
-    protected int timerJobCount;
-    protected int suspendedJobCount;
-    protected int deadLetterJobCount;
-    protected int externalWorkerJobCount;
-    protected int variableCount;
-    protected int identityLinkCount;
-    
+    protected final CountingExecutionEntityImpl countingExecutionEntity = new CountingExecutionEntityImpl(this);
+
     /**
      * Persisted reference to the processDefinition.
      * 
@@ -285,15 +279,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("startTime", this.startTime);
         persistentState.put("startUserId", this.startUserId);
         persistentState.put("isCountEnabled", this.isCountEnabled);
-        persistentState.put("eventSubscriptionCount", eventSubscriptionCount);
-        persistentState.put("taskCount", taskCount);
-        persistentState.put("jobCount", jobCount);
-        persistentState.put("timerJobCount", timerJobCount);
-        persistentState.put("suspendedJobCount", suspendedJobCount);
-        persistentState.put("deadLetterJobCount", deadLetterJobCount);
-        persistentState.put("externalWorkerJobCount", externalWorkerJobCount);
-        persistentState.put("variableCount", variableCount);
-        persistentState.put("identityLinkCount", identityLinkCount);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
         persistentState.put("referenceId", referenceId);
@@ -305,6 +290,30 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public ReadOnlyDelegateExecution snapshotReadOnly() {
         return new ReadOnlyDelegateExecutionImpl(this);
+    }
+
+    @Override
+    public void setId(String id) {
+        super.setId(id);
+        countingExecutionEntity.setId(id);
+    }
+
+    @Override
+    public void setInserted(boolean isInserted) {
+        super.setInserted(isInserted);
+        countingExecutionEntity.setInserted(isInserted);
+    }
+
+    @Override
+    public void setUpdated(boolean isUpdated) {
+        // We don't need to do anything specific for the Update (since it is taken care of by the cache)
+        super.setUpdated(isUpdated);
+    }
+
+    @Override
+    public void setDeleted(boolean isDeleted) {
+        super.setDeleted(isDeleted);
+        countingExecutionEntity.setDeleted(isDeleted);
     }
 
     // The current flow element, will be filled during operation execution
@@ -979,6 +988,18 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         }
     }
 
+    // counting entity information
+
+    @Override
+    public void storedInCache(EntityCache entityCache, boolean storeState) {
+        entityCache.put(countingExecutionEntity, true); // true -> We always store the state for the countingExecutionEntity
+    }
+
+    @Override
+    public CountingExecutionEntity getCountingExecutionEntity() {
+        return countingExecutionEntity;
+    }
+
     // getters and setters //////////////////////////////////////////////////////
 
     @Override
@@ -1266,94 +1287,76 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         this.startTime = startTime;
     }
 
-    @Override
     public int getEventSubscriptionCount() {
-        return eventSubscriptionCount;
+        return countingExecutionEntity.getEventSubscriptionCount();
     }
 
-    @Override
     public void setEventSubscriptionCount(int eventSubscriptionCount) {
-        this.eventSubscriptionCount = eventSubscriptionCount;
+        countingExecutionEntity.setEventSubscriptionCount(eventSubscriptionCount);
     }
 
-    @Override
     public int getTaskCount() {
-        return taskCount;
+        return countingExecutionEntity.getTaskCount();
     }
 
-    @Override
     public void setTaskCount(int taskCount) {
-        this.taskCount = taskCount;
+        countingExecutionEntity.setTaskCount(taskCount);
     }
 
-    @Override
     public int getJobCount() {
-        return jobCount;
+        return countingExecutionEntity.getJobCount();
     }
 
-    @Override
     public void setJobCount(int jobCount) {
-        this.jobCount = jobCount;
+        countingExecutionEntity.setJobCount(jobCount);
     }
 
-    @Override
     public int getTimerJobCount() {
-        return timerJobCount;
+        return countingExecutionEntity.getTimerJobCount();
     }
 
-    @Override
     public void setTimerJobCount(int timerJobCount) {
-        this.timerJobCount = timerJobCount;
+        countingExecutionEntity.setTimerJobCount(timerJobCount);
     }
 
-    @Override
     public int getSuspendedJobCount() {
-        return suspendedJobCount;
+        return countingExecutionEntity.getSuspendedJobCount();
     }
 
-    @Override
     public void setSuspendedJobCount(int suspendedJobCount) {
-        this.suspendedJobCount = suspendedJobCount;
+        countingExecutionEntity.setSuspendedJobCount(suspendedJobCount);
     }
 
-    @Override
     public int getDeadLetterJobCount() {
-        return deadLetterJobCount;
+        return countingExecutionEntity.getDeadLetterJobCount();
     }
 
-    @Override
     public void setDeadLetterJobCount(int deadLetterJobCount) {
-        this.deadLetterJobCount = deadLetterJobCount;
+        countingExecutionEntity.setDeadLetterJobCount(deadLetterJobCount);
     }
 
-    @Override
     public int getExternalWorkerJobCount() {
-        return externalWorkerJobCount;
+        return countingExecutionEntity.getExternalWorkerJobCount();
     }
 
-    @Override
     public void setExternalWorkerJobCount(int externalWorkerJobCount) {
-        this.externalWorkerJobCount = externalWorkerJobCount;
+        countingExecutionEntity.setExternalWorkerJobCount(externalWorkerJobCount);
     }
 
-    @Override
     public int getVariableCount() {
-        return variableCount;
+        return countingExecutionEntity.getVariableCount();
     }
 
-    @Override
     public void setVariableCount(int variableCount) {
-        this.variableCount = variableCount;
+        countingExecutionEntity.setVariableCount(variableCount);
     }
 
-    @Override
     public int getIdentityLinkCount() {
-        return identityLinkCount;
+        return countingExecutionEntity.getIdentityLinkCount();
     }
 
-    @Override
     public void setIdentityLinkCount(int identityLinkCount) {
-        this.identityLinkCount = identityLinkCount;
+        countingExecutionEntity.setIdentityLinkCount(identityLinkCount);
     }
     
     @Override

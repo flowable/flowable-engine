@@ -45,7 +45,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.history.HistoryManager;
-import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
@@ -241,7 +240,7 @@ public class ExecutionEntityManagerImpl
         ExecutionEntity processInstanceExecution = dataManager.create();
 
         if (CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            ((CountingExecutionEntity) processInstanceExecution).setCountEnabled(true);
+            processInstanceExecution.setCountEnabled(true);
         }
         
         if (predefinedProcessInstanceId != null) {
@@ -393,10 +392,7 @@ public class ExecutionEntityManagerImpl
 
         // Inherits the 'count' feature from the parent.
         // If the parent was not 'counting', we can't make the child 'counting' again.
-        if (parentExecutionEntity instanceof CountingExecutionEntity) {
-            CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
-            ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
-        }
+        childExecution.setCountEnabled(parentExecutionEntity.isCountEnabled());
 
         // inherit the stage instance id, if present
         childExecution.setPropagatedStageInstanceId(parentExecutionEntity.getPropagatedStageInstanceId());
@@ -890,8 +886,7 @@ public class ExecutionEntityManagerImpl
     }
 
     protected void deleteVariables(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
-        if (!enableExecutionRelationshipCounts ||
-                (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getVariableCount(executionEntity) > 0) {
             
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             if (!executionVariables.isEmpty()) {
@@ -959,8 +954,7 @@ public class ExecutionEntityManagerImpl
 
     protected void deleteUserTasks(ExecutionEntity executionEntity, String deleteReason, CommandContext commandContext, 
             boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
-        if (!enableExecutionRelationshipCounts ||
-                (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTaskCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getTaskCount(executionEntity) > 0) {
             TaskHelper.deleteTasksForExecution(executionEntity, 
                     engineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByExecutionId(executionEntity.getId()), deleteReason);
         }
@@ -970,29 +964,25 @@ public class ExecutionEntityManagerImpl
         
         // Jobs have byte array references that don't store the execution id. 
         // This means a bulk delete is not done for jobs. Generally there aren't many jobs / execution either.
-        
-        if (!enableExecutionRelationshipCounts
-                || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
+
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getTimerJobCount(executionEntity) > 0) {
             engineConfiguration.getJobServiceConfiguration().getTimerJobService().deleteTimerJobsByExecutionId(executionEntity.getId());
         }
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
-        if (!enableExecutionRelationshipCounts
-                || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getJobCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getJobCount(executionEntity) > 0) {
             jobService.deleteJobsByExecutionId(executionEntity.getId());
         }
 
-        if (!enableExecutionRelationshipCounts
-                || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getSuspendedJobCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getSuspendedJobCount(executionEntity) > 0) {
             jobService.deleteSuspendedJobsByExecutionId(executionEntity.getId());
         }
 
-        if (!enableExecutionRelationshipCounts
-                || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getDeadLetterJobCount(executionEntity) > 0) {
             jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
 
-        if (!enableExecutionRelationshipCounts || ((CountingExecutionEntity) executionEntity).getExternalWorkerJobCount() > 0) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getExternalWorkerJobCount(executionEntity) > 0) {
             Collection<ExternalWorkerJobEntity> externalWorkerJobsForExecution = jobService.findExternalWorkerJobsByExecutionId(executionEntity.getId());
 
             ExternalWorkerJobEntityManager externalWorkerJobEntityManager = engineConfiguration.getJobServiceConfiguration()
@@ -1010,8 +1000,7 @@ public class ExecutionEntityManagerImpl
     }
 
     protected void deleteEventSubScriptions(ExecutionEntity executionEntity, boolean enableExecutionRelationshipCounts, boolean eventDispatcherEnabled) {
-        if (!enableExecutionRelationshipCounts
-                || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getEventSubscriptionCount() > 0)) {
+        if (!enableExecutionRelationshipCounts || CountingEntityUtil.getEventSubscriptionCountCount(executionEntity) > 0) {
             
             EventSubscriptionService eventSubscriptionService = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             

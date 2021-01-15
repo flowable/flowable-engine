@@ -23,6 +23,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
@@ -125,7 +126,7 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         assertThat(executions).hasSize(2);
         for (Execution execution : executions) {
-            CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
+            CountingExecutionEntity countingExecutionEntity = ((ExecutionEntity) execution).getCountingExecutionEntity();
             assertThat(countingExecutionEntity.isCountEnabled()).isEqualTo(expectedCountIsEnabledFlag);
 
             if (expectedCountIsEnabledFlag && execution.getParentId() != null) {

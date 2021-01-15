@@ -27,6 +27,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 
 /**
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class CountingEntityUtil {
 
@@ -40,10 +41,10 @@ public class CountingEntityUtil {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() - 1);
             }
         } else if (variableInstance.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) processEngineConfiguration.getExecutionEntityManager(
-                    ).findById(variableInstance.getExecutionId());
+            CountingExecutionEntity executionEntity = processEngineConfiguration.getExecutionEntityManager(
+                    ).findById(variableInstance.getExecutionId()).getCountingExecutionEntity();
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setVariableCount(executionEntity.getVariableCount() - 1);
+                executionEntity.decrementVariableCount();
             }
         }
         
@@ -65,36 +66,38 @@ public class CountingEntityUtil {
                 countingTaskEntity.setVariableCount(countingTaskEntity.getVariableCount() + 1);
             }
         } else if (variableInstance.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(variableInstance.getExecutionId());
+            CountingExecutionEntity executionEntity = processEngineConfiguration.getExecutionEntityManager().findById(variableInstance.getExecutionId())
+                    .getCountingExecutionEntity();
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
+                executionEntity.incrementVariableCount();
             }
         } else if (ScopeTypes.BPMN_DEPENDENT.contains(variableInstance.getScopeType()) && isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(variableInstance.getSubScopeId());
+            CountingExecutionEntity executionEntity = processEngineConfiguration.getExecutionEntityManager()
+                    .findById(variableInstance.getSubScopeId()).getCountingExecutionEntity();
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
+                executionEntity.incrementVariableCount();
             }
         }
     }
     
     public static void handleInsertEventSubscriptionEntityCount(EventSubscription eventSubscription) {
         if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
-                            eventSubscription.getExecutionId());
+            CountingExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId()).getCountingExecutionEntity();
 
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() + 1);
+                executionEntity.incrementEventSubscriptionCount();
             }
         }
     }
     
     public static void handleDeleteEventSubscriptionEntityCount(EventSubscription eventSubscription) {
         if (eventSubscription.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) CommandContextUtil.getExecutionEntityManager().findById(
-                            eventSubscription.getExecutionId());
+            CountingExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(
+                            eventSubscription.getExecutionId()).getCountingExecutionEntity();
             
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() - 1);
+                executionEntity.decrementEventSubscriptionCount();
             }
         }
     }
@@ -113,10 +116,7 @@ public class CountingEntityUtil {
     }
 
     public static boolean isExecutionRelatedEntityCountEnabled(ExecutionEntity executionEntity) {
-        if (executionEntity.isProcessInstanceType() || executionEntity instanceof CountingExecutionEntity) {
-            return isExecutionRelatedEntityCountEnabled((CountingExecutionEntity) executionEntity);
-        }
-        return false;
+        return isExecutionRelatedEntityCountEnabled(executionEntity.getCountingExecutionEntity());
     }
 
     public static boolean isTaskRelatedEntityCountEnabled(TaskEntity taskEntity) {
@@ -142,7 +142,7 @@ public class CountingEntityUtil {
      * From this table it is clear that only when both are true, the result should be true, which is the regular AND rule for booleans.
      */
     public static boolean isExecutionRelatedEntityCountEnabled(CountingExecutionEntity executionEntity) {
-        return !executionEntity.isProcessInstanceType() && isExecutionRelatedEntityCountEnabledGlobally() && executionEntity.isCountEnabled();
+        return executionEntity != null && isExecutionRelatedEntityCountEnabledGlobally() && executionEntity.isCountEnabled();
     }
 
     /**
@@ -150,6 +150,51 @@ public class CountingEntityUtil {
      */
     public static boolean isTaskRelatedEntityCountEnabled(CountingTaskEntity taskEntity) {
         return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
+    }
+
+    public static int getEventSubscriptionCountCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getEventSubscriptionCount() : 0;
+    }
+
+    public static int getTaskCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getTaskCount() : 0;
+    }
+
+    public static int getJobCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getJobCount() : 0;
+    }
+
+    public static int getTimerJobCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getTimerJobCount() : 0;
+    }
+
+    public static int getSuspendedJobCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getSuspendedJobCount() : 0;
+    }
+
+    public static int getDeadLetterJobCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getDeadLetterJobCount() : 0;
+    }
+
+    public static int getExternalWorkerJobCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getExternalWorkerJobCount() : 0;
+    }
+
+    public static int getVariableCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getVariableCount() : 0;
+    }
+
+    public static int getIdentityLinkCount(ExecutionEntity executionEntity) {
+        CountingExecutionEntity countingExecutionEntity = executionEntity.getCountingExecutionEntity();
+        return countingExecutionEntity != null ? countingExecutionEntity.getIdentityLinkCount() : 0;
     }
     
 }

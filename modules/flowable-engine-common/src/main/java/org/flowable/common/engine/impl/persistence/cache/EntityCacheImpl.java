@@ -37,6 +37,11 @@ public class EntityCacheImpl implements EntityCache {
         }
         CachedEntity cachedObject = new CachedEntity(entity, storeState);
         classCache.put(entity.getId(), cachedObject);
+
+        if (entity instanceof CacheAwareEntity) {
+            ((CacheAwareEntity) entity).storedInCache(this, storeState);
+
+        }
         return cachedObject;
     }
 

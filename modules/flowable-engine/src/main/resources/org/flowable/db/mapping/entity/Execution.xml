@@ -192,33 +192,6 @@
             <if test="originalPersistentState.isCountEnabled != isCountEnabled">
                 IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
             </if>
-            <if test="originalPersistentState.eventSubscriptionCount != eventSubscriptionCount">
-                EVT_SUBSCR_COUNT_ = #{eventSubscriptionCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.taskCount != taskCount">
-                TASK_COUNT_ = #{taskCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.jobCount != jobCount">
-                JOB_COUNT_ = #{jobCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.timerJobCount != timerJobCount">
-                TIMER_JOB_COUNT_ = #{timerJobCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.suspendedJobCount != suspendedJobCount">
-                SUSP_JOB_COUNT_ = #{suspendedJobCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.deadLetterJobCount != deadLetterJobCount">
-                DEADLETTER_JOB_COUNT_ = #{deadLetterJobCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.externalWorkerJobCount != externalWorkerJobCount">
-                EXTERNAL_WORKER_JOB_COUNT_ = #{externalWorkerJobCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.variableCount != variableCount">
-                VAR_COUNT_ = #{variableCount, jdbcType=INTEGER},
-            </if>
-            <if test="originalPersistentState.identityLinkCount != identityLinkCount">
-                ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER},
-            </if>
             <if test="originalPersistentState.callbackId != callbackId">
                 CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
             </if>

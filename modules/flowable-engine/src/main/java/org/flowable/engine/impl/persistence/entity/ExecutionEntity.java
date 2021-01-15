@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.AlwaysUpdatedPersistentObject;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -160,4 +161,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     void setOriginatingCurrentFlowElement(FlowElement flowElement);
 
     List<VariableInstanceEntity> getQueryVariables();
+
+    boolean isCountEnabled();
+
+    void setCountEnabled(boolean countEnabled);
+
+    CountingExecutionEntity getCountingExecutionEntity();
 }

@@ -12,41 +12,52 @@
  */
 package org.flowable.engine.impl.persistence;
 
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public interface CountingExecutionEntity {
+public interface CountingExecutionEntity extends Entity {
     
     boolean isProcessInstanceType();
     
     boolean isCountEnabled();
-    void setCountEnabled(boolean isCountEnabled);
-    
-    void setEventSubscriptionCount(int eventSubscriptionCount);
+
     int getEventSubscriptionCount();
+    void incrementEventSubscriptionCount();
+    void decrementEventSubscriptionCount();
 
-    void setTaskCount(int taskcount);
     int getTaskCount();
+    void incrementTaskCount();
+    void decrementTaskCount();
 
-    void setJobCount(int jobCount);
     int getJobCount();
+    void incrementJobCount();
+    void decrementJobCount();
 
-    void setTimerJobCount(int timerJobCount);
     int getTimerJobCount();
+    void incrementTimerJobCount();
+    void decrementTimerJobCount();
 
-    void setSuspendedJobCount(int suspendedJobCount);
     int getSuspendedJobCount();
+    void incrementSuspendedJobCount();
+    void decrementSuspendedJobCount();
 
-    void setDeadLetterJobCount(int deadLetterJobCount);
     int getDeadLetterJobCount();
+    void incrementDeadLetterJobCount();
+    void decrementDeadLetterJobCount();
 
-    void setExternalWorkerJobCount(int externalWorkerJobCount);
     int getExternalWorkerJobCount();
+    void incrementExternalWorkerJobCount();
+    void decrementExternalWorkerJobCount();
 
-    void setVariableCount(int variableCount);
     int getVariableCount();
+    void incrementVariableCount();
+    void decrementVariableCount();
 
-    void setIdentityLinkCount(int identityLinkCount);
     int getIdentityLinkCount();
+    void incrementIdentityLinkCount();
+    void decrementIdentityLinkCount();
 
 }
