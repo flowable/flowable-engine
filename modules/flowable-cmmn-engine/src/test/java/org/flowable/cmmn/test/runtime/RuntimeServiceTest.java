@@ -1048,6 +1048,87 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testStartSimplePassthroughCaseWithBlockingTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testCaseInstanceQueryWithOrderByCaseDefinitionId() {
+        CaseInstance case1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .businessKey("Pass Through Case")
+                .start();
+
+        CaseInstance case2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("One Human Task Case")
+                .start();
+
+        String caseBusinessKeyWithHigherCaseDefId;
+        String caseBusinessKeyWithLowerCaseDefId;
+
+        if (case1.getCaseDefinitionId().compareTo(case2.getCaseDefinitionId()) > 0) {
+            // Case Definition Id 1 has higher id
+            caseBusinessKeyWithHigherCaseDefId = case1.getBusinessKey();
+            caseBusinessKeyWithLowerCaseDefId = case2.getBusinessKey();
+        } else {
+            caseBusinessKeyWithHigherCaseDefId = case2.getBusinessKey();
+            caseBusinessKeyWithLowerCaseDefId = case1.getBusinessKey();
+        }
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionId().asc().list())
+                .extracting(CaseInstance::getBusinessKey)
+                .containsExactly(
+                        caseBusinessKeyWithLowerCaseDefId,
+                        caseBusinessKeyWithHigherCaseDefId
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionId().asc().listPage(0, 3))
+                .extracting(CaseInstance::getBusinessKey)
+                .containsExactly(
+                        caseBusinessKeyWithLowerCaseDefId,
+                        caseBusinessKeyWithHigherCaseDefId
+                );
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionId().asc().listPage(10, 20))
+                .extracting(CaseInstance::getId, CaseInstance::getBusinessKey)
+                .isEmpty();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionId().desc().list())
+                .extracting(CaseInstance::getBusinessKey)
+                .containsExactly(
+                        caseBusinessKeyWithHigherCaseDefId,
+                        caseBusinessKeyWithLowerCaseDefId
+                );
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByCaseDefinitionId().asc().list())
+                .extracting(HistoricCaseInstance::getBusinessKey)
+                .containsExactly(
+                        caseBusinessKeyWithLowerCaseDefId,
+                        caseBusinessKeyWithHigherCaseDefId
+                );
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByCaseDefinitionId().asc().listPage(0, 3))
+                .extracting(HistoricCaseInstance::getBusinessKey)
+                .containsExactly(
+                        caseBusinessKeyWithLowerCaseDefId,
+                        caseBusinessKeyWithHigherCaseDefId
+                );
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByCaseDefinitionId().asc().listPage(10, 20))
+                .extracting(HistoricCaseInstance::getBusinessKey)
+                .isEmpty();
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().orderByCaseDefinitionId().desc().list())
+                    .extracting(HistoricCaseInstance::getBusinessKey)
+                    .containsExactly(
+                            caseBusinessKeyWithHigherCaseDefId,
+                            caseBusinessKeyWithLowerCaseDefId
+                    );
+        }
+    }
+
     protected class TestStartCaseInstanceInterceptor implements StartCaseInstanceInterceptor {
 
         protected int beforeStartCaseInstanceCounter = 0;
