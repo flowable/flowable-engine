@@ -15,7 +15,6 @@ package org.flowable.dmn.converter.child;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamReader;
