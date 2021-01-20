@@ -64,7 +64,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Deployment {
 
     /**
-     * Specify all the resources that make up the process definition.
+     * Specify all the resources that make up the deployment.
      * When using this property, all resources should be passed, as no automatic detection will be done.
      */
     String[] resources() default {};

@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 
@@ -38,17 +39,18 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
 
     @Override
-    public void run() {
-        super.run();
+    public void internalExecute() {
         deleteCaseInstance();
     }
-    
+
     protected void deleteCaseInstance() {
         updateChildPlanItemInstancesState();
         
         String newState = getNewState();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
-                caseInstanceEntity, caseInstanceEntity.getState(), newState);
+        CallbackData callBackData = new CallbackData(caseInstanceEntity.getCallbackId(), caseInstanceEntity.getCallbackType(),
+            caseInstanceEntity.getId(), caseInstanceEntity.getState(), newState);
+        addAdditionalCallbackData(callBackData);
+        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(callBackData);
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         CommandContextUtil.getCmmnHistoryManager(commandContext)
@@ -81,5 +83,8 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
 
     public abstract String getDeleteReason();
-    
+
+    public void addAdditionalCallbackData(CallbackData callbackData) {
+        // meant to be overridden
+    }
 }

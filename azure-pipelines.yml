@@ -8,11 +8,11 @@ pr: none
 resources:
   containers:
   - container: openjdk8
-    image: repo.flowable.com/infra/openjdk:8
+    image: artifacts.flowable.com/docker-local/infra/openjdk:8
     endpoint: FlowableDockerRegistry
 
   - container: oracle11
-    image: repo.flowable.com/infra/oracle:11.2.0.2-xe
+    image: artifacts.flowable.com/docker-local/infra/oracle:11.2.0.2-xe
     endpoint: FlowableDockerRegistry
     options: --shm-size=2g
     ports:
@@ -22,7 +22,7 @@ resources:
       ORACLE_USER_PASSWORD: flowable
 
   - container: oracle18
-    image: repo.flowable.com/infra/oracle:18.4.0-xe
+    image: artifacts.flowable.com/docker-local/infra/oracle:18.4.0-xe
     endpoint: FlowableDockerRegistry
     options: --shm-size=6g
     env:

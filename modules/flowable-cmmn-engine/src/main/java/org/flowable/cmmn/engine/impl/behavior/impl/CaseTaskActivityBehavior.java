@@ -169,14 +169,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         // Need to be set before planning the complete operation
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-        handleOutParameters(
-            planItemInstance,
-            caseInstance,
-            cmmnEngineConfiguration.getCmmnRuntimeService(),
-            cmmnEngineConfiguration);
+        handleOutParameters(commandContext, planItemInstance);
 
         // Triggering the plan item (as opposed to a regular complete) terminates the case instance
         CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
@@ -186,8 +179,23 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
-            if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+
+            if (PlanItemTransition.EXIT.equals(transition)) {
+
+                // Typically this happens when terminating through an exit sentry
+                // There is out parameter handling, consistent with the case task in BPMN
+
+                handleOutParameters(commandContext, (PlanItemInstanceEntity) planItemInstance);
+                CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+
+            }
+
+            if (PlanItemTransition.TERMINATE.equals(transition)) {
+
+                // Typically this happens when terminating a case instance through the API
                 // The plan item will be deleted by the regular TerminatePlanItemOperation
+                // There is no out parameter handling as the case instance is forced terminated.
+
                 CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
 
             }
@@ -213,6 +221,17 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         } else {
             throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE);
         }
+    }
+
+    protected void handleOutParameters(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
+        handleOutParameters(
+            planItemInstance,
+            caseInstance,
+            cmmnEngineConfiguration.getCmmnRuntimeService(),
+            cmmnEngineConfiguration);
     }
 
     protected void handleOutParameters(DelegatePlanItemInstance planItemInstance,
