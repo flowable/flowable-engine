@@ -2,8 +2,12 @@ package org.flowable.dmn.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.converter.child.OutputValuesParser;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -45,8 +49,7 @@ public class OutputValuesParserTest {
 
     @Test
     void outputValuesParsing() {
-        OutputValuesParser outputValuesParser = new OutputValuesParser();
-        List<Object> splitAndFormattedOutputValues = outputValuesParser.splitAndFormatOutputValuesWithTokenizer(LONG_LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValues = new OutputValuesParser().splitAndFormatOutputValuesWithTokenizer(LONG_LIST_OUTPUT_VALUES);
 
         assertThat(splitAndFormattedOutputValues)
                 .hasSize(5761)
@@ -54,19 +57,26 @@ public class OutputValuesParserTest {
                 .allMatch(t -> !((String) t).endsWith("\""));
     }
 
-    @Test()
-    void outputValuesParsingStackOverflow() {
-        OutputValuesParser outputValuesParser = new OutputValuesParser();
-        Assert.assertThrows(StackOverflowError.class, () -> outputValuesParser.splitAndFormatOutputValues(LONG_LIST_OUTPUT_VALUES));
+    @Test
+    void outputValuesParsingRegressionStackOverflow() {
+        Assert.assertThrows(StackOverflowError.class, () -> splitAndFormatOutputValues(LONG_LIST_OUTPUT_VALUES));
     }
 
     @Test
     void regressionOutputValuesParsing() {
-        OutputValuesParser outputValuesParser = new OutputValuesParser();
-        List<Object> splitAndFormattedOutputValuesNew = outputValuesParser.splitAndFormatOutputValuesWithTokenizer(LIST_OUTPUT_VALUES);
-        List<Object> splitAndFormattedOutputValuesOld = outputValuesParser.splitAndFormatOutputValues(LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValuesNew = new OutputValuesParser().splitAndFormatOutputValuesWithTokenizer(LIST_OUTPUT_VALUES);
+        List<Object> splitAndFormattedOutputValuesOld = splitAndFormatOutputValues(LIST_OUTPUT_VALUES);
 
         assertThat(splitAndFormattedOutputValuesNew)
                 .isEqualTo(splitAndFormattedOutputValuesOld);
+    }
+
+    protected static List<Object> splitAndFormatOutputValues(String outputValuesText) {
+        if (StringUtils.isEmpty(outputValuesText)) {
+            return Collections.emptyList();
+        }
+
+        String[] outputValuesSplit = outputValuesText.replaceAll("^\"", "").split("\"?(,|$)(?=(([^\"]*\"){2})*[^\"]*$) *\"?");
+        return new ArrayList<>(Arrays.asList(outputValuesSplit));
     }
 }

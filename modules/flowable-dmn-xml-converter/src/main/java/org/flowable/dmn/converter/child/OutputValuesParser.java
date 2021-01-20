@@ -13,7 +13,6 @@
 package org.flowable.dmn.converter.child;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -78,15 +77,6 @@ public class OutputValuesParser extends BaseChildElementParser {
         List<Object> formattedTokens = formatTokens(splitTokens);
 
         return formattedTokens;
-    }
-
-    public List<Object> splitAndFormatOutputValues(String outputValuesText) {
-        if (StringUtils.isEmpty(outputValuesText)) {
-            return Collections.emptyList();
-        }
-
-        String[] outputValuesSplit = outputValuesText.replaceAll("^\"", "").split("\"?(,|$)(?=(([^\"]*\"){2})*[^\"]*$) *\"?");
-        return new ArrayList<>(Arrays.asList(outputValuesSplit));
     }
 
     protected List<Object> formatTokens(List<String> splitTokens) {
