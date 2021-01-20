@@ -51,7 +51,7 @@ public class OutputValuesParser extends BaseChildElementParser {
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     String outputValuesText = xtr.getElementText();
 
-                    outputValues.setTextValues(splitAndFormatOutputValuesWithTokenizer(outputValuesText));
+                    outputValues.setTextValues(splitAndFormatOutputValues(outputValuesText));
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithOutputValues = true;
                 }
@@ -63,20 +63,50 @@ public class OutputValuesParser extends BaseChildElementParser {
         clause.setOutputValues(outputValues);
     }
 
-    public List<Object> splitAndFormatOutputValuesWithTokenizer(String outputValuesText) {
+    public List<Object> splitAndFormatOutputValues(String outputValuesText) {
         if (StringUtils.isEmpty(outputValuesText)) {
             return Collections.emptyList();
         }
 
-        List<String> splitTokens = new ArrayList<>();
-        StringTokenizer tokenizer = new StringTokenizer(outputValuesText, ",");
-        while (tokenizer.hasMoreElements()) {
-            splitTokens.add(tokenizer.nextToken());
+        List<Object> result = new ArrayList<>();
+        int start = 0;
+        int subStart, subEnd;
+        boolean inQuotes = false;
+        for (int current = 0; current < outputValuesText.length(); current++) {
+            if (outputValuesText.charAt(current) == '\"') {
+                inQuotes = !inQuotes;
+            } else if (outputValuesText.charAt(current) == ',' && !inQuotes) {
+                subStart = getSubStringStartPos(start, outputValuesText);
+                subEnd = getSubStringEndPos(current, outputValuesText);
+
+                result.add(outputValuesText.substring(subStart, subEnd));
+
+                start = current + 1;
+                if (outputValuesText.charAt(start) == ' ') {
+                    start++;
+                }
+            }
         }
 
-        List<Object> formattedTokens = formatTokens(splitTokens);
+        subStart = getSubStringStartPos(start, outputValuesText);
+        subEnd = getSubStringEndPos(outputValuesText.length(), outputValuesText);
+        result.add(outputValuesText.substring(subStart, subEnd));
 
-        return formattedTokens;
+        return result;
+    }
+
+    protected int getSubStringStartPos(int initialStart, String searchString) {
+        if (searchString.charAt(initialStart) == '\"') {
+            return initialStart + 1;
+        }
+        return initialStart;
+    }
+
+    protected int getSubStringEndPos(int initialEnd, String searchString) {
+        if (searchString.charAt(initialEnd - 1) == '\"') {
+            return initialEnd - 1;
+        }
+        return initialEnd;
     }
 
     protected List<Object> formatTokens(List<String> splitTokens) {
