@@ -37,8 +37,8 @@
 		<mockito.version>3.5.13</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
-		<oracle.jdbc.version>12.1.0.1</oracle.jdbc.version>
-		<oracle.jdbc.artifact>ojdbc7</oracle.jdbc.artifact>
+		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
+		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
         <!-- JVM params for test execution -->
 		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
@@ -140,7 +140,7 @@
 				<version>4.5.12</version>
 			</dependency>
 			<dependency>
-				<groupId>com.oracle.jdbc</groupId>
+				<groupId>com.oracle.database.jdbc</groupId>
 				<artifactId>${oracle.jdbc.artifact}</artifactId>
 				<version>${oracle.jdbc.version}</version>
 				<scope>test</scope>
@@ -1932,7 +1932,7 @@
 			<id>oracle</id>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
+					<groupId>com.oracle.database.jdbc</groupId>
 					<artifactId>${oracle.jdbc.artifact}</artifactId>
 				</dependency>
 			</dependencies>
