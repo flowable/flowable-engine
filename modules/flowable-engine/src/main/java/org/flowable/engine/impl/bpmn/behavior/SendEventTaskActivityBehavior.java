@@ -95,8 +95,6 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 job.setTenantId(execution.getTenantId());
             }
 
-            executionEntity.getJobs().add(job);
-
             jobService.createAsyncJob(job, true);
             jobService.scheduleAsyncJob(job);
 

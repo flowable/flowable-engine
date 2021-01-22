@@ -48,31 +48,6 @@ public class BpmnActivityBehavior implements Serializable {
     }
 
     /**
-     * dispatch job canceled event for job associated with given execution entity
-     * 
-     * @param activityExecution
-     */
-    protected void dispatchJobCanceledEvents(ExecutionEntity activityExecution) {
-        if (activityExecution != null) {
-            List<JobEntity> jobs = activityExecution.getJobs();
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
-            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                for (JobEntity job : jobs) {
-                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
-                            processEngineConfiguration.getEngineCfgKey());
-                }
-
-                List<TimerJobEntity> timerJobs = activityExecution.getTimerJobs();
-                for (TimerJobEntity job : timerJobs) {
-                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job),
-                            processEngineConfiguration.getEngineCfgKey());
-                }
-            }
-        }
-    }
-
-    /**
      * Performs the default outgoing BPMN 2.0 behavior (@see {@link #performDefaultOutgoingBehavior(ExecutionEntity)}), but without checking the conditions on the outgoing sequence flow.
      * 
      * This means that every outgoing sequence flow is selected for continuing the process instance, regardless of having a condition or not. In case of multiple outgoing sequence flow, multiple

@@ -85,13 +85,7 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void addChildExecution(ExecutionEntity executionEntity);
 
-    List<TaskEntity> getTasks();
-
     List<EventSubscriptionEntity> getEventSubscriptions();
-
-    List<JobEntity> getJobs();
-
-    List<TimerJobEntity> getTimerJobs();
 
     List<IdentityLinkEntity> getIdentityLinks();
 

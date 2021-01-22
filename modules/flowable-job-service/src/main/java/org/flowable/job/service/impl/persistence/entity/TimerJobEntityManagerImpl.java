@@ -142,14 +142,10 @@ public class TimerJobEntityManagerImpl
 
     @Override
     public void delete(TimerJobEntity jobEntity) {
-        super.delete(jobEntity, false);
+        delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
-
-        if (serviceConfiguration.getInternalJobManager() != null) {
-            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
-        }
 
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
@@ -158,7 +154,16 @@ public class TimerJobEntityManagerImpl
                     serviceConfiguration.getEngineName());
         }
     }
-    
+
+    @Override
+    public void delete(TimerJobEntity jobEntity, boolean fireDeleteEvent) {
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
+        }
+
+        super.delete(jobEntity, fireDeleteEvent);
+    }
+
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();
         newTimerEntity.setJobHandlerConfiguration(te.getJobHandlerConfiguration());

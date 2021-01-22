@@ -239,6 +239,87 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testParallelForkAndJoinWithAsyncJobs() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            deployStartProcessInstanceAndProfile("parallelForkAndJoinWithAsyncTasks.bpmn20.xml", "parallelForkAndJoin");
+
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectLatestProcessDefinitionByKey", 1L);
+
+            assertDatabaseInserts("StartProcessInstanceCmd",
+                    "JobEntityImpl-bulk-with-2", 1L,
+                    "ExecutionEntityImpl-bulk-with-3", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-5", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-5", 1L,
+                    "HistoricProcessInstanceEntityImpl", 1L);
+            assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
+
+            Job job  = managementService.createJobQuery().elementId("left").singleResult();
+
+            restartProfiling("execute Left Job");
+            managementService.executeJob(job.getId());
+
+            assertDatabaseSelects("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
+                    "selectById org.flowable.job.service.impl.persistence.entity.JobEntityImpl", 1L,
+                    "selectExecutionsWithSameRootProcessInstanceId", 1L,
+                    "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L);
+
+            assertDatabaseInserts("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "ActivityInstanceEntityImpl-bulk-with-3", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L);
+
+            assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "JobEntityImpl", 1L);
+
+            assertDatabaseUpdates("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L
+                    );
+
+            stopProfiling();
+
+            job = managementService.createJobQuery().elementId("right").singleResult();
+            restartProfiling("execute Right Job");
+            managementService.executeJob(job.getId());
+
+            assertDatabaseSelects("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
+                    "selectById org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L,
+                    "selectById org.flowable.job.service.impl.persistence.entity.JobEntityImpl", 1L,
+                    // Almost all selectXXXByExecutionId are needed when the process instance is deleted
+                    "selectDeadLetterJobsByExecutionId", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L,
+                    "selectEventSubscriptionsByExecution", 1L,
+                    "selectExecutionsWithSameRootProcessInstanceId", 1L,
+                    "selectExternalWorkerJobsByExecutionId", 1L,
+                    "selectIdentityLinksByProcessInstance", 1L,
+                    "selectJobsByExecutionId", 1L,
+                    "selectSuspendedJobsByExecutionId", 1L,
+                    "selectTasksByExecutionId", 1L,
+                    "selectTimerJobsByExecutionId", 1L,
+                    "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 3L,
+                    "selectVariablesByQuery", 2L);
+
+            assertDatabaseInserts("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "HistoricActivityInstanceEntityImpl-bulk-with-5", 1L);
+
+            assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "JobEntityImpl", 1L,
+                    "ExecutionEntityImpl", 3L,
+                    "Bulk-delete-deleteTasksByExecutionId", 1L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
+
+            assertDatabaseUpdates("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
+                    "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
+            stopProfiling();
+
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
+        }
+    }
+
+    @Test
     public void testNestedParallelForkAndJoin() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process04.bpmn20.xml", "process04");
@@ -744,10 +825,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     }
 
     protected FlowableProfiler startProcessInstanceAndProfile(String processDefinitionKey) {
-        FlowableProfiler activitiProfiler = FlowableProfiler.getInstance();
-        activitiProfiler.startProfileSession("Profiling session");
+        FlowableProfiler flowableProfiler = restartProfiling("Profiling session");
         runtimeService.startProcessInstanceByKey(processDefinitionKey);
-        return activitiProfiler;
+        return flowableProfiler;
+    }
+
+    protected FlowableProfiler restartProfiling(String sessionName) {
+        FlowableProfiler flowableProfiler = FlowableProfiler.getInstance();
+        flowableProfiler.reset();
+        flowableProfiler.startProfileSession(sessionName);
+        return flowableProfiler;
     }
 
     protected void stopProfiling() {

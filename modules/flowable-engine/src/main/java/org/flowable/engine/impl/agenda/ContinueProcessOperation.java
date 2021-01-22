@@ -205,8 +205,6 @@ public class ContinueProcessOperation extends AbstractOperation {
             job.setTenantId(execution.getTenantId());
         }
         
-        execution.getJobs().add(job);
-        
         jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
         

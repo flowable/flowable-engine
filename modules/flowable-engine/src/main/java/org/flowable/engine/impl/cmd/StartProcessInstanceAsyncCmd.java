@@ -76,8 +76,6 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
             job.setTenantId(execution.getTenantId());
         }
 
-        execution.getJobs().add(job);
-
         jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);
     }
