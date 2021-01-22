@@ -1276,13 +1276,17 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         // Case instance starts and ends immediately
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("main").start();
 
-        HistoricCaseInstance historicSubCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
-        assertThat(historicSubCaseInstance.getEndTime()).isNotNull();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicSubCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+            assertThat(historicSubCaseInstance.getEndTime()).isNotNull();
+        }
 
         assertCaseInstanceEnded(caseInstance);
 
-        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        }
     }
 
     @Test
@@ -1296,16 +1300,20 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
         assertThat(subCaseInstance).isNotNull();
 
-        HistoricCaseInstance historicSubCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
-        assertThat(historicSubCaseInstance.getEndTime()).isNull();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicSubCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+            assertThat(historicSubCaseInstance.getEndTime()).isNull();
+        }
 
         cmmnTaskService.complete(task.getId());
 
         assertCaseInstanceEnded(subCaseInstance);
         assertCaseInstanceEnded(caseInstance);
 
-        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        }
 
     }
 
