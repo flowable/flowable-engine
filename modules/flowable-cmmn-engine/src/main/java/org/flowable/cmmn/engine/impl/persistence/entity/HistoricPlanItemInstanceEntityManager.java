@@ -16,12 +16,15 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Dennis Federico
  */
 public interface HistoricPlanItemInstanceEntityManager extends EntityManager<HistoricPlanItemInstanceEntity> {
+
+    HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance);
 
     HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery();
 

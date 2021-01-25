@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
@@ -31,6 +32,11 @@ public class HistoricPlanItemInstanceEntityManagerImpl
 
     public HistoricPlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager) {
         super(cmmnEngineConfiguration, historicPlanItemInstanceDataManager);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance) {
+        return dataManager.create(planItemInstance);
     }
 
     @Override
