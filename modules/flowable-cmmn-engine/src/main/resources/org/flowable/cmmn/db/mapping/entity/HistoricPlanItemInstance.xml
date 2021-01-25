@@ -224,13 +224,13 @@
                 EXIT_CRITERION_ID_ = #{exitCriterionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.showInOverview != showInOverview">
-                SHOW_IN_OVERVIEW_ = #{showInOverview, jdbcType=VARCHAR}
+                SHOW_IN_OVERVIEW_ = #{showInOverview, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.extraValue != extraValue">
                 EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
