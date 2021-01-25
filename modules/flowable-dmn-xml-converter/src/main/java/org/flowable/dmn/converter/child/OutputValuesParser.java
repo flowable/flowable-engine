@@ -15,8 +15,6 @@ package org.flowable.dmn.converter.child;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamReader;
 
@@ -107,14 +105,5 @@ public class OutputValuesParser extends BaseChildElementParser {
             return initialEnd - 1;
         }
         return initialEnd;
-    }
-
-    protected List<Object> formatTokens(List<String> splitTokens) {
-        // remove start quote
-        // remove end quote
-        // remove space start quote
-        return splitTokens.stream()
-                .map(elem -> elem.replaceAll("^\"|^ \"|\"$", ""))
-                .collect(Collectors.toList());
     }
 }
