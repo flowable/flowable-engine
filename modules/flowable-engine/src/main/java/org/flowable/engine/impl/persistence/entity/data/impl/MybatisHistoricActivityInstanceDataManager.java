@@ -27,6 +27,7 @@ import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstance
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricActivityInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.UnfinishedHistoricActivityInstanceByProcessInstanceIdMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.UnfinishedHistoricActivityInstanceMatcher;
+import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Joram Barrez
@@ -54,6 +55,11 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
     @Override
     public HistoricActivityInstanceEntity create() {
         return new HistoricActivityInstanceEntityImpl();
+    }
+
+    @Override
+    public HistoricActivityInstanceEntity create(ActivityInstance activityInstance) {
+        return new HistoricActivityInstanceEntityImpl(activityInstance);
     }
 
     @Override

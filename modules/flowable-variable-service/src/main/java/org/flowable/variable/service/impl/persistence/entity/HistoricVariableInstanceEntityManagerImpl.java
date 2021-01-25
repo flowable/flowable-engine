@@ -37,7 +37,7 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
-    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime) {
+    public HistoricVariableInstanceEntity create(VariableInstanceEntity variableInstance, Date createTime) {
         HistoricVariableInstanceEntity historicVariableInstance = dataManager.create();
         historicVariableInstance.setId(variableInstance.getId());
         historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
@@ -54,6 +54,13 @@ public class HistoricVariableInstanceEntityManagerImpl
 
         historicVariableInstance.setCreateTime(createTime);
         historicVariableInstance.setLastUpdatedTime(createTime);
+
+        return historicVariableInstance;
+    }
+
+    @Override
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime) {
+        HistoricVariableInstanceEntity historicVariableInstance = create(variableInstance, createTime);
 
         insert(historicVariableInstance);
 
