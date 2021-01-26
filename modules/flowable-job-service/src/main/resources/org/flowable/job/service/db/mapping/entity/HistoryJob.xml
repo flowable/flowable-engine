@@ -267,10 +267,10 @@
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.scopeType != scopeType">
-                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
