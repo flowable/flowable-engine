@@ -481,7 +481,7 @@
                 ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.createTime != createTime">
-                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}
+                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.correlationId != correlationId">
                 CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
