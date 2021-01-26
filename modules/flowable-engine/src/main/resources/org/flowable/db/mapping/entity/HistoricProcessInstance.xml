@@ -197,7 +197,7 @@
           CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
         </if> 
         <if test="originalPersistentState.callbackType != callbackType">
-          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
+          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.referenceId != referenceId">
           REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
