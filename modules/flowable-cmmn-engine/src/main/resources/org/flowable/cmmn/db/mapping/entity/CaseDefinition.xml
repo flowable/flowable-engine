@@ -61,9 +61,11 @@
   </insert>
   
   <update id="updateCaseDefinition" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl">
-    update ${prefix}ACT_CMMN_CASEDEF set
+    update ${prefix}ACT_CMMN_CASEDEF
+    <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},    
-      CATEGORY_ = #{category, jdbcType=VARCHAR}
+      CATEGORY_ = #{category, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

@@ -40,9 +40,10 @@
 
   <update id="updateIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     update ${prefix}ACT_ID_BYTEARRAY 
-    set
+    <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      BYTES_ = #{bytes, jdbcType=${blobType}}
+      BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

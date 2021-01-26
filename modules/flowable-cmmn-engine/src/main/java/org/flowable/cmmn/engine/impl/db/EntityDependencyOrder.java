@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityIm
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
@@ -43,6 +44,8 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
@@ -57,15 +60,18 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(PropertyEntityImpl.class);
         DELETE_ORDER.add(JobEntityImpl.class);
         DELETE_ORDER.add(ExternalWorkerJobEntityImpl.class);
         DELETE_ORDER.add(TimerJobEntityImpl.class);
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
+        DELETE_ORDER.add(HistoricTaskLogEntryEntityImpl.class);
         DELETE_ORDER.add(HistoryJobEntityImpl.class);
         DELETE_ORDER.add(HistoricEntityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
         DELETE_ORDER.add(HistoricMilestoneInstanceEntityImpl.class);
+        DELETE_ORDER.add(HistoricTaskInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricCaseInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);

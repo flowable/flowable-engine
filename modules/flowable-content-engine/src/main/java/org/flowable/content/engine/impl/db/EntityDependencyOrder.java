@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl;
 
 public class EntityDependencyOrder {
@@ -25,6 +26,7 @@ public class EntityDependencyOrder {
     public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
 
     static {
+        DELETE_ORDER.add(PropertyEntityImpl.class);
         DELETE_ORDER.add(ContentItemEntityImpl.class);
         INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);

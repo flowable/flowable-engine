@@ -50,7 +50,8 @@
   <!-- USER UPDATE -->
 
   <update id="updateUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
-    update ${prefix}ACT_ID_USER set
+    update ${prefix}ACT_ID_USER
+    <set>
       REV_ = #{revisionNext ,jdbcType=INTEGER},
       <if test="originalPersistentState.firstName != firstName">
         FIRST_ = #{firstName, jdbcType=VARCHAR},
@@ -71,6 +72,7 @@
         PWD_ = #{password ,jdbcType=VARCHAR},
       </if>
       PICTURE_ID_ = #{pictureByteArrayRef ,typeHandler=IdmByteArrayRefTypeHandler}
+    </set>
     where ID_ = #{id}
       and REV_ = #{revision}
   </update>

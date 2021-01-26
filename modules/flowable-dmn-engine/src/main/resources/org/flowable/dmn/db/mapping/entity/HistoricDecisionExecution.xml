@@ -67,7 +67,10 @@
   <!-- HISTORIC DECISION EXECUTION UPDATE -->
 
   <update id="updateHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
-    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION set EXECUTION_JSON_ = #{executionJson, jdbcType=VARCHAR}
+    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION
+    <set>
+        EXECUTION_JSON_ = #{executionJson, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
