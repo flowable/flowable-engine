@@ -88,7 +88,7 @@
       IP_ADDRESS_ = #{ipAddress, jdbcType=VARCHAR},
       USER_AGENT_ = #{userAgent, jdbcType=VARCHAR},
       USER_ID_ = #{userId, jdbcType=VARCHAR},
-      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR}
+      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR},
     </set>
     where ID_ = #{id, jdbcType=VARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
   </update>

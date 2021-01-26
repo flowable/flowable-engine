@@ -52,9 +52,11 @@
   </insert>
 
   <update id="updateHistoricMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityImpl">
-    update ${prefix}ACT_CMMN_HI_MIL_INST set 
+    update ${prefix}ACT_CMMN_HI_MIL_INST
+    <set>
         REV_ = #{revisionNext, jdbcType=INTEGER}, 
-        NAME_ = #{name, jdbcType=VARCHAR} 
+        NAME_ = #{name, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

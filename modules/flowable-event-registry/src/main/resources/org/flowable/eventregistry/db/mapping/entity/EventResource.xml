@@ -37,8 +37,9 @@
 
   <update id="updateEventResource" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityImpl">
     update ${prefix}FLW_EVENT_RESOURCE
-    set
-      RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    <set>
+      RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 

@@ -36,9 +36,11 @@
 
   <!-- ProcessDefinitionInfo UPDATE -->
   <update id="updateProcessDefinitionInfo" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl">
-    update ${prefix}ACT_PROCDEF_INFO set
+    update ${prefix}ACT_PROCDEF_INFO
+    <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      INFO_JSON_ID_ = #{infoJsonId, jdbcType=VARCHAR}
+      INFO_JSON_ID_ = #{infoJsonId, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 

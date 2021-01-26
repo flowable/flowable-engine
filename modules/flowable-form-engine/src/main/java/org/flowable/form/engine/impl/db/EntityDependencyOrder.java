@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl;
@@ -29,6 +30,7 @@ public class EntityDependencyOrder {
 
     static {
         
+        DELETE_ORDER.add(PropertyEntityImpl.class);
         DELETE_ORDER.add(FormResourceEntityImpl.class);
         DELETE_ORDER.add(FormDeploymentEntityImpl.class);
         DELETE_ORDER.add(FormDefinitionEntityImpl.class);

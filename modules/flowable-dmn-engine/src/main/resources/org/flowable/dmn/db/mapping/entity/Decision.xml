@@ -61,7 +61,10 @@
   <!-- DECISION TABLE UPDATE -->
 
   <update id="updateDecision" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityImpl">
-    update ${prefix}ACT_DMN_DECISION set CATEGORY_ = #{category, jdbcType=VARCHAR}
+    update ${prefix}ACT_DMN_DECISION
+    <set>
+      CATEGORY_ = #{category, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

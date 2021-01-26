@@ -67,10 +67,11 @@
 
   <update id="updateFormInstance" parameterType="org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
     update ${prefix}ACT_FO_FORM_INSTANCE
-    set
+    <set>
       SUBMITTED_DATE_ = #{submittedDate, jdbcType=TIMESTAMP},
       SUBMITTED_BY_ = #{submittedBy, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+    </set>
     where
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
