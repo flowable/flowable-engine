@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 
 /**
@@ -54,6 +55,45 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String extraValue;
     protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+
+    public HistoricPlanItemInstanceEntityImpl() {
+    }
+
+    public HistoricPlanItemInstanceEntityImpl(PlanItemInstance planItemInstance) {
+        this.id = planItemInstance.getId();
+        this.name = planItemInstance.getName();
+        this.state = planItemInstance.getState();
+        this.caseDefinitionId = planItemInstance.getCaseDefinitionId();
+        this.derivedCaseDefinitionId = planItemInstance.getDerivedCaseDefinitionId();
+        this.caseInstanceId = planItemInstance.getCaseInstanceId();
+        this.stageInstanceId = planItemInstance.getStageInstanceId();
+        this.isStage = planItemInstance.isStage();
+        this.elementId = planItemInstance.getElementId();
+        this.planItemDefinitionId = planItemInstance.getPlanItemDefinitionId();
+        this.planItemDefinitionType = planItemInstance.getPlanItemDefinitionType();
+        this.startUserId = planItemInstance.getStartUserId();
+        this.referenceId = planItemInstance.getReferenceId();
+        this.referenceType = planItemInstance.getReferenceType();
+        this.createTime = planItemInstance.getCreateTime();
+        this.entryCriterionId = planItemInstance.getEntryCriterionId();
+        this.exitCriterionId = planItemInstance.getExitCriterionId();
+        this.extraValue = planItemInstance.getExtraValue();
+
+        this.lastAvailableTime = planItemInstance.getLastAvailableTime();
+        this.lastUnavailableTime = planItemInstance.getLastUnavailableTime();
+        this.lastEnabledTime = planItemInstance.getLastEnabledTime();
+        this.lastDisabledTime = planItemInstance.getLastDisabledTime();
+        this.lastStartedTime = planItemInstance.getLastStartedTime();
+        this.lastSuspendedTime = planItemInstance.getLastSuspendedTime();
+        this.completedTime = planItemInstance.getCompletedTime();
+        this.occurredTime = planItemInstance.getOccurredTime();
+        this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.endedTime = planItemInstance.getEndedTime();
+
+        if (planItemInstance.getTenantId() != null) {
+            this.tenantId = planItemInstance.getTenantId();
+        }
+    }
 
     @Override
     public Object getPersistentState() {

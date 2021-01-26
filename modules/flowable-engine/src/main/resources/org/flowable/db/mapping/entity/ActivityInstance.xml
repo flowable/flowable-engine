@@ -172,7 +172,7 @@
             DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
-            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.activityId != activityId">
             ACT_ID_ = #{activityId, jdbcType=VARCHAR},
