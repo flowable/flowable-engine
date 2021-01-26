@@ -47,6 +47,10 @@ import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.EmbeddedValueResolver;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
@@ -57,7 +61,7 @@ import org.springframework.util.StringValueResolver;
 /**
  * @author Filip Hrisafov
  */
-public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, ChannelModelProcessor {
+public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, ChannelModelProcessor {
 
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.rabbit.ChannelRabbitListenerEndpointContainer#";
 
@@ -70,6 +74,8 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
     protected RabbitListenerContainerFactory<?> containerFactory;
 
     protected BeanFactory beanFactory;
+    protected ApplicationContext applicationContext;
+    protected boolean contextRefreshed;
 
     protected BeanExpressionResolver resolver = new StandardBeanExpressionResolver();
 
@@ -291,7 +297,13 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
         Assert.hasText(endpoint.getId(), "Endpoint id must be set");
 
         Assert.state(this.endpointRegistry != null, "No RabbitListenerEndpointRegistry set");
-        endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), true);
+        // We need to start the container immediately only if the endpoint registry is already running,
+        // otherwise we should not start it and leave it to the registry to start all the containers when it starts.
+        // If we do not do that then it is possible that @RabbitListener will not be started
+        // We also need to start immediately if the application context has already been refreshed.
+        // If we don't and the endpoint has no registered containers then our endpoint will never be started.
+        boolean startImmediately = contextRefreshed || endpointRegistry.isRunning();
+        endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), startImmediately);
     }
 
     protected RabbitListenerContainerFactory<?> resolveContainerFactory(RabbitListenerEndpoint endpoint, RabbitListenerContainerFactory<?> containerFactory) {
@@ -336,6 +348,18 @@ public class RabbitChannelDefinitionProcessor implements BeanFactoryAware, Chann
             this.embeddedValueResolver = new EmbeddedValueResolver((ConfigurableBeanFactory) beanFactory);
             this.resolver = ((ConfigurableListableBeanFactory) beanFactory).getBeanExpressionResolver();
             this.expressionContext = new BeanExpressionContext((ConfigurableListableBeanFactory) beanFactory, null);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (event.getApplicationContext() == this.applicationContext) {
+            this.contextRefreshed = true;
         }
     }
 
