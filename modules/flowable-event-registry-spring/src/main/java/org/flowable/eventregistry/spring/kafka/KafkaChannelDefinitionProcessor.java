@@ -251,6 +251,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         Assert.hasText(endpoint.getId(), "Endpoint id must be set");
 
         Assert.state(this.endpointRegistry != null, "No KafkaListenerEndpointRegistry set");
+        // There is no need to use a specific flag for starting immediately for Kafka since the KafkaListenerEndpointRegistry
+        // handles the start of the containers differently then the JMS and Rabbit ones.
+        // It has its own state for whether it is running or not and does not depend on the underlying containers.
         endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), true);
     }
 
