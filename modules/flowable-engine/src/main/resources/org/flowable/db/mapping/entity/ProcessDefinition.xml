@@ -87,7 +87,7 @@
               SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
           </if>
           <if test="originalPersistentState.category != category">
-              CATEGORY_ = #{category, jdbcType=VARCHAR}
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
           </if>
       </set>
     where ID_ = #{id, jdbcType=VARCHAR}

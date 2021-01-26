@@ -81,7 +81,7 @@
           NAME_ = #{name, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.description != description">
-          DESCRIPTION_ = #{description, jdbcType=TIMESTAMP}
+          DESCRIPTION_ = #{description, jdbcType=TIMESTAMP},
         </if>
     </set>
     where ID_ = #{id}

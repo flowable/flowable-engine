@@ -71,7 +71,7 @@
                 IF_PART_ID_ = #{ifPartId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.timeStamp != timeStamp">
-                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP}
+                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}

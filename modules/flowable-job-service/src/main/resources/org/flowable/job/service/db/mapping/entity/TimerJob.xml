@@ -401,7 +401,7 @@
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
