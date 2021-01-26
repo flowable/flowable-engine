@@ -25,6 +25,8 @@ import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
  */
 public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
 
+    HistoricVariableInstanceEntity create(VariableInstanceEntity variableInstance, Date createTime);
+
     HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime);
 
     void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime);

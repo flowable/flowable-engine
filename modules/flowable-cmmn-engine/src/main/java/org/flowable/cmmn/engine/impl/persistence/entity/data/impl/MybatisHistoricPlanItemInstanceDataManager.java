@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
@@ -77,4 +78,8 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
         return new HistoricPlanItemInstanceEntityImpl();
     }
 
+    @Override
+    public HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance) {
+        return new HistoricPlanItemInstanceEntityImpl(planItemInstance);
+    }
 }
