@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl;
@@ -34,6 +35,7 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(PropertyEntityImpl.class);
         DELETE_ORDER.add(IdmPropertyEntityImpl.class);
         DELETE_ORDER.add(IdmByteArrayEntityImpl.class);
         DELETE_ORDER.add(MembershipEntityImpl.class);

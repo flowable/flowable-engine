@@ -47,10 +47,12 @@
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateEventDeployment" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
-    update ${prefix}FLW_EVENT_DEPLOYMENT set
+    update ${prefix}FLW_EVENT_DEPLOYMENT
+    <set>
       CATEGORY_ = #{category, jdbcType=VARCHAR},
       TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
-      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
+      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

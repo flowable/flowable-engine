@@ -70,14 +70,15 @@
 
   <update id="updateComment" parameterType="org.flowable.engine.impl.persistence.entity.CommentEntityImpl">
     update ${prefix}ACT_HI_COMMENT 
-    set
+    <set>
       TYPE_ = #{type, jdbcType=VARCHAR},
       TIME_ = #{time, jdbcType=TIMESTAMP},
       USER_ID_ = #{userId, jdbcType=VARCHAR},
       TASK_ID_ = #{taskId, jdbcType=VARCHAR},
       PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       MESSAGE_ = #{message, jdbcType=VARCHAR},
-      FULL_MSG_ = #{fullMessageBytes, jdbcType=${blobType}}
+      FULL_MSG_ = #{fullMessageBytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 

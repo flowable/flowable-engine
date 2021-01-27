@@ -65,7 +65,10 @@
   </select>
   
   <update id="updateAppResource" parameterType="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">
-    update ${prefix}ACT_APP_DEPLOYMENT_RESOURCE set RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    update ${prefix}ACT_APP_DEPLOYMENT_RESOURCE
+    <set>
+        RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update> 
   

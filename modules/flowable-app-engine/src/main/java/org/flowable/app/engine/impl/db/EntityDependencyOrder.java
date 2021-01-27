@@ -21,7 +21,10 @@ import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntityImpl;
 import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
@@ -34,13 +37,16 @@ public class EntityDependencyOrder {
 
     static {
 
+        DELETE_ORDER.add(PropertyEntityImpl.class);
+        DELETE_ORDER.add(HistoricIdentityLinkEntityImpl.class);
+        DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
         DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
         DELETE_ORDER.add(IdentityLinkEntityImpl.class);
         DELETE_ORDER.add(AppDefinitionEntityImpl.class);
         DELETE_ORDER.add(AppResourceEntityImpl.class);
         DELETE_ORDER.add(AppDeploymentEntityImpl.class);
-        
+
         INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);
 

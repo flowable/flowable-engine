@@ -52,7 +52,11 @@
     </insert>
 
     <update id="updateMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
-        update ${prefix}ACT_CMMN_RU_MIL_INST set NAME_ = #{name, jdbcType=VARCHAR} where ID_ = #{id, jdbcType=VARCHAR}
+        update ${prefix}ACT_CMMN_RU_MIL_INST
+        <set>
+            NAME_ = #{name, jdbcType=VARCHAR},
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
     </update>
 
     <delete id="deleteMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">

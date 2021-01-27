@@ -32,7 +32,7 @@
                 #{tenantId, jdbcType=VARCHAR})
     </insert>
 
-    <insert id="bulkInsertProcessMigrationBatch" parameterType="java.util.List">
+    <insert id="bulkInsertBatch" parameterType="java.util.List">
         INSERT INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_)
         VALUES
         <foreach collection="list" item="batch" index="index" separator=",">
@@ -49,7 +49,7 @@
         </foreach>
     </insert>
 
-    <insert id="bulkInsertProcessMigrationBatch" databaseId="oracle" parameterType="java.util.List">
+    <insert id="bulkInsertBatch" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="batch" index="index">
             INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_) VALUES
@@ -79,7 +79,7 @@
                 COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}

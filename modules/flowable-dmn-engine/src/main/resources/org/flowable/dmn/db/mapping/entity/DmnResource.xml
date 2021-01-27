@@ -36,7 +36,10 @@
   <!-- RESOURCE UPDATE -->
   
   <update id="updateDmnResource" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
-    update ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE set RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
+    update ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE
+    <set>
+      RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
