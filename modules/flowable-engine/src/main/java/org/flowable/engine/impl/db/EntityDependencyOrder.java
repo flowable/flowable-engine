@@ -107,7 +107,7 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(SuspendedJobEntityImpl.class);
         DELETE_ORDER.add(DeadLetterJobEntityImpl.class);
 
-        /**
+        /*
          * no FK
          */
         DELETE_ORDER.add(HistoricTaskLogEntryEntityImpl.class);

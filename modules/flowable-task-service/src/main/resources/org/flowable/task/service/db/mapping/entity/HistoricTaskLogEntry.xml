@@ -37,7 +37,7 @@
         #{taskLog.taskId, jdbcType=VARCHAR},
         #{taskLog.executionId, jdbcType=VARCHAR},
         #{taskLog.processInstanceId, jdbcType=VARCHAR},
-        #{taskLog.processDefintionId, jdbcType=VARCHAR},
+        #{taskLog.processDefinitionId, jdbcType=VARCHAR},
         #{taskLog.scopeId, jdbcType=VARCHAR},
         #{taskLog.scopeDefinitionId, jdbcType=VARCHAR},
         #{taskLog.subScopeId, jdbcType=VARCHAR},
