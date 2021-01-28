@@ -70,7 +70,7 @@ public class CaseInstanceMigrationValidationCmd implements Command<CaseInstanceM
             throw new FlowableException("Must specify a case definition id to migrate");
         }
         if (caseDefinitionTenantId == null) {
-            throw new FlowableException("Must specify a case definition id to migrate");
+            throw new FlowableException("Must specify a case definition tenant id to migrate");
         }
         if (caseInstanceMigrationDocument == null) {
             throw new FlowableException("Must specify a case instance migration document to migrate");
