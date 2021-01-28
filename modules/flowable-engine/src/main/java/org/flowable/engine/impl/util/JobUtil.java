@@ -18,13 +18,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.FlowNode;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
