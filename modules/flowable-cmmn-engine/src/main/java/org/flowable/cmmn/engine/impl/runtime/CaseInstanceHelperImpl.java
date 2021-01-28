@@ -36,15 +36,14 @@ import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceBeforeContext;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
@@ -181,28 +180,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected void createAsyncInitJob(CaseInstanceEntity caseInstance, CaseDefinition caseDefinition, 
             Case caseModel, JobService jobService, CommandContext commandContext) {
         
-        JobEntity job = jobService.createJob();
-        job.setJobHandlerType(AsyncInitializePlanModelJobHandler.TYPE);
-        job.setScopeId(caseInstance.getId());
-        job.setScopeDefinitionId(caseInstance.getCaseDefinitionId());
-        job.setScopeType(ScopeTypes.CMMN);
+        JobEntity job = JobUtil.createJob(caseInstance, caseModel, AsyncInitializePlanModelJobHandler.TYPE, cmmnEngineConfiguration);
         job.setElementId(caseDefinition.getId());
         job.setElementName(caseDefinition.getName());
         job.setJobHandlerConfiguration(caseInstance.getId());
         
-        List<ExtensionElement> jobCategoryElements = caseModel.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(caseInstance);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
-                }
-            }
-        }
-        
-        job.setTenantId(caseInstance.getTenantId());
         jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);
     }

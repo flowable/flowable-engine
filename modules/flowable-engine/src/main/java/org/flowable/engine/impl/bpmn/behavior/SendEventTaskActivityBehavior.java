@@ -40,6 +40,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.runtime.EventInstance;
@@ -82,18 +83,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         if (!sendSynchronously) {
             JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
             
-            JobEntity job = jobService.createJob();
-            job.setExecutionId(execution.getId());
-            job.setProcessInstanceId(execution.getProcessInstanceId());
-            job.setProcessDefinitionId(execution.getProcessDefinitionId());
-            job.setElementId(sendEventServiceTask.getId());
-            job.setElementName(sendEventServiceTask.getName());
-            job.setJobHandlerType(AsyncSendEventJobHandler.TYPE);
-
-            // Inherit tenant id (if applicable)
-            if (execution.getTenantId() != null) {
-                job.setTenantId(execution.getTenantId());
-            }
+            JobEntity job = JobUtil.createJob(executionEntity, sendEventServiceTask, AsyncSendEventJobHandler.TYPE, processEngineConfiguration);
 
             jobService.createAsyncJob(job, true);
             jobService.scheduleAsyncJob(job);

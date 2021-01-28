@@ -21,6 +21,7 @@ import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -61,20 +62,11 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
     }
 
     protected void executeAsynchronous(ExecutionEntity execution, Process process, CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
 
-        JobEntity job = jobService.createJob();
-        job.setExecutionId(execution.getId());
-        job.setProcessInstanceId(execution.getProcessInstanceId());
-        job.setProcessDefinitionId(execution.getProcessDefinitionId());
-        job.setElementId(process.getId());
+        JobEntity job = JobUtil.createJob(execution, process, AsyncContinuationJobHandler.TYPE, processEngineConfiguration);
         job.setElementName(process.getName());
-        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-
-        // Inherit tenant id (if applicable)
-        if (execution.getTenantId() != null) {
-            job.setTenantId(execution.getTenantId());
-        }
 
         jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);

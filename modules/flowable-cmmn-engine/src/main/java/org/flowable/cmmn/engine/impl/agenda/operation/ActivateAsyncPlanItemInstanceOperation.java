@@ -12,21 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Task;
-import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 import org.flowable.job.service.JobService;
@@ -64,29 +59,9 @@ public class ActivateAsyncPlanItemInstanceOperation extends AbstractChangePlanIt
     protected void createAsyncJob(Task task) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
-        JobEntity job = jobService.createJob();
-        job.setJobHandlerType(AsyncActivatePlanItemInstanceJobHandler.TYPE);
-        job.setScopeId(planItemInstanceEntity.getCaseInstanceId());
-        job.setSubScopeId(planItemInstanceEntity.getId());
-        job.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-        job.setScopeType(ScopeTypes.CMMN);
-        job.setElementId(task.getId());
-        job.setElementName(task.getName());
+        JobEntity job = JobUtil.createJob(planItemInstanceEntity, task, AsyncActivatePlanItemInstanceJobHandler.TYPE, cmmnEngineConfiguration);
         job.setJobHandlerConfiguration(entryCriterionId);
         
-        List<ExtensionElement> jobCategoryElements = task.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(planItemInstanceEntity);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
-                }
-            }
-        }
-        
-        job.setTenantId(planItemInstanceEntity.getTenantId());
         jobService.createAsyncJob(job, task.isExclusive());
         jobService.scheduleAsyncJob(job);
         
