@@ -61,7 +61,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractTaskHistoryJsonTran
             HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             HistoricTaskInstanceEntity historicTaskInstanceEntity = historicTaskService.createHistoricTask();
             copyCommonHistoricTaskInstanceFields(historicalData, historicTaskInstanceEntity);
-            setEndProperties(historicalData, historicTaskInstance);
+            setEndProperties(historicalData, historicTaskInstanceEntity);
             historicTaskService.insertHistoricTask(historicTaskInstanceEntity, false);
         }
     }
