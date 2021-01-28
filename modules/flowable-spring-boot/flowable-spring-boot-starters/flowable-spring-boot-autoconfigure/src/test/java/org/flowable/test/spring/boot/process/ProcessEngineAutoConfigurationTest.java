@@ -64,7 +64,6 @@ import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
-import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
