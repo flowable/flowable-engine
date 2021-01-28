@@ -14,17 +14,10 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
-import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * Helper class for implementing BPMN 2.0 activities, offering convenience methods specific to BPMN 2.0.
