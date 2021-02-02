@@ -21,6 +21,8 @@ public interface ReferenceTypes {
 
     String PLAN_ITEM_CHILD_PROCESS = "cmmn-1.1-to-bpmn-2.0-child-process";
 
+    String PLAN_ITEM_CHILD_HUMAN_TASK = "cmmn-1.1-to-cmmn-1.1-child-human-task";
+
     String EXECUTION_CHILD_CASE = "bpmn-2.0-to-cmmn-1.1-child-case";
 
     String EVENT_PROCESS = "event-to-bpmn-2.0-process";

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
+import org.flowable.dmn.image.exception.FlowableImageException;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
@@ -130,6 +131,11 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
         for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
 
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
+
+            if (decisionServiceInfo == null) {
+                throw new FlowableImageException("Could not find graphic info for decision service: " + decisionService.getId());
+            }
+
             List<GraphicInfo> decisionServiceDividerInfos = dmnDefinition.getDecisionServiceDividerGraphicInfo(decisionService.getId());
             decisionRequirementsDiagramCanvas.drawDecisionService(decisionService.getName(), decisionServiceInfo, decisionServiceDividerInfos, scaleFactor);
 
@@ -233,8 +239,8 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
 
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             graphicInfoList = connectionPerfectionizer(decisionRequirementsDiagramCanvas, dmnDefinition, sourceDecision, targetDecision, graphicInfoList);
-            int xPoints[] = new int[graphicInfoList.size()];
-            int yPoints[] = new int[graphicInfoList.size()];
+            int[] xPoints = new int[graphicInfoList.size()];
+            int[] yPoints = new int[graphicInfoList.size()];
 
             for (int i = 1; i < graphicInfoList.size(); i++) {
                 GraphicInfo graphicInfo = graphicInfoList.get(i);
@@ -282,8 +288,8 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
     protected static GraphicInfo getLineCenter(List<GraphicInfo> graphicInfoList) {
         GraphicInfo gi = new GraphicInfo();
 
-        int xPoints[] = new int[graphicInfoList.size()];
-        int yPoints[] = new int[graphicInfoList.size()];
+        int[] xPoints = new int[graphicInfoList.size()];
+        int[] yPoints = new int[graphicInfoList.size()];
 
         double length = 0;
         double[] lengths = new double[graphicInfoList.size()];
@@ -346,6 +352,10 @@ public class DefaultDecisionRequirementsDiagramGenerator implements DecisionRequ
 
         for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
             GraphicInfo decisionServiceInfo = dmnDefinition.getGraphicInfo(decisionService.getId());
+
+            if (decisionServiceInfo == null) {
+                throw new FlowableImageException("Could not find graphic info for decision service: " + decisionService.getId());
+            }
 
             // width
             if (decisionServiceInfo.getX() + decisionServiceInfo.getWidth() > maxX) {

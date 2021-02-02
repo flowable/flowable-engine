@@ -172,7 +172,7 @@
             DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
-            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.activityId != activityId">
             ACT_ID_ = #{activityId, jdbcType=VARCHAR},
@@ -193,6 +193,17 @@
   
   <delete id="deleteActivityInstancesByProcessDefinitionId">
     delete from ${prefix}ACT_RU_ACTINST where PROC_DEF_ID_ = #{processDefinitionId}
+  </delete>
+
+  <delete id="deleteActivityInstance">
+    delete from ${prefix}ACT_RU_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteActivityInstance" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_RU_ACTINST where
+    <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+      ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+    </foreach>
   </delete>
 
   <!-- ACTIVITY INSTANCE RESULT MAP -->

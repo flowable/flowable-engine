@@ -1086,6 +1086,36 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
     }
 
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn" })
+    public void testCompleteCaseTaskWithSuspendedParentProcessInstance() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+            .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+            .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+            processEngineTaskService.complete(processEngineTaskService.createTaskQuery().singleResult().getId());
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
+
+            processEngineRuntimeService.suspendProcessInstanceById(processInstance.getId());
+
+            Task taskInCaseInstance = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+            assertThatThrownBy(() -> cmmnTaskService.complete(taskInCaseInstance.getId()))
+                    .isInstanceOf(FlowableException.class)
+                    .hasMessageContaining("Cannot complete case task. Parent process instance")
+                    .hasMessageContaining("is suspended");
+
+            processEngineRuntimeService.activateProcessInstanceById(processInstance.getId());
+            cmmnTaskService.complete(taskInCaseInstance.getId());
+            assertCaseInstanceEnded(caseInstance);
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
     static class ClearExecutionReferenceCmd implements Command<Void> {
 
         @Override

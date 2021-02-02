@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -26,10 +27,12 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
 /**
- * @author martin.grofcikplanItem
+ * @author martin.grofcik
+ * @author Joram Barrez
  */
 public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
@@ -47,6 +50,54 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
 
         beans.put("delegateListener", new TestDelegateTaskListener());
         beans.put("receiveAll", testReceiveAllLifecycleListener);
+
+        cmmnEngineConfiguration.addCaseInstanceLifeCycleListener(new CaseInstanceLifecycleListener() {
+
+            @Override
+            public String getSourceState() {
+                return null;
+            }
+            @Override
+            public String getTargetState() {
+                return CaseInstanceState.ACTIVE;
+            }
+            @Override
+            public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+                ((CaseInstanceEntity)caseInstance).setVariable("globalActiveVariable", "ok");
+            }
+        });
+
+        cmmnEngineConfiguration.addCaseInstanceLifeCycleListener(new CaseInstanceLifecycleListener() {
+
+            @Override
+            public String getSourceState() {
+                return null;
+            }
+            @Override
+            public String getTargetState() {
+                return CaseInstanceState.COMPLETED;
+            }
+            @Override
+            public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+                ((CaseInstanceEntity)caseInstance).setVariable("globalCompletedVariable", "ok");
+            }
+        });
+
+        cmmnEngineConfiguration.addCaseInstanceLifeCycleListener(new CaseInstanceLifecycleListener() {
+
+            @Override
+            public String getSourceState() {
+                return null;
+            }
+            @Override
+            public String getTargetState() {
+                return CaseInstanceState.TERMINATED;
+            }
+            @Override
+            public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+                ((CaseInstanceEntity)caseInstance).setVariable("globalTerminatedVariable", "ok");
+            }
+        });
     }
 
     @Test
@@ -57,6 +108,8 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
         assertVariable(caseInstance, "classDelegateVariable", "Hello World");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVar", "planItemIsActive");
+
+        assertVariable(caseInstance, "globalActiveVariable", "ok");
     }
 
     @Test
@@ -69,6 +122,10 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
         assertHistoricVariable(caseInstance.getId(), "classDelegateVariable", "Hello World");
         assertHistoricVariable(caseInstance.getId(), "variableFromDelegateExpression", "Hello World from delegate expression");
         assertHistoricVariable(caseInstance.getId(), "expressionVar", "planItemIsCompleted");
+
+        assertHistoricVariable(caseInstance.getId(), "globalActiveVariable", "ok");
+        assertHistoricVariable(caseInstance.getId(), "globalCompletedVariable", "ok");
+        assertHistoricVariable(caseInstance.getId(), "globalTerminatedVariable", null);
     }
 
     @Test
@@ -80,6 +137,10 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
         assertHistoricVariable(caseInstance.getId(), "classDelegateVariable", "Hello World");
         assertHistoricVariable(caseInstance.getId(), "variableFromDelegateExpression", "Hello World from delegate expression");
         assertHistoricVariable(caseInstance.getId(), "expressionVar", "planItemIsTerminated");
+
+        assertHistoricVariable(caseInstance.getId(), "globalActiveVariable", "ok");
+        assertHistoricVariable(caseInstance.getId(), "globalCompletedVariable", null);
+        assertHistoricVariable(caseInstance.getId(), "globalTerminatedVariable", "ok");
     }
 
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {
@@ -89,8 +150,12 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
 
     private void assertHistoricVariable(String caseInstanceId, String varName, String value) {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            String variable = (String) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(varName).singleResult().getValue();
-            assertThat(variable).isEqualTo(value);
+            HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName(varName).singleResult();
+            String variableValue = null;
+            if (historicVariableInstance != null) {
+                variableValue = (String) historicVariableInstance.getValue();
+            }
+            assertThat(variableValue).isEqualTo(value);
         }
     }
 

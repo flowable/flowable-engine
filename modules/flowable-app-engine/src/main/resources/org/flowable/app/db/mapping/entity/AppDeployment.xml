@@ -61,7 +61,7 @@
         KEY_ = #{key, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
       </if>
     </set>  
     where ID_ = #{id, jdbcType=VARCHAR}

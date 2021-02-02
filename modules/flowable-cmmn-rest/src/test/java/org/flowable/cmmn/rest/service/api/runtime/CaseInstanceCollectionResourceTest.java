@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -39,6 +40,7 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -380,15 +382,17 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         // Check if engine has correct variables set
         Map<String, Object> caseVariables = runtimeService.getVariables(caseInstance.getId());
-        assertThat(caseVariables).hasSize(7);
 
-        assertThat(caseVariables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(caseVariables.get("integerVariable")).isEqualTo(1234);
-        assertThat(caseVariables.get("shortVariable")).isEqualTo((short) 123);
-        assertThat(caseVariables.get("longVariable")).isEqualTo(4567890L);
-        assertThat(caseVariables.get("doubleVariable")).isEqualTo(123.456);
-        assertThat(caseVariables.get("booleanVariable")).isEqualTo(Boolean.TRUE);
-        assertThat(caseVariables.get("dateVariable")).isEqualTo(longDateFormat.parse(isoString));
+        assertThat(caseVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", Boolean.TRUE),
+                        entry("dateVariable", longDateFormat.parse(isoString))
+                );
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
@@ -577,5 +581,33 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+    }
+    
+    /**
+     * Test getting a list of case instance, using all possible filters.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testGetCaseInstancesByActivePlanItemDefinitionId() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        String id = caseInstance.getId();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url);
+
+        Task task = taskService.createTaskQuery().caseInstanceId(id).singleResult();
+        taskService.complete(task.getId());
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task2";
+        assertResultsPresentInDataResponse(url, id);
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?activePlanItemDefinitionId=task1";
+        assertResultsPresentInDataResponse(url);
     }
 }

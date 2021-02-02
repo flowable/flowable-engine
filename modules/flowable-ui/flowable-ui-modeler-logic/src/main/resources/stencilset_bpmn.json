@@ -1399,6 +1399,13 @@
         "description" : "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_TYPEPACKAGE.MULTIINSTANCE_TYPE.DESCRIPTION",
         "popular" : true,
         "refToView" : "multiinstance"
+      }, {
+        "id" : "multiinstance_variableaggregations",
+        "type" : "Complex",
+        "title" : "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_TYPEPACKAGE.VARIABLE_AGGREGATIONS.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_TYPEPACKAGE.VARIABLE_AGGREGATIONS.DESCRIPTION",
+        "popular" : true
       } ]
     }, {
       "name" : "multiinstance_cardinalitypackage",

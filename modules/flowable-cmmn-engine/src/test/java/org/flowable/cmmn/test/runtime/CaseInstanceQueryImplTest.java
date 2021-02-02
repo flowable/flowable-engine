@@ -24,8 +24,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,9 +37,11 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.CaseLocalizationManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,13 +50,14 @@ import org.junit.Test;
  */
 public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
 
+    protected String deploymentId;
+
     @Before
     public void createCase() {
-        deploymentId = cmmnRepositoryService.createDeployment()
+        this.deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
-                .deploy()
-                .getId();
+                .deploy());
 
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
@@ -632,6 +637,76 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         } finally {
             cmmnRepositoryService.deleteDeployment(tempDeploymentId, true);
         }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/three-task.cmmn")
+    public void getCaseInstanceByActivePlanItemDefinitionId() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("activePlanItemDefinition")
+                .start();
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).taskDefinitionKey("humanTask1").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).taskDefinitionKey("humanTask3").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("activePlanItemDefinition")
+                .start();
+        
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("activePlanItemDefinition")
+                .start();
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).taskDefinitionKey("humanTask3").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        List<String> queryIds = cmmnRuntimeService.createCaseInstanceQuery().activePlanItemDefinitionId("humanTask3").list().stream()
+            .map(CaseInstance::getId)
+            .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(1);
+        assertThat(queryIds.contains(caseInstance2.getId())).isTrue();
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).activePlanItemDefinitionId("humanTask1").count()).isZero();
+        
+        queryIds = cmmnRuntimeService.createCaseInstanceQuery().activePlanItemDefinitionId("humanTask1").list().stream()
+                .map(CaseInstance::getId)
+                .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(2);
+        assertThat(queryIds.contains(caseInstance2.getId())).isTrue();
+        assertThat(queryIds.contains(caseInstance3.getId())).isTrue();
+        
+        Set<String> planItemDefinitionIds = new HashSet<>();
+        planItemDefinitionIds.add("humanTask1");
+        planItemDefinitionIds.add("humanTask3");
+        
+        queryIds = cmmnRuntimeService.createCaseInstanceQuery().activePlanItemDefinitionIds(planItemDefinitionIds).list().stream()
+                .map(CaseInstance::getId)
+                .collect(Collectors.toList());
+     
+        assertThat(queryIds.size()).isEqualTo(2);
+        assertThat(queryIds.contains(caseInstance2.getId())).isTrue();
+        assertThat(queryIds.contains(caseInstance3.getId())).isTrue();
+        
+        planItemDefinitionIds = new HashSet<>();
+        planItemDefinitionIds.add("humanTask2");
+        planItemDefinitionIds.add("humanTask4");
+        
+        queryIds = cmmnRuntimeService.createCaseInstanceQuery().activePlanItemDefinitionIds(planItemDefinitionIds).list().stream()
+                .map(CaseInstance::getId)
+                .collect(Collectors.toList());
+        
+        assertThat(queryIds.size()).isEqualTo(1);
+        assertThat(queryIds.contains(caseInstance1.getId())).isTrue();
+        
+        planItemDefinitionIds = new HashSet<>();
+        planItemDefinitionIds.add("humanTask88");
+        planItemDefinitionIds.add("humanTask99");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().activePlanItemDefinitionIds(planItemDefinitionIds).count()).isZero();
     }
 
     @Test

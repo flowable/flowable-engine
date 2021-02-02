@@ -25,15 +25,10 @@ import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 import org.junit.jupiter.api.Test;
 
-public class PoolsConverterTest extends AbstractConverterTest {
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
+class PoolsConverterTest {
 
     @Test
     public void convertXMLToModel2() throws Exception {
@@ -43,19 +38,8 @@ public class PoolsConverterTest extends AbstractConverterTest {
         }
     }
 
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "pools.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("pools.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getPools())
                 .extracting(Pool::getId, Pool::getName)
                 .containsExactly(tuple("pool1", "Pool"));

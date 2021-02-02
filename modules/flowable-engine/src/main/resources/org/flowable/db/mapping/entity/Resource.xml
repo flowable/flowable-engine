@@ -67,7 +67,10 @@
   </select>
   
   <update id="updateResource" parameterType="org.flowable.engine.impl.persistence.entity.ResourceEntityImpl">
-    update ${prefix}ACT_GE_BYTEARRAY set BYTES_ = #{bytes, jdbcType=${blobType}}
+    update ${prefix}ACT_GE_BYTEARRAY
+    <set>
+        BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
 

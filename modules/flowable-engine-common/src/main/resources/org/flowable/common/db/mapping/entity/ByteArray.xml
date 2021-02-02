@@ -46,9 +46,10 @@
 
   <update id="updateByteArray" parameterType="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">
     update ${prefix}ACT_GE_BYTEARRAY 
-    set
+    <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      BYTES_ = #{bytes, jdbcType=${blobType}}
+      BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
     where ID_ = #{id}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>

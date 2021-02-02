@@ -85,15 +85,12 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                 
                 if (job instanceof TimerJobEntity) {
                     TimerJobEntity timerJobEntity = (TimerJobEntity) job;
-                    execution.getTimerJobs().add(timerJobEntity);
-    
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() + 1);
                     }
                     
                 } else if (job instanceof JobEntity) {
                     JobEntity jobEntity = (JobEntity) job;
-                    execution.getJobs().add(jobEntity);
 
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
@@ -129,11 +126,9 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
             if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) executionEntity;
                 if (job instanceof JobEntity) {
-                    executionEntity.getJobs().remove(job);
                     countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() - 1);
                 
                 } else if (job instanceof TimerJobEntity) {
-                    executionEntity.getTimerJobs().remove(job);
                     countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() - 1);
                 
                 } else if (job instanceof SuspendedJobEntity) {
@@ -170,13 +165,14 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
             }
 
             executionEntityManager.updateProcessInstanceLockTime(execution.getProcessInstanceId(), lockOwner, lockExpirationTime);
+
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                FlowElement flowElement = execution.getCurrentFlowElement();
+                BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + flowElement.getId() + ", with job id " + job.getId(),
+                        LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, flowElement, execution);
+            }
         }
-        
-        if (processEngineConfiguration.isLoggingSessionEnabled()) {
-            FlowElement flowElement = execution.getCurrentFlowElement();
-            BpmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + flowElement.getId() + ", with job id " + job.getId(),
-                            LoggingSessionConstants.TYPE_SERVICE_TASK_LOCK_JOB, (JobEntity) job, flowElement, execution);
-        }
+
     }
 
     @Override

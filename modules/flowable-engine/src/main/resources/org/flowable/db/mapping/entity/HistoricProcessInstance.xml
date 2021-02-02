@@ -40,7 +40,8 @@
         CALLBACK_ID_,
         CALLBACK_TYPE_,
         REFERENCE_ID_,
-        REFERENCE_TYPE_
+        REFERENCE_TYPE_,
+        PROPAGATED_STAGE_INST_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1, #{processInstanceId, jdbcType=VARCHAR},
@@ -59,7 +60,8 @@
         #{callbackId, jdbcType=VARCHAR},
         #{callbackType, jdbcType=VARCHAR},
         #{referenceId, jdbcType=VARCHAR},
-        #{referenceType, jdbcType=VARCHAR}
+        #{referenceType, jdbcType=VARCHAR},
+        #{propagatedStageInstanceId, jdbcType=VARCHAR}
       )
   </insert>
   
@@ -83,8 +85,9 @@
         CALLBACK_ID_,
         CALLBACK_TYPE_,
         REFERENCE_ID_,
-        REFERENCE_TYPE_
-      ) values 
+        REFERENCE_TYPE_,
+        PROPAGATED_STAGE_INST_ID_
+      ) values
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
            #{historicProcessInstance.id ,jdbcType=VARCHAR},
@@ -104,7 +107,8 @@
            #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
            #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
            #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
-           #{historicProcessInstance.referenceType, jdbcType=VARCHAR}
+           #{historicProcessInstance.referenceType, jdbcType=VARCHAR},
+           #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR}
           )
          </foreach>
   </insert>
@@ -131,8 +135,9 @@
             CALLBACK_ID_,
             CALLBACK_TYPE_,
             REFERENCE_ID_,
-            REFERENCE_TYPE_
-          ) VALUES 
+            REFERENCE_TYPE_,
+            PROPAGATED_STAGE_INST_ID_
+          ) VALUES
               (
                #{historicProcessInstance.id ,jdbcType=VARCHAR},
                1, #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
@@ -151,7 +156,8 @@
                #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
                #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
                #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
-               #{historicProcessInstance.referenceType, jdbcType=VARCHAR}
+               #{historicProcessInstance.referenceType, jdbcType=VARCHAR},
+               #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR}
               )
        </foreach>
     SELECT * FROM dual
@@ -191,13 +197,16 @@
           CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
         </if> 
         <if test="originalPersistentState.callbackType != callbackType">
-          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
+          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.referenceId != referenceId">
           REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.referenceType != referenceType">
           REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
+            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
         </if>
       </set>
     where ID_ = #{id}
@@ -243,6 +252,7 @@
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -269,6 +279,7 @@
     <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
@@ -446,7 +457,7 @@
   <sql id="commonSelectHistoricProcessInstancesByQueryCriteriaSql">
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
       <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-        inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+        inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
       </if>
     </foreach>
     <foreach collection="orQueryObjects" index="orIndex" item="orQueryObject">
@@ -762,6 +773,16 @@
       <if test="deleted">
         and ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
       </if>
+      <if test="activeActivityId != null">
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+      </if>
+      <if test="activeActivityIds != null">
+        and EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
+        <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+            #{activeActivityId}
+        </foreach>
+        and A.END_TIME_ is null)
+      </if>
       <if test="involvedUser != null">
         and (exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_))
       </if>
@@ -864,6 +885,16 @@
       </if>
       <if test="orQueryObject.deleted">
         or ${queryTablePrefix}DELETE_REASON_ IS NOT NULL
+      </if>
+      <if test="activeActivityId != null">
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+      </if>
+      <if test="activeActivityIds != null">
+        or EXISTS(select ID_ from ${prefix}ACT_HI_ACTINST A where A.PROC_INST_ID_ = ${queryTablePrefix}ID_ and A.ACT_ID_ in 
+        <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
+            #{activeActivityId}
+        </foreach>
+        and A.END_TIME_ is null)
       </if>
       <if test="orQueryObject.involvedUser != null">
         or (exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_))

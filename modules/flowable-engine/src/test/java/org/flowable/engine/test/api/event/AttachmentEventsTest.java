@@ -77,7 +77,6 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
             Authentication.setAuthenticatedUserId("testuser");
             attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description",
                     new ByteArrayInputStream("test".getBytes()));
-            assertThat(attachment.getUserId()).isNotNull();
             assertThat(attachment.getUserId()).isEqualTo("testuser");
             assertThat(listener.getEventsReceived()).hasSize(2);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);

@@ -96,16 +96,19 @@ public abstract class AbstractCmmnDynamicStateManager {
     }
 
     protected void doMovePlanItemState(CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
-        Map<String, List<PlanItemInstanceEntity>> currentPlanItemInstances = resolvePlanItemInstances(caseInstanceChangeState.getCaseInstanceId(), 
-                caseInstanceChangeState.getCaseDefinitionToMigrateTo(), commandContext);
-        caseInstanceChangeState.setCurrentPlanItemInstances(currentPlanItemInstances);
-        
-        // Set the case variables first so they are available during the change state logic
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(caseInstanceChangeState.getCaseInstanceId());
-        caseInstance.setVariables(caseInstanceChangeState.getCaseVariables());
+        
+        Map<String, List<PlanItemInstanceEntity>> currentPlanItemInstances = retrievePlanItemInstances(caseInstanceChangeState.getCaseInstanceId());
+        caseInstanceChangeState.setCurrentPlanItemInstances(currentPlanItemInstances);
         
         executeTerminatePlanItemInstances(caseInstanceChangeState, caseInstance, commandContext);
+        
+        navigatePlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo());
+        
+        // Set the case variables first so they are available during the change state logic
+        caseInstance.setVariables(caseInstanceChangeState.getCaseVariables());
+        
         executeActivatePlanItemInstances(caseInstanceChangeState, caseInstance, true, commandContext);
         executeActivatePlanItemInstances(caseInstanceChangeState, caseInstance, false, commandContext);
         executeChangePlanItemInstancesToAvailableState(caseInstanceChangeState, caseInstance, true, commandContext);
@@ -288,31 +291,35 @@ public abstract class AbstractCmmnDynamicStateManager {
     
     protected abstract boolean isDirectPlanItemDefinitionMigration(PlanItemDefinition currentPlanItemDefinition, PlanItemDefinition newPlanItemDefinition);
 
-    protected Map<String, List<PlanItemInstanceEntity>> resolvePlanItemInstances(String caseInstanceId, CaseDefinition caseDefinition, CommandContext commandContext) {
+    protected Map<String, List<PlanItemInstanceEntity>> retrievePlanItemInstances(String caseInstanceId) {
         PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstanceId);
         
+        Map<String, List<PlanItemInstanceEntity>> stagesByPlanItemDefinitionId = planItemInstances.stream()
+            .collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
+        return stagesByPlanItemDefinitionId;
+    }
+    
+    protected void navigatePlanItemInstances(Map<String, List<PlanItemInstanceEntity>> stagesByPlanItemDefinitionId, CaseDefinition caseDefinition) {
         if (caseDefinition != null) {
             TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
-            for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
-                
-                planItemInstance.setCaseDefinitionId(caseDefinition.getId());
-                
-                if (!PlanItemInstanceState.AVAILABLE.equals(planItemInstance.getState()) && 
-                        planItemInstance.getPlanItemDefinition() instanceof HumanTask) {
+            for (List<PlanItemInstanceEntity> planItemInstances : stagesByPlanItemDefinitionId.values()) {
+                for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
                     
-                    TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration)
-                            .subScopeId(planItemInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
-                    if (task != null) {
-                        task.setScopeDefinitionId(caseDefinition.getId());
+                    planItemInstance.setCaseDefinitionId(caseDefinition.getId());
+                    
+                    if (!PlanItemInstanceState.AVAILABLE.equals(planItemInstance.getState()) && 
+                            planItemInstance.getPlanItemDefinition() instanceof HumanTask) {
+                        
+                        TaskEntityImpl task = (TaskEntityImpl) taskService.createTaskQuery(cmmnEngineConfiguration.getCommandExecutor(), cmmnEngineConfiguration)
+                                .subScopeId(planItemInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
+                        if (task != null) {
+                            task.setScopeDefinitionId(caseDefinition.getId());
+                        }
                     }
                 }
             }
         }
-
-        Map<String, List<PlanItemInstanceEntity>> stagesByPlanItemDefinitionId = planItemInstances.stream()
-            .collect(Collectors.groupingBy(PlanItemInstance::getPlanItemDefinitionId));
-        return stagesByPlanItemDefinitionId;
     }
 
     protected boolean isStageContainerOfAnyPlanItemDefinition(String stageId, Collection<PlanItemMoveEntry> moveToPlanItems) {

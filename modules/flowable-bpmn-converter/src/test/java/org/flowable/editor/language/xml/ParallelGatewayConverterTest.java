@@ -17,27 +17,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ParallelGateway;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * @author martin.grofcik
  */
-public class ParallelGatewayConverterTest extends AbstractConverterTest {
+class ParallelGatewayConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "parallelgatewaymodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("parallelgatewaymodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("parallelGateway");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ParallelGateway.class);
 
         ParallelGateway gateway = (ParallelGateway) flowElement;

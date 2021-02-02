@@ -12,7 +12,7 @@
         <extensionElements>
             <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true">com.activiti.Something1</flowable:mapException>
             <flowable:mapException errorCode="myErrorCode2" includeChildExceptions="false">com.activiti.Something2</flowable:mapException>
-            <flowable:mapException errorCode="myErrorCode3">com.activiti.Something3</flowable:mapException>
+            <flowable:mapException errorCode="myErrorCode3" rootCause="org.flowable.Exception">com.activiti.Something3</flowable:mapException>
         </extensionElements>
     </serviceTask>
     <sequenceFlow id="flow2" sourceRef="servicetaskWithAndTrueAndChildren" targetRef="servicetaskWithNoMapException"></sequenceFlow>

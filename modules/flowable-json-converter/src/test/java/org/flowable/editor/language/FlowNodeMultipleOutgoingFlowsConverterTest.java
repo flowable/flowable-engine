@@ -34,7 +34,6 @@ public class FlowNodeMultipleOutgoingFlowsConverterTest extends AbstractConverte
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("parallel1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ParallelGateway.class);
         ParallelGateway gateway = (ParallelGateway) flowElement;
         List<SequenceFlow> sequenceFlows = gateway.getOutgoingFlows();
@@ -49,7 +48,6 @@ public class FlowNodeMultipleOutgoingFlowsConverterTest extends AbstractConverte
                 .extracting(SequenceFlow::getSourceRef)
                 .containsExactly("parallel1", "parallel1", "parallel1");
         flowElement = model.getMainProcess().getFlowElement("parallel2", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(ParallelGateway.class);
         gateway = (ParallelGateway) flowElement;
         sequenceFlows = gateway.getIncomingFlows();

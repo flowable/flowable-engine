@@ -17,29 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ServiceTaskTransientVariableTest extends AbstractConverterTest {
+class ServiceTaskTransientVariableTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "servicetaskstoreresulttransient.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("servicetaskstoreresulttransient.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement1 = model.getMainProcess().getFlowElement("servicetask1");
         FlowElement flowElement2 = model.getMainProcess().getFlowElement("servicetask2");
         FlowElement flowElement3 = model.getMainProcess().getFlowElement("servicetask3");

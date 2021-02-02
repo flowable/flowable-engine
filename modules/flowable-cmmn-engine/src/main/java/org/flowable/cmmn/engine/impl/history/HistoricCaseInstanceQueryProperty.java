@@ -29,7 +29,7 @@ public class HistoricCaseInstanceQueryProperty implements QueryProperty {
 
     public static final HistoricCaseInstanceQueryProperty CASE_INSTANCE_ID = new HistoricCaseInstanceQueryProperty("RES.ID_");
     public static final HistoricCaseInstanceQueryProperty CASE_DEFINITION_KEY = new HistoricCaseInstanceQueryProperty("CaseDefinitionKey");
-    public static final HistoricCaseInstanceQueryProperty CASE_DEFINITION_ID = new HistoricCaseInstanceQueryProperty("CaseDefinitionId");
+    public static final HistoricCaseInstanceQueryProperty CASE_DEFINITION_ID = new HistoricCaseInstanceQueryProperty("CASE_DEF_ID_");
     public static final HistoricCaseInstanceQueryProperty CASE_INSTANCE_NAME = new HistoricCaseInstanceQueryProperty("RES.NAME_");
     public static final HistoricCaseInstanceQueryProperty CASE_START_TIME = new HistoricCaseInstanceQueryProperty("RES.START_TIME_");
     public static final HistoricCaseInstanceQueryProperty CASE_END_TIME = new HistoricCaseInstanceQueryProperty("RES.END_TIME_");

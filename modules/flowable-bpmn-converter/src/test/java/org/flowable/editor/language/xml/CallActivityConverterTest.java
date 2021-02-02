@@ -21,31 +21,14 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
-import org.junit.jupiter.api.Test;
+import org.flowable.bpmn.model.MapExceptionEntry;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CallActivityConverterTest extends AbstractConverterTest {
+class CallActivityConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "callactivity.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("callactivity.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity");
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;
         assertThat(callActivity.getId()).isEqualTo("callactivity");
@@ -69,5 +52,12 @@ public class CallActivityConverterTest extends AbstractConverterTest {
                 .containsExactly(
                         tuple("test", "test")
                 );
+        
+        List<MapExceptionEntry> mapExceptions = callActivity.getMapExceptions();
+        assertThat(mapExceptions).hasSize(1);
+        MapExceptionEntry mapExectionEntry = mapExceptions.get(0);
+        assertThat(mapExectionEntry.getErrorCode()).isEqualTo("myErrorCode");
+        assertThat(mapExectionEntry.getClassName()).isEqualTo("org.flowable.Something");
+        assertThat(mapExectionEntry.getRootCause()).isEqualTo("org.flowable.Exception");
     }
 }

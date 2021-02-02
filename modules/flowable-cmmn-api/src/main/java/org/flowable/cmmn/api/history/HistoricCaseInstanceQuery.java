@@ -170,6 +170,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * End an OR statement. Only one OR statement is allowed, for the second call to this method an exception will be thrown.
      */
     HistoricCaseInstanceQuery endOr();
+    
+    /**
+     * Select the historic case instances with an active plan item definition id equal to the provided definition id.
+     */
+    HistoricCaseInstanceQuery activePlanItemDefinitionId(String planItemDefinitionId);
+    
+    /**
+     * Select the historic case instances with an active plan item definition id equal to one of the provided definition ids.
+     */
+    HistoricCaseInstanceQuery activePlanItemDefinitionIds(Set<String> planItemDefinitionIds);
 
     /**
      * Select the historic case instances with which the user with the given id is involved.

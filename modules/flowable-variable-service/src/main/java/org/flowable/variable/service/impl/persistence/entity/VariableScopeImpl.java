@@ -677,7 +677,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
 
             // If the variable exists on this scope, replace it
-            if (hasVariableLocal(variableName)) {
+            if (storeVariableLocal(variableName)) {
                 setVariableLocal(variableName, value, true);
                 return;
             }
@@ -823,9 +823,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         variableServiceConfiguration.getVariableInstanceEntityManager().delete(variableInstance);
-        
+
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {
-            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + 
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" +
                     variableInstance.getName() + "' deleted", variableInstance, variableServiceConfiguration.getObjectMapper());
             addLoggingSessionInfo(loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_DELETE, loggingNode, variableServiceConfiguration.getEngineName());
@@ -883,7 +883,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
         
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {
-            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' updated", 
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' updated",
                     variableInstance, variableServiceConfiguration.getObjectMapper());
             addLoggingSessionInfo(loggingNode);
             loggingNode.put("oldVariableType", oldVariableType);
@@ -924,13 +924,17 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
         
         if (variableServiceConfiguration.isLoggingSessionEnabled()) {
-            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' created", 
+            ObjectNode loggingNode = VariableLoggingSessionUtil.addLoggingData("Variable '" + variableInstance.getName() + "' created",
                     variableInstance, variableServiceConfiguration.getObjectMapper());
             addLoggingSessionInfo(loggingNode);
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_CREATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
 
         return variableInstance;
+    }
+
+    protected boolean storeVariableLocal(String variableName) {
+        return hasVariableLocal(variableName);
     }
 
     /*
@@ -949,7 +953,9 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         if (transientVariables == null) {
             transientVariables = new HashMap<>();
         }
-        transientVariables.put(variableName, new TransientVariableInstance(variableName, variableValue));
+        TransientVariableInstance transientVariableInstance = new TransientVariableInstance(variableName, variableValue);
+        transientVariables.put(variableName, transientVariableInstance);
+
     }
 
     @Override
@@ -1063,7 +1069,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
      * Return whether changes to the variables are propagated to the history storage.
      */
     protected abstract boolean isPropagateToHistoricVariable();
-    
+
     protected abstract VariableServiceConfiguration getVariableServiceConfiguration();
 
     // getters and setters

@@ -95,6 +95,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return tasks with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -288,6 +289,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         if (requestParams.containsKey("scopeType")) {
             request.setScopeType(requestParams.get("scopeType"));
+        }
+
+        if (requestParams.containsKey("propagatedStageInstanceId")) {
+            request.setPropagatedStageInstanceId(requestParams.get("propagatedStageInstanceId"));
         }
 
         if (requestParams.containsKey("tenantId")) {

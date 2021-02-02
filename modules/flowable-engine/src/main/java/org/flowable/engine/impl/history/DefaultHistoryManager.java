@@ -523,26 +523,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     protected HistoricActivityInstanceEntity createNewHistoricActivityInstance(ActivityInstance activityInstance) {
-        HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().create();
-
-        historicActivityInstanceEntity.setId(activityInstance.getId());
-
-        historicActivityInstanceEntity.setProcessDefinitionId(activityInstance.getProcessDefinitionId());
-        historicActivityInstanceEntity.setProcessInstanceId(activityInstance.getProcessInstanceId());
-        historicActivityInstanceEntity.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
-        historicActivityInstanceEntity.setExecutionId(activityInstance.getExecutionId());
-        historicActivityInstanceEntity.setTaskId(activityInstance.getTaskId());
-        historicActivityInstanceEntity.setActivityId(activityInstance.getActivityId());
-        historicActivityInstanceEntity.setActivityName(activityInstance.getActivityName());
-        historicActivityInstanceEntity.setActivityType(activityInstance.getActivityType());
-        historicActivityInstanceEntity.setAssignee(activityInstance.getAssignee());
-        historicActivityInstanceEntity.setStartTime(activityInstance.getStartTime());
-        historicActivityInstanceEntity.setEndTime(activityInstance.getEndTime());
-        historicActivityInstanceEntity.setDeleteReason(activityInstance.getDeleteReason());
-        historicActivityInstanceEntity.setDurationInMillis(activityInstance.getDurationInMillis());
-        historicActivityInstanceEntity.setTransactionOrder(activityInstance.getTransactionOrder());
-        historicActivityInstanceEntity.setTenantId(activityInstance.getTenantId());
-
+        HistoricActivityInstanceEntity historicActivityInstanceEntity = getHistoricActivityInstanceEntityManager().create(activityInstance);
 
         getHistoricActivityInstanceEntityManager().insert(historicActivityInstanceEntity);
         return historicActivityInstanceEntity;

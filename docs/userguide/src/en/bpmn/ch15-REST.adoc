@@ -6149,10 +6149,10 @@ GET management/jobs
 |withException|If +true+, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.|Boolean
 |dueBefore|Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.|Date
 |dueAfter|Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.|Date
-|exceptionMessage|Only return jobs with the given exception message|String
-|tenantId|No|String|Only return jobs with the given tenantId.
-|tenantIdLike|No|String|Only return jobs with a tenantId like the given value.
-|withoutTenantId|No|Boolean|If +true+, only returns jobs without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.
+|exceptionMessage|Only return jobs with the given exception message.|String
+|tenantId|Only return jobs with the given tenantId.|String
+|tenantIdLike|Only return jobs with a tenantId like the given value.|String
+|withoutTenantId|If +true+, only returns jobs without a tenantId set. If +false+, the +withoutTenantId+ parameter is ignored.|Boolean
 |sort|Field to sort results on, should be one of +id+, +dueDate+, +executionId+, +processInstanceId+, +retries+ or +tenantId+.|String
 |The general <<restPagingAndSort,paging and sorting query-parameters>> can be used for this URL.
 

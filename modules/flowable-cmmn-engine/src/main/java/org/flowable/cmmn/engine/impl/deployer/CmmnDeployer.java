@@ -190,7 +190,7 @@ public class CmmnDeployer implements EngineDeployer {
 
             CaseDefinitionEntity previousCaseDefinition = mapOfNewCaseDefinitionToPreviousVersion.get(caseDefinition);
             if (previousCaseDefinition != null) {
-                eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndType(previousCaseDefinition.getId(), ScopeTypes.CMMN);
+                eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(previousCaseDefinition.getId(), ScopeTypes.CMMN);
             }
 
             Case caseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);

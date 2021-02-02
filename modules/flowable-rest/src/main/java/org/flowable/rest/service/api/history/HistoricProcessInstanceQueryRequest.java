@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.history;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -46,6 +47,8 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private String superProcessInstanceId;
     private Boolean excludeSubprocesses;
     private Boolean finished;
+    private String activeActivityId;
+    private Set<String> activeActivityIds;
     private String involvedUser;
     private Date finishedAfter;
     private Date finishedBefore;
@@ -210,6 +213,22 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setFinished(Boolean finished) {
         this.finished = finished;
+    }
+    
+    public String getActiveActivityId() {
+        return activeActivityId;
+    }
+
+    public void setActiveActivityId(String activeActivityId) {
+        this.activeActivityId = activeActivityId;
+    }
+
+    public Set<String> getActiveActivityIds() {
+        return activeActivityIds;
+    }
+
+    public void setActiveActivityIds(Set<String> activeActivityIds) {
+        this.activeActivityIds = activeActivityIds;
     }
 
     public String getInvolvedUser() {

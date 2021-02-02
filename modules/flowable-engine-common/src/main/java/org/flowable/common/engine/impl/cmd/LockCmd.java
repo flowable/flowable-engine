@@ -69,6 +69,9 @@ public class LockCmd implements Command<Boolean> {
             property.setValue(Instant.now().toString() + hostLockDescription);
             propertyEntityManager.insert(property);
             return true;
+        } else if (property.getValue() == null) {
+            property.setValue(Instant.now().toString() + hostLockDescription);
+            return true;
         } else {
             return false;
         }

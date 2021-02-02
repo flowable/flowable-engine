@@ -19,6 +19,8 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Joram Barrez
@@ -43,8 +45,22 @@ public class VariableContainerELResolver extends ELResolver {
                 return Authentication.getAuthenticatedUserId();
 
             } else if (variableContainer.hasVariable(variable)) {
+                Object value = null;
+                if (context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
+                    if (variableContainer instanceof VariableScope) {
+                        VariableInstance variableInstance = ((VariableScope) variableContainer).getVariableInstance(variable);
+                        if (!variableInstance.isReadOnly()) {
+                            // When we are in a write evaluation context we can only access the variable if it is not read only
+                            // e.g. this can happen when using multi instance variable aggregation and someone wants to write to
+                            // reviews[0].score, reviews is an aggregated variable which is read only
+                            value = variableInstance.getValue();
+                        }
+                    }
+                } else {
+                    value = variableContainer.getVariable(variable);
+                }
                 context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
-                return variableContainer.getVariable(variable);
+                return value;
             } else if (VARIABLE_CONTAINER_KEY.equals(property)) {
                 context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
                 return variableContainer;
@@ -68,7 +84,14 @@ public class VariableContainerELResolver extends ELResolver {
             String variable = (String) property;
             if (variableContainer.hasVariable(variable)) {
                 context.setPropertyResolved(true);
-                variableContainer.setVariable(variable, value);
+                if (variableContainer instanceof VariableScope) {
+                    VariableInstance variableInstance = ((VariableScope) variableContainer).getVariableInstance(variable);
+                    if (variableInstance == null || !variableInstance.isReadOnly()) {
+                        variableContainer.setVariable(variable, value);
+                    }
+                } else {
+                    variableContainer.setVariable(variable, value);
+                }
             }
         }
     }

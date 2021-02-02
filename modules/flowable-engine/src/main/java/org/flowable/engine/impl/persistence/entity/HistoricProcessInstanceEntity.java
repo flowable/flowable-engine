@@ -60,6 +60,8 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
     void setReferenceId(String referenceId);
 
     void setReferenceType(String referenceType);
+
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
     
     List<HistoricVariableInstanceEntity> getQueryVariables();
 

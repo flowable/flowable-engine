@@ -45,12 +45,10 @@ public class SubProcessConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(StartEvent.class);
         assertThat(flowElement.getId()).isEqualTo("start1");
 
         flowElement = model.getMainProcess().getFlowElement("userTask1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(UserTask.class);
         assertThat(flowElement.getId()).isEqualTo("userTask1");
         UserTask userTask = (UserTask) flowElement;
@@ -59,14 +57,12 @@ public class SubProcessConverterTest extends AbstractConverterTest {
         assertThat(userTask.getFormProperties()).hasSize(2);
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(SubProcess.class);
         assertThat(flowElement.getId()).isEqualTo("subprocess1");
         SubProcess subProcess = (SubProcess) flowElement;
         assertThat(subProcess.getFlowElements()).hasSize(5);
 
         flowElement = model.getMainProcess().getFlowElement("boundaryEvent1", true);
-        assertThat(flowElement).isNotNull();
         assertThat(flowElement).isInstanceOf(BoundaryEvent.class);
         assertThat(flowElement.getId()).isEqualTo("boundaryEvent1");
         BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;

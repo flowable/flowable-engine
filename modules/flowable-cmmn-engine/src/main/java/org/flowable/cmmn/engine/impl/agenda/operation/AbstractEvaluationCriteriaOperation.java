@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseInstanceOperation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EvaluateCriteriaOperation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEvaluationCriteriaOperation.class);
 
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
 
@@ -796,6 +796,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         }
 
         PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+        // The repetition counter is 1 based
+        setRepetitionCounter(childPlanItemInstanceEntity, index + 1);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.ACTIVE;

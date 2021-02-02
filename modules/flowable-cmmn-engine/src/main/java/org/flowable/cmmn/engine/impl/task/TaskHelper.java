@@ -116,7 +116,7 @@ public class TaskHelper {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
                 deleteHistoricTaskLogEntries(task.getId(), cmmnEngineConfiguration);
             } else {
-                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason, 
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason,
                         cmmnEngineConfiguration.getClock().getCurrentTime());
             }
 

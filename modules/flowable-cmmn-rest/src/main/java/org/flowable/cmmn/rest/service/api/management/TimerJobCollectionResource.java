@@ -63,7 +63,10 @@ public class TimerJobCollectionResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return jobs part of a case with the given id", paramType = "query"),
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return jobs part of a plan item instance with the given id", paramType = "query"),
-            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return jobs with the given process definition id", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return jobs with the given case definition id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "(Deprecated; use caseDefinitionId instead) Only return jobs with the given scope definition id", paramType = "query"),
+            @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
+            @ApiImplicitParam(name = "elementName", dataType = "string", value = "Only return jobs with the given element name", paramType = "query"),
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),
@@ -96,9 +99,18 @@ public class TimerJobCollectionResource {
             query.subScopeId(allRequestParams.get("planItemInstanceId"));
             query.scopeType(ScopeTypes.CMMN);
         }
+        if (allRequestParams.containsKey("caseDefinitionId")) {
+            query.caseDefinitionId(allRequestParams.get("caseDefinitionId"));
+        }
         if (allRequestParams.containsKey("scopeDefinitionId")) {
             query.scopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
             query.scopeType(ScopeTypes.CMMN);
+        }
+        if (allRequestParams.containsKey("elementId")) {
+            query.elementId(allRequestParams.get("elementId"));
+        }
+        if (allRequestParams.containsKey("elementName")) {
+            query.elementName(allRequestParams.get("elementName"));
         }
         if (allRequestParams.containsKey("executable")) {
             query.executable();

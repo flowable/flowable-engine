@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.common.rest.api.PaginateRequest;
@@ -35,6 +36,8 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String involvedUser;
     private Boolean includeCaseVariables;
     private List<QueryVariable> variables;
+    private String activePlanItemDefinitionId;
+    private Set<String> activePlanItemDefinitionIds;
     private String tenantId;
     private String tenantIdLike;
     private Boolean withoutTenantId;
@@ -110,6 +113,22 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setVariables(List<QueryVariable> variables) {
         this.variables = variables;
+    }
+
+    public String getActivePlanItemDefinitionId() {
+        return activePlanItemDefinitionId;
+    }
+
+    public void setActivePlanItemDefinitionId(String activePlanItemDefinitionId) {
+        this.activePlanItemDefinitionId = activePlanItemDefinitionId;
+    }
+
+    public Set<String> getActivePlanItemDefinitionIds() {
+        return activePlanItemDefinitionIds;
+    }
+
+    public void setActivePlanItemDefinitionIds(Set<String> activePlanItemDefinitionIds) {
+        this.activePlanItemDefinitionIds = activePlanItemDefinitionIds;
     }
 
     public void setTenantId(String tenantId) {

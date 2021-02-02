@@ -481,7 +481,7 @@
                 ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.createTime != createTime">
-                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}
+                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.correlationId != correlationId">
                 CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
@@ -490,7 +490,7 @@
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}

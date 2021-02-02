@@ -15,14 +15,25 @@ package org.flowable.cmmn.converter.util;
 import java.util.List;
 
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.HasEntryCriteria;
+import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CriterionUtil {
+
+    public static String generateEntryCriterionId(HasEntryCriteria hasEntryCriteria) {
+        return "entryCriterion_" + hasEntryCriteria.getId() + "_" + (hasEntryCriteria.getEntryCriteria().size() + 1);
+    }
+
+    public static String generateExitCriterionId(HasExitCriteria hasExitCriteria) {
+        return "exitCriterion_" + hasExitCriteria.getId() + "_" + (hasExitCriteria.getExitCriteria().size() + 1);
+    }
 
     public static boolean planItemHasOneEntryCriterionDependingOnPlanItem(PlanItem planItemToCheck, PlanItem planItem, String event) {
         List<Criterion> entryCriteria = planItemToCheck.getEntryCriteria();

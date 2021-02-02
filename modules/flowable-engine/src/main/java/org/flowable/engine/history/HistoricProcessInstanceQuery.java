@@ -100,6 +100,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
     /** Only select historic process instance that are not deleted. */
     HistoricProcessInstanceQuery notDeleted();
+    
+    /**
+     * Select the historic process instances which have an active activity instance like the provided id.
+     */
+    HistoricProcessInstanceQuery activeActivityId(String activityId);
+    
+    /**
+     * Select the historic process instances which have an active activity instance like the provided ids.
+     */
+    HistoricProcessInstanceQuery activeActivityIds(Set<String> activityIds);
 
     /** Only select the historic process instances with which the user with the given id is involved. */
     HistoricProcessInstanceQuery involvedUser(String userId);

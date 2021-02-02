@@ -44,6 +44,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         vars.put("longString", longString.toString());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertThat(task.getProcessVariables()).isNotNull();
         assertThat(task.getProcessVariables())
                 .containsEntry("longString", longString.toString());
     }
@@ -206,6 +206,10 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count())
                 .as("Process is started, but its execution waits on the job").isZero();
 
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isFalse();
+
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 2000, 200);
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).as("The task is created from the job execution")
                 .isEqualTo(1);
@@ -272,6 +276,22 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertThat(processInstance.getProcessDefinitionKey()).isEqualTo(processDefinition.getKey());
         assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(processDefinition.getVersion());
         assertThat(processInstance.getProcessDefinitionName()).isEqualTo(processDefinition.getName());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
+    public void testProcessInstanceDefinitionInformationWithoutProcessDefinitionName() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+
+        ProcessInstance processInstance = processInstanceBuilder.processDefinitionKey("twoTasksProcess").start();
+
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+        assertThat(processInstance.getProcessDefinitionKey()).isEqualTo("twoTasksProcess");
+        assertThat(processInstance.getProcessDefinitionVersion().intValue()).isEqualTo(processDefinition.getVersion());
+        assertThat(processInstance.getProcessDefinitionName()).isNull();
     }
 
     @Test
@@ -471,7 +491,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         List<String> activities = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertThat(activities).isNotNull();
         assertThat(activities).hasSize(1);
     }
 

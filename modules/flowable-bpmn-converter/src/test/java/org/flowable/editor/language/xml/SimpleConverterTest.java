@@ -21,29 +21,12 @@ import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.jupiter.api.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SimpleConverterTest extends AbstractConverterTest {
+class SimpleConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "simplemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("simplemodel.bpmn")
+    void validateModel(BpmnModel model) {
         assertThat(model.getDefinitionsAttributes()).hasSize(2);
         assertThat(model.getDefinitionsAttributeValue("http://flowable.org/modeler", "version")).isEqualTo("2.2A");
         assertThat(model.getDefinitionsAttributeValue("http://flowable.org/modeler", "exportDate")).isEqualTo("20140312T10:45:23");

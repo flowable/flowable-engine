@@ -12,7 +12,7 @@
  */
 package org.flowable.app.spring.test.junit4;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.engine.test.AppDeployment;
@@ -32,6 +32,6 @@ public class SpringAppEngineJunit4Test {
     @AppDeployment
     public void simpleAppTest() {
         AppDefinition appDefinition = appRule.getAppRepositoryService().createAppDefinitionQuery().appDefinitionKey("testApp").singleResult();
-        assertNotNull(appDefinition);
+        assertThat(appDefinition).isNotNull();
     }
 }

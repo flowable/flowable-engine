@@ -13,7 +13,9 @@
 package org.flowable.cmmn.test.itemcontrol;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -410,7 +412,6 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         // new timer should NOT be scheduled. The orphan detection algorithm will take in account the waiting for repetition state and the fact its missing here
         assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
-        assertThat(cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
         assertThat(cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
         // Ignoring second occur event
@@ -475,6 +476,88 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         }
 
         assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(3);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testPlanItemLocalVariablesWithCollection() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .transientVariable("myCollection", Arrays.asList("one", "two", "three"))
+                .start();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+                .orderByTaskPriority().asc()
+                .list();
+
+        assertThat(tasks).hasSize(3);
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(0).getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 1),
+                        entry("item", "one"),
+                        entry("itemIndex", 0),
+                        entry("initiator", null)
+                );
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(1).getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 2),
+                        entry("item", "two"),
+                        entry("itemIndex", 1),
+                        entry("initiator", null)
+                );
+
+        assertThat(cmmnTaskService.getVariables(tasks.get(2).getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 3),
+                        entry("item", "three"),
+                        entry("itemIndex", 2),
+                        entry("initiator", null)
+                );
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testPlanItemLocalVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("repeatingTask")
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getVariables(task.getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 1),
+                        entry("initiator", null)
+                );
+
+        cmmnTaskService.complete(task.getId());
+
+        task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getVariables(task.getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 2),
+                        entry("initiator", null)
+                );
+
+        cmmnTaskService.complete(task.getId());
+
+        task = cmmnTaskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+
+        assertThat(cmmnTaskService.getVariables(task.getId()))
+                .containsOnly(
+                        entry("repetitionCounter", 3),
+                        entry("initiator", null)
+                );
+
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
     }
 
 }

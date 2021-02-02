@@ -303,7 +303,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Test EQUAL on single string variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("stringVar", "abcdef");
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Test EQUAL on two string variables, should result in single match
@@ -524,7 +523,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Query on single long variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("longVar", 12345L);
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Query on two long variables, should result in single match
@@ -613,7 +611,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Query on single double variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("doubleVar", 12345.6789);
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Query on two double variables, should result in single value
@@ -702,7 +699,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Query on single integer variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("integerVar", 12345);
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Query on two integer variables, should result in single value
@@ -793,7 +789,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Query on single short variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("shortVar", shortVar);
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Query on two short variables, should result in single value
@@ -899,7 +894,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         // Query on single short variable, should result in 2 matches
         ExecutionQuery query = runtimeService.createExecutionQuery().variableValueEquals("dateVar", date1);
         List<Execution> executions = query.list();
-        assertThat(executions).isNotNull();
         assertThat(executions).hasSize(2);
 
         // Query on two short variables, should result in single value

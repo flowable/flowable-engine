@@ -59,7 +59,10 @@
   <!-- DEFINITION UPDATE -->
 
   <update id="updateChannelDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
-    update ${prefix}FLW_CHANNEL_DEFINITION set CATEGORY_ = #{category, jdbcType=VARCHAR}
+    update ${prefix}FLW_CHANNEL_DEFINITION
+    <set>
+       CATEGORY_ = #{category, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

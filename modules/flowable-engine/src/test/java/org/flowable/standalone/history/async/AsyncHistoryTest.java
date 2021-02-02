@@ -18,11 +18,16 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -41,6 +46,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
+import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -54,6 +60,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
@@ -687,6 +694,71 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         assertThat(task.getName()).isEqualTo("Wait2");
     }
 
+    // Test for a bug when using non-interrupting boundary event (any type) with async history
+    @Test
+    @Deployment(extraResources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    public void testNonInterruptingTimerBoundaryEventOnCallActivityWithOldData() {
+
+        // In earlier versions of Flowable, there used to be a bug that would not generate a historic activity instance when it was expected to,
+        // when using a non-interrupting boundary event on a call activity.
+        // More precisely: the activity-end for the boundary event was triggered twice (but only one activity-start),
+        // which led to failure when using asynchronous history (as no start for the end exists).
+        // This unit test mimics this setup and validates that the problem is solved now.
+        //
+        // Side-note: non-interrupting boundary events such as signals/messages are repeating by default.
+        // For timer boundary events, the timer should be made repeating (the child execution is still created if it isn't)
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess");
+
+        // Mimic timer firing
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        Job executableJob = managementService.moveTimerToExecutableJob(timerJob.getId());
+        managementService.executeJob(executableJob.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+
+        List<HistoricActivityInstance> timerBoundaryEvents = historyService.createHistoricActivityInstanceQuery().activityId("timerBoundaryEvent").list();
+        assertThat(timerBoundaryEvents).hasSize(2);
+
+        // Mimic the bug by removing the latest activity instance (runtime and historical) - this was not created before
+        HistoricActivityInstance historicActivityInstanceToDelete = timerBoundaryEvents.stream()
+            .filter(historicActivityInstance -> historicActivityInstance.getEndTime() == null).findFirst().get();
+        managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getActivityInstanceEntityManager().delete(historicActivityInstanceToDelete.getId());
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricActivityInstanceEntityManager().delete(historicActivityInstanceToDelete.getId());
+            return null;
+        });
+
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        // Additionally, an extra activity-end was generated
+        // (not anymore, due to recent changes in ActivityInstanceEntityManagerImpl#recordActivityInstanceEnd - hence why it needs to be inserted manually here)
+        ObjectNode historyJson = processEngineConfiguration.getObjectMapper().createObjectNode();
+        historyJson.put("type", "activity-end");
+        ObjectNode dataNode = historyJson.putObject("data");
+
+        // Note the lack of runtimeActivityInstanceId. This is because at that time,
+        // there would be no runtime activity and it would fallback to the execution based logic (that's there for backwards compatibility)
+        dataNode.put("processDefinitionId", historicActivityInstanceToDelete.getProcessDefinitionId());
+        dataNode.put("processInstanceId", historicActivityInstanceToDelete.getProcessInstanceId());
+        dataNode.put("executionId", historicActivityInstanceToDelete.getExecutionId());
+        dataNode.put("activityId", "timerBoundaryEvent");
+        dataNode.put("activityType", "boundaryEvent");
+        dataNode.put("transactionOrder", 1);
+        dataNode.put("tenantId", "");
+        dataNode.put("startTime", AsyncHistoryDateUtil.formatDate(new Date()));
+        dataNode.put("__timeStamp", AsyncHistoryDateUtil.formatDate(new Date()));
+        addJsonToHistoryJobJson((HistoryJobEntity) managementService.createHistoryJobQuery().singleResult(), historyJson);
+
+        waitForHistoryJobExecutorToProcessAllJobs(1000000, 200);
+
+        timerBoundaryEvents = historyService.createHistoricActivityInstanceQuery().activityId("timerBoundaryEvent").list();
+        assertThat(timerBoundaryEvents)
+            .extracting(HistoricActivityInstance::getStartTime, HistoricActivityInstance::getEndTime)
+            .doesNotContainNull();
+    }
+
     @Test
     public void testHistoryJobFailure() {
         Task task = startOneTaskprocess();
@@ -723,14 +795,49 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         taskService.complete(task.getId());
 
         assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(0);
+        assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+        assertThat(historyService.createHistoricTaskInstanceQuery().list()).isEmpty();
+        assertThat(historyService.createHistoricActivityInstanceQuery().activityId("theTask").list()).isEmpty();
         waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
         assertThat(managementService.createDeadLetterJobQuery().count()).isEqualTo(2);
+        assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(1);
+        assertThat(historyService.createHistoricActivityInstanceQuery().activityId("theTask").list()).isEmpty();
+
+        // Even though there are dead letter jobs, only the delta of the jobs needs to be there
+        // the parts that didn't fail should still create the historic process instance
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .singleResult();
+
+        assertThat(historicProcessInstance).isNotNull();
+        assertThat(historicProcessInstance.getEndTime()).isNotNull();
 
         List<String> exceptionMessages = managementService.createDeadLetterJobQuery().list().stream().map(job -> job.getExceptionMessage()).collect(Collectors.toList());
         assertThat(exceptionMessages).containsOnly(
-            "Job is not applicable for transformer types: [activity-end]",
-            "Job is not applicable for transformer types: [activity-update]"
+            "Failed to process async history json. See suppressed exceptions.",
+            "Failed to process async history json. See suppressed exceptions."
         );
+
+        List<String> exceptionStacktraces = managementService.createDeadLetterJobQuery()
+                .list()
+                .stream()
+                .sorted(Comparator.comparing(Job::getCreateTime))
+                .map(job -> managementService.getDeadLetterJobExceptionStacktrace(job.getId()))
+                .collect(Collectors.toList());
+
+        String stackTrace1 = exceptionStacktraces.get(0);
+        if (stackTrace1.contains("[activity-update]")) {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-update]");
+            
+            assertThat(exceptionStacktraces.get(1))
+                .contains("Job is not applicable for transformer types: [activity-end]");
+            
+        } else {
+            assertThat(stackTrace1).contains("Job is not applicable for transformer types: [activity-end]");
+            
+            assertThat(exceptionStacktraces.get(1))
+                .contains("Job is not applicable for transformer types: [activity-update]");
+        }
 
         // The history jobs in the deadletter table have no link to the process instance, hence why a manual cleanup is needed.
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
@@ -738,6 +845,9 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
     @Test
     public void testMoveDeadLetterJobBackToHistoryJob() {
+        TestDeadletterEventListener testDeadletterEventListener = new TestDeadletterEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(testDeadletterEventListener, FlowableEngineEventType.JOB_MOVED_TO_DEADLETTER);
+
         Task task = startOneTaskprocess();
 
         HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
@@ -745,11 +855,13 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
         String originalAdvancedConfiguration = getAdvancedJobHandlerConfiguration(historyJob.getId());
         assertThat(originalAdvancedConfiguration).isNotEmpty();
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(0);
 
         waitForHistoryJobExecutorToProcessAllJobs(20000L, 50L);
 
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(0);
         Job deadLetterJob = managementService.createDeadLetterJobQuery().singleResult();
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(1);
 
         managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
         assertThat(managementService.createHistoryJobQuery().count()).isEqualTo(1);
@@ -767,6 +879,31 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         runtimeService.deleteProcessInstance(task.getProcessInstanceId(), null);
         managementService.createHistoryJobQuery().list().forEach(j -> managementService.deleteHistoryJob(j.getId()));
         managementService.createDeadLetterJobQuery().list().forEach(j -> managementService.deleteDeadLetterJob(j.getId()));
+
+        assertThat(TestDeadletterEventListener.COUNTER.get()).isEqualTo(1);
+        processEngineConfiguration.getEventDispatcher().removeEventListener(testDeadletterEventListener);
+    }
+
+    static final class TestDeadletterEventListener implements FlowableEventListener {
+
+        public static AtomicInteger COUNTER = new AtomicInteger(0);
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            COUNTER.incrementAndGet();
+        }
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
     }
 
     protected void changeTransformerTypeToInvalidType(HistoryJobEntity historyJob) {
@@ -801,10 +938,9 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             @Override
             public Void execute(CommandContext commandContext) {
                 try {
-                    HistoryJobEntity historyJobEntity = historyJob;
 
                     ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
-                    JsonNode historyJsonNode = objectMapper.readTree(historyJobEntity.getAdvancedJobHandlerConfiguration());
+                    JsonNode historyJsonNode = objectMapper.readTree(historyJob.getAdvancedJobHandlerConfiguration());
 
                     Iterator<JsonNode> iterator = historyJsonNode.iterator();
                     while (iterator.hasNext()) {
@@ -814,7 +950,28 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
                         }
                     }
 
-                    historyJobEntity.setAdvancedJobHandlerConfiguration(objectMapper.writeValueAsString(historyJsonNode));
+                    historyJob.setAdvancedJobHandlerConfiguration(objectMapper.writeValueAsString(historyJsonNode));
+                } catch (JsonProcessingException e) {
+                    Assert.fail();
+                }
+                return null;
+            }
+        });
+    }
+
+    protected void addJsonToHistoryJobJson(HistoryJobEntity historyJob, ObjectNode objectNode) {
+        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                try {
+
+                    ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+                    JsonNode historyJsonNode = objectMapper.readTree(historyJob.getAdvancedJobHandlerConfiguration());
+
+                    ((ArrayNode) historyJsonNode).add(objectNode);
+
+                    historyJob.setAdvancedJobHandlerConfiguration(objectMapper.writeValueAsString(historyJsonNode));
                 } catch (JsonProcessingException e) {
                     Assert.fail();
                 }

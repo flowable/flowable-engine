@@ -73,6 +73,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
     protected boolean unassigned;
+    protected boolean withAssignee;
     protected boolean noDelegationState;
     protected DelegationState delegationState;
     protected String candidateUser;
@@ -491,6 +492,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.unassigned = true;
         } else {
             this.unassigned = true;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskAssigned() {
+        if (orActive) {
+            currentOrQueryObject.withAssignee = true;
+        } else {
+            this.withAssignee = true;
         }
         return this;
     }
@@ -1807,6 +1818,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean getUnassigned() {
         return unassigned;
+    }
+    
+    public boolean isWithAssignee() {
+        return withAssignee;
     }
 
     public DelegationState getDelegationState() {

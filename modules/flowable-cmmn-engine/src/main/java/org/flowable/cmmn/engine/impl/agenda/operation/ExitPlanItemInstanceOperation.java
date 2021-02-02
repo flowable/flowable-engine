@@ -141,6 +141,16 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
         return (EXIT_TYPE_ACTIVE_INSTANCES.equals(exitType) || EXIT_TYPE_ACTIVE_AND_ENABLED_INSTANCES.equals(exitType)) && TERMINATED.equals(getNewState());
     }
 
+    @Override
+    protected boolean shouldAggregateForSingleInstance() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldAggregateForMultipleInstances() {
+        return false;
+    }
+
     public boolean isStage() {
         if (isStage == null) {
             isStage = isStage(planItemInstanceEntity);

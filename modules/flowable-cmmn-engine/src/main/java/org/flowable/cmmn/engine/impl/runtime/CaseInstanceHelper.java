@@ -12,10 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.callback.CallbackData;
 
 /**
  * @author Joram Barrez
@@ -26,6 +25,6 @@ public interface CaseInstanceHelper {
 
     CaseInstanceEntity startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder);
 
-    void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
+    void callCaseInstanceStateChangeCallbacks(CallbackData callbackData);
     
 }

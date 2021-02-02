@@ -19,14 +19,13 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
-import org.flowable.cmmn.engine.impl.listener.CaseLifeCycleListenerUtil;
+import org.flowable.cmmn.engine.impl.listener.CaseInstanceLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -37,15 +36,14 @@ import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
+import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceBeforeContext;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
@@ -182,29 +180,12 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected void createAsyncInitJob(CaseInstanceEntity caseInstance, CaseDefinition caseDefinition, 
             Case caseModel, JobService jobService, CommandContext commandContext) {
         
-        JobEntity job = jobService.createJob();
-        job.setJobHandlerType(AsyncInitializePlanModelJobHandler.TYPE);
-        job.setScopeId(caseInstance.getId());
-        job.setScopeDefinitionId(caseInstance.getCaseDefinitionId());
-        job.setScopeType(ScopeTypes.CMMN);
+        JobEntity job = JobUtil.createJob(caseInstance, caseModel, AsyncInitializePlanModelJobHandler.TYPE, cmmnEngineConfiguration);
         job.setElementId(caseDefinition.getId());
         job.setElementName(caseDefinition.getName());
         job.setJobHandlerConfiguration(caseInstance.getId());
         
-        List<ExtensionElement> jobCategoryElements = caseModel.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(caseInstance);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
-                }
-            }
-        }
-        
-        job.setTenantId(caseInstance.getTenantId());
-        jobService.createAsyncJob(job, true);
+        jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);
     }
     
@@ -251,9 +232,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             cmmnEngineConfiguration.getStartCaseInstanceInterceptor().afterStartCaseInstance(instanceAfterContext);
         }
 
-        CaseLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
+        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
 
-        callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
+        CallbackData callbackData = new CallbackData(caseInstanceEntity.getCallbackId(), caseInstanceEntity.getCallbackType(),
+            caseInstanceEntity.getId(), null, CaseInstanceState.ACTIVE);
+        callCaseInstanceStateChangeCallbacks(callbackData);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
         
         FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
@@ -439,13 +422,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     }
 
     @Override
-    public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
-        if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
+    public void callCaseInstanceStateChangeCallbacks(CallbackData callbackData) {
+        String callbackId = callbackData.getCallbackId();
+        String callbackType = callbackData.getCallbackType();
+        if (callbackId != null && callbackType != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = cmmnEngineConfiguration.getCaseInstanceStateChangeCallbacks();
-            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(caseInstance.getCallbackType())) {
-                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(caseInstance.getCallbackType())) {
-                    CallbackData callBackData = new CallbackData(caseInstance.getCallbackId(), caseInstance.getCallbackType(), caseInstance.getId(), oldState, newState);
-                    caseInstanceCallback.stateChanged(callBackData);
+            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(callbackType)) {
+                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(callbackType)) {
+                    caseInstanceCallback.stateChanged(callbackData);
                 }
             }
         }

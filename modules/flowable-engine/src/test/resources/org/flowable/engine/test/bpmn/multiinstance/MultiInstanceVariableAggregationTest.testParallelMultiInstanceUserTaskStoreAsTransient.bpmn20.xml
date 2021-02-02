@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="myProcess">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+
+        <userTask id="miTasks" name="My Task" flowable:taskIdVariableName="taskId" flowable:priority="${loopCounter}">
+
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews" storeAsTransientVariable="true">
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
+                <loopCardinality>${nrOfLoops}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+        </userTask>
+
+        <sequenceFlow id="flow4" sourceRef="miTasks" targetRef="afterMiService" />
+        <serviceTask id="afterMiService" flowable:expression="${reviews[0].description}" flowable:resultVariableName="firstDescription" />
+
+        <sequenceFlow id="flow5" sourceRef="afterMiService" targetRef="afterMiTasks" />
+        <userTask id="afterMiTasks" />
+
+        <sequenceFlow id="flow6" sourceRef="afterMiTasks" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

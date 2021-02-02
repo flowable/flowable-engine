@@ -42,6 +42,7 @@ import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormInstance;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -206,7 +207,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
      */
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
-    public void testGetCaseInstancesSorted() throws Exception {
+    public void testGetProcessInstancesSorted() throws Exception {
         Instant initialTime = Instant.now();
         processEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime));
         String nowInstanceId = runtimeService.startProcessInstanceByKey("processOne", "now").getId();
@@ -442,15 +443,16 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
         // Check if engine has correct variables set
         Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
-        assertThat(processVariables).hasSize(7);
-
-        assertThat(processVariables.get("stringVariable")).isEqualTo("simple string value");
-        assertThat(processVariables.get("integerVariable")).isEqualTo(1234);
-        assertThat(processVariables.get("shortVariable")).isEqualTo((short) 123);
-        assertThat(processVariables.get("longVariable")).isEqualTo(4567890L);
-        assertThat(processVariables.get("doubleVariable")).isEqualTo(123.456);
-        assertThat(processVariables.get("booleanVariable")).isEqualTo(Boolean.TRUE);
-        assertThat(processVariables.get("dateVariable")).isEqualTo(dateFormat.parse(isoString));
+        assertThat(processVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", Boolean.TRUE),
+                        entry("dateVariable", dateFormat.parse(isoString))
+                );
     }
 
     /**
@@ -720,5 +722,57 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
             assertThat(historicProcessInstance.getStartUserId()).isEqualTo("kermit");
         }
 
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testGetProcessInstancesByActiveActivityId() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        
+        // check that the right process is returned with no variables
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask";
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ {"
+                        + "   id: '" + processInstance.getId() + "',"
+                        + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                        + "} ]"
+                        + "}");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask2";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: []"
+                        + "}");
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?activeActivityId=processTask2";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+        .when(Option.IGNORING_EXTRA_FIELDS)
+        .isEqualTo("{"
+                + "data: [ {"
+                + "   id: '" + processInstance.getId() + "',"
+                + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
+                + "} ]"
+                + "}");
     }
 }

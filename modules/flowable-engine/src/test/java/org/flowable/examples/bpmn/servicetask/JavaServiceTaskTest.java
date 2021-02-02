@@ -188,7 +188,6 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
         // Check if business-key was available from the process
         String key = (String) runtimeService.getVariable(processInstance.getId(), "businessKeySetOnExecution");
-        assertThat(key).isNotNull();
         assertThat(key).isEqualTo("1234567890");
     }
 

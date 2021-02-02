@@ -39,10 +39,12 @@
   <!-- GROUP UPDATE -->
   
   <update id="updateGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
-    update ${prefix}ACT_ID_GROUP set
+    update ${prefix}ACT_ID_GROUP
+    <set>
       REV_ = #{revisionNext ,jdbcType=INTEGER},
       NAME_ = #{name ,jdbcType=VARCHAR},
-      TYPE_ = #{type ,jdbcType=VARCHAR}
+      TYPE_ = #{type ,jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id}
        and REV_ = #{revision}
   </update>

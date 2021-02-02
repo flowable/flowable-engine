@@ -64,20 +64,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
-            HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create();
-            historicCaseInstanceEntity.setId(caseInstanceEntity.getId());
-            historicCaseInstanceEntity.setName(caseInstanceEntity.getName());
-            historicCaseInstanceEntity.setBusinessKey(caseInstanceEntity.getBusinessKey());
-            historicCaseInstanceEntity.setParentId(caseInstanceEntity.getParentId());
-            historicCaseInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
-            historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
-            historicCaseInstanceEntity.setStartUserId(caseInstanceEntity.getStartUserId());
-            historicCaseInstanceEntity.setStartTime(caseInstanceEntity.getStartTime());
-            historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
-            historicCaseInstanceEntity.setCallbackId(caseInstanceEntity.getCallbackId());
-            historicCaseInstanceEntity.setCallbackType(caseInstanceEntity.getCallbackType());
-            historicCaseInstanceEntity.setReferenceId(caseInstanceEntity.getReferenceId());
-            historicCaseInstanceEntity.setReferenceType(caseInstanceEntity.getReferenceType());
+            HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create(caseInstanceEntity);
             historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
         }
     }
@@ -242,26 +229,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     public void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
-            HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create();
-            historicPlanItemInstanceEntity.setId(planItemInstanceEntity.getId());
-            historicPlanItemInstanceEntity.setName(planItemInstanceEntity.getName());
-            historicPlanItemInstanceEntity.setState(planItemInstanceEntity.getState());
-            historicPlanItemInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-            historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(planItemInstanceEntity.getDerivedCaseDefinitionId());
-            historicPlanItemInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
-            historicPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getStageInstanceId());
-            historicPlanItemInstanceEntity.setStage(planItemInstanceEntity.isStage());
-            historicPlanItemInstanceEntity.setElementId(planItemInstanceEntity.getElementId());
-            historicPlanItemInstanceEntity.setPlanItemDefinitionId(planItemInstanceEntity.getPlanItemDefinitionId());
-            historicPlanItemInstanceEntity.setPlanItemDefinitionType(planItemInstanceEntity.getPlanItemDefinitionType());
-            historicPlanItemInstanceEntity.setStartUserId(planItemInstanceEntity.getStartUserId());
-            historicPlanItemInstanceEntity.setReferenceId(planItemInstanceEntity.getReferenceId());
-            historicPlanItemInstanceEntity.setReferenceType(planItemInstanceEntity.getReferenceType());
-            historicPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
-            historicPlanItemInstanceEntity.setCreateTime(planItemInstanceEntity.getCreateTime());
-            historicPlanItemInstanceEntity.setEntryCriterionId(planItemInstanceEntity.getEntryCriterionId());
-            historicPlanItemInstanceEntity.setExitCriterionId(planItemInstanceEntity.getExitCriterionId());
-            historicPlanItemInstanceEntity.setExtraValue(planItemInstanceEntity.getExtraValue());
+            HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create(planItemInstanceEntity);
             historicPlanItemInstanceEntity.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
             
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
@@ -309,6 +277,10 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             h -> {
                 h.setLastStartedTime(planItemInstanceEntity.getLastStartedTime());
                 h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
+
+                // Can be updated when the plan item instance starts
+                h.setReferenceId(planItemInstanceEntity.getReferenceId());
+                h.setReferenceType(planItemInstanceEntity.getReferenceType());
             });
     }
 
@@ -423,7 +395,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         }
     }
     
-    protected boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
+    public boolean evaluateShowInOverview(PlanItemInstanceEntity planItemInstanceEntity) {
         boolean showInOverview = false;
         
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();

@@ -1268,6 +1268,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(11);
         assertThat(query.list()).hasSize(11);
     }
+    
+    @Test
+    public void testQueryByAssigned() {
+        TaskQuery query = taskService.createTaskQuery().taskAssigned();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).hasSize(1);
+    }
+
+    @Test
+    public void testQueryByAssignedOr() {
+        TaskQuery query = taskService.createTaskQuery().or().taskId("invalid").taskAssigned();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.list()).hasSize(1);
+    }
 
     @Test
     public void testQueryByCandidateUser() {
@@ -3085,13 +3099,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         // Query task, including identity links
         task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().singleResult();
         assertThat(task).isNotNull();
-        assertThat(task.getIdentityLinks()).isNotNull();
         assertThat(task.getIdentityLinks()).hasSize(1);
 
         // Query task, including identity links, process variables, and task variables
         task = taskService.createTaskQuery().taskId(task.getId()).includeIdentityLinks().includeProcessVariables().includeTaskLocalVariables().singleResult();
         assertThat(task).isNotNull();
-        assertThat(task.getIdentityLinks()).isNotNull();
         assertThat(task.getIdentityLinks()).hasSize(1);
         IdentityLinkInfo identityLink = task.getIdentityLinks().get(0);
         assertThat(identityLink.getProcessInstanceId()).isNull();

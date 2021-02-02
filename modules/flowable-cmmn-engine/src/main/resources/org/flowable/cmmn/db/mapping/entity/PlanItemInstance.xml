@@ -244,7 +244,7 @@
             SENTRY_PART_INST_COUNT_ = #{sentryPartInstanceCount, jdbcType=INTEGER},
         </if>
         <if test="originalPersistentState.tenantId != tenantId">
-            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
         </if>
     </set>
     where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
@@ -321,6 +321,11 @@
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
       where CASE_INST_ID_ = #{parameter.caseInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
   </select>
+
+    <select id="selectPlanItemInstancesByStageInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+        where STAGE_INST_ID_ = #{parameter.stageInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
+    </select>
 
   <select id="selectPlanItemInstancesByStagePlanItemInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES

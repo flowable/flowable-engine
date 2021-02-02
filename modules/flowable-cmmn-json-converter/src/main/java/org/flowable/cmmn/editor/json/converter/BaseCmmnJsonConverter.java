@@ -13,6 +13,7 @@
 package org.flowable.cmmn.editor.json.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import org.flowable.cmmn.model.ExtensionAttribute;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -41,6 +43,8 @@ import org.flowable.cmmn.model.RequiredRule;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.cmmn.model.VariableAggregationDefinitions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +169,8 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (!RepetitionRule.DEFAULT_REPETITION_COUNTER_VARIABLE_NAME.equals(repetitionRule.getRepetitionCounterVariableName())) {
                 propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
             }
+
+            convertVariableAggregationDefinitionsToJson(repetitionRule.getAggregations(), propertiesNode);
         }
         
         ManualActivationRule manualActivationRule = planItem.getItemControl().getManualActivationRule();
@@ -191,6 +197,46 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             
             if (StringUtils.isNotEmpty(completionNeutralRule.getCondition())) {
                 propertiesNode.put(PROPERTY_COMPLETION_NEUTRAL_RULE_CONDITION, completionNeutralRule.getCondition());
+            }
+        }
+    }
+
+    protected void convertVariableAggregationDefinitionsToJson(VariableAggregationDefinitions aggregations, ObjectNode propertiesNode) {
+        if (aggregations == null) {
+            propertiesNode.putNull(PROPERTY_REPETITION_VARIABLE_AGGREGATIONS);
+            return;
+        }
+
+        ObjectNode aggregationsNode = propertiesNode.putObject(PROPERTY_REPETITION_VARIABLE_AGGREGATIONS);
+
+
+        Collection<VariableAggregationDefinition> aggregationsCollection = aggregations.getAggregations();
+        ArrayNode itemsArray = aggregationsNode.putArray("aggregations");
+        for (VariableAggregationDefinition aggregation : aggregationsCollection) {
+            ObjectNode aggregationNode = itemsArray.addObject();
+
+            aggregationNode.put("target", aggregation.getTarget());
+            aggregationNode.put("targetExpression", aggregation.getTarget());
+
+            String implementationType = aggregation.getImplementationType();
+            if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(implementationType)) {
+                aggregationNode.put("delegateExpression", aggregation.getImplementation());
+            } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType)) {
+                aggregationNode.put("class", aggregation.getImplementation());
+            }
+
+            aggregationNode.put("storeAsTransient", aggregation.isStoreAsTransientVariable());
+            aggregationNode.put("createOverview", aggregation.isCreateOverviewVariable());
+
+            ArrayNode definitionsArray = aggregationNode.putArray("definitions");
+
+            for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+                ObjectNode definitionNode = definitionsArray.addObject();
+
+                definitionNode.put("source", definition.getSource());
+                definitionNode.put("sourceExpression", definition.getSourceExpression());
+                definitionNode.put("target", definition.getTarget());
+                definitionNode.put("targetExpression", definition.getTargetExpression());
             }
         }
     }
@@ -281,12 +327,68 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
                 repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
             }
+
+            repetitionRule.setAggregations(convertJsonToVariableAggregationDefinitions(CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_REPETITION_VARIABLE_AGGREGATIONS, elementNode)));
             
             if (planItem.getItemControl() == null) {
                 planItem.setItemControl(new PlanItemControl());
             }
             planItem.getItemControl().setRepetitionRule(repetitionRule);
         }
+    }
+
+    protected VariableAggregationDefinitions convertJsonToVariableAggregationDefinitions(JsonNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        JsonNode aggregationsNode = node.path("aggregations");
+        if (aggregationsNode.size() < 0) {
+            return null;
+        }
+
+        VariableAggregationDefinitions aggregations = new VariableAggregationDefinitions();
+
+        for (JsonNode aggregationNode : aggregationsNode) {
+            VariableAggregationDefinition aggregation = new VariableAggregationDefinition();
+
+            aggregation.setTarget(StringUtils.defaultIfBlank(aggregationNode.path("target").asText(null), null));
+            aggregation.setTargetExpression(StringUtils.defaultIfBlank(aggregationNode.path("targetExpression").asText(null), null));
+
+            String delegateExpression = aggregationNode.path("delegateExpression").asText(null);
+            String customClass = aggregationNode.path("class").asText(null);
+            if (StringUtils.isNotBlank(delegateExpression)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                aggregation.setImplementation(delegateExpression);
+            } else if (StringUtils.isNotBlank(customClass)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+                aggregation.setImplementation(aggregationNode.path("class").asText(null));
+            }
+
+            if (aggregationNode.path("storeAsTransient").asBoolean(false)) {
+                aggregation.setStoreAsTransientVariable(true);
+            }
+
+            if (aggregationNode.path("createOverview").asBoolean(false)) {
+                aggregation.setCreateOverviewVariable(true);
+            }
+
+            for (JsonNode definitionNode : aggregationNode.path("definitions")) {
+                VariableAggregationDefinition.Variable definition = new VariableAggregationDefinition.Variable();
+
+                definition.setSource(StringUtils.defaultIfBlank(definitionNode.path("source").asText(null), null));
+                definition.setSourceExpression(StringUtils.defaultIfBlank(definitionNode.path("sourceExpression").asText(null), null));
+                definition.setTarget(StringUtils.defaultIfBlank(definitionNode.path("target").asText(null), null));
+                definition.setTargetExpression(StringUtils.defaultIfBlank(definitionNode.path("targetExpression").asText(null), null));
+
+                aggregation.addDefinition(definition);
+            }
+
+            aggregations.getAggregations().add(aggregation);
+        }
+
+        return aggregations;
+
     }
 
     protected void handleManualActivationRule(JsonNode elementNode, PlanItem planItem) {

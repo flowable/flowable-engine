@@ -12,15 +12,24 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
@@ -29,6 +38,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,6 +264,55 @@ public class AsyncExecutorTest {
         }
     }
 
+    @Test
+    public void testJobRejectionOnQueueFull() {
+        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+        processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-AsyncExecutorTest;DB_CLOSE_DELAY=1000");
+        processEngineConfiguration.setDatabaseSchemaUpdate("true");
+        processEngineConfiguration.setAsyncExecutorActivate(true);
+
+        // Important for this test
+        processEngineConfiguration.setAsyncExecutorCorePoolSize(1);
+        processEngineConfiguration.setAsyncExecutorMaxPoolSize(1);
+        processEngineConfiguration.setAsyncExecutorThreadPoolQueueSize(1);
+
+        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+
+        processEngine.getProcessEngineConfiguration().getEventDispatcher().addEventListener(new TestRejectionEventListener(), FlowableEngineEventType.JOB_REJECTED);
+
+        // 3 starts:
+        // 1) 1 thread available -> 1 thread blocked
+        // 2) no thread available -> take 1 spot in queue
+        // 3) no thread + queue spot available -> rejected
+        int nrOfProcesses = 3;
+
+        try {
+            deploy(processEngine, "AsyncExecutorTest.testAsyncJobRejection.bpmn20.xml");
+
+            assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(0);
+            for (int i = 0; i < nrOfProcesses; i++) {
+                processEngine.getRuntimeService().startProcessInstanceByKey("testRejection");
+            }
+            assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(1);
+
+        } catch(Exception e)  {
+            Assert.fail("Unexpected exception: " + e.getMessage());
+            throw e;
+        } finally {
+
+            TestBlockingJavaDelegate.SEMAPHORE.release(nrOfProcesses);
+
+            // 2 blocked jobs should be processed and end the process instance
+            // other job should have been changed to a timer job
+            await().atMost(Duration.of(10, SECONDS)).until(() -> processEngine.getRuntimeService().createProcessInstanceQuery().count() == 1);
+            assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(1);
+
+            if (processEngine != null) {
+                cleanup(processEngine);
+            }
+        }
+    }
+
     // Helpers ////////////////////////////////////////////////////////
 
     private ProcessEngine createProcessEngine(boolean enableAsyncExecutor) {
@@ -348,6 +407,42 @@ public class AsyncExecutorTest {
             this.counter = counter;
         }
 
+    }
+
+    public static final class TestBlockingJavaDelegate implements JavaDelegate {
+
+        public static Semaphore SEMAPHORE = new Semaphore(0);
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            try {
+                SEMAPHORE.acquire();
+            } catch (InterruptedException e) {
+                throw new FlowableException("Couldn't acquire semaphore", e);
+            }
+        }
+    }
+
+    public static final class TestRejectionEventListener implements FlowableEventListener {
+
+        public static AtomicInteger COUNTER = new AtomicInteger(0);
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            COUNTER.incrementAndGet();
+        }
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
+        @Override
+        public boolean isFireOnTransactionLifecycleEvent() {
+            return false;
+        }
+        @Override
+        public String getOnTransaction() {
+            return null;
+        }
     }
 
 }

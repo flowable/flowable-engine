@@ -52,6 +52,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format="date-time", value = "Return only historic case instances that were started after this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic case instances that were started before this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic case instances that were started by this user.", paramType = "query"),
+            @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return historic case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "An indication if the historic case instance variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.\n", paramType = "query"),
@@ -102,6 +103,10 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("startedBefore") != null) {
             queryRequest.setStartedBefore(RequestUtil.getDate(allRequestParams, "startedBefore"));
+        }
+        
+        if (allRequestParams.containsKey("activePlanItemDefinitionId")) {
+            queryRequest.setActivePlanItemDefinitionId(allRequestParams.get("activePlanItemDefinitionId"));
         }
 
         if (allRequestParams.get("startedBy") != null) {

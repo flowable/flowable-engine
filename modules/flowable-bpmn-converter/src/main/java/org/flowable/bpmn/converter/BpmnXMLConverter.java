@@ -429,7 +429,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 } else {
 
                     if (!activeSubProcessList.isEmpty() && ELEMENT_MULTIINSTANCE.equalsIgnoreCase(xtr.getLocalName())) {
-
                         multiInstanceParser.parseChildElement(xtr, activeSubProcessList.get(activeSubProcessList.size() - 1), model);
 
                     } else if (convertersToBpmnMap.containsKey(xtr.getLocalName())) {
@@ -487,7 +486,8 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             } else if (flowElement instanceof SubProcess) {
                 SubProcess subProcess = (SubProcess) flowElement;
-                processFlowElements(subProcess.getFlowElements(), subProcess);
+                Collection<FlowElement> childFlowElements = subProcess.getFlowElements();
+                processFlowElements(childFlowElements, subProcess);
             }
         }
     }

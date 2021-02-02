@@ -29,10 +29,12 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -92,8 +94,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseDefinitionId=" + caseInstance.getCaseDefinitionId(), 2, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseDefinitionkey=myCase", 3, task.getId());
-            assertResultsPresentInDataResponse(url + "?caseDefinitionkeyLike=%Case", 3, task.getId());
-            assertResultsPresentInDataResponse(url + "?caseDefinitionKeyLikeIgnoreCase=%case", 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionkeyLike=" + encode("%Case"), 3, task.getId());
+            assertResultsPresentInDataResponse(url + "?caseDefinitionKeyLikeIgnoreCase=" + encode("%case"), 3, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance2.getId(), 1, task2.getId());
 
@@ -158,6 +160,46 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         taskService.claim(task.getId(), "johnDoe");
         assertEmptyResultsPresentInDataResponse(url + "?taskCandidateGroup=test");
         assertResultsPresentInDataResponse(url + "?taskCandidateGroup=test&ignoreTaskAssignee=true", 1, task.getId());
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PropagatedStageInstanceId.cmmn" })
+    public void testQueryWithPropagatedStageId() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("propagatedStageInstanceId").start();
+        HistoricTaskInstance task1 = historyService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        PlanItemInstance stageInstanceId1 = runtimeService.createPlanItemInstanceQuery()
+            .onlyStages()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionId("expandedStage2")
+            .singleResult();
+        assertThat(stageInstanceId1).isNotNull();
+
+        taskService.complete(task1.getId());
+        HistoricTaskInstance task2 = historyService.createHistoricTaskInstanceQuery()
+            .caseInstanceId(caseInstance.getId())
+            .unfinished()
+            .singleResult();
+
+        PlanItemInstance stageInstanceId2 = runtimeService.createPlanItemInstanceQuery()
+            .onlyStages()
+            .caseInstanceId(caseInstance.getId())
+            .planItemDefinitionId("expandedStage3")
+            .singleResult();
+        assertThat(stageInstanceId2).isNotNull();
+
+        taskService.complete(task2.getId());
+        assertCaseEnded(caseInstance.getId());
+
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES) + "?propagatedStageInstanceId=wrong";
+        assertEmptyResultsPresentInDataResponse(url);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES) + "?propagatedStageInstanceId=" + stageInstanceId1.getId();
+        assertResultsPresentInDataResponse(url, task1.getId());
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCES) + "?propagatedStageInstanceId=" + stageInstanceId2.getId();
+        assertResultsPresentInDataResponse(url, task2.getId());
+
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds)

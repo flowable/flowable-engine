@@ -68,7 +68,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
-    public void testDeleteHistoricInstances() {
+    public void testDeleteHistoricInstancesWithFinishedBefore() {
         List<String> caseInstanceIds = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
@@ -115,6 +115,40 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
                             .isEqualTo(1);
                 }
             }
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
+    public void testDeleteHistoricInstances() {
+        List<String> caseInstanceIds = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+            caseInstanceIds.add(caseInstance.getId());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
+        }
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(20);
+
+        }
+
+        for (int i = 0; i < 10; i++) {
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
+            cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+            cmmnTaskService.complete(task.getId());
+        }
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
+            HistoricCaseInstanceQuery query = cmmnHistoryService.createHistoricCaseInstanceQuery();
+            query.activePlanItemDefinitionId("noneexisting");
+            query.deleteWithRelatedData();
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isEqualTo(20);
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(40);
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(20);
         }
     }
 }

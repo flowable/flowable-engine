@@ -75,6 +75,18 @@
             "TITLE": "任务应用程序",
             "DESCRIPTION": " 访问您的完成任务列表, 并处理从任何流程应用程序分配给您的任何任务。此外, 启动新的进程和任务。"
         },
+        "ADMIN": {
+            "TITLE": "管理员应用程式",
+            "DESCRIPTION": "访问Flowable Admin应用程序。"
+        },
+        "IDM": {
+            "TITLE": "身份管理应用程序",
+            "DESCRIPTION": "访问中心位置以定义用户，组和特权。"
+        },
+        "MODELER": {
+            "TITLE": "建模器应用程序",
+            "DESCRIPTION": "访问中心位置以对BPMN流程，DMN决策表，表单定义进行建模并创建应用程序定义。"
+        },
         "IDENTITY-MANAGEMENT": {
             "TITLE": "身份管理",
             "TITLE-TENANT-ADMIN": "身份管理",

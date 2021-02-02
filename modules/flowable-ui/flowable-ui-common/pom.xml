@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-ui-parent</artifactId>
-    <version>6.6.0-SNAPSHOT</version>
+    <version>6.6.1-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -151,10 +151,6 @@
     </dependency>
 
     <!-- Json -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-json-org</artifactId>
-    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>

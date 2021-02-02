@@ -223,6 +223,8 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("kermi%").count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%ermi%").count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigneeLike("%johndoe%").count()).isZero();
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskAssigned().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskUnassigned().count()).isZero();
 
         // Delete reason
         assertThat(historyService.createHistoricTaskInstanceQuery().taskDeleteReason("deleted").count()).isZero();
@@ -633,6 +635,8 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssignee("johndoe").endOr().count()).isZero();
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%ermit").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssigneeLike("%johndoe%").endOr().count()).isZero();
+        assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssigned().endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricTaskInstanceQuery().or().taskUnassigned().endOr().count()).isZero();
 
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssignee("kermit").endOr().or().taskAssigneeLike("%ermit").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().or().taskAssignee("kermit").endOr().or().taskAssigneeLike("%johndoe%").endOr().count()).isZero();

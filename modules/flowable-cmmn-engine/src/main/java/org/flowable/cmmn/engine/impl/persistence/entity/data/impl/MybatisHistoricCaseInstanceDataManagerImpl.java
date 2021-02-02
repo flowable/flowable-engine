@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -45,6 +46,11 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         return new HistoricCaseInstanceEntityImpl();
     }
     
+    @Override
+    public HistoricCaseInstanceEntity create(CaseInstance caseInstance) {
+        return new HistoricCaseInstanceEntityImpl(caseInstance);
+    }
+
     @Override
     public List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
         return getList("selectHistoricCaseInstancesByCaseDefinitionId", caseDefinitionId, historicCaseInstanceByCaseDefinitionIdMatcher, true);

@@ -45,6 +45,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);
     CaseInstanceQuery caseInstanceWithoutTenantId();
+    
+    /**
+     * Select the case instances with an active plan item definition id equal to the provided definition id.
+     */
+    CaseInstanceQuery activePlanItemDefinitionId(String planItemDefinitionId);
+    
+    /**
+     * Select the case instances with an active plan item definition id equal to one of the provided definition ids.
+     */
+    CaseInstanceQuery activePlanItemDefinitionIds(Set<String> planItemDefinitionIds);
 
     /**
      * Select the case instances with which the user with the given id is involved.

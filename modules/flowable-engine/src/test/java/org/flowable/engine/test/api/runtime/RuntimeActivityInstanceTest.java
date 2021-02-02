@@ -397,8 +397,6 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         List<ActivityInstance> activityInstance = runtimeService.createActivityInstanceQuery().activityId("join").processInstanceId(processInstance.getId())
                 .list();
 
-        assertThat(activityInstance).isNotNull();
-
         // History contains 2 entries for parallel join (one for each path
         // arriving in the join), should contain end-time
         assertThat(activityInstance).hasSize(2);

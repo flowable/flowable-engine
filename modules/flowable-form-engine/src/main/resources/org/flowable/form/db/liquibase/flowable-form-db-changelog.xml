@@ -122,4 +122,17 @@
 
     </changeSet>
 
+    <changeSet id="6" author="flowable">
+        <createIndex tableName="ACT_FO_FORM_INSTANCE" indexName="ACT_IDX_FORM_TASK">
+            <column name="TASK_ID_" />
+        </createIndex>
+        <createIndex tableName="ACT_FO_FORM_INSTANCE" indexName="ACT_IDX_FORM_PROC">
+            <column name="PROC_INST_ID_" />
+        </createIndex>
+        <createIndex tableName="ACT_FO_FORM_INSTANCE" indexName="ACT_IDX_FORM_SCOPE">
+            <column name="SCOPE_ID_" />
+            <column name="SCOPE_TYPE_" />
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

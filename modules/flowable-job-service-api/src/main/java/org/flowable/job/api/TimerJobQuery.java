@@ -131,6 +131,11 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     TimerJobQuery orderByJobDuedate();
 
     /**
+     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    TimerJobQuery orderByJobCreateTime();
+
+    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     TimerJobQuery orderByJobRetries();

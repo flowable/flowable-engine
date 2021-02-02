@@ -79,7 +79,7 @@ public class JobEntityManagerImpl
 
     @Override
     public void delete(JobEntity jobEntity) {
-        super.delete(jobEntity, false);
+        delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());

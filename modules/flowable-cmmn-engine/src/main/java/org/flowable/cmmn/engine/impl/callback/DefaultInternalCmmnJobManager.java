@@ -84,7 +84,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
 
         caseInstanceEntityManager.updateLockTime(job.getScopeId(), lockOwner, lockExpirationTime);
         
-        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled() && job.getSubScopeId() != null) {
             PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
             if (planItemInstanceEntity != null) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Locking job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),

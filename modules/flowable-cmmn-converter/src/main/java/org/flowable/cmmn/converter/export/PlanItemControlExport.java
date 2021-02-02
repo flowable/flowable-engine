@@ -17,17 +17,21 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.cmmn.model.VariableAggregationDefinitions;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  * @author Micha Kiener
+ * @author Filip Hrisafov
  */
 public class PlanItemControlExport implements CmmnXmlConstants {
 
@@ -95,6 +99,13 @@ public class PlanItemControlExport implements CmmnXmlConstants {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                     ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME, repetitionRule.getElementIndexVariableName());
             }
+
+            boolean hasWrittenExtensionElements = writeVariableAggregations(repetitionRule.getAggregations(), xtw);
+
+            if (hasWrittenExtensionElements) {
+                xtw.writeEndElement();
+            }
+
             if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
                 xtw.writeStartElement(ELEMENT_CONDITION);
                 xtw.writeCData(repetitionRule.getCondition());
@@ -102,6 +113,50 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             }
             xtw.writeEndElement();
         }
+    }
+
+    protected static boolean writeVariableAggregations(VariableAggregationDefinitions aggregationDefinitions, XMLStreamWriter xtw) throws XMLStreamException {
+        boolean hasWrittenExtensionElements = false;
+        if (aggregationDefinitions != null) {
+            xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+            hasWrittenExtensionElements = true;
+
+            for (VariableAggregationDefinition aggregation : aggregationDefinitions.getAggregations()) {
+                // start variable aggregation element
+                xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_VARIABLE_AGGREGATION);
+
+
+                CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, aggregation.getTarget(), xtw);
+                CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, aggregation.getTargetExpression(), xtw);
+                if (aggregation.isStoreAsTransientVariable()) {
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE, "true", xtw);
+                }
+                if (aggregation.isCreateOverviewVariable()) {
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW, "true", xtw);
+                }
+                if (StringUtils.isNotEmpty(aggregation.getImplementationType())) {
+                    CmmnXmlUtil.writeDefaultAttribute(aggregation.getImplementationType(), aggregation.getImplementation(), xtw);
+                }
+
+                for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+                    // start variable element
+                    xtw.writeStartElement(ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE);
+
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, definition.getSource(), xtw);
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, definition.getSourceExpression(), xtw);
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, definition.getTarget(), xtw);
+                    CmmnXmlUtil.writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, definition.getTargetExpression(), xtw);
+
+                    // end variable element
+                    xtw.writeEndElement();
+                }
+
+                // end variable aggregation element
+                xtw.writeEndElement();
+            }
+        }
+
+        return hasWrittenExtensionElements;
     }
 
     public static void writeManualActivationRule(ManualActivationRule manualActivationRule, XMLStreamWriter xtw) throws XMLStreamException {

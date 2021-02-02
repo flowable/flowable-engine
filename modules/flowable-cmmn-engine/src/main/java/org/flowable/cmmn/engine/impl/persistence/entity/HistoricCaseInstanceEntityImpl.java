@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
@@ -50,6 +51,33 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     protected String caseDefinitionName;
     protected Integer caseDefinitionVersion;
     protected String caseDefinitionDeploymentId;
+
+    public HistoricCaseInstanceEntityImpl() {
+
+    }
+
+    public HistoricCaseInstanceEntityImpl(CaseInstance caseInstance) {
+        this.id = caseInstance.getId();
+        this.businessKey = caseInstance.getBusinessKey();
+        this.name = caseInstance.getName();
+        this.parentId = caseInstance.getParentId();
+        this.caseDefinitionId = caseInstance.getCaseDefinitionId();
+        this.caseDefinitionKey = caseInstance.getCaseDefinitionKey();
+        this.caseDefinitionName = caseInstance.getCaseDefinitionName();
+        this.caseDefinitionVersion = caseInstance.getCaseDefinitionVersion();
+        this.caseDefinitionDeploymentId = caseInstance.getCaseDefinitionDeploymentId();
+        this.state = caseInstance.getState();
+        this.startTime = caseInstance.getStartTime();
+        this.startUserId = caseInstance.getStartUserId();
+        this.callbackId = caseInstance.getCallbackId();
+        this.callbackType = caseInstance.getCallbackType();
+        this.referenceId = caseInstance.getReferenceId();
+        this.referenceType = caseInstance.getReferenceType();
+
+        if (caseInstance.getTenantId() != null) {
+            this.tenantId = caseInstance.getTenantId();
+        }
+    }
 
     @Override
     public Object getPersistentState() {

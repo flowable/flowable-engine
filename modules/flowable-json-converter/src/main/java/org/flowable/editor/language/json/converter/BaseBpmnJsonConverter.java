@@ -13,6 +13,7 @@
 package org.flowable.editor.language.json.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ import org.flowable.bpmn.model.FormValue;
 import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Lane;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -57,6 +59,8 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TerminateEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.VariableAggregationDefinition;
+import org.flowable.bpmn.model.VariableAggregationDefinitions;
 import org.flowable.editor.constants.EditorJsonConstants;
 import org.flowable.editor.constants.StencilConstants;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -199,6 +203,8 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     if (StringUtils.isNotEmpty(loopDef.getElementIndexVariable())) {
                         propertiesNode.put(PROPERTY_MULTIINSTANCE_INDEX_VARIABLE, loopDef.getElementIndexVariable());
                     }
+
+                    processVariableAggregationDefinitions(loopDef.getAggregations(), propertiesNode);
                 }
             }
 
@@ -250,6 +256,47 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
         flowElementNode.set("outgoing", outgoingArrayNode);
     }
+
+    protected void processVariableAggregationDefinitions(VariableAggregationDefinitions aggregations, ObjectNode propertiesNode) {
+        if (aggregations == null) {
+            propertiesNode.putNull(PROPERTY_MULTIINSTANCE_VARIABLE_AGGREGATIONS);
+            return;
+        }
+
+        ObjectNode aggregationsNode = propertiesNode.putObject(PROPERTY_MULTIINSTANCE_VARIABLE_AGGREGATIONS);
+
+
+        Collection<VariableAggregationDefinition> aggregationsCollection = aggregations.getAggregations();
+        ArrayNode itemsArray = aggregationsNode.putArray("aggregations");
+        for (VariableAggregationDefinition aggregation : aggregationsCollection) {
+            ObjectNode aggregationNode = itemsArray.addObject();
+
+            aggregationNode.put("target", aggregation.getTarget());
+            aggregationNode.put("targetExpression", aggregation.getTarget());
+
+            String implementationType = aggregation.getImplementationType();
+            if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(implementationType)) {
+                aggregationNode.put("delegateExpression", aggregation.getImplementation());
+            } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType)) {
+                aggregationNode.put("class", aggregation.getImplementation());
+            }
+
+            aggregationNode.put("storeAsTransient", aggregation.isStoreAsTransientVariable());
+            aggregationNode.put("createOverview", aggregation.isCreateOverviewVariable());
+
+            ArrayNode definitionsArray = aggregationNode.putArray("definitions");
+
+            for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+                ObjectNode definitionNode = definitionsArray.addObject();
+
+                definitionNode.put("source", definition.getSource());
+                definitionNode.put("sourceExpression", definition.getSourceExpression());
+                definitionNode.put("target", definition.getTarget());
+                definitionNode.put("targetExpression", definition.getTargetExpression());
+            }
+        }
+    }
+
 
     protected void processDataStoreReferences(FlowElementsContainer container, String dataStoreReferenceId, ArrayNode outgoingArrayNode) {
         for (FlowElement flowElement : container.getFlowElements()) {
@@ -359,6 +406,9 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                     multiInstanceObject.setElementVariable(multiInstanceVariable);
                     multiInstanceObject.setCompletionCondition(multiInstanceCondition);
                     multiInstanceObject.setElementIndexVariable(multiInstanceIndexVariable);
+
+                    multiInstanceObject.setAggregations(convertJsonToVariableAggregationDefinitions(getProperty(PROPERTY_MULTIINSTANCE_VARIABLE_AGGREGATIONS, elementNode)));
+
                     activity.setLoopCharacteristics(multiInstanceObject);
                 }
 
@@ -1027,6 +1077,60 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 }
             }
         }
+    }
+
+    protected VariableAggregationDefinitions convertJsonToVariableAggregationDefinitions(JsonNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        JsonNode aggregationsNode = node.path("aggregations");
+        if (aggregationsNode.size() < 0) {
+            return null;
+        }
+
+        VariableAggregationDefinitions aggregations = new VariableAggregationDefinitions();
+
+        for (JsonNode aggregationNode : aggregationsNode) {
+            VariableAggregationDefinition aggregation = new VariableAggregationDefinition();
+
+            aggregation.setTarget(StringUtils.defaultIfBlank(aggregationNode.path("target").asText(null), null));
+            aggregation.setTargetExpression(StringUtils.defaultIfBlank(aggregationNode.path("targetExpression").asText(null), null));
+
+            String delegateExpression = aggregationNode.path("delegateExpression").asText(null);
+            String customClass = aggregationNode.path("class").asText(null);
+            if (StringUtils.isNotBlank(delegateExpression)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                aggregation.setImplementation(delegateExpression);
+            } else if (StringUtils.isNotBlank(customClass)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+                aggregation.setImplementation(aggregationNode.path("class").asText(null));
+            }
+
+            if (aggregationNode.path("storeAsTransient").asBoolean(false)) {
+                aggregation.setStoreAsTransientVariable(true);
+            }
+
+            if (aggregationNode.path("createOverview").asBoolean(false)) {
+                aggregation.setCreateOverviewVariable(true);
+            }
+
+            for (JsonNode definitionNode : aggregationNode.path("definitions")) {
+                VariableAggregationDefinition.Variable definition = new VariableAggregationDefinition.Variable();
+
+                definition.setSource(StringUtils.defaultIfBlank(definitionNode.path("source").asText(null), null));
+                definition.setSourceExpression(StringUtils.defaultIfBlank(definitionNode.path("sourceExpression").asText(null), null));
+                definition.setTarget(StringUtils.defaultIfBlank(definitionNode.path("target").asText(null), null));
+                definition.setTargetExpression(StringUtils.defaultIfBlank(definitionNode.path("targetExpression").asText(null), null));
+
+                aggregation.addDefinition(definition);
+            }
+
+            aggregations.getAggregations().add(aggregation);
+        }
+
+        return aggregations;
+
     }
     
     protected void convertJsonToConditionalDefinition(JsonNode objectNode, Event event) {

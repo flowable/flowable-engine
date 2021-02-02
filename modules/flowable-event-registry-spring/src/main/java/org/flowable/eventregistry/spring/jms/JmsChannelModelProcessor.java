@@ -31,6 +31,10 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.EmbeddedValueResolver;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerEndpoint;
 import org.springframework.jms.config.JmsListenerEndpointRegistry;
@@ -45,7 +49,7 @@ import org.springframework.util.StringValueResolver;
 /**
  * @author Filip Hrisafov
  */
-public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelProcessor {
+public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent>, ChannelModelProcessor {
     
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.jms.ChannelJmsListenerEndpointContainer#";
 
@@ -63,6 +67,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
     protected JmsListenerContainerFactory<?> containerFactory;
 
     protected BeanFactory beanFactory;
+    protected ApplicationContext applicationContext;
+    protected boolean contextRefreshed;
 
     protected StringValueResolver embeddedValueResolver;
 
@@ -172,7 +178,14 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
         Assert.hasText(endpoint.getId(), "Endpoint id must be set");
 
         Assert.state(this.endpointRegistry != null, "No JmsListenerEndpointRegistry set");
-        endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), true);
+
+        // We need to start the container immediately only if the endpoint registry is already running,
+        // otherwise we should not start it and leave it to the registry to start all the containers when it starts.
+        // If we do not do that then it is possible that @JmsListener will not be started
+        // We also need to start immediately if the application context has already been refreshed.
+        // If we don't and the endpoint has no registered containers then our endpoint will never be started.
+        boolean startImmediately = contextRefreshed || endpointRegistry.isRunning();
+        endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), startImmediately);
     }
 
     protected JmsListenerContainerFactory<?> resolveContainerFactory(JmsListenerEndpoint endpoint, JmsListenerContainerFactory<?> containerFactory) {
@@ -213,6 +226,18 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ChannelModelP
         this.beanFactory = beanFactory;
         if (beanFactory instanceof ConfigurableBeanFactory) {
             this.embeddedValueResolver = new EmbeddedValueResolver((ConfigurableBeanFactory) beanFactory);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (event.getApplicationContext() == this.applicationContext) {
+            this.contextRefreshed = true;
         }
     }
 

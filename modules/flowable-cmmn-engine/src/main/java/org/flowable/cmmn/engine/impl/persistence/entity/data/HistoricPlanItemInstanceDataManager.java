@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
@@ -23,6 +24,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
  * @author Dennis Federico
  */
 public interface HistoricPlanItemInstanceDataManager extends DataManager<HistoricPlanItemInstanceEntity> {
+
+    HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance);
 
     List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQueryImpl query);
 

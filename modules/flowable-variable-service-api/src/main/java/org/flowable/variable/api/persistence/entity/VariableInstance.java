@@ -42,6 +42,10 @@ public interface VariableInstance extends ValueFields {
 
     void setTypeName(String typeName);
 
+    default boolean isReadOnly() {
+        return false;
+    }
+
     void setTaskId(String taskId);
     
     void setScopeId(String scopeId);

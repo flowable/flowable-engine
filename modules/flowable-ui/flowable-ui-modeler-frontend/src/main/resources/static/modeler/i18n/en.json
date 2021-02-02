@@ -764,6 +764,10 @@
           "MULTIINSTANCE_TYPE" : {
             "TITLE" : "Multi-instance type",
             "DESCRIPTION" : "Repeated activity execution (parallel or sequential) can be displayed through different loop types"
+          },
+          "VARIABLE_AGGREGATIONS" : {
+            "TITLE" : "Variable aggregations (Multi-instance)",
+            "DESCRIPTION" : "Variable aggregation definition for when the multi instance completes."
           }
         },
         "MULTIINSTANCE_CARDINALITYPACKAGE" : {
@@ -1762,6 +1766,10 @@
           "REPETITIONCOUNTERVARIABLENAME": {
             "TITLE": "Repetition counter variable",
             "DESCRIPTION": "The name of the local variable which stores the instance counter of the repetition. Default value is 'repetitionCounter'."
+          },
+          "VARIABLE_AGGREGATIONS" : {
+            "TITLE" : "Repetition Variable aggregations",
+            "DESCRIPTION" : "Variable aggregation definition for when the repetitions complete."
           }
         },
         "MANUALACTIVATIONRULEPACKAGE": {
@@ -2947,6 +2955,17 @@
     "PROPERTY.EVENTCORRELATIONPARAMETERS.NOSELECTION" : "No parameter selected",
     "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP" : "Value",
     "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP.PLACEHOLDER" : "Enter a value / expression",
+
+    "PROPERTY.VARIABLE.AGGREGATIONS.CLASS" : "Class",
+    "PROPERTY.VARIABLE.AGGREGATIONS.CLASS.PLACEHOLDER" : "Enter a classname",
+    "PROPERTY.VARIABLE.AGGREGATIONS.CREATEOVERVIEW" : "Create target overview variable",
+    "PROPERTY.VARIABLE.AGGREGATIONS.DEFINITIONS.UNSELECTED" : "No variables selected",
+    "PROPERTY.VARIABLE.AGGREGATIONS.DELEGATEEXPRESSION" : "Delegate expression",
+    "PROPERTY.VARIABLE.AGGREGATIONS.DELEGATEEXPRESSION.PLACEHOLDER" : "Enter a delegate expression",
+    "PROPERTY.VARIABLE.AGGREGATIONS.EMPTY" : "No variable aggregations configured",
+    "PROPERTY.VARIABLE.AGGREGATIONS.STOREASTRANSIENT" : "Store target variable transiently",
+    "PROPERTY.VARIABLE.AGGREGATIONS.UNSELECTED" : "No variable aggregations selected",
+    "PROPERTY.VARIABLE.AGGREGATIONS.VALUE" : "{{length}} variable aggregations",
 
     "MODEL.SAVE.TITLE" : "Save model",
     "MODEL.VALIDATE.TITLE" : "Validation results",

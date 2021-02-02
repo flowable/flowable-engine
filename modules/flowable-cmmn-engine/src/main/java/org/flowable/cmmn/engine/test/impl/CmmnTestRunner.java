@@ -21,11 +21,13 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
-import org.flowable.job.api.HistoryJob;
-import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -135,28 +137,6 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
 
                     if (errors.isEmpty()) {
                         assertDatabaseEmpty(method);
-
-                        // Delete any remaining data after outputting the tables which weren't empty
-
-                        List<org.flowable.cmmn.api.repository.CmmnDeployment> cmmnDeployments = cmmnEngineConfiguration.getCmmnRepositoryService().createDeploymentQuery().list();
-                        for (org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment : cmmnDeployments) {
-                            CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, cmmnDeployment.getId());
-                        }
-
-                        List<HistoryJob> historyJobs = cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().list();
-                        for (HistoryJob historyJob : historyJobs) {
-                            cmmnEngineConfiguration.getCmmnManagementService().deleteHistoryJob(historyJob.getId());
-                        }
-
-                        List<Task> tasks = cmmnEngineConfiguration.getCmmnTaskService().createTaskQuery().list();
-                        for (Task task : tasks) {
-                            if (task.getScopeId() == null && task.getScopeType() == null
-                                    && task.getExecutionId() == null && task.getProcessInstanceId() == null) {
-                                CmmnTestHelper.deleteWithoutGeneratingHistoryJobs(cmmnEngineConfiguration,
-                                    configuration -> configuration.getCmmnTaskService().deleteTask(task.getId()));
-                            }
-                        }
-
                     }
 
                 }
@@ -189,6 +169,13 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
             }
+
+            String[] extraResources = deploymentAnnotation.extraResources();
+            if (extraResources != null && extraResources.length > 0) {
+                for (String extraResource : extraResources) {
+                    deploymentBuilder.addClasspathResource(extraResource);
+                }
+            }
             
             if (StringUtils.isNotEmpty(deploymentAnnotation.tenantId())) {
                 deploymentBuilder.tenantId(deploymentAnnotation.tenantId());
@@ -212,15 +199,25 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         }
         return className + "." + method.getName() + ".cmmn";
     }
-    
+
     protected void assertDatabaseEmpty(FrameworkMethod method) {
         EnsureCleanDbUtils.assertAndEnsureCleanDb(
-                getTestClass().getName() + "." + method.getName(),
-                LOGGER,
-                cmmnEngineConfiguration,
-                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
-                true,
-                null
+            getTestClass().getName() + "." + method.getName(),
+            LOGGER,
+            cmmnEngineConfiguration,
+            TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+            true,
+            new Command<Void>() {
+
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
+                    return null;
+                }
+            }
+
         );
     }
 

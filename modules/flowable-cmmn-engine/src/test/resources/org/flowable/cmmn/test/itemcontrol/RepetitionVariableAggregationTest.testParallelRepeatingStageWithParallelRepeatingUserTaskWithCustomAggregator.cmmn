@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" targetNamespace="http://flowable.org/cmmn">
+    <case id="repeatingStage" name="repeatingStage">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="A" definitionRef="humanTask1"/>
+            <planItem id="planItem5" definitionRef="expandedStage1">
+                <itemControl>
+                    <repetitionRule flowable:collectionVariable="myCollection" flowable:elementVariable="item" flowable:elementIndexVariable="itemIndex"
+                                    flowable:counterVariable="stageRepetitionCounter">
+                        <extensionElements>
+                            <flowable:variableAggregation target="reviews" class="org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest$CustomVariableAggregator" createOverviewVariable="true">
+                                <variable source="taskOneReviews" />
+                                <variable source="taskTwoReviews" />
+                            </flowable:variableAggregation>
+                        </extensionElements>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <humanTask id="humanTask1" name="A"/>
+            <stage id="expandedStage1">
+                <planItem id="planItem2" name="Stage task A" definitionRef="humanTask2">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
+                                        flowable:elementIndexVariable="itemIndex">
+                            <extensionElements>
+                                <flowable:variableAggregation target="taskOneReviews" createOverviewVariable="true">
+                                    <variable source="approved"/>
+                                    <variable source="description"/>
+                                    <variable sourceExpression="${stageRepetitionCounter * 10 + repetitionCounter}" target="task"/>
+                                </flowable:variableAggregation>
+                            </extensionElements>
+                        </repetitionRule>
+                    </itemControl>
+                </planItem>
+                <planItem id="planItem3" name="Stage task B" definitionRef="humanTask3">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter" flowable:collectionVariable="myCollection" flowable:elementVariable="item"
+                                        flowable:elementIndexVariable="itemIndex">
+                            <extensionElements>
+                                <flowable:variableAggregation target="taskTwoReviews" createOverviewVariable="true">
+                                    <variable sourceExpression="${vars:getOrDefault(myScore, 0) * 2}" target="score"/>
+                                </flowable:variableAggregation>
+                            </extensionElements>
+                        </repetitionRule>
+                    </itemControl>
+                </planItem>
+                <humanTask id="humanTask2" name="Stage task A" flowable:priority="${stageRepetitionCounter * 10 + repetitionCounter}"/>
+                <humanTask id="humanTask3" name="Stage task B" flowable:priority="${stageRepetitionCounter * 10 + repetitionCounter}"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

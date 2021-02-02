@@ -301,6 +301,10 @@ public class TaskBaseResource {
             taskQuery.scopeType(request.getScopeType());
         }
 
+        if (request.getPropagatedStageInstanceId() != null) {
+            taskQuery.propagatedStageInstanceId(request.getPropagatedStageInstanceId());
+        }
+
         if (request.getTenantId() != null) {
             taskQuery.taskTenantId(request.getTenantId());
         }

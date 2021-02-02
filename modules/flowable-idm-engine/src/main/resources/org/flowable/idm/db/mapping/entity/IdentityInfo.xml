@@ -51,9 +51,11 @@
   <!-- INFO UPDATE -->
   <update id="updateIdentityInfo" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityImpl">
     update ${prefix}ACT_ID_INFO 
-    set REV_ = #{revisionNext ,jdbcType=INTEGER},
+    <set>
+        REV_ = #{revisionNext ,jdbcType=INTEGER},
         VALUE_ = #{value ,jdbcType=VARCHAR},
-        PASSWORD_ = #{passwordBytes ,jdbcType=${blobType}}
+        PASSWORD_ = #{passwordBytes ,jdbcType=${blobType}},
+    </set>
     where ID_ = #{id}
       and REV_ = #{revision}
   </update>

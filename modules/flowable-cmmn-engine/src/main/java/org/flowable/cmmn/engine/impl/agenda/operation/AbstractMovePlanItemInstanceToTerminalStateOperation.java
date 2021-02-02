@@ -12,11 +12,26 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.COUNTER_VAR_PREFIX;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.COUNTER_VAR_VALUE_SEPARATOR;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.aggregateComplete;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.createScopedVariableAggregationVariableInstance;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupAggregationsByTarget;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupVariableInstancesByName;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.resolveVariableAggregator;
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.sortVariablesByCounter;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
@@ -25,12 +40,21 @@ import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.cmmn.model.VariableAggregationDefinitions;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * Operation that moves a given {@link org.flowable.cmmn.api.runtime.PlanItemInstance} to a terminal state (completed, terminated or failed).
  *
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
 
@@ -46,6 +70,14 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
         // Not overriding the internalExecute, as that's meant for subclasses of this operation.
         super.run();
+
+        VariableAggregationDefinitions aggregations = getVariableAggregations();
+        // There is a fake plan item instance created for waiting for repetition
+        // This instance does not follow the same lifecycle and thus we should not aggregate variables for it
+        boolean shouldAggregate = aggregations != null && PlanItemInstanceState.ACTIVE_STATES.contains(originalState);
+        if (shouldAggregate && shouldAggregateForSingleInstance()) {
+            aggregateVariablesForSingleInstance(planItemInstanceEntity, aggregations);
+        }
 
         if (!isNoop) {  // The super.run() could have marked this as a no-op. No point in continuing.
 
@@ -75,10 +107,19 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
                     }
                 }
+
+            } else if (shouldAggregate) {
+                aggregateVariablesForAllInstances(planItemInstanceEntity, aggregations);
+
             }
 
             removeSentryRelatedData();
         }
+    }
+
+    protected VariableAggregationDefinitions getVariableAggregations() {
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        return repetitionRule != null ? repetitionRule.getAggregations() : null;
     }
 
     /**
@@ -189,6 +230,118 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             }
         }
     }
+
+    protected void aggregateVariablesForSingleInstance(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
+        // Gathered variables are stored on the finished plan item instances
+        VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+
+        for (VariableAggregationDefinition aggregation : aggregations.getAggregations()) {
+
+            VariableInstanceEntity aggregatedVarInstance = aggregateComplete(planItemInstanceEntity, aggregation, cmmnEngineConfiguration);
+            if (aggregatedVarInstance != null) {
+                variableService.insertVariableInstance(aggregatedVarInstance);
+
+                String targetVarName = aggregatedVarInstance.getName();
+
+                int repetitionCounter = getRepetitionCounter(planItemInstanceEntity);
+                String repetitionValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + repetitionCounter;
+                VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
+                        aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), repetitionValue, variableServiceConfiguration);
+                variableService.insertVariableInstance(counterVarInstance);
+            }
+        }
+
+    }
+
+    protected void aggregateVariablesForAllInstances(PlanItemInstanceEntity planItemInstanceEntity, VariableAggregationDefinitions aggregations) {
+
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
+        List<PlanItemInstanceEntity> planItemInstances;
+
+        if (StringUtils.isNotEmpty(planItemInstanceEntity.getStageInstanceId())) {
+            planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByStageInstanceIdAndPlanItemId(planItemInstanceEntity.getStageInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        } else {
+            planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByCaseInstanceIdAndPlanItemId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getPlanItem().getId());
+        }
+
+        if (planItemInstances == null || planItemInstances.isEmpty()) {
+            return;
+        }
+
+        // All instances should be in the terminal state to apply the variable gathering
+        for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+            if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
+                return;
+            }
+        }
+
+        String subScopeId = planItemInstanceEntity.getStageInstanceId();
+        if (subScopeId == null) {
+            subScopeId = planItemInstanceEntity.getCaseInstanceId();
+        }
+
+        // Gathered variables are stored on finished the plan item instances
+        VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+        List<VariableInstanceEntity> variableInstances = variableService.createInternalVariableInstanceQuery()
+                .subScopeId(subScopeId)
+                .scopeType(ScopeTypes.CMMN_VARIABLE_AGGREGATION)
+                .list();
+
+        Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity, aggregations.getAggregations(), cmmnEngineConfiguration);
+
+        Map<String, List<VariableInstance>> instancesByName = groupVariableInstancesByName(variableInstances);
+
+        boolean aggregateMulti = shouldAggregateForMultipleInstances();
+
+        for (Map.Entry<String, VariableAggregationDefinition> entry : aggregationsByTarget.entrySet()) {
+            String varName = entry.getKey();
+            if (aggregateMulti) {
+
+                VariableAggregationDefinition aggregation = aggregationsByTarget.get(varName);
+                PlanItemVariableAggregator aggregator = resolveVariableAggregator(aggregation, planItemInstanceEntity);
+
+                List<VariableInstance> counterVariables = instancesByName.getOrDefault(COUNTER_VAR_PREFIX + varName, Collections.emptyList());
+                List<VariableInstance> varValues = instancesByName.getOrDefault(varName, Collections.emptyList());
+
+                sortVariablesByCounter(varValues, counterVariables);
+
+                Object value = aggregator.aggregateMultiVariables(planItemInstanceEntity, varValues, BaseVariableAggregatorContext.complete(aggregation));
+
+                if (aggregation.isStoreAsTransientVariable()) {
+                    planItemInstanceEntity.getParentVariableScope().setTransientVariable(varName, value);
+                } else {
+                    planItemInstanceEntity.getParentVariableScope().setVariable(varName, value);
+                }
+            } else {
+                planItemInstanceEntity.getParentVariableScope().removeVariable(varName);
+            }
+
+        }
+
+        variableInstances.forEach(variableService::deleteVariableInstance);
+    }
+
+    /**
+     * Whether variable aggregation should be done when a single instance completes.
+     * This does not need to check whether the plan item instance has variable aggregations,
+     * that is the same for all instances.
+     * e.g. When an instance completes normally we should aggregate the data, but if it terminates we shouldn't
+     */
+    protected abstract boolean shouldAggregateForSingleInstance();
+
+    /**
+     * Whether multi aggregation needs to be done.
+     * This does not need to check whether the plan item instance has variable aggregations,
+     * that is the same for all instances.
+     * e.g. Multi aggregation needs to be done when we do a normal completion, but not when the plan items are terminated
+     */
+    protected abstract boolean shouldAggregateForMultipleInstances();
 
     public abstract boolean isEvaluateRepetitionRule();
     

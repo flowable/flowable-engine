@@ -402,6 +402,11 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId) {
+        return dataManager.findByStageInstanceIdAndPlanItemId(stageInstanceId, planItemId);
+    }
+
+    @Override
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
         CountingPlanItemInstanceEntity countingPlanItemInstanceEntity = (CountingPlanItemInstanceEntity) planItemInstanceEntity;
         

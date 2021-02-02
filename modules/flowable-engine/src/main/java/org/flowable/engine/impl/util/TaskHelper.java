@@ -207,7 +207,6 @@ public class TaskHelper {
         }
 
         if (execution != null) {
-            execution.getTasks().add(taskEntity);
             taskEntity.setExecutionId(execution.getId());
             taskEntity.setProcessInstanceId(execution.getProcessInstanceId());
             taskEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
@@ -281,7 +280,7 @@ public class TaskHelper {
         
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        
+
         // Delete all entities related to the task entities
         for (TaskEntity taskEntity : taskEntities) {
             internalDeleteTask(taskEntity, deleteReason, false, false, true, true);
@@ -455,7 +454,7 @@ public class TaskHelper {
             }
 
             deleteTask(task, deleteReason, cascade, true, true);
-            
+
         } else if (cascade) {
             deleteHistoricTask(taskId);
             deleteHistoricTaskEventLogEntries(taskId);
@@ -536,7 +535,7 @@ public class TaskHelper {
 
     public static boolean isFormFieldValidationEnabled(VariableContainer variableContainer,
             ProcessEngineConfigurationImpl processEngineConfiguration, String formFieldValidationExpression) {
-        
+
         if (StringUtils.isNotEmpty(formFieldValidationExpression)) {
             Boolean formFieldValidation = getBoolean(formFieldValidationExpression);
             if (formFieldValidation != null) {

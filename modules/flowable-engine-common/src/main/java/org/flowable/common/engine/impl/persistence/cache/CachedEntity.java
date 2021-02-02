@@ -59,7 +59,9 @@ public class CachedEntity {
     }
 
     public boolean hasChanged() {
-        return entity.getPersistentState() != null && !entity.getPersistentState().equals(originalPersistentState);
+        Object currentPersistentState = entity.getPersistentState();
+        return currentPersistentState != null && !entity.getPersistentState().equals(originalPersistentState)
+                || currentPersistentState == null && originalPersistentState != null;
     }
 
 }

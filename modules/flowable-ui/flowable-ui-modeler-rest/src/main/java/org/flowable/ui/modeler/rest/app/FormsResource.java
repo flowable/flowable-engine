@@ -14,7 +14,6 @@ package org.flowable.ui.modeler.rest.app;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class FormsResource {
             reps.add(new FormRepresentation(model));
         }
 
-        Collections.sort(reps, new NameComparator());
+        reps.sort(new NameComparator());
 
         ResultListDataRepresentation result = new ResultListDataRepresentation(reps);
         result.setTotal(Long.valueOf(models.size()));

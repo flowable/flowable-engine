@@ -272,6 +272,17 @@ public class ModelServiceImpl implements ModelService {
             stencilSetNode.put("namespace", "http://b3mn.org/stencilset/dmn1.2#");
             editorNode.set("stencilset", stencilSetNode);
 
+            ObjectNode canvasBoundsNode = objectMapper.createObjectNode();
+            editorNode.set("bounds", canvasBoundsNode);
+            ObjectNode lowerRightCanvasNode = objectMapper.createObjectNode();
+            canvasBoundsNode.set("lowerRight", lowerRightCanvasNode);
+            lowerRightCanvasNode.put("x", 1200);
+            lowerRightCanvasNode.put("y", 1050);
+            ObjectNode upperLeftCanvasNode = objectMapper.createObjectNode();
+            canvasBoundsNode.set("upperLeft", upperLeftCanvasNode);
+            upperLeftCanvasNode.put("x", 0);
+            upperLeftCanvasNode.put("y", 0);
+
             ObjectNode propertiesNode = objectMapper.createObjectNode();
             propertiesNode.put("drd_id", model.getKey());
             propertiesNode.put("name", model.getName());

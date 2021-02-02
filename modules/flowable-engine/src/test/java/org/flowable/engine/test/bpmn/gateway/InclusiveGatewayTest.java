@@ -48,6 +48,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
@@ -456,6 +457,33 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testAsyncTasks() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("testAsyncTasks")
+            .variable("counter", 0L)
+            .start();
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        // There should be 2 jobs, one for each excution arriving in the join
+        jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(2);
+
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        // There was a bug that async inclusive gw joins would lead to two executions leaving the gateway
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter")).isEqualTo(1L);
+    }
+
+    @Test
+    @Deployment
     public void testDirectSequenceFlow() {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("input", 1);
@@ -775,8 +803,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(childExecutions).hasSize(5);
         classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
         assertThat(classifiedExecutions)
-                .containsKeys("multiInstanceSubProcess", "taskInclusive1", "taskInclusive2", "inclusiveJoin");
-        assertThat(classifiedExecutions).doesNotContainKey("taskInclusive3");
+                .containsKeys("multiInstanceSubProcess", "taskInclusive1", "taskInclusive2", "inclusiveJoin")
+                .doesNotContainKey("taskInclusive3");
         assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(2);
         assertThat(classifiedExecutions.get("taskInclusive1")).hasSize(1);
         assertThat(classifiedExecutions.get("taskInclusive2")).hasSize(1);
@@ -786,8 +814,8 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         classifiedTasks = tasks.stream().collect(Collectors.groupingBy(Task::getTaskDefinitionKey));
         assertThat(classifiedTasks)
-                .containsOnlyKeys("taskInclusive1", "taskInclusive2");
-        assertThat(classifiedTasks).doesNotContainKeys("taskInclusive3");
+                .containsOnlyKeys("taskInclusive1", "taskInclusive2")
+                .doesNotContainKeys("taskInclusive3");
 
         //Finish the rest of the tasks
         Stream.concat(classifiedTasks.get("taskInclusive1").stream(), classifiedTasks.get("taskInclusive2").stream())

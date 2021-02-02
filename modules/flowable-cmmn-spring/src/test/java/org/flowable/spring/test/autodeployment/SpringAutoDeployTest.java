@@ -144,7 +144,7 @@ public class SpringAutoDeployTest {
         assertThat(caseDefinitionQuery.count()).isEqualTo(1);
     }
 
-    // Updating the form file should lead to a new deployment when restarting the Spring container
+    // Updating the CMMN file should lead to a new deployment when restarting the Spring container
     @Test
     public void testResourceRedeploymentAfterCaseDefinitionChange() throws Exception {
         createAppContextWithoutDeploymentMode();
@@ -169,7 +169,7 @@ public class SpringAutoDeployTest {
             IoUtil.writeStringToFile(originalCaseFileContent, filePath);
         }
 
-        // Assertions come AFTER the file write! Otherwise the form file is
+        // Assertions come AFTER the file write! Otherwise the CMMN file is
         // messed up if the assertions fail.
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
         assertThat(repositoryService.createCaseDefinitionQuery().count()).isEqualTo(2);

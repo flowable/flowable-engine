@@ -171,7 +171,7 @@
             CREATED_=#{created, jdbcType=TIMESTAMP},
             CREATED_BY_=#{createdBy, jdbcType=TIMESTAMP},
             LAST_MODIFIED_=#{lastModified, jdbcType=TIMESTAMP},
-            LAST_MODIFIED_BY_=#{lastModifiedBy, jdbcType=VARCHAR}
+            LAST_MODIFIED_BY_=#{lastModifiedBy, jdbcType=VARCHAR},
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>

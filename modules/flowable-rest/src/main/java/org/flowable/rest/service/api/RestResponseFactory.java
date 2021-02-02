@@ -626,6 +626,7 @@ public class RestResponseFactory {
         result.setCallbackType(processInstance.getCallbackType());
         result.setReferenceId(processInstance.getReferenceId());
         result.setReferenceType(processInstance.getReferenceType());
+        result.setPropagatedStageInstanceId(processInstance.getPropagatedStageInstanceId());
         result.setTenantId(processInstance.getTenantId());
 
         if (processInstance.isEnded()) {
@@ -764,6 +765,7 @@ public class RestResponseFactory {
         result.setCallbackType(processInstance.getCallbackType());
         result.setReferenceId(processInstance.getReferenceId());
         result.setReferenceType(processInstance.getReferenceType());
+        result.setPropagatedStageInstanceId(processInstance.getPropagatedStageInstanceId());
         result.setTenantId(processInstance.getTenantId());
         return result;
     }
@@ -801,6 +803,7 @@ public class RestResponseFactory {
         result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
         result.setScopeId(taskInstance.getScopeId());
         result.setScopeType(taskInstance.getScopeType());
+        result.setPropagatedStageInstanceId(taskInstance.getPropagatedStageInstanceId());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getProcessDefinitionId() != null) {

@@ -14,16 +14,12 @@ package org.flowable.content.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.content.api.ContentItem;
-import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
 import org.flowable.content.api.ContentObjectStorageMetadata;
 import org.flowable.content.api.ContentStorage;
@@ -66,21 +62,6 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
 
         if (inputStream != null) {
             // Stream given, write to store and save a reference to the content object
-            Map<String, Object> metaData = new HashMap<>();
-            if (contentItem.getTaskId() != null) {
-                metaData.put(ContentMetaDataKeys.TASK_ID, contentItem.getTaskId());
-            } else {
-                if (contentItem.getProcessInstanceId() != null) {
-                    metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, contentItem.getProcessInstanceId());
-                } else {
-                    if (StringUtils.isNotEmpty(contentItem.getScopeType())) {
-                        metaData.put(ContentMetaDataKeys.SCOPE_TYPE, contentItem.getScopeType());
-                    }
-                    if (StringUtils.isNotEmpty(contentItem.getScopeId())) {
-                        metaData.put(ContentMetaDataKeys.SCOPE_ID, contentItem.getScopeId());
-                    }
-                }
-            }
 
             ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
             ContentObject createContentObject = contentStorage.createContentObject(inputStream, new ContentItemContentObjectMetadata());

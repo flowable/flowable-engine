@@ -44,7 +44,7 @@
     update ${prefix}ACT_GE_PROPERTY
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      VALUE_ = #{value, jdbcType=VARCHAR}
+      VALUE_ = #{value, jdbcType=VARCHAR},
     </set>
     where NAME_ = #{name, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}

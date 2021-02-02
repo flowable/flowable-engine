@@ -27,7 +27,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for DmnEngine and services initialization in the form of a JUnit rule.
+ * Convenience for FormEngine and services initialization in the form of a JUnit rule.
  * 
  * <p>
  * Usage:

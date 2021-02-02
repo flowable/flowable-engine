@@ -56,7 +56,6 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
     @Override
     protected void validateModel(CmmnModel model) {
         List<Association> associations = model.getAssociations();
-        assertThat(associations).isNotNull();
         assertThat(associations).hasSize(5);
 
         Map<String, List<Association>> byRelationShip = associations.stream()
@@ -87,14 +86,12 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         PlanItem taskBIntance = model.findPlanItem(taskC.getPlanItemRef());
         assertThat(taskBIntance).isNotNull();
         List<Criterion> taskCEntryCriterions = taskBIntance.getEntryCriteria();
-        assertThat(taskCEntryCriterions).isNotNull();
-        assertThat(taskCEntryCriterions).hasSize(1);
+         assertThat(taskCEntryCriterions).hasSize(1);
         Criterion criterion = taskCEntryCriterions.get(0);
         assertThat(criterion.getId()).isEqualTo("taskCEntrySentry");
         Sentry sentry = criterion.getSentry();
         assertThat(sentry).isNotNull();
         List<SentryOnPart> onParts = sentry.getOnParts();
-        assertThat(onParts).isNotNull();
         assertThat(onParts).hasSize(2);
         SentryOnPart sentryOnPart = onParts.get(0);
         assertThat(sentryOnPart.getSource().getDefinitionRef()).isEqualTo("taskA");
@@ -110,7 +107,6 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         assertThat(stage2Instance).isNotNull();
         //Stage 2 Entry Sentry
         List<Criterion> stage2EntryCriterions = stage2Instance.getEntryCriteria();
-        assertThat(stage2EntryCriterions).isNotNull();
         assertThat(stage2EntryCriterions).hasSize(1);
         criterion = stage2EntryCriterions.get(0);
         assertThat(criterion.getId()).isEqualTo("stage1EntrySentry");
@@ -125,7 +121,6 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
 
         //Stage 2 Exit Sentry
         List<Criterion> stage2ExitCriterions = stage2Instance.getExitCriteria();
-        assertThat(stage2ExitCriterions).isNotNull();
         assertThat(stage2ExitCriterions).hasSize(1);
         criterion = stage2ExitCriterions.get(0);
         assertThat(criterion.getId()).isEqualTo("stage2ExitSentry");
@@ -144,7 +139,6 @@ public class SentryOnPartAssociationsConverterTest extends AbstractConverterTest
         PlanItem timedtaskInstance = model.findPlanItem(timedTask.getPlanItemRef());
         assertThat(timedtaskInstance).isNotNull();
         List<Criterion> timedTaskExitCriterions = timedtaskInstance.getExitCriteria();
-        assertThat(timedTaskExitCriterions).isNotNull();
         assertThat(timedTaskExitCriterions).hasSize(1);
         criterion = timedTaskExitCriterions.get(0);
         assertThat(criterion.getId()).isEqualTo("timedTaskExitSentry");

@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
-    
+
     protected String businessKey;
     protected String name;
     protected String parentId;
@@ -283,7 +283,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
     }
-    
+
     @Override
     protected void addLoggingSessionInfo(ObjectNode loggingNode) {
         CmmnLoggingSessionUtil.fillLoggingData(loggingNode, this);

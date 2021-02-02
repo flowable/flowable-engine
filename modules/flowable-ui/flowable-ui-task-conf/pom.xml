@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
         <artifactId>flowable-ui-parent</artifactId>
-    	<version>6.6.0-SNAPSHOT</version>
+    	<version>6.6.1-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -170,10 +170,6 @@
 		<!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-json-org</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
         </dependency>
 
@@ -268,10 +264,6 @@
         <dependency>
             <groupId>jakarta.jms</groupId>
             <artifactId>jakarta.jms-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
         </dependency>
 
         <dependency>

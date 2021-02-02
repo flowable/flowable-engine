@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -26,6 +27,8 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -103,13 +106,11 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertThat(timerJob2).isNotNull();
-        assertThat(timerJob2.getExceptionMessage()).isNotNull();
         assertThat(timerJob2.getExceptionMessage())
                 .contains("This is an exception thrown from scriptTask");
 
         // Get the full stacktrace using the managementService
         String exceptionStack = managementService.getTimerJobExceptionStacktrace(timerJob2.getId());
-        assertThat(exceptionStack).isNotNull();
         assertThat(exceptionStack)
                 .contains("This is an exception thrown from scriptTask");
     }
@@ -344,33 +345,43 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     void testAcquireAlreadyAcquiredLock() {
         String lockName = "testLock";
-        LockManager testLockManager1 = managementService.getLockManager(lockName);
+        try {
+            LockManager testLockManager1 = managementService.getLockManager(lockName);
 
-        assertThat(testLockManager1.acquireLock()).isTrue();
-        // acquiring the lock from the same lock manager should always return true
-        assertThat(testLockManager1.acquireLock()).isTrue();
-        assertThat(managementService.getProperties()).containsKey(lockName);
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            // acquiring the lock from the same lock manager should always return true
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            Map<String, String> properties = managementService.getProperties();
+            assertThat(properties).containsKey(lockName);
+            assertThat(properties.get(lockName)).isNotNull();
 
-        LockManager testLockManager2 = managementService.getLockManager(lockName);
-        assertThat(testLockManager2.acquireLock()).isFalse();
+            LockManager testLockManager2 = managementService.getLockManager(lockName);
+            assertThat(testLockManager2.acquireLock()).isFalse();
 
-        testLockManager1.releaseLock();
-        assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+            testLockManager1.releaseLock();
+            properties = managementService.getProperties();
+            assertThat(properties).containsEntry(lockName, null);
 
-        assertThat(testLockManager2.acquireLock()).isTrue();
-        assertThat(testLockManager1.acquireLock()).isFalse();
+            assertThat(testLockManager2.acquireLock()).isTrue();
+            assertThat(testLockManager1.acquireLock()).isFalse();
 
-        assertThat(managementService.getProperties()).containsKey(lockName);
-        testLockManager2.releaseLock();
-        assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+            properties = managementService.getProperties();
+            assertThat(properties).containsKey(lockName);
+            assertThat(properties.get(lockName)).isNotNull();
+            testLockManager2.releaseLock();
+            properties = managementService.getProperties();
+            assertThat(properties).containsEntry(lockName, null);
+        } finally {
+            deletePropertyIfExists(lockName);
+        }
     }
 
     @Test
     void testWaitForLock() {
         Duration initialLockPollRate = processEngineConfiguration.getLockPollRate();
+        String lockName = "testWaitForLock";
         try {
             processEngineConfiguration.setLockPollRate(Duration.ofMillis(100));
-            String lockName = "testWaitForLock";
             LockManager testLockManager1 = managementService.getLockManager(lockName);
 
             testLockManager1.waitForLock(Duration.ofMillis(100));
@@ -387,9 +398,11 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             testLockManager2.waitForLock(Duration.ofSeconds(1));
             assertThat(testLockManager2.acquireLock()).isTrue();
             testLockManager2.releaseLock();
-            assertThat(managementService.getProperties()).doesNotContainKey(lockName);
+            assertThat(managementService.getProperties())
+                    .containsEntry(lockName, null);
         } finally {
             processEngineConfiguration.setLockPollRate(initialLockPollRate);
+            deletePropertyIfExists(lockName);
         }
     }
 
@@ -491,6 +504,17 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             managementService.deleteDeadLetterJob(deadLetterJob.getId());
         }
 
+    }
+
+    protected void deletePropertyIfExists(String propertyName) {
+        managementService.executeCommand(commandContext -> {
+            PropertyEntityManager propertyEntityManager = CommandContextUtil.getPropertyEntityManager(commandContext);
+            PropertyEntity property = propertyEntityManager.findById(propertyName);
+            if (property != null) {
+                propertyEntityManager.delete(property);
+            }
+            return null;
+        });
     }
 
 }

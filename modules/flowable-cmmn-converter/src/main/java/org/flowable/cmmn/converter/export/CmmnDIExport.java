@@ -89,13 +89,16 @@ public class CmmnDIExport implements CmmnXmlConstants {
     }
     
     protected static void createCmmnShape(CmmnModel model, String elementId, XMLStreamWriter xtw) throws Exception {
+        GraphicInfo graphicInfo = model.getGraphicInfo(elementId);
+        if (graphicInfo == null) {
+            return;
+        }
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_SHAPE, CMMNDI_NAMESPACE);
         String shapeId = "CMMNShape_" + elementId;
         xtw.writeAttribute(ATTRIBUTE_ID, shapeId);
         xtw.writeAttribute(ATTRIBUTE_DI_CMMN_ELEMENT_REF, elementId);
 
-        GraphicInfo graphicInfo = model.getGraphicInfo(elementId);
-        
+
         xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
         xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(graphicInfo.getHeight()));
         xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(graphicInfo.getWidth()));

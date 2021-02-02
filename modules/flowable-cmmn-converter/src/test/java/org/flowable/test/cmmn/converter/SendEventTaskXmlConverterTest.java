@@ -17,28 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.SendEventServiceTask;
-import org.junit.Test;
+import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 /**
  * @author Joram Barrez
  */
-public class SendEventTaskXmlConverterTest extends AbstractConverterTest {
+public class SendEventTaskXmlConverterTest {
     
-    private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/send-event-task.cmmn";
-    
-    @Test
-    public void convertXMLToModel() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
-        CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
-        validateModel(parsedModel);
-    }
-
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/send-event-task.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition("sendEventTask1");
         assertThat(planItemDefinition)
