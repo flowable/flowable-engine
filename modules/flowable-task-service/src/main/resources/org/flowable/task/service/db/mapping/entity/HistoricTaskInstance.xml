@@ -315,6 +315,11 @@
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
   
+  <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_TASKINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
     delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_ID_ != '' and TASK.SCOPE_TYPE_ = 'cmmn' and
     NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
@@ -330,8 +335,12 @@
     SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
   </delete>
 
-  <!-- HISTORIC TASK INSTANCE RESULT MAP -->
+  <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_TASKINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
+  </delete>
 
+  <!-- HISTORIC TASK INSTANCE RESULT MAP -->
   <resultMap id="historicTaskInstanceResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
