@@ -24,6 +24,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceActivityCompletionJobHandler;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -493,18 +495,24 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
         // now there should be one job in the database:
-        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE);
 
         // execute first of 3 parallel multi instance tasks
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).list().get(0).getId());
-        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE);
 
         // execute second of 3 parallel multi instance tasks
-        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).list().get(0).getId());
-        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).handlerType(AsyncContinuationJobHandler.TYPE).list().get(0).getId());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE);
 
         // execute third of 3 parallel multi instance tasks
-        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).handlerType(AsyncContinuationJobHandler.TYPE).singleResult().getId());
 
         // the job is done
         assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();

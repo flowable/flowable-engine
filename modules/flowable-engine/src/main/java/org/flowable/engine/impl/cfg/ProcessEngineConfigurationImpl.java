@@ -275,6 +275,7 @@ import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
+import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceActivityCompletionJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
@@ -344,6 +345,7 @@ import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationM
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
+import org.flowable.engine.impl.variable.ParallelMultiInstanceLoopVariableType;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
@@ -861,6 +863,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * And the changes to the JsonNode will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
      */
     protected boolean jsonVariableTypeTrackObjects = true;
+
+    /**
+     * Whether the Parallel Multi instance should perform the leave operation through an async exclusive job.
+     * When this is true then non exclusive parallel multi instances can run in non exclusive asynchronously without an exception being thrown.
+     */
+    protected boolean parallelMultiInstanceAsyncLeave = true;
 
     protected ExpressionManager expressionManager;
     protected List<String> customScriptingEngineClasses;
@@ -2110,6 +2118,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         ExternalWorkerTaskCompleteJobHandler externalWorkerTaskCompleteJobHandler = new ExternalWorkerTaskCompleteJobHandler();
         jobHandlers.put(externalWorkerTaskCompleteJobHandler.getType(), externalWorkerTaskCompleteJobHandler);
 
+        ParallelMultiInstanceActivityCompletionJobHandler parallelMultiInstanceActivityCompletionJobHandler = new ParallelMultiInstanceActivityCompletionJobHandler();
+        jobHandlers.put(parallelMultiInstanceActivityCompletionJobHandler.getType(), parallelMultiInstanceActivityCompletionJobHandler);
+
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {
             for (JobHandler customJobHandler : getCustomJobHandlers()) {
@@ -2456,6 +2467,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new ParallelMultiInstanceLoopVariableType(this));
             variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
@@ -2467,6 +2479,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         } else {
             if (variableTypes.getVariableType(BpmnAggregatedVariableType.TYPE_NAME) == null) {
                 variableTypes.addTypeBefore(new BpmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
+            }
+
+            if (variableTypes.getVariableType(ParallelMultiInstanceLoopVariableType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new ParallelMultiInstanceLoopVariableType(this), SerializableType.TYPE_NAME);
             }
         }
     }
@@ -3287,6 +3303,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    public boolean isParallelMultiInstanceAsyncLeave() {
+        return parallelMultiInstanceAsyncLeave;
+    }
+
+    public ProcessEngineConfigurationImpl setParallelMultiInstanceAsyncLeave(boolean parallelMultiInstanceAsyncLeave) {
+        this.parallelMultiInstanceAsyncLeave = parallelMultiInstanceAsyncLeave;
         return this;
     }
 
