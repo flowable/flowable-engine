@@ -115,7 +115,6 @@ public class DMNParseUtil {
     }
 
     protected static Object formatElementValue(Object value, Class<?> collectionType) {
-
         if (value instanceof String) {
             String stringValue = (String) value;
             if (stringValue.isEmpty()) {
@@ -127,7 +126,7 @@ public class DMNParseUtil {
 
         // format element based on collection type
         if (Date.class.equals(collectionType)) {
-            return DateUtil.toDate(value.toString());
+            return DateUtil.toDate(value);
         } else if (LocalDate.class.equals(collectionType)) {
             return new DateTime(DateUtil.toDate(value)).toLocalDate();
         } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType)
