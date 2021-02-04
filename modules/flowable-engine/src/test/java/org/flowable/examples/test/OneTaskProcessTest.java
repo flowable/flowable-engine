@@ -98,7 +98,7 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         // deploy different process - test should fail
         assertThatThrownBy(() -> testProcessModelByAnotherProcess(createTestProcessBpmnModel("twoTasksProcess")))
                 .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("\nExpecting:\n <1L>\nto be equal to:\n <0L>");
+                .hasMessageContainingAll("expected: 0L", "but was : 1L");
     }
 
     @Test
