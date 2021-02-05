@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.el;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Frederik Heremans
@@ -136,5 +139,24 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
             // Cleanup
             Authentication.setAuthenticatedUserId(null);
         }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testOverloadedMethodUsage() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("nodeVariable", processEngineConfiguration.getObjectMapper().createObjectNode());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression("#{nodeVariable.put('stringVar', 'String value').put('intVar', 10)}");
+        Object value = managementService.executeCommand(commandContext ->
+                expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
+
+        assertThat(value).isInstanceOf(ObjectNode.class);
+        assertThatJson(value)
+                .isEqualTo("{"
+                        + "  stringVar: 'String value',"
+                        + "  intVar: 10"
+                        + "}");
     }
 }
