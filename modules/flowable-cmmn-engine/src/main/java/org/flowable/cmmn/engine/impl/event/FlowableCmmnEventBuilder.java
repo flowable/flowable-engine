@@ -13,7 +13,11 @@
 package org.flowable.cmmn.engine.impl.event;
 
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
+import org.flowable.cmmn.api.event.FlowableTaskAssignedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.task.api.Task;
 
 /**
  * @author Filip Hrisafov
@@ -23,4 +27,9 @@ public class FlowableCmmnEventBuilder {
     public static FlowableCaseStartedEvent createCaseStartedEvent(CaseInstance caseInstance) {
         return new FlowableCaseStartedEventImpl(caseInstance);
     }
+
+    public static FlowableTaskAssignedEvent createTaskAssignedEvent(Task task) {
+        return new FlowableTaskAssignedEventImpl(task);
+    }
+
 }
