@@ -71,4 +71,21 @@ class JreCompat {
     public boolean isExported(Class<?> type) {
         return true;
     }
+
+    /**
+     * Try to set the method as accessible. If it fails then return {@code false}
+     *
+     * @param accessibleObject the method to be set as accessible
+     * @return {@code true} if the AccessibleObject was set as accessible, {@code false} otherwise
+     */
+    public boolean trySetAccessible(AccessibleObject accessibleObject) {
+        if (!accessibleObject.isAccessible()) {
+            try {
+                accessibleObject.setAccessible(true);
+            } catch (SecurityException ignored) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

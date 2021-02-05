@@ -32,17 +32,20 @@ class Jre9Compat extends JreCompat {
     private static final Method canAccessMethod;
     private static final Method getModuleMethod;
     private static final Method isExportedMethod;
+    private static final Method trySetAccessibleMethod;
 
     static {
         Method m1 = null;
         Method m2 = null;
         Method m3 = null;
+        Method m4 = null;
 
         try {
             m1 = AccessibleObject.class.getMethod("canAccess", Object.class);
             m2 = Class.class.getMethod("getModule");
             Class<?> moduleClass = Class.forName("java.lang.Module");
             m3 = moduleClass.getMethod("isExported", String.class);
+            m4 = AccessibleObject.class.getMethod("trySetAccessible");
         } catch (NoSuchMethodException e) {
             // Expected for Java 8
         } catch (ClassNotFoundException e) {
@@ -53,6 +56,7 @@ class Jre9Compat extends JreCompat {
         canAccessMethod = m1;
         getModuleMethod = m2;
         isExportedMethod = m3;
+        trySetAccessibleMethod = m4;
     }
 
 
@@ -78,6 +82,15 @@ class Jre9Compat extends JreCompat {
             Object module = getModuleMethod.invoke(type);
             return ((Boolean) isExportedMethod.invoke(module, packageName)).booleanValue();
         } catch (ReflectiveOperationException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean trySetAccessible(AccessibleObject accessibleObject) {
+        try {
+            return ((Boolean) trySetAccessibleMethod.invoke(accessibleObject)).booleanValue();
+        } catch (ReflectiveOperationException | SecurityException e) {
             return false;
         }
     }

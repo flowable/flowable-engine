@@ -19,16 +19,16 @@ import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// This class is adapted to match the BeanELResolver from Tomcat from https://github.com/apache/tomcat/tree/febda9acf2a9d6ed833382c4c49eec8964bc1431/java/jakarta/el
+// The adaptations are done in order for us to use the Util class for finding methods
 /**
  * Defines property resolution behavior on objects using the JavaBeans component architecture. This
  * resolver handles base objects of any type, as long as the base is not null. It accepts any object
@@ -57,7 +57,7 @@ public class BeanELResolver extends ELResolver {
 				throw new ELException(e);
 			}
 			for (PropertyDescriptor descriptor : descriptors) {
-				map.put(descriptor.getName(), new BeanProperty(descriptor));
+				map.put(descriptor.getName(), new BeanProperty(baseClass, descriptor));
 			}
 		}
 
@@ -67,12 +67,15 @@ public class BeanELResolver extends ELResolver {
 	}
 
 	protected static final class BeanProperty {
+
+		private final Class<?> owner;
 		private final PropertyDescriptor descriptor;
 		
 		private Method readMethod;
 		private Method writedMethod;
 
-		public BeanProperty(PropertyDescriptor descriptor) {
+		public BeanProperty(Class<?> owner, PropertyDescriptor descriptor) {
+			this.owner = owner;
 			this.descriptor = descriptor;
 		}
 
@@ -80,69 +83,23 @@ public class BeanELResolver extends ELResolver {
 			return descriptor.getPropertyType();
 		}
 
-		public Method getReadMethod() {
+		public Method getReadMethod(Object base) {
 			if (readMethod == null) {
-				readMethod = findAccessibleMethod(descriptor.getReadMethod());
+				readMethod = Util.getMethod(owner, base, descriptor.getReadMethod());
 			}
 			return readMethod;
 		}
 
-		public Method getWriteMethod() {
+		public Method getWriteMethod(Object base) {
 			if (writedMethod == null) {
-				writedMethod = findAccessibleMethod(descriptor.getWriteMethod());
+				writedMethod = Util.getMethod(owner, base, descriptor.getWriteMethod());
 			}
 			return writedMethod;
 		}
 
-		public boolean isReadOnly() {
-			return getWriteMethod() == null;
+		public boolean isReadOnly(Object base) {
+			return getWriteMethod(base) == null;
 		}
-	}
-
-	private static Method findPublicAccessibleMethod(Method method) {
-		if (method == null || !Modifier.isPublic(method.getModifiers())) {
-			return null;
-		}
-		if (method.isAccessible() || Modifier.isPublic(method.getDeclaringClass().getModifiers())) {
-			return method;
-		}
-		for (Class<?> cls : method.getDeclaringClass().getInterfaces()) {
-			Method mth = null;
-			try {
-				mth = findPublicAccessibleMethod(cls.getMethod(method.getName(), method.getParameterTypes()));
-				if (mth != null) {
-					return mth;
-				}
-			} catch (NoSuchMethodException ignore) {
-				// do nothing
-			}
-		}
-		Class<?> cls = method.getDeclaringClass().getSuperclass();
-		if (cls != null) {
-			Method mth = null;
-			try {
-				mth = findPublicAccessibleMethod(cls.getMethod(method.getName(), method.getParameterTypes()));
-				if (mth != null) {
-					return mth;
-				}
-			} catch (NoSuchMethodException ignore) {
-				// do nothing
-			}
-		}
-		return null;
-	}
-
-	private static Method findAccessibleMethod(Method method) {
-		Method result = findPublicAccessibleMethod(method);
-		if (result == null && method != null && Modifier.isPublic(method.getModifiers())) {
-			result = method;
-			try {
-				method.setAccessible(true);
-			} catch (SecurityException e) {
-				result = null; 
-			}
-		}
-		return result;
 	}
 
 	private final boolean readOnly;
@@ -324,7 +281,7 @@ public class BeanELResolver extends ELResolver {
 		if (isResolvable(base)) {
 			BeanProperty beanProperty = toBeanProperty(base, property);
 			if (beanProperty != null) {
-				Method method = beanProperty.getReadMethod();
+				Method method = beanProperty.getReadMethod(base);
 				if (method != null) {
 					try {
 						result = method.invoke(base);
@@ -374,7 +331,7 @@ public class BeanELResolver extends ELResolver {
 		if (isResolvable(base)) {
 			BeanProperty beanProperty = toBeanProperty(base, property);
 			if (beanProperty != null) {
-				result |= beanProperty.isReadOnly();
+				result |= beanProperty.isReadOnly(base);
 				context.setPropertyResolved(true);
 			}
 		}
@@ -423,7 +380,7 @@ public class BeanELResolver extends ELResolver {
 			}
 			BeanProperty beanProperty = toBeanProperty(base, property);
 			if (beanProperty != null) {
-				Method method = beanProperty.getWriteMethod();
+				Method method = beanProperty.getWriteMethod(base);
 				if (method == null) {
 					throw new PropertyNotWritableException("Cannot write property: " + property);
 				}
@@ -508,12 +465,15 @@ public class BeanELResolver extends ELResolver {
 				params = new Object[0];
 			}
 			String name = method.toString();
-			Method target = findMethod(base, name, paramTypes, params.length);
+			ExpressionFactory factory = getExpressionFactory(context);
+			Method target = Util.findMethod(base.getClass(), base, name, paramTypes, params, factory);
 			if (target == null) {
 				throw new MethodNotFoundException("Cannot find method " + name + " with " + params.length + " parameters in " + base.getClass());
 			}
+
+			Object[] parameters = Util.buildParameters(target.getParameterTypes(), target.isVarArgs(), params, factory);
 			try {
-				result = target.invoke(base, coerceParams(getExpressionFactory(context), target, params));
+				result = target.invoke(base, parameters);
 			} catch (InvocationTargetException e) {
 				throw new ELException(e.getCause());
 			} catch (IllegalAccessException e) {
@@ -522,28 +482,6 @@ public class BeanELResolver extends ELResolver {
 			context.setPropertyResolved(true);
 		}
 		return result;
-	}
-
-    private Method findMethod(Object base, String name, Class<?>[] types, int paramCount) {
-		if (types != null) {
-			try {
-				return findAccessibleMethod(base.getClass().getMethod(name, types));
-			} catch (NoSuchMethodException e) {
-				return null;
-			}
-		}
-		Method varArgsMethod = null;
-		for (Method method : base.getClass().getMethods()) {
-			if (method.getName().equals(name)) {
-				int formalParamCount = method.getParameterTypes().length;
-				if (method.isVarArgs() && paramCount >= formalParamCount - 1) {
-					varArgsMethod = method;
-				} else if (paramCount == formalParamCount) {
-					return findAccessibleMethod(method);
-				}
-			}
-		}
-		return varArgsMethod == null ? null : findAccessibleMethod(varArgsMethod);
 	}
 
 	/**
@@ -564,60 +502,6 @@ public class BeanELResolver extends ELResolver {
 			defaultFactory = ExpressionFactory.newInstance();
 		}
 		return defaultFactory;
-	}
-	
-	private Object[] coerceParams(ExpressionFactory factory, Method method, Object[] params) {
-		Class<?>[] types = method.getParameterTypes();
-		Object[] args = new Object[types.length];
-		if (method.isVarArgs()) {
-			int varargIndex = types.length - 1;
-			if (params.length < varargIndex) {
-				throw new ELException("Bad argument count");
-			}
-			for (int i = 0; i < varargIndex; i++) {
-				coerceValue(args, i, factory, params[i], types[i]);
-			}
-			Class<?> varargType = types[varargIndex].getComponentType();
-			int length = params.length - varargIndex;
-			Object array = null;
-			if (length == 1) {
-				Object source = params[varargIndex];
-				if (source != null && source.getClass().isArray()) {
-					if (types[varargIndex].isInstance(source)) { // use source array as is
-						array = source;
-					} else { // coerce array elements
-						length = Array.getLength(source);
-						array = Array.newInstance(varargType, length);
-						for (int i = 0; i < length; i++) {
-							coerceValue(array, i, factory, Array.get(source, i), varargType);
-						}
-					}
-				} else { // single element array
-					array = Array.newInstance(varargType, 1);
-					coerceValue(array, 0, factory, source, varargType);
-				}
-			} else {
-				array = Array.newInstance(varargType, length);
-				for (int i = 0; i < length; i++) {
-					coerceValue(array, i, factory, params[varargIndex + i], varargType);
-				}
-			}
-			args[varargIndex] = array;
-		} else {
-			if (params.length != args.length) {
-				throw new ELException("Bad argument count");
-			}
-			for (int i = 0; i < args.length; i++) {
-				coerceValue(args, i, factory, params[i], types[i]);
-			}
-		}
-		return args;
-	}
-
-	private void coerceValue(Object array, int index, ExpressionFactory factory, Object value, Class<?> type) {
-		if (value != null || type.isPrimitive()) {
-			Array.set(array, index, factory.coerceToType(value, type));
-		}
 	}
 	
 	/**

@@ -16,195 +16,46 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 // This class is copied from https://github.com/apache/tomcat/tree/febda9acf2a9d6ed833382c4c49eec8964bc1431/java/jakarta/el
+// This class has been slightly modified in order to support the use cases for Flowable.
+// The following modifications have been done:
+// Remove getExpressionFactory static method -> We are instead passing the expression Factory to the appropriate methods in this class
+// Remove nullTcclFactory and factoryCache static fields -> They are only relevant to the getExpressionFactory method, and we don't need that one
+// Remove private static CacheKey, CacheValue and PrivilegedGetTccl classes -> They are only relevant to the getExpressionFactory method, and we don't need that one
+// Remove private static getContextLoader method -> Only relevant for the getExpressionFactory method, abd we don't need that one
+// Remove handleThrowable static method -> We are not using it
+// Remove findConstructor static method -> We are not using it
+// Throw fixed error messages instead of using LocalString resource bundle
+// Remove message static method -> ew are not using it
+// Add ExpressionFactory as last method parameter to findMethod, findWrapper, isCoercibleFrom and buildParameters
+// Make public methods accessible if they aren't
+
+// In order for this class to be more easily kept in sync with the Tomcat implementation we should not do style changes, nor fix warnings.
+// Keeping the modifications to minimum would make it easier to keep this class in sync
 class Util {
 
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
-
-    /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
-     * @param t the Throwable to check
-     */
-    static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
-        if (t instanceof VirtualMachineError) {
-            throw (VirtualMachineError) t;
-        }
-        // All other instances of Throwable will be silently swallowed
-    }
-
-
-    static String message(ELContext context, String name, Object... props) {
-        Locale locale = null;
-        if (context != null) {
-            locale = context.getLocale();
-        }
-        if (locale == null) {
-            locale = Locale.getDefault();
-            if (locale == null) {
-                return "";
-            }
-        }
-        ResourceBundle bundle = ResourceBundle.getBundle(
-                "jakarta.el.LocalStrings", locale);
-        try {
-            String template = bundle.getString(name);
-            if (props != null) {
-                template = MessageFormat.format(template, props);
-            }
-            return template;
-        } catch (MissingResourceException e) {
-            return "Missing Resource: '" + name + "' for Locale " + locale.getDisplayName();
-        }
-    }
-
-
-    private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
-
-    /**
-     * Provides a per class loader cache of ExpressionFactory instances without
-     * pinning any in memory as that could trigger a memory leak.
-     */
-    static ExpressionFactory getExpressionFactory() {
-
-        ClassLoader tccl = getContextClassLoader();
-
-        CacheValue cacheValue = null;
-        ExpressionFactory factory = null;
-
-        if (tccl == null) {
-            cacheValue = nullTcclFactory;
-        } else {
-            CacheKey key = new CacheKey(tccl);
-            cacheValue = factoryCache.get(key);
-            if (cacheValue == null) {
-                CacheValue newCacheValue = new CacheValue();
-                cacheValue = factoryCache.putIfAbsent(key, newCacheValue);
-                if (cacheValue == null) {
-                    cacheValue = newCacheValue;
-                }
-            }
-        }
-
-        final Lock readLock = cacheValue.getLock().readLock();
-        readLock.lock();
-        try {
-            factory = cacheValue.getExpressionFactory();
-        } finally {
-            readLock.unlock();
-        }
-
-        if (factory == null) {
-            final Lock writeLock = cacheValue.getLock().writeLock();
-            writeLock.lock();
-            try {
-                factory = cacheValue.getExpressionFactory();
-                if (factory == null) {
-                    factory = ExpressionFactory.newInstance();
-                    cacheValue.setExpressionFactory(factory);
-                }
-            } finally {
-                writeLock.unlock();
-            }
-        }
-
-        return factory;
-    }
-
-
-    /**
-     * Key used to cache default ExpressionFactory information per class
-     * loader. The class loader reference is never {@code null}, because
-     * {@code null} tccl is handled separately.
-     */
-    private static class CacheKey {
-        private final int hash;
-        private final WeakReference<ClassLoader> ref;
-
-        public CacheKey(ClassLoader key) {
-            hash = key.hashCode();
-            ref = new WeakReference<>(key);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof CacheKey)) {
-                return false;
-            }
-            ClassLoader thisKey = ref.get();
-            if (thisKey == null) {
-                return false;
-            }
-            return thisKey == ((CacheKey) obj).ref.get();
-        }
-    }
-
-    private static class CacheValue {
-        private final ReadWriteLock lock = new ReentrantReadWriteLock();
-        private WeakReference<ExpressionFactory> ref;
-
-        public CacheValue() {
-        }
-
-        public ReadWriteLock getLock() {
-            return lock;
-        }
-
-        public ExpressionFactory getExpressionFactory() {
-            return ref != null ? ref.get() : null;
-        }
-
-        public void setExpressionFactory(ExpressionFactory factory) {
-            ref = new WeakReference<>(factory);
-        }
-    }
-
 
     /*
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
     static Method findMethod(Class<?> clazz, Object base, String methodName,
-            Class<?>[] paramTypes, Object[] paramValues) {
+            Class<?>[] paramTypes, Object[] paramValues, ExpressionFactory factory) {
 
         if (clazz == null || methodName == null) {
-            throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", clazz, methodName,
-                            paramString(paramTypes)));
+            throw new MethodNotFoundException("Method not found: " + clazz + "." + methodName + "(" + paramString(paramTypes) + ")");
         }
 
         if (paramTypes == null) {
@@ -215,7 +66,7 @@ class Util {
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
 
-        Wrapper<Method> result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper<Method> result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues, factory);
 
         return getMethod(clazz, base, result.unWrap());
     }
@@ -226,7 +77,7 @@ class Util {
      */
     @SuppressWarnings("null")
     private static <T> Wrapper<T> findWrapper(Class<?> clazz, List<Wrapper<T>> wrappers,
-            String name, Class<?>[] paramTypes, Object[] paramValues) {
+            String name, Class<?>[] paramTypes, Object[] paramValues, ExpressionFactory factory) {
 
         Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
@@ -288,7 +139,7 @@ class Util {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (isCoercibleFrom(paramValues[j], varType)) {
+                                if (isCoercibleFrom(paramValues[j], varType, factory)) {
                                     coercibleMatch++;
                                 } else {
                                     noMatch = true;
@@ -310,7 +161,7 @@ class Util {
                             noMatch = true;
                             break;
                         } else {
-                            if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                            if (isCoercibleFrom(paramValues[i], mParamTypes[i], factory)) {
                                 coercibleMatch++;
                             } else {
                                 noMatch = true;
@@ -361,17 +212,13 @@ class Util {
             if (match == null) {
                 // If multiple methods have the same matching number of parameters
                 // the match is ambiguous so throw an exception
-                throw new MethodNotFoundException(message(
-                        null, "util.method.ambiguous", clazz, name,
-                        paramString(paramTypes)));
+                throw new MethodNotFoundException("Unable to find unambiguous method: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
             }
         }
 
         // Handle case where no match at all was found
         if (match == null) {
-            throw new MethodNotFoundException(message(
-                    null, "util.method.notfound", clazz, name,
-                    paramString(paramTypes)));
+            throw new MethodNotFoundException("Method not found: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
         }
 
         return match;
@@ -507,11 +354,11 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+    private static boolean isCoercibleFrom(Object src, Class<?> target, ExpressionFactory factory) {
         // TODO: This isn't pretty but it works. Significant refactoring would
         //       be required to avoid the exception.
         try {
-            getExpressionFactory().coerceToType(src, target);
+            factory.coerceToType(src, target);
         } catch (ELException e) {
             return false;
         }
@@ -549,6 +396,13 @@ class Util {
                         (jreCompat.canAccess(base, m) || base != null && jreCompat.canAccess(null, m)))) {
             return m;
         }
+
+        if (Modifier.isPublic(m.getModifiers())) {
+            if (jreCompat.trySetAccessible(m)) {
+                return m;
+            }
+        }
+
         Class<?>[] interfaces = type.getInterfaces();
         Method mp = null;
         for (Class<?> iface : interfaces) {
@@ -578,43 +432,8 @@ class Util {
     }
 
 
-    static Constructor<?> findConstructor(Class<?> clazz, Class<?>[] paramTypes,
-            Object[] paramValues) {
-
-        String methodName = "<init>";
-
-        if (clazz == null) {
-            throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", null, methodName,
-                            paramString(paramTypes)));
-        }
-
-        if (paramTypes == null) {
-            paramTypes = getTypesFromValues(paramValues);
-        }
-
-        Constructor<?>[] constructors = clazz.getConstructors();
-
-        List<Wrapper<Constructor<?>>> wrappers = Wrapper.wrap(constructors);
-
-        Wrapper<Constructor<?>> wrapper = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
-
-        Constructor<?> constructor = wrapper.unWrap();
-
-        JreCompat jreCompat = JreCompat.getInstance();
-        if (!Modifier.isPublic(clazz.getModifiers()) || !jreCompat.canAccess(null, constructor)) {
-            throw new MethodNotFoundException(message(
-                    null, "util.method.notfound", clazz, methodName,
-                    paramString(paramTypes)));
-        }
-
-        return constructor;
-    }
-
-
     static Object[] buildParameters(Class<?>[] parameterTypes,
-            boolean isVarArgs,Object[] params) {
-        ExpressionFactory factory = getExpressionFactory();
+            boolean isVarArgs,Object[] params, ExpressionFactory factory) {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
@@ -650,19 +469,6 @@ class Util {
             }
         }
         return parameters;
-    }
-
-
-    static ClassLoader getContextClassLoader() {
-        ClassLoader tccl;
-        if (System.getSecurityManager() != null) {
-            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
-            tccl = AccessController.doPrivileged(pa);
-        } else {
-            tccl = Thread.currentThread().getContextClassLoader();
-        }
-
-        return tccl;
     }
 
 
@@ -823,11 +629,4 @@ class Util {
         }
     }
 
-
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
-        @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
 }
