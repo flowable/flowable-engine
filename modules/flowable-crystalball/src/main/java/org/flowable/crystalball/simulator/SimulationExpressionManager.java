@@ -40,7 +40,7 @@ public class SimulationExpressionManager extends ProcessExpressionManager {
     protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
         compositeElResolver.add(new SimulationScopeElResolver(variableContainer));
-        compositeElResolver.add(super.createElResolver(variableContainer));
+        compositeElResolver.add(super.createElResolver());
         return compositeElResolver;
     }
 
