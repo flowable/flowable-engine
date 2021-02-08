@@ -52,8 +52,8 @@ public class ProcessExpressionManager extends VariableScopeExpressionManager {
     }
     
     @Override
-    protected ELResolver createVariableElResolver(VariableContainer variableContainer) {
-        return new ProcessVariableScopeELResolver(variableContainer);
+    protected ELResolver createVariableElResolver() {
+        return new ProcessVariableScopeELResolver();
     }
 
     @Override

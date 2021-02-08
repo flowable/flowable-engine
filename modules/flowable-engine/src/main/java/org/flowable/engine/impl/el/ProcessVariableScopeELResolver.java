@@ -24,16 +24,13 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class ProcessVariableScopeELResolver extends VariableContainerELResolver {
     
-    public ProcessVariableScopeELResolver(VariableContainer variableContainer) {
-        super(variableContainer);
-    }
-
     public static final String EXECUTION_KEY = "execution";
     public static final String TASK_KEY = "task";
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
+            VariableContainer variableContainer = getVariableContainer(context);
             if ((EXECUTION_KEY.equals(property) && variableContainer instanceof ExecutionEntity) || (TASK_KEY.equals(property) && variableContainer instanceof TaskEntity)) {
                 context.setPropertyResolved(true);
                 return variableContainer;

@@ -30,13 +30,10 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
     public static final String CASE_INSTANCE_KEY = "caseInstance";
     public static final String TASK_KEY = "task";
 
-    public CmmnVariableScopeELResolver(VariableContainer variableContainer) {
-        super(variableContainer);
-    }
-
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
+            VariableContainer variableContainer = getVariableContainer(context);
             if ((CASE_INSTANCE_KEY.equals(property) && variableContainer instanceof CaseInstanceEntity)
                     || (PLAN_ITEM_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity)
                     || (TASK_KEY.equals(property) && variableContainer instanceof TaskEntity)) {

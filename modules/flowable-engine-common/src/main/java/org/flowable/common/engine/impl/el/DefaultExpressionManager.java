@@ -112,7 +112,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     
     protected ELResolver createElResolver(VariableContainer variableContainer) {
         List<ELResolver> elResolvers = new ArrayList<>();
-        elResolvers.add(createVariableElResolver(variableContainer));
+        elResolvers.add(createVariableElResolver());
         if (beans != null) {
             elResolvers.add(new ReadOnlyMapELResolver(beans));
         }
@@ -139,8 +139,8 @@ public class DefaultExpressionManager implements ExpressionManager {
         // to be extended if needed
     }
 
-    protected ELResolver createVariableElResolver(VariableContainer variableContainer) {
-        return new VariableContainerELResolver(variableContainer);
+    protected ELResolver createVariableElResolver() {
+        return new VariableContainerELResolver();
     }
     
     protected ELResolver createBeanElResolver() {

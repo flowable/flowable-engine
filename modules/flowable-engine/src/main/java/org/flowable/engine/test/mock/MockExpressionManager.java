@@ -29,7 +29,7 @@ public class MockExpressionManager extends ProcessExpressionManager {
     @Override
     protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new ProcessVariableScopeELResolver(variableContainer));
+        compositeElResolver.add(new ProcessVariableScopeELResolver());
         compositeElResolver.add(new MockElResolver());
         compositeElResolver.add(new ArrayELResolver());
         compositeElResolver.add(new ListELResolver());
