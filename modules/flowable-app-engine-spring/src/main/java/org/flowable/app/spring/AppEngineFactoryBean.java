@@ -49,7 +49,6 @@ public class AppEngineFactoryBean implements FactoryBean<AppEngine>, DisposableB
 
     @Override
     public AppEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
         
         if (appEngineConfiguration.getBeans() == null) {
@@ -60,12 +59,6 @@ public class AppEngineFactoryBean implements FactoryBean<AppEngine>, DisposableB
         return this.appEngine;
     }
     
-    protected void configureExpressionManager() {
-        if (appEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            appEngineConfiguration.setExpressionManager(new SpringAppExpressionManager(applicationContext, appEngineConfiguration.getBeans()));
-        }
-    }
-
     protected void configureExternallyManagedTransactions() {
         if (appEngineConfiguration instanceof SpringAppEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
             SpringAppEngineConfiguration engineConfiguration = (SpringAppEngineConfiguration) appEngineConfiguration;

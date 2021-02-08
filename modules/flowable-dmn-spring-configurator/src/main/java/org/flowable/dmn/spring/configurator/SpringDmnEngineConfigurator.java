@@ -14,12 +14,10 @@ package org.flowable.dmn.spring.configurator;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
-import org.flowable.dmn.spring.SpringDmnExpressionManager;
 
 /**
  * @author Tijs Rademakers
@@ -39,20 +37,9 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
         
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringDmnEngineConfiguration) dmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
-        ExpressionManager configuredExpressionManager = dmnEngineConfiguration.getExpressionManager();
-		if (configuredExpressionManager == null) {
-			dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
-					springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
-		} else if (configuredExpressionManager instanceof SpringDmnExpressionManager) {
-			if (((SpringDmnExpressionManager) configuredExpressionManager).getApplicationContext() == null) {
-				((SpringDmnExpressionManager) configuredExpressionManager)
-						.setApplicationContext(springEngineConfiguration.getApplicationContext());
-			}
-			if (((SpringDmnExpressionManager) configuredExpressionManager).getBeans() == null) {
-				((SpringDmnExpressionManager) configuredExpressionManager)
-						.setBeans(springEngineConfiguration.getBeans());
-			}
-		}
+        if (dmnEngineConfiguration.getBeans() == null) {
+            dmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
+        }
 
         initDmnEngine();
         

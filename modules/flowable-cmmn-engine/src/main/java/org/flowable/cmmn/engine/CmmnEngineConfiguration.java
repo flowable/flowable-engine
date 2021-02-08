@@ -866,6 +866,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initIdGenerator();
         initFunctionDelegates();
         initAstFunctionCreators();
+        initBeans();
         initExpressionManager();
         initCmmnEngineAgendaFactory();
 
@@ -881,7 +882,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         configureVariableServiceConfiguration();
         configureJobServiceConfiguration();
         initVariableTypes();
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {
