@@ -15,7 +15,6 @@ package org.flowable.cmmn.spring.configurator;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
-import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -59,9 +58,8 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
         }
 
         ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
-        if (cmmnEngineConfiguration.getExpressionManager() == null) {
-            cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
-                springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        if (cmmnEngineConfiguration.getBeans() == null) {
+            cmmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
         }
 
         initCmmnEngine();

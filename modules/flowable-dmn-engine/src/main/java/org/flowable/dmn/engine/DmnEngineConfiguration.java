@@ -244,6 +244,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
         initEngineConfigurations();
         initClock();
         initFunctionDelegates();
+        initBeans();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -262,7 +263,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
         dmnEngineObjectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {

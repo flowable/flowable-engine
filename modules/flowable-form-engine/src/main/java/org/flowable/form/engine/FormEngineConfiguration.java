@@ -165,6 +165,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initBeans();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -180,7 +181,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
             initSchemaManagementCommand();
         }
 
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {

@@ -1034,6 +1034,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFunctionDelegates();
         initAstFunctionCreators();
         initDelegateInterceptor();
+        initBeans();
         initExpressionManager();
         initAgendaFactory();
 
@@ -1053,7 +1054,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         initHelpers();
         initVariableTypes();
-        initBeans();
         initFormEngines();
         initFormTypes();
         initScriptingEngines();

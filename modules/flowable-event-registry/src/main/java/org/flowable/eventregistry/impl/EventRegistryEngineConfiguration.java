@@ -210,6 +210,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initBeans();
         initExpressionManager();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -225,7 +226,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
             initSchemaManagementCommand();
         }
 
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {

@@ -49,7 +49,6 @@ public class EventRegistryFactoryBean implements FactoryBean<EventRegistryEngine
 
     @Override
     public EventRegistryEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
         
         if (eventEngineConfiguration.getBeans() == null) {
@@ -60,12 +59,6 @@ public class EventRegistryFactoryBean implements FactoryBean<EventRegistryEngine
         return this.eventRegistryEngine;
     }
     
-    protected void configureExpressionManager() {
-        if (eventEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            eventEngineConfiguration.setExpressionManager(new SpringEventExpressionManager(applicationContext, eventEngineConfiguration.getBeans()));
-        }
-    }
-
     protected void configureExternallyManagedTransactions() {
         if (eventEngineConfiguration instanceof SpringEventRegistryEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
             SpringEventRegistryEngineConfiguration engineConfiguration = (SpringEventRegistryEngineConfiguration) eventEngineConfiguration;
