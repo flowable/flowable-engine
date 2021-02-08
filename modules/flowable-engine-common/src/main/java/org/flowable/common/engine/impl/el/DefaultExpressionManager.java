@@ -41,6 +41,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
  * @author Dave Syer
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class DefaultExpressionManager implements ExpressionManager {
 
@@ -55,9 +56,11 @@ public class DefaultExpressionManager implements ExpressionManager {
     protected DeploymentCache<Expression> expressionCache;
     protected int expressionTextLengthCacheLimit = -1;
     
-    public DefaultExpressionManager() {
-        this(null);
-    }
+    protected List<ELResolver> preDefaultResolvers;
+    protected List<ELResolver> postDefaultResolvers;
+    protected List<ELResolver> preBeanResolvers;
+
+    protected ELResolver staticElResolver;
 
     public DefaultExpressionManager(Map<Object, Object> beans) {
         this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
@@ -106,13 +109,25 @@ public class DefaultExpressionManager implements ExpressionManager {
     
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
-        ELResolver elResolver = createElResolver(variableContainer);
+        ELResolver elResolver = getOrCreateStaticElResolver();
         return new FlowableElContext(elResolver, functionResolver);
     }
     
-    protected ELResolver createElResolver(VariableContainer variableContainer) {
+    protected ELResolver getOrCreateStaticElResolver() {
+        if (staticElResolver == null) {
+            staticElResolver = new CompositeELResolver(createDefaultElResolvers());
+        }
+
+        return staticElResolver;
+    }
+
+    protected List<ELResolver> createDefaultElResolvers() {
         List<ELResolver> elResolvers = new ArrayList<>();
         elResolvers.add(createVariableElResolver());
+
+        if (preDefaultResolvers != null) {
+            elResolvers.addAll(preDefaultResolvers);
+        }
         if (beans != null) {
             elResolvers.add(new ReadOnlyMapELResolver(beans));
         }
@@ -120,23 +135,22 @@ public class DefaultExpressionManager implements ExpressionManager {
         elResolvers.add(new ListELResolver());
         elResolvers.add(new MapELResolver());
         elResolvers.add(new JsonNodeELResolver());
+        if (preBeanResolvers != null) {
+            elResolvers.addAll(preBeanResolvers);
+        }
+
         ELResolver beanElResolver = createBeanElResolver();
         if (beanElResolver != null) {
             elResolvers.add(beanElResolver);
         }
         
-        configureResolvers(elResolvers);
-        
-        CompositeELResolver compositeELResolver = new CompositeELResolver();
-        for (ELResolver elResolver : elResolvers) {
-            compositeELResolver.add(elResolver);
+        if (postDefaultResolvers != null) {
+            elResolvers.addAll(postDefaultResolvers);
         }
-        compositeELResolver.add(new CouldNotResolvePropertyELResolver());
-        return compositeELResolver;
-    }
     
-    protected void configureResolvers(List<ELResolver> elResolvers) {
-        // to be extended if needed
+        elResolvers.add(new CouldNotResolvePropertyELResolver());
+
+        return elResolvers;
     }
 
     protected ELResolver createVariableElResolver() {
@@ -154,6 +168,8 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     @Override
     public void setBeans(Map<Object, Object> beans) {
+        // When the beans are modified we need to reset the el resolver
+        this.staticElResolver = null;
         this.beans = beans;
     }
 
@@ -217,6 +233,30 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     public void setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
         this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
+    }
+
+    public void addPreDefaultResolver(ELResolver elResolver) {
+        if (this.preDefaultResolvers == null) {
+            this.preDefaultResolvers = new ArrayList<>();
+        }
+
+        this.preDefaultResolvers.add(elResolver);
+    }
+
+    public void addPostDefaultResolver(ELResolver elResolver) {
+        if (this.postDefaultResolvers == null) {
+            this.postDefaultResolvers = new ArrayList<>();
+        }
+
+        this.postDefaultResolvers.add(elResolver);
+    }
+
+    public void addPreBeanResolver(ELResolver elResolver) {
+        if (this.preBeanResolvers == null) {
+            this.preBeanResolvers = new ArrayList<>();
+        }
+
+        this.preBeanResolvers.add(elResolver);
     }
     
 }
