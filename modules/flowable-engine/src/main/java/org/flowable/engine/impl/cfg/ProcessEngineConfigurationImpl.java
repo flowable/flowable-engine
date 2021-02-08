@@ -84,6 +84,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
@@ -871,6 +872,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean parallelMultiInstanceAsyncLeave = true;
 
     protected ExpressionManager expressionManager;
+    protected List<ELResolver> customELResolvers;
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
@@ -2538,6 +2540,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 processExpressionManager.setExpressionTextLengthCacheLimit(expressionTextLengthCacheLimit);
             }
 
+            if (customELResolvers != null) {
+                customELResolvers.forEach(processExpressionManager::addPreDefaultResolver);
+            }
+
             expressionManager = processExpressionManager;
         }
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
@@ -3312,6 +3318,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setParallelMultiInstanceAsyncLeave(boolean parallelMultiInstanceAsyncLeave) {
         this.parallelMultiInstanceAsyncLeave = parallelMultiInstanceAsyncLeave;
+        return this;
+    }
+
+    public List<ELResolver> getCustomELResolvers() {
+        return customELResolvers;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomELResolvers(List<ELResolver> customELResolvers) {
+        this.customELResolvers = customELResolvers;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addCustomELResolver(ELResolver elResolver) {
+        if (customELResolvers == null) {
+            customELResolvers = new ArrayList<>();
+        }
+
+        customELResolvers.add(elResolver);
         return this;
     }
 

@@ -41,7 +41,12 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     @Override
     public void init() throws Exception {
         ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
-        configImpl.setExpressionManager(new BlueprintExpressionManager());
+        if (blueprintContextELResolver != null) {
+            configImpl.addCustomELResolver(blueprintContextELResolver);
+        }
+        if (blueprintELResolver != null) {
+            configImpl.addCustomELResolver(blueprintELResolver);
+        }
 
         List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
         if (resolverFactories == null) {
@@ -52,31 +57,6 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
         configImpl.setScriptingEngines(new OsgiScriptingEngines(new ScriptBindingsFactory(configImpl, resolverFactories)));
         super.init();
-    }
-
-    public class BlueprintExpressionManager extends ProcessExpressionManager {
-
-        public BlueprintExpressionManager() {
-            this.delegateInterceptor = new DefaultDelegateInterceptor();
-            this.expressionFactory = new ExpressionFactoryImpl();
-        }
-
-        @Override
-        protected ELResolver createElResolver(VariableContainer variableContainer) {
-            CompositeELResolver compositeElResolver = new CompositeELResolver();
-            compositeElResolver.add(createVariableElResolver(variableContainer));
-            if (blueprintContextELResolver != null) {
-                compositeElResolver.add(blueprintContextELResolver);
-            }
-            compositeElResolver.add(blueprintELResolver);
-            compositeElResolver.add(new BeanELResolver());
-            compositeElResolver.add(new ArrayELResolver());
-            compositeElResolver.add(new ListELResolver());
-            compositeElResolver.add(new MapELResolver());
-            compositeElResolver.add(new CouldNotResolvePropertyELResolver());
-            return compositeElResolver;
-        }
-
     }
 
     public void setBlueprintELResolver(BlueprintELResolver blueprintELResolver) {

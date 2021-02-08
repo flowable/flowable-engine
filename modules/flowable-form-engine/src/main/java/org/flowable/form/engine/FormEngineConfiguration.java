@@ -206,7 +206,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager();
+            expressionManager = new DefaultExpressionManager(beans);
         }
     }
 
