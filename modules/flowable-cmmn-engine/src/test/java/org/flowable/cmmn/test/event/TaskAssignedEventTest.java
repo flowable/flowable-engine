@@ -14,13 +14,14 @@ package org.flowable.cmmn.test.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.cmmn.api.event.FlowableTaskAssignedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
@@ -60,16 +61,20 @@ public class TaskAssignedEventTest extends FlowableCmmnTestCase {
 
         assertThat(task.getAssignee()).isNotNull();
         assertThat(listener.caughtEvent).isNotNull()
-                .isInstanceOf(FlowableTaskAssignedEvent.class);
+                .isInstanceOf(FlowableEntityEventImpl.class);
 
-        FlowableTaskAssignedEvent caughtEvent = (FlowableTaskAssignedEvent) listener.caughtEvent;
+        FlowableEntityEventImpl caughtEvent = (FlowableEntityEventImpl) listener.caughtEvent;
         assertThat(caughtEvent.getScopeId()).isEqualTo(caseInstance.getId());
         assertThat(caughtEvent.getScopeDefinitionId()).isEqualTo(caseInstance.getCaseDefinitionId());
         assertThat(caughtEvent.getSubScopeId()).isEqualTo(task.getId());
         assertThat(caughtEvent.getScopeType()).isEqualTo(task.getScopeType());
 
-        assertThat(caughtEvent.getEntity().getId()).isEqualTo(task.getId());
-        assertThat(caughtEvent.getEntity().getAssignee()).isEqualTo(task.getAssignee());
+        assertThat(caughtEvent.getEntity())
+                .isNotNull()
+                .isInstanceOf(Task.class);
+        Task taskEntity = (Task) caughtEvent.getEntity();
+        assertThat(taskEntity.getId()).isEqualTo(task.getId());
+        assertThat(taskEntity.getAssignee()).isEqualTo(task.getAssignee());
     }
 
     public static class CustomEventListener extends AbstractFlowableEventListener {
