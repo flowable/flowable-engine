@@ -25,19 +25,16 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.ldap.LDAPIdentityServiceImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
 @SpringBootTest
-@RunWith(SpringRunner.class)
 public class SampleLdapGroupCacheTest extends AbstractSampleLdapTest {
 
     @Autowired
@@ -59,14 +56,14 @@ public class SampleLdapGroupCacheTest extends AbstractSampleLdapTest {
 
     private Collection<String> processes;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clock = processEngineConfiguration.getClock();
         processes = new ArrayList<>();
         ((LDAPIdentityServiceImpl) idmIdentityService).getLdapGroupCache().clear();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         clock.reset();
         processes.forEach(instanceId -> runtimeService.deleteProcessInstance(instanceId, "Test tear down"));

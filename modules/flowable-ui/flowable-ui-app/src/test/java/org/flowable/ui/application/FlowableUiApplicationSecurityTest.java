@@ -28,10 +28,9 @@ import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
 import org.flowable.ui.common.security.CookieConstants;
 import org.flowable.ui.common.security.DefaultPrivileges;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,14 +42,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebClient(registerRestTemplate = true)
 public class FlowableUiApplicationSecurityTest {
@@ -89,7 +86,7 @@ public class FlowableUiApplicationSecurityTest {
     @Autowired
     private IdmIdentityService identityService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         User testUser = identityService.newUser("test-user");
         testUser.setPassword("test");
@@ -162,7 +159,7 @@ public class FlowableUiApplicationSecurityTest {
         identityService.saveToken(tokenRest);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         identityService.deleteUser("test-user");
         identityService.deleteToken("user");

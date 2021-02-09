@@ -17,11 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.Application;
 import flowable.mappers.CustomMybatisMapper;
@@ -29,7 +27,6 @@ import flowable.mappers.CustomMybatisMapper;
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class CustomMyBatisMappersApplicationTest {
 

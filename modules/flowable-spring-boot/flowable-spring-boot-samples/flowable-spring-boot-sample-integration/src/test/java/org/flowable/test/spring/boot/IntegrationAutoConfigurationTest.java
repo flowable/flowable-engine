@@ -23,12 +23,10 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.Application;
 
@@ -37,7 +35,6 @@ import flowable.Application;
  *
  * @author Josh Long
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class IntegrationAutoConfigurationTest {
 
