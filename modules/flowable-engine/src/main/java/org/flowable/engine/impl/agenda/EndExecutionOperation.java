@@ -174,8 +174,6 @@ public class EndExecutionOperation extends AbstractOperation {
         job.setTenantId(childProcessInstanceExecutionEntity.getTenantId());
         job.setJobHandlerType(AsyncCompleteCallActivityJobHandler.TYPE);
         
-        superExecutionEntity.getJobs().add(job);
-        
         jobService.createAsyncJob(job, true); // Always exclusive to avoid concurrency problems
         jobService.scheduleAsyncJob(job);
     }

@@ -44,9 +44,6 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -120,9 +117,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     // (we cache associated entities here to minimize db queries)
     protected List<EventSubscriptionEntity> eventSubscriptions;
-    protected List<JobEntity> jobs;
-    protected List<TimerJobEntity> timerJobs;
-    protected List<TaskEntity> tasks;
     protected List<IdentityLinkEntity> identityLinks;
 
     // cascade deletion ////////////////////////////////////////////////////////
@@ -249,10 +243,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     public static ExecutionEntityImpl createWithEmptyRelationshipCollections() {
         ExecutionEntityImpl execution = new ExecutionEntityImpl();
         execution.executions = new ArrayList<>(1);
-        execution.tasks = new ArrayList<>(1);
         execution.variableInstances = new HashMap<>(1);
-        execution.jobs = new ArrayList<>(1);
-        execution.timerJobs = new ArrayList<>(1);
         execution.eventSubscriptions = new ArrayList<>(1);
         execution.identityLinks = new ArrayList<>(1);
         return execution;
@@ -920,47 +911,6 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             eventSubscriptions = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                     .findEventSubscriptionsByExecution(id);
         }
-    }
-
-    // referenced job entities //////////////////////////////////////////////////
-
-    @Override
-    public List<JobEntity> getJobs() {
-        ensureJobsInitialized();
-        return jobs;
-    }
-
-    protected void ensureJobsInitialized() {
-        if (jobs == null) {
-            jobs = CommandContextUtil.getJobService().findJobsByExecutionId(id);
-        }
-    }
-
-    @Override
-    public List<TimerJobEntity> getTimerJobs() {
-        ensureTimerJobsInitialized();
-        return timerJobs;
-    }
-
-    protected void ensureTimerJobsInitialized() {
-        if (timerJobs == null) {
-            timerJobs = CommandContextUtil.getTimerJobService().findTimerJobsByExecutionId(id);
-        }
-    }
-
-    // referenced task entities ///////////////////////////////////////////////////
-
-    protected void ensureTasksInitialized() {
-        if (tasks == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-            tasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByExecutionId(id);
-        }
-    }
-
-    @Override
-    public List<TaskEntity> getTasks() {
-        ensureTasksInitialized();
-        return tasks;
     }
 
     // identity links ///////////////////////////////////////////////////////////

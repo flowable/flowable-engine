@@ -207,7 +207,6 @@ public class TaskHelper {
         }
 
         if (execution != null) {
-            execution.getTasks().add(taskEntity);
             taskEntity.setExecutionId(execution.getId());
             taskEntity.setProcessInstanceId(execution.getProcessInstanceId());
             taskEntity.setProcessDefinitionId(execution.getProcessDefinitionId());

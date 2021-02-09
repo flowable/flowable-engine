@@ -16,17 +16,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -43,6 +40,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.engine.logging.LogMDC;
@@ -180,32 +178,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
         
-        JobEntity job = jobService.createJob();
-        job.setExecutionId(execution.getId());
-        job.setProcessInstanceId(execution.getProcessInstanceId());
-        job.setProcessDefinitionId(execution.getProcessDefinitionId());
-        job.setElementId(flowNode.getId());
-        job.setElementName(flowNode.getName());
-        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-        
-        List<ExtensionElement> jobCategoryElements = flowNode.getExtensionElements().get("jobCategory");
-        if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
-            ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
-            if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
-                Expression categoryExpression = processEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
-                Object categoryValue = categoryExpression.getValue(execution);
-                if (categoryValue != null) {
-                    job.setCategory(categoryValue.toString());
-                }
-            }
-        }
-
-        // Inherit tenant id (if applicable)
-        if (execution.getTenantId() != null) {
-            job.setTenantId(execution.getTenantId());
-        }
-        
-        execution.getJobs().add(job);
+        JobEntity job = JobUtil.createJob(execution, flowNode, AsyncContinuationJobHandler.TYPE, processEngineConfiguration);
         
         jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
