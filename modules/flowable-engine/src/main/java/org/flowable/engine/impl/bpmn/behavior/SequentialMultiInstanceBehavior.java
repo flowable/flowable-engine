@@ -86,8 +86,8 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         // When leaving one of the child executions we need to aggregate the information for it
         // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
         aggregateVariablesForChildExecution(execution, multiInstanceRootExecution);
-
-        boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
+        
+        boolean completeConditionSatisfied = completionConditionSatisfied(execution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
             if (completeConditionSatisfied) {
                 sendCompletedWithConditionEvent(multiInstanceRootExecution);
@@ -102,7 +102,12 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
         }
     }
-    
+
+    @Override
+    protected DelegateExecution getCompletionConditionExecution(DelegateExecution execution) {
+        return getMultiInstanceRootExecution(execution);
+    }
+
     public void continueSequentialMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution) {
         try {
             

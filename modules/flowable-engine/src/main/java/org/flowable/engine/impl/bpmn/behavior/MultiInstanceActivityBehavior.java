@@ -356,21 +356,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     public boolean completionConditionSatisfied(DelegateExecution execution) {
         if (completionCondition != null) {
-            
+
+            DelegateExecution completionConditionExecution = getCompletionConditionExecution(execution);
+
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
             
             String activeCompletionCondition = null;
 
             if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-                ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(activity.getId(), execution.getProcessDefinitionId());
+                ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(activity.getId(), completionConditionExecution.getProcessDefinitionId());
                 activeCompletionCondition = getActiveValue(completionCondition, DynamicBpmnConstants.MULTI_INSTANCE_COMPLETION_CONDITION, taskElementProperties);
 
             } else {
                 activeCompletionCondition = completionCondition;
             }
             
-            Object value = expressionManager.createExpression(activeCompletionCondition).getValue(execution);
+            Object value = expressionManager.createExpression(activeCompletionCondition).getValue(completionConditionExecution);
             
             if (!(value instanceof Boolean)) {
                 throw new FlowableIllegalArgumentException("completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
@@ -704,4 +706,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     public AbstractBpmnActivityBehavior getInnerActivityBehavior() {
         return innerActivityBehavior;
     }
+
+    /**
+     * Returns Execution for completionConditionSatisfied check to enable possibility check completion condition on
+     * child execution level and not only on root or parent.
+     */
+    protected abstract DelegateExecution getCompletionConditionExecution(DelegateExecution execution);
 }
