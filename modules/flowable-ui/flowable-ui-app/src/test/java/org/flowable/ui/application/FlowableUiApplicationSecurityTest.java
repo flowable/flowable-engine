@@ -187,7 +187,7 @@ public class FlowableUiApplicationSecurityTest {
 
         assertThat(result.getHeaders().getFirst(HttpHeaders.LOCATION))
                 .as("redirect location")
-                .isEqualTo("http://localhost:" + serverPort + "/flowable-ui/idm/#/login?redirectOnAuthSuccess=true&redirectUrl=" + rootUrl);
+                .isEqualTo("http://localhost:" + serverPort + "/flowable-ui/idm/#/login");
     }
 
     @Test

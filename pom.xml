@@ -1340,6 +1340,12 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>ui</id>
+			<modules>
+				<module>modules/flowable-ui</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>deploy</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
