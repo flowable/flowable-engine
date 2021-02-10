@@ -225,8 +225,7 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
         @Override
         public CompletableFuture<HttpResponse> callAsync() {
             return request
-                    .exchange()
-                    .flatMap(response -> response.toEntity(ByteArrayResource.class))
+                    .exchangeToMono(response -> response.toEntity(ByteArrayResource.class))
                     .map(SpringWebClientFlowableHttpClient.this::toFlowableHttpResponse)
                     .toFuture();
         }

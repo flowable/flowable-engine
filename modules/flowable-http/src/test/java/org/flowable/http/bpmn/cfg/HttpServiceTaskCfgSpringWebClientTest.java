@@ -12,8 +12,16 @@
  */
 package org.flowable.http.bpmn.cfg;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import javax.net.ssl.SSLHandshakeException;
+
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.test.Deployment;
 import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
  * @author Filip Hrisafov
@@ -25,5 +33,13 @@ public class HttpServiceTaskCfgSpringWebClientTest extends HttpServiceTaskCfgTes
         super.additionalConfiguration(processEngineConfiguration);
         processEngineConfiguration.getHttpClientConfig().setDefaultParallelInSameTransaction(true);
         processEngineConfiguration.getHttpClientConfig().setHttpClient(new SpringWebClientFlowableHttpClient(processEngineConfiguration.getHttpClientConfig()));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/http/bpmn/cfg/HttpServiceTaskCfgTest.testHttpsSelfSignedFail.bpmn20.xml")
+    public void testHttpsSelfSignedFail() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId())
+                .isInstanceOf(WebClientRequestException.class)
+                .hasCauseInstanceOf(SSLHandshakeException.class);
     }
 }
