@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import javax.net.ssl.SSLHandshakeException;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
