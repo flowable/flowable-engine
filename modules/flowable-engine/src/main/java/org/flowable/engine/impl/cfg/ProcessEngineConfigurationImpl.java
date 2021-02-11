@@ -84,6 +84,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.interceptor.InstantiateInterceptor;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
@@ -900,6 +901,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected DelegateInterceptor delegateInterceptor;
+
+    protected InstantiateInterceptor instantiateInterceptor;
 
     protected Map<String, EventHandler> eventHandlers;
     protected List<EventHandler> customEventHandlers;
@@ -3716,6 +3719,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public DelegateInterceptor getDelegateInterceptor() {
         return delegateInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setInstantiateInterceptor(InstantiateInterceptor instantiateInterceptor) {
+        this.instantiateInterceptor = instantiateInterceptor;
+        return this;
+    }
+
+    public InstantiateInterceptor getInstantiateInterceptor() {
+        return instantiateInterceptor;
     }
 
     public EventHandler getEventHandler(String eventType) {

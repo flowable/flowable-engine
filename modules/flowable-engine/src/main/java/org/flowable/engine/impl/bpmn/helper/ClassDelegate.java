@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,14 +46,16 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
+import org.flowable.common.engine.api.FlowableClassLoadingException;
+import org.flowable.common.engine.impl.interceptor.InstantiateInterceptor;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
- * 
+ *
  * This class will lazily instantiate the referenced classes when needed at runtime.
- * 
+ *
  * @author Joram Barrez
  * @author Falko Menge
  * @author Saeid Mirzaei
@@ -85,11 +87,11 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations, Expression skipExpression) {
         this(clazz.getName(), fieldDeclarations, skipExpression);
     }
-    
+
     public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
         super(className, fieldDeclarations);
     }
-    
+
     public ClassDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
         super(clazz, fieldDeclarations);
     }
@@ -258,7 +260,17 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     }
 
     protected ActivityBehavior getActivityBehaviorInstance() {
-        Object delegateInstance = instantiateDelegate(className, fieldDeclarations);
+        Object delegateInstance = null;
+        try {
+            delegateInstance = instantiateDelegate(className, fieldDeclarations);
+        } catch (FlowableClassLoadingException e) {
+            InstantiateInterceptor instantiateIntercepter = CommandContextUtil.getProcessEngineConfiguration().getInstantiateInterceptor();
+            if (instantiateIntercepter == null) {
+                throw new FlowableException("couldn't instantiate class " + className, e);
+            } else {
+                delegateInstance = instantiateIntercepter.instantiate(className);
+            }
+        }
 
         if (delegateInstance instanceof ActivityBehavior) {
             return determineBehaviour((ActivityBehavior) delegateInstance);
