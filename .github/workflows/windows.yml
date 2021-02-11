@@ -3,7 +3,7 @@ name: Flowable Windows Build
 on: [push]
 
 env:
-  MAVEN_WINDOWS_ARGS: >-
+  MAVEN_ARGS: >-
     -B -V --no-transfer-progress
     -D http.keepAlive=false -D maven.wagon.http.pool=false -D maven.wagon.httpconnectionManager.ttlSeconds=120
 
