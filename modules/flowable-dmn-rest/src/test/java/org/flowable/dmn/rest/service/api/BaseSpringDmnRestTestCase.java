@@ -193,8 +193,6 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            fail(e.getMessage());
         } catch (IOException e) {
             fail(e.getMessage());
         }
