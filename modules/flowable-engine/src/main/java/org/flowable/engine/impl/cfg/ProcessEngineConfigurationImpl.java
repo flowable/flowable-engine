@@ -872,7 +872,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean parallelMultiInstanceAsyncLeave = true;
 
     protected ExpressionManager expressionManager;
-    protected List<ELResolver> customELResolvers;
+    protected Collection<ELResolver> preDefaultELResolvers;
+    protected Collection<ELResolver> preBeanELResolvers;
+    protected Collection<ELResolver> postDefaultELResolvers;
     protected List<String> customScriptingEngineClasses;
     protected ScriptingEngines scriptingEngines;
     protected List<ResolverFactory> resolverFactories;
@@ -2540,8 +2542,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 processExpressionManager.setExpressionTextLengthCacheLimit(expressionTextLengthCacheLimit);
             }
 
-            if (customELResolvers != null) {
-                customELResolvers.forEach(processExpressionManager::addPreDefaultResolver);
+            if (preDefaultELResolvers != null) {
+                preDefaultELResolvers.forEach(processExpressionManager::addPreDefaultResolver);
+            }
+
+            if (preBeanELResolvers != null) {
+                preBeanELResolvers.forEach(processExpressionManager::addPreBeanResolver);
+            }
+
+            if (postDefaultELResolvers != null) {
+                postDefaultELResolvers.forEach(processExpressionManager::addPostDefaultResolver);
             }
 
             expressionManager = processExpressionManager;
@@ -3321,21 +3331,57 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<ELResolver> getCustomELResolvers() {
-        return customELResolvers;
+    public Collection<ELResolver> getPreDefaultELResolvers() {
+        return preDefaultELResolvers;
     }
 
-    public ProcessEngineConfigurationImpl setCustomELResolvers(List<ELResolver> customELResolvers) {
-        this.customELResolvers = customELResolvers;
+    public ProcessEngineConfigurationImpl setPreDefaultELResolvers(Collection<ELResolver> preDefaultELResolvers) {
+        this.preDefaultELResolvers = preDefaultELResolvers;
         return this;
     }
 
-    public ProcessEngineConfigurationImpl addCustomELResolver(ELResolver elResolver) {
-        if (customELResolvers == null) {
-            customELResolvers = new ArrayList<>();
+    public ProcessEngineConfigurationImpl addPreDefaultELResolver(ELResolver elResolver) {
+        if (preDefaultELResolvers == null) {
+            preDefaultELResolvers = new ArrayList<>();
         }
 
-        customELResolvers.add(elResolver);
+        preDefaultELResolvers.add(elResolver);
+        return this;
+    }
+
+    public Collection<ELResolver> getPreBeanELResolvers() {
+        return preBeanELResolvers;
+    }
+
+    public ProcessEngineConfigurationImpl setPreBeanELResolvers(Collection<ELResolver> preBeanELResolvers) {
+        this.preBeanELResolvers = preBeanELResolvers;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addPreBeanELResolver(ELResolver elResolver) {
+        if (this.preBeanELResolvers == null) {
+            this.preBeanELResolvers = new ArrayList<>();
+        }
+
+        this.preBeanELResolvers.add(elResolver);
+        return this;
+    }
+
+    public Collection<ELResolver> getPostDefaultELResolvers() {
+        return postDefaultELResolvers;
+    }
+
+    public ProcessEngineConfigurationImpl setPostDefaultELResolvers(Collection<ELResolver> postDefaultELResolvers) {
+        this.postDefaultELResolvers = postDefaultELResolvers;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addPostDefaultELResolver(ELResolver elResolver) {
+        if (this.postDefaultELResolvers == null) {
+            this.postDefaultELResolvers = new ArrayList<>();
+        }
+
+        this.postDefaultELResolvers.add(elResolver);
         return this;
     }
 

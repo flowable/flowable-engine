@@ -26,6 +26,7 @@ import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
@@ -115,6 +116,9 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventResourceEntityManager resourceEntityManager;
 
     protected ExpressionManager expressionManager;
+    protected Collection<ELResolver> preDefaultELResolvers;
+    protected Collection<ELResolver> preBeanELResolvers;
+    protected Collection<ELResolver> postDefaultELResolvers;
 
     protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
     protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
@@ -257,7 +261,21 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager(beans);
+            DefaultExpressionManager eventRegistryExpressionManager = new DefaultExpressionManager(beans);
+
+            if (preDefaultELResolvers != null) {
+                preDefaultELResolvers.forEach(eventRegistryExpressionManager::addPreDefaultResolver);
+            }
+
+            if (preBeanELResolvers != null) {
+                preBeanELResolvers.forEach(eventRegistryExpressionManager::addPreBeanResolver);
+            }
+
+            if (postDefaultELResolvers != null) {
+                postDefaultELResolvers.forEach(eventRegistryExpressionManager::addPostDefaultResolver);
+            }
+
+            expressionManager = eventRegistryExpressionManager;
         }
     }
 
@@ -803,6 +821,60 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     @Override
     public EventRegistryEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public Collection<ELResolver> getPreDefaultELResolvers() {
+        return preDefaultELResolvers;
+    }
+
+    public EventRegistryEngineConfiguration setPreDefaultELResolvers(Collection<ELResolver> preDefaultELResolvers) {
+        this.preDefaultELResolvers = preDefaultELResolvers;
+        return this;
+    }
+
+    public EventRegistryEngineConfiguration addPreDefaultELResolver(ELResolver elResolver) {
+        if (this.preDefaultELResolvers == null) {
+            this.preDefaultELResolvers = new ArrayList<>();
+        }
+
+        this.preDefaultELResolvers.add(elResolver);
+        return this;
+    }
+
+    public Collection<ELResolver> getPreBeanELResolvers() {
+        return preBeanELResolvers;
+    }
+
+    public EventRegistryEngineConfiguration setPreBeanELResolvers(Collection<ELResolver> preBeanELResolvers) {
+        this.preBeanELResolvers = preBeanELResolvers;
+        return this;
+    }
+
+    public EventRegistryEngineConfiguration addPreBeanELResolver(ELResolver elResolver) {
+        if (this.preBeanELResolvers == null) {
+            this.preBeanELResolvers = new ArrayList<>();
+        }
+
+        this.preBeanELResolvers.add(elResolver);
+        return this;
+    }
+
+    public Collection<ELResolver> getPostDefaultELResolvers() {
+        return postDefaultELResolvers;
+    }
+
+    public EventRegistryEngineConfiguration setPostDefaultELResolvers(Collection<ELResolver> postDefaultELResolvers) {
+        this.postDefaultELResolvers = postDefaultELResolvers;
+        return this;
+    }
+
+    public EventRegistryEngineConfiguration addPostDefaultELResolver(ELResolver elResolver) {
+        if (this.postDefaultELResolvers == null) {
+            this.postDefaultELResolvers = new ArrayList<>();
+        }
+
+        this.postDefaultELResolvers.add(elResolver);
         return this;
     }
 

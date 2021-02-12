@@ -23,7 +23,7 @@ import org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration;
 public class CdiJtaProcessEngineConfiguration extends JtaProcessEngineConfiguration {
 
     public CdiJtaProcessEngineConfiguration() {
-        addCustomELResolver(new CdiResolver());
+        addPreDefaultELResolver(new CdiResolver());
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 public class CdiStandaloneProcessEngineConfiguration extends StandaloneProcessEngineConfiguration {
 
     public CdiStandaloneProcessEngineConfiguration() {
-        addCustomELResolver(new CdiResolver());
+        addPreDefaultELResolver(new CdiResolver());
     }
 
     @Override

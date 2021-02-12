@@ -15,21 +15,10 @@ package org.flowable.osgi.blueprint;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.common.engine.impl.de.odysseus.el.ExpressionFactoryImpl;
-import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
-import org.flowable.common.engine.impl.javax.el.BeanELResolver;
-import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
-import org.flowable.common.engine.impl.javax.el.CouldNotResolvePropertyELResolver;
-import org.flowable.common.engine.impl.javax.el.ELResolver;
-import org.flowable.common.engine.impl.javax.el.ListELResolver;
-import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
-import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.osgi.OsgiScriptingEngines;
 
@@ -42,10 +31,10 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     public void init() throws Exception {
         ProcessEngineConfigurationImpl configImpl = (ProcessEngineConfigurationImpl) getProcessEngineConfiguration();
         if (blueprintContextELResolver != null) {
-            configImpl.addCustomELResolver(blueprintContextELResolver);
+            configImpl.addPreDefaultELResolver(blueprintContextELResolver);
         }
         if (blueprintELResolver != null) {
-            configImpl.addCustomELResolver(blueprintELResolver);
+            configImpl.addPreDefaultELResolver(blueprintELResolver);
         }
 
         List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
