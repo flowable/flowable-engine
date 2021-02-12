@@ -149,17 +149,17 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityId("task1").singleResult().getId()).isEqualTo(processInstance2.getId());
             assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityId("task2").count()).isZero();
             
-            Set<String> activityIds = new HashSet<String>();
+            Set<String> activityIds = new HashSet<>();
             activityIds.add("task1");
             activityIds.add("task2");
             assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).singleResult().getId()).isEqualTo(processInstance2.getId());
         
-            activityIds = new HashSet<String>();
+            activityIds = new HashSet<>();
             activityIds.add("task1");
             activityIds.add("task3");
             assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).count()).isEqualTo(2);
             
-            activityIds = new HashSet<String>();
+            activityIds = new HashSet<>();
             activityIds.add("task2");
             activityIds.add("task3");
             assertThat(historyService.createHistoricProcessInstanceQuery().activeActivityIds(activityIds).singleResult().getId()).isEqualTo(processInstance1.getId());
