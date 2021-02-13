@@ -34,7 +34,7 @@
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.5.13</mockito.version>
+		<mockito.version>3.7.7</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
