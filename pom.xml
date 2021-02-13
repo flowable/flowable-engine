@@ -29,7 +29,7 @@
 		<groovy.version>3.0.7</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
-		<junit.version>4.13</junit.version>
+		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.7.1</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
