@@ -157,6 +157,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>test</scope>
+       </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring</artifactId>
             <scope>test</scope>
