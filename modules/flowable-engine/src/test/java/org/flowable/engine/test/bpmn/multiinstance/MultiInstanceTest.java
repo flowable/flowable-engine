@@ -55,6 +55,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.servicetask.ValueBean;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.JobInfo;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -601,6 +602,92 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 assertThat(hai.getStartTime()).isNotNull();
                 assertThat(hai.getEndTime()).isNotNull();
             }
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testParallelAsyncScriptTasks() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("miParallelAsyncScriptTask")
+                .variable("nrOfLoops", 10)
+                .start();
+        List<Job> jobs = managementService.createJobQuery().list();
+        // There are 10 jobs for each async execution
+        assertThat(jobs).hasSize(10);
+
+        // When a job fails it is moved to the timer jobs, so it can be executed later
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000000, 200);
+        jobs = managementService.createJobQuery().list();
+        assertThat(jobs).isEmpty();
+        List<Job> timerJobs = managementService.createTimerJobQuery().list();
+        assertThat(timerJobs).isEmpty();
+
+        List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
+        assertThat(deadLetterJobs).isEmpty();
+
+
+        List<Execution> executions = runtimeService.createExecutionQuery().list();
+        assertThat(executions).hasSize(2);
+        Execution processInstanceExecution = null;
+        Execution waitStateExecution = null;
+        for (Execution execution : executions) {
+            if (execution.getId().equals(execution.getProcessInstanceId())) {
+                processInstanceExecution = execution;
+            } else {
+                waitStateExecution = execution;
+            }
+        }
+        assertThat(processInstanceExecution).isNotNull();
+        assertThat(waitStateExecution).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelAsyncScriptTasks.bpmn20.xml")
+    public void testParallelAsyncScriptTasksWithoutAsyncLeave() {
+        boolean originalAsyncLeave = processEngineConfiguration.isParallelMultiInstanceAsyncLeave();
+        processEngineConfiguration.setParallelMultiInstanceAsyncLeave(false);
+        try {
+
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("miParallelAsyncScriptTask")
+                    .variable("nrOfLoops", 10)
+                    .start();
+            List<Job> jobs = managementService.createJobQuery().list();
+            // There are 10 jobs for each async execution
+            assertThat(jobs).hasSize(10);
+
+            // When a job fails it is moved to the timer jobs, so it can be executed later
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000, 200);
+            jobs = managementService.createJobQuery().list();
+            assertThat(jobs).isEmpty();
+            List<Job> timerJobs = managementService.createTimerJobQuery().list();
+            assertThat(timerJobs)
+                    .isNotEmpty()
+                    .extracting(JobInfo::getExceptionMessage)
+                    .allSatisfy(message -> {
+                        assertThat(message)
+                                .contains("was updated by another transaction concurrently");
+                    });
+
+            List<String> timerJobsExceptionStacktraces = timerJobs.stream()
+                    .map(JobInfo::getId)
+                    .map(managementService::getTimerJobExceptionStacktrace)
+                    .collect(Collectors.toList());
+            assertThat(timerJobsExceptionStacktraces)
+                    .allSatisfy(stacktrace -> {
+                        assertThat(stacktrace).contains("FlowableOptimisticLockingException");
+                    });
+
+            List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
+            assertThat(deadLetterJobs).isEmpty();
+
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSizeGreaterThan(timerJobs.size());
+            Execution waitStateExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+            assertThat(waitStateExecution).isNull();
+        } finally {
+            processEngineConfiguration.setParallelMultiInstanceAsyncLeave(originalAsyncLeave);
         }
     }
 

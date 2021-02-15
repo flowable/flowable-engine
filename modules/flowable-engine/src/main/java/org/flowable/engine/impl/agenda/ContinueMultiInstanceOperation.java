@@ -29,6 +29,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.logging.LogMDC;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -110,22 +111,10 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
         
-        JobEntity job = jobService.createJob();
-        job.setExecutionId(execution.getId());
-        job.setProcessInstanceId(execution.getProcessInstanceId());
-        job.setProcessDefinitionId(execution.getProcessDefinitionId());
-        job.setElementId(flowNode.getId());
-        job.setElementName(flowNode.getName());
-        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-
-        // Inherit tenant id (if applicable)
-        if (execution.getTenantId() != null) {
-            job.setTenantId(execution.getTenantId());
-        }
-        
-        execution.getJobs().add(job);
+        JobEntity job = JobUtil.createJob(execution, flowNode, AsyncContinuationJobHandler.TYPE, processEngineConfiguration);
         
         jobService.createAsyncJob(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);

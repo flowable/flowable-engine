@@ -50,7 +50,6 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
 
     @Override
     public ProcessEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
 
         if (processEngineConfiguration.getBeans() == null) {
@@ -59,13 +58,6 @@ public class ProcessEngineFactoryBean implements FactoryBean<ProcessEngine>, Dis
 
         this.processEngine = processEngineConfiguration.buildProcessEngine();
         return this.processEngine;
-    }
-
-    protected void configureExpressionManager() {
-        if (processEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            processEngineConfiguration.setExpressionManager(new SpringExpressionManager(applicationContext,
-                    processEngineConfiguration.getBeans()));
-        }
     }
 
     protected void configureExternallyManagedTransactions() {

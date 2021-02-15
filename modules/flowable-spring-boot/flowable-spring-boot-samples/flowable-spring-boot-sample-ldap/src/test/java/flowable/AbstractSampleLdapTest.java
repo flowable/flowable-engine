@@ -18,8 +18,8 @@ import java.util.Collection;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
 import org.flowable.spring.boot.ldap.FlowableLdapProperties;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -42,7 +42,7 @@ public abstract class AbstractSampleLdapTest {
 
     private Collection<String> privilegeIds = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void createLdapService() throws LDAPException {
         directoryServer = InMemoryDirectoryServerCreator.create(ldapProperties);
         directoryServer.startListening();
@@ -58,7 +58,7 @@ public abstract class AbstractSampleLdapTest {
         idmIdentityService.addUserPrivilegeMapping(managementPrivilege.getId(), "fozzie");
     }
 
-    @After
+    @AfterEach
     public void shutDownLdapServer() {
         directoryServer.shutDown(true);
         privilegeIds.forEach(idmIdentityService::deletePrivilege);

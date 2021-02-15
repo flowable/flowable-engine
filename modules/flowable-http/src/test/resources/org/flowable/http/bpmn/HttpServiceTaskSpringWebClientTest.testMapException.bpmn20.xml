@@ -10,7 +10,7 @@
         <flowable:field name="requestUrl">
           <flowable:string><![CDATA[http://nohost:9798/api]]></flowable:string>
         </flowable:field>
-        <flowable:mapException errorCode="errorCode">java.net.UnknownHostException</flowable:mapException>
+        <flowable:mapException errorCode="errorCode" includeChildExceptions="true" rootCause="java.net.UnknownHostException"/>
       </extensionElements>
     </serviceTask>
     <endEvent id="theEnd" name="theEnd"></endEvent>

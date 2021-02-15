@@ -23,9 +23,6 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Joram Barrez
  */
 public class VariableScopeExpressionManager extends DefaultExpressionManager {
-    
-    public VariableScopeExpressionManager() {
-    }
 
     public VariableScopeExpressionManager(Map<Object, Object> beans) {
        super(beans);

@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
@@ -76,6 +77,13 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         ProcessEngines.setInitialized(true);
         enginesBuild.add(processEngine.getName());
         return processEngine;
+    }
+
+    @Override
+    public void initBeans() {
+        if (beans == null) {
+            beans = new SpringBeanFactoryProxyMap(applicationContext);
+        }
     }
 
     @Override

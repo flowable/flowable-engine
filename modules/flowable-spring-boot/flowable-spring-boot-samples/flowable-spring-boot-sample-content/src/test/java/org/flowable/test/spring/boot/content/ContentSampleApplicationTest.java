@@ -21,18 +21,15 @@ import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.ContentSampleApplication;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ContentSampleApplication.class)
 public class ContentSampleApplicationTest {
 

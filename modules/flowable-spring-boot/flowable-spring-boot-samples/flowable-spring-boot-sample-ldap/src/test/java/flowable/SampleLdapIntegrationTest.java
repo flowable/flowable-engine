@@ -27,18 +27,15 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.ldap.LDAPIdentityServiceImpl;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
 @SpringBootTest
-@RunWith(SpringRunner.class)
 public class SampleLdapIntegrationTest extends AbstractSampleLdapTest {
 
     @Autowired
@@ -55,7 +52,7 @@ public class SampleLdapIntegrationTest extends AbstractSampleLdapTest {
 
     private Collection<String> processes = new ArrayList<>();
 
-    @After
+    @AfterEach
     public void tearDown() {
         processes.forEach(instanceId -> runtimeService.deleteProcessInstance(instanceId, "Test tear down"));
     }

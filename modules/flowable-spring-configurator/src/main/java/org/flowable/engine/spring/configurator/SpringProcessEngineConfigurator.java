@@ -17,7 +17,6 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.spring.SpringEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
-import org.flowable.spring.SpringExpressionManager;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -41,9 +40,8 @@ public class SpringProcessEngineConfigurator extends ProcessEngineConfigurator {
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
         springProcessEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
-        if (springProcessEngineConfiguration.getExpressionManager() == null) {
-            springProcessEngineConfiguration.setExpressionManager(new SpringExpressionManager(
-                springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        if (springProcessEngineConfiguration.getBeans() == null) {
+            springProcessEngineConfiguration.setBeans(springProcessEngineConfiguration.getBeans());
         }
 
         initProcessEngine();

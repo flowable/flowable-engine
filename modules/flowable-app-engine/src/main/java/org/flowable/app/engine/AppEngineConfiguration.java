@@ -36,7 +36,6 @@ import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.deployer.AppDeployer;
 import org.flowable.app.engine.impl.deployer.AppDeploymentManager;
 import org.flowable.app.engine.impl.deployer.AppResourceConverterImpl;
-import org.flowable.app.engine.impl.el.AppExpressionManager;
 import org.flowable.app.engine.impl.interceptor.AppCommandInvoker;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManager;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManagerImpl;
@@ -64,6 +63,7 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -202,6 +202,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initBeans();
         initExpressionManager();
         
         if (usingRelationalDatabase) {
@@ -215,7 +216,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
         configureVariableServiceConfiguration();
         initVariableTypes();
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {
@@ -280,7 +280,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new AppExpressionManager(beans);
+            expressionManager = new DefaultExpressionManager(beans);
         }
     }
 
