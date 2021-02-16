@@ -41,7 +41,7 @@
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
         <!-- JVM params for test execution -->
-		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
+		<argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>
 
 		<!-- OSGi bundles properties -->
 		<flowable.artifact />
