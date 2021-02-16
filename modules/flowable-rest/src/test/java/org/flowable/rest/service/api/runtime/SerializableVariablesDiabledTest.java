@@ -193,8 +193,6 @@ public class SerializableVariablesDiabledTest {
 
             response.close();
 
-        } catch (ClientProtocolException e) {
-            fail(e.getMessage());
         } catch (IOException e) {
             fail(e.getMessage());
         }
