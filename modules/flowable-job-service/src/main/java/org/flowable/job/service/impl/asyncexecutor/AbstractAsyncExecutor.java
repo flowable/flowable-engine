@@ -36,9 +36,11 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     
     protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
     protected AcquireTimerJobsRunnable timerJobRunnable;
+    protected AcquireTimerLifecycleListener timerLifecycleListener;
     protected String acquireRunnableThreadName;
     protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
     protected AcquireAsyncJobsDueRunnable asyncJobsDueRunnable;
+    protected AcquireAsyncJobsDueLifecycleListener asyncJobsDueLifecycleListener;
     protected String resetExpiredRunnableName;
     protected ResetExpiredJobsRunnable resetExpiredJobsRunnable;
 
@@ -128,7 +130,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected void initializeRunnables() {
         if (timerRunnableNeeded && timerJobRunnable == null) {
-            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager());
+            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(), timerLifecycleListener);
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
@@ -143,7 +145,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
             String acquireJobsRunnableName = acquireRunnableThreadName != null ?
                     acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
-            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
+            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse, asyncJobsDueLifecycleListener);
         }
     }
 
@@ -312,8 +314,24 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.asyncJobsDueRunnable = asyncJobsDueRunnable;
     }
 
+    public AcquireAsyncJobsDueLifecycleListener getAsyncJobsDueLifecycleListener() {
+        return asyncJobsDueLifecycleListener;
+    }
+
+    public void setAsyncJobsDueLifecycleListener(AcquireAsyncJobsDueLifecycleListener asyncJobsDueLifecycleListener) {
+        this.asyncJobsDueLifecycleListener = asyncJobsDueLifecycleListener;
+    }
+
     public void setTimerRunnableNeeded(boolean timerRunnableNeeded) {
         this.timerRunnableNeeded = timerRunnableNeeded;
+    }
+
+    public AcquireTimerLifecycleListener getTimerLifecycleListener() {
+        return timerLifecycleListener;
+    }
+
+    public void setTimerLifecycleListener(AcquireTimerLifecycleListener timerLifecycleListener) {
+        this.timerLifecycleListener = timerLifecycleListener;
     }
 
     public void setAcquireRunnableThreadName(String acquireRunnableThreadName) {

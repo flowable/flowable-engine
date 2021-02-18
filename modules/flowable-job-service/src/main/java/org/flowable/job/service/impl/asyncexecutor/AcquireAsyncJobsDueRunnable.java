@@ -31,20 +31,44 @@ import org.slf4j.LoggerFactory;
 public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AcquireAsyncJobsDueRunnable.class);
+    private static final AcquireAsyncJobsDueLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireAsyncJobsDueLifecycleListener() {
+
+        @Override
+        public void startAcquiring(String engineName) {
+
+        }
+
+        @Override
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
+
+        }
+
+        @Override
+        public void rejectedJobs(String engineName, int jobsRejected) {
+
+        }
+
+        @Override
+        public void startWaiting(String engineName, long millisToWait) {
+
+        }
+    };
 
     protected String name;
     protected final AsyncExecutor asyncExecutor;
     protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+    protected final AcquireAsyncJobsDueLifecycleListener lifecycleListener;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
-    public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor, 
-            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+    public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor,
+            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager, AcquireAsyncJobsDueLifecycleListener lifecycleListener) {
         this.name = name;
         this.asyncExecutor = asyncExecutor;
         this.jobEntityManager = jobEntityManager;
+        this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
     }
 
     @Override
@@ -54,6 +78,8 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
 
+        lifecycleListener.startAcquiring(getEngineName());
+
         while (!isInterrupted) {
             final long millisToWait;
 
@@ -62,13 +88,13 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
+                    LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
                 }
             } else {
                 millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("queue is full for engine {}; sleeping for {} ms", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
+                    LOGGER.debug("queue is full for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
                 }
             }
 
@@ -76,16 +102,20 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 sleep(millisToWait);
             }
         }
-        LOGGER.info("stopped async job due acquisition for engine {}", asyncExecutor.getJobServiceConfiguration().getEngineName());
+        LOGGER.info("stopped async job due acquisition for engine {}", getEngineName());
     }
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
             AcquiredJobEntities acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
 
+            lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
+
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
 
-            LOGGER.debug("Jobs acquired: {}, rejected: {}, for engine {}", acquiredJobs.size(), rejectedJobs.size(), asyncExecutor.getJobServiceConfiguration().getEngineName());
+            lifecycleListener.rejectedJobs(getEngineName(), rejectedJobs.size());
+
+            LOGGER.debug("Jobs acquired: {}, rejected: {}, for engine {}", acquiredJobs.size(), rejectedJobs.size(), getEngineName());
             if (rejectedJobs.size() > 0) {
                 // some jobs were rejected, so the queue was full; wait until attempting to acquire more.
                 return asyncExecutor.getDefaultQueueSizeFullWaitTimeInMillis();
@@ -97,10 +127,11 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread.This is expected behavior in a clustered environment. You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. for engine {}. Exception message: {}", asyncExecutor.getJobServiceConfiguration().getEngineName(), optimisticLockingException.getMessage());
+                LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread.This is expected behavior in a clustered environment. You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. for engine {}. Exception message: {}",
+                        getEngineName(), optimisticLockingException.getMessage());
             }
         } catch (Throwable e) {
-            LOGGER.error("exception for engine {} during async job acquisition: {}", asyncExecutor.getJobServiceConfiguration().getEngineName(), e.getMessage(), e);
+            LOGGER.error("exception for engine {} during async job acquisition: {}", getEngineName(), e.getMessage(), e);
         }
 
         return asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
@@ -130,26 +161,34 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         if (millisToWait > 0) {
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition for engine {}, thread sleeping for {} millis", asyncExecutor.getJobServiceConfiguration().getEngineName(), millisToWait);
+                    LOGGER.debug("async job acquisition for engine {}, thread sleeping for {} millis", getEngineName(), millisToWait);
                 }
                 synchronized (MONITOR) {
                     if (!isInterrupted) {
                         isWaiting.set(true);
+                        lifecycleListener.startWaiting(getEngineName(), millisToWait);
                         MONITOR.wait(millisToWait);
                     }
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition for engine {}, thread woke up", asyncExecutor.getJobServiceConfiguration().getEngineName());
+                    LOGGER.debug("async job acquisition for engine {}, thread woke up", getEngineName());
                 }
             } catch (InterruptedException e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async job acquisition for engine {}, wait interrupted", asyncExecutor.getJobServiceConfiguration().getEngineName());
+                    LOGGER.debug("async job acquisition for engine {}, wait interrupted", getEngineName());
                 }
             } finally {
                 isWaiting.set(false);
+                if (!isInterrupted) {
+                    lifecycleListener.startAcquiring(getEngineName());
+                }
             }
         }
+    }
+
+    protected String getEngineName() {
+        return asyncExecutor.getJobServiceConfiguration().getEngineName();
     }
 
 }
