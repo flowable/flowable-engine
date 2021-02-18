@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.4.2</spring.boot.version>
+		<spring.boot.version>2.4.3</spring.boot.version>
 		<spring.framework.version>5.3.4</spring.framework.version>
-		<spring.security.version>5.4.4</spring.security.version>
-		<spring.amqp.version>2.3.4</spring.amqp.version>
-		<spring.kafka.version>2.6.5</spring.kafka.version>
+		<spring.security.version>5.4.5</spring.security.version>
+		<spring.amqp.version>2.3.5</spring.amqp.version>
+		<spring.kafka.version>2.6.6</spring.kafka.version>
 		<reactor-netty.version>1.0.3</reactor-netty.version>
 		<jackson.version>2.11.4</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
@@ -222,7 +222,7 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>8.0.19</version>
+				<version>8.0.23</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
@@ -775,7 +775,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.25.Final</version>
+				<version>5.4.28.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
