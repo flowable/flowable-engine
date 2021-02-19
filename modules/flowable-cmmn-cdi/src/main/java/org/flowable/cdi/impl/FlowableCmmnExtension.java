@@ -87,7 +87,7 @@ public class FlowableCmmnExtension implements Extension {
 
         if (cmmnEngineLookup == null) {
             throw new FlowableException(
-                    "Could not find an implementation of the org.flowable.cdi.spi.CmmnEngineLookup service " + "returning a non-null cmmnEngine. Giving up.");
+                    "Could not find an implementation of the " + CmmnEngineLookup.class.getName() + " service returning a non-null cmmnEngine. Giving up.");
         }
 
         Bean<FlowableCmmnServices> flowableCmmnServicesBean = (Bean<FlowableCmmnServices>) beanManager.getBeans(FlowableCmmnServices.class).stream()
