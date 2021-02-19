@@ -2894,7 +2894,7 @@ Only one of processDefinitionId, processDefinitionKey or message can be used in 
     }
 
 The request body can contain all possible filters that can be used in the [List process instances](bpmn/ch15-REST.md#list-of-process-instances) URL query. On top of these, it’s possible to provide an array of variables
-to include in the query, with their format [described here](restQueryVariable).
+to include in the query, with their format [described here](#json-query-variable-format).
 
 The general [paging and sorting query-parameters](restPagingAndSort) can be used for this URL.
 
@@ -4154,7 +4154,7 @@ Returns all activities which are active in the execution and in all child-execut
     }
 
 The request body can contain all possible filters that can be used in the [List executions](bpmn/ch15-REST.md#list-of-executions) URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables
-to include in the query, with their format [described here](restQueryVariable).
+to include in the query, with their format [described here](#json-query-variable-format).
 
 The general [paging and sorting query-parameters](restPagingAndSort) can be used for this URL.
 
