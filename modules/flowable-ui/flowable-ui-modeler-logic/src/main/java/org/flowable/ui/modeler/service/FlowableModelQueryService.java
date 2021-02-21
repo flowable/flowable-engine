@@ -41,6 +41,7 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
+import org.flowable.ui.common.service.exception.ConflictingRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.util.XmlUtil;
 import org.flowable.ui.modeler.domain.AbstractModel;
@@ -176,6 +177,10 @@ public class FlowableModelQueryService {
     }
 
     public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
+        return importProcessModel(request, file);
+    }
+
+    public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file, boolean importAsNewVersionIfKeysAreMatching) {
 
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
@@ -194,21 +199,38 @@ public class FlowableModelQueryService {
                 }
 
                 ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
-
                 org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
-                String name = process.getId();
-                if (StringUtils.isNotEmpty(process.getName())) {
-                    name = process.getName();
-                }
-                String description = process.getDocumentation();
+                final List<Model> existing = modelRepository.findByKeyAndType(process.getId(), AbstractModel.MODEL_TYPE_BPMN);
 
-                ModelRepresentation model = new ModelRepresentation();
-                model.setKey(process.getId());
-                model.setName(name);
-                model.setDescription(description);
-                model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
-                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserId());
-                return new ModelRepresentation(newModel);
+                if (importAsNewVersionIfKeysAreMatching && existing.size() == 0) {
+                    throw new ConflictingRequestException("Provided model for version import not available: " + process.getId());
+                }
+                if (importAsNewVersionIfKeysAreMatching && existing.size() > 1) {
+                    throw new ConflictingRequestException("Provided model key is not unique: " + process.getId());
+                }
+                if (!importAsNewVersionIfKeysAreMatching && existing.size() > 0) {
+                    throw new ConflictingRequestException("Provided model key already exists: " + process.getId());
+                }
+
+                if (!importAsNewVersionIfKeysAreMatching) {
+                    String description = process.getDocumentation();
+                    String name = process.getId();
+                    if (StringUtils.isNotEmpty(process.getName())) {
+                        name = process.getName();
+                    }
+                    ModelRepresentation model = new ModelRepresentation();
+                    model.setKey(process.getId());
+                    model.setName(name);
+                    model.setDescription(description);
+                    model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
+                    Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserId());
+                    return new ModelRepresentation(newModel);
+                } else {
+                    final Model processModel = existing.get(0);
+                    AbstractModel savedModel = modelService.saveModel(processModel.getId(), processModel.getName(), processModel.getKey(),
+                            processModel.getDescription(), modelNode.toString(), true, "Version import via REST service", SecurityUtils.getCurrentUserId());
+                    return new ModelRepresentation(savedModel);
+                }
 
             } catch (BadRequestException e) {
                 throw e;

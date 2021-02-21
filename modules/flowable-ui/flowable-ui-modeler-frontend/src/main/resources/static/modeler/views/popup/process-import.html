@@ -16,6 +16,13 @@
                     <i class="glyphicon glyphicon-info-sign"></i>
                     {{'PROCESS.POPUP.IMPORT-DESCRIPTION' | translate}}
                 </p>
+
+                <div ng-if="model.error && model.errorMessage && model.errorMessage.length > 0" class="alert error" style="font-size: 14px; margin-top:20px">
+                    <div class="popup-error" style="font-size: 14px">
+                        <span class="glyphicon glyphicon-remove-circle"></span>
+                        <span>{{'PROCESS.POPUP.IMPORT.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
+                    </div>
+                </div>
                 <!--[if IE 9]>
 
                 <div class="import-process-form">
@@ -65,14 +72,18 @@
                 </div>
 
                 <!-- <![endif]-->
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" ng-model="model.importNewVersionIndicator" id="importNewVersionIndicator">
+                    <label class="form-check-label" for="importNewVersionIndicator">
+                        Import into existing process model as new version if keys are matching.
+                    </label>
+                </div>
             </div>
 
             <div class="modal-footer-wrapper">
                 <div class="modal-footer">
                     <loading></loading>
-                    <div class="pull-right modeler-processes-error" ng-if="model.error">
-                        <span>{{'PROCESS.POPUP.IMPORT.ERROR' | translate}} <span ng-if="model.errorMessage"> : </span>{{model.errorMessage}}</span>
-                    </div>
                 </div>
             </div>
         </div>
