@@ -461,6 +461,9 @@ public class SubProcessTest extends PluggableFlowableTestCase {
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
+
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
@@ -498,6 +501,9 @@ public class SubProcessTest extends PluggableFlowableTestCase {
                 .variable("myList", Arrays.asList("one", "two", "three"))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
 
         List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSize(3);

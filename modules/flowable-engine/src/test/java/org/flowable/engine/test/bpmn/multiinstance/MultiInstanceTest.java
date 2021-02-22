@@ -345,6 +345,23 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testAsyncUserTasksRollback() {
+        String procId = runtimeService.startProcessInstanceByKey("asyncMiUserTasksWithScriptTask").getId();
+
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        waitForJobExecutorToProcessAllJobs(10000, 500);
+
+        // The async multi-instance user tasks activity fails due to missing collection.
+        // Check that the execution was not rolled back to before the preceding script task.
+        Job timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob.getElementId()).describedAs("Element ID").isEqualTo("miTasks");
+        assertThat(timerJob.getExceptionMessage()).describedAs("Exception message").isEqualTo("Variable 'nonExistingList' was not found");
+
+        assertThat(runtimeService.getVariable(procId, "scriptExecuted")).describedAs("Variable set by script task").isEqualTo(true);
+    }
+
+    @Test
+    @Deployment
     public void testParallelUserTasksCustomCollectionExpressionExtension() {
     	checkParallelUserTasksCustomCollection("miParallelUserTasksCollection");
     }
@@ -612,6 +629,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 .processDefinitionKey("miParallelAsyncScriptTask")
                 .variable("nrOfLoops", 10)
                 .start();
+
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
+
         List<Job> jobs = managementService.createJobQuery().list();
         // There are 10 jobs for each async execution
         assertThat(jobs).hasSize(10);
@@ -653,6 +674,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                     .processDefinitionKey("miParallelAsyncScriptTask")
                     .variable("nrOfLoops", 10)
                     .start();
+
+            // async-continuation into the async multi-instance activity
+            managementService.executeJob(managementService.createJobQuery().singleResult().getId());
+
             List<Job> jobs = managementService.createJobQuery().list();
             // There are 10 jobs for each async execution
             assertThat(jobs).hasSize(10);
@@ -1045,6 +1070,23 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment
+    public void testAsyncSubProcessRollback() {
+        String procId = runtimeService.startProcessInstanceByKey("asyncMiSubProcessWithScriptTask").getId();
+
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        waitForJobExecutorToProcessAllJobs(10000, 500);
+
+        // The async multi-instance subprocess activity fails due to missing collection.
+        // Check that the execution was not rolled back to before the preceding script task.
+        Job timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob.getElementId()).describedAs("Element ID").isEqualTo("miSubProcess");
+        assertThat(timerJob.getExceptionMessage()).describedAs("Exception message").isEqualTo("Variable 'nonExistingList' was not found");
+
+        assertThat(runtimeService.getVariable(procId, "scriptExecuted")).describedAs("Variable set by script task").isEqualTo(true);
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testCallActivityLocalVariables.bpmn20.xml",
             "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
     public void testCallActivityLocalVariables() {
@@ -1105,7 +1147,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         
         assertProcessEnded(procId);
     }
-    
+
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
     "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
@@ -1183,6 +1225,23 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment
+    public void testAsyncCallActivityRollback() {
+        String procId = runtimeService.startProcessInstanceByKey("asyncMiCallActivityWithScriptTask").getId();
+
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        waitForJobExecutorToProcessAllJobs(10000, 500);
+
+        // The async multi-instance call activity fails due to missing collection.
+        // Check that the execution was not rolled back to before the preceding script task.
+        Job timerJob = managementService.createTimerJobQuery().singleResult();
+        assertThat(timerJob.getElementId()).describedAs("Element ID").isEqualTo("miCallActivity");
+        assertThat(timerJob.getExceptionMessage()).describedAs("Exception message").isEqualTo("Variable 'nonExistingList' was not found");
+
+        assertThat(runtimeService.getVariable(procId, "scriptExecuted")).describedAs("Variable set by script task").isEqualTo(true);
     }
 
     @Test
@@ -1988,6 +2047,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             .processDefinitionKey("loopCounterTest")
             .start();
 
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
+
         List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
         assertThat(jobs).hasSameSizeAs(myCollection);
         for (Job job : jobs) {
@@ -2015,6 +2077,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             .variable("myCollection", myCollection)
             .processDefinitionKey("loopCounterTest")
             .start();
+
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
 
         for (int i = 0; i < myCollection.size(); i++) {
             Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
