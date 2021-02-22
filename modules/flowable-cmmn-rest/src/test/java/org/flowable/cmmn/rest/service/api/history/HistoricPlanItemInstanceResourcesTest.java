@@ -13,8 +13,19 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -28,25 +39,20 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to get historic plan item instances
  *
  * @author DennisFederico
+ * @author Filip Hrisafov
  */
 public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCase {
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn" })
     public void testSimpleHistoricPlanItemInstanceFlow() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
 
@@ -55,14 +61,15 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode jsonResponse = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(jsonResponse.get("data"));
+        assertThat(jsonResponse.get("data")).isNotNull();
         JsonNode jsonData = jsonResponse.get("data");
-        assertEquals(3, jsonData.size());
-        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertEquals(PlanItemInstanceState.AVAILABLE, n.get("state").asText()));
+        assertThat(jsonData).hasSize(3);
+        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.AVAILABLE));
 
         //Trigger the event and check the history after the case ends
-        PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent").singleResult();
-        assertNotNull(activateMilestoneEvent);
+        PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent")
+                .singleResult();
+        assertThat(activateMilestoneEvent).isNotNull();
         runtimeService.triggerPlanItemInstance(activateMilestoneEvent.getId());
 
         //Check each planItem individually
@@ -70,95 +77,277 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         String planItemInstanceId = planItemsByElementId.get("activateMilestoneEvent").get("id").asText();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(planItemInstanceNode);
-        assertEquals(PlanItemInstanceState.COMPLETED, planItemInstanceNode.get("state").asText());
+        assertThat(planItemInstanceNode).isNotNull();
+        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED);
 
         planItemInstanceId = planItemsByElementId.get("milestonePlanItem1").get("id").asText();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(planItemInstanceNode);
-        assertEquals(PlanItemInstanceState.COMPLETED, planItemInstanceNode.get("state").asText());
+        assertThat(planItemInstanceNode).isNotNull();
+        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED);
 
         planItemInstanceId = planItemsByElementId.get("finishCaseEvent").get("id").asText();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(planItemInstanceNode);
-        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstanceNode.get("state").asText());
+        assertThat(planItemInstanceNode).isNotNull();
+        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Finish the case
-        runtimeService.triggerPlanItemInstance(runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("finishCaseEvent").singleResult().getId());
+        runtimeService
+                .triggerPlanItemInstance(runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("finishCaseEvent").singleResult().getId());
         assertCaseEnded(caseInstance.getId());
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCES));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         jsonResponse = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(jsonResponse.get("data"));
+        assertThat(jsonResponse.get("data")).isNotNull();
         jsonData = jsonResponse.get("data");
-        assertEquals(3, jsonData.size());
-        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertEquals(PlanItemInstanceState.COMPLETED, n.get("state").asText()));
+        assertThat(jsonData).hasSize(3);
+        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED));
     }
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceResource() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithStage").start();
 
-        //There are 3 planItems... check them by Id
-        List<HistoricPlanItemInstance> historicPlanItems = historyService.createHistoricPlanItemInstanceQuery().list();
-        assertEquals(3, historicPlanItems.size());
-        historicPlanItems.forEach(p -> {
-            try {
-                HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, p.getId()));
-                CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-                assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertHistoricPlanItemValues(p, responseNode);
-                String state = responseNode.get("state").asText();
-                assertTrue(PlanItemInstanceState.ACTIVE.equals(state) || PlanItemInstanceState.AVAILABLE.equals(state));
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
-        });
+        HistoricPlanItemInstance abortStageEvent = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionId("abortStageEvent")
+                .singleResult();
+
+        assertThat(abortStageEvent).isNotNull();
+
+        String abortStagePlanItemInstanceId = abortStageEvent.getId();
+        JsonNode responseNode = getHistoricPlanItemInstanceResponse(abortStagePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "  id: '" + abortStagePlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, abortStagePlanItemInstanceId) + "',"
+                        + "  name: null,"
+                        + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                        + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                        + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                        + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                        + "  derivedCaseDefinitionId: null,"
+                        + "  derivedCaseDefinitionUrl: null,"
+                        + "  stageInstanceId: null,"
+                        + "  stageInstanceUrl: null,"
+                        + "  planItemDefinitionId: 'abortStageEvent',"
+                        + "  planItemDefinitionType: 'usereventlistener',"
+                        + "  state: 'available',"
+                        + "  stage: false,"
+                        + "  elementId: 'planItemAbortStage',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: null,"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: null,"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: null,"
+                        + "  lastUpdatedTime: '${json-unit.any-string}',"
+                        + "  startUserId: null,"
+                        + "  referenceId: null,"
+                        + "  referenceType: null,"
+                        + "  entryCriterionId: null,"
+                        + "  exitCriterionId: null,"
+                        + "  formKey: null,"
+                        + "  extraValue: null,"
+                        + "  showInOverview: false,"
+                        + "  tenantId: ''"
+                        + "}");
+
+        HistoricPlanItemInstance stageOne = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionId("stageOne")
+                .singleResult();
+
+        assertThat(stageOne).isNotNull();
+
+        String stageOnePlanItemInstanceId = stageOne.getId();
+        responseNode = getHistoricPlanItemInstanceResponse(stageOnePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "  id: '" + stageOnePlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                        + "  name: null,"
+                        + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                        + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                        + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                        + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                        + "  derivedCaseDefinitionId: null,"
+                        + "  derivedCaseDefinitionUrl: null,"
+                        + "  stageInstanceId: null,"
+                        + "  stageInstanceUrl: null,"
+                        + "  planItemDefinitionId: 'stageOne',"
+                        + "  planItemDefinitionType: 'stage',"
+                        + "  state: 'active',"
+                        + "  stage: true,"
+                        + "  elementId: 'planItemStageOne',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: '${json-unit.any-string}',"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: null,"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: null,"
+                        + "  lastUpdatedTime: '${json-unit.any-string}',"
+                        + "  startUserId: null,"
+                        + "  referenceId: null,"
+                        + "  referenceType: null,"
+                        + "  entryCriterionId: null,"
+                        + "  exitCriterionId: null,"
+                        + "  formKey: null,"
+                        + "  extraValue: null,"
+                        + "  showInOverview: true,"
+                        + "  tenantId: ''"
+                        + "}");
+
+        HistoricPlanItemInstance manualTask = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionId("myManualTask")
+                .singleResult();
+
+        assertThat(manualTask).isNotNull();
+
+        String manualTaskPlanItemInstanceId = manualTask.getId();
+        responseNode = getHistoricPlanItemInstanceResponse(manualTaskPlanItemInstanceId);
+
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "  id: '" + manualTaskPlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, manualTaskPlanItemInstanceId) + "',"
+                        + "  name: null,"
+                        + "  caseInstanceId: '" + caseInstance.getId() + "',"
+                        + "  caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()) + "',"
+                        + "  caseDefinitionId: '" + caseInstance.getCaseDefinitionId() + "',"
+                        + "  caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "',"
+                        + "  derivedCaseDefinitionId: null,"
+                        + "  derivedCaseDefinitionUrl: null,"
+                        + "  stageInstanceId: '" + stageOnePlanItemInstanceId + "',"
+                        + "  stageInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                        + "  planItemDefinitionId: 'myManualTask',"
+                        + "  planItemDefinitionType: 'humantask',"
+                        + "  state: 'active',"
+                        + "  stage: false,"
+                        + "  elementId: 'planItemTask',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: '${json-unit.any-string}',"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: null,"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: null,"
+                        + "  lastUpdatedTime: '${json-unit.any-string}',"
+                        + "  startUserId: null,"
+                        + "  referenceId: '${json-unit.any-string}',"
+                        + "  referenceType: 'cmmn-1.1-to-cmmn-1.1-child-human-task',"
+                        + "  entryCriterionId: null,"
+                        + "  exitCriterionId: null,"
+                        + "  formKey: null,"
+                        + "  extraValue: null,"
+                        + "  showInOverview: false,"
+                        + "  tenantId: ''"
+                        + "}");
 
         //Complete the task
         taskService.complete(taskService.createTaskQuery().active().singleResult().getId());
 
-        //Check that plan item in history are completed
-        historicPlanItems = historyService.createHistoricPlanItemInstanceQuery().list();
-        assertEquals(3, historicPlanItems.size());
-        historicPlanItems.forEach(p -> {
-            try {
-                HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, p.getId()));
-                CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-                assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertHistoricPlanItemValues(p, responseNode);
+        //Check that plan items in history are completed
+        responseNode = getHistoricPlanItemInstanceResponse(abortStagePlanItemInstanceId);
 
-                if ("usereventlistener".equals(responseNode.get("planItemDefinitionType").asText())) {
-                    assertEquals(PlanItemInstanceState.TERMINATED, responseNode.get("state").asText());
-                } else {
-                    assertEquals(PlanItemInstanceState.COMPLETED, responseNode.get("state").asText());
-                }
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
-        });
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + abortStagePlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, abortStagePlanItemInstanceId) + "',"
+                        + "  state: 'terminated',"
+                        + "  elementId: 'planItemAbortStage',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: null,"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: null,"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: '${json-unit.any-string}',"
+                        + "  exitTime: null,"
+                        + "  endedTime: '${json-unit.any-string}',"
+                        + "  lastUpdatedTime: '${json-unit.any-string}'"
+                        + "}");
+
+        responseNode = getHistoricPlanItemInstanceResponse(stageOnePlanItemInstanceId);
+
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + stageOnePlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, stageOnePlanItemInstanceId) + "',"
+                        + "  state: 'completed',"
+                        + "  elementId: 'planItemStageOne',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: '${json-unit.any-string}',"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: '${json-unit.any-string}',"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: '${json-unit.any-string}',"
+                        + "  lastUpdatedTime: '${json-unit.any-string}'"
+                        + "}");
+
+        responseNode = getHistoricPlanItemInstanceResponse(manualTaskPlanItemInstanceId);
+
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  id: '" + manualTaskPlanItemInstanceId + "',"
+                        + "  url: '" + buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, manualTaskPlanItemInstanceId) + "',"
+                        + "  state: 'completed',"
+                        + "  elementId: 'planItemTask',"
+                        + "  createTime: '${json-unit.any-string}',"
+                        + "  lastAvailableTime: '${json-unit.any-string}',"
+                        + "  lastEnabledTime: null,"
+                        + "  lastDisabledTime: null,"
+                        + "  lastStartedTime: '${json-unit.any-string}',"
+                        + "  lastSuspendedTime: null,"
+                        + "  completedTime: '${json-unit.any-string}',"
+                        + "  occurredTime: null,"
+                        + "  terminatedTime: null,"
+                        + "  exitTime: null,"
+                        + "  endedTime: '${json-unit.any-string}',"
+                        + "  lastUpdatedTime: '${json-unit.any-string}'"
+                        + "}");
+
         assertCaseEnded(caseInstance.getId());
     }
 
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceCollectionResource() throws Exception {
         //Set the clock for the first instance
         Calendar calendar = Calendar.getInstance();
@@ -176,30 +365,32 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         //There should be 6 planItems
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl);
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(6, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(6);
 
         //Three for each case Instance
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance1.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance1.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance2.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance2.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //End case instance one "normally"
         calendar.set(Calendar.HOUR_OF_DAY, 3);
@@ -210,7 +401,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         //Abort stage of case instance two
         calendar.set(Calendar.HOUR_OF_DAY, 4);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        String abortEventId = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemDefinitionId("abortStageEvent").singleResult().getId();
+        String abortEventId = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemDefinitionId("abortStageEvent")
+                .singleResult().getId();
         runtimeService.triggerPlanItemInstance(abortEventId);
         assertCaseEnded(caseInstance2.getId());
 
@@ -227,11 +419,11 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                 + "&occurredAfter=" + getISODateString(occurredAfter)
         );
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(1, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(1);
 
         //Two planItems exit with terminate state when the exitCriteria for the stage of the second case instance was met
         calendar.set(Calendar.HOUR_OF_DAY, 1);
@@ -243,13 +435,13 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                 + "&exitBefore=" + getISODateString(exitBefore)
         );
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertEquals(PlanItemInstanceState.TERMINATED, n.get("state").asText()));
+                .forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.TERMINATED));
 
         //For the sake of completeness, fetch all the planItems in "complete" state
         //and compare each with the result of the api call, default sort is by creation timestamp
@@ -257,13 +449,14 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                 + "?planItemInstanceState=" + PlanItemInstanceState.COMPLETED
         );
         response = executeRequest(httpGet, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
 
-        List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
+        List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
         assertHistoricPlanItemValues(listOfCompleted, responseNode.get("data"));
 
         assertCaseEnded(caseInstance1.getId());
@@ -271,7 +464,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     }
 
     //Same as the previous test, but using query post
-    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn"})
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceQueryResource() throws Exception {
         //Set the clock for the first instance
         Calendar calendar = Calendar.getInstance();
@@ -289,11 +482,11 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         ObjectNode requestNode = objectMapper.createObjectNode();
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(6, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(6);
 
         //Three for each case Instance
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY));
@@ -301,24 +494,26 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         requestNode.put("caseInstanceId", caseInstance1.getId());
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance1.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
 
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance2.getId());
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
-        StreamSupport.stream(responseNode.get("data").spliterator(), false).forEach(n -> assertEquals(caseInstance2.getId(), n.get("caseInstanceId").asText()));
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
+        StreamSupport.stream(responseNode.get("data").spliterator(), false)
+                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
 
         //End case instance one "normally"
         calendar.set(Calendar.HOUR_OF_DAY, 3);
@@ -329,7 +524,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         //Abort stage of case instance two
         calendar.set(Calendar.HOUR_OF_DAY, 4);
         cmmnEngineConfiguration.getClock().setCurrentTime(calendar.getTime());
-        String abortEventId = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemDefinitionId("abortStageEvent").singleResult().getId();
+        String abortEventId = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId()).planItemDefinitionId("abortStageEvent")
+                .singleResult().getId();
         runtimeService.triggerPlanItemInstance(abortEventId);
         assertCaseEnded(caseInstance2.getId());
 
@@ -347,11 +543,11 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         requestNode.put("occurredAfter", getISODateString(occurredAfter));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(1, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(1);
 
         //Two planItems exit with terminate state when the exitCriteria for the stage of the second case instance was met
         calendar.set(Calendar.HOUR_OF_DAY, 1);
@@ -364,13 +560,13 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         requestNode.put("exitBefore", getISODateString(exitBefore));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(2, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertEquals(PlanItemInstanceState.TERMINATED, n.get("state").asText()));
+                .forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.TERMINATED));
 
         //For the sake of completeness, fetch all the planItems in "complete" state
         //and compare each with the result of the api call, default sort is by creation timestamp
@@ -379,23 +575,37 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         requestNode.put("planItemInstanceState", PlanItemInstanceState.COMPLETED);
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPost, HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(3, responseNode.get("data").size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("data")).hasSize(3);
 
-        List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
+        List<HistoricPlanItemInstance> listOfCompleted = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceState(PlanItemInstanceState.COMPLETED).list();
         assertHistoricPlanItemValues(listOfCompleted, responseNode.get("data"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
     }
 
-
     private Map<String, JsonNode> mapNodesBy(String attribute, JsonNode array) {
         return StreamSupport.stream(array.spliterator(), false)
                 .collect(Collectors.toMap(o -> o.get(attribute).asText(), o -> o));
+    }
+
+    protected JsonNode getHistoricPlanItemInstanceResponse(String planItemInstanceId) {
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
+        try (CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK)) {
+
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            assertThat(response).isNotNull();
+            return responseNode;
+        } catch (IOException e) {
+            throw new AssertionError("IO Exception for HTTP Connection", e);
+        }
     }
 
     private void assertHistoricPlanItemValues(List<HistoricPlanItemInstance> expected, JsonNode actual) {
@@ -407,57 +617,55 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     }
 
     private void assertHistoricPlanItemValues(HistoricPlanItemInstance expected, JsonNode actual) {
-        assertNotNull(actual);
+        assertThat(actual).isNotNull();
 
-        assertEquals(expected.getId(), actual.get("id").textValue());
-        assertEquals(expected.getName(), actual.get("name").textValue());
-        assertEquals(expected.getState(), actual.get("state").textValue());
-        assertEquals(expected.getCaseDefinitionId(), actual.get("caseDefinitionId").textValue());
-        assertEquals(expected.getCaseInstanceId(), actual.get("caseInstanceId").textValue());
-        assertEquals(expected.getStageInstanceId(), actual.get("stageInstanceId").textValue());
-        assertEquals(expected.getElementId(), actual.get("elementId").textValue());
-        assertEquals(expected.getPlanItemDefinitionId(), actual.get("planItemDefinitionId").textValue());
-        assertEquals(expected.getPlanItemDefinitionType(), actual.get("planItemDefinitionType").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getCreateTime()), actual.get("createTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getLastAvailableTime()), actual.get("lastAvailableTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getLastEnabledTime()), actual.get("lastEnabledTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getLastDisabledTime()), actual.get("lastDisabledTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getLastStartedTime()), actual.get("lastStartedTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getLastSuspendedTime()), actual.get("lastSuspendedTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getCompletedTime()), actual.get("completedTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getOccurredTime()), actual.get("occurredTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getTerminatedTime()), actual.get("terminatedTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getExitTime()), actual.get("exitTime").textValue());
-        assertEquals(getISODateStringWithTZ(expected.getEndedTime()), actual.get("endedTime").textValue());
-        assertEquals(expected.getStartUserId(), actual.get("startUserId").textValue());
-        assertEquals(expected.getReferenceId(), actual.get("referenceId").textValue());
-        assertEquals(expected.getReferenceType(), actual.get("referenceType").textValue());
-        assertEquals(expected.getTenantId(), actual.get("tenantId").textValue());
+        assertThatJson(actual)
+                .isEqualTo("{"
+                        + "  id: '" + expected.getId() + "',"
+                        + "  name: '" + expected.getName() + "',"
+                        + "  state: '" + expected.getState() + "',"
+                        + "  caseDefinitionId: '" + expected.getCaseDefinitionId() + "',"
+                        + "  caseInstanceId: '" + expected.getCaseInstanceId() + "',"
+                        + "  stageInstanceId: '" + expected.getStageInstanceId() + "',"
+                        + "  elementId: '" + expected.getElementId() + "',"
+                        + "  planItemDefinitionId: '" + expected.getPlanItemDefinitionId() + "',"
+                        + "  planItemDefinitionType: '" + expected.getPlanItemDefinitionType() + "',"
+                        + "  startUserId: '" + expected.getStartUserId() + "',"
+                        + "  referenceId: '" + expected.getReferenceId() + "',"
+                        + "  referenceType: '" + expected.getReferenceType() + "',"
+                        + "  tenantId: '" + expected.getTenantId() + "',"
+                        + "  createTime: '" + getISODateStringWithTZ(expected.getCreateTime()) + "',"
+                        + "  lastAvailableTime: '" + getISODateStringWithTZ(expected.getLastAvailableTime()) + "',"
+                        + "  lastEnabledTime: '" + getISODateStringWithTZ(expected.getLastEnabledTime()) + "',"
+                        + "  lastDisabledTime: '" + getISODateStringWithTZ(expected.getLastDisabledTime()) + "',"
+                        + "  lastStartedTime: '" + getISODateStringWithTZ(expected.getLastStartedTime()) + "',"
+                        + "  lastSuspendedTime: '" + getISODateStringWithTZ(expected.getLastSuspendedTime()) + "',"
+                        + "  completedTime: '" + getISODateStringWithTZ(expected.getCompletedTime()) + "',"
+                        + "  occurredTime: '" + getISODateStringWithTZ(expected.getOccurredTime()) + "',"
+                        + "  terminatedTime: '" + getISODateStringWithTZ(expected.getTerminatedTime()) + "',"
+                        + "  exitTime: '" + getISODateStringWithTZ(expected.getExitTime()) + "',"
+                        + "  endedTime: '" + getISODateStringWithTZ(expected.getEndedTime()) + "'"
+                        + "}");
 
-        try {
-            assertNotNull(actual.get("url").textValue());
-            String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, expected.getId())).toURL().toString();
-            assertEquals(url, actual.get("url").textValue());
-        } catch (MalformedURLException e) {
-            throw new AssertionError("Cannot create url", e);
-        }
+        assertThatCode(() -> {
+            assertThat(actual.get("url").textValue()).isNotNull();
+            String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, expected.getId()))
+                    .toURL().toString();
+            assertThat(actual.get("url").textValue()).isEqualTo(url);
+        }).doesNotThrowAnyException();
 
-        try {
-            assertNotNull(actual.get("historicCaseInstanceUrl").textValue());
+        assertThatCode(() -> {
+            assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid historicCaseInstanceUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
 
-        try {
-            assertNotNull(actual.get("caseDefinitionUrl").textValue());
+        assertThatCode(() -> {
+            assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
             CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
-        } catch (URISyntaxException e) {
-            fail("Invalid caseDefinitionUrl: " + e.getMessage());
-        }
+        }).doesNotThrowAnyException();
     }
 }

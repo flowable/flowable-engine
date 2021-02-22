@@ -81,7 +81,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("unexistingkey");
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no processes deployed with key", ae.getMessage());
+            assertTextPresent("No process definition found for key", ae.getMessage());
             assertEquals(ProcessDefinition.class, ae.getObjectClass());
         }
     }

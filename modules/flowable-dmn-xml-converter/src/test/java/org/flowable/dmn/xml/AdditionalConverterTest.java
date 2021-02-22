@@ -12,8 +12,7 @@
  */
 package org.flowable.dmn.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -25,8 +24,7 @@ import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.HitPolicy;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AdditionalConverterTest extends AbstractConverterTest {
 
@@ -50,40 +48,41 @@ public class AdditionalConverterTest extends AbstractConverterTest {
 
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
-        assertEquals(1, decisions.size());
+        assertThat(decisions).hasSize(1);
 
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable);
+        assertThat(decisionTable).isNotNull();
 
-        Assert.assertEquals(HitPolicy.COLLECT, decisionTable.getHitPolicy());
-        Assert.assertEquals(BuiltinAggregator.SUM, decisionTable.getAggregation());
+        assertThat(decisionTable.getHitPolicy()).isEqualTo(HitPolicy.COLLECT);
+        assertThat(decisionTable.getAggregation()).isEqualTo(BuiltinAggregator.SUM);
 
         List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(2, inputClauses.size());
-        assertNotNull(inputClauses.get(0).getId());
-        assertNotNull(inputClauses.get(0).getLabel());
-        assertNotNull(inputClauses.get(0).getInputExpression().getTypeRef());
-        assertNotNull(inputClauses.get(0).getInputExpression().getId());
-        assertNotNull(inputClauses.get(0).getInputExpression().getText());
+        assertThat(inputClauses).hasSize(2);
+        assertThat(inputClauses.get(0).getId()).isNotNull();
+        assertThat(inputClauses.get(0).getLabel()).isNotNull();
+        assertThat(inputClauses.get(0).getInputExpression().getTypeRef()).isNotNull();
+        assertThat(inputClauses.get(0).getInputExpression().getId()).isNotNull();
+        assertThat(inputClauses.get(0).getInputExpression().getText()).isNotNull();
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(2, outputClauses.size());
-        assertNotNull(outputClauses.get(0).getName());
-        assertNotNull(outputClauses.get(0).getTypeRef());
-        assertNotNull(outputClauses.get(0).getId());
-        assertNotNull(outputClauses.get(0).getLabel());
+        assertThat(outputClauses).hasSize(2);
+        assertThat(outputClauses.get(0).getName()).isNotNull();
+        assertThat(outputClauses.get(0).getTypeRef()).isNotNull();
+        assertThat(outputClauses.get(0).getId()).isNotNull();
+        assertThat(outputClauses.get(0).getLabel()).isNotNull();
 
-        assertEquals("\"result2\",\"result1\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
-        assertEquals("\"2\",\"1\"", decisionTable.getOutputs().get(1).getOutputValues().getText());
+        assertThat(decisionTable.getOutputs())
+                .extracting(outputs -> outputs.getOutputValues().getText())
+                .containsExactly("\"result2\",\"result1\"", "\"2\",\"1\"");
 
         List<DecisionRule> rules = decisionTable.getRules();
-        assertEquals(2, rules.size());
+        assertThat(rules).hasSize(2);
 
-        assertNotNull(rules.get(0).getInputEntries().get(0).getInputClause().getInputExpression().getTypeRef());
-        assertNotNull(rules.get(0).getInputEntries().get(0).getInputClause().getInputExpression().getText());
-        assertNotNull(rules.get(0).getOutputEntries().get(0).getOutputClause().getTypeRef());
-        assertNotNull(rules.get(0).getOutputEntries().get(0).getOutputClause().getName());
-        assertNotNull(rules.get(0).getOutputEntries().get(1).getOutputClause().getTypeRef());
-        assertNotNull(rules.get(0).getOutputEntries().get(1).getOutputClause().getName());
+        assertThat(rules.get(0).getInputEntries().get(0).getInputClause().getInputExpression().getTypeRef()).isNotNull();
+        assertThat(rules.get(0).getInputEntries().get(0).getInputClause().getInputExpression().getText()).isNotNull();
+        assertThat(rules.get(0).getOutputEntries().get(0).getOutputClause().getTypeRef()).isNotNull();
+        assertThat(rules.get(0).getOutputEntries().get(0).getOutputClause().getName()).isNotNull();
+        assertThat(rules.get(0).getOutputEntries().get(1).getOutputClause().getTypeRef()).isNotNull();
+        assertThat(rules.get(0).getOutputEntries().get(1).getOutputClause().getName()).isNotNull();
     }
 }

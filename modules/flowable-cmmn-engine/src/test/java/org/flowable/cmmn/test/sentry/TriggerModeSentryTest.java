@@ -13,7 +13,6 @@
 package org.flowable.cmmn.test.sentry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -44,22 +43,26 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
         // However, due to the fact the triggerMode is onEvent, these sentries are evaluated when the complete event happens and not before.
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testTriggerMode")
-            // Even though the variables are true, they should not be evaluated on start due to the onEvent triggerMode
-            .variable("goToC", true)
-            .start();
+                .caseDefinitionKey("testTriggerMode")
+                // Even though the variables are true, they should not be evaluated on start due to the onEvent triggerMode
+                .variable("goToC", true)
+                .start();
 
         // There should be no if parts stored
         assertSentryPartInstanceCount(caseInstance, 0);
 
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("B");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("B");
 
         // When completing B, we're setting an extra variable to go to stage 1. The goToC variable is still true and should now be evaluated.
         cmmnTaskService.complete(tasks.get(0).getId(), Collections.singletonMap("gotoStage1", true));
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
         assertSentryPartInstanceCount(caseInstance, 0);
 
         // Now we're completing B again, changing the variable. If we were using the default triggerMode,
@@ -68,7 +71,9 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(tasks.get(1).getId(), Collections.singletonMap("goToC", false));
 
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C", "D");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C", "D");
         assertSentryPartInstanceCount(caseInstance, 0);
 
     }
@@ -80,45 +85,52 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
         // This tests verifies that the ifPart of an onEvent triggered sentry doesn't get called unless the event happens
 
         cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testIfPartTriggeredOnce")
-            .variable("var", new TestCondition())
-            .start();
-        assertEquals(0, TestCondition.COUNTER.get());
+                .caseDefinitionKey("testIfPartTriggeredOnce")
+                .variable("var", new TestCondition())
+                .start();
+        assertThat(TestCondition.COUNTER.get()).isZero();
 
         List<Task> tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("Guarded task", "The task");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Guarded task", "The task");
 
         cmmnTaskService.complete(tasks.get(1).getId());
-        assertEquals(1, TestCondition.COUNTER.get());
+        assertThat(TestCondition.COUNTER.get()).isEqualTo(1);
         tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
-        assertThat(tasks).hasSize(0);
+        assertThat(tasks).isEmpty();
     }
 
     @Test
     @CmmnDeployment
     public void testExitTriggersAnotherExit() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("exitTriggersAnotherExit")
-            .variable("var", true)
-            .start();
+                .caseDefinitionKey("exitTriggersAnotherExit")
+                .variable("var", true)
+                .start();
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("A", "B", "C");
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
 
         // Completing A cascades into exiting B and C when using the default trigger mode, as there is memory.
         // This should be the same case in 'onEvent', as both events are part of the same 'evaluation cycle'.
         cmmnTaskService.complete(tasks.get(0).getId());
         tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).hasSize(0);
+        assertThat(tasks).isEmpty();
         assertCaseInstanceEnded(caseInstance);
     }
 
     private void assertSentryPartInstanceCount(CaseInstance caseInstance, int count) {
-        List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<List<SentryPartInstanceEntity>>() {
-            @Override
-            public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
-                return CommandContextUtil.getSentryPartInstanceEntityManager(commandContext).findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
-            }
-        });
+        List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor()
+                .execute(new Command<List<SentryPartInstanceEntity>>() {
+
+                    @Override
+                    public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {
+                        return CommandContextUtil.getSentryPartInstanceEntityManager(commandContext)
+                                .findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
+                    }
+                });
         assertThat(sentryPartInstanceEntities).hasSize(count);
     }
 

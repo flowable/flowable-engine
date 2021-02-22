@@ -1,0 +1,2879 @@
+{
+    "GENERAL" : {
+        "MAIN-TITLE": "Editor de Flowable",
+        "NAVIGATION" : {
+            "PROCESSES": "Procesos",
+            "CASEMODELS": "Casos",
+            "FORMS": "Formularios",
+            "DECISION-TABLES": "Tablas de decisión",
+            "APPS": "Aplicaciones"
+        },
+        "TITLE": {
+            "SELECT-GROUP" :"Selecciona el grupo",
+            "MATCHING-GROUPS": "Grupos coincidentes",
+            "FILTER": "Filtro",
+            "HISTORY": "Historial"
+        },
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "DASHBOARD": "Dashboard",
+            "RETURN-TO-LIST": "Mostrar todas las definiciones",
+            "CANCEL": "Cancelar",
+            "CLOSE": "Cerrar",
+            "EDIT": "Editar",
+            "SAVE": "Guardar",
+            "OPEN": "Abrir",
+            "OK": "Ok",
+            "CONFIRM": "Confirmar",
+            "CONFIRM-AND-CLOSE": "Confirmar y cerrar",
+            "NEW-FORM": "Nuevo formulario",
+            "CREATE-FORM": "Crear formulario",
+            "NEW-DECISION-TABLE": "Nueva tabla de decisión",
+            "CREATE-DECISION-TABLE": "Crear tabla de decisión"
+        },
+        "MESSAGE": {
+          "SELECT-GROUP-HELP": "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar",
+          "PEOPLE-NO-MATCHING-RESULTS": "No se encontraron usuarios similares",
+          "GROUP-NO-MATCHING-RESULTS": "No se encontraron grupos similares",
+          "GROUP-SOURCE-TYPE": "Origen de grupo",
+          "GROUP-SOURCE-SEARCH-OPTION": "Búsqueda de grupo",
+          "GROUP-SOURCE-FIELD-OPTION": "Campo de formulario"
+        },
+        "OTHERS" : {
+          "PROCESS" : "Proceso",
+          "PROCESS_NAVIGATOR" : "Navegador de procesos",
+          "NO_STRUCTURAL_ELEMENTS_USED" : "No se usaron elementos estructurales."
+        }
+    },
+
+    "BPMN" : {
+      "TITLE": "Editor de procesos",
+      "DESCRIPTION" : "Editor de procesos BPMN",
+      "PROPERTYPACKAGES" : {
+        "PROCESS_IDPACKAGE" : {
+          "PROCESS_ID" : {
+            "TITLE" : "Identificador de proceso",
+            "DESCRIPTION" : "Indentificador único de la definición del proceso."
+          }
+        },
+        "OVERRIDEIDPACKAGE" : {
+          "OVERRIDEID" : {
+            "TITLE" : "Id",
+            "DESCRIPTION" : "Identificador único del elemento."
+          }
+        },
+        "NAMEPACKAGE" : {
+          "NAME" : {
+            "TITLE" : "Nombre",
+            "DESCRIPTION" : "El nombre descriptivo del elemento de BPMN."
+          }
+        },
+        "DOCUMENTATIONPACKAGE" : {
+          "DOCUMENTATION" : {
+            "TITLE" : "Documentación",
+            "DESCRIPTION" : "La documentación del elemento de BPMN."
+          }
+        },
+        "CATEGORYPACKAGE" : {
+          "CATEGORYDEFINITION" : {
+            "TITLE" : "Categoría",
+            "DESCRIPTION" : "La categoría del elemento de BPMN."
+          }
+        },
+        "PROCESS_AUTHORPACKAGE" : {
+          "PROCESS_AUTHOR" : {
+            "TITLE" : "Autor del proceso",
+            "DESCRIPTION" : "Autor de la definiciónd del proceso."
+          }
+        },
+        "PROCESS_VERSIONPACKAGE" : {
+          "PROCESS_VERSION" : {
+            "TITLE" : "Id de la versión del proceso (sólo documentación)",
+            "DESCRIPTION" : "El identificador de la versión para propósitos de documentación."
+          }
+        },
+        "PROCESS_HISTORYLEVELPACKAGE" : {
+          "PROCESS_HISTORYLEVEL" : {
+            "TITLE" : "Establecer nivel de historial para la definición de este proceso",
+            "DESCRIPTION" : "Establece un nivel de historial específico para la definición de este proceso"
+          }
+        },
+        "ISEXECUTABLEPACKAGE" : {
+          "ISEXECUTABLE" : {
+            "TITLE" : "Es ejecutable",
+            "DESCRIPTION" : "¿Es ejecutable este proceso?"
+          }
+        },
+        "PROCESS_POTENTIALSTARTERUSERPACKAGE" : {
+          "PROCESS_POTENTIALSTARTERUSER" : {
+            "TITLE" : "Usuario iniciador potencial",
+            "DESCRIPTION" : "¿Qué usuario puede iniciar este proceso?"
+          }
+        },
+        "PROCESS_POTENTIALSTARTERGROUPPACKAGE" : {
+          "PROCESS_POTENTIALSTARTERGROUP" : {
+            "TITLE" : "Grupo iniciador potencial",
+            "DESCRIPTION" : "¿Qué grupo puede iniciar este proceso?"
+          }
+        },
+        "PROCESS_NAMESPACEPACKAGE" : {
+          "PROCESS_NAMESPACE" : {
+            "TITLE" : "Espacio de nombres (target namespace)",
+            "DESCRIPTION" : "El espacio de nombres (target namespace) de la definición del proceso. Ej: http://www.flowable.org/processdef"
+          }
+        },
+        "PROCESS_ISEAGEREXECUTIONFETCHPACKAGE" : {
+          "ISEAGEREXECUTIONFETCH" : {
+            "TITLE" : "Búsqueda de ejecución previa",
+            "DESCRIPTION" : "¿Habilitar la búsqueda de ejecución previa (eager execution fetching) de la definición del proceso?"
+          }
+        },
+        "ASYNCHRONOUSDEFINITIONPACKAGE" : {
+          "ASYNCHRONOUSDEFINITION" : {
+            "TITLE" : "Asíncrona",
+            "DESCRIPTION" : "¿Definir esta actividad como asíncrona?"
+          }
+        },
+        "DATAPROPERTIESPACKAGE" : {
+          "DATAPROPERTIES" : {
+            "TITLE" : "Objetos de datos",
+            "DESCRIPTION" : "Definición de las propiedades de los objetos de datos"
+          }
+        },
+        "EXCLUSIVEDEFINITIONPACKAGE" : {
+          "EXCLUSIVEDEFINITION" : {
+            "TITLE" : "Exclusiva",
+            "DESCRIPTION" : "Define la actividad como exclusiva."
+          }
+        },
+        "EXECUTIONLISTENERSPACKAGE" : {
+          "EXECUTIONLISTENERS" : {
+            "TITLE" : "Gestores de eventos de ejecución",
+            "DESCRIPTION" : "Gestores para una actividad, proceso, flujo de secuencia y eventos de inicio y fin."
+          }
+        },
+        "TASKLISTENERSPACKAGE" : {
+          "TASKLISTENERS" : {
+            "TITLE" : "Gestores de eventos de tarea",
+            "DESCRIPTION" : "Gestores de eventos para una tarea de usuario"
+          }
+        },
+        "EVENTLISTENERSPACKAGE" : {
+          "EVENTLISTENERS" : {
+            "TITLE" : "Gestores de eventos",
+            "DESCRIPTION" : "Gestores cualquier evento que ocurra en el Flowable Engine. También es posible relanzar el evento como una señal, mensaje o evento de error"
+          }
+        },
+        "USERTASKASSIGNMENTPACKAGE" : {
+          "USERTASKASSIGNMENT" : {
+            "TITLE" : "Asignaciones",
+            "DESCRIPTION" : "Definición de la asignación para la tarea de usuario"
+          }
+        },
+        "FORMPROPERTIESPACKAGE" : {
+          "FORMPROPERTIES" : {
+            "TITLE" : "Propiedades del formulario",
+            "DESCRIPTION" : "Definición del formulario mediante una lista de propiedades"
+          }
+        },
+        "FORMKEYDEFINITIONPACKAGE" : {
+          "FORMKEYDEFINITION" : {
+            "TITLE" : "Clave del formulario",
+            "DESCRIPTION" : "Clave de identificación de formulario que provee una referencia a un formulario."
+          }
+        },
+        "FORMFIELDVALIDATIONPACKAGE" : {
+          "FORMFIELDVALIDATION" : {
+            "TITLE" : "Validar campos de formulario",
+            "DESCRIPTION" : "Validar los campos del formulario en el envío. (los valores permitidos son 'true', 'false' or una expresión)"
+          }
+        },
+        "DUEDATEDEFINITIONPACKAGE" : {
+          "DUEDATEDEFINITION" : {
+            "TITLE" : "Fecha de vencimiento",
+            "DESCRIPTION" : "Fecha de vencimiento de la tarea de usuario."
+          }
+        },
+        "PRIORITYDEFINITIONPACKAGE" : {
+          "PRIORITYDEFINITION" : {
+            "TITLE" : "Prioridad",
+            "DESCRIPTION" : "Prioridad de la tarea de usuario."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
+          }
+        },
+        "SERVICETASKCLASSPACKAGE" : {
+          "SERVICETASKCLASS" : {
+            "TITLE" : "Clase",
+            "DESCRIPTION" : "Clase de java que implementa la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKEXPRESSIONPACKAGE" : {
+          "SERVICETASKEXPRESSION" : {
+            "TITLE" : "Expresión",
+            "DESCRIPTION" : "Expresión que define la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKDELEGATEEXPRESSIONPACKAGE" : {
+          "SERVICETASKDELEGATEEXPRESSION" : {
+            "TITLE" : "Expresión del delegado",
+            "DESCRIPTION" : "Expresión del delegado que define la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKFAILEDJOBRETRYTIMECYCLEPACKAGE" : {
+          "SERVICETASKFAILEDJOBRETRYTIMECYCLE" : {
+            "TITLE" : "Tiempo del ciclo de reintento para trabajos fallidos",
+            "DESCRIPTION" : "Tiempo del ciclo de reintento establecido para la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKFIELDSPACKAGE" : {
+          "SERVICETASKFIELDS" : {
+            "TITLE" : "Campos de clase (java)",
+            "DESCRIPTION" : "Extensiones de campos"
+          }
+        },
+        "SERVICETASKEXCEPTIONSPACKAGE" : {
+          "SERVICETASKEXCEPTIONS" : {
+            "TITLE" : "Excepciones",
+            "DESCRIPTION" : "Mapeo de excepciones"
+          }
+        },
+        "SERVICETASKRESULTVARIABLEPACKAGE" : {
+          "SERVICETASKRESULTVARIABLE" : {
+            "TITLE" : "Nombre de la variable de resultado",
+            "DESCRIPTION" : "Nombre de la variable del proceso para almacenar el resultado de la tarea de servicio."
+          },
+          "SERVICETASKUSELOCALSCOPEFORRESULTVARIABLE" : {
+            "TITLE" : "Usar alcance local para la variable de resultado",
+            "DESCRIPTION" : "Marca que indica que la variable de resultado se guadará como variable local"
+          }
+        },
+        "SERVICETASKTRIGGERABLEPACKAGE" : {
+          "SERVICETASKTRIGGERABLE" : {
+            "TITLE" : "Configurar la tarea de servicio como disparable",
+            "DESCRIPTION" : "Configura la tarea de servicio para ser disparable (triggerable)"
+          }
+        },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Establecer variable resultante como transitoria",
+            "DESCRIPTION" : "Atributo que establece que el resultado de la expresión no será persistido al finalizar la transacción de base de datos"
+          }
+        },
+        "SCRIPTFORMATPACKAGE" : {
+          "SCRIPTFORMAT" : {
+            "TITLE" : "Formato del script",
+            "DESCRIPTION" : "Format del script de la tarea."
+          }
+        },
+        "SCRIPTTEXTPACKAGE" : {
+          "SCRIPTTEXT" : {
+            "TITLE" : "Script",
+            "DESCRIPTION" : "El código fuente del script de la tarea."
+          }
+        },
+        "SCRIPTAUTOSTOREVARIABLESPACKAGE" : {
+          "SCRIPTAUTOSTOREVARIABLES" : {
+            "TITLE" : "Almacenar variables automáticamente",
+            "DESCRIPTION" : "Almacenar en el proceso todas las variables del script."
+          }
+        },
+        "SHELLCOMMANDPACKAGE" : {
+          "SHELLCOMMAND" : {
+            "TITLE" : "Comando",
+            "DESCRIPTION" : "Comando de la tarea de shell"
+          }
+        },
+        "SHELLARG1PACKAGE" : {
+          "SHELLARG1" : {
+            "TITLE" : "Argumento 1",
+            "DESCRIPTION" : "El argumento 1 del comando de shell"
+          }
+        },
+        "SHELLARG2PACKAGE" : {
+          "SHELLARG2" : {
+            "TITLE" : "Argumento 2",
+            "DESCRIPTION" : "El argumento 2 del comando de shell"
+          }
+        },
+        "SHELLARG3PACKAGE" : {
+          "SHELLARG3" : {
+            "TITLE" : "Argumento 3",
+            "DESCRIPTION" : "El argumento 3 del comando de shell"
+          }
+        },
+        "SHELLARG4PACKAGE" : {
+          "SHELLARG4" : {
+            "TITLE" : "Argumento 4",
+            "DESCRIPTION" : "El argumento 4 del comando de shell"
+          }
+        },
+        "SHELLARG5PACKAGE" : {
+          "SHELLARG5" : {
+            "TITLE" : "Argumento 5",
+            "DESCRIPTION" : "El argumento 5 del comando de shell"
+          }
+        },
+        "SHELLWAITPACKAGE" : {
+          "SHELLWAIT" : {
+            "TITLE" : "Esperar",
+            "DESCRIPTION" : "Marca para esperar la finalización del comando de shell"
+          }
+        },
+        "SHELLOUTPUTVARIABLEPACKAGE" : {
+          "SHELLOUTPUTVARIABLE" : {
+            "TITLE" : "Variable de salida",
+            "DESCRIPTION" : "Variable para almacenar la salida del comando de shell"
+          }
+        },
+        "SHELLERRORCODEVARIABLEPACKAGE" : {
+          "SHELLERRORCODEVARIABLE" : {
+            "TITLE" : "Variable de código de error",
+            "DESCRIPTION" : "Variable para almacenar el código de error (error code) del comando de shell"
+          }
+        },
+        "SHELLREDIRECTERRORPACKAGE" : {
+          "SHELLREDIRECTERROR" : {
+            "TITLE" : "Redirigir error",
+            "DESCRIPTION" : "Si es verdadero, combina la salida de error con la salida estándar"
+          }
+        },
+        "SHELLCLEANENVPACKAGE" : {
+          "SHELLCLEANENV" : {
+            "TITLE" : "Limpiar entorno",
+            "DESCRIPTION" : "Limpiar el entorno de ejecución del shell"
+          }
+        },
+        "SHELLDIRECTORYPACKAGE" : {
+          "SHELLDIRECTORY" : {
+            "TITLE" : "Directorio",
+            "DESCRIPTION" : "El directorio de trabajo del proceso de shell"
+          }
+        },
+        "RULETASK_RULESPACKAGE" : {
+          "RULETASK_RULES" : {
+            "TITLE" : "Reglas",
+            "DESCRIPTION" : "Reglas de la tarea"
+          }
+        },
+        "RULETASK_VARIABLES_INPUTPACKAGE" : {
+          "RULETASK_VARIABLES_INPUT" : {
+            "TITLE" : "Variables de entrada",
+            "DESCRIPTION" : "Variables de entrada de la tarea."
+          }
+        },
+        "RULETASK_EXCLUDEPACKAGE" : {
+          "RULETASK_EXCLUDE" : {
+            "TITLE" : "Excluir",
+            "DESCRIPTION" : "Usar la propiedad de reglas como exclusión."
+          }
+        },
+        "RULETASK_RESULTPACKAGE" : {
+          "RULETASK_RESULT" : {
+            "TITLE" : "Variable de resultado",
+            "DESCRIPTION" : "Variable de resultado de la tarea de regla."
+          }
+        },
+        "MAILTASKHEADERSPACKAGE" : {
+          "MAILTASKHEADERS" : {
+            "TITLE" : "Cabeceras",
+            "DESCRIPTION" : "Cabeceras del email separadas en líneas (por ejemplo, X-Attribute: valor)."
+          }
+        },
+        "MAILTASKTOPACKAGE" : {
+          "MAILTASKTO" : {
+            "TITLE" : "Para",
+            "DESCRIPTION" : "El destinatario del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKFROMPACKAGE" : {
+          "MAILTASKFROM" : {
+            "TITLE" : "De",
+            "DESCRIPTION" : "La dirección del remitente del email. Si no se indica, se utiliza la dirección de remitente predeterminada en la configuración."
+          }
+        },
+        "MAILTASKSUBJECTPACKAGE" : {
+          "MAILTASKSUBJECT" : {
+            "TITLE" : "Asunto",
+            "DESCRIPTION" : "El asunto del email."
+          }
+        },
+        "MAILTASKCCPACKAGE" : {
+          "MAILTASKCC" : {
+            "TITLE" : "CC",
+            "DESCRIPTION" : "La dirección que recibirá copia del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKBCCPACKAGE" : {
+          "MAILTASKBCC" : {
+            "TITLE" : "CCO",
+            "DESCRIPTION" : "La dirección que recibirá copia oculta del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKTEXTPACKAGE" : {
+          "MAILTASKTEXT" : {
+            "TITLE" : "Texto",
+            "DESCRIPTION" : "El contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "TextVar",
+            "DESCRIPTION" : "El nombre de la variable del proceso que contiene el texto con el contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
+          }
+        },
+        "MAILTASKHTMLPACKAGE" : {
+          "MAILTASKHTML" : {
+            "TITLE" : "Html",
+            "DESCRIPTION" : "Una porción de HTML que se usa como contenido del email."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "HtmlVar",
+            "DESCRIPTION" : "El nombre de la variable del proceso que contiene una porción de HTML que se usa como contenido del email."
+          }
+        },
+        "MAILTASKCHARSETPACKAGE" : {
+          "MAILTASKCHARSET" : {
+            "TITLE" : "Juego de caracteres",
+            "DESCRIPTION" : "Permite cambiar el juego de caracteres del email, que es necesario para los idiomas diferentes al inglés. "
+          }
+        },
+        "HTTPTASKREQUESTMETHODPACKAGE" : {
+          "HTTPTASKREQUESTMETHOD" : {
+            "TITLE" : "Método de petición",
+            "DESCRIPTION" : "Método de petición. Por ejemplo, GET,POST,PUT, etc."
+          }
+        },
+        "HTTPTASKREQUESTURLPACKAGE" : {
+          "HTTPTASKREQUESTURL" : {
+            "TITLE" : "URL de la petición",
+            "DESCRIPTION" : "URL de la petición. Por ejemplo, http://flowable.org."
+          }
+        },
+        "HTTPTASKREQUESTHEADERSPACKAGE" : {
+          "HTTPTASKREQUESTHEADERS" : {
+            "TITLE" : "Cabeceras de la petición",
+            "DESCRIPTION" : "Cabecereas HTTP separadas en líneas. Por ejemplo, Content-Type: application/json."
+          }
+        },
+        "HTTPTASKREQUESTBODYPACKAGE" : {
+          "HTTPTASKREQUESTBODYPACKAGE" : {
+            "TITLE" : "Cuerpo de la petición",
+            "DESCRIPTION" : "Cuerpo de la petición. Por ejemplo, ${sampleBody}."
+          }
+        },
+        "HTTPTASKREQUESTBODYENCODINGPACKAGE" : {
+          "HTTPTASKREQUESTBODYENCODING" : {
+            "TITLE" : "Codificación del cuerpo de la petición",
+            "DESCRIPTION" : "Codificación del cuerpo de la petición. Por ejemplo, UTF-8."
+          }
+        },
+        "HTTPTASKREQUESTTIMEOUTPACKAGE" : {
+          "HTTPTASKREQUESTTIMEOUT" : {
+            "TITLE" : "Tiempo de espera de la petición",
+            "DESCRIPTION" : "Tiempo de espera en milisegundos para la petición. Por ejemplo, 5000."
+          }
+        },
+        "HTTPTASKDISALLOWREDIRECTSPACKAGE" : {
+          "HTTPTASKDISALLOWREDIRECTS" : {
+            "TITLE" : "Rechazar redirecciones",
+            "DESCRIPTION" : "Determina si se rechazan las redirecciones HTTP."
+          }
+        },
+        "HTTPTASKFAILSTATUSCODESPACKAGE" : {
+          "HTTPTASKFAILSTATUSCODES" : {
+            "TITLE" : "Códigos de estado de falla",
+            "DESCRIPTION" : "Lista separada por comas de los códigos de estado en las respuestas HTTP para reintentos (arroja FlowableException). Por ejemplo, 400,5XX."
+          }
+        },
+        "HTTPTASKHANDLESTATUSCODESPACKAGE" : {
+          "HTTPTASKHANDLESTATUSCODES" : {
+            "TITLE" : "Códigos de estado de manejo",
+            "DESCRIPTION" : "Lista separada por comas de los códigos de estado en las respuestas HTTP para ignorar (arroja BPMNError). Por ejemplo, 404,3XX."
+          }
+        },
+        "HTTPTASKIGNOREEXCEPTIONPACKAGE" : {
+          "HTTPTASKIGNOREEXCEPTION" : {
+            "TITLE" : "Ignorar excepciones",
+            "DESCRIPTION" : "Determina si se ignoran las excepciones"
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT" : {
+            "TITLE" : "Guardar respuesta como variable transient",
+            "DESCRIPTION" : "Determina si se debe almacenar las respuesta como variable(s) transient"
+          }
+        },
+        "HTTPTASKSAVERESPONSEASJSONPACKAGE" : {
+          "HTTPTASKSAVERESPONSEASJSON" : {
+            "TITLE" : "Guardar respuesta como JSON",
+            "DESCRIPTION" : "Determina si se guarda la variable de respuesta como JSON en lugar de String"
+          }
+        },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
+          }
+        },
+        "SKIPEXPRESSIONPACKAGE" : {
+          "SKIPEXPRESSION" : {
+            "TITLE" : "Expresión de salto",
+            "DESCRIPTION" : "Expresión que indica, en caso de resultar verdadera, si debe saltarse la tarea."
+          }
+        },
+        "HTTPTASKRESPONSEVARIABLENAMEPACKAGE" : {
+          "HTTPTASKRESPONSEVARIABLENAME" : {
+            "TITLE" : "Nombre de la variable de respuesta",
+            "DESCRIPTION" : "Define el nombre de la variable para almacenar la respuesta HTTP."
+          }
+        },
+        "HTTPTASKSAVEREQUESTVARIABLESPACKAGE" : {
+          "HTTPTASKSAVEREQUESTVARIABLES" : {
+            "TITLE" : "Guardar variables de la solicitud",
+            "DESCRIPTION" : "Determina si se guardan las variables de la solicitud."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERS" : {
+            "TITLE" : "Guardar estado de respuesta y cabeceras",
+            "DESCRIPTION" : "Determinan si se guarda el estado de respuesta, cabeceras, etc."
+          }
+        },
+        "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
+          "HTTPTASKRESULTVARIABLEPREFIX" : {
+            "TITLE" : "Prefijo de la variable de resultado",
+            "DESCRIPTION" : "Prefijo para los nombres de variables de ejecución."
+          }
+        },
+        "CALLACTIVITYCALLEDELEMENTPACKAGE" : {
+          "CALLACTIVITYCALLEDELEMENT" : {
+            "TITLE" : "Elemento al que se llama",
+            "DESCRIPTION" : "Referencia al proceso."
+          }
+        },
+        "CALLACTIVITYCALLEDELEMENTTYPEPACKAGE" : {
+          "CALLACTIVITYCALLEDELEMENTTYPE" : {
+            "TITLE" : "Tipo de elemento al que se llama",
+            "DESCRIPTION" : "Tipo de referencia del proceso utilizado."
+          }
+        },
+        "CALLACTIVITYINPARAMETERSPACKAGE" : {
+          "CALLACTIVITYINPARAMETERS" : {
+            "TITLE" : "Parámetros de entrada",
+            "DESCRIPTION" : "Definición de los parámetros de entrada"
+          }
+        },
+        "CALLACTIVITYOUTPARAMETERSPACKAGE" : {
+          "CALLACTIVITYOUTPARAMETERS" : {
+            "TITLE" : "Parámetros de salida",
+            "DESCRIPTION" : "Definición de los parámetros de salida"
+          }
+        },
+        "CALLACTIVITYINHERITVARIABLESPACKAGE" : {
+          "CALLACTIVITYINHERITVARIABLES" : {
+            "TITLE" : "Heredar variables en subproceso",
+            "DESCRIPTION" : "Hereda las variables del proceso padre en el subproceso"
+          }
+        },
+        "CALLACTIVITYSAMEDEPLOYMENTPACKAGE" : {
+          "CALLACTIVITYSAMEDEPLOYMENT" : {
+            "TITLE" : "Iniciar el proceso referido desde el mismo despliegue",
+            "DESCRIPTION" : "Usar el proceso referido del mismo despliegue."
+          }
+        },
+        "CALLACTIVITYFALLBACKTODEFAULTTENANTPACKAGE" : {
+          "CALLACTIVITYFALLBACKTODEFAULTTENANT" : {
+            "TITLE" : "Recaer en el tenant predeterminado",
+            "DESCRIPTION" : "Buscar la definición por clave en el tenant predeterminado cuando falle la búsqueda en el tenant actual."
+          }
+        },
+        "CALLACTIVITYIDVARIABLENAMEPACKAGE": {
+          "CALLACTIVITYIDVARIABLENAME": {
+            "TITLE": "Id de variable",
+            "DESCRIPTION": "Si está establecido, el id de la instancia iniciada será almacenado en esta variable"
+          }
+        },
+        "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE" : {
+          "CALLACTIVITYPROCESSINSTANCENAME" : {
+            "TITLE" : "Nombre de la instancia del proceso",
+            "DESCRIPTION" : "Una expresión que resuelva el nombre de la instancia de proceso hija"
+          }
+        },
+        "CALLACTIVITYINHERITBUSINESSKEYPACKAGE" : {
+          "CALLACTIVITYINHERITBUSINESSKEY" : {
+            "TITLE" : "Heredar clave de negocio",
+            "DESCRIPTION" : "Hereda la clave de indentificación de negocio del proceso padre."
+          }
+        },
+        "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERSPACKAGE" : {
+          "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERS" : {
+            "TITLE" : "Usar alcance local para los parámetros de salida",
+            "DESCRIPTION" : "Usa alcance local para los parámetros de salida."
+          }
+        },
+        "CALLACTIVITYBUSINESSKEYPACKAGE" : {
+          "CALLACTIVITYBUSINESSKEY" : {
+            "TITLE" : "Expresión de la clave de negocio",
+            "DESCRIPTION" : "Una expresión que resuelve la clave de identificación de negocio para la instancia de proceso hija"
+          }
+        },
+        "CALLACTIVITYCOMPLETEASYNCPACKAGE" : {
+          "CALLACTIVITYCOMPLETEASYNC" : {
+            "TITLE" : "Completar asincrónicamente",
+            "DESCRIPTION" : "Si se establece, la actividad de llamada se finaliza y completa de manera asincrónica. Es útil cuando se usan instancias múltiples paralelas y la definición de proceso llamado tiene tareas asincrónicas."
+          }
+        },
+        "CAMELTASKCAMELCONTEXTPACKAGE" : {
+          "CAMELTASKCAMELCONTEXT" : {
+            "TITLE" : "Contexto Camel",
+            "DESCRIPTION" : "Definición opcional del contexto Camel. Si se deja vacío se utiliza el predeterminado."
+          }
+        },
+        "MULETASKENDPOINTURLPACKAGE" : {
+          "MULETASKENDPOINTURL" : {
+            "TITLE" : "URL del endpoint",
+            "DESCRIPTION" : "Se requiere la url del endpoint para enviar los mensajes a Mule."
+          }
+        },
+        "MULETASKLANGUAGEPACKAGE" : {
+          "MULETASKLANGUAGE" : {
+            "TITLE" : "Lenguaje",
+            "DESCRIPTION" : "Se requiere la definición del lenguaje para resolver la expresión de la carga útil, como juel."
+          }
+        },
+        "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
+          "MULETASKPAYLOADEXPRESSION" : {
+            "TITLE" : "Expresión de la carga útil",
+            "DESCRIPTION" : "Se requiere la definición de la carga útil del mensaje a ser enviado a Mule."
+          }
+        },
+        "MULETASKRESULTVARIABLEPACKAGE" : {
+          "MULETASKRESULTVARIABLE" : {
+            "TITLE" : "Variable de resultado",
+            "DESCRIPTION" : "Una variable de resultado opcional para la carga útil recibida."
+          }
+        },
+        "CONDITIONSEQUENCEFLOWPACKAGE" : {
+          "CONDITIONSEQUENCEFLOWPACKAGE" : {
+            "TITLE" : "Condición del flujo",
+            "DESCRIPTION" : "La condición de la secuencia de flujo"
+          }
+        },
+        "DEFAULTFLOWPACKAGE" : {
+          "DEFAULTFLOW" : {
+            "TITLE" : "Flujo predeterminado",
+            "DESCRIPTION" : "Define la secuencia del flujo como predeterminada"
+          }
+        },
+        "CONDITIONALFLOWPACKAGE" : {
+          "CONDITIONALFLOW" : {
+            "TITLE" : "Fujo condicional",
+            "DESCRIPTION" : "Define la secuencia del flujo con una condición"
+          }
+        },
+        "TIMERCYCLEDEFINITIONPACKAGE" : {
+          "TIMERCYCLEDEFINITION" : {
+            "TITLE" : "Ciclo del temporizador (e.g. R3/PT10H)",
+            "DESCRIPTION" : "Define el temporizador con un ciclo según la norma ISO-8601"
+          }
+        },
+        "TIMERDATEDEFINITIONPACKAGE" : {
+          "TIMERDATEDEFINITION" : {
+            "TITLE" : "Fecha del temporizador en ISO-8601",
+            "DESCRIPTION" : "Define la fecha del temporizador según la norma ISO-8601."
+          }
+        },
+        "TIMERDURATIONDEFINITIONPACKAGE" : {
+          "TIMERDURATIONDEFINITION" : {
+            "TITLE" : "Duración del temporizador (e.g. PT5M)",
+            "DESCRIPTION" : "Define la duración del temporizador según la norma ISO-8601."
+          }
+        },
+        "TIMERENDDATEDEFINITIONPACKAGE" : {
+          "TIMERENDDATEDEFINITION" : {
+            "TITLE" : "Fecha de fin del temporizador en ISO-8601",
+            "DESCRIPTION" : "Define la fecha de fin del temporizador según la norma ISO-8601."
+          }
+        },
+        "MESSAGEREFPACKAGE" : {
+          "MESSAGEREF" : {
+            "TITLE" : "Referencia del mensaje",
+            "DESCRIPTION" : "Define el nombre del mensaje."
+          }
+        },
+        "SIGNALREFPACKAGE" : {
+          "SIGNALREF" : {
+            "TITLE" : "Referencia de señal",
+            "DESCRIPTION" : "Define el nombre de la señal."
+          }
+        },
+        "ERRORREFPACKAGE" : {
+          "ERRORREF" : {
+            "TITLE" : "Referencia de error",
+            "DESCRIPTION" : "Define el nombre del error."
+          }
+        },
+        "ESCALATIONREFPACKAGE" : {
+          "ESCALATIONREF" : {
+            "TITLE" : "Referencia de escalamiento",
+            "DESCRIPTION" : "Define el nombre del escalamiento."
+          }
+        },
+        "CONDITIONALEVENTPACKAGE" : {
+          "CONDITION" : {
+            "TITLE" : "Expresión de condición",
+            "DESCRIPTION" : "Define la expresión de la condición para el evento condicional."
+          }
+        },
+        "CANCELACTIVITYPACKAGE" : {
+          "CANCELACTIVITY" : {
+            "TITLE" : "Cancelar actividad",
+            "DESCRIPTION" : "Indica si se debe cancelar la actividad"
+          }
+        },
+        "INITIATORPACKAGE" : {
+          "INITIATOR" : {
+            "TITLE" : "Iniciador",
+            "DESCRIPTION" : "Iniciador del proceso."
+          }
+        },
+        "TEXTPACKAGE" : {
+          "TEXT" : {
+            "TITLE" : "Texto",
+            "DESCRIPTION" : "El texto de la anotación"
+          }
+        },
+        "MULTIINSTANCE_TYPEPACKAGE" : {
+          "MULTIINSTANCE_TYPE" : {
+            "TITLE" : "Tipo de multi-instancia",
+            "DESCRIPTION" : "Las ejecución de actividades repetitivas (paralelas o secuenciales) se pueden mostrar a través de diferentes tipos de bucles"
+          }
+        },
+        "MULTIINSTANCE_CARDINALITYPACKAGE" : {
+          "MULTIINSTANCE_CARDINALITY" : {
+            "TITLE" : "Cardinalidad (multi-instancia)",
+            "DESCRIPTION" : "Define la cardinalidad de la multi-instancia"
+          }
+        },
+        "MULTIINSTANCE_COLLECTIONPACKAGE" : {
+          "MULTIINSTANCE_COLLECTION" : {
+            "TITLE" : "Colección (multi-instancia)",
+            "DESCRIPTION" : "Define la colección para la multi-instancia."
+          }
+        },
+        "MULTIINSTANCE_VARIABLEPACKAGE" : {
+          "MULTIINSTANCE_VARIABLE" : {
+            "TITLE" : "Variable de elemento (multi-instancia)",
+            "DESCRIPTION" : "Define la variable del elemento para la multi-instancia."
+          }
+        },
+        "MULTIINSTANCE_CONDITIONPACKAGE" : {
+          "MULTIINSTANCE_CONDITION" : {
+            "TITLE" : "Condición de conclusión (multi-instancia)",
+            "DESCRIPTION" : "Define the la condición de conclusión for la multi-instancia."
+          }
+        },
+        "ISFORCOMPENSATIONPACKAGE" : {
+          "ISFORCOMPENSATION" : {
+            "TITLE" : "Es para compensación",
+            "DESCRIPTION" : "Determina si la actividad tiene propósitos de compensación."
+          }
+        },
+        "SEQUENCEFLOWORDERPACKAGE" : {
+          "SEQUENCEFLOWORDER" : {
+            "TITLE" : "Orden del flujo",
+            "DESCRIPTION" : "Ordena los flujos de secuencia salientes"
+          }
+        },
+        "SIGNALDEFINITIONSPACKAGE" : {
+          "SIGNALDEFINITIONS" : {
+            "TITLE" : "Definiciones de señal",
+            "DESCRIPTION" : "Definiciones de señal"
+          }
+        },
+        "MESSAGEDEFINITIONSPACKAGE" : {
+          "MESSAGEDEFINITIONS" : {
+            "TITLE" : "Definiciones de mensaje",
+            "DESCRIPTION" : "Definiciones de mensaje"
+          }
+        },
+        "ESCALATIONDEFINITIONSPACKAGE" : {
+          "ESCALATIONDEFINITIONS" : {
+            "TITLE" : "Definiciones de escalamiento",
+            "DESCRIPTION" : "Definiciones de escalamiento"
+          }
+        },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Clave del evento",
+            "DESCRIPTION" : "Definición de la calve de identificación del evento"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Nombre de evento",
+            "DESCRIPTION" : "Definición del nombre del evento"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Mapeo hacia carga útil del evento",
+            "DESCRIPTION" : "Mapeo de las variables del proceso a las propiedades de la carga útil del evento"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Mapeo desde la carga util del evento",
+            "DESCRIPTION" : "Mapeo de las propiedades de la carga útil del evento a las variables del proceso"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Parámetros de correlación",
+            "DESCRIPTION" : "Definición de los parámetros de correlación"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Clave del canal",
+            "DESCRIPTION" : "Definición de la clave de identificación del canal"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Nombre del canal",
+            "DESCRIPTION" : "Definición del nombre del canal"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Tipo de canal",
+            "DESCRIPTION" : "Definición del tipo de canal"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Destino del canal",
+            "DESCRIPTION" : "Definición del destino del canal"
+          },
+          "TRIGGEREVENTKEY" : {
+            "TITLE" : "Clave del disparador de evento",
+            "DESCRIPTION" : "Definción de la clave de identificación del disparador de evento"
+          },
+          "TRIGGEREVENTNAME" : {
+            "TITLE" : "Nombre del disparador de evento",
+            "DESCRIPTION" : "Definición del nombre del disparador de evento"
+          },
+          "TRIGGERCHANNELKEY" : {
+            "TITLE" : "Clave del canal disparador",
+            "DESCRIPTION" : "Definición de la clave de identificación del canal disparador"
+          },
+          "TRIGGERCHANNELNAME" : {
+            "TITLE" : "Nombre del canal disparador",
+            "DESCRIPTION" : "Definición del nombre del canal disparador"
+          },
+          "TRIGGERCHANNELTYPE" : {
+            "TITLE" : "Tipo de canal disparador",
+            "DESCRIPTION" : "Definición del tipo de canal disparador"
+          },
+          "TRIGGERCHANNELDESTINATION" : {
+            "TITLE" : "Destino del canal disparador",
+            "DESCRIPTION" : "Definición del destino del canal disparador"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Valor fijo de la clave del evento",
+            "DESCRIPTION" : "Definición del valor fijo de la clave de identificación de evento"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Campo JSON de la clave del evento",
+            "DESCRIPTION" : "Definición de la detección de la clave de identificación de evento con un campo JSON"
+          },
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Puntero JSON de la clave del evento",
+            "DESCRIPTION" : "Definición de la detección de la clave de identificación de evento con la expresión de un puntero JSON"
+          }
+        },
+        "ISTRANSACTIONPACKAGE" : {
+          "ISTRANSACTION" : {
+            "TITLE" : "Es un subproceso de transacción",
+            "DESCRIPTION" : "Determina si este subproceso es de tipo transacción."
+          }
+        },
+        "FORMREFERENCEPACKAGE" : {
+          "FORMREFERENCE" : {
+            "TITLE" : "Referencia al formulario",
+            "DESCRIPTION" : "Referencia a un formulario"
+          }
+        },
+        "TERMINATEALLPACKAGE" : {
+          "TERMINATEALL" : {
+            "TITLE" : "Finalizar todo",
+            "DESCRIPTION" : "Habilita a finalizar la instancia del proceso"
+          }
+        },
+        "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE" : {
+          "DECISIONTASKDECISIONTABLEREFERENCE" : {
+            "TITLE" : "Referencia a tabla de decisión",
+            "DESCRIPTION" : "Establece una referencia a una tabla de decisión"
+          }
+        },
+        "DECISIONTASKTHROWERRORONNOHITSPACKAGE" : {
+          "DECISIONTASKTHROWERRORONNOHITS" : {
+            "TITLE" : "Arrojar error si no coinciden reglas",
+            "DESCRIPTION" : "Inidica si debe arrojar error cuando no haya reglas en la tabla de decisión que coincidan y, en consecuencia, no haya resultados."
+          }
+        },
+        "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE" : {
+          "DECISIONTASKFALLBACKTODEFAULTTENANT" : {
+            "TITLE" : "Recaer en el tenant predeterminado",
+            "DESCRIPTION" : "Buscar definciones de decisión sin tenant cuando fallan los intentos previos para encontrar definiciones con tenant."
+          }
+        },
+        "INTERRUPTINGPACKAGE" : {
+          "INTERRUPTING" : {
+            "TITLE" : "Interrupir",
+            "DESCRIPTION" : "¿Deben finalizar todas las ejecuciones padre?"
+          }
+        },
+        "COMPLETIONCONDITIONPACKAGE" : {
+          "COMPLETIONCONDITION" : {
+            "TITLE" : "Condición de compleción",
+            "DESCRIPTION" : "La condición de compleción para el subproceso adhoc"
+          }
+        },
+        "ORDERINGPACKAGE" : {
+          "ORDERING" : {
+            "TITLE" : "Ordenamiento",
+            "DESCRIPTION" : "El ordenamiento para el subproceso adhoc"
+          }
+        },
+        "CANCELREMAININGINSTANCESPACKAGE" : {
+          "CANCELREMAININGINSTANCES" : {
+            "TITLE" : "Cancelar las instancias restantes",
+            "DESCRIPTION" : "¿Cancelar las instancias restantes del subproceso adhoc?"
+          }
+        }
+
+      },
+      "STENCILS" : {
+        "GROUPS" : {
+          "STARTEVENTS" : "Eventos de inicio",
+          "ENDEVENTS" : "Eventos de fin",
+          "DIAGRAM" : "Diagrama",
+          "ACTIVITIES" : "Actividades",
+          "STRUCTURAL" : "Estructura",
+          "GATEWAYS" : "Puertas de enlace",
+          "BOUNDARYEVENTS" : "Eventos de frontera",
+          "INTERMEDIATECATCHINGEVENTS" : "Eventos intermedios de captura",
+          "INTERMEDIATETHROWINGEVENTS" : "Eventos intermedios de lanzamiento",
+          "SWIMLANES" : "Carriles",
+          "CONNECTINGOBJECTS" : "Objetos conectores",
+          "ARTIFACTS" : "Artefactos"
+        },
+        "BPMNDIAGRAM" : {
+          "TITLE" : "Diagrama BPMN",
+          "DESCRIPTION" : "Un diagrama BPMN 2.0."
+        },
+        "STARTNONEEVENT" : {
+          "TITLE" : "Evento de incio",
+          "DESCRIPTION" : "Un evento de inicio sin un disparador específico"
+        },
+        "STARTTIMEREVENT" : {
+          "TITLE" : "Evento de inicio temporizado",
+          "DESCRIPTION" : "In evento de incio disparado por un temporizador"
+        },
+        "STARTSIGNALEVENT" : {
+          "TITLE" : "Evento de incio de señal",
+          "DESCRIPTION" : "Un evento de inicio disparado por una señal"
+        },
+        "STARTMESSAGEEVENT" : {
+          "TITLE" : "Evento de inicio de mensaje",
+          "DESCRIPTION" : "Un evento de inicio disparado por un mensaje"
+        },
+        "STARTEVENTREGISTRYEVENT" : {
+          "TITLE" : "Evento de inicio de registración",
+          "DESCRIPTION" : "Un evento de inicio disparado por una registración"
+        },
+        "STARTCONDITIONALEVENT" : {
+          "TITLE" : "Evento de inicio condicional",
+          "DESCRIPTION" : "Un evento de inicio que evalúa un evento condicional"
+        },
+        "STARTERROREVENT" : {
+          "TITLE" : "Evento de inicio de error",
+          "DESCRIPTION" : "Un evento de inicio que captura un error BPMN"
+        },
+        "STARTESCALATIONEVENT" : {
+          "TITLE" : "Evento de inicio de escalamiento",
+          "DESCRIPTION" : "Un evento de inicio que captura un escalamiento BPMN"
+        },
+        "USERTASK" : {
+          "TITLE" : "Tarea de usuario",
+          "DESCRIPTION" : "Una tarea manual asignada a un usuario específico"
+        },
+        "SERVICETASK" : {
+          "TITLE" : "Tarea de servicio",
+          "DESCRIPTION" : "Una tarea automática con una lógica de servicio"
+        },
+        "SCRIPTTASK" : {
+          "TITLE" : "Tarea de script",
+          "DESCRIPTION" : "Una tarea automática con una lógica de script (guión)"
+        },
+        "BUSINESSRULE" : {
+          "TITLE" : "Tarea de regla de negocio",
+          "DESCRIPTION" : "Una tarea automática con una lógica de reglas"
+        },
+        "RECEIVETASK" : {
+          "TITLE" : "Tarea de recepción",
+          "DESCRIPTION" : "Una tarea que espera una señal"
+        },
+        "MANUALTASK" : {
+          "TITLE" : "Tarea manual",
+          "DESCRIPTION" : "Una tarea sin una lógica"
+        },
+        "MAILTASK" : {
+          "TITLE" : "Tarea de email",
+          "DESCRIPTION" : "Una tarea de email"
+        },
+        "CAMELTASK" : {
+          "TITLE" : "Tarea de Camel",
+          "DESCRIPTION" : "Una tarea que envía un mensaje a Camel"
+        },
+        "HTTPTASK" : {
+          "TITLE" : "Tarea de HTTP",
+          "DESCRIPTION" : "Una tarea que usa HTTP"
+        },
+        "MULETASK" : {
+          "TITLE" : "Tarea de Mule",
+          "DESCRIPTION" : "Una tarea que envía un mensaje a Mule"
+        },
+        "SENDTASK" : {
+          "TITLE" : "Tarea de envío",
+          "DESCRIPTION" : "Una tarea que envía un mensaje"
+        },
+        "DECISIONTASK" : {
+          "TITLE" : "Tarea de decisión",
+          "DESCRIPTION" : "Una tarea que utiliza el motor de reglas Flowable DMN"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Tarea de envío de evento",
+          "DESCRIPTION" : "Una tarea que envía un evento al registro de eventos"
+        },
+        "SHELLTASK" : {
+          "TITLE" : "Tarea de shell",
+          "DESCRIPTION" : "Una tarea automática con una lógica de shell batch"
+        },
+        "SUBPROCESS" : {
+          "TITLE" : "Subproceso",
+          "DESCRIPTION" : "Un ámbito de subproceso"
+        },
+        "COLLAPSEDSUBPROCESS" : {
+          "TITLE" : "Subproceso colapsado",
+          "DESCRIPTION" : "Un ámbito de subproceso"
+        },
+        "EVENTSUBPROCESS" : {
+          "TITLE" : "Subproceso de evento",
+          "DESCRIPTION" : "Un ámbito de subproceso de evento"
+        },
+        "CALLACTIVITY" : {
+          "TITLE" : "Actividad de llamada",
+          "DESCRIPTION" : "Una actividad de llamada"
+        },
+        "EXCLUSIVEGATEWAY" : {
+          "TITLE" : "Puerta de enlace exclusiva",
+          "DESCRIPTION" : "Una puerta de enlace que indica opción"
+        },
+        "PARALLELGATEWAY" : {
+          "TITLE" : "Puerta de enlace paralela",
+          "DESCRIPTION" : "Una puerta de enlace paralela"
+        },
+        "INCLUSIVEGATEWAY" : {
+          "TITLE" : "Puerta de enlace inclusiva",
+          "DESCRIPTION" : "Una puerta de enlace inclusiva"
+        },
+        "EVENTGATEWAY" : {
+          "TITLE" : "Puerta de enlace de evento",
+          "DESCRIPTION" : "Una puerta de enlace de evento"
+        },
+        "BOUNDARYCONDITIONALEVENT" : {
+          "TITLE" : "Evento frontera condicional",
+          "DESCRIPTION" : "Un evento de frontera que evalúa un evento condicional"
+        },
+        "BOUNDARYERROREVENT" : {
+          "TITLE" : "Evento frontera de error",
+          "DESCRIPTION" : "Un evento de frontera que captura un error BPMN"
+        },
+        "BOUNDARYESCALATIONEVENT" : {
+          "TITLE" : "Evento frontera de escalamiento",
+          "DESCRIPTION" : "Un evento de frontera que captura un escalamiento BPMN"
+        },
+        "BOUNDARYTIMEREVENT" : {
+          "TITLE" : "Evento frontera temporizado",
+          "DESCRIPTION" : "Un evento de frontera disparado por un temporizador"
+        },
+        "BOUNDARYSIGNALEVENT" : {
+          "TITLE" : "Evento frontera de señal",
+          "DESCRIPTION" : "Un evento de frontera disparado por una señal"
+        },
+        "BOUNDARYMESSAGEEVENT" : {
+          "TITLE" : "Evento frontera de mensaje",
+          "DESCRIPTION" : "Un evento de frontera disparado por un mensaje"
+        },
+        "BOUNDARYCANCELEVENT" : {
+          "TITLE" : "Evento frontera de cancelación",
+          "DESCRIPTION" : "Un evento de cancelación de frontera"
+        },
+        "BOUNDARYEVENTREGISTRYEVENT" : {
+          "TITLE" : "Evento frontera de registración",
+          "DESCRIPTION" : "Un evento de registración de frontera"
+        },
+        "BOUNDARYCOMPENSATIONEVENT" : {
+          "TITLE" : "Evento frontera de compensación",
+          "DESCRIPTION" : "Un evento de compensación de frontera"
+        },
+        "CATCHTIMEREVENT" : {
+          "TITLE" : "Evento intermedio de captura temporizado",
+          "DESCRIPTION" : "Un evento intermedio de captura disparado por un temporizador"
+        },
+        "CATCHSIGNALEVENT" : {
+          "TITLE" : "Evento intermedio de captura de señal",
+          "DESCRIPTION" : "Un evento intermedio de captura disparado por una señal"
+        },
+        "CATCHMESSAGEEVENT" : {
+          "TITLE" : "Evento intermedio de captura de mensaje",
+          "DESCRIPTION" : "Un evento intermedio de captura disparado por un mensaje"
+        },
+        "CATCHCONDITIONALEVENT" : {
+          "TITLE" : "Evento intermedio de captura condicional",
+          "DESCRIPTION" : "Un evento intermedio de captura disparado por una condición"
+        },
+        "THROWNONEEVENT" : {
+          "TITLE" : "Evento intermedio sin lanzamiento",
+          "DESCRIPTION" : "Un evento intermedio sin un disparador específico"
+        },
+        "THROWSIGNALEVENT" : {
+          "TITLE" : "Evento intermedio de lanzamiento de señal",
+          "DESCRIPTION" : "Un evento intermedio con un disparador de señal"
+        },
+        "THROWESCALATIONEVENT" : {
+          "TITLE" : "Evento intermedio de lanzamiento de escalamiento",
+          "DESCRIPTION" : "Un evento intermedio con un disparador de escalamiento"
+        },
+        "ENDNONEEVENT" : {
+          "TITLE" : "Evento de fin",
+          "DESCRIPTION" : "Un evento de fin sin un disparador específico"
+        },
+        "ENDERROREVENT" : {
+          "TITLE" : "Evento de fin con error",
+          "DESCRIPTION" : "Un evento de fin que evento de error"
+        },
+        "ENDESCALATIONEVENT" : {
+          "TITLE" : "Evento de fin con escalamiento",
+          "DESCRIPTION" : "Un evento de fin que lanza un evento de escalamiento"
+        },
+        "ENDCANCELEVENT" : {
+          "TITLE" : "Evento de fin con cancelación",
+          "DESCRIPTION" : "Un evento de fin con cancelación"
+        },
+        "ENDTERMINATEEVENT" : {
+          "TITLE" : "Evento de fin con terminación",
+          "DESCRIPTION" : "Un evento de fin con terminación"
+        },
+        "POOL" : {
+          "TITLE" : "Piscina",
+          "DESCRIPTION" : "Una psichina para estructura la definición de procesos"
+        },
+        "LANE" : {
+          "TITLE" : "Carril",
+          "DESCRIPTION" : "Un carril para estructurar la definción de procesos"
+        },
+        "SEQUENCEFLOW" : {
+          "TITLE" : "Flujo de secuencia",
+          "DESCRIPTION" : "El flujo de secuencia define el orden de ejecución de las actividades."
+        },
+        "MESSAGEFLOW" : {
+          "TITLE" : "Flujo de mensaje",
+          "DESCRIPTION" : "El fujo de mensaje conecta elementos en diferentes piscinas."
+        },
+        "ASSOCIATION" : {
+          "TITLE" : "Asociación",
+          "DESCRIPTION" : "Asocia una antoación de texto con un elemento."
+        },
+        "DATAASSOCIATION" : {
+          "TITLE" : "Asociación de datos",
+          "DESCRIPTION" : "Asocia un elemento de datos con una actividad."
+        },
+        "TEXTANNOTATION" : {
+          "TITLE" : "Anotación de texto",
+          "DESCRIPTION" : "Anota un elemento con una descrpción de texto."
+        },
+        "DATASTORE" : {
+          "TITLE" : "Almacenamiento de datos",
+          "DESCRIPTION" : "Referencia a un almacenamiento de datos."
+        },
+        "ADHOCSUBPROCESS" : {
+          "TITLE" : "Subproceso adhoc",
+          "DESCRIPTION" : "Un subproceso adhoc"
+        }
+      }
+    },
+
+    "CMMN" : {
+      "TITLE": "Editor CMMN",
+      "DESCRIPTION": "Editor de casos CMMN",
+      "PROPERTYPACKAGES": {
+        "CASE_IDPACKAGE": {
+          "CASE_ID": {
+            "TITLE": "Identificador del acso",
+            "DESCRIPTION": "Identificador único de la definición del caso."
+          }
+        },
+        "OVERRIDEIDPACKAGE": {
+          "OVERRIDEID": {
+            "TITLE": "Id",
+            "DESCRIPTION": "Identificador único del elemento."
+          }
+        },
+        "NAMEPACKAGE": {
+          "NAME": {
+            "TITLE": "Nombre",
+            "DESCRIPTION": "Nombre descriptivo del elemento CMMN."
+          }
+        },
+        "DOCUMENTATIONPACKAGE": {
+          "DOCUMENTATION": {
+            "TITLE": "Documentación",
+            "DESCRIPTION": "Documentación del elemento CMMN."
+          }
+        },
+        "BLOCKINGPACKAGE": {
+          "ISBLOCKING": {
+            "TITLE": "Bloqueo",
+            "DESCRIPTION": "Propiedad booleana, por defecto true. Si es false, la tarea automáticamente se completa luego de ejecutar la lógica asciada"
+          },
+          "ISBLOCKINGEXPRESSION": {
+            "TITLE": "Expresión de bloqueo",
+            "DESCRIPTION": "Una expresión de control en tiempo de ejecución que indica si esta tarea se bloquea o no. Si se establece, el valor de la propiedad Bloqueo se ignora."
+          }
+        },
+        "CASE_INITIATORVARIABLENAMEPACKAGE": {
+          "CASE_INITIATORVARIABLENAME": {
+            "TITLE": "Nombre de variable de iniciador",
+            "DESCRIPTION": "Establece el nombre de la variable para ser usada para el valor del iniciador del caso."
+          }
+        },
+        "CASE_AUTHORPACKAGE": {
+          "CASE_AUTHOR": {
+            "TITLE": "Autor del acso",
+            "DESCRIPTION": "Autor de la definición del caso."
+          }
+        },
+        "CASE_VERSIONPACKAGE": {
+          "CASE_VERSION": {
+            "TITLE": "Id de la versión del caso (sólo documentación)",
+            "DESCRIPTION" : "El identificador de la versión para propósitos de documentación."
+          }
+        },
+        "CASE_NAMESPACEPACKAGE": {
+          "CASE_NAMESPACE": {
+            "TITLE" : "Espacio de nombres (target namespace)",
+            "DESCRIPTION" : "El espacio de nombres (target namespace) de la definición del caso."
+          }
+        },
+        "USERTASKASSIGNMENTPACKAGE": {
+          "USERTASKASSIGNMENT": {
+            "TITLE": "Asignaciones",
+            "DESCRIPTION": "Definición de asignaciones para la tarea del usuario"
+          }
+        },
+        "TASKLISTENERSPACKAGE": {
+          "TASKLISTENERS": {
+            "TITLE": "Gestores de eventos de tarea",
+            "DESCRIPTION": "Gestores de eventos para una tarea de usuario"
+          }
+        },
+        "FORMPROPERTIESPACKAGE": {
+          "FORMPROPERTIES": {
+            "TITLE": "Propiedades del formulario",
+            "DESCRIPTION": "Definición del formulario con una lista de propiuedades de formulario"
+          }
+        },
+        "FORMKEYDEFINITIONPACKAGE": {
+          "FORMKEYDEFINITION": {
+            "TITLE": "Clave del formulario",
+            "DESCRIPTION": "Clave de identificación de formulario que provee una referencia a un formulario."
+          }
+        },
+        "FORMFIELDVALIDATIONPACKAGE": {
+          "FORMFIELDVALIDATION": {
+            "TITLE": "Validar campos de formulario",
+            "DESCRIPTION" : "Validar los campos del formulario en el envío. (los valores permitidos son 'true', 'false' or una expresión)"
+          }
+        },
+        "DUEDATEDEFINITIONPACKAGE" : {
+          "DUEDATEDEFINITION" : {
+            "TITLE" : "Fecha de vencimiento",
+            "DESCRIPTION" : "Fecha de vencimiento de la tarea de usuario."
+          }
+        },
+        "PRIORITYDEFINITIONPACKAGE" : {
+          "PRIORITYDEFINITION" : {
+            "TITLE" : "Prioridad",
+            "DESCRIPTION" : "Prioridad de la tarea de usuario."
+          }
+        },
+        "TASKIDVARIABLENAMEPACKAGE": {
+          "TASKIDVARIABLENAME": {
+            "TITLE": "Variable para el taskId",
+            "DESCRIPTION": "Si se establece, el id de la tarea será almacenado en esta variable"
+          }
+        },
+        "SERVICETASKCLASSPACKAGE" : {
+          "SERVICETASKCLASS" : {
+            "TITLE" : "Clase",
+            "DESCRIPTION" : "Clase de java que implementa la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKEXPRESSIONPACKAGE" : {
+          "SERVICETASKEXPRESSION" : {
+            "TITLE" : "Expresión",
+            "DESCRIPTION" : "Expresión que define la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKDELEGATEEXPRESSIONPACKAGE" : {
+          "SERVICETASKDELEGATEEXPRESSION" : {
+            "TITLE" : "Expresión del delegado",
+            "DESCRIPTION" : "Expresión del delegado que define la lógica de la tarea de servicio."
+          }
+        },
+        "SERVICETASKFIELDSPACKAGE" : {
+          "SERVICETASKFIELDS" : {
+            "TITLE" : "Campos de clase (java)",
+            "DESCRIPTION" : "Extensiones de campos"
+          }
+        },
+        "SERVICETASKRESULTVARIABLEPACKAGE" : {
+          "SERVICETASKRESULTVARIABLE" : {
+            "TITLE" : "Nombre de la variable de resultado",
+            "DESCRIPTION" : "Nombre de la variable del proceso para almacenar el resultado de la tarea de servicio."
+          }
+        },
+        "ASYNCPACKAGE": {
+          "ISASYNC": {
+            "TITLE": "Asincrónico",
+            "DESCRIPTION": "Indica si la tarea necesita ser ejecutada de manera asincrónica."
+          },
+          "ISEXCLUSIVE": {
+            "TITLE": "Exclusiva",
+            "DESCRIPTION": "Indica si una tarea asincrónica necesita ser ejecutada de manera exclusiva"
+          }
+        },
+        "MAILTASKHEADERSPACKAGE" : {
+          "MAILTASKHEADERS" : {
+            "TITLE" : "Cabeceras",
+            "DESCRIPTION" : "Cabeceras del email separadas en líneas (por ejemplo, X-Attribute: valor)."
+          }
+        },
+        "MAILTASKTOPACKAGE" : {
+          "MAILTASKTO" : {
+            "TITLE" : "Para",
+            "DESCRIPTION" : "El destinatario del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKFROMPACKAGE" : {
+          "MAILTASKFROM" : {
+            "TITLE" : "De",
+            "DESCRIPTION" : "La dirección del remitente del email. Si no se indica, se utiliza la dirección de remitente predeterminada en la configuración."
+          }
+        },
+        "MAILTASKSUBJECTPACKAGE" : {
+          "MAILTASKSUBJECT" : {
+            "TITLE" : "Asunto",
+            "DESCRIPTION" : "El asunto del email."
+          }
+        },
+        "MAILTASKCCPACKAGE" : {
+          "MAILTASKCC" : {
+            "TITLE" : "CC",
+            "DESCRIPTION" : "La dirección que recibirá copia del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKBCCPACKAGE" : {
+          "MAILTASKBCC" : {
+            "TITLE" : "CCO",
+            "DESCRIPTION" : "La dirección que recibirá copia oculta del email. Se pueden definir múltiples destintarios con una lista separada por comas."
+          }
+        },
+        "MAILTASKTEXTPACKAGE" : {
+          "MAILTASKTEXT" : {
+            "TITLE" : "Texto",
+            "DESCRIPTION" : "El contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
+          },
+          "MAILTASKTEXTVAR" : {
+            "TITLE" : "Variable del texto",
+            "DESCRIPTION" : "El nombre de la variable de caso que contiene el texto del contenido del email, en caso de necesitar enviar texto plano (no enriquecido). Puede ser utilizado en combinación con HTML para clientes de email que no soproten contenido enriquecido. En ese caso el cliente recae en esta alternativa de sólo texto."
+          }
+        },
+        "MAILTASKHTMLPACKAGE": {
+          "MAILTASKHTML" : {
+            "TITLE" : "HTML",
+            "DESCRIPTION" : "Una porción de HTML que se usa como contenido del email."
+          },
+          "MAILTASKHTMLVAR" : {
+            "TITLE" : "Variable del HTML",
+            "DESCRIPTION" : "El nombre de la variable de caso que contiene el HTML que se usa como contenido del email."
+          }
+        },
+        "MAILTASKCHARSETPACKAGE" : {
+          "MAILTASKCHARSET" : {
+            "TITLE" : "Juego de caracteres",
+            "DESCRIPTION" : "Permite cambiar el juego de caracteres del email, que es necesario para los idiomas diferentes al inglés. "
+          }
+        },
+        "TEXTPACKAGE" : {
+          "TEXT" : {
+            "TITLE" : "Texto",
+            "DESCRIPTION" : "El texto de la anotación"
+          }
+        },
+        "FORMREFERENCEPACKAGE" : {
+          "FORMREFERENCE" : {
+            "TITLE" : "Referencia al formulario",
+            "DESCRIPTION" : "Referencia a un formulario"
+          }
+        },
+        "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE" : {
+          "DECISIONTASKDECISIONTABLEREFERENCE" : {
+            "TITLE" : "Referencia a tabla de decisión",
+            "DESCRIPTION" : "Establece una referencia a una tabla de decisión"
+          }
+        },
+        "DECISIONTASKTHROWERRORONNOHITSPACKAGE" : {
+          "DECISIONTASKTHROWERRORONNOHITS" : {
+            "TITLE" : "Arrojar error si no coinciden reglas",
+            "DESCRIPTION" : "Inidica si debe arrojar error cuando no haya reglas en la tabla de decisión que coincidan y, en consecuencia, no haya resultados."
+          }
+        },
+        "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE" : {
+          "DECISIONTASKFALLBACKTODEFAULTTENANT" : {
+            "TITLE" : "Recaer en el tenant predeterminado",
+            "DESCRIPTION" : "Buscar definciones de decisión sin tenant cuando fallan los intentos previos para encontrar definiciones con tenant."
+          }
+        },
+        "HTTPTASKREQUESTMETHODPACKAGE" : {
+          "HTTPTASKREQUESTMETHOD" : {
+            "TITLE" : "Método de petición",
+            "DESCRIPTION" : "Método de petición. Por ejemplo, GET,POST,PUT, etc."
+          }
+        },
+        "HTTPTASKREQUESTURLPACKAGE" : {
+          "HTTPTASKREQUESTURL" : {
+            "TITLE" : "URL de la petición",
+            "DESCRIPTION" : "URL de la petición. Por ejemplo, http://flowable.org."
+          }
+        },
+        "HTTPTASKREQUESTHEADERSPACKAGE" : {
+          "HTTPTASKREQUESTHEADERS" : {
+            "TITLE" : "Cabeceras de la petición",
+            "DESCRIPTION" : "Cabecereas HTTP separadas en líneas. Por ejemplo, Content-Type: application/json."
+          }
+        },
+        "HTTPTASKREQUESTBODYPACKAGE" : {
+          "HTTPTASKREQUESTBODY" : {
+            "TITLE" : "Cuerpo de la petición",
+            "DESCRIPTION" : "Cuerpo de la petición. Por ejemplo, ${sampleBody}."
+          }
+        },
+        "HTTPTASKREQUESTBODYENCODINGPACKAGE" : {
+          "HTTPTASKREQUESTBODYENCODING" : {
+            "TITLE" : "Codificación del cuerpo de la petición",
+            "DESCRIPTION" : "Codificación del cuerpo de la petición. Por ejemplo, UTF-8."
+          }
+        },
+        "HTTPTASKREQUESTTIMEOUTPACKAGE" : {
+          "HTTPTASKREQUESTTIMEOUT" : {
+            "TITLE" : "Tiempo de espera de la petición",
+            "DESCRIPTION" : "Tiempo de espera en milisegundos para la petición. Por ejemplo, 5000."
+          }
+        },
+        "HTTPTASKDISALLOWREDIRECTSPACKAGE" : {
+          "HTTPTASKDISALLOWREDIRECTS" : {
+            "TITLE" : "Rechazar redirecciones",
+            "DESCRIPTION" : "Determina si se rechazan las redirecciones HTTP."
+          }
+        },
+        "HTTPTASKFAILSTATUSCODESPACKAGE" : {
+          "HTTPTASKFAILSTATUSCODES" : {
+            "TITLE" : "Códigos de estado de falla",
+            "DESCRIPTION" : "Lista separada por comas de los códigos de estado en las respuestas HTTP para reintentos (arroja FlowableException). Por ejemplo, 400,5XX."
+          }
+        },
+        "HTTPTASKHANDLESTATUSCODESPACKAGE" : {
+          "HTTPTASKHANDLESTATUSCODES" : {
+            "TITLE" : "Códigos de estado de manejo",
+            "DESCRIPTION" : "Lista separada por comas de los códigos de estado en las respuestas HTTP para ignorar (arroja BPMNError). Por ejemplo, 404,3XX."
+          }
+        },
+        "HTTPTASKIGNOREEXCEPTIONPACKAGE" : {
+          "HTTPTASKIGNOREEXCEPTION" : {
+            "TITLE" : "Ignorar excepciones",
+            "DESCRIPTION" : "Determina si se ignoran las excepciones"
+          }
+        },
+        "HTTPTASKRESPONSEVARIABLENAMEPACKAGE" : {
+          "HTTPTASKRESPONSEVARIABLENAME" : {
+            "TITLE" : "Nombre de la variable de respuesta",
+            "DESCRIPTION" : "Define el nombre de la variable para almacenar la respuesta HTTP."
+          }
+        },
+        "HTTPTASKSAVEREQUESTVARIABLESPACKAGE" : {
+          "HTTPTASKSAVEREQUESTVARIABLES" : {
+            "TITLE" : "Guardar variables de la solicitud",
+            "DESCRIPTION" : "Determina si se guardan las variables de la solicitud."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERS" : {
+            "TITLE" : "Guardar estado de respuesta y cabeceras",
+            "DESCRIPTION" : "Determinan si se guarda el estado de respuesta, cabeceras, etc."
+          }
+        },
+        "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
+          "HTTPTASKRESULTVARIABLEPREFIX" : {
+            "TITLE" : "Prefijo de la variable de resultado",
+            "DESCRIPTION" : "Prefijo para los nombres de variables de ejecución."
+          }
+        },
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE" : {
+          "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT" : {
+            "TITLE" : "Guardar respuesta como variable transient",
+            "DESCRIPTION" : "Determina si se debe almacenar las respuesta como variable(s) transient"
+          }
+        },
+        "HTTPTASKSAVERESPONSEASJSONPACKAGE" : {
+          "HTTPTASKSAVERESPONSEASJSON" : {
+            "TITLE" : "Guardar respuesta como JSON",
+            "DESCRIPTION" : "Determina si se guarda la variable de respuesta como JSON en lugar de String"
+          }
+        },
+        "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+          "HTTPTASKPARALLELINSAMETRANSACTION" : {
+            "TITLE" : "Execute parallel in same transaction",
+            "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
+          }
+        },
+        "EVENTREGISTRYPACKAGE" : {
+          "EVENTKEY" : {
+            "TITLE" : "Clave del evento",
+            "DESCRIPTION" : "Definición del clave de de identificación del evento"
+          },
+          "EVENTNAME" : {
+            "TITLE" : "Nombre de evento",
+            "DESCRIPTION" : "Definición del nombre del evento"
+          },
+          "EVENTINPARAMETERS" : {
+            "TITLE" : "Mapeo hacia carga útil del evento",
+            "DESCRIPTION" : "Mapeo de las variables del proceso a las propiedades de la carga útil del evento"
+          },
+          "EVENTOUTPARAMETERS" : {
+            "TITLE" : "Mapeo desde la carga util del evento",
+            "DESCRIPTION" : "Mapeo de las propiedades de la carga útil del evento a las variables del proceso"
+          },
+          "EVENTCORRELATIONPARAMETERS" : {
+            "TITLE" : "Parámetros de correlación",
+            "DESCRIPTION" : "Definición de los parámetros de correlación"
+          },
+          "CHANNELKEY" : {
+            "TITLE" : "Clave del canal",
+            "DESCRIPTION" : "Definición del clave de identificación del canal"
+          },
+          "CHANNELNAME" : {
+            "TITLE" : "Nombre del canal",
+            "DESCRIPTION" : "Definición del nombre del canal"
+          },
+          "CHANNELTYPE" : {
+            "TITLE" : "Tipo de canal",
+            "DESCRIPTION" : "Definición del tipo de canal"
+          },
+          "CHANNELDESTINATION" : {
+            "TITLE" : "Destino del canal",
+            "DESCRIPTION" : "Definición del destino del canal"
+          },
+          "KEYDETECTIONFIXEDVALUE" : {
+            "TITLE" : "Valor fijo de la clavel de evento",
+            "DESCRIPTION" : "Definición del valor fijo de la clave de identificación de evento"
+          },
+          "KEYDETECTIONJSONFIELD" : {
+            "TITLE" : "Campo JSON de la clave del evento",
+            "DESCRIPTION" : "Definición de la detección de la clave de identificación de evento con un campo JSON"
+          },
+          "KEYDETECTIONJSONPOINTER" : {
+            "TITLE" : "Puntero JSON de la clave del evento",
+            "DESCRIPTION" : "Definición de la detección de la clave de identificación de evento con la expresión de un puntero JSON"
+          }
+        },
+        "CASETASKCASEREFERENCEPACKAGE": {
+          "CASETASKCASEREFERENCE": {
+            "TITLE": "Referencia del caso",
+            "DESCRIPTION": "Establecer la referencia del caso"
+          }
+        },
+        "PROCESSTASKPROCESSREFERENCEPACKAGE": {
+          "PROCESSTASKPROCESSREFERENCE": {
+            "TITLE": "Referencia del proceso",
+            "DESCRIPTION": "Establecer la referencia del proceso"
+          }
+        },
+        "FALLBACKTODEFAULTTENANTPACKAGE": {
+          "FALLBACKTODEFAULTTENANT": {
+            "TITLE" : "Recaer en el tenant predeterminado",
+            "DESCRIPTION" : "Buscar la definición por clave en el tenant predeterminado cuando falle la búsqueda en el tenant especificado."
+          }
+        },
+        "PROCESSTASKINPARAMETERSPACKAGE": {
+          "PROCESSTASKINPARAMETERS": {
+            "TITLE": "Parámetros de entrada",
+            "DESCRIPTION": "Definición de los parámetros de entrada"
+          }
+        },
+        "PROCESSTASKOUTPARAMETERSPACKAGE": {
+          "PROCESSTASKOUTPARAMETERS": {
+            "TITLE": "Parámetros de salida",
+            "DESCRIPTION": "Definición de los parámetros de salida"
+          }
+        },
+        "IDVARIABLENAMEPACKAGE": {
+          "IDVARIABLENAME": {
+            "TITLE": "Variable de Id",
+            "DESCRIPTION": "Si se establece, el id de la instancia será almacenado en esta variable"
+          }
+        },
+        "TIMEREXPRESSIONPACKAGE": {
+          "TIMEREXPRESSION": {
+            "TITLE": "Expresión de temporizador",
+            "DESCRIPTION": "Una cadena ISO-8601 o una expresión que resuelva una cadena ISO-8601 o una java.util.Date"
+          }
+        },
+        "TIMERSTARTTRIGGERPACKAGE": {
+          "TIMERSTARTTRIGGERSOURCEREF": {
+            "TITLE": "Item de plan del disparador incial",
+            "DESCRIPTION": "Una referencia a al ítem del plan para el cual el evento estandar configurado necesita ocurrir al inicio del temporizador (opcional)"
+          },
+          "TRANSITIONEVENT": {
+            "TITLE": "Evento de transición del disparador inicial",
+            "DESCRIPTION": "El tipo de evento de transición. Sólo se usa cuando se establece el ítem de plan del disparador inicial"
+          }
+        },
+        "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+          "DECISIONTASKDECISIONREFERENCE": {
+            "TITLE": "Referencia a la decisión",
+            "DESCRIPTION": "Establecer la referencia a la decisión"
+          }
+        },
+        "IFPARTCONDITIONPACKAGE": {
+          "IFPARTCONDITION": {
+            "TITLE": "Condición",
+            "DESCRIPTION": ""
+          }
+        },
+        "TRIGGERMODEPACKAGE": {
+          "TRIGGERMODE": {
+            "TITLE": "Modo disparador",
+            "DESCRIPTION": "Determina si las condiciones centinela son evaluadas con memoria (predeterminado) o sin (on-event). El valor predeterminado significa que se almacenarán las partes de un centinela que se satisfaga. Las evaluaciones posteriores utilizarán las partes almacenadas cuando se reevalúe el centinela. Usando 'on-event', se evalúan todas las partes y, si todas son verdaderas, el centinela queda satisfecho. Si no, todos los resultados se descartan y no se almacenan."
+          }
+        },
+        "AUTOCOMPLETEPACKAGE": {
+          "AUTOCOMPLETEENABLED": {
+            "TITLE": "Autocompletar",
+            "DESCRIPTION": "Determina si la etapa se completará automáticamente una vez que todos los hijos requeridos estén en un estado finalizado y no haya otros hijos activos."
+          },
+          "AUTOCOMPLETECONDITION": {
+            "TITLE": "Condición de autocompletar",
+            "DESCRIPTION": "Una expresión que resuelve si la etapa puede completarase automáticamente."
+          }
+        },
+        "REQUIREDRULEPACKAGE": {
+          "REQUIREDENABLED": {
+            "TITLE": "Requerida",
+            "DESCRIPTION": "Indica si la etapa, tarea o hito es requerida cuando para la finalización de la etapa padre. De manera predeterminada es false."
+          },
+          "REQUIREDRULECONDITION": {
+            "TITLE": "Regla requerida",
+            "DESCRIPTION": "Una expresión que resuelve si la etapa, tarea o hito es requerida para determinar la finalización de la etapa padre."
+          }
+        },
+        "REPETITIONRULEPACKAGE": {
+          "REPETITIONENABLED": {
+            "TITLE": "Repetición",
+            "DESCRIPTION": "Determina si la repetición está habilitada"
+          },
+          "REPETITIONRULECONDITION": {
+            "TITLE": "Regla de repetición",
+            "DESCRIPTION": "Una expresión que se resuelve para determinar si es necesario crear nuevas instancias de ítem de plan"
+          },
+          "REPETITIONCOUNTERVARIABLENAME": {
+            "TITLE": "Variable de contador de repeticiones",
+            "DESCRIPTION": "El nombre de la variable local que almacena el contador de instancias de las repeticiones. El valor predeterminado es 'repetitionCounter'."
+          }
+        },
+        "MANUALACTIVATIONRULEPACKAGE": {
+          "MANUALACTIVATIONENABLED": {
+            "TITLE": "Activación manual",
+            "DESCRIPTION": "Determina si la tarea o etapa necesita ser activada manualmente. De manera predeterminada es false."
+          },
+          "MANUALACTIVATIONRULECONDITION": {
+            "TITLE": "Regla de activación manual",
+            "DESCRIPTION": "Una expresión que determina si la tarea o etapa necesita ser activada manualmente."
+          }
+        },
+        "COMPLETIONNEUTRALRULEPACKAGE": {
+          "COMPLETIONNEUTRALENABLED": {
+            "TITLE": "Neutral para compleción",
+            "DESCRIPTION": "Determina si el ítem del plan es neutral para la compleción. De manera predeterminada es false."
+          },
+          "COMPLETIONNEUTRALRULECONDITION": {
+            "TITLE": "Regla de neutralidad para la compleción",
+            "DESCRIPTION": "Una expresión que se resuelve para determinar si el ítem del plan es neutral para la compleción."
+          }
+        },
+        "PLANITEMLIFECYCLELISTENERSPACKAGE": {
+          "PLANITEMLIFECYCLELISTENERS": {
+            "TITLE": "Gestores de eventos del ciclo de vida",
+            "DESCRIPTION": "Gestores de eventos del ciclo de vida de un ítem del plan"
+          }
+        },
+        "DISPLAYORDERPACKAGE": {
+          "DISPLAYORDER": {
+            "TITLE": "Orden de presentación",
+            "DESCRIPTION": "Un valor númérico que indica el orden comparado con otras estapas cuando se obtiene o muestra la visión general de etapas."
+          }
+        },
+        "INCLUDEINSTAGEOVERVIEWPACKAGE": {
+          "INCLUDEINSTAGEOVERVIEW": {
+            "TITLE": "Incluir en visión general",
+            "DESCRIPTION": "Indica si esta etapa debe ser considerada para la visión general"
+          }
+        },"MILESTONEVARIABLEPACKAGE" : {
+          "MILESTONEVARIABLE": {
+            "TITLE": "Milestone variable",
+            "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+          }
+        },
+        "SCRIPTFORMATPACKAGE": {
+          "SCRIPTFORMAT": {
+            "TITLE": "Formato de script",
+            "DESCRIPTION": "Formato de script de la tarea (JavaScript, groovy, etc)."
+          }
+        },
+        "SCRIPTTEXTPACKAGE": {
+          "SCRIPTTEXT": {
+            "TITLE": "Script",
+            "DESCRIPTION": "Código fuente del script de la tarea."
+          }
+        },
+        "TRANSITIONEVENTPACKAGE": {
+          "TRANSITIONEVENT": {
+            "TITLE": "Tipo de evento de transición",
+            "DESCRIPTION": "El tipo de evento de transición"
+          }
+        },
+        "AVAILABLECONDITIONPACKAGE": {
+          "AVAILABLECONDITION": {
+            "TITLE": "Condición de disponibilidad",
+            "DESCRIPTION": "Una expresión de condición opciónal sobre un gestor de eventos para indicar cuándo se vuelve disponible."
+          }
+        },
+        "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+          "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+            "TITLE" : "Establecer variable resultante como transitoria",
+            "DESCRIPTION" : "Atributo que establece que el resultado de la expresión no será persistido al finalizar la transacción de base de datos"
+          }
+        }
+      },
+      "STENCILS" : {
+        "GROUPS" : {
+          "DIAGRAM" : "Diagrama",
+          "CONTAINERS" : "Contenedores",
+          "ACTIVITIES" : "Actividades",
+          "EVENTLISTENERS" : "Gestores de eventos",
+          "SENTRIES" : "Centinelas",
+          "CONNECTORS" : "Conectores"
+        },
+        "CMMNDIAGRAM" : {
+          "TITLE" : "Diagrama CMMN",
+          "DESCRIPTION" : "Un diagram CMMN 2.0."
+        },
+        "CASEPLANMODEL" : {
+          "TITLE" : "Modelo del plan del caso",
+          "DESCRIPTION" : "Un model del plan del caso"
+        },
+        "STAGE" : {
+          "TITLE" : "Etapa",
+          "DESCRIPTION" : "Una etapa"
+        },
+        "TASK" : {
+          "TITLE" : "Tarea",
+          "DESCRIPTION" : "Una tarea manual"
+        },
+        "HUMANTASK" : {
+          "TITLE" : "Tarea humana",
+          "DESCRIPTION" : "Una tarea manual asignada a una persona"
+        },
+        "SERVICETASK" : {
+          "TITLE" : "Tarea de servicio",
+          "DESCRIPTION" : "Una tarea automática con una lógica de servicio"
+        },
+        "DECISIONTASK" : {
+          "TITLE" : "Tarea de decisión",
+          "DESCRIPTION" : "Una tarea que involucra una decisión DMN"
+        },
+        "HTTPTASK" : {
+          "TITLE" : "Tarea de HTTP",
+          "DESCRIPTION" : "Una tarea que usa HTTP"
+        },
+        "MAILTASK" : {
+          "TITLE" : "Tarea de email",
+          "DESCRIPTION" : "Una tarea de email"
+        },
+        "SCRIPTTASK" : {
+          "TITLE" : "Tarea de script",
+          "DESCRIPTION" : "Una tarea automática con una lógica de script (guión)"
+        },
+        "SENDEVENTTASK" : {
+          "TITLE" : "Tarea de envío de evento",
+          "DESCRIPTION" : "Una tarea que envía un evento al registro de eventos"
+        },
+        "MILESTONE" : {
+          "TITLE" : "Hito",
+          "DESCRIPTION" : "Un hito"
+        },
+        "CASETASK" : {
+          "TITLE" : "Tarea de caso",
+          "DESCRIPTION" : "Una referencia a una definición de caso para crear una nueva instancia"
+        },
+        "PROCESSTASK" : {
+          "TITLE" : "Tarea de proceso",
+          "DESCRIPTION" : "Una referencia a una definición de proceso para crear una nueva instancia"
+        },
+        "EVENTLISTENER" : {
+          "TITLE" : "Gestor de eventos",
+          "DESCRIPTION" : "Un eventListener genérico"
+        },
+        "TIMEREVENTLISTENER" : {
+          "TITLE" : "Gestor de eventoss de temporizador",
+          "DESCRIPTION" : "Un eventlistener con un disparador temporizado"
+        },
+        "USEREVENTLISTENER" : {
+          "TITLE" : "Gestor de eventos de usuario",
+          "DESCRIPTION" : "Un gestor de eventos de usuario"
+        },
+        "ENTRYCRITERION" : {
+          "TITLE" : "Critero de ingreso",
+          "DESCRIPTION" : "Un centinela que define un criterio de ingreso"
+        },
+        "EXITCRITERION" : {
+          "TITLE" : "Criterio de salida",
+          "DESCRIPTION" : "Un centinela que define un criterio de salida"
+        },
+        "ASSOCIATION" : {
+          "TITLE" : "Asociacion",
+          "DESCRIPTION" : "Asocia un centinela con un ítem del plan"
+        }
+      }
+    },
+
+    "EDITOR": {
+      "POPUP": {
+        "UNSAVED-CHANGES": {
+          "TITLE": "Tienes cambios sin guardar",
+          "DESCRIPTION": "¿Qué deseas realizar con los cambios sin guardar?",
+          "ACTION": {
+            "SAVE": "Guardar cambios",
+            "DISCARD": "Descartar cambios",
+            "CONTINUE": "Continiar edición"
+          }
+        }
+      }
+    },
+
+    "PROCESS-LIST" : {
+        "TITLE" : "Modelos de procesos de negocio",
+        "SEARCH-PLACEHOLDER": "Búsqueda",
+        "ACTION" : {
+            "CREATE": "Crear Proceso",
+            "IMPORT": "Importar Proceso"
+        },
+
+        "FILTER" : {
+            "PROCESSES": "Modelo de proceso",
+            "PROCESSES-COUNT": "Existen {{total}} modelos de proceso",
+            "PROCESSES-ONE": "Existe un modelo de proceso",
+            "PROCESSES-EMPTY": "Aún no existe un modelo de proceso creado. Puedes diseñar tus propios modelos, formularios y después incluirlos en una aplicación. El primer paso es crear un modelo de proceso:",
+            "PROCESSES-BPMN-HINT": "Crear un modelo BPMN usando el editor visual BPMN.",
+            "PROCESSES-BPMN-IMPORT-HINT": "Tambien puede importar modelos BPMN existentes.",
+            "FILTER-TEXT": ", coincidentes con \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existen modelos de proceso que coincidan con \"{{filterText}}\"",
+            "RECENT": "Reciente",
+            "RECENT-COUNT": "{{total}} modelos usados recientemente",
+            "RECENT-ONE": "Existe un modelo usado recientemente",
+            "RECENT-EMPTY": "No existen modelos usados recientemente"
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Desde el más antiguo",
+            "MODIFIED-DESC": "Desde el más reciente",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "CASE-LIST" : {
+        "TITLE" : "Modelos de caso",
+        "SEARCH-PLACEHOLDER": "Búsqueda",
+        "ACTION" : {
+            "CREATE": "Crear caso",
+            "IMPORT": "Importar caso"
+        },
+
+        "FILTER" : {
+            "CASES": "Modelos de caso",
+            "CASES-COUNT": "Hay {{total}} modelos de caso",
+            "CASES-ONE": "Hay un modelo de caso",
+            "CASES-EMPTY": "Aún no hay modelos de caso creados. Puedes diseñar modelos de caso, formularios de usuario y después incluirlos en definición de aplicaciones. El primer paso es crear un modelo de caso:",
+            "CASES-CMMN-HINT": "Crear un modelo CMMN usando el editor visual de CMMN.",
+            "CASES-CMMN-IMPORT-HINT": "También puedes importar modelos CMMN existentes.",
+            "FILTER-TEXT": ", coincidentes con \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No hay modelos de caso que coincidan con \"{{filterText}}\"",
+            "RECENT": "Reciente",
+            "RECENT-COUNT": "{{total}} modelos usados recientemente",
+            "RECENT-ONE": "Un modelo usado recientemente",
+            "RECENT-EMPTY": "No hay modelos usados recientemente"
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Desde el más antiguo",
+            "MODIFIED-DESC": "Desde el más reciente",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "FORMS-LIST" : {
+        "TITLE" : "Formularios",
+        "SEARCH-PLACEHOLDER": "Búsqueda",
+        "ACTION" : {
+            "CREATE": "Crear formulario",
+            "CREATE-INLINE": "Crear un nuevo formulario ahora!",
+            "SHOW-MORE": "Mostrar más..."
+        },
+
+        "FILTER" : {
+            "FORMS": "Formularios",
+            "FORMS-COUNT": "Existen {{total}} formularios",
+            "FORMS-ONE": "Existe un formulario",
+            "FORMS-EMPTY": "No existen formularios. Para agregar uno haz click en Crear formulario.",
+            "FILTER-TEXT": ", coincidentes con \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existe un formulario que coincida con \"{{filterText}}\""
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Desde el más antiguo",
+            "MODIFIED-DESC": "Desde el más reciente",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "DECISIONS-LIST": {
+        "TITLE": "Tablas de decisión",
+        "SEARCH-PLACEHOLDER": "Búsqueda",
+        "ACTION": {
+            "CREATE": "Crear tabla de decisión",
+            "IMPORT": "Importar tabla de decisión",
+            "CREATE-INLINE": "Crear una tabla de decisión ahora!",
+            "SHOW-MORE": "Mostrar más..."
+        },
+
+        "FILTER": {
+            "DECISION-TABLES": "Tablas de decisión",
+            "DECISION-TABLES-COUNT": "Existen {{total}} tablas de decisión",
+            "DECISION-TABLES-ONE": "Existe una tabla de decisión",
+            "DECISION-TABLES-EMPTY": "No existen tablas de decisión. Para agregar una haz click en Crear tabla de decisión.",
+            "FILTER-TEXT": ", coincidente con \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "no existen tablas de decisión que coincidan con \"{{filterText}}\""
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Desde la más antigua",
+            "MODIFIED-DESC": "Desde la más reciente",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "APPS-LIST" : {
+        "TITLE" : "Aplicaciones",
+        "SEARCH-PLACEHOLDER": "Búsqueda",
+        "ACTION" : {
+            "CREATE": "Crear aplicación",
+            "IMPORT": "Importar aplicación",
+            "SHOW-MORE": "Mostrar más..."
+        },
+
+        "FILTER" : {
+            "APPS": "Aplicaciones",
+            "APPS-COUNT": "Existen {{total}} aplicaciones",
+            "APPS-ONE": "Existe una aplicacion",
+            "APPS-EMPTY": "No existen aplicaciones. Para agregar una da click en Crear aplicación.",
+            "FILTER-TEXT": ", concidentes con \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existen aplicaciones que coincidan con \"{{filterText}}\"",
+
+            "NO-APPS": "Puedes crear una aplicación publicando un conjunto de Modelos de Proceso.",
+            "NO-APPS-CALL-TO-ACTION": "Puedes crear una aplicación ahora.",
+            "NO-APPS-NOTE": "Recuerda publicar cuando estés listo para usar la aplicación."
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Desde la más antigua",
+            "MODIFIED-DESC": "Desde la más reciente",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+    "PROCESS": {
+      "NAME": "Nombre del modelo",
+      "KEY": "Clave del modelo",
+      "DESCRIPTION": "Descripción",
+      "VERSION-COMMENT": "Comentario de versión",
+      "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades del modelo",
+            "DUPLICATE": "Duplicar este modelo",
+            "EXPORT_BPMN20": "Exportar a BPMN 2.0",
+            "DELETE": "Eliminar este modelo",
+            "CREATE-CONFIRM": "Crear nuevo modelo",
+            "DUPLICATE-CONFIRM": "Duplicar el modelo",
+            "OPEN-IN-EDITOR": "Editor visual",
+            "EDIT-CONFIRM": "Guardar",
+            "DELETE-CONFIRM": "Eliminar modelo de proceso",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión",
+            "FAVORITE": "Añadir a favoritos"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "Historial",
+          "LAST-UPDATED-BY": "Última actualización por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}",
+          "NO-DESCRIPTION": "Este modelo no tiene descripción. Modifica las propiedades del modelo para agregar una."
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Crear un nuevo modelo de proceso de negocio",
+          "DUPLICATE-TITLE": "Duplicar modelo de proceso de negocio",
+          "CREATE-DESCRIPTION": "Necesitas dar un nombre para el nuevo modelo y es recomendable que también agregues una descripción.",
+          "DUPLICATE-DESCRIPTION": "Puedes cambiar el nombre del modelo y es recomendable que también cambies la descripción.",
+          "EDIT-DESCRIPTION": "Cambia cualquier propiedad del modelo y después presiona Guardar para actualizar el modelo.",
+          "DELETE-DESCRIPTION": "¿Estás seguro que deseas eliminar el modelo de proceso de negocio \"{{name}}\"?",
+          "EDIT-TITLE":"Editar los detalles del modelo",
+          "DELETE-TITLE": "Eliminar modelo",
+          "DELETE-LOADING-RELATIONS": "Verificando el uso del modelo...",
+          "DELETE-RELATIONS-DESCRIPTION-SINGLE": "Este modelo no puede ser eliminado porque esta siendo utilizado por otro modelo:",
+          "DELETE-RELATIONS-DESCRIPTION": "Este modelo no puede ser eliminado porque esta siendo utilizado por otros modelos:",
+          "DELETE-PROCESS-RELATION": "Modelo de proceso",
+          "DELETE-FORM-RELATION": "Formulario de modelo",
+          "DELETE-APP-RELATION": "Modelo de aplicación",
+          "IMPORT-DESCRIPTION": "Busca o arrastra una definición BPMN XML con la extension .bpmn o .bpmn20.xml",
+          "IMPORT-TITLE": "Importar un modelo de proceso",
+          "USE-AS-NEW-TITLE": "Usar como nueva versión",
+          "USE-AS-NEW-DESCRIPTION": "¿Estas seguro que deseas utilizar la versión {{version}} para crear una nueva versión de \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar a la versión seleccionada: algunos modelos no se encuentran debido a que fueron eliminados. Por favor actualiza el modelo de la aplicación. Modelos faltantes:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con el id {{id}}, creado por {{createdBy}}",
+          "SHARED-WITH": "Compartido con",
+          "PERMISSION": "Permiso",
+          "ACTIONS": "Acciones",
+          "IMPORT": {
+              "DROPZONE": "Arrastra un archivo .bpmn o .bpmn20.xml BPMN XML",
+              "CANCEL-UPLOAD": "Cancelar la carga de archivo",
+              "ERROR": "Error al procesar el archivo BPMN XML",
+              "NO-DROP": "Arrastrar y soltar no soportado"
+          }
+        },
+        "ALERT": {
+          "EDIT-CONFIRM": "Modelo actualizado"
+        },
+        "ERROR": {
+          "NOT-FOUND": "El modelo solicitado no existe"
+        }
+    },
+
+    "SUBPROCESS": {
+        "NAME": "Nombre del subproceso",
+        "DESCRIPTION": "Descripción",
+        "ACTION": {
+            "CREATE-CONFIRM": "Crear nuevo subproceso"
+        },
+        "POPUP": {
+            "CREATE-TITLE": "Crear nuevo subproceso",
+            "CREATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo subproceso y también es recomendable agregar una descripción."
+        }
+    },
+    
+    "CASE": {
+      "NAME": "Nombre del modelo",
+      "KEY": "Clave del modelo",
+      "DESCRIPTION": "Descripción",
+      "VERSION-COMMENT": "Comentarios de la versión",
+      "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar las propiedadades del modelo",
+            "DUPLICATE": "Duplicar este modelo",
+            "EXPORT_CMMN": "Exportar a CMMN 1.1",
+            "DELETE": "Eliminar este modelo",
+            "CREATE-CONFIRM": "Crear nuevo modelo",
+            "DUPLICATE-CONFIRM": "Duplicar el modelo",
+            "OPEN-IN-EDITOR": "Editor visual",
+            "EDIT-CONFIRM": "Guardar",
+            "DELETE-CONFIRM": "Eliminar modelo de caso",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión",
+            "FAVORITE": "Añadir a favoritos"
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "Historial",
+          "LAST-UPDATED-BY": "Última actualización por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}",
+          "NO-DESCRIPTION": "Este modelo no tiene descripción. Modifica las propiedades del modelo para agregar una."
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Crear un nuevo modelo de caso",
+          "DUPLICATE-TITLE": "Duplicar el modelo de caso",
+          "CREATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo modelo y también es recomendable agregar una descripción.",
+          "DUPLICATE-DESCRIPTION": "Puedes cambiar el nombre del modelo y es recomendable que también cambies la descripción.",
+          "EDIT-DESCRIPTION": "Cambia cualquier propiedad del modelo y después presiona Guardar para actualizar el modelo.",
+          "DELETE-DESCRIPTION": "¿Estás seguro que deseas eliminar el modelo \"{{name}}\"?",
+          "EDIT-TITLE":"Editar los detalles del modelo",
+          "DELETE-TITLE": "Eliminar modelo",
+          "DELETE-LOADING-RELATIONS": "Verificando el uso del modelo...",
+          "DELETE-RELATIONS-DESCRIPTION-SINGLE": "Este modelo no puede ser eliminado porque esta siendo utilizado por otro modelo:",
+          "DELETE-RELATIONS-DESCRIPTION": "Este modelo no puede ser eliminado porque esta siendo utilizado por otros modelos:",
+          "DELETE-PROCESS-RELATION": "Modelo de caso",
+          "DELETE-FORM-RELATION": "Formulario de modelo",
+          "DELETE-APP-RELATION": "Modelo de aplicación",
+          "IMPORT-DESCRIPTION": "Busca o arrastra una definición CMMN XML con la extension .cpmn o .cmmn.xml",
+          "IMPORT-TITLE": "Importar un modelo de caso",
+          "USE-AS-NEW-TITLE": "Usar como nueva versión",
+          "USE-AS-NEW-DESCRIPTION": "¿Estas seguro que deseas utilizar la versión {{version}} para crear una nueva versión de \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar a la versión seleccionada: algunos modelos no se encuentran debido a que fueron eliminados. Por favor actualiza el modelo de la aplicación. Modelos faltantes:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con el id {{id}}, creado por {{createdBy}}",
+          "SHARED-WITH": "Compartido con",
+          "PERMISSION": "Permiso",
+          "ACTIONS": "Acciones",
+          "IMPORT": {
+              "DROPZONE": "Arrastra un archivo .cmmn o .cmmn.xml CMMN XML",
+              "CANCEL-UPLOAD": "Cancelar la carga de archivo",
+              "ERROR": "Error al procesar el archivo CMMN XML",
+              "NO-DROP": "Arrastrar y soltar no soportado"
+          }
+        },
+        "ALERT": {
+          "EDIT-CONFIRM": "Modelo actualizado"
+        },
+        "ERROR": {
+          "NOT-FOUND": "El modelo solicitado no existe"
+        }
+    },
+
+    "FORM": {
+      "NAME": "Nombre del formulario",
+      "KEY": "Clave del formulario",
+      "DESCRIPTION": "Descripción",
+      "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modicar propiedades del formulario",
+            "DELETE": "Eliminar este formulario",
+            "CREATE-CONFIRM": "Crear nuevo formulario",
+            "DUPLICATE": "Duplicar este formulario",
+            "DUPLICATE-CONFIRM": "Duplicar el formulario",
+            "OPEN-IN-EDITOR": "Editor de formulario",
+            "EDIT-CONFIRM": "Guardar",
+            "DELETE-CONFIRM": "Eliminar formulario",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "Historial",
+          "LAST-UPDATED-BY": "Ultima actualizacion por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}"
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Crear nuevo formulario",
+          "DUPLICATE-TITLE": "Duplicar formulario",
+          "CREATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo formulario y también es recomendable agregar una descripción.",
+          "DUPLICATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo formulario y también es recomendable agregar una descripción.",
+          "SAVE-FORM-TITLE": "Guardar formulario",
+          "EDIT-DESCRIPTION": "Cambia cualquiera de las propiedades debajo y después presiona Guardar para actualizar el formulario.",
+          "DELETE-DESCRIPTION": "Estas seguro de eliminar el formulario \"{{name}}\"?",
+          "EDIT-TITLE":"Editar detalles de formulario",
+          "DELETE-TITLE": "Eliminar formulario",
+          "USE-AS-NEW-TITLE": "Usar como nueva versión",
+          "USE-AS-NEW-VERSION": "Usar como nueva versión",
+          "USE-AS-NEW-DESCRIPTION": "¿Estás seguro que quieres utilizar la versión {{version}} para crear una nueva versión de \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar completamente a la versión seleccionada: Algunos modelos referenciados fueron eliminados. Por favor actualiza el modelo. Moodelos faltantes:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con identificador {{id}}, creado por {{createdBy}}"
+        }
+    },
+
+    "DECISION-TABLE": {
+        "NAME": "Nombre de la tabla de decisión",
+        "KEY": "Clave de la tabla de decisión",
+        "DESCRIPTION": "Descripción",
+        "VERSION-COMMENT": "Comentario de versión",
+        "HIT-POLICY": "Reglas de aciertos:",
+        "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades del modelo",
+            "SHARE": "Compartir esta tabla de decisión",
+            "DELETE": "Eliminar esta tabla de decisión",
+            "ADD-COMMENT": "+ Agregar comentario",
+            "CREATE-CONFIRM": "Crear nueva tabla de decisión",
+            "OPEN-IN-EDITOR": "Editor de tabla de decisión",
+            "EXPORT": "Exportar tabla de decisión",
+            "DELETE-CONFIRM": "Eliminar tabla de decisión",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión",
+            "FAVORITE": "Añadir a favoritos",
+            "DUPLICATE": "Duplicar esta tabla de decisión"
+        },
+        "DETAILS": {
+            "HISTORY-TITLE": "Historial",
+            "COMMENTS-TITLE": "Comentarios",
+            "LAST-UPDATED-BY": "Última vez actualizado por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+            "CREATED-BY": "Creado por {{createdBy}}"
+        },
+        "HIT-POLICIES": {
+            "FIRST": "Primero",
+            "ANY": "Cualquiera",
+            "UNIQUE": "Único",
+            "PRIORITY": "Prioridad",
+            "RULE ORDER": "Orden de regla",
+            "OUTPUT ORDER": "Orden de salida",
+            "COLLECT": "Recolectar"
+        },
+        "COLLECT-OPERATORS": {
+            "SUM": "Suma",
+            "MIN": "Mín",
+            "MAX": "Máx",
+            "COUNT": "Cuenta"
+        },
+        "POPUP": {
+            "CREATE-TITLE": "Crear nueva tabla de decisión",
+            "CREATE-DESCRIPTION": "Es necesario dar un nombre par a la tabla de decisión, también es recomendable proporcionar una descripción.",
+            "SAVE-DESCRIPTION": "Es necesario proporcionar un nombre y un identificador unico para la tabla de decisión, también es recomendable proporcionar una descripción.",
+            "DUPLICATE-TITLE": "Duplicar tabla de decisión",
+            "DUPLICATE-DESCRIPTION": "Puedes dar un nombre a la nueva tabla de decisión, también es recomendable proporcionar una descripción.",
+            "DELETE-TITLE": "Eliminar tabla de decisión",
+            "DELETE-DESCRIPTION": "¿Estás seguro que deseas eliminar esta tabla de decisión \"{{name}}\"?",
+            "SAVE-DECISION-TABLE-TITLE": "Guardar tabla de decisión",
+            "IMPORT-DESCRIPTION": "Busca o arrastra una definición DMN XML con una extension .dmn o .dmn.xml",
+          	"IMPORT-TITLE": "Importar un modelo DMN",
+	        "IMPORT": {
+	            "DROPZONE": "Arrastra un archivo.dmn o .dmn.xml DMN XML",
+	            "CANCEL-UPLOAD": "Cancelar la carga",
+	            "ERROR": "Error cuando se procesaba el archivo DMN XML",
+	            "NO-DROP": "Arrastrar y soltar no soportado"
+	        },
+            "USE-AS-NEW-TITLE": "Usar como nueva versión",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión",
+            "USE-AS-NEW-DESCRIPTION": "¿Estás seguro que quieres utilizar la versión {{version}} para crear una nueva versión de \"{{name}}\"?",
+            "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar completamente a la versión seleccionada: algunos modelos referenciados fueron eliminados. Por favor actualiza el modelo. Moodelos faltantes:",
+            "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con identificador {{id}}, creado por {{createdBy}}",
+            "FORCE-DMN-11": "Forzar DMN 1.1"
+        },
+        "ALERT": {
+            "FAVORITE-CONFIRM": "Esta tabla de decisión es ahora favorita",
+            "UN-FAVORITE-CONFIRM": "Esta tabla de decisión ya no es favorita"
+        }
+    },
+
+    "APP": {
+        "NAME": "Nombre de la aplicación",
+        "KEY": "Clave de la aplicación",
+        "DESCRIPTION": "Descripción",
+        "ICON": "Ícono",
+        "THEME": "Tema",
+        "GROUPS-ACCESS": "Acceso a grupos, separado por comas",
+        "USERS-ACCESS": "Acceso a usuarios, separado por comas",
+        "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades de la aplicación",
+            "DUPLICATE": "Duplicar esta aplicación",
+            "SHARE": "Compartir esta aplicación",
+            "DELETE": "Eliminar esta aplicación",
+            "CREATE-CONFIRM": "Crear nueva aplicación",
+            "DUPLICATE-CONFIRM": "Duplicar aplicación",
+            "DELETE-CONFIRM": "Eliminar aplicación",
+            "USE-AS-NEW-VERSION": "Usar como nueva versión",
+            "OPEN-IN-EDITOR": "Editor de aplicación",
+            "PUBLISH": "Publicar",
+            "PUBLISH-CONFIRM": "Publicar aplicación",
+            "SELECT-ICON": "Cambiar ícono...",
+            "SELECT-THEME": "Cambiar tema...",
+            "EDIT-MODELS": "Editar modelos incluidos",
+            "EXPORT-ZIP": "Exportar aplicación como archivo zip",
+            "EXPORT-BAR": "Exportar aplicación como archivo de despliegue bar"
+
+        },
+        "DETAILS": {
+          "TITLE": "Detalles de la aplicación: {{name}}",
+          "HISTORY-TITLE": "Historial",
+          "MODELS-TITLE": "Modelos incluidos en la aplicación",
+          "LAST-UPDATED-BY": "Ultima modificación por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creada por {{createdBy}}",
+          "NO-DESCRIPTION": "Esta aplicación no tiene descripción. Modifica las propiedades de la aplicación para agregar una.",
+          "NO-MODELS-SELECTED": "No hay modelos seleccionados para esta aplicación"
+        },
+        "TITLE": {
+          "SELECT-ICON": "Seleccionar ícono de la aplicación",
+          "SELECT-THEME": "Seleccionar tema de la aplicación",
+          "PREVIEW": "Vista previa"
+
+        },
+        "POPUP": {
+          "CREATE-TITLE": "Crear nueva aplicación",
+          "DUPLICATE-TITLE": "Duplicar aplicación",
+          "SAVE-APP-TITLE": "Guardar aplicación",
+          "SAVE-APP-SAVE-SUCCESS": "Aplicación guardada",
+          "CREATE-DESCRIPTION": "Necesitas dar un nombre para la nueva aplicación, también es recomendable proporcionar una descripción.",
+          "DUPLICATE-DESCRIPTION": "Puedes dar un nombre para la nueva aplicación, también es recomendable proporcionar una descripción.",
+          "PUBLISH-TITLE": "Publicar aplicación",
+          "PUBLISH-DESCRIPTION": "¿Estás seguro que deseas publicar la aplicación \"{{name}}\"? Esta aplicación sera versionada y actualizada en la aplicación de workflow si ya existe.",
+          "PUBLISH-FIELD": "¿Publicar? Esta aplicación sera versionada y actualizada en la aplicación de workflow si ya existe.",
+          "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "Tu modelo de proceso \"{{modelInAppName}}\" tiene el mismo identificador \"{{processDefinitionKey}}\" que el proceso existente desplegado \"{{conflictingModelName}}\" de la aplicación \"{{conflictingAppName}}\". Por favor cambia la identificación del modelo de proceso a algo diferente.",
+          "PUBLISH-ERROR-PROCESS-ALREADY-USED": "Los siguientes modelos de proceso ya son utilizados en otra aplicación. ¿Esto es correcto?",
+          "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "Aplicación",
+          "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "Aplicación invalida: se encontraron identificadores de proceso duplicados (cambia la identificación de los procesos que tienen este detalle):",
+          "DELETE-TITLE": "Eliminar aplicación",
+          "DELETE-DESCRIPTION": "¿Estás seguro que deseas eliminar la aplicación \"{{name}}\"?",
+          "DELETE-DESCRIPTION-WITH-RUNTIME": "¿Estás seguro que deseas eliminar la aplicación \"{{name}}\"? Esta aplicación se ha publicado en la vista de aplicaciones si confirmas, el acceso a la aplicación sera removido.",
+          "DELETE-CASCADE-FALSE": "Eliminar sólo la versión actual de la aplicación (v{{version}})",
+          "DELETE-CASCADE-TRUE": "Eliminar también las versiones anteriores de esta aplicación",
+          "HAS-CUSTOM-STENCILITEM" : "El modelo \"{{modelName}}\" usa una plantilla con ítems personalizados. No es posible usar este modelo en una aplicación.",
+          "HAS-VALIDATIONERROR" : "El modelo \"{{modelName}}\" tiene errores de validación y no puede ser añadido a una aplicación. Abre el modelo en el editor para ver más detalles sobre los errores de validación.",
+          "IMPORT-DESCRIPTION":"Por favor busca o arrastra una aplicación con una extension .zip",
+          "IMPORT-TITLE":"Importar una aplicación",
+          "IMPORT": {
+              "DROPZONE": "Arrastra un archivo de aplicación .zip",
+              "CANCEL-UPLOAD": "Cancelar la carga",
+              "RENEWIDM-IDS": "Renueva los identificadores de grupo y de usuario cuando importes los modelos BPMN. Esto es comunmente requerido cuando importas la aplicación en un ambiente de Flowable diferente. Se intentará ligar los pasos humanos y las tareas de usuario al usuario y grupo de usuarios correctos en este ambiente.",
+              "ERROR": "Error mientras se procesaba el archivo de la aplicación",
+              "NO-DROP": "Arrastrar y soltar no soportado"
+          },
+          "INCLUDE-MODELS-TITLE": "Modelos incluidos en la aplicación"
+        },
+        "ALERT": {
+          "DELETE-CONFIRM": "Aplicación eliminada",
+          "PUBLISH-CONFIRM": "La aplicación ha sido publicada",
+          "PUBLISH-ERROR": "No se pude publicar la aplicación. Por favor revisa que los modelos de proceso incluidos sean correctos"
+        }
+    },
+
+    "SHARE-INFO": {
+        "ACTION": {
+          "ADD": "Agregar otra persona"
+        }
+    },
+
+    "FORM-BUILDER": {
+        "PALLETTE": {
+            "TEXT": "Texto",
+            "MULTILINE-TEXT": "Texto multilínea",
+            "PASSWORD": "Contraseña",
+            "NUMBER": "Número",
+            "CHECKBOX": "Verificación",
+            "DATE": "Fecha",
+            "DROPDOWN": "Lista",
+            "RADIO": "Opciones",
+            "PEOPLE": "Personas",
+            "GROUP-OF-PEOPLE": "Grupo de personas",
+            "UPLOAD": "Cargar archivo",
+            "EXPRESSION": "Expresión",
+            "DECIMAL": "Decimal",
+	    	"HYPERLINK": "Hipervínculo",
+	    	"SPACER": "Espaciador",
+			"HORIZONTAL-LINE": "Línea horizontal",
+			"HEADLINE": "Título",
+			"HEADLINE-WITH-LINE":"Título"
+        },
+        "TABS": {
+            "GENERAL": "General",
+            "OPTIONS": "Opciones",
+            "UPLOAD-OPTIONS": "Opciones de carga",
+	    "ADVANCED-OPTIONS":"Avanzado"	
+        },
+        "VERSION": "Versión {{version}}",
+        "LAST-UPDATED": "Ultima vez actualizado por {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
+        "TITLE": {
+            "DESIGN": "Diseño",
+            "OUTCOME": "Resultado"
+        },
+        "POPUP": {
+            "EDIT-TITLE": "Editar campo '{{name}}'",
+            "EXPRESSION-TITLE": "Editar expresión"
+        },
+        "MESSAGE": {
+            "EMPTY-EXPRESSION": "(Sin valor de expresión)",
+            "EXPRESSION-HELP": "Tambien puedes mostrar valores enviados anteriormente en cualquier formulario como parte del texto. Debes referenciarlos mediante una notación como la siguiente: ${myFieldId}.",
+            "OPTIONS-EXPRESSION-HELP": "Puede usar una expresión para completar dinámicamente las opciones, por ejemplo, haciendo referencia a una variable como esta: ${optionsVariable}. La expresión debe dar como resultado un objeto java (java.util.List con objetos Option) o su representación json."
+        },
+        "LABEL" : {
+            "FUNCTIONAL-GROUP": "Selecciona el grupo..",
+            "PERSON": "Selecciona la persona..."
+        },
+        "COMPONENT": {
+            "LABEL": "Etiqueta:",
+            "OVERRIDEID": "¿Sobreescribir identificador?",
+            "ID": "Identificador:",
+            "PLACEHOLDER": "Marcador de posición",
+            "OPTIONS": "Opciones",
+            "RADIO-BUTTON-DEFAULT": "Opción 1",
+            "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Por favor elige uno...",
+            "DROPDOWN-EMPTY-VALUE-HELP": "Esta es la opción 'valor vacio'. Seleccionar esto en tiempo de ejecucion es igual a 'sin valor' o 'vacio'.  Esto esta permitido para campos opcionales, pero no para campos requeridos.",
+            "OPTIONS-EXPRESSION": "Expresión de opciones",
+            "OPTIONS-EXPRESSION-ENABLED": "Habilitar expresión de opciones",
+            "REQUIRED": "Requerido",
+	          "READONLY": "Sólo lectura",
+            "EXPRESSION": "Expresión",
+            "ADD-OPTION": "+ Agregar nueva opción",
+            "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
+            "SIZE": "Tamaño",
+	          "MAX-LENGTH":"Longitud máxima",
+            "MIN-LENGTH":"Longitud mínima",
+            "PASSWORD-UNMASK-OPTION": "Opción de enmascaramiento/desenmascaramiento de contraseña",
+	          "HYPERLINK-URL": "URL de enlace",
+	          "REGEX-PATTERN":"Expresión regular",
+            "MASK":{
+              "TITLE":"Máscara de entrada",
+              "EXAMPLES":{
+                "TITLE":"Ejemplos:",
+                "NUMBER":"Cualquier número",
+                "LETTER":"Cualquier letra",
+                "NUMBERORLETTER":"Cualquier letra o número",
+                "OPTIONAL":"Hacer la máscara opcional (no valida)",
+                "PHONE":"Teléfono"
+	              }
+            }
+        },
+        "OUTCOMES": {
+            "DESCRIPTION": "Puedes definir múltiples resultados para esta tarea. Cuando se esté completando la tarea, el usuario seleccionará uno de los resultados disponibles. Pueden ser utilizados, por ejemplo, en una condición utilizada más adelante en el proceso.",
+            "NO-OUTCOMES-OPTION": "No utilizar resultados personalizados. Sólo mostrar un botón de 'Completar'.",
+            "OUTCOMES-OPTION": "Usar resultados personalizados para este formulario.",
+            "POSSIBLE-OUTCOMES": "Posibles resultados",
+            "NEW-OUTCOME-PLACEHOLDER": "Introduce un nuevo resultado",
+            "ADD": "Agregar resultado",
+            "REMOVE": "Eliminar"
+        }
+    },
+
+    "DECISION-TABLE-EDITOR": {
+        "EMPTY-MESSAGES": {
+            "NO-VARIABLE-SELECTED": "Indefinido"
+        },
+        "POPUP": {
+            "EXPRESSION-EDITOR": {
+                "INPUT-TITLE": "Editar columna de entrada",
+                "INPUT-DESCRIPTION": "Seleccionar variable de entrada como entrada para la columna",
+                "OUTPUT-TITLE": "Editar columna de salida",
+                "OUTPUT-DESCRIPTION": "Selecionar una variable de salida existente o crear una nueva",
+                "EXPRESSION-LABEL": "Etiqueta de columna",
+                "EXPRESSION-PLACEHOLDER": "Ingresar una etiqueta opcional",
+                "EXPRESSION-VARIABLE-NAME": "Nombre de variable",
+                "EXPRESSION-VARIABLE-TYPE": "Tipo de variable",
+                "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "Ingresar nombre de variable",
+                "OUTPUT-NEW-VARIABLE-ID": "Identificador de variable",
+                "OUTPUT-NEW-VARIABLE-TYPE": "Tipo de variable",
+                "COMPLEX-EXPRESSION-LABEL": "Expresión compleja",
+                "ALLOWED-VALUES": "Valores permitidos (opcional)",
+                "OUTPUT-VALUES": "Valores de salida ",
+                "OUTPUT-VALUES-OPTIONAL": "(opcional)",
+                "OUTPUT-VALUES-NOT-OPTIONAL": "(arrastrar filas para definir prioridad / orden de salida):"
+            }
+        },
+        "BUTTON-ACTIONS-LABEL": "Acciones",
+        "BUTTON-ADD-INPUT-LABEL": "Agregar entrada",
+        "BUTTON-ADD-OUTPUT-LABEL": "Agregar salida",
+        "BUTTON-ADD-RULE-LABEL": "Agregar regla",
+        "BUTTON-MOVE-RULE-UPWARDS-LABEL": "Mover arriba",
+        "BUTTON-MOVE-RULE-DOWNWARDS-LABEL": "Mover abajo",
+        "BUTTON-REMOVE-RULE-LABEL": "Eliminar regla",
+        "ALERT": {
+            "EXPRESSION-VARIABLE-REQUIRED-ERROR": "Todas las expresiones de entrada y salida deben referenciar un campo del formulario o una variable.",
+            "SAVE-CONFIRM": "Guardar tabla de decisión '{{name}}'"
+        }
+    },
+
+    "TOUR": {
+        "WELCOME-TITLE": "Bienvenido, {{userName}}",
+        "WELCOME-CONTENT": "Esta es una pequeña guía del Editor Flowable. Los siguientes pasos te guiarán a través de las diferentes secciones de la aplicación. Presiona ESC para detener la guía en cualquier momento." ,
+        "PALETTE-TITLE": "Barra de dibujo",
+        "PALETTE-CONTENT": "Todos los símbolos necesarios para crear un proceso de negocio se pueden encontrar aquí. Se encuentran agrupados de manera lógica. Para abrir un grupo simplemente da clic en él:",
+        "CANVAS-TITLE": "El área de trabajo",
+        "CANVAS-CONTENT": "En este espacio crea tu proceso de negocio. Arrastra elementos desde la barra de dibujo a la izquierda y suéltalos en esta área para empezar a modelar.",
+        "DRAGDROP-TITLE": "Ejemplo arrastrar y soltar",
+        "DRAGDROP-CONTENT": "Aquí tienes un ejemplo de cómo comenzar a modelar:",
+        "PROPERTIES-TITLE": "Propiedades",
+        "PROPERTIES-CONTENT": "Aquí puedes configurar las propiedades de un proceso de negocios. Simplemente selecciona un elemento en el área de trabajo y sus propiedades se mostrarán. Haz clic en la propiedad si deseas editarla.",
+        "TOOLBAR-TITLE": "Barra de herramientas",
+        "TOOLBAR-CONTENT": "Aquí se pueden encontrar todas las acciones: guardar o validar un modelo, copiar y pegar partes del proceso, etc. Pasa sobre los botones para ver lo que realizan.",
+        "END-TITLE": "Fin",
+        "END-CONTENT": "Ahora puedes modelar tus procesos. Si tienes alguna duda, sientete libre de preguntar en <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable Forum</a>."
+    },
+
+    "FEATURE-TOUR" : {
+        "BENDPOINT" : {
+            "TITLE": "Tutorial punto de curva",
+            "DESCRIPTION" : "Cuando estás conectando un elemento con otro usando un flujo de secuencia (esas flechas entre los pasos del proceso), encontrarás que esos flujos se entrecruzan o que deseas acomodarlos de una manera diferente. Para hacer esto puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/> Como se muestra debajo en la figura, primero das click en el boton 'Añadir punto curva' y después das click en el flujo de secuencia al que deseas agregarlo. El flujo de secuencia te indicará con un punto en verde que el punto curva puede ser agregado.<br/> Para eliminar un punto curva, click en 'Eliminar punto curva' y haz click en el flujo de secuencia del cual deseas eliminar."
+        }
+    },
+
+    "ACTION.OK" : "Ok",
+    "ACTION.SAVE" : "Guardar",
+    "ACTION.SAVE-AND-CLOSE" : "Guardar y cerrar el editor",
+    "ACTION.SEND" : "Enviar",
+    "ACTION.CANCEL" : "Cancelar",
+    "ACTION.SELECT" : "Seleccionar",
+    "ACTION.ADD" : "Añadir",
+    "ACTION.REMOVE" : "Eliminar",
+    "ACTION.MOVE.UP" : "Mover arriba",
+    "ACTION.MOVE.DOWN" : "Mover abajo",
+
+    "TOOLBAR.ACTION.CLOSE" : "Cerrar el editor y volver a la página de previsualizacion",
+    "TOOLBAR.ACTION.SAVE" : "Guardar el modelo",
+    "TOOLBAR.ACTION.VALIDATE" : "Validar el modelo",
+    "TOOLBAR.ACTION.CUT" : "Cortar (seleciona uno o más elementos de tu proceso de negocio)",
+    "TOOLBAR.ACTION.COPY" : "Copiar (seleciona uno o más elementos de tu proceso de negocio)",
+    "TOOLBAR.ACTION.PASTE" : "Pegar",
+    "TOOLBAR.ACTION.DELETE" : "Eliminar el elemento seleccionado",
+    "TOOLBAR.ACTION.UNDO" : "Deshacer",
+    "TOOLBAR.ACTION.REDO" : "Rehacer",
+    "TOOLBAR.ACTION.ZOOMIN" : "Acercar",
+    "TOOLBAR.ACTION.ZOOMOUT" : "Alejar",
+    "TOOLBAR.ACTION.ZOOMACTUAL" : "Tamaño original",
+    "TOOLBAR.ACTION.ZOOMFIT" : "Ajustar a la página",
+    "TOOLBAR.ACTION.BENDPOINT.ADD" : "Añadir punto de curva al flujo de secuencia seleccionado",
+    "TOOLBAR.ACTION.BENDPOINT.REMOVE" : "Eliminar punto de curva del flujo de secuencia seleccionado",
+    "TOOLBAR.ACTION.ALIGNHORIZONTAL" : "Alinear modelo horizontalmente",
+    "TOOLBAR.ACTION.ALIGNVERTICAL" : "Alinear modelo verticalmente",
+    "TOOLBAR.ACTION.SAMESIZE" : "Mismo tamaño",
+    "TOOLBAR.ACTION.HELP": "Iniciar la visita guiada",
+    "TOOLBAR.ACTION.FEEDBACK": "Danos tu opinión",
+
+    "FORM_TOOLBAR.ACTION.SAVE" : "Guardar el modelo",
+
+    "APP_DEFINITION_TOOLBAR.ACTION.SAVE" : "Guardar la aplicación",
+
+    "BUTTON.ACTION.DELETE.TOOLTIP": "Eliminar elemento del modelo",
+    "BUTTON.ACTION.MORPH.TOOLTIP": "Cambiar tipo del elemento",
+
+    "ELEMENT.AUTHOR" : "Autor",
+    "ELEMENT.DATE_CREATED" : "Fecha de creación",
+
+    "PROPERTY.REMOVED" : "Eliminado",
+    "PROPERTY.EMPTY" : "Sin valor",
+    "PROPERTY.PROPERTY.EDIT.TITLE" : "Cambiar valor por",
+
+    "PROPERTY.FEEDBACK.TITLE" : "Por favor danos tu opinión",
+
+    "PROPERTY.ASSIGNMENT.TITLE" : "Asignación",
+    "PROPERTY.ASSIGNMENT.TYPE" : "Tipo",
+    "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE" : "Almacén de identidad",
+    "PROPERTY.ASSIGNMENT.TYPE.STATIC" : "Valores fijos",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE" : "Asignado",
+    "PROPERTY.ASSIGNMENT.MATCHING" : "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar o usa el mouse",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Ingresa una asignación",
+    "PROPERTY.ASSIGNMENT.EMPTY" : "No hay asignación seleccionada",
+    "PROPERTY.ASSIGNMENT.NONE" : "Ninguno...",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Buscar usuario",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Buscar grupo",
+    "PROPERTY.ASSIGNMENT.SEARCH": "Buscar: ",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "Asignación {{assignee}}",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "Usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY" :  "{{length}} grupos candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS" :  "Grupos candidatos",
+    "PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY": "Usuario {{firstName}} {{lastName}}",
+    "PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY": "Usuario {{email}}",
+    "PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY": "Campo {{name}}",
+    "PROPERTY.ASSIGNMENT.IDM_EMPTY" : "Iniciador del proceso",
+    "PROPERTY.ASSIGNMENT.IDM.TYPE" : "Asignación",
+    "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_USERS" : "No hay usuarios candidatos seleccionados...",
+    "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_GROUPS" : "No hay grupos candidatos seleccionados...",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.INITIATOR" : "Asignar al iniciador del proceso",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USER" : "Asignar a un solo usuario",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USERS" : "Usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.GROUPS" : "Grupos candidatos",
+    "PROPERTY.ASSIGNMENT.INITIATOR-CAN-COMPLETE" : "Permitir al iniciador del proceso completar la tarea",
+    "PROPERTY.EXECUTIONLISTENERS.DISPLAY" : "{{length}} gestores de eventos de ejecucion",
+    "PROPERTY.EXECUTIONLISTENERS.EMPTY" : "No hay gestores de eventos de ejecucion configurados",
+    "PROPERTY.EXECUTIONLISTENERS.EVENT" : "Evento",
+    "PROPERTY.EXECUTIONLISTENERS.CLASS" : "Clase",
+    "PROPERTY.EXECUTIONLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.EXECUTIONLISTENERS.EXPRESSION" : "Expresión",
+    "PROPERTY.EXECUTIONLISTENERS.EXPRESSION.PLACEHOLDER" : "Introduce una expresión",
+    "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION" : "Expresión del delegado",
+    "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresión del delegado",
+    "PROPERTY.EXECUTIONLISTENERS.UNSELECTED" : "No hay gestores de eventos de ejecución seleccionados",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME" : "Nombre",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION" : "Expresión",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Introduce una expresión",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE" : "Valor cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING" : "Cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.IMPLEMENTATION" : "Implementación",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY" : "No hay un campo seleccionado",
+
+    "PROPERTY.FIELDS" : "{{length}} campos",
+    "PROPERTY.FIELDS.EMPTY" : "No hay campos seleccionados",
+    "PROPERTY.FIELDS.NAME" : "Nombre",
+    "PROPERTY.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.FIELDS.EXPRESSION" : "Expresión",
+    "PROPERTY.FIELDS.EXPRESSION.PLACEHOLDER" : "Ingresa una expresión",
+    "PROPERTY.FIELDS.STRINGVALUE" : "Valor de cadena",
+    "PROPERTY.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.FIELDS.STRING" : "Cadena",
+    "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.FIELDS.IMPLEMENTATION" : "Implementación",
+
+    "PROPERTY.EXCEPTIONS" : "{{length}} excepciones",
+    "PROPERTY.EXCEPTIONS.EMPTY" : "No hay excepciones seleccionadas",
+    "PROPERTY.EXCEPTIONS.CODE" : "Código",
+    "PROPERTY.EXCEPTIONS.CODE.PLACEHOLDER" : "Ingresar un código",
+    "PROPERTY.EXCEPTIONS.CLASS" : "Clase",
+    "PROPERTY.EXCEPTIONS.CLASS.PLACEHOLDER" : "Ingresar una clase",
+    "PROPERTY.EXCEPTIONS.CHILDREN" : "Incluir excepciones hijas",
+
+    "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} objetos de datos",
+    "PROPERTY.DATAPROPERTIES.EMPTY" : "No hay objetos de datos configurados",
+    "PROPERTY.DATAPROPERTIES.ID" : "Id",
+    "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER" : "Ingresar un id",
+    "PROPERTY.DATAPROPERTIES.NAME" : "Nombre",
+    "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER" : "Ingresar un nombre",
+    "PROPERTY.DATAPROPERTIES.TYPE" : "Tipo",
+    "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER" : "Ingrsar un valor (opcional)",
+    "PROPERTY.DATAPROPERTIES.VALUE" : "Valor predeterminado",
+
+    "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} propiedades del formulario",
+    "PROPERTY.FORMPROPERTIES.EMPTY" : "No hay propiedades del formulario seleccionadas",
+    "PROPERTY.FORMPROPERTIES.ID" : "Identificador",
+    "PROPERTY.FORMPROPERTIES.ID.PLACEHOLDER" : "Introduce un identificador",
+    "PROPERTY.FORMPROPERTIES.NAME" : "Nombre",
+    "PROPERTY.FORMPROPERTIES.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.FORMPROPERTIES.TYPE" : "Tipo",
+    "PROPERTY.FORMPROPERTIES.DATEPATTERN" : "Patrón de fecha",
+    "PROPERTY.FORMPROPERTIES.DATEPATTERN.PLACEHOLDER" : "Introduce un patrón de fecha",
+    "PROPERTY.FORMPROPERTIES.VALUES" : "Valores",
+    "PROPERTY.FORMPROPERTIES.ENUMVALUES.EMPTY" : "No se selecciono un valor enum",
+    "PROPERTY.FORMPROPERTIES.VALUES.ID" : "Identificador",
+    "PROPERTY.FORMPROPERTIES.VALUES.NAME" : "Nombre",
+    "PROPERTY.FORMPROPERTIES.VALUES.ID.PLACEHOLDER" : "Introduce el identificador del valor",
+  	"PROPERTY.FORMPROPERTIES.VALUES.NAME.PLACEHOLDER" : "Introduce el nombre del valor",
+    "PROPERTY.FORMPROPERTIES.EXPRESSION" : "Expresión",
+    "PROPERTY.FORMPROPERTIES.EXPRESSION.PLACEHOLDER" : "Introduce una expresión",
+    "PROPERTY.FORMPROPERTIES.VARIABLE" : "Variable",
+    "PROPERTY.FORMPROPERTIES.VARIABLE.PLACEHOLDER" : "Introduce una variable",
+    "PROPERTY.FORMPROPERTIES.DEFAULT" : "valor predeterminado",
+    "PROPERTY.FORMPROPERTIES.DEFAULT.PLACEHOLDER" : "Introduce un valor predeterminado",
+    "PROPERTY.FORMPROPERTIES.REQUIRED" : "Requerido",
+    "PROPERTY.FORMPROPERTIES.READABLE" : "Legible",
+    "PROPERTY.FORMPROPERTIES.WRITABLE" : "Escribible",
+
+    "PROPERTY.INPARAMETERS.VALUE" : "{{length}} parámetros de entrada",
+    "PROPERTY.INPARAMETERS.EMPTY" : "No hay parámetros de entrada configurados",
+
+    "PROPERTY.OUTPARAMETERS.VALUE" : "{{length}} parámetros de salida",
+    "PROPERTY.OUTPARAMETERS.EMPTY" : "No hay parámetros de salida configurados",
+
+    "PROPERTY.PARAMETER.SOURCE" : "Fuente",
+    "PROPERTY.PARAMETER.SOURCE.PLACEHOLDER" : "Introduce una fuente",
+    "PROPERTY.PARAMETER.SOURCEEXPRESSION" : "Expresión de fuente",
+    "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "Expresión de fuente",
+    "PROPERTY.PARAMETER.TARGET" : "Objetivo",
+    "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Introduce un objetivo",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION" : "Expresión de objetivo",
+    "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "Introduce un expresión de objetivo",
+    "PROPERTY.PARAMETER.EMPTY" : "No hay parámetro seleccionado",
+
+    "PROPERTY.PROCESSREFERENCE.EMPTY" : "No hay referencia seleccionada",
+    "PROPERTY.PROCESSREFERENCE.TITLE" : "Referencia a proceso",
+    "PROPERTY.PROCESSREFERENCE.ERROR.PROCESS" : "Ocurrió un error cargando los procesos. Intenta más tarde",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING" : "Cargando procesos...",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY" : "Esta carpeta no contiene procesos",
+
+    "PROPERTY.FORMREFERENCE.EMPTY" : "No hay referencia seleccionada",
+    "PROPERTY.FORMREFERENCE.TITLE" : "Referencia a formulario",
+    "PROPERTY.FORMREFERENCE.DESCRIPTION" : "Referencia a formulario",
+    "PROPERTY.FORMREFERENCE.ERROR.FORM" : "Ocurrió un error cargando los formularios. Intenta mas tarde",
+    "PROPERTY.FORMREFERENCE.FORM.LOADING" : "Cargando formularios...",
+    "PROPERTY.FORMREFERENCE.FORM.EMPTY" : "Esta carpeta no contiene formularios",
+
+    "PROPERTY.TASKLISTENERS.VALUE" : "{{length}} gestores de eventos de tarea",
+    "PROPERTY.TASKLISTENERS.EMPTY" : "No hay gestores de eventos de tarea configurados",
+    "PROPERTY.TASKLISTENERS.EVENT" : "Evento",
+    "PROPERTY.TASKLISTENERS.CLASS" : "Clase",
+    "PROPERTY.TASKLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.TASKLISTENERS.EXPRESSION" : "Expresión",
+    "PROPERTY.TASKLISTENERS.EXPRESSION.PLACEHOLDER" : "Introduce una expresión",
+    "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION" : "Expresión de delegado",
+    "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresión del delegado",
+    "PROPERTY.TASKLISTENERS.UNSELECTED" : "No hay gestores de eventos de tarea seleccionados",
+    "PROPERTY.TASKLISTENERS.FIELDS.NAME" : "Nombre",
+    "PROPERTY.TASKLISTENERS.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION" : "Expresión",
+    "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Introduce una expresión",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE" : "Valor de cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRING" : "Cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.IMPLEMENTATION" : "Implementación",
+    "PROPERTY.TASKLISTENERS.FIELDS.EMPTY" : "No hay campo seleccionado",
+
+    "PROPERTY.EVENTLISTENERS.DISPLAY" : "{{length}} gestores de evento",
+    "PROPERTY.EVENTLISTENERS.EMPTY" : "No hay gestores de evento seleecionados",
+    "PROPERTY.EVENTLISTENERS.EVENTS": "Eventos",
+    "PROPERTY.EVENTLISTENERS.RETHROW": "¿Relanzar evento?",
+    "PROPERTY.EVENTLISTENERS.CLASS" : "Clase",
+    "PROPERTY.EVENTLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION" : "Expresión de delegado",
+    "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresión del delegado",
+    "PROPERTY.EVENTLISTENERS.ENTITYTYPE" : "Tipo de entidad",
+    "PROPERTY.EVENTLISTENERS.ENTITYTYPE.PLACEHOLDER" : "Introduce un tipo de entidad",
+    "PROPERTY.EVENTLISTENERS.RETHROWTYPE": "Relanzar tipo de evento",
+    "PROPERTY.EVENTLISTENERS.ERRORCODE" : "Codigo de error",
+    "PROPERTY.EVENTLISTENERS.ERRORCODE.PLACEHOLDER" : "Introduce un código de error",
+    "PROPERTY.EVENTLISTENERS.MESSAGENAME" : "Nombre de mensaje",
+    "PROPERTY.EVENTLISTENERS.MESSAGENAME.PLACEHOLDER" : "Introduce un nombre de mensaje",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME" : "Nombre de señal",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER" : "Introduce un nombre de señal",
+    "PROPERTY.EVENTLISTENERS.UNSELECTED" : "No hay gestores de evento seleccionado",
+
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.VALUE" : "{{length}} gestores de eventos de ciclo de vida",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.EMPTY" : "No hay gestores de eventos de ciclo de vida configurados",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.EVENT" : "Evento",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.SOURCE_STATE" : "Estado de origen",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.TARGET_STATE" : "Estado de destino",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS" : "Clase",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS.PLACEHOLDER" : "Ingresa un nombre de clase",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION" : "Expresión",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION.PLACEHOLDER" : "Ingresa una expresión",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION" : "Expresión del delegado",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresión del delegado",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.UNSELECTED" : "No hay gestor de eventos de tarea seleccionado",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME" : "Nombre",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME.PLACEHOLDER" : "Ingresa un nombre",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION" : "Expresión",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Ingresa una expresión",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE" : "Valor de cadena",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "Ingresa un valor de cadena",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING" : "CAdena",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING.PLACEHOLDER" : "Ingresa una cadena",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.IMPLEMENTATION" : "Implementación",
+    "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EMPTY" : "No hay campos selecionados",
+
+    "PROPERTY.SIGNALDEFINITIONS.DISPLAY" : "{{length}} definiciones de señal",
+    "PROPERTY.SIGNALDEFINITIONS.EMPTY" : "No hay definiciones de señal",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "Global",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "Instancia de proceso",
+    "PROPERTY.SIGNALDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.SIGNALDEFINITIONS.NAME" : "Nombre",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE" : "Ámbito",
+
+    "PROPERTY.MESSAGEDEFINITIONS.DISPLAY" : "{{length}} definiciones de mensaje",
+    "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No hay definiciones de mensaje configuradas",
+    "PROPERTY.MESSAGEDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Nombre",
+
+    "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} definiciones de escalamiento",
+    "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "No hay definiciones de escalamiento configuradas",
+    "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
+    "PROPERTY.ESCALATIONDEFINITIONS.NAME" : "Nombre",
+
+    "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No se definió el orden de los flujos de secuencia",
+    "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Orden de flujos de secuencia establecido",
+    "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "No se encontro un flujo de secuencia de salida.",
+    "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION" : "Establecer el orden en el cual el flujo de secuencia necesita ser evaluado:",
+    "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE" : "Flujo de secuencia a {{targetType}} {{targetTitle}}",
+
+    "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE" : "Condición del flujo de secuencia",
+    "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC" : "Expresión de la condición",
+    "PROPERTY.SEQUENCEFLOW.CONDITION.NO-CONDITION-DISPLAY": "No hay condición fijada",
+
+    "PROPERTY.DUEDATE.EMPTY" : "No se definió fecha de vencimiento",
+    "PROPERTY.DUEDATE.DEFINED" : "Se definió fecha de vencimiento",
+    "PROPERTY.DUEDATE.TITLE" : "Fecha de vencimiento",
+    "PROPERTY.DUEDATE.EXPRESSION-LABEL" : "Expresión de fecha de vencimiento",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.NO-DUEDATE" : "No hay fecha de vencimiento",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "Definición de expresión",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Duración arreglada después de la creación de la tarea",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Basado en un campo",
+    
+    "PROPERTY.EVENTINPARAMETERS.VALUE" : "{{length}} parámetros de eventos de entrada",
+    "PROPERTY.EVENTINPARAMETERS.EMPTY" : "No hay parámetro de entrada configurado",
+
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME" : "Nombre de la propiedad del evento",
+    "PROPERTY.EVENTINPARAMETERS.EVENTNAME.PLACEHOLDER" : "Ingrese el nombre de la propiedad del evento",
+    "PROPERTY.EVENTINPARAMETERS.EVENTTYPE" : "Tipo",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME" : "Nombre de variable",
+    "PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Ingrese un nombre de variable",
+    "PROPERTY.EVENTINPARAMETERS.NOSELECTION" : "No hay un parámetro seleccionado",
+    
+    "PROPERTY.EVENTOUTPARAMETERS.VALUE" : "{{length}} parámetros de eventos de salida",
+    "PROPERTY.EVENTOUTPARAMETERS.EMPTY" : "No hay parámetro de salida configurado",
+
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME" : "Nomre de la propiedad del evento",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME.PLACEHOLDER" : "Ingrese el nombre de la propiedad del evento",
+    "PROPERTY.EVENTOUTPARAMETERS.EVENTTYPE" : "Tipo",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME" : "Nombre de variable",
+    "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Ingrese un nombre de variable",
+    "PROPERTY.EVENTOUTPARAMETERS.NOSELECTION" : "No hay un parámetro seleccionado",
+    
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUE" : "{{length}} parámetros de correlación",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.EMPTY" : "No hay parámetro de correlación configurado",
+
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME" : "Nombre",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME.PLACEHOLDER" : "Ingrese un nombre",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.TYPE" : "Tipo",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.NOSELECTION" : "No hay parámetro seleccionado",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP" : "Valor",
+    "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP.PLACEHOLDER" : "Ingrese un valor o expresión",
+
+    "MODEL.SAVE.TITLE" : "Guardar modelo",
+    "MODEL.VALIDATE.TITLE" : "Resultados de validación",
+    "MODEL.NAME" : "Nombre",
+    "MODEL.KEY" : "Clave",
+    "MODEL.DESCRIPTION" : "Descripción",
+    "MODEL.SAVE.NEWVERSION" : "¿Guardar como nueva versión?  Esto significa que siempre podras volver a una versión anterior",
+    "MODEL.SAVE.COMMENT" : "Comentario",
+    "MODEL.SAVE.SAVING" : "Guardando modelo",
+    "MODEL.LASTMODIFIEDDATE" : "Último guardado",
+    "MODEL.SAVE.ERROR": "Error inesperado: no se pudo guardar el modelo",
+    "MODEL.VALIDATIONERRORS": "El modelo tiene errores de validación. El modelo no puede desplegarse al Flowable Engine en el estado actual.",
+    "MODEL.CONFLICT.WRITE": "No se puede guardar el modelo: '{{userFullName}}'. Ha echo cambios a este modelo.",
+    "MODEL.CONFLICT.WRITE.OPTIONS": "Selecciona una opción para solucionar esto:",
+    "MODEL.CONFLICT.WRITE.OPTION.OVERWRITE": "Sobreescribir el otro modelo",
+    "MODEL.CONFLICT.WRITE.OPTION.DISCARDCHANGES": "Descartar mis cambios",
+    "MODEL.CONFLICT.WRITE.OPTION.SAVEAS": "Guardar como nuevo modelo",
+    "MODEL.CONFLICT.WRITE.OPTION.NEWVERSION": "Crear una nueva versión",
+    "MODEL.CONFLICT.SAVEAS" : "Guardar como:",
+
+    "EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP": "Una actividad está a punto de ser ejecutada como compensación para otra actividad. El evento apunta a la actividad que está a punto de ser ejecutada para la compensación.",
+    "EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP": "Una actividad se ha completado exitosamente.",
+    "EVENT_TYPE.ACTIVITY.ERROR.RECEIVED.TOOLTIP": "Una actividad ha recibido un mensaje de error. Enviado antes que el error en sí haya sido recibido por la actividad.",
+    "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "Una nueva membresía ha sido creada",
+    "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "Una sola membresía ha sido eliminada",
+    "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "Todas las membresías relacionadas a un grupo han sido eliminadas. No se enviarán eventos individuales debido a razones de desempeño.",
+    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "Una tarea se ha asignado. Se lanzó junto al evento ENTITY_UPDATED",
+    "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "Una tarea ha sido completada. Enviado antes que la entidad de la tarea sea eliminada.",
+    "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "Cuando un error BPMN fue lanzado, pero no fue capturado dentro del proceso",
+    "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "Una nueva variable se creó",
+    "EVENT_TYPE.VARIABLE.DELETED.TOOLTIP": "Una variable existente fue eliminada",
+    "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "Una variable existente fue actualizada",
+
+    "PROPERTY.DECISIONTABLEREFERENCE.EMPTY" : "No hay referencia selecionada",
+    "PROPERTY.DECISIONTABLEREFERENCE.TITLE" : "Referencia a la tabla de decisión",
+    "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "Ocurrió un error cargando la tabla de decisiones. Intenta más tarde.",
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Cargando tabla de decisiones...",
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "Esta carpeta no contiene tablas de decisiones",
+    
+    "PROPERTY.CASEREFERENCE.EMPTY" : "No hay referencia seleccionda",
+    "PROPERTY.CASEREFERENCE.TITLE" : "Referencia al modelo de casos",
+    "PROPERTY.CASEREFERENCE.ERROR.FORM" : "Ocurrió un error cargando los modelos de caso. Intenta más tarde.",
+    "PROPERTY.CASEREFERENCE.CASE.LOADING" : "Cargando modelos de caso...",
+    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "Esta carpeta no contiene modelos de caso"
+}

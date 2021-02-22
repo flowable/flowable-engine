@@ -13,6 +13,7 @@
 package org.flowable.cmmn.editor.json.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +21,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.ExtensionAttribute;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -38,6 +43,8 @@ import org.flowable.cmmn.model.RequiredRule;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.cmmn.model.VariableAggregationDefinitions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +64,8 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    public void convertToJson(BaseElement baseElement, ActivityProcessor processor, CmmnModel model, PlanFragment planFragment, ArrayNode shapesArrayNode, double subProcessX, double subProcessY) {
+    public void convertToJson(BaseElement baseElement, ActivityProcessor processor, CmmnModel model, PlanFragment planFragment,
+            ArrayNode shapesArrayNode, CmmnJsonConverterContext converterContext, double subProcessX, double subProcessY) {
 
         if (!(baseElement instanceof PlanItem)) {
             return;
@@ -114,24 +122,36 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             convertPlanItemControlToJson(planItem, propertiesNode);
         }
 
-        convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
+        convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model, converterContext);
 
         planItemNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
 
         if (CollectionUtils.isNotEmpty(planItem.getEntryCriteria())) {
-            convertCriteria(planItem.getEntryCriteria(), planItemDefinition, planItemNode, model, processor, shapesArrayNode, 
+            convertCriteria(planItem.getEntryCriteria(), planItemDefinition, planItemNode, model, processor, converterContext, shapesArrayNode,
                             outgoingArrayNode, subProcessX, subProcessY);
         }
 
         if (CollectionUtils.isNotEmpty(planItem.getExitCriteria())) {
-            convertCriteria(planItem.getExitCriteria(), planItemDefinition, planItemNode, model, processor, shapesArrayNode, 
+            convertCriteria(planItem.getExitCriteria(), planItemDefinition, planItemNode, model, processor, converterContext, shapesArrayNode,
                             outgoingArrayNode, subProcessX, subProcessY);
         }
         
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
             for (Association association : planItem.getOutgoingAssociations()) {
                 outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+            }
+        
+        } else if (!model.getAssociations().isEmpty() && CollectionUtils.isEmpty(planItem.getOutgoingAssociations()) && 
+                CollectionUtils.isEmpty(planItem.getIncomingAssociations())) {
+            
+            for (Association association : model.getAssociations()) {
+                if (planItem.getId().equals(association.getSourceRef())) {
+                    outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+                
+                } else if (planItem.getId().equals(association.getTargetRef())) {
+                    outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+                }
             }
         }
 
@@ -149,6 +169,8 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (!RepetitionRule.DEFAULT_REPETITION_COUNTER_VARIABLE_NAME.equals(repetitionRule.getRepetitionCounterVariableName())) {
                 propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
             }
+
+            convertVariableAggregationDefinitionsToJson(repetitionRule.getAggregations(), propertiesNode);
         }
         
         ManualActivationRule manualActivationRule = planItem.getItemControl().getManualActivationRule();
@@ -179,10 +201,50 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         }
     }
 
-    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
-            Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+    protected void convertVariableAggregationDefinitionsToJson(VariableAggregationDefinitions aggregations, ObjectNode propertiesNode) {
+        if (aggregations == null) {
+            propertiesNode.putNull(PROPERTY_REPETITION_VARIABLE_AGGREGATIONS);
+            return;
+        }
 
-        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel, cmmnModelIdHelper);
+        ObjectNode aggregationsNode = propertiesNode.putObject(PROPERTY_REPETITION_VARIABLE_AGGREGATIONS);
+
+
+        Collection<VariableAggregationDefinition> aggregationsCollection = aggregations.getAggregations();
+        ArrayNode itemsArray = aggregationsNode.putArray("aggregations");
+        for (VariableAggregationDefinition aggregation : aggregationsCollection) {
+            ObjectNode aggregationNode = itemsArray.addObject();
+
+            aggregationNode.put("target", aggregation.getTarget());
+            aggregationNode.put("targetExpression", aggregation.getTarget());
+
+            String implementationType = aggregation.getImplementationType();
+            if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(implementationType)) {
+                aggregationNode.put("delegateExpression", aggregation.getImplementation());
+            } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType)) {
+                aggregationNode.put("class", aggregation.getImplementation());
+            }
+
+            aggregationNode.put("storeAsTransient", aggregation.isStoreAsTransientVariable());
+            aggregationNode.put("createOverview", aggregation.isCreateOverviewVariable());
+
+            ArrayNode definitionsArray = aggregationNode.putArray("definitions");
+
+            for (VariableAggregationDefinition.Variable definition : aggregation.getDefinitions()) {
+                ObjectNode definitionNode = definitionsArray.addObject();
+
+                definitionNode.put("source", definition.getSource());
+                definitionNode.put("sourceExpression", definition.getSourceExpression());
+                definitionNode.put("target", definition.getTarget());
+                definitionNode.put("targetExpression", definition.getTargetExpression());
+            }
+        }
+    }
+
+    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
+            Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
+
+        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel, converterContext, cmmnModelIdHelper);
         baseElement.setId(CmmnJsonConverterUtil.getElementId(elementNode));
 
         if (baseElement instanceof PlanItemDefinition) {
@@ -265,12 +327,68 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
                 repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
             }
+
+            repetitionRule.setAggregations(convertJsonToVariableAggregationDefinitions(CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_REPETITION_VARIABLE_AGGREGATIONS, elementNode)));
             
             if (planItem.getItemControl() == null) {
                 planItem.setItemControl(new PlanItemControl());
             }
             planItem.getItemControl().setRepetitionRule(repetitionRule);
         }
+    }
+
+    protected VariableAggregationDefinitions convertJsonToVariableAggregationDefinitions(JsonNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        JsonNode aggregationsNode = node.path("aggregations");
+        if (aggregationsNode.size() < 0) {
+            return null;
+        }
+
+        VariableAggregationDefinitions aggregations = new VariableAggregationDefinitions();
+
+        for (JsonNode aggregationNode : aggregationsNode) {
+            VariableAggregationDefinition aggregation = new VariableAggregationDefinition();
+
+            aggregation.setTarget(StringUtils.defaultIfBlank(aggregationNode.path("target").asText(null), null));
+            aggregation.setTargetExpression(StringUtils.defaultIfBlank(aggregationNode.path("targetExpression").asText(null), null));
+
+            String delegateExpression = aggregationNode.path("delegateExpression").asText(null);
+            String customClass = aggregationNode.path("class").asText(null);
+            if (StringUtils.isNotBlank(delegateExpression)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+                aggregation.setImplementation(delegateExpression);
+            } else if (StringUtils.isNotBlank(customClass)) {
+                aggregation.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+                aggregation.setImplementation(aggregationNode.path("class").asText(null));
+            }
+
+            if (aggregationNode.path("storeAsTransient").asBoolean(false)) {
+                aggregation.setStoreAsTransientVariable(true);
+            }
+
+            if (aggregationNode.path("createOverview").asBoolean(false)) {
+                aggregation.setCreateOverviewVariable(true);
+            }
+
+            for (JsonNode definitionNode : aggregationNode.path("definitions")) {
+                VariableAggregationDefinition.Variable definition = new VariableAggregationDefinition.Variable();
+
+                definition.setSource(StringUtils.defaultIfBlank(definitionNode.path("source").asText(null), null));
+                definition.setSourceExpression(StringUtils.defaultIfBlank(definitionNode.path("sourceExpression").asText(null), null));
+                definition.setTarget(StringUtils.defaultIfBlank(definitionNode.path("target").asText(null), null));
+                definition.setTargetExpression(StringUtils.defaultIfBlank(definitionNode.path("targetExpression").asText(null), null));
+
+                aggregation.addDefinition(definition);
+            }
+
+            aggregations.getAggregations().add(aggregation);
+        }
+
+        return aggregations;
+
     }
 
     protected void handleManualActivationRule(JsonNode elementNode, PlanItem planItem) {
@@ -307,15 +425,16 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         }
     }
 
-    protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel);
+    protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+        BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext);
 
     protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper);
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper);
 
     protected abstract String getStencilId(BaseElement baseElement);
 
     protected void convertCriteria(List<Criterion> criteria, PlanItemDefinition criterionParentDefinition, ObjectNode criterionParentPlanItemNode, CmmnModel model, ActivityProcessor processor, 
-                    ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
+                    CmmnJsonConverterContext converterContext, ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
         
         for (Criterion criterion : criteria) {
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
@@ -334,13 +453,14 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (attachedToStage != null) {
                 ArrayNode planItemChildShapes = (ArrayNode) criterionParentPlanItemNode.get(EDITOR_CHILD_SHAPES);
                 planItemChildShapes.add(criterionNode);
+                outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
             } else {
                 shapesArrayNode.add(criterionNode);
             }
             
             ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
             criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
-            new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, processor, criterion, model);
+            new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, processor, criterion, model, converterContext);
             criterionNode.set(EDITOR_SHAPE_PROPERTIES, criterionPropertiesNode);
 
             if (CollectionUtils.isNotEmpty(criterion.getOutgoingAssociations())) {
@@ -393,6 +513,37 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             task.getFieldExtensions().add(field);
         }
     }
+    
+    protected ExtensionElement addFlowableExtensionElement(String name, PlanItemDefinition planItemDefinition) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(name);
+        extensionElement.setNamespace("http://flowable.org/cmmn");
+        extensionElement.setNamespacePrefix("flowable");
+        planItemDefinition.addExtensionElement(extensionElement);
+        return extensionElement;
+    }
+    
+    protected ExtensionElement addFlowableExtensionElementWithValue(String name, String value, PlanItemDefinition planItemDefinition) {
+        ExtensionElement extensionElement = null;
+        if (StringUtils.isNotEmpty(value)) {
+            extensionElement = addFlowableExtensionElement(name, planItemDefinition);
+            extensionElement.setElementText(value);
+        }
+        
+        return extensionElement;
+    }
+    
+    public void addExtensionAttribute(String name, String value, ExtensionElement extensionElement) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        extensionElement.addAttribute(attribute);
+    }
+    
+    public ExtensionAttribute createExtensionAttribute(String name, String value) {
+        ExtensionAttribute attribute = new ExtensionAttribute(name);
+        attribute.setValue(value);
+        return attribute;
+    }
 
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
         if (StringUtils.isNotEmpty(value)) {
@@ -416,6 +567,23 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             propertyValue = propertyNode.asBoolean();
         }
         return propertyValue;
+    }
+    
+    protected String getPropertyValueAsString(String name, JsonNode objectNode) {
+        return CmmnModelJsonConverterUtil.getPropertyValueAsString(name, objectNode);
+    }
+    
+    protected JsonNode getProperty(String name, JsonNode objectNode) {
+        return CmmnModelJsonConverterUtil.getProperty(name, objectNode);
+    }
+    
+    protected String getExtensionValue(String name, PlanItemDefinition planItemDefinition) {
+        List<ExtensionElement> extensionElements = planItemDefinition.getExtensionElements().get(name);
+        if (extensionElements != null && extensionElements.size() > 0) {
+            return extensionElements.get(0).getElementText();
+        }
+        
+        return null;
     }
 
     protected List<String> getValueAsList(String name, JsonNode objectNode) {

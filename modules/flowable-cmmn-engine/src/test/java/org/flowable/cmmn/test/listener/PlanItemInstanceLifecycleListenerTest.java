@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.listener;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -34,24 +33,22 @@ import org.junit.Test;
 public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase {
 
     private Map<String, List<PlanItemInstanceLifecycleListener>> originalLifeCycleListeners;
-    private String deploymentId;
 
     private AbstractTestLifecycleListener testLifeCycleListener;
+
 
     @Before
     public void addListeners() {
         this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/listener/PlanItemInstanceLifeCycleListenerTest.cmmn")
-            .deploy()
-            .getId();
+            .deploy());
     }
 
     @After
     public void removeListeners() {
         cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test
@@ -62,7 +59,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
 
         List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
-        assertEquals(7, events.size());
+        assertThat(events).hasSize(7);
 
         assertEvent(events.get(0), "Stage one", null, PlanItemInstanceState.AVAILABLE);
         assertEvent(events.get(1), "Stage two", null, PlanItemInstanceState.AVAILABLE);
@@ -82,7 +79,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.disablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.ENABLED, PlanItemInstanceState.DISABLED);
 
         testLifeCycleListener.clear();
@@ -91,7 +88,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.enablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.DISABLED, PlanItemInstanceState.ENABLED);
 
         testLifeCycleListener.clear();
@@ -101,7 +98,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.ENABLED, PlanItemInstanceState.ACTIVE);
 
         testLifeCycleListener.clear();
@@ -112,7 +109,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         }
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(10, events.size());
+        assertThat(events).hasSize(10);
 
         assertEvent(events.get(0), "A", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.COMPLETED);
         assertEvent(events.get(1), "B", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.COMPLETED);
@@ -137,7 +134,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
 
         List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
-        assertEquals(4, events.size());
+        assertThat(events).hasSize(4);
 
         assertEvent(events.get(0), "A", null, PlanItemInstanceState.AVAILABLE);
         assertEvent(events.get(1), "B", null, PlanItemInstanceState.AVAILABLE);
@@ -152,7 +149,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.disablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.ENABLED, PlanItemInstanceState.DISABLED);
 
         testLifeCycleListener.clear();
@@ -161,7 +158,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.enablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.DISABLED, PlanItemInstanceState.ENABLED);
 
         testLifeCycleListener.clear();
@@ -171,7 +168,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.ENABLED, PlanItemInstanceState.ACTIVE);
 
         testLifeCycleListener.clear();
@@ -182,7 +179,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         }
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(4, events.size());
+        assertThat(events).hasSize(4);
 
         assertEvent(events.get(0), "A", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.COMPLETED);
         assertEvent(events.get(1), "B", PlanItemInstanceState.ACTIVE, PlanItemInstanceState.COMPLETED);
@@ -198,7 +195,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
 
         List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
-        assertEquals(3, events.size());
+        assertThat(events).hasSize(3);
 
         assertEvent(events.get(0), "Stage one", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(1), "A", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
@@ -211,20 +208,20 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.disablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(0, events.size());
+        assertThat(events).isEmpty();
 
         // Enable B
         cmmnRuntimeService.enablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(0, events.size());
+        assertThat(events).isEmpty();
 
         // Start B
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(0, events.size());
+        assertThat(events).isEmpty();
 
         testLifeCycleListener.clear();
 
@@ -234,7 +231,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         }
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(3, events.size());
+        assertThat(events).hasSize(3);
 
         assertEvent(events.get(0), "Stage two", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(1), "M1", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
@@ -249,7 +246,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLifeCycleListener").start();
 
         List<TestLifeCycleEvent> events = testLifeCycleListener.getEvents();
-        assertEquals(2, events.size());
+        assertThat(events).hasSize(2);
 
         assertEvent(events.get(0), "Stage one", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(1), "A", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
@@ -261,20 +258,20 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         cmmnRuntimeService.disablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(0, events.size());
+        assertThat(events).isEmpty();
 
         // Enable B
         cmmnRuntimeService.enablePlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(0, events.size());
+        assertThat(events).isEmpty();
 
         // Start B
         planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(1, events.size());
+        assertThat(events).hasSize(1);
         assertEvent(events.get(0), "B", PlanItemInstanceState.ENABLED, PlanItemInstanceState.ACTIVE);
 
         testLifeCycleListener.clear();
@@ -285,7 +282,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         }
 
         events = testLifeCycleListener.getEvents();
-        assertEquals(3, events.size());
+        assertThat(events).hasSize(3);
 
         assertEvent(events.get(0), "Stage two", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
         assertEvent(events.get(1), "M1", PlanItemInstanceState.AVAILABLE, PlanItemInstanceState.ACTIVE);
@@ -293,18 +290,18 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
     }
 
     private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {
-        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListeners(planItemDefinitionType, testLifeCycleListener);
+        cmmnEngineConfiguration.addPlanItemInstanceLifeCycleListener(planItemDefinitionType, testLifeCycleListener);
         this.testLifeCycleListener = testLifeCycleListener;
     }
 
     private void assertEvent(TestLifeCycleEvent event, String name, String oldState, String newState) {
-        assertEquals(name, event.getPlanItemInstance().getName());
+        assertThat(event.getPlanItemInstance().getName()).isEqualTo(name);
         if (oldState == null) {
-            assertNull(event.getOldState());
+            assertThat(event.getOldState()).isNull();
         } else {
-            assertEquals(oldState, event.getOldState());
+            assertThat(event.getOldState()).isEqualTo(oldState);
         }
-        assertEquals(newState, event.getNewState());
+        assertThat(event.getNewState()).isEqualTo(newState);
     }
 
 }

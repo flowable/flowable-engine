@@ -51,13 +51,13 @@ public class TaskJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
-            BaseElement baseElement, CmmnModel cmmnModel) {
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, ((PlanItem) baseElement).getPlanItemDefinition());
     }
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
         Task task = new Task();
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
         return task;

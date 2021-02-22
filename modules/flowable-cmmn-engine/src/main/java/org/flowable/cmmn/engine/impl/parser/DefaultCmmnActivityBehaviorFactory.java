@@ -13,9 +13,13 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.CasePageTaskActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
@@ -24,15 +28,19 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionAct
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ScriptTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.SendEventActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.SignalEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.http.DefaultCmmnHttpActivityDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
+import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HumanTask;
@@ -40,6 +48,7 @@ import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ScriptServiceTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
@@ -71,7 +80,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         } else if (StringUtils.isNotEmpty(milestone.getName())) {
             name = milestone.getName();
         }
-        return new MilestoneActivityBehavior(expressionManager.createExpression(name));
+        return new MilestoneActivityBehavior(expressionManager.createExpression(name), milestone.getMilestoneVariable());
     }
 
     @Override
@@ -103,7 +112,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public PlanItemExpressionActivityBehavior createPlanItemExpressionActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return new PlanItemExpressionActivityBehavior(task.getImplementation(), task.getResultVariableName());
+        return new PlanItemExpressionActivityBehavior(task.getImplementation(), task.getResultVariableName(), task.isStoreResultVariableAsTransient());
     }
 
     @Override
@@ -132,6 +141,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
+    public EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener) {
+        return new EventRegistryEventListenerActivityBehaviour(createExpression(genericEventListener.getEventType()));
+    }
+
+    @Override
     public DecisionTaskActivityBehavior createDecisionTaskActivityBehavior(PlanItem planItem, DecisionTask decisionTask) {
         return new DecisionTaskActivityBehavior(createExpression(decisionTask.getDecisionRefExpression()), decisionTask);
     }
@@ -155,13 +169,23 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
             // Default Http behavior class
             if (theClass == null) {
-                theClass = Class.forName("org.flowable.http.cmmn.impl.CmmnHttpActivityBehaviorImpl");
+                return createDefaultHttpActivityBehaviour(planItem, task);
             }
 
-            return (CmmnActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(theClass, task, true); // CmmnHttpActivityBehaviorImpl only has expression fields
+            return classDelegateFactory.create(theClass.getName(), task.getFieldExtensions());
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
+    }
+
+    protected CmmnActivityBehavior createDefaultHttpActivityBehaviour(PlanItem planItem, ServiceTask serviceTask) {
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+            return createCmmnClassDelegate(planItem, serviceTask);
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+            return createPlanItemDelegateExpressionActivityBehavior(planItem, serviceTask);
+        } else {
+            return classDelegateFactory.create(DefaultCmmnHttpActivityDelegate.class.getName(), serviceTask.getFieldExtensions());
         }
     }
 
@@ -171,8 +195,23 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
+    public SendEventActivityBehavior createSendEventActivityBehavior(PlanItem planItem, SendEventServiceTask sendEventServiceTask) {
+        return new SendEventActivityBehavior(sendEventServiceTask);
+    }
+
+    @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerActivityBehaviour(PlanItem planItem, ExternalWorkerServiceTask externalWorkerServiceTask) {
+        return new ExternalWorkerTaskActivityBehavior(externalWorkerServiceTask);
+    }
+
+    @Override
     public ScriptTaskActivityBehavior createScriptTaskActivityBehavior(PlanItem planItem, ScriptServiceTask task) {
         return new ScriptTaskActivityBehavior(task);
+    }
+
+    @Override
+    public CasePageTaskActivityBehaviour createCasePageTaskActivityBehaviour(PlanItem planItem, CasePageTask task) {
+        return new CasePageTaskActivityBehaviour(task);
     }
 
     public void setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {

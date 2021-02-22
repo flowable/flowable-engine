@@ -137,7 +137,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(lastTask.getId());
 
-        assertEquals(0l, runtimeService.createProcessInstanceQuery().active().count());
+        assertEquals(0L, runtimeService.createProcessInstanceQuery().active().count());
     }
 
     /**

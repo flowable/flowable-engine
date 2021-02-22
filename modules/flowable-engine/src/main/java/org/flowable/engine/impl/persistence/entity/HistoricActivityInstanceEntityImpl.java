@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Christian Stettler
@@ -28,6 +29,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     private static final long serialVersionUID = 1L;
 
+    protected Integer transactionOrder;
     protected String activityId;
     protected String activityName;
     protected String activityType;
@@ -41,11 +43,35 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     }
 
+    public HistoricActivityInstanceEntityImpl(ActivityInstance activityInstance) {
+        this.id = activityInstance.getId();
+
+        this.processDefinitionId = activityInstance.getProcessDefinitionId();
+        this.processInstanceId = activityInstance.getProcessInstanceId();
+        this.calledProcessInstanceId = activityInstance.getCalledProcessInstanceId();
+        this.executionId = activityInstance.getExecutionId();
+        this.taskId = activityInstance.getTaskId();
+        this.activityId = activityInstance.getActivityId();
+        this.activityName = activityInstance.getActivityName();
+        this.activityType = activityInstance.getActivityType();
+        this.assignee = activityInstance.getAssignee();
+        this.startTime = activityInstance.getStartTime();
+        this.endTime = activityInstance.getEndTime();
+        this.deleteReason = activityInstance.getDeleteReason();
+        this.durationInMillis = activityInstance.getDurationInMillis();
+        this.transactionOrder = activityInstance.getTransactionOrder();
+
+        if (activityInstance.getTenantId() != null) {
+            this.tenantId = activityInstance.getTenantId();
+        }
+    }
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
         persistentState.put("durationInMillis", durationInMillis);
+        persistentState.put("transactionOrder", transactionOrder);
         persistentState.put("deleteReason", deleteReason);
         persistentState.put("executionId", executionId);
         persistentState.put("taskId", taskId);
@@ -58,6 +84,16 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
+    public Integer getTransactionOrder() {
+        return transactionOrder;
+    }
+
+    @Override
+    public void setTransactionOrder(Integer transactionOrder) {
+        this.transactionOrder = transactionOrder;
+    }
+    
     @Override
     public String getActivityId() {
         return activityId;

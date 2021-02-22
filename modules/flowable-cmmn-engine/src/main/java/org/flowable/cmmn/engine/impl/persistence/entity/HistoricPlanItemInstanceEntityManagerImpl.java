@@ -17,50 +17,50 @@ import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Dennis Federico
  */
-public class HistoricPlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager<HistoricPlanItemInstanceEntity> implements HistoricPlanItemInstanceEntityManager {
-
-    protected HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager;
+public class HistoricPlanItemInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, HistoricPlanItemInstanceEntity, HistoricPlanItemInstanceDataManager>
+    implements HistoricPlanItemInstanceEntityManager {
 
     public HistoricPlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, HistoricPlanItemInstanceDataManager historicPlanItemInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.historicPlanItemInstanceDataManager = historicPlanItemInstanceDataManager;
+        super(cmmnEngineConfiguration, historicPlanItemInstanceDataManager);
     }
 
     @Override
-    protected DataManager<HistoricPlanItemInstanceEntity> getDataManager() {
-        return historicPlanItemInstanceDataManager;
+    public HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance) {
+        return dataManager.create(planItemInstance);
     }
 
     @Override
     public HistoricPlanItemInstanceQuery createHistoricPlanItemInstanceQuery() {
-        return new HistoricPlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new HistoricPlanItemInstanceQueryImpl(engineConfiguration.getCommandExecutor());
     }
 
     @Override
     public List<HistoricPlanItemInstance> findByCaseDefinitionId(String caseDefinitionId) {
-        return historicPlanItemInstanceDataManager.findByCaseDefinitionId(caseDefinitionId);
+        return dataManager.findByCaseDefinitionId(caseDefinitionId);
     }
 
     @Override
     public List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQuery query) {
-        return historicPlanItemInstanceDataManager.findByCriteria((HistoricPlanItemInstanceQueryImpl) query);
+        return dataManager.findByCriteria((HistoricPlanItemInstanceQueryImpl) query);
     }
 
     @Override
     public long countByCriteria(HistoricPlanItemInstanceQuery query) {
-        return historicPlanItemInstanceDataManager.countByCriteria((HistoricPlanItemInstanceQueryImpl) query);
+        return dataManager.countByCriteria((HistoricPlanItemInstanceQueryImpl) query);
     }
     
     @Override
     public void deleteHistoricPlanItemInstancesForNonExistingCaseInstances() {
-        historicPlanItemInstanceDataManager.deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
+        dataManager.deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
     }
 }

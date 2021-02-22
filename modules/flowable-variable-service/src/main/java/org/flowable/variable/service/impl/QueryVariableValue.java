@@ -17,12 +17,12 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.types.NullType;
 
 /**
  * Represents a variable value used in queries.
@@ -45,9 +45,9 @@ public class QueryVariableValue implements Serializable {
         this.local = local;
     }
 
-    public void initialize(VariableTypes types) {
+    public void initialize(VariableServiceConfiguration variableServiceConfiguration) {
         if (variableInstanceEntity == null) {
-            VariableType type = types.findVariableType(value);
+            VariableType type = variableServiceConfiguration.getVariableTypes().findVariableType(value);
             if (type instanceof ByteArrayType) {
                 throw new FlowableIllegalArgumentException("Variables of type ByteArray cannot be used to query");
             } else if (type instanceof JPAEntityVariableType && operator != QueryOperator.EQUALS) {
@@ -56,7 +56,7 @@ public class QueryVariableValue implements Serializable {
                 throw new FlowableIllegalArgumentException("Variables containing a list of JPA entities cannot be used to query");
             } else {
                 // Type implementation determines which fields are set on the entity
-                variableInstanceEntity = CommandContextUtil.getVariableInstanceEntityManager().create(name, type, value);
+                variableInstanceEntity = variableServiceConfiguration.getVariableInstanceEntityManager().create(name, type, value);
             }
         }
     }
@@ -105,6 +105,19 @@ public class QueryVariableValue implements Serializable {
             return variableInstanceEntity.getType().getTypeName();
         }
         return null;
+    }
+
+    public boolean needsTypeCheck() {
+        // When operator is not-equals or type of value is null, type doesn't matter!
+        if (operator == QueryOperator.NOT_EQUALS || operator == QueryOperator.NOT_EQUALS_IGNORE_CASE) {
+            return false;
+        }
+
+        if (variableInstanceEntity != null) {
+            return !NullType.TYPE_NAME.equals(variableInstanceEntity.getType().getTypeName());
+        }
+
+        return false;
     }
 
     public boolean isLocal() {

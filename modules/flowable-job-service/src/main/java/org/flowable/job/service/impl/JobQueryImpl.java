@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -34,17 +34,23 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String processInstanceId;
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String category;
+    protected String categoryLike;
     protected String elementId;
     protected String elementName;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
     protected Date duedateHigherThan;
@@ -64,12 +70,14 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     public JobQueryImpl() {
     }
 
-    public JobQueryImpl(CommandContext commandContext) {
+    public JobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public JobQueryImpl(CommandExecutor commandExecutor) {
+    public JobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -96,6 +104,24 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl category(String category) {
+        if (category == null) {
+            throw new FlowableIllegalArgumentException("Provided category is null");
+        }
+        this.category = category;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl categoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("Provided categoryLike is null");
+        }
+        this.categoryLike = categoryLike;
         return this;
     }
     
@@ -180,6 +206,15 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         }
         subScopeId(planItemInstanceId);
         scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
+    @Override
+    public JobQueryImpl correlationId(String correlationId) {
+        if (correlationId == null) {
+            throw new FlowableIllegalArgumentException("Provided correlationId is null");
+        }
+        this.correlationId = correlationId;
         return this;
     }
 
@@ -302,6 +337,11 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     }
 
     @Override
+    public JobQuery orderByJobCreateTime() {
+        return orderBy(JobQueryProperty.CREATE_TIME);
+    }
+
+    @Override
     public JobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
@@ -330,12 +370,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getJobEntityManager(commandContext).findJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -353,7 +393,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {
@@ -376,10 +416,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return withoutTenantId;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
     public String getId() {
         return id;
     }
@@ -388,6 +424,22 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return processDefinitionId;
     }
     
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public String getElementName() {
+        return elementName;
+    }
+
     public String getScopeId() {
         return scopeId;
     }
@@ -402,6 +454,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
     }
 
     public boolean isOnlyTimers() {

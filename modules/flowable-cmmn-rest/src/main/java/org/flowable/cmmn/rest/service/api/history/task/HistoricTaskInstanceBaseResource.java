@@ -87,6 +87,21 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }
+        if (queryRequest.getCaseDefinitionKey() != null) {
+            query.caseDefinitionKey(queryRequest.getCaseDefinitionKey());
+        }
+        if (queryRequest.getCaseDefinitionKeys() != null) {
+            query.caseDefinitionKeyIn(queryRequest.getCaseDefinitionKeys());
+        }
+        if (queryRequest.getCaseDefinitionKeyLike() != null) {
+            query.caseDefinitionKeyLike(queryRequest.getCaseDefinitionKeyLike());
+        }
+        if (queryRequest.getCaseDefinitionKeyLikeIgnoreCase() != null) {
+            query.caseDefinitionKeyLikeIgnoreCase(queryRequest.getCaseDefinitionKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getPropagatedStageInstanceId() != null) {
+            query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
+        }
         if (queryRequest.getTaskName() != null) {
             query.taskName(queryRequest.getTaskName());
         }
@@ -221,6 +236,10 @@ public class HistoricTaskInstanceBaseResource {
 
         if (queryRequest.getTaskCandidateGroup() != null) {
             query.taskCandidateGroup(queryRequest.getTaskCandidateGroup());
+        }
+
+        if (queryRequest.isIgnoreTaskAssignee()) {
+            query.ignoreAssigneeValue();
         }
         
         if (restApiInterceptor != null) {

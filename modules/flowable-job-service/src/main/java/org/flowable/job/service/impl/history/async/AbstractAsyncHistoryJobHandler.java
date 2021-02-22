@@ -12,17 +12,24 @@
  */
 package org.flowable.job.service.impl.history.async;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.HistoryJobHandler;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
@@ -41,40 +48,88 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
     }
 
     @Override
-    public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
-        ObjectMapper objectMapper = CommandContextUtil.getJobServiceConfiguration(commandContext).getObjectMapper();
+    public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext,
+            JobServiceConfiguration jobServiceConfiguration) {
+        ObjectMapper objectMapper = commandContext.getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
+
+            JsonNode historyNode;
             try {
-
                 byte[] bytes = getJobBytes(job);
-                JsonNode historyNode = objectMapper.readTree(bytes);
-                if (isAsyncHistoryJsonGroupingEnabled() && historyNode.isArray()) {
-                    ArrayNode arrayNode = (ArrayNode) historyNode;
-                    for (JsonNode jsonNode : arrayNode) {
-                        processHistoryJson(commandContext, job, jsonNode);
-                    }
-                } else {
-                    processHistoryJson(commandContext, job, historyNode);
-                }
-                
-            } catch (AsyncHistoryJobNotApplicableException e) {
-                throw e;
-
+                historyNode = objectMapper.readTree(bytes);
             } catch (Exception e) {
-                
-                if (!(e instanceof FlowableException) || (e instanceof FlowableException && ((FlowableException) e).isLogged())) {
-                    logger.warn("Could not execute history job", e);
-                }
-                
                 // The transaction will be rolled back and the job retries decremented,
                 // which is different from unacquiring the job where the retries are not changed.
                 throw new FlowableException("Could not deserialize async history json for job (id=" + job.getId() + ")", e);
+            }
+
+            if (isAsyncHistoryJsonGroupingEnabled() && historyNode.isArray()) {
+                List<ObjectNode> failedNodes = null;
+                Exception exception = null;
+                ArrayNode arrayNode = (ArrayNode) historyNode;
+                for (JsonNode jsonNode : arrayNode) {
+                    try {
+                        processHistoryJson(commandContext, job, jsonNode);
+
+                    } catch (Exception ex) {
+                        if (failedNodes == null) {
+                            failedNodes = new ArrayList<>();
+                        }
+                        failedNodes.add((ObjectNode) jsonNode);
+
+                        exception = new FlowableException("Failed to process async history json. See suppressed exceptions.");
+                        exception.addSuppressed(ex);
+                    }
+                }
+
+                if (failedNodes != null && !failedNodes.isEmpty()) {
+                    AsyncHistorySession historySession = commandContext.getSession(AsyncHistorySession.class);
+                    List<HistoryJobEntity> newHistoryJobs = historySession.getAsyncHistoryListener()
+                            .historyDataGenerated(jobServiceConfiguration, failedNodes);
+
+                    StringWriter stringWriter = new StringWriter();
+                    exception.printStackTrace(new PrintWriter(stringWriter));
+                    String exceptionStacktrace = stringWriter.toString();
+
+                    for (HistoryJobEntity historyJob : newHistoryJobs) {
+                        historyJob.setExceptionMessage(exception.getMessage());
+                        historyJob.setExceptionStacktrace(exceptionStacktrace);
+                        if (job.getRetries() == 0) {
+                            // If the job has no more retries then we should create a dead letter job out of it
+                            DeadLetterJobEntity deadLetterJob = jobServiceConfiguration.getJobManager().createDeadLetterJobFromHistoryJob(historyJob);
+                            jobServiceConfiguration.getDeadLetterJobDataManager().insert(deadLetterJob);
+                            jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJob); // no cascade -> the bytearray ref is reused for either the new history job or the deadletter job
+                        } else {
+                            // The historyJob is a new job with new data
+                            // However, we still should decrement the retries
+                            historyJob.setRetries(job.getRetries() - 1);
+                        }
+                    }
+                }
+            } else {
+                try {
+                    processHistoryJson(commandContext, job, historyNode);
+
+                } catch (AsyncHistoryJobNotApplicableException e) {
+                    throw e;
+
+                } catch (Exception e) {
+
+                    if (!(e instanceof FlowableException) || (e instanceof FlowableException && ((FlowableException) e).isLogged())) {
+                        logger.warn("Could not execute history job", e);
+                    }
+
+                    // The transaction will be rolled back and the job retries decremented,
+                    // which is different from unacquiring the job where the retries are not changed.
+                    throw new FlowableException("Failed to process async history json for job (id=" + job.getId() + ")", e);
+                }
+
             }
         }
     }
 
     protected byte[] getJobBytes(HistoryJobEntity job) {
-        return job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
+        return job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes(job.getScopeType());
     }
 
     protected abstract void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode);

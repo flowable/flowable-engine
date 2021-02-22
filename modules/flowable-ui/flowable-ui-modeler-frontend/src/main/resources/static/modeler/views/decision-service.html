@@ -1,0 +1,71 @@
+<div class="subheader" ng-if="model.decisionService">
+    <div class="fixed-container">
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-default" ng-click="openEditor()"
+                    ng-if="model.decisionService.latestVersion">
+                <i class="glyphicon glyphicon-edit icon-and-label"></i> {{'DECISION-SERVICE.ACTION.OPEN-IN-EDITOR' |
+                translate}}
+            </button>
+            <button type="button" class="btn btn-default" ng-click="useAsNewVersion()"
+                    ng-if="!model.decisionService.latestVersion">
+                {{'DECISION-SERVICE.ACTION.USE-AS-NEW-VERSION' | translate}}
+            </button>
+        </div>
+
+        <div class="btn-group pull-right">
+            <a href="{{model.decisionDownloadUrl}}" class="btn btn-default"
+               title="{{'DECISION-SERVICE.ACTION.EXPORT' | translate}}">
+                <i class="glyphicon glyphicon-save"></i>
+            </a>
+        </div>
+
+        <div class="btn-group pull-right">
+            <button type="button" class="btn btn-default" ng-click="editDecisionService()"
+                    ng-disabled="!model.decisionService.latestVersion"
+                    title="{{'DECISION-SERVICE.ACTION.EDIT' | translate}}">
+                <i class="glyphicon glyphicon-pencil"></i>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="duplicateDecisionService()"
+                    ng-disabled="!model.decisionService.latestVersion"
+                    title="{{'DECISION-SERVICE.ACTION.DUPLICATE' | translate}}">
+                <i class="editor-icon editor-icon-copy"></i>
+            </button>
+            <button type="button" class="btn btn-default" ng-click="deleteDecisionService()"
+                    title="{{'DECISION-SERVICE.ACTION.DELETE' | translate}}"
+                    ng-disabled="!model.decisionService.latestVersion">
+                <i class="glyphicon glyphicon-trash"></i>
+            </button>
+        </div>
+        <div class="pull-right">
+            <a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+        </div>
+
+        <h2><span class="version">v{{model.decisionService.version}}</span>{{model.decisionService.name}}</h2>
+        <div class="clearfix">
+            <div class="col-xs-4 details">
+                <span><i class="glyphicon glyphicon-user"></i><span translate="DECISION-TABLE.DETAILS.CREATED-BY"
+                                                                    translate-values="model.decisionService"></span></span>
+                <span><i class="glyphicon glyphicon-pencil"></i><span translate="DECISION-TABLE.DETAILS.LAST-UPDATED-BY"
+                                                                      translate-values="model.decisionService"></span></span>
+            </div>
+            <div class="col-xs-8 details clearfix">
+                <div class="related btn-group">
+                    <button id="toggle-history" ng-if="!(currentKickstartModel)" type="button" class="btn btn-subtle"
+                            ng-click="toggleHistory($event)"
+                            title="{{'DECISION-SERVICE.ACTION.EDIT' | translate}}">
+                        {{'DECISION-SERVICE.DETAILS.HISTORY-TITLE' | translate}} <span class="counter"
+                                                                                     ng-show="model.versions.data.length">{{model.versions.data.length}}</span>
+                    </button>
+                </div>
+                <p ng-if="model.decisionService.description">
+                    {{model.decisionService.description}}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content center-pane" ng-if="model.decisionService" auto-height offset="40" >
+    <div class="model-preview-wrapper" ng-if="model.decisionService.modelType && model.decisionService.modelType != 1">
+        <div id="dmnModel"></div>
+    </div>
+</div>

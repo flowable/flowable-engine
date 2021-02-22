@@ -14,15 +14,20 @@
 package org.flowable.engine;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -41,15 +46,14 @@ import org.flowable.task.service.TaskPostProcessor;
  * ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResourceDefault().buildProcessEngine();
  * </pre>
  * 
- * </p>
- * 
  * <p>
  * To create a process engine programmatic, without a configuration file, the first option is {@link #createStandaloneProcessEngineConfiguration()}
  * 
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration().buildProcessEngine();
  * </pre>
- * 
+ *
+ * <p>
  * This creates a new process engine with all the defaults to connect to a remote h2 database (jdbc:h2:tcp://localhost/flowable) in standalone mode. Standalone mode means that the process engine will
  * manage the transactions on the JDBC connections that it creates. One transaction per service method. For a description of how to write the configuration files, see the userguide.
  * </p>
@@ -60,9 +64,10 @@ import org.flowable.task.service.TaskPostProcessor;
  * <pre>
  * ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().buildProcessEngine();
  * </pre>
- * 
+ *
+ * <p>
  * This creates a new process engine with all the defaults to connect to an memory h2 database (jdbc:h2:tcp://localhost/flowable) in standalone mode. The DB schema strategy default is in this case
- * <code>create-drop</code>. Standalone mode means that Flowable will manage the transactions on the JDBC connections that it creates. One transaction per service method.
+ * {@code create-drop}. Standalone mode means that Flowable will manage the transactions on the JDBC connections that it creates. One transaction per service method.
  * </p>
  * 
  * <p>
@@ -72,8 +77,6 @@ import org.flowable.task.service.TaskPostProcessor;
  * ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResourceDefault().setMailServerHost(&quot;gmail.com&quot;).setJdbcUsername(&quot;mickey&quot;).setJdbcPassword(&quot;mouse&quot;)
  *         .buildProcessEngine();
  * </pre>
- * 
- * </p>
  * 
  * @see ProcessEngines
  * @author Tom Baeyens
@@ -90,6 +93,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String mailServerUsername; // by default no name and password are provided, which
     protected String mailServerPassword; // means no authentication for mail server
     protected int mailServerPort = 25;
+    protected int mailServerSSLPort = 465;
     protected boolean useSSL;
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
@@ -110,7 +114,13 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean jpaCloseEntityManager;
 
     protected AsyncExecutor asyncExecutor;
+    protected AsyncTaskExecutor asyncTaskExecutor;
+    protected boolean shutdownAsyncTaskExecutor;
+    protected AsyncTaskInvoker asyncTaskInvoker;
+
     protected AsyncExecutor asyncHistoryExecutor;
+    protected AsyncTaskExecutor asyncHistoryTaskExecutor;
+    protected boolean shutdownAsyncHistoryTaskExecutor;
     /**
      * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
      * retried again.
@@ -127,6 +137,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessDiagramGenerator processDiagramGenerator;
 
     protected boolean isCreateDiagramOnDeploy = true;
+
+    protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
     
     /**
      *  include the sequence flow name in case there's no Label DI, 
@@ -139,9 +151,14 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected String labelFontName = "Arial";
     protected String annotationFontName = "Arial";
 
-    protected ProcessEngineLifecycleListener processEngineLifecycleListener;
-
     protected boolean enableProcessDefinitionInfoCache;
+
+    // History Cleanup
+    protected boolean enableHistoryCleaning = false;
+    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
+    protected int cleanInstancesEndedAfterNumberOfDays = 365;
+    protected HistoryCleaningManager historyCleaningManager;
+
 
     /** postprocessor for a task builder */
     protected TaskPostProcessor taskPostProcessor = null;
@@ -275,6 +292,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public int getMailServerSSLPort() {
+        return mailServerSSLPort;
+    }
+
+    public ProcessEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
+        this.mailServerSSLPort = mailServerSSLPort;
         return this;
     }
 
@@ -570,13 +596,49 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #setEngineLifecycleListeners(List)}.
+     */
+    @Deprecated
     public ProcessEngineConfiguration setProcessEngineLifecycleListener(ProcessEngineLifecycleListener processEngineLifecycleListener) {
-        this.processEngineLifecycleListener = processEngineLifecycleListener;
+        // Backwards compatibility (when there was only one typed engine listener)
+        if (engineLifecycleListeners == null || engineLifecycleListeners.isEmpty()) {
+            List<EngineLifecycleListener> engineLifecycleListeners = new ArrayList<>(1);
+            engineLifecycleListeners.add(processEngineLifecycleListener);
+            super.setEngineLifecycleListeners(engineLifecycleListeners);
+
+        } else {
+            ProcessEngineLifecycleListener originalEngineLifecycleListener = (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
+
+            ProcessEngineLifecycleListener wrappingEngineLifecycleListener = new ProcessEngineLifecycleListener() {
+
+                @Override
+                public void onProcessEngineBuilt(ProcessEngine processEngine) {
+                    originalEngineLifecycleListener.onProcessEngineBuilt(processEngine);
+                }
+                @Override
+                public void onProcessEngineClosed(ProcessEngine processEngine) {
+                    originalEngineLifecycleListener.onProcessEngineClosed(processEngine);
+                }
+            };
+
+            engineLifecycleListeners.set(0, wrappingEngineLifecycleListener);
+
+        }
+
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #getEngineLifecycleListeners()}.
+     */
+    @Deprecated
     public ProcessEngineLifecycleListener getProcessEngineLifecycleListener() {
-        return processEngineLifecycleListener;
+        // Backwards compatibility (when there was only one typed engine listener)
+        if (engineLifecycleListeners != null && !engineLifecycleListeners.isEmpty()) {
+            return (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
+        }
+        return null;
     }
 
     public String getLabelFontName() {
@@ -657,12 +719,39 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
     
+    public AsyncTaskExecutor getAsyncTaskExecutor() {
+        return asyncTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
+        this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
+    public AsyncTaskInvoker getAsyncTaskInvoker() {
+        return asyncTaskInvoker;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskInvoker(AsyncTaskInvoker asyncTaskInvoker) {
+        this.asyncTaskInvoker = asyncTaskInvoker;
+        return this;
+    }
+
     public AsyncExecutor getAsyncHistoryExecutor() {
         return asyncHistoryExecutor;
     }
 
     public ProcessEngineConfiguration setAsyncHistoryExecutor(AsyncExecutor asyncHistoryExecutor) {
         this.asyncHistoryExecutor = asyncHistoryExecutor;
+        return this;
+    }
+
+    public AsyncTaskExecutor getAsyncHistoryTaskExecutor() {
+        return asyncHistoryTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
+        this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
         return this;
     }
 
@@ -708,5 +797,51 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public void setTaskPostProcessor(TaskPostProcessor processor) {
         this.taskPostProcessor = processor;
+    }
+
+
+    public boolean isEnableHistoryCleaning() {
+        return enableHistoryCleaning;
+    }
+
+    public ProcessEngineConfiguration setEnableHistoryCleaning(boolean enableHistoryCleaning) {
+        this.enableHistoryCleaning = enableHistoryCleaning;
+        return this;
+    }
+
+    public String getHistoryCleaningTimeCycleConfig() {
+        return historyCleaningTimeCycleConfig;
+    }
+
+    public ProcessEngineConfiguration setHistoryCleaningTimeCycleConfig(String historyCleaningTimeCycleConfig) {
+        this.historyCleaningTimeCycleConfig = historyCleaningTimeCycleConfig;
+        return this;
+    }
+
+    public int getCleanInstancesEndedAfterNumberOfDays() {
+        return cleanInstancesEndedAfterNumberOfDays;
+    }
+
+    public ProcessEngineConfiguration setCleanInstancesEndedAfterNumberOfDays(int cleanInstancesEndedAfterNumberOfDays) {
+        this.cleanInstancesEndedAfterNumberOfDays = cleanInstancesEndedAfterNumberOfDays;
+        return this;
+    }
+
+    public HistoryCleaningManager getHistoryCleaningManager() {
+        return historyCleaningManager;
+    }
+
+    public ProcessEngineConfiguration setHistoryCleaningManager(HistoryCleaningManager historyCleaningManager) {
+        this.historyCleaningManager = historyCleaningManager;
+        return this;
+    }
+
+    public boolean isAlwaysUseArraysForDmnMultiHitPolicies() {
+        return alwaysUseArraysForDmnMultiHitPolicies;
+    }
+
+    public ProcessEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
+        this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
+        return this;
     }
 }

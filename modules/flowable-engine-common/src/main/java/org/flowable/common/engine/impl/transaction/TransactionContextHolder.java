@@ -17,7 +17,7 @@ import java.util.Stack;
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 
 /**
- * Holder for a threadlocal stack of {@link BaseTransactionContext} objects. Different engines (process/idm/dmn/form/...) use this 'shared' object to see if another engine has already started a
+ * Holder for a threadlocal stack of TransactionContext objects. Different engines (process/idm/dmn/form/...) use this 'shared' object to see if another engine has already started a
  * transaction or not.
  * 
  * @author Joram Barrez

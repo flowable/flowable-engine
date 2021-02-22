@@ -13,6 +13,7 @@
 package org.flowable.cdi;
 
 import org.flowable.cdi.impl.CdiCommandInvoker;
+import org.flowable.cdi.impl.el.CdiResolver;
 import org.flowable.engine.impl.bpmn.parser.factory.AbstractBehaviorFactory;
 import org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration;
 
@@ -21,15 +22,14 @@ import org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration;
  */
 public class CdiJtaProcessEngineConfiguration extends JtaProcessEngineConfiguration {
 
-    @Override
-    public void initExpressionManager() {
-        expressionManager = new CdiExpressionManager();
+    public CdiJtaProcessEngineConfiguration() {
+        addPreDefaultELResolver(new CdiResolver());
     }
 
     @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
-            commandInvoker = new CdiCommandInvoker();
+            commandInvoker = new CdiCommandInvoker(agendaOperationRunner);
         }
     }
 

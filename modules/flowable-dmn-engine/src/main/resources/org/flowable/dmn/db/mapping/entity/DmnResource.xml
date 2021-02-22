@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
+  
+  <!-- RESOURCE INSERT -->
+
+  <insert id="insertDmnResource" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
+    insert into ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
+  </insert>
+
+  <insert id="bulkInsertDmnResource" parameterType="java.util.List">
+    INSERT INTO ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+      <foreach collection="list" item="byteArr" index="index" separator=","> 
+        (#{byteArr.id, jdbcType=VARCHAR},
+         #{byteArr.name, jdbcType=VARCHAR},
+         #{byteArr.bytes, jdbcType=${blobType}},
+         #{byteArr.deploymentId, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertDmnResource" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+      <foreach collection="list" item="resource" index="index"> 
+        INTO ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- RESOURCE UPDATE -->
+  
+  <update id="updateDmnResource" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
+    update ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE
+    <set>
+      RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}},
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- RESOURCE DELETE -->
+
+  <delete id="deleteDmnResourcesByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
+  </delete>
+  
+  <!-- RESOURCE RESULTMAP -->
+
+  <resultMap id="dmnResourceResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
+  </resultMap>
+  
+  <!-- RESOURCE SELECT -->
+
+  <select id="selectDmnResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
+    select NAME_ from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>
+  
+  <select id="selectDmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="dmnResourceResultMap">
+    select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+          AND NAME_ = #{resourceName}
+  </select>
+
+  <select id="selectDmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="dmnResourceResultMap">
+    select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+  </select>  
+  
+</mapper>

@@ -18,18 +18,19 @@ import java.util.List;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDecisionTableQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionQuery;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.NativeDecisionTableQuery;
+import org.flowable.dmn.api.NativeDecisionQuery;
 import org.flowable.dmn.api.NativeDmnDeploymentQuery;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.dmn.engine.impl.cmd.DeployCmd;
-import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionTableCmd;
+import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionCmd;
+import org.flowable.dmn.engine.impl.cmd.GetDeploymentDecisionRequirementsDiagramCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentDmnResourceCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.dmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
@@ -66,12 +67,12 @@ public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineC
     }
 
     @Override
-    public DmnDecisionTableQuery createDecisionTableQuery() {
-        return new DecisionTableQueryImpl(commandExecutor);
+    public DmnDecisionQuery createDecisionQuery() {
+        return new DecisionQueryImpl(commandExecutor);
     }
 
     @Override
-    public NativeDecisionTableQuery createNativeDecisionTableQuery() {
+    public NativeDecisionQuery createNativeDecisionQuery() {
         return new NativeDecisionTableQueryImpl(commandExecutor);
     }
 
@@ -111,22 +112,28 @@ public class DmnRepositoryServiceImpl extends CommonEngineServiceImpl<DmnEngineC
     }
 
     @Override
-    public DmnDecisionTable getDecisionTable(String decisionTableId) {
-        return commandExecutor.execute(new GetDeploymentDecisionTableCmd(decisionTableId));
+    public DmnDecision getDecision(String decisionId) {
+        return commandExecutor.execute(new GetDeploymentDecisionCmd(decisionId));
     }
 
     @Override
-    public DmnDefinition getDmnDefinition(String decisionTableId) {
-        return commandExecutor.execute(new GetDmnDefinitionCmd(decisionTableId));
+    public DmnDefinition getDmnDefinition(String decisionId) {
+        return commandExecutor.execute(new GetDmnDefinitionCmd(decisionId));
     }
 
     @Override
-    public InputStream getDmnResource(String decisionTableId) {
-        return commandExecutor.execute(new GetDeploymentDmnResourceCmd(decisionTableId));
+    public InputStream getDmnResource(String decisionId) {
+        return commandExecutor.execute(new GetDeploymentDmnResourceCmd(decisionId));
     }
 
     @Override
-    public void setDecisionTableCategory(String decisionTableId, String category) {
-        commandExecutor.execute(new SetDecisionTableCategoryCmd(decisionTableId, category));
+    public void setDecisionCategory(String decisionId, String category) {
+        commandExecutor.execute(new SetDecisionTableCategoryCmd(decisionId, category));
     }
+
+    @Override
+    public InputStream getDecisionRequirementsDiagram(String decisionId) {
+        return commandExecutor.execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionId));
+    }
+
 }

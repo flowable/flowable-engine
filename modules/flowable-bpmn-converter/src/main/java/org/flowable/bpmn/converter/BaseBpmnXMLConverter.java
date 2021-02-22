@@ -454,7 +454,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
     protected void writeSignalDefinition(Event parentEvent, SignalEventDefinition signalDefinition, BpmnModel model,
         XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_SIGNALDEFINITION);
-        writeDefaultAttribute(ATTRIBUTE_SIGNAL_REF, signalDefinition.getSignalRef(), xtw);
+
+        if (StringUtils.isNotEmpty(signalDefinition.getSignalRef())) {
+            writeDefaultAttribute(ATTRIBUTE_SIGNAL_REF, signalDefinition.getSignalRef(), xtw);
+        }
+        if (StringUtils.isNotEmpty(signalDefinition.getSignalExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SIGNAL_EXPRESSION, signalDefinition.getSignalExpression());
+        }
+
         if (parentEvent instanceof ThrowEvent && signalDefinition.isAsync()) {
             BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_ACTIVITY_ASYNCHRONOUS, "true", xtw);
         }
@@ -505,7 +512,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 }
             }
         }
-        writeDefaultAttribute(ATTRIBUTE_MESSAGE_REF, messageRef, xtw);
+
+        if (StringUtils.isNotEmpty(messageRef)) {
+            writeDefaultAttribute(ATTRIBUTE_MESSAGE_REF, messageRef, xtw);
+        }
+        if (StringUtils.isNotEmpty(messageDefinition.getMessageExpression())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MESSAGE_EXPRESSION, messageDefinition.getMessageExpression());
+        }
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(messageDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();

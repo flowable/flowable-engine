@@ -29,7 +29,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan
 @EnableAutoConfiguration
 public class Application {
@@ -97,7 +97,7 @@ public class Application {
         };
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 

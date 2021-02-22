@@ -15,18 +15,15 @@ package org.flowable.test.spring.boot.app;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.app.api.AppRepositoryService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.AppSampleApplication;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = AppSampleApplication.class)
 public class AppSampleApplicationTest {
 
@@ -38,6 +35,6 @@ public class AppSampleApplicationTest {
         assertThat(repositoryService).as("App repository service").isNotNull();
         assertThat(repositoryService.createAppDefinitionQuery().count())
             .as("All app definitions")
-            .isEqualTo(0);
+            .isZero();
     }
 }

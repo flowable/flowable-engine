@@ -13,9 +13,6 @@
 package org.flowable.job.service.impl.asyncexecutor;
 
 import org.flowable.common.engine.impl.cfg.TransactionListener;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.JobInfo;
@@ -24,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class JobAddedTransactionListener implements TransactionListener {
 
@@ -41,16 +39,11 @@ public class JobAddedTransactionListener implements TransactionListener {
 
     @Override
     public void execute(CommandContext commandContext) {
-        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
-        commandExecutor.execute(commandConfig, new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("notifying job executor of new job");
-                }
-                asyncExecutor.executeAsyncJob(job);
-                return null;
-            }
-        });
+        // No need to wrap this call in a new command context, as otherwise the
+        // call to the executeAsyncJob would require a new database connection and transaction
+        // which would block the current connection/transaction (of the calling thread)
+        // until the job has been handed of to the async executor.
+        // When the connection pool is small, this might lead to contention and (temporary) locks.
+        asyncExecutor.executeAsyncJob(job);
     }
 }

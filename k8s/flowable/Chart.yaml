@@ -1,0 +1,7 @@
+apiVersion: v1
+appVersion: "6.6.0"
+description: A Flowable Helm chart for Kubernetes
+name: flowable
+version: 6.6.0
+home: https://flowable.org
+icon: https://flowable.org/docs/img/logo.png

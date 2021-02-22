@@ -51,7 +51,7 @@ public class SetFormDefinitionCategoryCmd implements Command<Void> {
         // Update category
         formDefinition.setCategory(category);
 
-        // Remove form from cache, it will be refetched later
+        // Remove form from cache, it will be refetch later
         DeploymentCache<FormDefinitionCacheEntry> formDefinitionCache = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionCache();
         if (formDefinitionCache != null) {
             formDefinitionCache.remove(formDefinitionId);

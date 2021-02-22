@@ -1,0 +1,134 @@
+
+<div class="modal" ng-controller="ShowProcessDiagramCtrl">
+    <div class="modal-dialog wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="close" ng-click="$hide()">&times;</button>
+                </div>
+                <h3 class="modal-title">{{'PROCESS.TITLE.DIAGRAM' | translate}}
+                    <span id="navigationTree">| <a href="javascript:_navigateTo('FLOWABLE_ROOT_PROCESS')">Root</a></span>
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="error-message" ng-if="model.errorMessage">
+                    <span>{{model.errorMessage}}</span>
+                </div>
+                <div class="alert-wrapper" ng-cloak>
+                    <div class="alert {{alerts.current.type}}" ng-if="alerts.current" ng-click="dismissAlert()">
+                        <span>{{alerts.current.message}}</span>
+                        <span class="badge" ng-show="alerts.queue.length">{{alerts.queue.length + 1}}</span>
+                    </div>
+                </div>
+
+                <div class="popup-wrapper clearfix">
+                    <div class="model-preview-wrapper">
+                        <div id="bpmnModel"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+
+                    <div class="component" ng-if="model.isDebuggerEnabled">
+                        <div class="tabs-wrapper">
+                            <div class="tabs clearfix">
+                                <div class="tab" ng-repeat="tab in tabData.tabs"
+                                     ng-class="{'active': tabData.activeTab == tab.id}">
+                                    <a ng-click="tabData.activeTab = tab.id">
+                                        {{tab.name | translate:node}}&nbsp;
+                                        <span class="badge" ng-if="tab.info != undefined">{{tab.info}}</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="title"></div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridVariables && tabData.activeTab == tabData.tabs[0].id">
+                                <div class="pull-left">
+                                    <label for="executionId">{{'PROCESS.TITLE.EXECUTION' | translate}}</label>
+                                    <span id="executionId"
+                                          ng-bind="model.selectedExecution">{{model.selectedExecution}}</span>
+                                </div>
+                                <div class="ui-grid-contents-wrapper" ng-show="model.displayVariables">
+                                    <label for="variablesUi">{{'PROCESS.TITLE.VARIABLES' | translate}}</label>
+                                    <div id="variablesUi" ui-grid="gridVariables" style="height: 200px; width: 100%"
+                                         ui-grid-auto-resize></div>
+                                </div>
+                            </div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridExecutions && tabData.activeTab == tabData.tabs[1].id">
+                                <div class="ui-grid-contents-wrapper" ng-show="model.executions">
+                                    <div id="executionsUi" ui-grid="gridExecutions" style="height: 200px; width: 100%"
+                                         ui-grid-selection
+                                         ui-grid-auto-resize></div>
+                                </div>
+                            </div>
+
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="gridLog && tabData.activeTab == tabData.tabs[2].id">
+                                <div class="ui-grid-contents-wrapper">
+                                    <div id="logUi" ui-grid="gridLog" style="height: 200px; width: 100%"
+                                         ui-grid-selection
+                                         ui-grid-auto-resize></div>
+                                </div>
+
+                            </div>
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                                <div class="col-xs-12">
+                                    <label for="expressionText" class="col-xs-1">{{'PROCESS.TITLE.EXPRESSION' | translate}}</label>
+                                    <div id="expressionText" class="col-xs-7">
+                                        <textarea class="form-control" ng-model="model.expression" editor-input-check
+                                                  style="width:100%; height:100%; max-width: 100%; max-height: 100%; min-height: 50px"
+                                        />
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <label for="expressionResult">{{'PROCESS.TITLE.RESULT' | translate}}</label>
+                                    </div>
+                                    <div class="col-xs-1">
+                                        <div id="expressionResult" ng-if="model.result">
+                                            <span>{{model.result}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-wrapper grid-wrapper-compact"
+                                 ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[4].id">
+                                <div class="col-xs-12">
+                                    <label for="scriptText" class="col-xs-1">{{'PROCESS.TITLE.SCRIPT' | translate}}</label>
+                                    <div id="scriptText" class="col-xs-7">
+                                        <textarea class="form-control" ng-model="model.scriptText" editor-input-check
+                                                  style="width:100%; height:100%; max-width: 100%; max-height: 100%; min-height: 150px"
+                                        />
+                                    </div>
+                                    <div id="scriptLanguage" class="col-xs-1" align="left">
+                                        <input type="radio" ng-model="model.scriptLanguage" name="scriptLanguage" value="groovy"> groovy
+                                        <input type="radio" ng-model="model.scriptLanguage" name="scriptLanguage" value="javascript"> js
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pull-left" ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[3].id">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="evaluateExpression()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                </div>
+                <div class="pull-left" ng-if="!model.processInstance.ended && tabData.activeTab == tabData.tabs[4].id">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="evaluateScript()">
+                        {{'PROCESS.ACTION.EXECUTE' | translate}}
+                    </button>
+                </div>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
+                        {{'GENERAL.ACTION.CLOSE' | translate}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

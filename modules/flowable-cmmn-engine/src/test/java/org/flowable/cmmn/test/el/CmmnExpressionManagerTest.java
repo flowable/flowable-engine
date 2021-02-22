@@ -45,14 +45,15 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("mapVariable", cmmnEngineConfiguration.getObjectMapper().createObjectNode().put("minIntVar", Integer.MIN_VALUE));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneTaskCase")
-            .variables(vars)
-            .start();
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
 
         Expression expression = this.cmmnEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minIntVar}");
         Object value = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext ->
-            expression.getValue(
-                (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().singleResult()));
+                expression.getValue(
+                        (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables()
+                                .singleResult()));
 
         assertThat(value).isEqualTo(Integer.MIN_VALUE);
     }
@@ -63,14 +64,15 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("mapVariable", cmmnEngineConfiguration.getObjectMapper().createObjectNode().put("minShortVar", Short.MIN_VALUE));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneTaskCase")
-            .variables(vars)
-            .start();
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
 
         Expression expression = this.cmmnEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minShortVar}");
         Object value = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext ->
-            expression.getValue(
-                (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().singleResult()));
+                expression.getValue(
+                        (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables()
+                                .singleResult()));
 
         assertThat(value).isEqualTo((int) Short.MIN_VALUE);
     }
@@ -81,14 +83,15 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("mapVariable", cmmnEngineConfiguration.getObjectMapper().createObjectNode().put("minFloatVar", Float.valueOf((float) -1.5)));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("oneTaskCase")
-            .variables(vars)
-            .start();
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
 
         Expression expression = this.cmmnEngineConfiguration.getExpressionManager().createExpression("#{mapVariable.minFloatVar}");
         Object value = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext ->
-            expression.getValue((CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables()
-                .singleResult()));
+                expression
+                        .getValue((CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables()
+                                .singleResult()));
 
         assertThat(value).isEqualTo(-1.5d);
     }
@@ -96,18 +99,15 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testMethodExpressions() {
-        // Case contains 2 service tasks. one containing a method with no
-        // params, the other
-        // contains a method with 2 params. When the case completes without
-        // exception,
-        // test passed.
+        // Case contains 2 service tasks. one containing a method with no params, the other
+        // contains a method with 2 params. When the case completes without exception, test passed.
         Map<String, Object> vars = new HashMap<>();
         vars.put("aString", "abcdefgh");
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("methodExpressionCase")
-            .variables(vars)
-            .start();
+                .variables(vars)
+                .start();
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("methodExpressionCase").count());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("methodExpressionCase").count()).isZero();
     }
 
     @Test
@@ -117,9 +117,9 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
 
         vars.put("myVar", new PlanItemInstanceTestVariable());
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-            .caseDefinitionKey("testPlanItemInstanceAvailableCase")
-            .variables(vars)
-            .start();
+                .caseDefinitionKey("testPlanItemInstanceAvailableCase")
+                .variables(vars)
+                .start();
 
         // Check of the testMethod has been called with the current planItemInstance
         String value = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "testVar");
@@ -133,8 +133,8 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
             // Setup authentication
             Authentication.setAuthenticatedUserId("filip");
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("testAuthenticatedUserIdAvailableCase")
-                .start();
+                    .caseDefinitionKey("testAuthenticatedUserIdAvailableCase")
+                    .start();
 
             // Check if the variable that has been set in service-task is the
             // authenticated user

@@ -20,7 +20,7 @@ import org.flowable.task.api.Task;
 
 /**
  * Represents a means for associating an execution with a context.
- * <p />
+ * <p>
  * This enables the cdi logic to provide contextual business process management services, without relying on a specific context like i.e. the conversation context.
  * 
  * @author Daniel Meyer
@@ -33,17 +33,17 @@ public interface ContextAssociationManager {
      * @throws FlowableException
      *             if no process instance is currently associated
      */
-    public void disAssociate();
+    void disAssociate();
 
     /**
      * @return the id of the execution currently associated or null
      */
-    public String getExecutionId();
+    String getExecutionId();
 
     /**
      * get the current execution
      */
-    public Execution getExecution();
+    Execution getExecution();
 
     /**
      * associate with the provided execution
@@ -53,26 +53,26 @@ public interface ContextAssociationManager {
     /**
      * set a current task
      */
-    public void setTask(Task task);
+    void setTask(Task task);
 
     /**
      * get the current task
      */
-    public Task getTask();
+    Task getTask();
 
     /**
      * set a process variable
      */
-    public void setVariable(String variableName, Object value);
+    void setVariable(String variableName, Object value);
 
     /**
      * get a process variable
      */
-    public Object getVariable(String variableName);
+    Object getVariable(String variableName);
 
     /**
      * @return a map of process variables cached between flushes
      */
-    public Map<String, Object> getCachedVariables();
+    Map<String, Object> getCachedVariables();
 
 }

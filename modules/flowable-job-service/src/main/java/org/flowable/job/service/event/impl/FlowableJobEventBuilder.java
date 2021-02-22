@@ -16,9 +16,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.event.FlowableEntityExceptionEventImpl;
-import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.job.api.Job;
 
 /**
@@ -65,9 +65,17 @@ public class FlowableJobEventBuilder {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {
-                event.setExecutionId(((Job) persistedObject).getExecutionId());
-                event.setProcessInstanceId(((Job) persistedObject).getProcessInstanceId());
-                event.setProcessDefinitionId(((Job) persistedObject).getProcessDefinitionId());   
+                Job jobObject = (Job) persistedObject;
+                if (jobObject.getScopeType() == null) {
+                    event.setExecutionId(jobObject.getExecutionId());
+                    event.setProcessInstanceId(jobObject.getProcessInstanceId());
+                    event.setProcessDefinitionId(jobObject.getProcessDefinitionId());
+                } else {
+                    event.setScopeType(jobObject.getScopeType());
+                    event.setScopeId(jobObject.getScopeId());
+                    event.setSubScopeId(jobObject.getSubScopeId());
+                    event.setScopeDefinitionId(jobObject.getScopeDefinitionId());
+                }
             }
         }
     }

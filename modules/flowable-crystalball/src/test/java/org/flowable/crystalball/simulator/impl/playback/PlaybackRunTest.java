@@ -12,8 +12,7 @@
  */
 package org.flowable.crystalball.simulator.impl.playback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -121,15 +120,18 @@ public class PlaybackRunTest {
 
     private void checkStatus(ProcessEngine processEngine) {
         HistoryService historyService = processEngine.getHistoryService();
-        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().singleResult();
-        assertNotNull(historicProcessInstance);
+        final HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables()
+                .singleResult();
+        assertThat(historicProcessInstance).isNotNull();
         RepositoryService repositoryService = processEngine.getRepositoryService();
-        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
-        assertEquals(SIMPLEST_PROCESS, processDefinition.getKey());
+        final ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
+        assertThat(processDefinition.getKey()).isEqualTo(SIMPLEST_PROCESS);
 
-        assertEquals(1, historicProcessInstance.getProcessVariables().size());
-        assertEquals(TEST_VALUE, historicProcessInstance.getProcessVariables().get(TEST_VARIABLE));
-        assertEquals(BUSINESS_KEY, historicProcessInstance.getBusinessKey());
+        assertThat(historicProcessInstance.getProcessVariables())
+                .hasSize(1)
+                .containsEntry(TEST_VARIABLE, TEST_VALUE);
+        assertThat(historicProcessInstance.getBusinessKey()).isEqualTo(BUSINESS_KEY);
     }
 
     private List<Function<FlowableEvent, SimulationEvent>> getTransformers() {

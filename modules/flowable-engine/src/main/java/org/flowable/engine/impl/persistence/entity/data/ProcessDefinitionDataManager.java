@@ -43,6 +43,10 @@ public interface ProcessDefinitionDataManager extends DataManager<ProcessDefinit
 
     ProcessDefinitionEntity findProcessDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String processDefinitionKey, String tenantId);
 
+    ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKey(String parentDeploymentId, String processDefinitionKey);
+
+    ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String processDefinitionKey, String tenantId);
+
     ProcessDefinitionEntity findProcessDefinitionByKeyAndVersion(String processDefinitionKey, Integer processDefinitionVersion);
 
     ProcessDefinitionEntity findProcessDefinitionByKeyAndVersionAndTenantId(String processDefinitionKey, Integer processDefinitionVersion, String tenantId);
@@ -52,5 +56,7 @@ public interface ProcessDefinitionDataManager extends DataManager<ProcessDefinit
     long findProcessDefinitionCountByNativeQuery(Map<String, Object> parameterMap);
 
     void updateProcessDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void updateProcessDefinitionVersionForProcessDefinitionId(String processDefinitionId, int version);
 
 }

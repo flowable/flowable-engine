@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.bpmn.helper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -62,7 +62,8 @@ public class ScopeUtil {
         }
 
         // signal compensation events in reverse order of their 'created' timestamp
-        Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
+        eventSubscriptions.sort(new Comparator<EventSubscriptionEntity>() {
+
             @Override
             public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
                 return o2.getCreated().compareTo(o1.getCreated());
@@ -78,7 +79,8 @@ public class ScopeUtil {
      * Creates a new event scope execution and moves existing event subscriptions to this new execution
      */
     public static void createCopyOfSubProcessExecutionForCompensation(ExecutionEntity subProcessExecution) {
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByExecutionAndType(subProcessExecution.getId(), "compensate");
 
         List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = new ArrayList<>();
@@ -92,7 +94,7 @@ public class ScopeUtil {
 
             ExecutionEntity processInstanceExecutionEntity = subProcessExecution.getProcessInstance();
 
-            ExecutionEntity eventScopeExecution = CommandContextUtil.getExecutionEntityManager().createChildExecution(processInstanceExecutionEntity);
+            ExecutionEntity eventScopeExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(processInstanceExecutionEntity);
             eventScopeExecution.setActive(false);
             eventScopeExecution.setEventScope(true);
             eventScopeExecution.setCurrentFlowElement(subProcessExecution.getCurrentFlowElement());

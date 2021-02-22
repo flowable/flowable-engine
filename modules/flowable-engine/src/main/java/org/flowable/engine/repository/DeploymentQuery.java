@@ -150,7 +150,7 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment> {
     /**
      * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
-    DeploymentQuery orderByDeploymenTime();
+    DeploymentQuery orderByDeploymentTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

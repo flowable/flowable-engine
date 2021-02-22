@@ -18,6 +18,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -37,25 +38,29 @@ public class IntermediateCatchConditionalEventActivityBehavior extends Intermedi
     public void execute(DelegateExecution execution) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_WAITING, 
-                            executionEntity.getActivityId(), conditionExpression, executionEntity.getId(), 
-                            executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+                    executionEntity.getActivityId(), conditionExpression, executionEntity.getId(), 
+                    executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
 
     @Override
     public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
-        Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression);
         Object result = expression.getValue(execution);
         
-        if (result != null && result instanceof Boolean && (Boolean) result) {
+        if (result instanceof Boolean && (Boolean) result) {
             ExecutionEntity executionEntity = (ExecutionEntity) execution;
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_RECEIVED, executionEntity.getActivityId(), 
-                                conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+                        conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                        processEngineConfiguration.getEngineCfgKey());
             }
             
             leaveIntermediateCatchEvent(execution);

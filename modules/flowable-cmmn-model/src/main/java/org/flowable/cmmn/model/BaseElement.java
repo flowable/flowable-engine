@@ -82,8 +82,9 @@ public class BaseElement implements HasExtensionAttributes {
         List<ExtensionAttribute> attributes = getAttributes().get(name);
         if (attributes != null && !attributes.isEmpty()) {
             for (ExtensionAttribute attribute : attributes) {
-                if ((namespace == null && attribute.getNamespace() == null) || namespace.equals(attribute.getNamespace()))
+                if ((namespace == null && attribute.getNamespace() == null) || namespace.equals(attribute.getNamespace())) {
                     return attribute.getValue();
+                }
             }
         }
         return null;

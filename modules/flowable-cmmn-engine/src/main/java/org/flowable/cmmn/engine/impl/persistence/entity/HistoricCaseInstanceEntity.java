@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Date;
+import java.util.List;
+
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -29,12 +29,18 @@ public interface HistoricCaseInstanceEntity extends Entity, HasRevision, Histori
     void setName(String name);
     void setParentId(String parentId);
     void setCaseDefinitionId(String caseDefinitionId);
+    void setCaseDefinitionKey(String caseDefinitionKey);
+    void setCaseDefinitionName(String caseDefinitionName);
+    void setCaseDefinitionVersion(Integer caseDefinitionVersion);
+    void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId);
     void setState(String state);
     void setStartTime(Date startTime);
     void setEndTime(Date endTime);
     void setStartUserId(String startUserId);
     void setCallbackId(String callbackId);
     void setCallbackType(String callbackType);
+    void setReferenceId(String referenceId);
+    void setReferenceType(String referenceType);
     void setTenantId(String tenantId);
 
     List<HistoricVariableInstanceEntity> getQueryVariables();

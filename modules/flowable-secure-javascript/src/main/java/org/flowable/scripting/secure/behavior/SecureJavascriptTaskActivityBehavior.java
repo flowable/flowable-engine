@@ -12,12 +12,16 @@
  */
 package org.flowable.scripting.secure.behavior;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.scripting.secure.SecureJavascriptConfigurator;
 import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
 
 /**
@@ -34,7 +38,11 @@ public class SecureJavascriptTaskActivityBehavior extends ScriptTaskActivityBeha
     public void execute(DelegateExecution execution) {
         boolean noErrors = true;
         try {
-            Object result = SecureJavascriptUtil.evaluateScript(execution, script);
+            Map<Object, Object> beans = null;
+            if (SecureJavascriptConfigurator.secureScriptContextFactory.isEnableAccessToBeans()) {
+                beans = CommandContextUtil.getProcessEngineConfiguration().getBeans();
+            }
+            Object result = SecureJavascriptUtil.evaluateScript(execution, script, beans);
 
             if (resultVariable != null) {
                 execution.setVariable(resultVariable, result);

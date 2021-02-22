@@ -26,15 +26,23 @@ public interface HistoricEntityLinkEntity extends HistoricEntityLink, Entity {
 
     void setScopeId(String scopeId);
     
+    void setSubScopeId(String subScopeId);
+    
     void setScopeType(String scopeType);
     
     void setScopeDefinitionId(String scopeDefinitionId);
+    
+    void setParentElementId(String parentElementId);
 
     void setReferenceScopeId(String referenceScopeId);
     
     void setReferenceScopeType(String referenceScopeType);
     
     void setReferenceScopeDefinitionId(String referenceScopeDefinitionId);
+
+    void setRootScopeId(String rootScopeId);
+
+    void setRootScopeType(String rootScopeType);
 
     void setHierarchyType(String hierarchyType);
 

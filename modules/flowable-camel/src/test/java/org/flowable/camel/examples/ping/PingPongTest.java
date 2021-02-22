@@ -12,6 +12,9 @@
  */
 package org.flowable.camel.examples.ping;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +59,8 @@ public class PingPongTest extends SpringFlowableTestCase {
         variables.put("outputMap", outputMap);
 
         runtimeService.startProcessInstanceByKey("PingPongProcess", variables);
-        assertEquals(1, outputMap.size());
-        assertNotNull(outputMap.get("outputValue"));
-        assertEquals("Hello World", outputMap.get("outputValue"));
+        assertThat(outputMap)
+                .containsExactly(entry("outputValue", "Hello World"));
     }
 
 }

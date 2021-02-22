@@ -39,8 +39,9 @@ public class UUIDType implements VariableType {
     @Override
     public Object getValue(ValueFields valueFields) {
         String textValue = valueFields.getTextValue();
-        if (textValue == null)
+        if (textValue == null) {
             return null;
+        }
         return UUID.fromString(textValue);
     }
 

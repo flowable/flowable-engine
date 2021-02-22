@@ -24,25 +24,40 @@ public interface VariableTypes {
     /**
      * @return the type for the given type name. Returns null if no type was found with the name.
      */
-    public VariableType getVariableType(String typeName);
+    VariableType getVariableType(String typeName);
 
     /**
      * @return the variable type to be used to store the given value as a variable.
      * @throws org.flowable.common.engine.api.FlowableException
      *             When no available type is capable of storing the value.
      */
-    public VariableType findVariableType(Object value);
+    VariableType findVariableType(Object value);
 
-    public VariableTypes addType(VariableType type);
+    VariableTypes addType(VariableType type);
+
+    /**
+     * Add the variable type before the type with the given name.
+     * When a type with the requested name is not registered then use {@link #addType(VariableType)}
+     * @param type the type to add
+     * @param afterTypeName the name of the other type
+     */
+    default VariableTypes addTypeBefore(VariableType type, String afterTypeName) {
+        int afterTypeIndex = getTypeIndex(afterTypeName);
+        if (afterTypeIndex > -1) {
+            return addType(type, afterTypeIndex);
+        } else {
+            return addType(type);
+        }
+    }
 
     /**
      * Add type at the given index. The index is used when finding a type for an object. When different types can store a specific object value, the one with the smallest index will be used.
      */
-    public VariableTypes addType(VariableType type, int index);
+    VariableTypes addType(VariableType type, int index);
 
-    public int getTypeIndex(VariableType type);
+    int getTypeIndex(VariableType type);
 
-    public int getTypeIndex(String typeName);
+    int getTypeIndex(String typeName);
 
-    public VariableTypes removeType(VariableType type);
+    VariableTypes removeType(VariableType type);
 }

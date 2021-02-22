@@ -12,10 +12,9 @@
  */
 package org.flowable.examples.identity;
 
-import java.util.Collections;
-import java.util.HashSet;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
-import java.util.Set;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
@@ -33,8 +32,8 @@ public class IdentityTest extends PluggableFlowableTestCase {
         user.setPassword("xxx");
         identityService.saveUser(user);
 
-        assertTrue(identityService.checkPassword("johndoe", "xxx"));
-        assertFalse(identityService.checkPassword("johndoe", "invalid pwd"));
+        assertThat(identityService.checkPassword("johndoe", "xxx")).isTrue();
+        assertThat(identityService.checkPassword("johndoe", "invalid pwd")).isFalse();
 
         identityService.deleteUser("johndoe");
     }
@@ -73,20 +72,17 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.createMembership("joesmoe", "user");
 
         List<Group> groups = identityService.createGroupQuery().groupMember("johndoe").groupType("security-role").list();
-        Set<String> groupIds = getGroupIds(groups);
-        Set<String> expectedGroupIds = new HashSet<>();
-        expectedGroupIds.add("user");
-        expectedGroupIds.add("admin");
-        assertEquals(expectedGroupIds, groupIds);
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactlyInAnyOrder("user", "admin");
 
         groups = identityService.createGroupQuery().groupMember("joesmoe").groupType("security-role").list();
-        groupIds = getGroupIds(groups);
-        expectedGroupIds = new HashSet<>();
-        expectedGroupIds.add("user");
-        assertEquals(expectedGroupIds, groupIds);
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("user");
 
         groups = identityService.createGroupQuery().groupMember("jackblack").groupType("security-role").list();
-        assertTrue(groups.isEmpty());
+        assertThat(groups).isEmpty();
 
         identityService.deleteGroup("sales");
         identityService.deleteGroup("development");
@@ -106,10 +102,10 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.saveUser(user);
 
         user = identityService.createUserQuery().userId("johndoe").singleResult();
-        assertEquals("johndoe", user.getId());
-        assertEquals("John", user.getFirstName());
-        assertEquals("Doe", user.getLastName());
-        assertEquals("johndoe@alfresco.com", user.getEmail());
+        assertThat(user.getId()).isEqualTo("johndoe");
+        assertThat(user.getFirstName()).isEqualTo("John");
+        assertThat(user.getLastName()).isEqualTo("Doe");
+        assertThat(user.getEmail()).isEqualTo("johndoe@alfresco.com");
 
         identityService.deleteUser("johndoe");
     }
@@ -121,8 +117,8 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.saveGroup(group);
 
         group = identityService.createGroupQuery().groupId("sales").singleResult();
-        assertEquals("sales", group.getId());
-        assertEquals("Sales division", group.getName());
+        assertThat(group.getId()).isEqualTo("sales");
+        assertThat(group.getName()).isEqualTo("Sales division");
 
         identityService.deleteGroup("sales");
     }
@@ -151,19 +147,29 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.createMembership("jackblack", "development");
 
         List<Group> groups = identityService.createGroupQuery().groupMember("johndoe").list();
-        assertEquals(createStringSet("sales"), getGroupIds(groups));
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("sales");
 
         groups = identityService.createGroupQuery().groupMember("joesmoe").list();
-        assertEquals(createStringSet("sales", "development"), getGroupIds(groups));
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactlyInAnyOrder("sales", "development");
 
         groups = identityService.createGroupQuery().groupMember("jackblack").list();
-        assertEquals(createStringSet("development"), getGroupIds(groups));
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("development");
 
         List<User> users = identityService.createUserQuery().memberOfGroup("sales").list();
-        assertEquals(createStringSet("johndoe", "joesmoe"), getUserIds(users));
+        assertThat(users)
+                .extracting(User::getId)
+                .containsExactlyInAnyOrder("johndoe", "joesmoe");
 
         users = identityService.createUserQuery().memberOfGroup("development").list();
-        assertEquals(createStringSet("joesmoe", "jackblack"), getUserIds(users));
+        assertThat(users)
+                .extracting(User::getId)
+                .containsExactlyInAnyOrder("joesmoe", "jackblack");
 
         identityService.deleteGroup("sales");
         identityService.deleteGroup("development");
@@ -171,27 +177,5 @@ public class IdentityTest extends PluggableFlowableTestCase {
         identityService.deleteUser("jackblack");
         identityService.deleteUser("joesmoe");
         identityService.deleteUser("johndoe");
-    }
-
-    private Object createStringSet(String... strings) {
-        Set<String> stringSet = new HashSet<>();
-        Collections.addAll(stringSet, strings);
-        return stringSet;
-    }
-
-    public Set<String> getGroupIds(List<Group> groups) {
-        Set<String> groupIds = new HashSet<>();
-        for (Group group : groups) {
-            groupIds.add(group.getId());
-        }
-        return groupIds;
-    }
-
-    public Set<String> getUserIds(List<User> users) {
-        Set<String> userIds = new HashSet<>();
-        for (User user : users) {
-            userIds.add(user.getId());
-        }
-        return userIds;
     }
 }

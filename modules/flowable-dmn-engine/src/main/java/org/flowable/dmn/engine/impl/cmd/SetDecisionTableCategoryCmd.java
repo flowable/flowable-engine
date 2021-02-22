@@ -17,8 +17,8 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
 /**
@@ -41,7 +41,7 @@ public class SetDecisionTableCategoryCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Decision table id is null");
         }
 
-        DecisionTableEntity decisionTable = CommandContextUtil.getDecisionTableEntityManager(commandContext).findById(decisionTableId);
+        DecisionEntity decisionTable = CommandContextUtil.getDecisionEntityManager(commandContext).findById(decisionTableId);
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("No decision table found for id = '" + decisionTableId + "'");
@@ -50,13 +50,13 @@ public class SetDecisionTableCategoryCmd implements Command<Void> {
         // Update category
         decisionTable.setCategory(category);
 
-        // Remove process definition from cache, it will be refetched later
-        DeploymentCache<DecisionTableCacheEntry> decisionTableCache = CommandContextUtil.getDmnEngineConfiguration().getDecisionCache();
+        // Remove process definition from cache, it will be refetch later
+        DeploymentCache<DecisionCacheEntry> decisionTableCache = CommandContextUtil.getDmnEngineConfiguration().getDefinitionCache();
         if (decisionTableCache != null) {
             decisionTableCache.remove(decisionTableId);
         }
 
-        CommandContextUtil.getDecisionTableEntityManager(commandContext).update(decisionTable);
+        CommandContextUtil.getDecisionEntityManager(commandContext).update(decisionTable);
 
         return null;
     }

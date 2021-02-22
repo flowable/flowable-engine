@@ -2,45 +2,34 @@ name: Flowable Main Build
 
 on: [push, pull_request]
 
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
 jobs:
-  test_jdk8:
-    name: Linux (OpenJDK 8)
+  test_jdk:
+    name: Linux (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
-    container: openjdk:8
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [1.8, 11, 13, 14]
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2-beta
       with:
         fetch-depth: 10
-    - name: Install
-      # Need to do install first in order for the OSGi tests to work
-      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
-
-  test_jdk11:
-    name: Linux (OpenJDK 11)
-    runs-on: ubuntu-latest
-    container: openjdk:11
-    steps:
-    - uses: actions/checkout@master
+    - uses: actions/setup-java@v1
       with:
-        fetch-depth: 10
-    - name: Install
-      # Need to do install first in order for the OSGi tests to work
-      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
-
-  test_jdk13:
-    name: Linux (OpenJDK 13)
-    runs-on: ubuntu-latest
-    container: openjdk:13
-    steps:
-    - uses: actions/checkout@master
+        java-version: ${{ matrix.java }}
+    - name: Cache Maven Repository
+      uses: actions/cache@v1
       with:
-        fetch-depth: 10
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
     - name: Install
       # Need to do install first in order for the OSGi tests to work
-      run: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+      run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging -B -V
+      run: ./mvnw verify -Pdistro,ui,errorLogging,includeDockerTests ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false

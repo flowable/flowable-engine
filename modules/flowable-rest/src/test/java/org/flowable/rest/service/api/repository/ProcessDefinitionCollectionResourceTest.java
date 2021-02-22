@@ -12,8 +12,7 @@
  */
 package org.flowable.rest.service.api.repository;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -62,8 +61,7 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             String baseUrl = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_COLLECTION);
             assertResultsPresentInDataResponse(baseUrl, oneTaskProcess.getId(), twoTaskprocess.getId(), latestOneTaskProcess.getId(), oneTaskWithDiProcess.getId());
 
-            // Verify ACT-2141 Persistent isGraphicalNotation flag for process
-            // definitions
+            // Verify ACT-2141 Persistent isGraphicalNotation flag for process definitions
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + baseUrl), HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
@@ -72,10 +70,10 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
 
                 String key = processDefinitionJson.get("key").asText();
                 JsonNode graphicalNotationNode = processDefinitionJson.get("graphicalNotationDefined");
-                if (key.equals("oneTaskProcessWithDi")) {
-                    assertTrue(graphicalNotationNode.asBoolean());
+                if ("oneTaskProcessWithDi".equals(key)) {
+                    assertThat(graphicalNotationNode.asBoolean()).isTrue();
                 } else {
-                    assertFalse(graphicalNotationNode.asBoolean());
+                    assertThat(graphicalNotationNode.asBoolean()).isFalse();
                 }
 
             }
@@ -130,7 +128,7 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, latestOneTaskProcess.getId(), twoTaskprocess.getId(), oneTaskWithDiProcess.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, oneTaskProcess.getId(), twoTaskprocess.getId(), latestOneTaskProcess.getId(), oneTaskWithDiProcess.getId());
+            assertResultsPresentInDataResponse(url, oneTaskProcess.getId(), twoTaskprocess.getId(), latestOneTaskProcess.getId(), oneTaskWithDiProcess.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

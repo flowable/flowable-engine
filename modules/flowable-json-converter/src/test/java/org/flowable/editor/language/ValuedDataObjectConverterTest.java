@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +30,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValuedDataObjectConverterTest extends AbstractConverterTest {
 
@@ -56,111 +54,117 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
-        assertEquals("start1", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(StartEvent.class);
+        assertThat(flowElement.getId()).isEqualTo("start1");
 
         // verify main process data objects
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
-        assertEquals(12, dataObjects.size());
+        assertThat(dataObjects).hasSize(12);
         for (ValuedDataObject dObj : dataObjects) {
             if ("dObj1".equals(dObj.getId())) {
-                assertEquals(StringDataObject.class, dObj.getClass());
-                assertEquals("StringTest", dObj.getName());
-                assertTrue(dObj.getValue() instanceof String);
-                assertEquals("xsd:string", dObj.getItemSubjectRef().getStructureRef());
-                assertEquals("Testing123", dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(StringDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("StringTest");
+                assertThat(dObj.getValue()).isInstanceOf(String.class);
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
+                assertThat(dObj.getValue()).isEqualTo("Testing123");
             } else if ("dObj2".equals(dObj.getId())) {
-                assertEquals(BooleanDataObject.class, dObj.getClass());
-                assertEquals("BooleanTest", dObj.getName());
-                assertEquals("xsd:boolean", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Boolean);
-                assertEquals(Boolean.TRUE, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(BooleanDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("BooleanTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:boolean");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Boolean.class)
+                        .isEqualTo(Boolean.TRUE);
             } else if ("dObj3".equals(dObj.getId())) {
-                assertEquals(DateDataObject.class, dObj.getClass());
-                assertEquals("DateTest", dObj.getName());
-                assertEquals("xsd:datetime", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Date);
+                assertThat(dObj.getClass()).isEqualTo(DateDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("DateTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:datetime");
+                assertThat(dObj.getValue()).isInstanceOf(Date.class);
                 GregorianCalendar dateCal = new GregorianCalendar();
                 dateCal.setTime((Date) dObj.getValue());
-                assertEquals(2013, dateCal.get(Calendar.YEAR));
-                assertEquals(8, dateCal.get(Calendar.MONTH));
-                assertEquals(16, dateCal.get(Calendar.DAY_OF_MONTH));
-                assertEquals(11, dateCal.get(Calendar.HOUR_OF_DAY));
-                assertEquals(23, dateCal.get(Calendar.MINUTE));
+                assertThat(dateCal.get(Calendar.YEAR)).isEqualTo(2013);
+                assertThat(dateCal.get(Calendar.MONTH)).isEqualTo(8);
+                assertThat(dateCal.get(Calendar.DAY_OF_MONTH)).isEqualTo(16);
+                assertThat(dateCal.get(Calendar.HOUR_OF_DAY)).isEqualTo(11);
+                assertThat(dateCal.get(Calendar.MINUTE)).isEqualTo(23);
             } else if ("dObj4".equals(dObj.getId())) {
-                assertEquals(DoubleDataObject.class, dObj.getClass());
-                assertEquals("DoubleTest", dObj.getName());
-                assertEquals("xsd:double", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Double);
-                assertEquals(123456789d, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(DoubleDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("DoubleTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:double");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Double.class)
+                        .isEqualTo(123456789d);
             } else if ("dObj5".equals(dObj.getId())) {
-                assertEquals(IntegerDataObject.class, dObj.getClass());
-                assertEquals("IntegerTest", dObj.getName());
-                assertEquals("xsd:int", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Integer);
-                assertEquals(123, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(IntegerDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("IntegerTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:int");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Integer.class)
+                        .isEqualTo(123);
             } else if ("dObj6".equals(dObj.getId())) {
-                assertEquals(LongDataObject.class, dObj.getClass());
-                assertEquals("LongTest", dObj.getName());
-                assertEquals("xsd:long", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Long);
-                assertEquals((long) -123456, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(LongDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("LongTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:long");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Long.class)
+                        .isEqualTo((long) -123456);
             }
         }
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess1", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(SubProcess.class);
+        assertThat(flowElement.getId()).isEqualTo("subprocess1");
         SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(17, subProcess.getFlowElements().size());
+        assertThat(subProcess.getFlowElements()).hasSize(17);
 
         // verify subprocess data objects
         dataObjects = ((SubProcess) flowElement).getDataObjects();
-        assertEquals(12, dataObjects.size());
+        assertThat(dataObjects).hasSize(12);
         for (ValuedDataObject dObj : dataObjects) {
             if ("dObj1".equals(dObj.getId())) {
-                assertEquals(StringDataObject.class, dObj.getClass());
-                assertEquals("SubStringTest", dObj.getName());
-                assertTrue(dObj.getValue() instanceof String);
-                assertEquals("xsd:string", dObj.getItemSubjectRef().getStructureRef());
-                assertEquals("Testing456", dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(StringDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubStringTest");
+                assertThat(dObj.getValue()).isInstanceOf(String.class);
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
+                assertThat(dObj.getValue()).isEqualTo("Testing456");
             } else if ("dObj2".equals(dObj.getId())) {
-                assertEquals(BooleanDataObject.class, dObj.getClass());
-                assertEquals("SubBooleanTest", dObj.getName());
-                assertEquals("xsd:boolean", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Boolean);
-                assertEquals(Boolean.FALSE, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(BooleanDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubBooleanTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:boolean");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Boolean.class)
+                        .isEqualTo(Boolean.FALSE);
             } else if ("dObj3".equals(dObj.getId())) {
-                assertEquals(DateDataObject.class, dObj.getClass());
-                assertEquals("SubDateTest", dObj.getName());
-                assertEquals("xsd:datetime", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Date);
+                assertThat(dObj.getClass()).isEqualTo(DateDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubDateTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:datetime");
+                assertThat(dObj.getValue()).isInstanceOf(Date.class);
                 GregorianCalendar dateCal = new GregorianCalendar();
                 dateCal.setTime((Date) dObj.getValue());
-                assertEquals(2013, dateCal.get(Calendar.YEAR));
-                assertEquals(10, dateCal.get(Calendar.MONTH));
-                assertEquals(11, dateCal.get(Calendar.DAY_OF_MONTH));
+                assertThat(dateCal.get(Calendar.YEAR)).isEqualTo(2013);
+                assertThat(dateCal.get(Calendar.MONTH)).isEqualTo(10);
+                assertThat(dateCal.get(Calendar.DAY_OF_MONTH)).isEqualTo(11);
             } else if ("dObj4".equals(dObj.getId())) {
-                assertEquals(DoubleDataObject.class, dObj.getClass());
-                assertEquals("SubDoubleTest", dObj.getName());
-                assertEquals("xsd:double", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Double);
-                assertEquals(678912345d, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(DoubleDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubDoubleTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:double");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Double.class)
+                        .isEqualTo(678912345d);
             } else if ("dObj5".equals(dObj.getId())) {
-                assertEquals(IntegerDataObject.class, dObj.getClass());
-                assertEquals("SubIntegerTest", dObj.getName());
-                assertEquals("xsd:int", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Integer);
-                assertEquals(45, dObj.getValue());
+                assertThat(dObj.getClass()).isEqualTo(IntegerDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubIntegerTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:int");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Integer.class)
+                        .isEqualTo(45);
             } else if ("dObj6".equals(dObj.getId())) {
-                assertEquals(LongDataObject.class, dObj.getClass());
-                assertEquals("SubLongTest", dObj.getName());
-                assertEquals("xsd:long", dObj.getItemSubjectRef().getStructureRef());
-                assertTrue(dObj.getValue() instanceof Long);
-                assertEquals(456123L, dObj.getValue());
-                assertEquals(1, dObj.getExtensionElements().size());
+                assertThat(dObj.getClass()).isEqualTo(LongDataObject.class);
+                assertThat(dObj.getName()).isEqualTo("SubLongTest");
+                assertThat(dObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:long");
+                assertThat(dObj.getValue())
+                        .isInstanceOf(Long.class)
+                        .isEqualTo(456123L);
+                assertThat(dObj.getExtensionElements()).hasSize(1);
             }
         }
     }

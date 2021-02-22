@@ -13,10 +13,14 @@
 
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -24,31 +28,61 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result of the expression as a variable on the execution.
  *
  * @author Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior {
 
     protected String expression;
     protected String resultVariable;
+    protected boolean storeResultVariableAsTransient;
 
-    public PlanItemExpressionActivityBehavior(String expression, String resultVariable) {
+    public PlanItemExpressionActivityBehavior(String expression, String resultVariable, boolean storeResultVariableAsTransient) {
         this.expression = expression;
         this.resultVariable = resultVariable;
+        this.storeResultVariableAsTransient = storeResultVariableAsTransient;
     }
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         Object value = null;
-        try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
-            value = expressionObject.getValue(planItemInstanceEntity);
-            if (resultVariable != null) {
+        Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+        value = expressionObject.getValue(planItemInstanceEntity);
+        if (value instanceof CompletableFuture) {
+            CommandContextUtil.getAgenda(commandContext)
+                    .planFutureOperation((CompletableFuture<Object>) value, new FutureExpressionCompleteAction(planItemInstanceEntity));
+        } else {
+            complete(value, planItemInstanceEntity);
+        }
+
+    }
+
+    protected void complete(Object value, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (resultVariable != null) {
+            if (storeResultVariableAsTransient) {
+                planItemInstanceEntity.setTransientVariable(resultVariable, value);
+            } else {
                 planItemInstanceEntity.setVariable(resultVariable, value);
             }
+        }
 
-            CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
-            
-        } catch (Exception exc) {
-            throw new FlowableException(exc.getMessage(), exc);
+        CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+    }
+
+    protected class FutureExpressionCompleteAction implements BiConsumer<Object, Throwable> {
+
+        protected final PlanItemInstanceEntity planItemInstanceEntity;
+
+        public FutureExpressionCompleteAction(PlanItemInstanceEntity planItemInstanceEntity) {
+            this.planItemInstanceEntity = planItemInstanceEntity;
+        }
+
+        @Override
+        public void accept(Object value, Throwable throwable) {
+            if (throwable == null) {
+                complete(value, planItemInstanceEntity);
+            } else {
+                sneakyThrow(throwable);
+            }
         }
     }
 }

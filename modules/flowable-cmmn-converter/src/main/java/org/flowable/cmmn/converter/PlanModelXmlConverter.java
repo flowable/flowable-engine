@@ -33,6 +33,12 @@ public class PlanModelXmlConverter extends StageXmlConverter {
         planModelStage.setPlanModel(true);
         conversionHelper.getCurrentCase().setPlanModel(planModelStage);
         planModelStage.setFormKey(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_KEY));
+
+        String sameDeploymentAttribute = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_SAME_DEPLOYMENT);
+        if ("false".equalsIgnoreCase(sameDeploymentAttribute)) {
+            planModelStage.setSameDeployment(false);
+
+        }
         planModelStage.setValidateFormFields(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_FIELD_VALIDATION));
         return planModelStage;
     }

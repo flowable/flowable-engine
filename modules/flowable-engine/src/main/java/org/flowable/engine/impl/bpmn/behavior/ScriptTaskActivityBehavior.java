@@ -78,7 +78,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
 
             if (null != result) {
-                if (language.equalsIgnoreCase("juel") && (result instanceof String) && script.equals(result.toString())) {
+                if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
                     throw new FlowableException("Error in Script");
                 }
             }
@@ -95,6 +95,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof BpmnError) {
                 ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+            } else if (rootCause instanceof FlowableException) {
+                throw (FlowableException) rootCause;
             } else {
                 throw e;
             }

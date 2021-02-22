@@ -31,10 +31,10 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     public static final String HANDLER_TYPE_BREAK_POINT = "breakpoint";
     protected ProcessDebugger debugger;
 
-    public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext,
-                                         ExecutionEntity execution, boolean forceSynchronousOperation,
-                                         boolean inCompensation) {
-        super(commandContext, execution, forceSynchronousOperation, inCompensation);
+    public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext, 
+            ExecutionEntity execution, boolean forceSynchronousOperation, boolean inCompensation) {
+        
+        super(commandContext, execution, forceSynchronousOperation, inCompensation, null);
         this.debugger = debugger;
     }
 
@@ -53,7 +53,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void breakExecution(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         JobEntity brokenJob = jobService.createJob();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);

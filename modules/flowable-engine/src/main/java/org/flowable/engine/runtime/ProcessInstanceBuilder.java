@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
 
 /**
  * Helper for starting new ProcessInstance.
@@ -41,6 +42,17 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey);
 
     /**
+     * When looking up for a process definition by key it would first lookup for a process definition
+     * within the given parent deployment.
+     * Then it would fallback to the latest process definition with the given key.
+     * <p>
+     * This is typically needed when the ProcessInstanceBuilder is called for example
+     * from the case engine to start a process instance and it needs to
+     * look up the process definition in the same deployment as the case.
+     */
+    ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId);
+
+    /**
      * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
      */
     ProcessInstanceBuilder messageName(String messageName);
@@ -64,6 +76,21 @@ public interface ProcessInstanceBuilder {
      * Sets the callback type of the process instance.
      */
     ProcessInstanceBuilder callbackType(String callbackType);
+
+    /**
+     * Sets the reference identifier of the process instance.
+     */
+    ProcessInstanceBuilder referenceId(String referenceId);
+
+    /**
+     * Sets the reference type of the process instance.
+     */
+    ProcessInstanceBuilder referenceType(String referenceType);
+
+    /**
+     * Set the optional instance id of the stage this process instance belongs to, if it runs in the context of a CMMN case.
+     */
+    ProcessInstanceBuilder stageInstanceId(String stageInstanceId);
 
     /**
      * Set the tenantId of to lookup the process definition
@@ -116,6 +143,12 @@ public interface ProcessInstanceBuilder {
      * Allows to set an outcome for a start form.
      */
     ProcessInstanceBuilder outcome(String outcome);
+
+    /**
+     * Start the process instance with the given form variables from the given {@code formInfo}.
+     * This is different than {@link #startFormVariables(Map)} and it can be used in addition to that.
+     */
+    ProcessInstanceBuilder formVariables(Map<String, Object> formVariables, FormInfo formInfo, String formOutcome);
 
     /**
      * Use default tenant as a fallback in the case when process definition was not found by key and tenant id

@@ -12,7 +12,10 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -38,10 +41,9 @@ public class DmnDeploymentResourceDataResourceTest extends BaseSpringDmnRestTest
             HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt"));
             httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "text/plain"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-            String responseAsString = IOUtils.toString(response.getEntity().getContent());
+            String responseAsString = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
-            assertNotNull(responseAsString);
-            assertEquals("Test content", responseAsString);
+            assertThat(responseAsString).isEqualTo("Test content");
         } finally {
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();

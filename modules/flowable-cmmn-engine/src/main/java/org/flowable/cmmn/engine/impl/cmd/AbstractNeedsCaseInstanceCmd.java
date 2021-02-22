@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -25,7 +26,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public abstract class AbstractNeedsCaseInstanceCmd implements Command<Void>, Serializable {
-
+    
     protected String caseInstanceId;
 
     public AbstractNeedsCaseInstanceCmd(String caseInstanceId) {
@@ -37,7 +38,9 @@ public abstract class AbstractNeedsCaseInstanceCmd implements Command<Void>, Ser
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("Case instance id is null");
         }
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
         if (caseInstanceEntity == null) {
             throw new FlowableObjectNotFoundException("Cannot find case instance for id " + caseInstanceId, CaseInstanceEntity.class);
         }

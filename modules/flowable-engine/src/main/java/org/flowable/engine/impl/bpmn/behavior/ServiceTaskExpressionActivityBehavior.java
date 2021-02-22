@@ -14,6 +14,8 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
@@ -21,7 +23,6 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -51,6 +52,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     protected String resultVariable;
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean useLocalScopeForResultVariable;
+    protected boolean triggerable;
+    protected boolean storeResultVariableAsTransient;
 
     public ServiceTaskExpressionActivityBehavior(ServiceTask serviceTask, Expression expression, Expression skipExpression) {
 
@@ -60,6 +63,8 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
         this.resultVariable = serviceTask.getResultVariableName();
         this.mapExceptions = serviceTask.getMapExceptions();
         this.useLocalScopeForResultVariable = serviceTask.isUseLocalScopeForResultVariable();
+        this.triggerable = serviceTask.isTriggerable();
+        this.storeResultVariableAsTransient = serviceTask.isStoreResultVariableAsTransient();
     }
 
     @Override
@@ -71,6 +76,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
             if (skipExpression != null) {
                 skipExpressionText = skipExpression.getExpressionText();
             }
+            boolean shouldLeave = !this.triggerable;
             boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpressionText, serviceTaskId, execution, commandContext);
             if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpressionText, serviceTaskId, execution, commandContext)) {
 
@@ -85,38 +91,72 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
                 }
 
                 value = expression.getValue(execution);
-                if (resultVariable != null) {
-                    if (useLocalScopeForResultVariable) {
-                        execution.setVariableLocal(resultVariable, value);
-                    } else {
-                        execution.setVariable(resultVariable, value);
-                    }
+                if (value instanceof CompletableFuture) {
+                    // We should never leave when we have a future. The FutureCompleteAction should perform the leave
+                    shouldLeave = false;
+                    CommandContextUtil.getAgenda(commandContext).planFutureOperation((CompletableFuture) value, new FutureCompleteAction(execution));
+                } else {
+                    setExecutionVariableValue(value, execution);
                 }
             }
 
-            leave(execution);
-            
+            if (shouldLeave) {
+                leave(execution);
+            }
+
         } catch (Exception exc) {
 
-            Throwable cause = exc;
-            BpmnError error = null;
-            while (cause != null) {
-                if (cause instanceof BpmnError) {
-                    error = (BpmnError) cause;
-                    break;
-                } else if (cause instanceof RuntimeException) {
-                    if (ErrorPropagation.mapException((RuntimeException) cause, (ExecutionEntity) execution, mapExceptions)) {
-                        return;
-                    }
-                }
-                cause = cause.getCause();
-            }
+            handleException(exc, execution);
+        }
+    }
 
-            if (error != null) {
-                ErrorPropagation.propagateError(error, execution);
+    protected void handleException(Throwable exc, DelegateExecution execution) {
+        ErrorPropagation.handleException(exc, (ExecutionEntity) execution, mapExceptions);
+    }
+
+    protected void setExecutionVariableValue(Object value, DelegateExecution execution) {
+        if (resultVariable != null) {
+            if (storeResultVariableAsTransient) {
+                if (useLocalScopeForResultVariable) {
+                    execution.setTransientVariableLocal(resultVariable, value);
+                } else {
+                    execution.setTransientVariable(resultVariable, value);
+                }
             } else {
-                throw exc;
+                if (useLocalScopeForResultVariable) {
+                    execution.setVariableLocal(resultVariable, value);
+                } else {
+                    execution.setVariable(resultVariable, value);
+                }
             }
         }
     }
+
+    @Override
+    public void trigger(DelegateExecution execution, String signalName, Object signalData) {
+        leave(execution);
+    }
+
+    protected class FutureCompleteAction implements BiConsumer<Object, Throwable> {
+
+        protected final DelegateExecution execution;
+
+        public FutureCompleteAction(DelegateExecution execution) {
+            this.execution = execution;
+        }
+
+        @Override
+        public void accept(Object value, Throwable throwable) {
+            if (throwable == null) {
+                setExecutionVariableValue(value, execution);
+                if (!triggerable) {
+                    leave(execution);
+                }
+            } else {
+                handleException(throwable, execution);
+            }
+
+        }
+    }
+
 }

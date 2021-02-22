@@ -26,6 +26,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
     protected String implementationType;
     protected String resultVariableName;
     protected String type;
+    protected boolean storeResultVariableAsTransient;
 
     public String getImplementation() {
         return implementation;
@@ -59,6 +60,14 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.type = type;
     }
 
+    public boolean isStoreResultVariableAsTransient() {
+        return storeResultVariableAsTransient;
+    }
+
+    public void setStoreResultVariableAsTransient(boolean storeResultVariableAsTransient) {
+        this.storeResultVariableAsTransient = storeResultVariableAsTransient;
+    }
+
     @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
@@ -72,6 +81,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         setImplementationType(otherElement.getImplementationType());
         setResultVariableName(otherElement.getResultVariableName());
         setType(otherElement.getType());
+        setStoreResultVariableAsTransient(otherElement.isStoreResultVariableAsTransient());
 
         fieldExtensions = new ArrayList<>();
         if (otherElement.getFieldExtensions() != null && !otherElement.getFieldExtensions().isEmpty()) {

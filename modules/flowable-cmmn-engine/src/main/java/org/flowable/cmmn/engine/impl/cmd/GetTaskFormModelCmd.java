@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -53,16 +53,16 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
     @Override
     public FormInfo execute(CommandContext commandContext) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        TaskInfo task = CommandContextUtil.getTaskService().getTask(taskId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        TaskInfo task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         Date endTime = null;
         if (task == null) {
-            task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+            task = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
             if (task != null) {
                 endTime = ((HistoricTaskInstance) task).getEndTime();
             }
@@ -86,13 +86,15 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
         String parentDeploymentId = null;
         if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
-            CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
-            CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
-            CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
-            if (cmmnDeployment.getParentDeploymentId() != null) {
-                parentDeploymentId = cmmnDeployment.getParentDeploymentId();
-            } else {
-                parentDeploymentId = cmmnDeployment.getId();
+            PlanItemDefinition itemDefinition = CaseDefinitionUtil.getCmmnModel(task.getScopeDefinitionId()).findPlanItemDefinition(task.getTaskDefinitionKey());
+            boolean sameDeployment = true;
+            if (itemDefinition instanceof HumanTask) {
+                sameDeployment = ((HumanTask) itemDefinition).isSameDeployment();
+            }
+
+            if (sameDeployment) {
+                // If it is not same deployment then there is no need to search for parent deployment
+                parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(task.getScopeDefinitionId(), cmmnEngineConfiguration);
             }
         }
 
@@ -116,7 +118,7 @@ public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
         }
 
-        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
+        FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
         formFieldHandler.enrichFormFields(formInfo);
 
         return formInfo;

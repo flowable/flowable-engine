@@ -12,14 +12,13 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,21 +27,14 @@ import org.junit.Test;
  */
 public class PlanItemInstanceCriterionTest extends FlowableCmmnTestCase {
 
-    protected String deploymentId;
     protected CaseInstance caseInstance;
 
     @Before
     public void deployTestCaseInstance() {
-        this.deploymentId = cmmnRepositoryService.createDeployment()
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceCriterionTest.testCriterionSaved.cmmn")
-            .deploy()
-            .getId();
+            .deploy());
         this.caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("criterions").start();
-    }
-
-    @After
-    public void removeDeployment() {
-        cmmnRepositoryService.deleteDeployment(deploymentId, true);
     }
 
     @Test

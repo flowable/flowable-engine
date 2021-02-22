@@ -14,8 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,8 +39,9 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected String formDefinitionId;
     protected String outcome;
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
-    protected boolean localScope;
+    protected Map<String, Object> transientVariablesLocal;
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         super(taskId);
@@ -48,20 +52,35 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
-
         this(taskId, formDefinitionId, outcome, variables);
-        this.localScope = localScope;
+        if (localScope) {
+            this.variablesLocal = variables;
+        } else {
+            this.variables = variables;
+        }
     }
 
     public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+                                   Map<String, Object> variables, Map<String, Object> transientVariables) {
 
         this(taskId, formDefinitionId, outcome, variables);
         this.transientVariables = transientVariables;
     }
 
+    public CompleteTaskWithFormCmd(String taskId, String formDefinitionId, String outcome, Map<String,
+            Object> variables, Map<String, Object> variablesLocal, Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        this(taskId, formDefinitionId, outcome, variables);
+        this.variablesLocal = variablesLocal;
+        this.transientVariables = transientVariables;
+        this.transientVariablesLocal = transientVariablesLocal;
+    }
+
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
+            throw new FlowableException("The task instance is created by the cmmn engine and should be completed via the cmmn engine API");
+        }
+        
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
@@ -70,33 +89,48 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
         FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
+        Map<String, Object> formVariables;
+        boolean local = variablesLocal != null && !variablesLocal.isEmpty();
+        if (local) {
+            formVariables = variablesLocal;
+        } else {
+            formVariables = variables;
+        }
+        Map<String, Object> taskVariables = null;
+
         if (formInfo != null) {
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
             if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formService.validateFormFields(formInfo, variables);
+                formService.validateFormFields(formInfo, formVariables);
             }
 
             // Extract raw variables and complete the task
-            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(formInfo, variables, outcome);
+            taskVariables = formService.getVariablesFromFormSubmission(formInfo, formVariables, outcome);
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances
             if (task.getProcessInstanceId() != null) {
-                formService.saveFormInstance(variables, formInfo, task.getId(), task.getProcessInstanceId(),
+                formService.saveFormInstance(formVariables, formInfo, task.getId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), task.getTenantId(), outcome);
             } else {
-                formService.saveFormInstanceWithScopeId(variables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
+                formService.saveFormInstanceWithScopeId(formVariables, formInfo, task.getId(), task.getScopeId(), task.getScopeType(),
                                 task.getScopeDefinitionId(), task.getTenantId(), outcome);
             }
 
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, task.getId(), task.getProcessInstanceId(), null, null, taskVariables, task.getTenantId());
 
-            TaskHelper.completeTask(task, taskVariables, transientVariables, localScope, commandContext);
-
-        } else {
-            TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
         }
+
+        // Only one set of variables can be used as form submission.
+        // When variablesLocal are present then they have precedence and those are used for the completion
+        if (local) {
+            TaskHelper.completeTask(task, variables, taskVariables, transientVariables, transientVariablesLocal, commandContext);
+        } else {
+            TaskHelper.completeTask(task, taskVariables, variablesLocal, transientVariables, transientVariablesLocal, commandContext);
+        }
+
+
 
         return null;
     }

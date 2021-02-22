@@ -27,11 +27,7 @@ public class SimulationEventComparator implements Comparator<SimulationEvent> {
         if (o1.getSimulationTime() > o2.getSimulationTime())
             return 1;
         // in case of equal simulation time, take priority into account
-        if (o1.getPriority() < o2.getPriority())
-            return -1;
-        if (o1.getPriority() > o2.getPriority())
-            return 1;
-        return 0;
+        return Integer.compare(o1.getPriority(), o2.getPriority());
     }
 
 }

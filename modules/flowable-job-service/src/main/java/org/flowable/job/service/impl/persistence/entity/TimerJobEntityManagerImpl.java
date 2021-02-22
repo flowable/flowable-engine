@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -33,15 +32,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Tijs Rademakers
  */
-public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEntity> implements TimerJobEntityManager {
+public class TimerJobEntityManagerImpl
+    extends JobInfoEntityManagerImpl<TimerJobEntity, TimerJobDataManager>
+    implements TimerJobEntityManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimerJobEntityManagerImpl.class);
 
-    protected TimerJobDataManager jobDataManager;
-
     public TimerJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, TimerJobDataManager jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
+        super(jobServiceConfiguration, jobDataManager);
     }
 
     @Override
@@ -62,53 +60,53 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     @Override
-    public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
-        return jobDataManager.findTimerJobsToExecute(page);
+    public TimerJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String jobHandlerType, String processDefinitionId) {
-        return jobDataManager.findJobsByTypeAndProcessDefinitionId(jobHandlerType, processDefinitionId);
+        return dataManager.findJobsByTypeAndProcessDefinitionId(jobHandlerType, processDefinitionId);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String jobHandlerType, String processDefinitionKey) {
-        return jobDataManager.findJobsByTypeAndProcessDefinitionKeyNoTenantId(jobHandlerType, processDefinitionKey);
+        return dataManager.findJobsByTypeAndProcessDefinitionKeyNoTenantId(jobHandlerType, processDefinitionKey);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String jobHandlerType, String processDefinitionKey, String tenantId) {
-        return jobDataManager.findJobsByTypeAndProcessDefinitionKeyAndTenantId(jobHandlerType, processDefinitionKey, tenantId);
+        return dataManager.findJobsByTypeAndProcessDefinitionKeyAndTenantId(jobHandlerType, processDefinitionKey, tenantId);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByExecutionId(String id) {
-        return jobDataManager.findJobsByExecutionId(id);
+        return dataManager.findJobsByExecutionId(id);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByProcessInstanceId(String id) {
-        return jobDataManager.findJobsByProcessInstanceId(id);
+        return dataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
     public List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId) {
-        return jobDataManager.findJobsByScopeIdAndSubScopeId(scopeId, subScopeId);
+        return dataManager.findJobsByScopeIdAndSubScopeId(scopeId, subScopeId);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override
@@ -127,36 +125,45 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     protected boolean doInsert(TimerJobEntity jobEntity, boolean fireCreateEvent) {
-        if (getJobServiceConfiguration().getInternalJobManager() != null) {
-            boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            boolean handledJob = serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
             if (!handledJob) {
                 return false;
             }
         }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }
 
     @Override
     public void delete(TimerJobEntity jobEntity) {
-        super.delete(jobEntity);
+        delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        if (getJobServiceConfiguration().getInternalJobManager() != null) {
-            getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
-        }
-
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
-    
+
+    @Override
+    public void delete(TimerJobEntity jobEntity, boolean fireDeleteEvent) {
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
+        }
+
+        super.delete(jobEntity, fireDeleteEvent);
+    }
+
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();
         newTimerEntity.setJobHandlerConfiguration(te.getJobHandlerConfiguration());
@@ -166,6 +173,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         newTimerEntity.setRepeat(te.getRepeat());
         newTimerEntity.setRetries(te.getRetries());
         newTimerEntity.setEndDate(te.getEndDate());
+        newTimerEntity.setCategory(te.getCategory());
         newTimerEntity.setExecutionId(te.getExecutionId());
         newTimerEntity.setProcessInstanceId(te.getProcessInstanceId());
         newTimerEntity.setProcessDefinitionId(te.getProcessDefinitionId());
@@ -193,14 +201,14 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     protected boolean isValidTime(JobEntity timerEntity, Date newTimerDate, VariableScope variableScope) {
-        BusinessCalendar businessCalendar = getJobServiceConfiguration().getBusinessCalendarManager().getBusinessCalendar(
-                        getJobServiceConfiguration().getJobManager().getBusinessCalendarName(timerEntity, variableScope));
+        BusinessCalendar businessCalendar = serviceConfiguration.getBusinessCalendarManager().getBusinessCalendar(
+                        serviceConfiguration.getJobManager().getBusinessCalendarName(timerEntity, variableScope));
         return businessCalendar.validateDuedate(timerEntity.getRepeat(), timerEntity.getMaxIterations(), timerEntity.getEndDate(), newTimerDate);
     }
 
     protected Date calculateNextTimer(JobEntity timerEntity, VariableScope variableScope) {
-        BusinessCalendar businessCalendar = getJobServiceConfiguration().getBusinessCalendarManager().getBusinessCalendar(
-                        getJobServiceConfiguration().getJobManager().getBusinessCalendarName(timerEntity, variableScope));
+        BusinessCalendar businessCalendar = serviceConfiguration.getBusinessCalendarManager().getBusinessCalendar(
+                        serviceConfiguration.getJobManager().getBusinessCalendarName(timerEntity, variableScope));
         return businessCalendar.resolveDuedate(timerEntity.getRepeat(), timerEntity.getMaxIterations());
     }
 
@@ -214,14 +222,5 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
             }
         }
         return times;
-    }
-
-    @Override
-    protected TimerJobDataManager getDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(TimerJobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
     }
 }

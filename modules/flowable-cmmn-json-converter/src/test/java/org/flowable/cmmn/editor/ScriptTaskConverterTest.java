@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
@@ -30,22 +28,22 @@ public class ScriptTaskConverterTest extends AbstractConverterTest {
     protected String getResource() {
         return "test.scriptTaskModel.json";
     }
-    
+
     @Override
     protected void validateModel(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
-        assertEquals(2, planModel.getPlanItemDefinitionMap().size());
-        
-        PlanItem planItemA = planModel.getPlanItems().stream().filter(p -> p.getName().equals("A")).findFirst().get();
-        assertEquals("A", planItemA.getName());
-        assertNull(planItemA.getItemControl());
-        
-        PlanItem planItemB = planModel.getPlanItems().stream().filter(p -> p.getName().equals("B")).findFirst().get();
-        assertEquals("B", planItemB.getName());
+        assertThat(planModel.getPlanItemDefinitionMap()).hasSize(2);
+
+        PlanItem planItemA = planModel.getPlanItems().stream().filter(p -> "A".equals(p.getName())).findFirst().get();
+        assertThat(planItemA.getName()).isEqualTo("A");
+        assertThat(planItemA.getItemControl()).isNull();
+
+        PlanItem planItemB = planModel.getPlanItems().stream().filter(p -> "B".equals(p.getName())).findFirst().get();
+        assertThat(planItemB.getName()).isEqualTo("B");
         PlanItemControl planItemControlB = planItemB.getItemControl();
-        assertNotNull(planItemControlB.getRequiredRule());
-        assertNotNull(planItemControlB.getRepetitionRule());
-        assertNotNull(planItemControlB.getManualActivationRule());
+        assertThat(planItemControlB.getRequiredRule()).isNotNull();
+        assertThat(planItemControlB.getRepetitionRule()).isNotNull();
+        assertThat(planItemControlB.getManualActivationRule()).isNotNull();
     }
 
 }

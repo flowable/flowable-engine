@@ -18,11 +18,8 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
-import org.flowable.engine.impl.bpmn.data.IOSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,16 +46,16 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
         // Email, Mule and Shell service tasks
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
-            if (serviceTask.getType().equalsIgnoreCase("mail")) {
+            if ("mail".equalsIgnoreCase(serviceTask.getType())) {
                 activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("mule")) {
+            } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
                 activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createMuleActivityBehavior(serviceTask, bpmnParse.getBpmnModel()));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("camel")) {
+            } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                 activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask, bpmnParse.getBpmnModel()));
 
-            } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
+            } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
                 activity.setActivityBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
 
             } else {
@@ -81,30 +78,9 @@ public class ServiceTaskParseHandler extends AbstractExternalInvocationBpmnParse
         } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) &&
                 StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
 
-            if (!bpmnParse.getOperations().containsKey(serviceTask.getOperationRef())) {
-                LOGGER.warn("{} does not exist for service task {}", serviceTask.getOperationRef(), serviceTask.getId());
-            } else {
+            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask, bpmnParse.getBpmnModel());
+            activity.setActivityBehavior(webServiceActivityBehavior);
 
-                WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
-                webServiceActivityBehavior.setOperation(bpmnParse.getOperations().get(serviceTask.getOperationRef()));
-
-                if (serviceTask.getIoSpecification() != null) {
-                    IOSpecification ioSpecification = createIOSpecification(bpmnParse, serviceTask.getIoSpecification());
-                    webServiceActivityBehavior.setIoSpecification(ioSpecification);
-                }
-
-                for (DataAssociation dataAssociationElement : serviceTask.getDataInputAssociations()) {
-                    AbstractDataAssociation dataAssociation = createDataInputAssociation(bpmnParse, dataAssociationElement);
-                    webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
-                }
-
-                for (DataAssociation dataAssociationElement : serviceTask.getDataOutputAssociations()) {
-                    AbstractDataAssociation dataAssociation = createDataOutputAssociation(bpmnParse, dataAssociationElement);
-                    webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
-                }
-
-                activity.setActivityBehavior(webServiceActivityBehavior);
-            }
         } else {
             LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
         }

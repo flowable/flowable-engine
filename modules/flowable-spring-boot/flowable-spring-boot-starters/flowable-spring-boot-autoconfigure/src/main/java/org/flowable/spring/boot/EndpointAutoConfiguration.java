@@ -17,7 +17,6 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineEndpoint;
 import org.flowable.spring.boot.actuate.endpoint.ProcessEngineMvcEndpoint;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,14 +28,14 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Josh Long
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(Endpoint.class)
 @ConditionalOnProcessEngine
 public class EndpointAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnEnabledEndpoint
+    //@ConditionalOnEnabledEndpoint
     public ProcessEngineEndpoint processEngineEndpoint(ProcessEngine engine) {
         return new ProcessEngineEndpoint(engine);
     }

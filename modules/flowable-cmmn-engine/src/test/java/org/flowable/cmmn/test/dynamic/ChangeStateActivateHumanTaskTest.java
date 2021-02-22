@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.test.dynamic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -29,230 +28,233 @@ public class ChangeStateActivateHumanTaskTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testActivateHumanTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", false)
-                        .start();
-        
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", false)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task1")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task1")
+                .changeState();
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
     public void testActivateSecondHumanTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", true)
-                        .start();
-        
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", true)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task2")
-            .changeState();
-        
-        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task2")
+                .changeState();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").singleResult();
-        assertEquals("Task 1", task.getName());
+        assertThat(task.getName()).isEqualTo("Task One");
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
     public void testActivateSecondHumanTaskWithNoInitialTasks() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", false)
-                        .start();
-        
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", false)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task2")
-            .changeState();
-        
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task2")
+                .changeState();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task1")
-            .changeState();
-        
-        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task1")
+                .changeState();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
-        assertEquals("Task 2", task.getName());
+        assertThat(task.getName()).isEqualTo("Task Two");
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testActivateHumanTaskAndMoveState() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", true)
-                        .start();
-        
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", true)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .movePlanItemDefinitionIdTo("task1", "task2")
-            .activatePlanItemDefinitionId("task3")
-            .changeState();
-        
-        assertEquals(2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseInstanceId(caseInstance.getId())
+                .terminatePlanItemDefinitionId("task1")
+                .activatePlanItemDefinitionId("task2")
+                .activatePlanItemDefinitionId("task3")
+                .changeState();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
-        assertEquals("Task 2", task.getName());
+        assertThat(task.getName()).isEqualTo("Task Two");
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 3", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Three");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testActivateHumanTaskInStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", false)
-                        .start();
-        
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", false)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, planItemInstance.getState());
-        
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task1")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task1")
+                .changeState();
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
+        assertThat(task.getName()).isEqualTo("Task One");
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, dbPlanItemInstance.getState());
-        assertEquals(planItemInstance.getId(), dbPlanItemInstance.getId());
-        
+        assertThat(dbPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(dbPlanItemInstance.getId()).isEqualTo(planItemInstance.getId());
+
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
     @CmmnDeployment
     public void testActivateHumanTaskInStageWithSentry() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateStage", false)
-                        .start();
-        
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(PlanItemInstanceState.AVAILABLE, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult().getState());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateStage", false)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult().getState())
+                .isEqualTo(PlanItemInstanceState.AVAILABLE);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .activatePlanItemDefinitionId("task1")
-            .changeState();
-        
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task1")
+                .changeToAvailableStateByPlanItemDefinitionId("task2")
+                .changeState();
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        
-        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count());
+        assertThat(task.getName()).isEqualTo("Task One");
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals(PlanItemInstanceState.ACTIVE, dbPlanItemInstance.getState());
-        
+        assertThat(dbPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }
-    
+
     @Test
-    @CmmnDeployment(resources="org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/dynamic/ChangeStateActivateHumanTaskTest.testActivateHumanTask.cmmn")
     public void testChangeHumanTaskStateToAvailable() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .variable("activateFirstTask", true)
-                        .start();
-        
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseDefinitionKey("myCase")
+                .variable("activateFirstTask", true)
+                .start();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnRuntimeService.setVariable(caseInstance.getId(), "activateFirstTask", false);
-        
-        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+
         cmmnRuntimeService.createChangePlanItemStateBuilder()
-            .caseInstanceId(caseInstance.getId())
-            .changePlanItemInstanceToAvailableByPlanItemDefinitionId("task1")
-            .changeState();
-        
-        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
-        
+                .caseInstanceId(caseInstance.getId())
+                .changeToAvailableStateByPlanItemDefinitionId("task1")
+                .changeState();
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
         PlanItemInstance dbPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-                        .caseInstanceId(caseInstance.getId())
-                        .planItemDefinitionId("task1")
-                        .singleResult();
-        
-        assertNotNull(dbPlanItemInstance);
-        assertEquals(PlanItemInstanceState.AVAILABLE, dbPlanItemInstance.getState());
-        
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .singleResult();
+
+        assertThat(dbPlanItemInstance).isNotNull();
+        assertThat(dbPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
         cmmnRuntimeService.setVariable(caseInstance.getId(), "activateFirstTask", true);
         cmmnRuntimeService.evaluateCriteria(caseInstance.getId());
-        
+
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task One");
+
         cmmnTaskService.complete(task.getId());
-        
+
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 2", task.getName());
-        
+        assertThat(task.getName()).isEqualTo("Task Two");
+
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
     }

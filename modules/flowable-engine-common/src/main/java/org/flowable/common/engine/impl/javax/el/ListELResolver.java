@@ -275,8 +275,6 @@ public class ListELResolver extends ELResolver {
 	 * 
 	 * @param base
 	 *            The bean to analyze.
-	 * @param property
-	 *            The name of the property to analyze. Will be coerced to a String.
 	 * @return base instanceof List
 	 */
 	private static final boolean isResolvable(Object base) {

@@ -12,19 +12,21 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens
@@ -97,7 +99,7 @@ public class DMNParseUtil {
         String regex;
         if (str.contains("\"")) {
             // only split on comma between matching quotes
-            regex  =",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+            regex = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
         } else {
             regex = ",";
         }
@@ -113,23 +115,22 @@ public class DMNParseUtil {
     }
 
     protected static Object formatElementValue(Object value, Class<?> collectionType) {
-    		
-	    	if(value instanceof String) {
-	    		String stringValue = (String) value;
-	    	
-	        if (stringValue.isEmpty()) {
-	            return null;
-	        }
-	
-	        value = removedSurroundingQuotes(stringValue);
-	    	}
+        if (value instanceof String) {
+            String stringValue = (String) value;
+            if (stringValue.isEmpty()) {
+                return null;
+            }
+
+            value = removedSurroundingQuotes(stringValue);
+        }
 
         // format element based on collection type
         if (Date.class.equals(collectionType)) {
-            return DateUtil.toDate(value.toString());
+            return DateUtil.toDate(value);
         } else if (LocalDate.class.equals(collectionType)) {
             return new DateTime(DateUtil.toDate(value)).toLocalDate();
-        } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType) || Double.class.equals(collectionType)) {
+        } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType)
+            || Double.class.equals(collectionType) || BigInteger.class.equals(collectionType)) {
             return getNumberValue(value.toString(), collectionType);
         } else if (Boolean.class.equals(collectionType)) {
             return Boolean.valueOf(value.toString());
@@ -155,6 +156,8 @@ public class DMNParseUtil {
                 returnValue = Long.valueOf(value);
             } else if (Float.class.equals(targetType)) {
                 returnValue = Float.valueOf(value);
+            } else if (BigInteger.class.equals(targetType)) {
+                returnValue = new BigInteger(value);
             } else { // Default case Double
                 returnValue = Double.valueOf(value);
             }

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -21,7 +23,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -29,7 +30,6 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,35 +45,35 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSplitMergeNoWaitstates() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoinNoWaitStates");
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     @Test
     @Deployment
     public void testUnstructuredConcurrencyTwoForks() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoForks");
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     @Test
     @Deployment
     public void testUnstructuredConcurrencyTwoJoins() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("unstructuredConcurrencyTwoJoins");
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     @Test
     @Deployment
     public void testForkFollowedByOnlyEndEvents() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkFollowedByEndEvents");
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     @Test
     @Deployment
     public void testNestedForksFollowedByEndEvents() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedForksFollowedByEndEvents");
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
     // ACT-482
@@ -85,36 +85,39 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         // After process starts, only task 0 should be active
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         List<org.flowable.task.api.Task> tasks = query.list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task 0", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task 0");
 
         // Completing task 0 will create org.flowable.task.service.Task A and B
         taskService.complete(tasks.get(0).getId());
         tasks = query.list();
-        assertEquals(2, tasks.size());
-        assertEquals("Task A", tasks.get(0).getName());
-        assertEquals("Task B", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task A", "Task B");
 
         // Completing task A should not trigger any new tasks
         taskService.complete(tasks.get(0).getId());
         tasks = query.list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task B", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task B");
 
         // Completing task B creates tasks B1 and B2
         taskService.complete(tasks.get(0).getId());
         tasks = query.list();
-        assertEquals(2, tasks.size());
-        assertEquals("Task B1", tasks.get(0).getName());
-        assertEquals("Task B2", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task B1", "Task B2");
 
         // Completing B1 and B2 will activate both joins, and process reaches
         // task C
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         tasks = query.list();
-        assertEquals(1, tasks.size());
-        assertEquals("Task C", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Task C");
     }
 
     /**
@@ -129,21 +132,22 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         // from the sub process
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         List<org.flowable.task.api.Task> tasks = query.list();
-        assertEquals(2, tasks.size());
-        assertEquals("Another task", tasks.get(0).getName());
-        assertEquals("Some Task", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Another task", "Some Task");
 
         // we complete the task from the parent process, the root execution is
         // recycled, the task in the sub process is still there
         taskService.complete(tasks.get(1).getId());
         tasks = query.list();
-        assertEquals(1, tasks.size());
-        assertEquals("Another task", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Another task");
 
         // we end the task in the sub process and the sub process instance end
         // is propagated to the parent process
         taskService.complete(tasks.get(0).getId());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isZero();
 
         // There is a QA config without history, so we cannot work with this:
         // assertEquals(1,
@@ -159,8 +163,8 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
             List<HistoricActivityInstance> history = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).list();
             for (HistoricActivityInstance h : history) {
                 assertActivityInstancesAreSame(h, runtimeService.createActivityInstanceQuery().activityInstanceId(h.getId()).singleResult());
-                if (h.getActivityId().equals("parallelgateway2")) {
-                    assertNotNull(h.getEndTime());
+                if ("parallelgateway2".equals(h.getActivityId())) {
+                    assertThat(h.getEndTime()).isNotNull();
                 }
             }
         }
@@ -171,13 +175,13 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     public void testAsyncBehavior() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async");
         waitForJobExecutorToProcessAllJobs(20000L, 250L);
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
     /*
      * @Test
      * @Deployment public void testAsyncBehavior() { for (int i = 0; i < 100; i++) { ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("async"); } assertEquals(200,
-     * managementService.createJobQuery().count()); waitForJobExecutorToProcessAllJobs(120000, 5000); assertEquals(0, managementService.createJobQuery().count()); assertEquals(0,
+     * managementService.createJobQuery().count()); waitForJobExecutorToProcessAllJobs(120000, 5000); assertThat(managementService.createJobQuery().count()).isZero(); assertEquals(0,
      * runtimeService.createProcessInstanceQuery().count()); }
      */
 
@@ -188,12 +192,12 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
-            assertEquals(41, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(41);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-                Assert.assertNotNull(historicActivityInstance.getStartTime());
-                Assert.assertNotNull(historicActivityInstance.getEndTime());
+                assertThat(historicActivityInstance.getStartTime()).isNotNull();
+                assertThat(historicActivityInstance.getEndTime()).isNotNull();
                 if (historicActivityInstance.getActivityId().startsWith("flow")) {
-                    assertEquals(historicActivityInstance.getStartTime(), historicActivityInstance.getEndTime());
+                    assertThat(historicActivityInstance.getEndTime()).isEqualTo(historicActivityInstance.getStartTime());
                 }
             }
         }
@@ -215,23 +219,21 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .processInstanceId(processInstance.getProcessInstanceId())
                 .list();
 
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
-                List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionService()
+                List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
+                assertThat(subs)
+                        .extracting(EventSubscription::getEventName)
+                        .containsExactly("testmessage");
 
-                assertEquals(1, subs.size());
-                EventSubscription sub = subs.get(0);
-                assertEquals("testmessage", sub.getEventName());
-
-                return sub.getExecutionId();
+                return subs.get(0).getExecutionId();
             }
         });
         taskService.complete(tasks.get(0).getId());
@@ -240,28 +242,26 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 .processInstanceId(processInstance.getProcessInstanceId())
                 .taskName("task 2")
                 .list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         taskService.complete(tasks.get(0).getId());
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         processEngine.getManagementService().executeCommand(new Command<String>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(processInstance.getProcessInstanceId());
 
-                List<EventSubscription> subs = CommandContextUtil
-                        .getEventSubscriptionService()
+                List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
                         .findEventSubscriptionsByQueryCriteria(q);
+                assertThat(subs)
+                        .extracting(EventSubscription::getEventName)
+                        .containsExactly("testmessage");
 
-                assertEquals(1, subs.size());
-                EventSubscription sub = subs.get(0);
-                assertEquals("testmessage", sub.getEventName());
-
-                return sub.getExecutionId();
+                return subs.get(0).getExecutionId();
             }
         });
 

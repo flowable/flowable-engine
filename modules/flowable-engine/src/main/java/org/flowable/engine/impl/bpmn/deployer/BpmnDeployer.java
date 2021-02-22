@@ -122,7 +122,6 @@ public class BpmnDeployer implements EngineDeployer {
      * When this method creates a new diagram, it also persists it via the ResourceEntityManager and adds it to the resources of the deployment.
      */
     protected void createAndPersistNewDiagramsIfNeeded(ParsedDeployment parsedDeployment) {
-
         final ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         final DeploymentEntity deploymentEntity = parsedDeployment.getDeployment();
 
@@ -197,6 +196,7 @@ public class BpmnDeployer implements EngineDeployer {
      */
     protected void setProcessDefinitionVersionsAndIds(ParsedDeployment parsedDeployment,
             Map<ProcessDefinitionEntity, ProcessDefinitionEntity> mapNewToOldProcessDefinitions) {
+        
         CommandContext commandContext = Context.getCommandContext();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
@@ -220,10 +220,11 @@ public class BpmnDeployer implements EngineDeployer {
 
             cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
     }
@@ -263,10 +264,11 @@ public class BpmnDeployer implements EngineDeployer {
             
             cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
     }
@@ -276,7 +278,8 @@ public class BpmnDeployer implements EngineDeployer {
      */
     protected void persistProcessDefinitionsAndAuthorizations(ParsedDeployment parsedDeployment) {
         CommandContext commandContext = Context.getCommandContext();
-        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessDefinitionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessDefinitionEntityManager processDefinitionManager = processEngineConfiguration.getProcessDefinitionEntityManager();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
             processDefinitionManager.insert(processDefinition, false);
@@ -296,11 +299,12 @@ public class BpmnDeployer implements EngineDeployer {
 
     protected void dispatchProcessDefinitionEntityInitializedEvent(ParsedDeployment parsedDeployment) {
         CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         for (ProcessDefinitionEntity processDefinitionEntity : parsedDeployment.getAllProcessDefinitions()) {
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
+            FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionEntity));
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionEntity),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
     }
@@ -346,8 +350,9 @@ public class BpmnDeployer implements EngineDeployer {
     }
 
     protected void createLocalizationValues(String processDefinitionId, Process process) {
-        if (process == null)
+        if (process == null) {
             return;
+        }
 
         CommandContext commandContext = Context.getCommandContext();
         DynamicBpmnService dynamicBpmnService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicBpmnService();
@@ -399,8 +404,9 @@ public class BpmnDeployer implements EngineDeployer {
     protected boolean localizeFlowElements(Collection<FlowElement> flowElements, ObjectNode infoNode) {
         boolean localizationValuesChanged = false;
 
-        if (flowElements == null)
+        if (flowElements == null) {
             return localizationValuesChanged;
+        }
 
         CommandContext commandContext = Context.getCommandContext();
         DynamicBpmnService dynamicBpmnService = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicBpmnService();

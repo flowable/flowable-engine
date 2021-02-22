@@ -12,12 +12,10 @@
  */
 package org.flowable.rest.service.api.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 
 import org.apache.commons.io.IOUtils;
@@ -36,6 +34,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to single a Process Definition resource.
@@ -57,21 +57,25 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(processDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(processDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(processDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(processDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(processDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(processDefinition.getName(), responseNode.get("name").textValue());
-        assertFalse(responseNode.get("graphicalNotationDefined").booleanValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(processDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, processDefinition.getDeploymentId())));
-        assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getResourceName())));
-        assertTrue(responseNode.get("diagramResource").isNull());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + processDefinition.getId() + "',"
+                        + "name: '" + processDefinition.getName() + "',"
+                        + "key: '" + processDefinition.getKey() + "',"
+                        + "category: '" + processDefinition.getCategory() + "',"
+                        + "version: " + processDefinition.getVersion() + ","
+                        + "description: '" + processDefinition.getDescription() + "',"
+                        + "url: '" + httpGet.getURI().toString() + "',"
+                        + "deploymentId: '" + processDefinition.getDeploymentId() + "',"
+                        + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, processDefinition.getDeploymentId()) + "',"
+                        + "resource: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getResourceName())
+                        + "',"
+                        + "graphicalNotationDefined: false,"
+                        + "diagramResource: null"
+                        + "}");
     }
 
     /**
@@ -87,22 +91,27 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(processDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(processDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(processDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(processDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(processDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(processDefinition.getName(), responseNode.get("name").textValue());
-        assertTrue(responseNode.get("graphicalNotationDefined").booleanValue());
-
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(processDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
-        assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, processDefinition.getDeploymentId())));
-        assertTrue(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getResourceName())));
-        assertTrue(URLDecoder.decode(responseNode.get("diagramResource").textValue(), "UTF-8").endsWith(
-                RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName())));
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + processDefinition.getId() + "',"
+                        + "name: " + processDefinition.getName() + ","
+                        + "key: '" + processDefinition.getKey() + "',"
+                        + "category: '" + processDefinition.getCategory() + "',"
+                        + "version: " + processDefinition.getVersion() + ","
+                        + "description: " + processDefinition.getDescription() + ","
+                        + "url: '" + httpGet.getURI().toString() + "',"
+                        + "deploymentId: '" + processDefinition.getDeploymentId() + "',"
+                        + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, processDefinition.getDeploymentId()) + "',"
+                        + "resource: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(), processDefinition.getResourceName())
+                        + "',"
+                        + "graphicalNotationDefined: true,"
+                        + "diagramResource: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_RESOURCE, processDefinition.getDeploymentId(),
+                                processDefinition.getDiagramResourceName()) + "'"
+                        + "}");
     }
 
     /**
@@ -122,7 +131,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testSuspendProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "suspend");
@@ -134,11 +143,15 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertTrue(responseNode.get("suspended").booleanValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "suspended: true"
+                        + "}");
 
         // Check if process-definition is suspended
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
     }
 
     /**
@@ -148,7 +161,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testSuspendProcessDefinitionDelayed() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
 
@@ -169,11 +182,15 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertTrue(responseNode.get("suspended").booleanValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "suspended: true"
+                        + "}");
 
         // Check if process-definition is not yet suspended
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         // Force suspension by altering time
         cal.add(Calendar.HOUR, 1);
@@ -182,7 +199,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
 
         // Check if process-definition is suspended
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
     }
 
     /**
@@ -195,7 +212,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "suspend");
@@ -216,7 +233,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "activate");
@@ -228,11 +245,15 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertFalse(responseNode.get("suspended").booleanValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "suspended: false"
+                        + "}");
 
         // Check if process-definition is suspended
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
     }
 
     /**
@@ -245,7 +266,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         repositoryService.suspendProcessDefinitionById(processDefinition.getId());
 
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
 
@@ -266,11 +287,15 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertFalse(responseNode.get("suspended").booleanValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "suspended: false"
+                        + "}");
 
         // Check if process-definition is not yet active
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertTrue(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isTrue();
 
         // Force activation by altering time
         cal.add(Calendar.HOUR, 1);
@@ -279,7 +304,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
 
         // Check if process-definition is activated
         processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
     }
 
     /**
@@ -289,7 +314,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testActivateAlreadyActiveProcessDefinition() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "activate");
@@ -309,7 +334,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testIllegalAction() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertFalse(processDefinition.isSuspended());
+        assertThat(processDefinition.isSuspended()).isFalse();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "unexistingaction");
@@ -325,14 +350,14 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessDefinitionResourceData() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_RESOURCE_CONTENT, processDefinition.getId()));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_RESOURCE_CONTENT, processDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
-        assertTrue(content.contains("The One Task Process"));
+        assertThat(content).contains("The One Task Process");
     }
 
     @Test
@@ -346,12 +371,16 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode resultNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(resultNode);
-        JsonNode processes = resultNode.get("processes");
-        assertNotNull(processes);
-        assertTrue(processes.isArray());
-        assertEquals(1, processes.size());
-        assertEquals("oneTaskProcess", processes.get(0).get("id").textValue());
+        assertThatJson(resultNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "processes : [ "
+                        + "              {"
+                        + "                id: 'oneTaskProcess'"
+                        + "              }"
+                        + "            ]"
+                        + "}"
+                );
     }
 
     /**
@@ -381,7 +410,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testUpdateProcessDefinitionCategory() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("OneTaskCategory").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionCategory("OneTaskCategory").count()).isEqualTo(1);
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("category", "updatedcategory");
@@ -393,10 +422,15 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals("updatedcategory", responseNode.get("category").textValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   category: 'updatedcategory'"
+                        + "}"
+                );
 
         // Check actual entry in DB
-        assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionCategory("updatedcategory").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionCategory("updatedcategory").count()).isEqualTo(1);
 
     }
 

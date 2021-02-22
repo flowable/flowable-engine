@@ -123,7 +123,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
             return true;
         }
         
-        // Fetches execution tree. This will store them in the cache and thus avoind extra database calls.
+        // Fetches execution tree. This will store them in the cache and thus avoids extra database calls.
         getList("selectExecutionsWithSameRootProcessInstanceId", executionId,
                 executionsWithSameRootProcessInstanceIdMatcher, true);
         
@@ -317,11 +317,12 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
-    public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime) {
+    public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, String lockOwner, Date expirationTime) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
         params.put("lockTime", lockDate);
         params.put("expirationTime", expirationTime);
+        params.put("lockOwner", lockOwner);
 
         int result = getDbSqlSession().update("updateProcessInstanceLockTime", params);
         if (result == 0) {
@@ -340,5 +341,12 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         params.put("id", processInstanceId);
         getDbSqlSession().update("clearProcessInstanceLockTime", params);
     }
-    
+
+    @Override
+    public void clearAllProcessInstanceLockTimes(String lockOwner) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("lockOwner", lockOwner);
+        getDbSqlSession().update("clearAllProcessInstanceLockTimes", params);
+    }
+
 }

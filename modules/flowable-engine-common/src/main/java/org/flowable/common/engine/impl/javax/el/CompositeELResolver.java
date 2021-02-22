@@ -17,6 +17,7 @@ package org.flowable.common.engine.impl.javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -42,6 +43,14 @@ import java.util.List;
  */
 public class CompositeELResolver extends ELResolver {
 	private final List<ELResolver> resolvers = new ArrayList<>();
+
+	public CompositeELResolver() {
+
+	}
+
+	public CompositeELResolver(Collection<ELResolver> resolvers) {
+		this.resolvers.addAll(resolvers);
+	}
 
 	/**
 	 * Adds the given resolver to the list of component resolvers. Resolvers are consulted in the
@@ -362,7 +371,6 @@ public class CompositeELResolver extends ELResolver {
 	 * <li>Otherwise, iteration stops and no more component resolvers are considered. The value
 	 * returned by <code>getValue()</code> is returned by this method.</li>
 	 * </ol>
-	 * </p>
 	 * 
 	 * <p>
 	 * If none of the component resolvers were able to perform this operation, the value

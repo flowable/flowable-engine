@@ -17,9 +17,10 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -27,8 +28,9 @@ import org.flowable.common.engine.impl.query.AbstractQuery;
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance> implements MilestoneInstanceQuery, QueryCacheValues {
-    
+public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance>
+        implements MilestoneInstanceQuery, CacheAwareQuery<MilestoneInstanceEntity> {
+
     protected String milestoneInstanceId;
     protected String name;
     protected String caseInstanceId;
@@ -131,6 +133,7 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
         return milestoneInstanceId;
     }
     
+    @Override
     public String getId() {
         return milestoneInstanceId;
     }

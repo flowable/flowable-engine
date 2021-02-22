@@ -1,22 +1,22 @@
 ---
 swagger: "2.0"
 info:
-  description: "# flowable / flow??b(??)l /\n\n- a compact and highly efficient workflow\
-    \ and Business Process Management (BPM) platform for developers, system admins\
-    \ and business users.\n- a lightning fast, tried and tested BPMN 2 process engine\
-    \ written in Java. It is Apache 2.0 licensed open source, with a committed community.\n\
-    - can run embedded in a Java application, or as a service on a server, a cluster,\
-    \ and in the cloud. It integrates perfectly with Spring. With a rich Java and\
-    \ REST API, it is the ideal engine for orchestrating human or system activities."
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
   version: "v1"
-  title: "Flowable Decision REST API"
+  title: "Flowable DMN REST API"
   contact:
     name: "Flowable"
     url: "http://www.flowable.org/"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost:8080"
 basePath: "/flowable-rest/dmn-api"
 tags:
 - name: "DMN Rule Service"
@@ -77,6 +77,24 @@ paths:
         in: "query"
         description: "Only return historic decision executions with the given instance\
           \ id."
+        required: false
+        type: "string"
+      - name: "scopeType"
+        in: "query"
+        description: "Only return historic decision executions with the given scope\
+          \ type."
+        required: false
+        type: "string"
+      - name: "processInstanceIdWithChildren"
+        in: "query"
+        description: "Return all historic decision executions with the given process\
+          \ instance id or its entity link children."
+        required: false
+        type: "string"
+      - name: "caseInstanceIdWithChildren"
+        in: "query"
+        description: "Return all historic decision executions with the given case\
+          \ instance id or its entity link children."
         required: false
         type: "string"
       - name: "failed"
@@ -206,7 +224,7 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return decision tables which don?t have the given category."
+        description: "Only return decision tables which do not have the given category."
         required: false
         type: "string"
       - name: "key"
@@ -390,8 +408,20 @@ paths:
         type: "string"
       - name: "categoryNotEquals"
         in: "query"
-        description: "Only return decision table deployments which don?t have the\
+        description: "Only return decision table deployments which do not have the\
           \ given category."
+        required: false
+        type: "string"
+      - name: "parentDeploymentId"
+        in: "query"
+        description: "Only return decision table deployments with the given parent\
+          \ deployment id."
+        required: false
+        type: "string"
+      - name: "parentDeploymentIdLike"
+        in: "query"
+        description: "Only return decision table deployments with a parent deployment\
+          \ id like the given value."
         required: false
         type: "string"
       - name: "tenantId"
@@ -711,6 +741,8 @@ definitions:
         type: "string"
       expression:
         $ref: "#/definitions/Expression"
+      forceDMN11:
+        type: "boolean"
   DecisionTableResponse:
     type: "object"
     properties:
@@ -742,9 +774,6 @@ definitions:
       deploymentId:
         type: "string"
         example: "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a"
-      parentDeploymentId:
-        type: "string"
-        example: "5001"
       tenantId:
         type: "string"
         example: "null"
@@ -962,6 +991,8 @@ definitions:
         type: "string"
       instanceId:
         type: "string"
+      scopeType:
+        type: "string"
       failed:
         type: "boolean"
       startTime:
@@ -971,6 +1002,12 @@ definitions:
         type: "string"
         format: "date-time"
       tenantId:
+        type: "string"
+      decisionKey:
+        type: "string"
+      decisionName:
+        type: "string"
+      decisionVersion:
         type: "string"
   ItemDefinition:
     type: "object"

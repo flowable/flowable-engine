@@ -14,9 +14,6 @@ package org.flowable.app.engine.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -36,55 +33,46 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class DeploymentTest extends FlowableAppTestCase {
-    
-    /**
-     * Simplest test possible: deploy the simple-case.cmmn (from the cmmn-converter module) and see if 
-     * - a deployment exists
-     * - a resouce exists
-     * - a case definition was created 
-     * - that case definition is in the cache
-     * - case definition properties set
-     */
+
     @Test
     @AppDeployment
     public void testAppDefinitionDeployed() throws Exception {
         org.flowable.app.api.repository.AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(appDeployment);
+        assertThat(appDeployment).isNotNull();
         
         List<String> resourceNames = appRepositoryService.getDeploymentResourceNames(appDeployment.getId());
-        assertEquals(1, resourceNames.size());
-        assertEquals("org/flowable/app/engine/test/repository/DeploymentTest.testAppDefinitionDeployed.app", resourceNames.get(0));
+        assertThat(resourceNames).containsOnly("org/flowable/app/engine/test/repository/DeploymentTest.testAppDefinitionDeployed.app");
         
         InputStream inputStream = appRepositoryService.getResourceAsStream(appDeployment.getId(), resourceNames.get(0));
-        assertNotNull(inputStream);
+        assertThat(inputStream).isNotNull();
         inputStream.close();
         
         DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = appEngineConfiguration.getAppDefinitionCache();
-        assertEquals(1, ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().size());
+        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll()).hasSize(1);
         
         AppDefinitionCacheEntry cachedAppDefinition = ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().iterator().next();
-        assertNotNull(cachedAppDefinition.getAppModel());
-        assertNotNull(cachedAppDefinition.getAppDefinition());
+        assertThat(cachedAppDefinition.getAppModel()).isNotNull();
+        assertThat(cachedAppDefinition.getAppDefinition()).isNotNull();
         
         AppDefinition appDefinition = cachedAppDefinition.getAppDefinition();
-        assertNotNull(appDefinition.getId());
-        assertNotNull(appDefinition.getDeploymentId());
-        assertNotNull(appDefinition.getKey());
-        assertNotNull(appDefinition.getResourceName());
-        assertTrue(appDefinition.getVersion() > 0);
+        assertThat(appDefinition.getId()).isNotNull();
+        assertThat(appDefinition.getDeploymentId()).isNotNull();
+        assertThat(appDefinition.getKey()).isNotNull();
+        assertThat(appDefinition.getResourceName()).isNotNull();
+        assertThat(appDefinition.getVersion()).isPositive();
         
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
-        assertNotNull(appDefinition.getId());
-        assertNotNull(appDefinition.getDeploymentId());
-        assertNotNull(appDefinition.getKey());
-        assertNotNull(appDefinition.getResourceName());
-        assertEquals(1, appDefinition.getVersion());
+        assertThat(appDefinition.getId()).isNotNull();
+        assertThat(appDefinition.getDeploymentId()).isNotNull();
+        assertThat(appDefinition.getKey()).isNotNull();
+        assertThat(appDefinition.getResourceName()).isNotNull();
+        assertThat(appDefinition.getVersion()).isEqualTo(1);
         
         AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
-        assertNotNull(appModel);
+        assertThat(appModel).isNotNull();
         
-        assertEquals("testApp", appModel.getKey());
-        assertEquals("Test app", appModel.getName());
+        assertThat(appModel.getKey()).isEqualTo("testApp");
+        assertThat(appModel.getName()).isEqualTo("Test app");
     }
     
     @Test
@@ -92,50 +80,43 @@ public class DeploymentTest extends FlowableAppTestCase {
         appRepositoryService.createDeployment().addZipInputStream(new ZipInputStream(this.getClass().getClassLoader().getResourceAsStream(
                         "org/flowable/app/engine/test/vacationRequest.zip"))).deploy();
         org.flowable.app.api.repository.AppDeployment appDeployment = appRepositoryService.createDeploymentQuery().singleResult();
-        assertNotNull(appDeployment);
+        assertThat(appDeployment).isNotNull();
         
         List<String> resourceNames = appRepositoryService.getDeploymentResourceNames(appDeployment.getId());
-        assertEquals(4, resourceNames.size());
-        
-        boolean vacationRequestAppFound = false;
-        for (String resourceName : resourceNames) {
-            if ("vacationRequestApp.app".equals(resourceName)) {
-                vacationRequestAppFound = true;
-                break;
-            }
-        }
-        assertTrue(vacationRequestAppFound);
+        assertThat(resourceNames).hasSize(4);
+
+        assertThat(resourceNames).contains("vacationRequestApp.app");
         
         InputStream inputStream = appRepositoryService.getResourceAsStream(appDeployment.getId(), "vacationRequestApp.app");
-        assertNotNull(inputStream);
+        assertThat(inputStream).isNotNull();
         inputStream.close();
         
         DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache = appEngineConfiguration.getAppDefinitionCache();
-        assertEquals(1, ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().size());
+        assertThat(((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll()).hasSize(1);
         
         AppDefinitionCacheEntry cachedAppDefinition = ((DefaultDeploymentCache<AppDefinitionCacheEntry>) appDefinitionCache).getAll().iterator().next();
-        assertNotNull(cachedAppDefinition.getAppModel());
-        assertNotNull(cachedAppDefinition.getAppDefinition());
+        assertThat(cachedAppDefinition.getAppModel()).isNotNull();
+        assertThat(cachedAppDefinition.getAppDefinition()).isNotNull();
         
         AppDefinition appDefinition = cachedAppDefinition.getAppDefinition();
-        assertNotNull(appDefinition.getId());
-        assertNotNull(appDefinition.getDeploymentId());
-        assertNotNull(appDefinition.getKey());
-        assertNotNull(appDefinition.getResourceName());
-        assertTrue(appDefinition.getVersion() > 0);
+        assertThat(appDefinition.getId()).isNotNull();
+        assertThat(appDefinition.getDeploymentId()).isNotNull();
+        assertThat(appDefinition.getKey()).isNotNull();
+        assertThat(appDefinition.getResourceName()).isNotNull();
+        assertThat(appDefinition.getVersion()).isPositive();
         
         appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(appDeployment.getId()).singleResult();
-        assertNotNull(appDefinition.getId());
-        assertNotNull(appDefinition.getDeploymentId());
-        assertNotNull(appDefinition.getKey());
-        assertNotNull(appDefinition.getResourceName());
-        assertEquals(1, appDefinition.getVersion());
+        assertThat(appDefinition.getId()).isNotNull();
+        assertThat(appDefinition.getDeploymentId()).isNotNull();
+        assertThat(appDefinition.getKey()).isNotNull();
+        assertThat(appDefinition.getResourceName()).isNotNull();
+        assertThat(appDefinition.getVersion()).isEqualTo(1);
         
         AppModel appModel = appRepositoryService.getAppModel(appDefinition.getId());
-        assertNotNull(appModel);
+        assertThat(appModel).isNotNull();
         
-        assertEquals("vacationRequestApp", appModel.getKey());
-        assertEquals("Vacation request app", appModel.getName());
+        assertThat(appModel.getKey()).isEqualTo("vacationRequestApp");
+        assertThat(appModel.getName()).isEqualTo("Vacation request app");
         
         appRepositoryService.deleteDeployment(appDeployment.getId(), true);
     }

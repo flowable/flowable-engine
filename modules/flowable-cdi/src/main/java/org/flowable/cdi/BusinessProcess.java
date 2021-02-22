@@ -38,11 +38,11 @@ import org.flowable.task.api.Task;
 /**
  * Bean supporting contextual business process management. This allows us to implement a unit of work, in which a particular CDI scope (Conversation / Request / Thread) is associated with a particular
  * Execution / ProcessInstance or Task.
- * <p/>
+ * <p>
  * The protocol is that we <em>associate</em> the {@link BusinessProcess} bean with a particular Execution / Task, then perform some changes (retrieve / set process variables) and then end the unit of
  * work. This bean makes sure that our changes are only "flushed" to the process engine when we successfully complete the unit of work.
- * <p/>
- * A typical usage scenario might look like this:<br />
+ * </p>
+ * A typical usage scenario might look like this:<br>
  * <strong>1st unit of work ("process instantiation"):</strong>
  * <p>
  * <pre>
@@ -65,10 +65,10 @@ import org.flowable.task.api.Task;
  * businessProcess.completeTask(); // now all changed process variables are flushed
  * conversation.end();
  * </pre>
- * <p/>
+ * <p>
  * <strong>NOTE:</strong> in the absence of a conversation, (non faces request, i.e. when processing a JAX-RS, JAX-WS, JMS, remote EJB or plain Servlet requests), the {@link BusinessProcess} bean
  * associates with the current Request (see {@link RequestScoped @RequestScoped}).
- * <p/>
+ * <p>
  * <strong>NOTE:</strong> in the absence of a request, ie. when the JobExecutor accesses {@link BusinessProcessScoped @BusinessProcessScoped} beans, the execution is associated with the current
  * thread.
  *
@@ -218,6 +218,9 @@ public class BusinessProcess implements Serializable {
         return processInstance;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public ProcessInstance startProcessByName(String string) {
 
@@ -236,6 +239,9 @@ public class BusinessProcess implements Serializable {
         return instance;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     public ProcessInstance startProcessByName(String string, Map<String, Object> variables) {
 
@@ -281,7 +287,7 @@ public class BusinessProcess implements Serializable {
 
     /**
      * Signals the current execution, see {@link RuntimeService#trigger(String)}
-     * <p/>
+     * <p>
      * Ends the current unit of work (flushes changes to process variables set using {@link #setVariable(String, Object)} or made on {@link BusinessProcessScoped @BusinessProcessScoped} beans).
      *
      * @throws FlowableCdiException if no execution is currently associated
@@ -309,7 +315,6 @@ public class BusinessProcess implements Serializable {
 
     /**
      * Associates the task with the provided taskId with the current conversation.
-     * <p/>
      *
      * @param taskId the id of the task
      * @return the resumed task
@@ -346,7 +351,7 @@ public class BusinessProcess implements Serializable {
 
     /**
      * Completes the current UserTask, see {@link TaskService#complete(String)}
-     * <p/>
+     * <p>
      * Ends the current unit of work (flushes changes to process variables set using {@link #setVariable(String, Object)} or made on {@link BusinessProcessScoped @BusinessProcessScoped} beans).
      *
      * @throws FlowableCdiException if no task is currently associated

@@ -350,6 +350,15 @@
       }
     },
     {
+      "name": "email.ssl-port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.mail.server.ssl-port"
+      }
+    },
+    {
       "name": "email.use-credentials",
       "type": "java.lang.Boolean",
       "deprecation": {
@@ -409,6 +418,15 @@
         "level": "error",
         "reason": "Moved properties to new group.",
         "replacement": "flowable.mail.server.port"
+      }
+    },
+    {
+      "name": "flowable.mail-server-ssl-port",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "error",
+        "reason": "Moved properties to new group.",
+        "replacement": "flowable.mail.server.ssl-port"
       }
     },
     {
@@ -629,6 +647,31 @@
           "description": "Use the Spring Security 5 PasswordEncoderFactories.createDelegatingPasswordEncoder(). With NoopPasswordEncoder as the default password encoder for matches. This should be used for backwards compatibility with older versions."
         }
 
+      ]
+    },
+    {
+      "name": "flowable.auto-deployment.engine.keys",
+      "values": [
+        {
+          "value": "bpmn",
+          "description": "Process engine."
+        },
+        {
+          "value": "cmmn",
+          "description": "Case engine."
+        },
+        {
+          "value": "dmn",
+          "description": "DMN engine."
+        },
+        {
+          "value": "form",
+          "description": "Form engine."
+        },
+        {
+          "value": "app",
+          "description": "App engine."
+        }
       ]
     }
   ]

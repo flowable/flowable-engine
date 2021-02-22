@@ -16,6 +16,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
@@ -24,7 +25,6 @@ import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.PropertyEntityManager;
-import org.flowable.idm.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.TokenEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityManager;
 
@@ -57,12 +57,12 @@ public class CommandContextUtil {
         return getIdmEngineConfiguration(commandContext).getTableDataManager();
     }
     
-    public static ByteArrayEntityManager getByteArrayEntityManager() {
-        return getByteArrayEntityManager(getCommandContext());
+    public static ByteArrayEntityManager getIdmByteArrayEntityManager() {
+        return getIdmByteArrayEntityManager(getCommandContext());
     }
     
-    public static ByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
-        return getIdmEngineConfiguration(commandContext).getByteArrayEntityManager();
+    public static ByteArrayEntityManager getIdmByteArrayEntityManager(CommandContext commandContext) {
+        return getIdmEngineConfiguration(commandContext).getIdmByteArrayEntityManager();
     }
     
     public static PropertyEntityManager getPropertyEntityManager() {
@@ -70,7 +70,7 @@ public class CommandContextUtil {
     }
     
     public static PropertyEntityManager getPropertyEntityManager(CommandContext commandContext) {
-        return getIdmEngineConfiguration(commandContext).getPropertyEntityManager();
+        return getIdmEngineConfiguration(commandContext).getIdmPropertyEntityManager();
     }
     
     public static UserEntityManager getUserEntityManager() {

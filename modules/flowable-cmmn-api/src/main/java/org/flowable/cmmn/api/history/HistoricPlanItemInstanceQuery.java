@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.api.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceName(String planItemInstanceName);
     HistoricPlanItemInstanceQuery planItemInstanceState(String state);
     HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId);
+    HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);
@@ -38,6 +40,10 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
     HistoricPlanItemInstanceQuery planItemInstanceExitCriterionId(String exitCriterionId);
+    HistoricPlanItemInstanceQuery planItemInstanceFormKey(String formKey);
+    HistoricPlanItemInstanceQuery planItemInstanceExtraValue(String extraValue);
+    HistoricPlanItemInstanceQuery involvedUser(String involvedUser);
+    HistoricPlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups);
     HistoricPlanItemInstanceQuery onlyStages();
     HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId();
@@ -46,6 +52,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery createdAfter(Date createdAfter);
     HistoricPlanItemInstanceQuery lastAvailableBefore(Date availableBefore);
     HistoricPlanItemInstanceQuery lastAvailableAfter(Date availableAfter);
+    HistoricPlanItemInstanceQuery lastUnavailableBefore(Date unavailableBefore);
+    HistoricPlanItemInstanceQuery lastUnavailableAfter(Date unavailableAfter);
     HistoricPlanItemInstanceQuery lastEnabledBefore(Date enabledBefore);
     HistoricPlanItemInstanceQuery lastEnabledAfter(Date enabledAfter);
     HistoricPlanItemInstanceQuery lastDisabledBefore(Date disabledBefore);
@@ -68,5 +76,15 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery notEnded();
     HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
+    HistoricPlanItemInstanceQuery orderByLastAvailableTime();
+    HistoricPlanItemInstanceQuery orderByLastEnabledTime();
+    HistoricPlanItemInstanceQuery orderByLastDisabledTime();
+    HistoricPlanItemInstanceQuery orderByLastStartedTime();
+    HistoricPlanItemInstanceQuery orderByLastSuspendedTime();
+    HistoricPlanItemInstanceQuery orderByLastUpdatedTime();
+    HistoricPlanItemInstanceQuery orderByCompletedTime();
+    HistoricPlanItemInstanceQuery orderByOccurredTime();
+    HistoricPlanItemInstanceQuery orderByTerminatedTime();
+    HistoricPlanItemInstanceQuery orderByExitTime();
     HistoricPlanItemInstanceQuery orderByName();
 }

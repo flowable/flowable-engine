@@ -13,9 +13,15 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -24,6 +30,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
@@ -41,30 +48,60 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
     
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_0", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_0");
             
             runtimeService.addMultiInstanceExecution("miTasks", procId, null);
             
             taskService.complete(task.getId());
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_1", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_1");
             taskService.complete(task.getId());
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_2", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_2");
             taskService.complete(task.getId());
             
             // another mi execution was added
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_3", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_3");
             taskService.complete(task.getId());
     
-            assertNull(taskService.createTaskQuery().singleResult());
+            assertThat(taskService.createTaskQuery().singleResult()).isNull();
+            assertProcessEnded(procId);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasksWithCollection.bpmn20.xml" })
+    public void testAddSequentialUserTaskWithCollection() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Map<String, Object> variableMap = new HashMap<>();
+            ArrayList<String> userList = new ArrayList<>();
+            userList.add("admin");
+            variableMap.put("taskUserList", userList);
+            String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", variableMap).getId();
+
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("admin");
+
+            userList.add("hr");
+            runtimeService.setVariable(procId, "taskUserList", userList);
+            runtimeService.addMultiInstanceExecution("miTasks", procId, CollectionUtil.singletonMap("taskUser", "hr"));
+
+            taskService.complete(task.getId());
+
+            task = taskService.createTaskQuery().singleResult();
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("hr");
+            taskService.complete(task.getId());
+
+            assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
         }
     }
@@ -76,22 +113,22 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
     
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_0", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_0");
             
             runtimeService.deleteMultiInstanceExecution(task.getExecutionId(), false);
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_0", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_0");
             taskService.complete(task.getId());
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_1", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_1");
             taskService.complete(task.getId());
     
-            assertNull(taskService.createTaskQuery().singleResult());
+            assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
         }
     }
@@ -103,22 +140,22 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
     
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_0", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_0");
             
             runtimeService.deleteMultiInstanceExecution(task.getExecutionId(), true);
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_1", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_1");
             taskService.complete(task.getId());
     
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("My Task", task.getName());
-            assertEquals("kermit_2", task.getAssignee());
+            assertThat(task.getName()).isEqualTo("My Task");
+            assertThat(task.getAssignee()).isEqualTo("kermit_2");
             taskService.complete(task.getId());
     
-            assertNull(taskService.createTaskQuery().singleResult());
+            assertThat(taskService.createTaskQuery().singleResult()).isNull();
             assertProcessEnded(procId);
         }
     }
@@ -130,20 +167,17 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasks").getId();
     
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(3, tasks.size());
-            assertEquals("My Task 0", tasks.get(0).getName());
-            assertEquals("My Task 1", tasks.get(1).getName());
-            assertEquals("My Task 2", tasks.get(2).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("My Task 0", "My Task 1", "My Task 2");
             
             runtimeService.addMultiInstanceExecution("miTasks", procId, null);
             
             tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(4, tasks.size());
-            assertEquals("My Task 0", tasks.get(0).getName());
-            assertEquals("My Task 1", tasks.get(1).getName());
-            assertEquals("My Task 2", tasks.get(2).getName());
-            assertEquals("My Task 3", tasks.get(3).getName());
-    
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("My Task 0", "My Task 1", "My Task 2", "My Task 3");
+
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
             taskService.complete(tasks.get(2).getId());
@@ -159,17 +193,16 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasks").getId();
     
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(3, tasks.size());
-            assertEquals("My Task 0", tasks.get(0).getName());
-            assertEquals("My Task 1", tasks.get(1).getName());
-            assertEquals("My Task 2", tasks.get(2).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("My Task 0", "My Task 1", "My Task 2");
             
             runtimeService.deleteMultiInstanceExecution(tasks.get(1).getExecutionId(), false);
             
             tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(2, tasks.size());
-            assertEquals("My Task 0", tasks.get(0).getName());
-            assertEquals("My Task 2", tasks.get(1).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("My Task 0", "My Task 2");
     
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
@@ -185,31 +218,28 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection", CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
         
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
-            assertEquals(5, tasks.size());
-            assertEquals("bubba", tasks.get(0).getAssignee());
-            assertEquals("fozzie", tasks.get(1).getAssignee());
-            assertEquals("gonzo", tasks.get(2).getAssignee());
-            assertEquals("kermit", tasks.get(3).getAssignee());
-            assertEquals("mispiggy", tasks.get(4).getAssignee());
+            assertThat(tasks)
+                    .extracting(Task::getAssignee)
+                    .containsExactly("bubba", "fozzie", "gonzo", "kermit", "mispiggy");
             
             runtimeService.addMultiInstanceExecution("miTasks", procId, Collections.singletonMap("assignee", (Object) "johndoe"));
             tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
-            assertEquals(6, tasks.size());
+            assertThat(tasks).hasSize(6);
         
             // Completing 3 tasks will not yet trigger completion condition
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
             taskService.complete(tasks.get(2).getId());
             
-            assertEquals(3, taskService.createTaskQuery().count());
+            assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
             
             org.flowable.task.api.Task newTask = taskService.createTaskQuery().processInstanceId(procId).taskAssignee("johndoe").singleResult();
-            assertNotNull(newTask);
+            assertThat(newTask).isNotNull();
             
             // Completing task will trigger completion condition
             taskService.complete(newTask.getId());
             
-            assertEquals(0, taskService.createTaskQuery().count());
+            assertThat(taskService.createTaskQuery().count()).isZero();
             assertProcessEnded(procId);
         }
     }
@@ -222,12 +252,12 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivity").getId();
             
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-            assertEquals(14, tasks.size());
+            assertThat(tasks).hasSize(14);
             
             runtimeService.addMultiInstanceExecution("miCallActivity", procId, null);
             
             tasks = taskService.createTaskQuery().list();
-            assertEquals(16, tasks.size());
+            assertThat(tasks).hasSize(16);
             
             for (int i = 0; i < 16; i++) {
                 taskService.complete(tasks.get(i).getId());
@@ -254,14 +284,13 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             }
             
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-            assertEquals(14, tasks.size());
+            assertThat(tasks).hasSize(14);
             
-            assertNotNull(childExecutions);
-            assertEquals(7, childExecutions.size());
+            assertThat(childExecutions).hasSize(7);
             runtimeService.deleteMultiInstanceExecution(childExecutions.get(2).getId(), false);
             
             tasks = taskService.createTaskQuery().list();
-            assertEquals(12, tasks.size());
+            assertThat(tasks).hasSize(12);
             
             for (int i = 0; i < 12; i++) {
                 taskService.complete(tasks.get(i).getId());
@@ -282,10 +311,9 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
             for (int i = 0; i < 3; i++) {
                 List<org.flowable.task.api.Task> tasks = query.list();
-                assertEquals(2, tasks.size());
-    
-                assertEquals("task one", tasks.get(0).getName());
-                assertEquals("task two", tasks.get(1).getName());
+                assertThat(tasks)
+                        .extracting(Task::getName)
+                        .containsExactly("task one", "task two");
     
                 taskService.complete(tasks.get(0).getId());
                 taskService.complete(tasks.get(1).getId());
@@ -311,7 +339,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                 }
             }
             
-            assertNotNull(miExecution);
+            assertThat(miExecution).isNotNull();
             
             List<Execution> childExecutions = runtimeService.createExecutionQuery().parentId(miExecution.getId()).list();
             runtimeService.deleteMultiInstanceExecution(childExecutions.get(0).getId(), false);
@@ -319,10 +347,9 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
             for (int i = 0; i < 3; i++) {
                 List<org.flowable.task.api.Task> tasks = query.list();
-                assertEquals(2, tasks.size());
-    
-                assertEquals("task one", tasks.get(0).getName());
-                assertEquals("task two", tasks.get(1).getName());
+                assertThat(tasks)
+                        .extracting(Task::getName)
+                        .containsExactly("task one", "task two");
     
                 taskService.complete(tasks.get(0).getId());
                 taskService.complete(tasks.get(1).getId());
@@ -348,7 +375,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
                 }
             }
             
-            assertNotNull(miExecution);
+            assertThat(miExecution).isNotNull();
             
             List<Execution> childExecutions = runtimeService.createExecutionQuery().parentId(miExecution.getId()).list();
             runtimeService.deleteMultiInstanceExecution(childExecutions.get(0).getId(), true);
@@ -356,10 +383,9 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
             for (int i = 0; i < 2; i++) {
                 List<org.flowable.task.api.Task> tasks = query.list();
-                assertEquals(2, tasks.size());
-    
-                assertEquals("task one", tasks.get(0).getName());
-                assertEquals("task two", tasks.get(1).getName());
+                assertThat(tasks)
+                        .extracting(Task::getName)
+                        .containsExactly("task one", "task two");
     
                 taskService.complete(tasks.get(0).getId());
                 taskService.complete(tasks.get(1).getId());
@@ -384,10 +410,9 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
             for (int i = 0; i < 5; i++) {
                 List<org.flowable.task.api.Task> tasks = query.list();
-                assertEquals(2, tasks.size());
-    
-                assertEquals("task one", tasks.get(0).getName());
-                assertEquals("task two", tasks.get(1).getName());
+                assertThat(tasks)
+                        .extracting(Task::getName)
+                        .containsExactly("task one", "task two");
     
                 taskService.complete(tasks.get(0).getId());
                 taskService.complete(tasks.get(1).getId());
@@ -404,27 +429,24 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
             String procId = runtimeService.startProcessInstanceByKey("miMultipleParallelSubProcess").getId();
             
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(procId).list();
-            assertEquals(8, tasks.size());
-            
-            try {
-                runtimeService.addMultiInstanceExecution("miSubProcess", procId, null);
-                fail("Expected exception because multiple multi instance executions are present");
-            } catch (FlowableException e) {
-                // expected
-            }
-            
+            assertThat(tasks).hasSize(8);
+
+            assertThatThrownBy(() -> runtimeService.addMultiInstanceExecution("miSubProcess", procId, null))
+                    .as("Expected exception because multiple multi instance executions are present")
+                    .isInstanceOf(FlowableException.class);
+
             List<Execution> miExecutions = runtimeService.createExecutionQuery().activityId("nesting1").list();
-            assertEquals(4, miExecutions.size());
+            assertThat(miExecutions).hasSize(4);
             
             runtimeService.addMultiInstanceExecution("miSubProcess", miExecutions.get(1).getId(), null);
             
             tasks = taskService.createTaskQuery().processInstanceId(procId).list();
-            assertEquals(9, tasks.size());
+            assertThat(tasks).hasSize(9);
             
             runtimeService.addMultiInstanceExecution("nesting1", procId, null);
             
             tasks = taskService.createTaskQuery().processInstanceId(procId).list();
-            assertEquals(11, tasks.size());
+            assertThat(tasks).hasSize(11);
             
             for (org.flowable.task.api.Task task : tasks) {
                 taskService.complete(task.getId());

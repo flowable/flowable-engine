@@ -17,10 +17,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
@@ -39,7 +41,6 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
             verifyResultVariableName(process, serviceTask, errors);
             verifyWebservice(bpmnModel, process, serviceTask, errors);
         }
-
     }
 
     protected void verifyImplementation(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
@@ -47,7 +48,6 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 && !ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) 
-                && !ServiceTask.CASE_TASK.equalsIgnoreCase(serviceTask.getType()) 
                 && StringUtils.isEmpty(serviceTask.getType())) {
             
             addError(errors, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
@@ -58,23 +58,34 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
     protected void verifyType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
-            if (!serviceTask.getType().equalsIgnoreCase("mail") && !serviceTask.getType().equalsIgnoreCase("mule") && !serviceTask.getType().equalsIgnoreCase("camel")
-                    && !serviceTask.getType().equalsIgnoreCase("shell") && !serviceTask.getType().equalsIgnoreCase("dmn") 
-                    && !serviceTask.getType().equalsIgnoreCase("http") && !serviceTask.getType().equalsIgnoreCase("case")) {
-
-                addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
-            }
-
-            if (serviceTask.getType().equalsIgnoreCase("mail")) {
-                validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("shell")) {
-                validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("dmn")) {
-                validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("http")) {
-                validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
-            } else if (serviceTask.getType().equalsIgnoreCase("case")) {
-                validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+            switch (serviceTask.getType()) {
+                case ServiceTask.MAIL_TASK:
+                    validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.SHELL_TASK:
+                    validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.DMN_TASK:
+                    validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.HTTP_TASK:
+                    validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    return;
+                case ServiceTask.CASE_TASK:
+                    validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+                    return;
+                case ServiceTask.SEND_EVENT_TASK:
+                    validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
+                    return;
+                case ServiceTask.EXTERNAL_WORKER_TASK:
+                    validateExternalWorkerTask(process, (ExternalWorkerServiceTask) serviceTask, errors);
+                    return;
+                case "mule":
+                case "camel":
+                    // Mule or camel have no special validation
+                    return;
+                default:
+                    addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
 
         }

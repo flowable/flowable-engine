@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.management;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,14 +54,30 @@ public class JobBaseResource {
         validateJob(job, jobId);
         return job;
     }
+
+    protected HistoryJob getHistoryJobById(String jobId) {
+        HistoryJob job = managementService.createHistoryJobQuery().jobId(jobId).singleResult();
+        validateHistoryJob(job, jobId);
+        return job;
+    }
     
     protected void validateJob(Job job, String jobId) {
         if (job == null) {
-            throw new FlowableObjectNotFoundException("Could not find a deadletter job with id '" + jobId + "'.", Job.class);
+            throw new FlowableObjectNotFoundException("Could not find a job with id '" + jobId + "'.", Job.class);
         }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessJobInfoById(job);
+        }
+    }
+
+    protected void validateHistoryJob(HistoryJob job, String jobId) {
+        if (job == null) {
+            throw new FlowableObjectNotFoundException("Could not find a history job with id '" + jobId + "'.", HistoryJob.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryJobInfoById(job);
         }
     }
 }

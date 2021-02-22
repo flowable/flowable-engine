@@ -17,6 +17,7 @@ import org.flowable.app.engine.AppEngines;
 import org.flowable.app.rest.AppRestApiInterceptor;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,12 +43,12 @@ public class AppEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/app-management/engine", produces = "application/json")
-    public AppEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessAppManagementInfo();
         }
         
-        AppEngineInfoResponse response = new AppEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             AppEngine appEngine = AppEngines.getDefaultAppEngine();
@@ -65,7 +66,7 @@ public class AppEngineResource {
             throw new FlowableException("Error retrieving app engine info", e);
         }
 
-        response.setVersion(AppEngine.VERSION);
+        response.setVersion(AppEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

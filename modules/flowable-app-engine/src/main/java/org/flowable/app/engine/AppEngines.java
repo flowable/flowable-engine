@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +51,7 @@ public abstract class AppEngines {
     public static synchronized void init() {
         if (!isInitialized()) {
             if (appEngines == null) {
-                // Create new map to store CMMN engines if current map is null
+                // Create new map to store App engines if current map is null
                 appEngines = new HashMap<>();
             }
             ClassLoader classLoader = AppEngines.class.getClassLoader();
@@ -60,7 +59,7 @@ public abstract class AppEngines {
             try {
                 resources = classLoader.getResources("flowable.app.cfg.xml");
             } catch (IOException e) {
-                throw new FlowableException("problem retrieving flowable.cmmn.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
+                throw new FlowableException("problem retrieving flowable.app.cfg.xml resources on the classpath: " + System.getProperty("java.class.path"), e);
             }
 
             // Remove duplicated configuration URL's using set. Some
@@ -69,8 +68,7 @@ public abstract class AppEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
-                URL resource = iterator.next();
+            for (URL resource : configUrls) {
                 LOGGER.info("Initializing app engine using configuration '{}'", resource);
                 initAppEngineFromResource(resource);
             }

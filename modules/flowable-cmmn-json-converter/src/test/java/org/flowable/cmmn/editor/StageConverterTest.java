@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.data.Offset.offset;
 
 import java.util.List;
 
@@ -40,192 +40,182 @@ public class StageConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("testCase", caseModel.getId());
-        assertEquals("Test case", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("testCase");
+        assertThat(caseModel.getName()).isEqualTo("Test case");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
-        assertEquals("myPlanModel", planModelStage.getId());
-        assertEquals("My plan model", planModelStage.getName());
-        assertEquals("My plan model documentation", planModelStage.getDocumentation());
-        assertEquals("formKeyDefinition", planModelStage.getFormKey());
-        assertEquals("validateFormFields", planModelStage.getValidateFormFields());
-        assertTrue(planModelStage.isPlanModel());
+        assertThat(planModelStage).isNotNull();
+        assertThat(planModelStage.getId()).isEqualTo("myPlanModel");
+        assertThat(planModelStage.getName()).isEqualTo("My plan model");
+        assertThat(planModelStage.getDocumentation()).isEqualTo("My plan model documentation");
+        assertThat(planModelStage.getFormKey()).isEqualTo("formKeyDefinition");
+        assertThat(planModelStage.getValidateFormFields()).isEqualTo("validateFormFields");
+        assertThat(planModelStage.isPlanModel()).isTrue();
 
         GraphicInfo graphicInfo = model.getGraphicInfo("myPlanModel");
-        assertEquals(30.0, graphicInfo.getX(), 0.1);
-        assertEquals(45.0, graphicInfo.getY(), 0.1);
-        assertEquals(819.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(713.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(30.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(45.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(819.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(713.0, offset(0.1));
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("Task", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("Task");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof HumanTask);
+        assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) planItemDefinition;
-        assertEquals("task1", humanTask.getId());
-        assertEquals("Task", humanTask.getName());
+        assertThat(humanTask.getId()).isEqualTo("task1");
+        assertThat(humanTask.getName()).isEqualTo("Task");
 
-        assertEquals(0, planItem.getEntryCriteria().size());
-        assertEquals(0, planItem.getExitCriteria().size());
+        assertThat(planItem.getEntryCriteria()).isEmpty();
+        assertThat(planItem.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem1");
-        assertEquals(165.0, graphicInfo.getX(), 0.1);
-        assertEquals(122.10, graphicInfo.getY(), 0.1);
-        assertEquals(100.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(80.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(165.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(122.10, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(100.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(80.0, offset(0.1));
 
         PlanItem taskPlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem2");
-        assertNotNull(planItem);
-        assertEquals("planItem2", taskPlanItem.getId());
-        assertEquals("Task2", taskPlanItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(taskPlanItem.getId()).isEqualTo("planItem2");
+        assertThat(taskPlanItem.getName()).isEqualTo("Task2");
         planItemDefinition = taskPlanItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof HumanTask);
+        assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
-        assertEquals("task2", humanTask.getId());
-        assertEquals("Task2", humanTask.getName());
+        assertThat(humanTask.getId()).isEqualTo("task2");
+        assertThat(humanTask.getName()).isEqualTo("Task2");
 
-        assertEquals(1, taskPlanItem.getEntryCriteria().size());
-        assertEquals(0, taskPlanItem.getExitCriteria().size());
+        assertThat(taskPlanItem.getEntryCriteria()).hasSize(1);
+        assertThat(taskPlanItem.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem2");
-        assertEquals(405.0, graphicInfo.getX(), 0.1);
-        assertEquals(120.0, graphicInfo.getY(), 0.1);
-        assertEquals(100.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(80.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(405.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(120.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(100.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(80.0, offset(0.1));
 
         PlanItem milestonePlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem6");
-        assertNotNull(milestonePlanItem);
-        assertEquals("planItem6", milestonePlanItem.getId());
-        assertEquals("Milestone 1", milestonePlanItem.getName());
+        assertThat(milestonePlanItem).isNotNull();
+        assertThat(milestonePlanItem.getId()).isEqualTo("planItem6");
+        assertThat(milestonePlanItem.getName()).isEqualTo("Milestone 1");
         planItemDefinition = milestonePlanItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof Milestone);
+        assertThat(planItemDefinition).isInstanceOf(Milestone.class);
         Milestone milestone = (Milestone) planItemDefinition;
-        assertEquals("milestone1", milestone.getId());
-        assertEquals("Milestone 1", milestone.getName());
+        assertThat(milestone.getId()).isEqualTo("milestone1");
+        assertThat(milestone.getName()).isEqualTo("Milestone 1");
 
-        assertEquals(1, milestonePlanItem.getEntryCriteria().size());
-        assertEquals(0, milestonePlanItem.getExitCriteria().size());
+        assertThat(milestonePlanItem.getEntryCriteria()).hasSize(1);
+        assertThat(milestonePlanItem.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem6");
-        assertEquals(630.0, graphicInfo.getX(), 0.1);
-        assertEquals(133.0, graphicInfo.getY(), 0.1);
-        assertEquals(146.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(54.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(630.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(133.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(146.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(54.0, offset(0.1));
 
         List<Sentry> sentries = planModelStage.getSentries();
-        assertEquals(2, sentries.size());
+        assertThat(sentries).hasSize(2);
 
         Sentry sentry = sentries.get(0);
 
         Criterion criterion = taskPlanItem.getEntryCriteria().get(0);
-        assertEquals(sentry.getId(), criterion.getSentryRef());
+        assertThat(criterion.getSentryRef()).isEqualTo(sentry.getId());
 
-        assertEquals(1, sentry.getOnParts().size());
-        SentryOnPart onPart = sentry.getOnParts().get(0);
-        assertEquals("complete", onPart.getStandardEvent());
-        assertEquals("planItem1", onPart.getSourceRef());
+        assertThat(sentry.getOnParts())
+                .extracting(SentryOnPart::getStandardEvent, SentryOnPart::getSourceRef)
+                .containsExactly(tuple("complete", "planItem1"));
 
         sentry = sentries.get(1);
 
         criterion = milestonePlanItem.getEntryCriteria().get(0);
-        assertEquals(sentry.getId(), criterion.getSentryRef());
+        assertThat(criterion.getSentryRef()).isEqualTo(sentry.getId());
 
-        assertEquals(1, sentry.getOnParts().size());
-        onPart = sentry.getOnParts().get(0);
-        assertEquals("complete", onPart.getStandardEvent());
-        assertEquals("planItem2", onPart.getSourceRef());
+        assertThat(sentry.getOnParts())
+                .extracting(SentryOnPart::getStandardEvent, SentryOnPart::getSourceRef)
+                .containsExactly(tuple("complete", "planItem2"));
 
         PlanItem stagePlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem5");
-        assertNotNull(stagePlanItem);
-        assertEquals("planItem5", stagePlanItem.getId());
-        assertEquals("Child stage", stagePlanItem.getName());
+        assertThat(stagePlanItem).isNotNull();
+        assertThat(stagePlanItem.getId()).isEqualTo("planItem5");
+        assertThat(stagePlanItem.getName()).isEqualTo("Child stage");
         planItemDefinition = stagePlanItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof Stage);
+        assertThat(planItemDefinition).isInstanceOf(Stage.class);
         Stage stage = (Stage) planItemDefinition;
-        assertEquals("childStage", stage.getId());
-        assertEquals("Child stage", stage.getName());
-        assertEquals(planModelStage.getId(), stagePlanItem.getParentStage().getId());
+        assertThat(stage.getId()).isEqualTo("childStage");
+        assertThat(stage.getName()).isEqualTo("Child stage");
+        assertThat(stagePlanItem.getParentStage().getId()).isEqualTo(planModelStage.getId());
 
-        assertEquals(0, stagePlanItem.getEntryCriteria().size());
-        assertEquals(0, stagePlanItem.getExitCriteria().size());
+        assertThat(stagePlanItem.getEntryCriteria()).isEmpty();
+        assertThat(stagePlanItem.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem5");
-        assertEquals(105.0, graphicInfo.getX(), 0.1);
-        assertEquals(240.0, graphicInfo.getY(), 0.1);
-        assertEquals(481.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(241.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(105.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(240.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(481.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(241.0, offset(0.1));
 
-        assertEquals(2, stage.getPlanItems().size());
+        assertThat(stage.getPlanItems()).hasSize(2);
         PlanItem subPlanItem1 = stage.findPlanItemInPlanFragmentOrUpwards("planItem3");
-        assertNotNull(subPlanItem1);
-        assertEquals("planItem3", subPlanItem1.getId());
-        assertEquals("Sub task 1", subPlanItem1.getName());
+        assertThat(subPlanItem1).isNotNull();
+        assertThat(subPlanItem1.getId()).isEqualTo("planItem3");
+        assertThat(subPlanItem1.getName()).isEqualTo("Sub task 1");
         planItemDefinition = subPlanItem1.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof HumanTask);
+        assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
-        assertEquals("subTask1", humanTask.getId());
-        assertEquals("Sub task 1", humanTask.getName());
-        assertEquals(stage.getId(), subPlanItem1.getParentStage().getId());
+        assertThat(humanTask.getId()).isEqualTo("subTask1");
+        assertThat(humanTask.getName()).isEqualTo("Sub task 1");
+        assertThat(subPlanItem1.getParentStage().getId()).isEqualTo(stage.getId());
 
-        assertEquals(1, subPlanItem1.getEntryCriteria().size());
-        assertEquals(0, subPlanItem1.getExitCriteria().size());
+        assertThat(subPlanItem1.getEntryCriteria()).hasSize(1);
+        assertThat(subPlanItem1.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem3");
-        assertEquals(194.0, graphicInfo.getX(), 0.1);
-        assertEquals(325.0, graphicInfo.getY(), 0.1);
-        assertEquals(100.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(80.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(194.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(325.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(100.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(80.0, offset(0.1));
 
         PlanItem subPlanItem2 = stage.findPlanItemInPlanFragmentOrUpwards("planItem4");
-        assertNotNull(subPlanItem2);
-        assertEquals("planItem4", subPlanItem2.getId());
-        assertEquals("Sub task 2", subPlanItem2.getName());
+        assertThat(subPlanItem2).isNotNull();
+        assertThat(subPlanItem2.getId()).isEqualTo("planItem4");
+        assertThat(subPlanItem2.getName()).isEqualTo("Sub task 2");
         planItemDefinition = subPlanItem2.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof HumanTask);
+        assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         humanTask = (HumanTask) planItemDefinition;
-        assertEquals("subTask2", humanTask.getId());
-        assertEquals("Sub task 2", humanTask.getName());
-        assertEquals(stage.getId(), subPlanItem2.getParentStage().getId());
+        assertThat(humanTask.getId()).isEqualTo("subTask2");
+        assertThat(humanTask.getName()).isEqualTo("Sub task 2");
+        assertThat(subPlanItem2.getParentStage().getId()).isEqualTo(stage.getId());
 
-        assertEquals(1, subPlanItem2.getEntryCriteria().size());
-        assertEquals(0, subPlanItem2.getExitCriteria().size());
+        assertThat(subPlanItem2.getEntryCriteria()).hasSize(1);
+        assertThat(subPlanItem2.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem4");
-        assertEquals(390.0, graphicInfo.getX(), 0.1);
-        assertEquals(325.0, graphicInfo.getY(), 0.1);
-        assertEquals(100.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(80.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(390.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(325.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(100.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(80.0, offset(0.1));
 
         sentries = stage.getSentries();
-        assertEquals(2, sentries.size());
+        assertThat(sentries).hasSize(2);
 
         sentry = sentries.get(0);
 
         criterion = subPlanItem1.getEntryCriteria().get(0);
-        assertEquals(sentry.getId(), criterion.getSentryRef());
+        assertThat(criterion.getSentryRef()).isEqualTo(sentry.getId());
 
-        assertEquals(1, sentry.getOnParts().size());
-        onPart = sentry.getOnParts().get(0);
-        assertEquals("complete", onPart.getStandardEvent());
-        assertEquals("planItem2", onPart.getSourceRef());
+        assertThat(sentry.getOnParts())
+                .extracting(SentryOnPart::getStandardEvent, SentryOnPart::getSourceRef)
+                .containsExactly(tuple("complete", "planItem2"));
 
         sentry = sentries.get(1);
 
         criterion = subPlanItem2.getEntryCriteria().get(0);
-        assertEquals(sentry.getId(), criterion.getSentryRef());
+        assertThat(criterion.getSentryRef()).isEqualTo(sentry.getId());
 
-        assertEquals(1, sentry.getOnParts().size());
-        onPart = sentry.getOnParts().get(0);
-        assertEquals("complete", onPart.getStandardEvent());
-        assertEquals("planItem3", onPart.getSourceRef());
+        assertThat(sentry.getOnParts())
+                .extracting(SentryOnPart::getStandardEvent, SentryOnPart::getSourceRef)
+                .containsExactly(tuple("complete", "planItem3"));
     }
 }

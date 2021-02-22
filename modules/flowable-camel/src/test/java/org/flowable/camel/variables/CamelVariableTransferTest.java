@@ -12,6 +12,9 @@
  */
 package org.flowable.camel.variables;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.List;
 import java.util.Map;
 
@@ -117,15 +120,18 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
         tpl.send("direct:startAllProperties", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertEquals("sampleValueForProperty1", variables.get("property1"));
-        assertEquals("sampleValueForProperty2", variables.get("property2"));
-        assertEquals("sampleValueForProperty3", variables.get("property3"));
+        assertThat(variables)
+                .contains(
+                        entry("property1", "sampleValueForProperty1"),
+                        entry("property2", "sampleValueForProperty2"),
+                        entry("property3", "sampleValueForProperty3")
+                );
     }
 
     // check that body will be copied into variables even if copyVariablesFromProperties=true
@@ -137,16 +143,19 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
 
         tpl.send("direct:startAllProperties", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertEquals("sampleValueForProperty1", variables.get("property1"));
-        assertEquals("sampleValueForProperty2", variables.get("property2"));
-        assertEquals("sampleValueForProperty3", variables.get("property3"));
-        assertEquals("sampleBody", variables.get("camelBody"));
+        assertThat(variables)
+                .contains(
+                        entry("property1", "sampleValueForProperty1"),
+                        entry("property2", "sampleValueForProperty2"),
+                        entry("property3", "sampleValueForProperty3"),
+                        entry("camelBody", "sampleBody")
+                );
     }
 
     @Test
@@ -156,15 +165,18 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startFilteredProperties").createExchange();
         tpl.send("direct:startFilteredProperties", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertEquals("sampleValueForProperty1", variables.get("property1"));
-        assertEquals("sampleValueForProperty2", variables.get("property2"));
-        assertNull(variables.get("property3"));
+        assertThat(variables)
+                .contains(
+                        entry("property1", "sampleValueForProperty1"),
+                        entry("property2", "sampleValueForProperty2")
+                )
+                .doesNotContainKey("property3");
     }
 
     @Test
@@ -174,15 +186,14 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startNoProperties").createExchange();
         tpl.send("direct:startNoProperties", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertNull(variables.get("property1"));
-        assertNull(variables.get("property2"));
-        assertNull(variables.get("property3"));
+        assertThat(variables)
+                .doesNotContainKeys("property1", "property2", "property3");
     }
 
     @Test
@@ -192,15 +203,18 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startAllProperties").createExchange();
         tpl.send("direct:startAllProperties", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertEquals("sampleValueForProperty1", variables.get("property1"));
-        assertEquals("sampleValueForProperty2", variables.get("property2"));
-        assertEquals("sampleValueForProperty3", variables.get("property3"));
+        assertThat(variables)
+                .contains(
+                        entry("property1", "sampleValueForProperty1"),
+                        entry("property2", "sampleValueForProperty2"),
+                        entry("property3", "sampleValueForProperty3")
+                );
     }
 
     @Test
@@ -210,15 +224,18 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startFilteredHeaders").createExchange();
         tpl.send("direct:startFilteredHeaders", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertEquals("sampleValueForProperty1", variables.get("property1"));
-        assertEquals("sampleValueForProperty2", variables.get("property2"));
-        assertNull(variables.get("property3"));
+        assertThat(variables)
+                .contains(
+                        entry("property1", "sampleValueForProperty1"),
+                        entry("property2", "sampleValueForProperty2")
+                )
+                .doesNotContainKey("property3");
     }
 
     @Test
@@ -228,15 +245,14 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         Exchange exchange = camelContext.getEndpoint("direct:startNoHeaders").createExchange();
         tpl.send("direct:startNoHeaders", exchange);
 
-        assertNotNull(taskService);
-        assertNotNull(runtimeService);
-        assertEquals(1, taskService.createTaskQuery().count());
+        assertThat(taskService).isNotNull();
+        assertThat(runtimeService).isNotNull();
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
         Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> variables = runtimeService.getVariables(task.getExecutionId());
-        assertNull(variables.get("property1"));
-        assertNull(variables.get("property2"));
-        assertNull(variables.get("property3"));
+        assertThat(variables)
+                .doesNotContainKeys("property1", "property2", "property3");
     }
 
 }

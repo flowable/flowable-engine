@@ -18,10 +18,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -94,7 +94,7 @@ public class FlowableDmnExtension implements ParameterResolver, BeforeEachCallba
         DmnEngineConfiguration.class,
         DmnEngine.class,
         DmnRepositoryService.class,
-        DmnRuleService.class,
+        DmnDecisionService.class,
         DmnHistoryService.class,
         DmnManagementService.class
     ));

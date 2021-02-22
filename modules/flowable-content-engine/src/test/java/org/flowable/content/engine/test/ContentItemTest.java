@@ -13,11 +13,7 @@
 package org.flowable.content.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,11 +38,11 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         contentItem.setProcessInstanceId("123456");
         contentService.saveContentItem(contentItem);
 
-        assertNotNull(contentItem.getId());
+        assertThat(contentItem.getId()).isNotNull();
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
-        assertNotNull(dbContentItem);
-        assertEquals(contentItem.getId(), dbContentItem.getId());
+        assertThat(dbContentItem).isNotNull();
+        assertThat(dbContentItem.getId()).isEqualTo(contentItem.getId());
 
         contentService.deleteContentItem(contentItem.getId());
     }
@@ -101,38 +97,28 @@ public class ContentItemTest extends AbstractFlowableContentTest {
             contentService.saveContentItem(contentItem, in);
         }
 
-        assertNotNull(contentItem.getId());
-        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+        assertThat(contentItem.getId()).isNotNull();
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-            ).exists()
-        );
+        )).exists();
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
-        assertNotNull(dbContentItem);
-        assertEquals(contentItem.getId(), dbContentItem.getId());
+        assertThat(dbContentItem).isNotNull();
+        assertThat(dbContentItem.getId()).isEqualTo(contentItem.getId());
 
         try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
             String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
-            assertEquals("hello", contentValue);
+            assertThat(contentValue).isEqualTo("hello");
         }
 
         contentService.deleteContentItem(contentItem.getId());
 
-        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-            ).exists()
-        );
-        try {
-            contentService.getContentItemData(contentItem.getId());
-            fail("Expected not found exception");
+        )).doesNotExist();
 
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-
-        } catch (Exception e) {
-            fail("Expected not found exception, not " + e);
-        }
-
+        assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
@@ -147,38 +133,28 @@ public class ContentItemTest extends AbstractFlowableContentTest {
             contentService.saveContentItem(contentItem, in);
         }
 
-        assertNotNull(contentItem.getId());
-        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+        assertThat(contentItem.getId()).isNotNull();
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-            ).exists()
-        );
+        )).exists();
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
-        assertNotNull(dbContentItem);
-        assertEquals(contentItem.getId(), dbContentItem.getId());
+        assertThat(dbContentItem).isNotNull();
+        assertThat(dbContentItem.getId()).isEqualTo(contentItem.getId());
 
         try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
             String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
-            assertEquals("hello", contentValue);
+            assertThat(contentValue).isEqualTo("hello");
         }
 
         contentService.deleteContentItem(contentItem.getId());
 
-        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
                 contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
-            ).exists()
-        );
-        try {
-            contentService.getContentItemData(contentItem.getId());
-            fail("Expected not found exception");
+        )).doesNotExist();
 
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-
-        } catch (Exception e) {
-            fail("Expected not found exception, not " + e);
-        }
-
+        assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
@@ -190,66 +166,57 @@ public class ContentItemTest extends AbstractFlowableContentTest {
     protected void assertCreateContentWithData(ContentItem contentItem, String typeDirectory) throws IOException {
         contentItem.setName("testItem");
         contentItem.setMimeType("application/pdf");
-        try(InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
             contentService.saveContentItem(contentItem, in);
         }
 
-        assertNotNull(contentItem.getId());
+        assertThat(contentItem.getId()).isNotNull();
         assertFileExists(typeDirectory, "123456", contentItem.getContentStoreId());
 
         ContentItem dbContentItem = contentService.createContentItemQuery().id(contentItem.getId()).singleResult();
-        assertNotNull(dbContentItem);
-        assertEquals(contentItem.getId(), dbContentItem.getId());
+        assertThat(dbContentItem).isNotNull();
+        assertThat(dbContentItem.getId()).isEqualTo(contentItem.getId());
 
-        try(InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
+        try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
             String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
-            assertEquals("hello", contentValue);
+            assertThat(contentValue).isEqualTo("hello");
         }
 
         contentService.deleteContentItem(contentItem.getId());
 
         assertMissingFile(typeDirectory, "123456", contentItem.getContentStoreId());
-        try {
-            contentService.getContentItemData(contentItem.getId());
-            fail("Expected not found exception");
 
-        } catch (FlowableObjectNotFoundException e) {
-            // expected
-
-        } catch (Exception e) {
-            fail("Expected not found exception, not " + e);
-        }
+        assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     protected void assertFileExists(String typeFolder, String idFolder, String contentStoreId) {
-        assertTrue(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
-                + File.separator + idFolder +File.separator+
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
+                + File.separator + idFolder + File.separator +
                 contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
-            ).exists()
-        );
+        )).exists();
     }
 
     protected void assertMissingFile(String typeFolder, String idFolder, String contentStoreId) {
-        assertFalse(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
-                + File.separator + idFolder +File.separator+
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + typeFolder
+                + File.separator + idFolder + File.separator +
                 contentStoreId.substring(contentStoreId.lastIndexOf('.') + 1)
-            ).exists()
-        );
+        )).doesNotExist();
     }
 
     @Test
     public void queryContentItemWithScopeId() {
         createContentItem();
-        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeId("testScopeId").singleResult().getName());
-        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeIdLike("testScope%").singleResult().getName());
+        assertThat(contentService.createContentItemQuery().scopeId("testScopeId").singleResult().getName()).isEqualTo("testScopeItem");
+        assertThat(contentService.createContentItemQuery().scopeIdLike("testScope%").singleResult().getName()).isEqualTo("testScopeItem");
         contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
     }
 
     @Test
     public void queryContentItemWithScopeType() {
         createContentItem();
-        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeType("testScopeType").singleResult().getName());
-        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeTypeLike("testScope%").singleResult().getName());
+        assertThat(contentService.createContentItemQuery().scopeType("testScopeType").singleResult().getName()).isEqualTo("testScopeItem");
+        assertThat(contentService.createContentItemQuery().scopeTypeLike("testScope%").singleResult().getName()).isEqualTo("testScopeItem");
         contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
     }
 
@@ -269,11 +236,11 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         contentItem2.setScopeId("testScopeId");
         contentService.saveContentItem(contentItem2);
 
-        assertEquals(2, contentService.createContentItemQuery().scopeTypeLike("testScope%").list().size());
+        assertThat(contentService.createContentItemQuery().scopeTypeLike("testScope%").list()).hasSize(2);
 
         contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
 
-        assertEquals(0, contentService.createContentItemQuery().scopeTypeLike("testScope%").list().size());
+        assertThat(contentService.createContentItemQuery().scopeTypeLike("testScope%").list()).isEmpty();
     }
 
     @Test
@@ -286,25 +253,23 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         Date createDate = Date.from(createTime);
         contentEngineConfiguration.getClock().setCurrentTime(createDate);
         contentService.saveContentItem(initialContentItem);
-        assertNotNull(initialContentItem.getId());
-        assertThat(initialContentItem.getLastModified())
-            .isEqualTo(createDate);
+        assertThat(initialContentItem.getId()).isNotNull();
+        assertThat(initialContentItem.getLastModified()).isEqualTo(createDate);
 
         ContentItem storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
-        assertNotNull(storedContentItem);
-        assertEquals(initialContentItem.getId(), storedContentItem.getId());
-        assertThat(initialContentItem.getLastModified())
-            .isEqualTo(storedContentItem.getLastModified());
+        assertThat(storedContentItem).isNotNull();
+        assertThat(storedContentItem.getId()).isEqualTo(initialContentItem.getId());
+        assertThat(initialContentItem.getLastModified()).isEqualTo(storedContentItem.getLastModified());
 
         Date updateDate = Date.from(createTime.plusSeconds(557));
         contentEngineConfiguration.getClock().setCurrentTime(updateDate);
         contentService.saveContentItem(storedContentItem, this.getClass().getClassLoader().getResourceAsStream("test.txt"));
         storedContentItem = contentService.createContentItemQuery().id(initialContentItem.getId()).singleResult();
-        assertNotNull(storedContentItem);
-        assertEquals(initialContentItem.getId(), storedContentItem.getId());
+        assertThat(storedContentItem).isNotNull();
+        assertThat(storedContentItem.getId()).isEqualTo(initialContentItem.getId());
         InputStream contentStream = contentService.getContentItemData(initialContentItem.getId());
         String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
-        assertEquals("hello", contentValue);
+        assertThat(contentValue).isEqualTo("hello");
 
         assertThat(initialContentItem.getLastModified()).isNotEqualTo(storedContentItem.getLastModified());
         assertThat(storedContentItem.getLastModified()).isEqualTo(updateDate);

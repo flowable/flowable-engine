@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.el.function;
 
 import java.util.Arrays;
 
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Opposite operation of the ${@link VariableIsEmptyExpressionFunction} .
@@ -27,13 +27,8 @@ public class VariableIsNotEmptyExpressionFunction extends AbstractFlowableVariab
         super(Arrays.asList("isNotEmpty", "notEmpty"), "isNotEmpty");
     }
     
-    @Override
-    protected boolean isMultiParameterFunction() {
-        return false;
-    }
-    
-    public static boolean isNotEmpty(VariableScope variableScope, String variableName) {
-        return !VariableIsEmptyExpressionFunction.isEmpty(variableScope, variableName);
+    public static boolean isNotEmpty(VariableContainer variableContainer, String variableName) {
+        return !VariableIsEmptyExpressionFunction.isEmpty(variableContainer, variableName);
     }
 
 }

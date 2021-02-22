@@ -1,0 +1,95 @@
+{
+  "modelId": "2602ad18-942d-11ea-97bb-acde48001122",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "drd_id": "decisionServiceTestOne",
+    "name": "Decision Service Test One"
+  },
+  "childShapes": [
+    {
+      "resourceId": "expandedDecisionService",
+      "properties": {
+      },
+      "stencil": {
+        "id": "ExpandedDecisionService"
+      },
+      "childShapes": [
+        {
+          "resourceId": "outputDecisions",
+          "properties": {
+            "overrideid": "outputDecisions",
+            "name": "Decision Service 1",
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "OutputDecisionsDecisionServiceSection"
+          },
+          "childShapes": [
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 606,
+              "y": 240
+            },
+            "upperLeft": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "encapsulatedDecisions",
+          "properties": {
+          },
+          "stencil": {
+            "id": "EncapsulatedDecisionsDecisionServiceSection"
+          },
+          "childShapes": [
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 606,
+              "y": 541
+            },
+            "upperLeft": {
+              "x": 0,
+              "y": 240
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 756,
+          "y": 615
+        },
+        "upperLeft": {
+          "x": 150,
+          "y": 74
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "DMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/dmn1.2#",
+    "url": "../editor/stencilsets/dmn1.1/dmn1.2.json"
+  }
+}

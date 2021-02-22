@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
+import org.flowable.app.engine.AppEngine;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
@@ -32,6 +33,9 @@ import org.springframework.core.io.Resource;
  * @author Tiese Barrell
  */
 public class AbstractAutoDeploymentStrategyTest {
+
+    @Mock
+    protected AppEngine appEngineMock;
 
     @Mock
     protected AppRepositoryService repositoryServiceMock;
@@ -71,6 +75,8 @@ public class AbstractAutoDeploymentStrategyTest {
 
     @Before
     public void before() throws Exception {
+
+        when(appEngineMock.getAppRepositoryService()).thenReturn(repositoryServiceMock);
 
         when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
         when(resourceMock1.getFile()).thenReturn(fileMock1);

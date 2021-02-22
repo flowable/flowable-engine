@@ -22,7 +22,7 @@ public class ExecutionsByRootProcessInstanceMatcher extends CachedEntityMatcherA
 
     @Override
     public boolean isRetained(ExecutionEntity entity, Object parameter) {
-        return entity.getRootProcessInstanceId() != null && entity.getRootProcessInstanceId().equals((String) parameter);
+        return entity.getRootProcessInstanceId() != null && entity.getRootProcessInstanceId().equals(parameter);
     }
 
 }

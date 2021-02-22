@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Privilege;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -28,19 +29,22 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 public class CreatePrivilegeCmd implements Command<Privilege>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected IdmEngineConfiguration idmEngineConfiguration;
 
     protected String name;
 
-    public CreatePrivilegeCmd(String name) {
+    public CreatePrivilegeCmd(String name, IdmEngineConfiguration idmEngineConfiguration) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("Privilege name is null");
         }
         this.name = name;
+        this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
     @Override
     public Privilege execute(CommandContext commandContext) {
-        long count = CommandContextUtil.getPrivilegeEntityManager(commandContext).createNewPrivilegeQuery().privilegeName(name).count();
+        long count = idmEngineConfiguration.getPrivilegeEntityManager().createNewPrivilegeQuery().privilegeName(name).count();
         if (count > 0) {
             throw new FlowableIllegalArgumentException("Provided privilege name already exists");
         }

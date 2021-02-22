@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -58,7 +60,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
         currentCal.add(Calendar.MINUTE, 1);
         processEngineConfiguration.getClock().setCurrentTime(currentCal.getTime());
 
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 200L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(12500L, 200L);
 
         Set<String> messages = new HashSet<>(tweetHandler.getMessages());
         Set<String> expectedMessages = new HashSet<>();
@@ -69,6 +71,6 @@ public class JobExecutorTest extends JobExecutorTestCase {
         expectedMessages.add("timer-one");
         expectedMessages.add("timer-two");
 
-        assertEquals(new TreeSet<>(expectedMessages), new TreeSet<>(messages));
+        assertThat(new TreeSet<>(messages)).isEqualTo(new TreeSet<>(expectedMessages));
     }
 }

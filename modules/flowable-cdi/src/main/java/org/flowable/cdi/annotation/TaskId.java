@@ -23,7 +23,7 @@ import org.flowable.task.api.Task;
 
 /**
  * Qualifier annotation for injecting the current taskId.
- * <p />
+ * <p>
  * Example:
  * 
  * <pre>

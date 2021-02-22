@@ -15,14 +15,15 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
-import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -33,6 +34,7 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 public class GetHistoricIdentityLinksForTaskCmd implements Command<List<HistoricIdentityLink>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String taskId;
 
     public GetHistoricIdentityLinksForTaskCmd(String taskId) {
@@ -45,13 +47,14 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public List<HistoricIdentityLink> execute(CommandContext commandContext) {
-        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        HistoricTaskInstanceEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().getHistoricTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("No historic task exists with the given id: " + taskId, HistoricTaskInstance.class);
         }
 
-        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
         List<HistoricIdentityLinkEntity> identityLinks = historicIdentityLinkService.findHistoricIdentityLinksByTaskId(taskId);
 
         HistoricIdentityLinkEntity assigneeIdentityLink = null;

@@ -25,13 +25,12 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
+import org.flowable.job.service.impl.cmd.ExecuteAsyncRunnableJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,19 +124,8 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     protected void executeJob(final boolean unlock) {
         try {
-            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    new ExecuteAsyncJobCmd(jobId, jobEntityManager).execute(commandContext);
-                    if (unlock) {
-                        // Part of the same transaction to avoid a race condition with the
-                        // potentially new jobs (wrt process instance locking) that are created 
-                        // during the execution of the original job 
-                        new UnlockExclusiveJobCmd((Job) job).execute(commandContext);
-                    }
-                    return null;
-                }
-            });
+            jobServiceConfiguration.getCommandExecutor().execute(
+                new ExecuteAsyncRunnableJobCmd(jobId, jobEntityManager, jobServiceConfiguration, unlock));
 
         } catch (final FlowableOptimisticLockingException e) {
 
@@ -168,7 +156,7 @@ public class ExecuteAsyncRunnable implements Runnable {
         Job job = (Job) this.job; // This method is only called for a regular Job
         try {
             if (job.isExclusive()) {
-                jobServiceConfiguration.getCommandExecutor().execute(new UnlockExclusiveJobCmd(job));
+                jobServiceConfiguration.getCommandExecutor().execute(new UnlockExclusiveJobCmd(job, jobServiceConfiguration));
             }
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
@@ -187,7 +175,7 @@ public class ExecuteAsyncRunnable implements Runnable {
     protected boolean lockJob() {
         Job job = (Job) this.job; // This method is only called for a regular Job
         try {
-            jobServiceConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd(job));
+            jobServiceConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd(job, jobServiceConfiguration));
 
         } catch (Throwable lockException) {
             if (LOGGER.isDebugEnabled()) {
@@ -206,12 +194,12 @@ public class ExecuteAsyncRunnable implements Runnable {
     protected void unacquireJob() {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext != null) {
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
+            jobServiceConfiguration.getJobManager().unacquire(job);
         } else {
             jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
                 @Override
                 public Void execute(CommandContext commandContext) {
-                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
+                    jobServiceConfiguration.getJobManager().unacquire(job);
                     return null;
                 }
             });

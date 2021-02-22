@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class TablePageQueryTest extends PluggableFlowableTestCase {
 
     @Test
@@ -34,17 +36,17 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
 
         TablePage tablePage = managementService.createTablePageQuery().tableName(tablePrefix + "ACT_RU_TASK").listPage(0, 5);
 
-        assertEquals(0, tablePage.getFirstResult());
-        assertEquals(5, tablePage.getSize());
-        assertEquals(5, tablePage.getRows().size());
-        assertEquals(20, tablePage.getTotal());
+        assertThat(tablePage.getFirstResult()).isZero();
+        assertThat(tablePage.getSize()).isEqualTo(5);
+        assertThat(tablePage.getRows()).hasSize(5);
+        assertThat(tablePage.getTotal()).isEqualTo(20);
 
         tablePage = managementService.createTablePageQuery().tableName(tablePrefix + "ACT_RU_TASK").listPage(14, 10);
 
-        assertEquals(14, tablePage.getFirstResult());
-        assertEquals(6, tablePage.getSize());
-        assertEquals(6, tablePage.getRows().size());
-        assertEquals(20, tablePage.getTotal());
+        assertThat(tablePage.getFirstResult()).isEqualTo(14);
+        assertThat(tablePage.getSize()).isEqualTo(6);
+        assertThat(tablePage.getRows()).hasSize(6);
+        assertThat(tablePage.getTotal()).isEqualTo(20);
 
         taskService.deleteTasks(taskIds, true);
     }
@@ -68,17 +70,18 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
     }
 
     private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {
-        assertEquals(expectedTaskNames.length, rowData.size());
+        assertThat(rowData).hasSameSizeAs(expectedTaskNames);
         String columnKey = "NAME_";
 
         // mybatis will return the correct case for postgres table columns from
         // version 3.0.6 on
-        if (processEngineConfiguration.getDatabaseType().equals("postgres")) {
+        if ("postgres".equals(processEngineConfiguration.getDatabaseType())) {
             columnKey = "name_";
         }
 
         for (int i = 0; i < expectedTaskNames.length; i++) {
-            assertEquals(expectedTaskNames[i], rowData.get(i).get(columnKey));
+            assertThat(rowData.get(i))
+                    .containsEntry(columnKey, expectedTaskNames[i]);
         }
     }
 

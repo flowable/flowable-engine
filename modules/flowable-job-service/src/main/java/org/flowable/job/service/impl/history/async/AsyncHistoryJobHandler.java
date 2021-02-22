@@ -89,7 +89,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
                 throw new AsyncHistoryJobNotApplicableException("Job is not applicable for default history json transformer types: " + defaultHistoryJsonTransformer.getTypes());
             }
         } else {
-            logger.warn("Cannot transform history json: no transformers found for type {}", type);
+            throw new AsyncHistoryJobNotApplicableException("Cannot transform history json: no transformers found for type " + type);
         }
     }
 

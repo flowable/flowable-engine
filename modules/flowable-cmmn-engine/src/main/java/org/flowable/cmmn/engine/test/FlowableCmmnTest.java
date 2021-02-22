@@ -49,9 +49,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * </pre>
  *
  * <p>
- * The CmmnEngine and the services will be made available to the test class through the parameter resolution (BeforeEach, AfterEach, test moethds).
+ * The CmmnEngine and the services will be made available to the test class through the parameter resolution (BeforeEach, AfterEach, test methods).
  * The CmmnEngine will be initialized by default with the flowable.cmmn.cfg.xml resource on the classpath.
- * To specify a different configuration file, annotate your class witn {@link CmmnConfigurationResource}.
+ * To specify a different configuration file, annotate your class with {@link CmmnConfigurationResource}.
  * Cmmn engines will be cached as part of the JUnit Jupiter Extension context.
  * Right before the first time the setUp is called for a given configuration resource, the cmmn engine will be constructed.
  * </p>

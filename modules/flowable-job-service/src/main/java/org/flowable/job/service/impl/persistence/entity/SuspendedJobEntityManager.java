@@ -25,12 +25,17 @@ import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEntity> {
 
     /**
-     * Returns all {@link SuspendedJobEntity} instances related to on {@link ExecutionEntity}.
+     * Find the suspended job with the given correlation id.
+     */
+    SuspendedJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
+     * Returns all {@link SuspendedJobEntity} instances related to an execution id.
      */
     List<SuspendedJobEntity> findJobsByExecutionId(String id);
 
     /**
-     * Returns all {@link SuspendedJobEntity} instances related to on {@link ExecutionEntity}.
+     * Returns all {@link SuspendedJobEntity} instances related to an execution id.
      */
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String id);
 
@@ -45,7 +50,7 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
+     * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     

@@ -15,16 +15,25 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.repository.AddAsNewDeploymentMergeStrategy;
+import org.flowable.engine.impl.repository.AddAsOldDeploymentMergeStrategy;
+import org.flowable.engine.impl.repository.MergeByDateDeploymentMergeStrategy;
+import org.flowable.engine.impl.repository.VerifyDeploymentMergeStrategy;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.job.service.JobService;
 
 /**
  * @author Joram Barrez
@@ -35,10 +44,37 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
 
     protected String deploymentId;
     protected String newTenantId;
+    protected DeploymentMergeStrategy deploymentMergeStrategy;
 
     public ChangeDeploymentTenantIdCmd(String deploymentId, String newTenantId) {
+        this(deploymentId, newTenantId, MergeMode.VERIFY);
+    }
+
+    public ChangeDeploymentTenantIdCmd(String deploymentId, String newTenantId, MergeMode mergeMode) {
         this.deploymentId = deploymentId;
         this.newTenantId = newTenantId;
+        switch (mergeMode) {
+            case VERIFY:
+                deploymentMergeStrategy = new VerifyDeploymentMergeStrategy();
+                break;
+            case AS_NEW:
+                deploymentMergeStrategy = new AddAsNewDeploymentMergeStrategy();
+                break;
+            case AS_OLD:
+                deploymentMergeStrategy = new AddAsOldDeploymentMergeStrategy();
+                break;
+            case BY_DATE:
+                deploymentMergeStrategy = new MergeByDateDeploymentMergeStrategy();
+                break;
+            default:
+                throw new FlowableException("Merge mode '" + mergeMode + "' not found.");
+        }
+    }
+
+    public ChangeDeploymentTenantIdCmd(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy) {
+        this.deploymentId = deploymentId;
+        this.newTenantId = newTenantId;
+        this.deploymentMergeStrategy = deploymentMergeStrategy;
     }
 
     @Override
@@ -48,36 +84,40 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
         }
 
         // Update all entities
-
-        DeploymentEntity deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(deploymentId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        DeploymentEntity deployment = processEngineConfiguration.getDeploymentEntityManager().findById(deploymentId);
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find deployment with id " + deploymentId, Deployment.class);
         }
 
         if (Flowable5Util.isFlowable5Deployment(deployment, commandContext)) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
+            processEngineConfiguration.getFlowable5CompatibilityHandler().changeDeploymentTenantId(deploymentId, newTenantId);
             return null;
         }
 
+        deploymentMergeStrategy.prepareMerge(commandContext, deploymentId, newTenantId);
         String oldTenantId = deployment.getTenantId();
         deployment.setTenantId(newTenantId);
 
         // Doing process instances, executions and tasks with direct SQL updates
         // (otherwise would not be performant)
-        CommandContextUtil.getProcessDefinitionEntityManager(commandContext).updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getExecutionEntityManager(commandContext).updateExecutionTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getTaskService().updateTaskTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getJobService().updateAllJobTypesTenantIdForDeployment(deploymentId, newTenantId);
-        CommandContextUtil.getEventSubscriptionService(commandContext).updateEventSubscriptionTenantId(oldTenantId, newTenantId);
+        processEngineConfiguration.getProcessDefinitionEntityManager().updateProcessDefinitionTenantIdForDeployment(deploymentId, newTenantId);
+        processEngineConfiguration.getExecutionEntityManager().updateExecutionTenantIdForDeployment(deploymentId, newTenantId);
+        processEngineConfiguration.getTaskServiceConfiguration().getTaskService().updateTaskTenantIdForDeployment(deploymentId, newTenantId);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
+        jobService.updateAllJobTypesTenantIdForDeployment(deploymentId, newTenantId);
+        processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionTenantId(oldTenantId, newTenantId);
+
+        deploymentMergeStrategy.finalizeMerge(commandContext, deploymentId, newTenantId);
 
         // Doing process definitions in memory, cause we need to clear the process definition cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         for (ProcessDefinition processDefinition : processDefinitions) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessDefinitionCache().remove(processDefinition.getId());
+            processEngineConfiguration.getProcessDefinitionCache().remove(processDefinition.getId());
         }
 
         // Clear process definition cache
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessDefinitionCache().clear();
+        processEngineConfiguration.getProcessDefinitionCache().clear();
 
         return null;
 

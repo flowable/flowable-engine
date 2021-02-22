@@ -12,12 +12,14 @@
  */
 package org.flowable.idm.engine.impl.cmd;
 
+import static org.flowable.idm.engine.impl.util.CommandContextUtil.getDbSqlSession;
+
 import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
+import org.flowable.idm.engine.impl.db.EntityToTableMap;
 
 public class GetTableNameCmd implements Command<String>, Serializable {
 
@@ -34,7 +36,11 @@ public class GetTableNameCmd implements Command<String>, Serializable {
         if (entityClass == null) {
             throw new FlowableIllegalArgumentException("entityClass is null");
         }
-        return CommandContextUtil.getTableDataManager(commandContext).getTableName(entityClass, true);
+
+        String databaseTablePrefix = getDbSqlSession(commandContext).getDbSqlSessionFactory().getDatabaseTablePrefix();
+        String tableName = EntityToTableMap.getTableName(entityClass);
+
+        return databaseTablePrefix + tableName;
     }
 
 }

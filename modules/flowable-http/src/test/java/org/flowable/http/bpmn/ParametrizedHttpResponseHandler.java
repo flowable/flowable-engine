@@ -12,16 +12,18 @@
  */
 package org.flowable.http.bpmn;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringFromField;
+import static org.flowable.http.common.impl.ExpressionUtils.getStringSetFromField;
+
 import java.util.Set;
+
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.HttpResponse;
 import org.flowable.http.delegate.HttpResponseHandler;
 
-import static org.flowable.http.ExpressionUtils.getStringFromField;
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ParametrizedHttpResponseHandler implements HttpResponseHandler {
 

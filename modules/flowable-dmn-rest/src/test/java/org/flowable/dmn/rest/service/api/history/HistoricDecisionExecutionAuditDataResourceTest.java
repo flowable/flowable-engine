@@ -12,7 +12,11 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +30,8 @@ import org.flowable.dmn.rest.service.api.DmnRestUrls;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Tijs Rademakers
@@ -46,13 +52,17 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
-        String content = IOUtils.toString(response.getEntity().getContent());
+        String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
+        assertThat(content).isNotNull();
         
         JsonNode auditNode = new ObjectMapper().readTree(content);
-        assertEquals("decision", auditNode.get("decisionKey").asText());
-        assertEquals("Full Decision", auditNode.get("decisionName").asText());
+        assertThatJson(auditNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   decisionKey: 'decision',"
+                        + "   decisionName: 'Full Decision'"
+                        + " }");
     }
 
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
@@ -60,7 +70,11 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         try (InputStream contentStream = response.getEntity().getContent()) {
             JsonNode errorNode = objectMapper.readTree(contentStream);
-            assertEquals("Could not find a decision execution with id 'unexisting'", errorNode.get("exception").textValue());
+            assertThatJson(errorNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "   exception: 'Could not find a decision execution with id \\'unexisting\\''"
+                            + " }");
         }
         closeResponse(response);
     }

@@ -52,6 +52,7 @@ create table ACT_RU_EXECUTION (
     START_TIME_ TIMESTAMP(6),
     START_USER_ID_ NVARCHAR2(255),
     LOCK_TIME_ TIMESTAMP(6),
+    LOCK_OWNER_ NVARCHAR2(255),
     IS_COUNT_ENABLED_ NUMBER(1,0) CHECK (IS_COUNT_ENABLED_ IN (1,0)),
     EVT_SUBSCR_COUNT_ INTEGER, 
     TASK_COUNT_ INTEGER, 
@@ -59,10 +60,14 @@ create table ACT_RU_EXECUTION (
     TIMER_JOB_COUNT_ INTEGER,
     SUSP_JOB_COUNT_ INTEGER,
     DEADLETTER_JOB_COUNT_ INTEGER,
+    EXTERNAL_WORKER_JOB_COUNT_ INTEGER,
     VAR_COUNT_ INTEGER, 
     ID_LINK_COUNT_ INTEGER,
     CALLBACK_ID_ NVARCHAR2(255),
     CALLBACK_TYPE_ NVARCHAR2(255),
+    REFERENCE_ID_ NVARCHAR2(255),
+    REFERENCE_TYPE_ NVARCHAR2(255),
+    PROPAGATED_STAGE_INST_ID_ NVARCHAR2(255),
     primary key (ID_)
 );
 
@@ -129,6 +134,7 @@ create table ACT_RU_ACTINST (
     START_TIME_ TIMESTAMP(6) not null,
     END_TIME_ TIMESTAMP(6),
     DURATION_ NUMBER(19,0),
+    TRANSACTION_ORDER_ INTEGER,
     DELETE_REASON_ NVARCHAR2(2000),
     TENANT_ID_ NVARCHAR2(255) default '',
     primary key (ID_)
@@ -339,7 +345,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.5.0.2', 1);
+values ('schema.version', '6.6.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.5.0.2)', 1);
+values ('schema.history', 'create(6.6.0.1)', 1);

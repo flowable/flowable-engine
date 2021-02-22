@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
@@ -20,13 +22,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
 
@@ -34,9 +35,9 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
 
     @Before
     public void createCase() {
-        org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment().
-            addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceUpdateBusinessKeyTest.testUpdateExistingCaseBusinessKey.cmmn").
-            deploy();
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceUpdateBusinessKeyTest.testUpdateExistingCaseBusinessKey.cmmn")
+                .deploy();
 
         deplId = deployment.getId();
     }
@@ -50,14 +51,14 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testCaseInstanceUpdateBusinessKey() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("businessKeyCase").start();
-        assertEquals("bzKey", caseInstance.getBusinessKey());
+        assertThat(caseInstance.getBusinessKey()).isEqualTo("bzKey");
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
-            assertEquals("bzKey", historicCaseInstance.getBusinessKey());
+            assertThat(historicCaseInstance.getBusinessKey()).isEqualTo("bzKey");
         }
     }
 
@@ -67,23 +68,23 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("businessKeyCase").businessKey("bzKey").start();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
-        assertEquals("bzKey", caseInstance.getBusinessKey());
+        assertThat(caseInstance.getBusinessKey()).isEqualTo("bzKey");
 
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
-            assertEquals("bzKey", historicCaseInstance.getBusinessKey());
+            assertThat(historicCaseInstance.getBusinessKey()).isEqualTo("bzKey");
         }
 
         cmmnRuntimeService.updateBusinessKey(caseInstance.getId(), "newKey");
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
-        assertEquals("newKey", caseInstance.getBusinessKey());
+        assertThat(caseInstance.getBusinessKey()).isEqualTo("newKey");
 
         Task task = cmmnTaskService.createTaskQuery().singleResult();
         cmmnTaskService.complete(task.getId());
-        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricCaseInstance historicCaseInstance2 = cmmnHistoryService.createHistoricCaseInstanceQuery().singleResult();
-            assertEquals("newKey", historicCaseInstance2.getBusinessKey());
+            assertThat(historicCaseInstance2.getBusinessKey()).isEqualTo("newKey");
         }
     }
 

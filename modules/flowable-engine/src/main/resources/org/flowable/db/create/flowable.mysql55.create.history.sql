@@ -16,6 +16,9 @@ create table ACT_HI_PROCINST (
     NAME_ varchar(255),
     CALLBACK_ID_ varchar(255),
     CALLBACK_TYPE_ varchar(255),
+    REFERENCE_ID_ varchar(255),
+    REFERENCE_TYPE_ varchar(255),
+    PROPAGATED_STAGE_INST_ID_ varchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -34,6 +37,7 @@ create table ACT_HI_ACTINST (
     ASSIGNEE_ varchar(255),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
+    TRANSACTION_ORDER_ integer,
     DURATION_ bigint,
     DELETE_REASON_ varchar(4000),
     TENANT_ID_ varchar(255) default '',

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 
 package org.flowable.cmmn.rest.service.api.runtime;
+
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -30,9 +33,11 @@ import org.flowable.task.api.Task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a identity links on a Task resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
@@ -47,41 +52,33 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         taskService.addUserIdentityLink(task.getId(), "john", "customType");
 
-        assertEquals(2, taskService.getIdentityLinksForTask(task.getId()).size());
+        assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(2);
 
         // Execute the request
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, task.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(2, responseNode.size());
-
-        boolean userCandidateFound = false;
-        boolean customLinkFound = false;
-
-        for (int i = 0; i < responseNode.size(); i++) {
-            ObjectNode link = (ObjectNode) responseNode.get(i);
-            assertNotNull(link);
-            if (!link.get("user").isNull()) {
-                if (link.get("user").textValue().equals("john")) {
-                    assertEquals("customType", link.get("type").textValue());
-                    assertTrue(link.get("group").isNull());
-                    assertTrue(link.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "john", "customType")));
-                    customLinkFound = true;
-                } else {
-                    assertEquals("johnDoe", link.get("user").textValue());
-                    assertEquals("assignee", link.get("type").textValue());
-                    assertTrue(link.get("group").isNull());
-                    assertTrue(link.get("url").textValue().endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "johnDoe", "assignee")));
-                    userCandidateFound = true;
-                }
-            }
-        }
-        
-        assertTrue(userCandidateFound);
-        assertTrue(customLinkFound);
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + " {"
+                        + " user: 'john',"
+                        + " type: 'customType',"
+                        + " group: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "john", "customType") + "'"
+                        + " },"
+                        + " {"
+                        + " user: 'johnDoe',"
+                        + " type: 'assignee',"
+                        + " group: null,"
+                        + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "johnDoe", "assignee") + "'"
+                        + " }"
+                        + "]");
     }
 
     /**
@@ -97,17 +94,23 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             requestNode.put("user", "kermit");
             requestNode.put("type", "myType");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, task.getId()));
+            HttpPost httpPost = new HttpPost(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("kermit", responseNode.get("user").textValue());
-            assertEquals("myType", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("group").isNull());
-            assertTrue(responseNode.get("url").textValue()
-                    .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  user: 'kermit',"
+                            + "  type: 'myType',"
+                            + "  group: null,"
+                            + "  url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
+                                    "kermit", "myType") + "'"
+                            + "}");
 
             // Add group link
             requestNode = objectMapper.createObjectNode();
@@ -118,15 +121,21 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("sales", responseNode.get("group").textValue());
-            assertEquals("myType", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("user").isNull());
-            assertTrue(responseNode.get("url").textValue()
-                    .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "sales", "myType")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  user: null,"
+                            + "  type: 'myType',"
+                            + "  group: 'sales',"
+                            + "  url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS,
+                                    "sales", "myType") + "'"
+                            + "}");
 
             // Test with unexisting task
-            httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, "unexistingtask"));
+            httpPost = new HttpPost(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINKS_COLLECTION, "unexistingtask"));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             closeResponse(executeRequest(httpPost, HttpStatus.SC_NOT_FOUND));
 
@@ -171,19 +180,27 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.addUserIdentityLink(task.getId(), "kermit", "myType");
 
-            HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "kermit", "myType"));
+            HttpGet httpGet = new HttpGet(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "kermit", "myType"));
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("kermit", responseNode.get("user").textValue());
-            assertEquals("myType", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("group").isNull());
-            assertTrue(responseNode.get("url").textValue()
-                    .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  user: 'kermit',"
+                            + "  type: 'myType',"
+                            + "  group: null,"
+                            + "  url: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                            .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS,
+                                    "kermit", "myType") + "'"
+                            + "}");
 
             // Test with unexisting task
-            httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, "unexistingtask", CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType"));
+            httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls
+                    .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, "unexistingtask", CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit",
+                            "myType"));
             closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
 
         } finally {
@@ -204,17 +221,22 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.addUserIdentityLink(task.getId(), "kermit", "myType");
 
-            HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "kermit", "myType"));
+            HttpDelete httpDelete = new HttpDelete(
+                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), "users", "kermit", "myType"));
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             // Test with unexisting identitylink
             httpDelete = new HttpDelete(SERVER_URL_PREFIX
-                    + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "unexistingtype"));
+                    + CmmnRestUrls
+                    .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, task.getId(), CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit",
+                            "unexistingtype"));
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
 
             // Test with unexisting task
             httpDelete = new HttpDelete(SERVER_URL_PREFIX
-                    + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, "unexistingtask", CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType"));
+                    + CmmnRestUrls
+                    .createRelativeResourceUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, "unexistingtask", CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit",
+                            "myType"));
             closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
 
         } finally {

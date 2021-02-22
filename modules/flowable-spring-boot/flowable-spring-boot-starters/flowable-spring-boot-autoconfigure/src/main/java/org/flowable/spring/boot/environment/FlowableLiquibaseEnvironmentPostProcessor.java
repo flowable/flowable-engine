@@ -51,11 +51,11 @@ public class FlowableLiquibaseEnvironmentPostProcessor implements EnvironmentPos
     }
 
     protected String getLiquibaseProperty() {
-        String liquibaseProperty = "liquibase.enabled";
         String springBootVersion = SpringBootVersion.getVersion();
-        if (springBootVersion.startsWith("2")) {
-            liquibaseProperty = "spring." + liquibaseProperty;
+        if (springBootVersion == null || !springBootVersion.startsWith("1")) {
+            return "spring.liquibase.enabled";
+        } else {
+            return "liquibase.enabled";
         }
-        return liquibaseProperty;
     }
 }

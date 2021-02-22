@@ -12,12 +12,16 @@
  */
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoCacheObject {
+public class ProcessDefinitionInfoCacheObject implements Serializable {
+
+    private static final long serialVersionUID = -5250476147064451489L;
 
     protected String id;
     protected int revision;

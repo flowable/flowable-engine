@@ -168,7 +168,17 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsForProcessDefinition(processDefinitionId);
     }
-    
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
+        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(scopeDefinitionId, scopeType);
+    }
+
     public EventSubscription createEventSubscription(EventSubscriptionBuilder builder) {
         return getEventSubscriptionEntityManager().createEventSubscription(builder);
     }

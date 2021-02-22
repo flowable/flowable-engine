@@ -20,9 +20,9 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 
 /**
  * @author Tijs Rademakers
@@ -189,7 +189,7 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
     }
 
     @Override
-    public CmmnDeploymentQuery orderByDeploymenTime() {
+    public CmmnDeploymentQuery orderByDeploymentTime() {
         return orderBy(CmmnDeploymentQueryProperty.DEPLOY_TIME);
     }
 

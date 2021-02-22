@@ -36,6 +36,7 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
@@ -173,15 +174,13 @@ public class EndExecutionOperation extends AbstractOperation {
         job.setTenantId(childProcessInstanceExecutionEntity.getTenantId());
         job.setJobHandlerType(AsyncCompleteCallActivityJobHandler.TYPE);
         
-        superExecutionEntity.getJobs().add(job);
-        
         jobService.createAsyncJob(job, true); // Always exclusive to avoid concurrency problems
         jobService.scheduleAsyncJob(job);
     }
 
     protected void handleRegularExecution() {
-
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         // There will be a parent execution (or else we would be in the process instance handling method)
         ExecutionEntity parentExecution = executionEntityManager.findById(execution.getParentId());
@@ -225,7 +224,8 @@ public class EndExecutionOperation extends AbstractOperation {
 
                 CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
-                                parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
+                                parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess),
+                        processEngineConfiguration.getEngineCfgKey());
 
                 ExecutionEntity subProcessParentExecution = parentExecution.getParent();
                 if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
@@ -345,9 +345,11 @@ public class EndExecutionOperation extends AbstractOperation {
         executionEntityManager.deleteChildExecutions(parentExecution, null, false);
         executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null, false);
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
-                        parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
+                        parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess),
+                processEngineConfiguration.getEngineCfgKey());
         return executionToContinue;
     }
 

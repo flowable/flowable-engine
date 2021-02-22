@@ -12,9 +12,8 @@
  */
 package org.flowable.rest.service.api.management;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -28,7 +27,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to the Table columns.
@@ -53,72 +53,121 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
             // We use variable-table as a reference
             String tableName = managementService.getTableName(VariableInstanceEntity.class);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName)), HttpStatus.SC_OK);
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName)), HttpStatus.SC_OK);
 
             // Check paging result
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals(3, responseNode.get("total").intValue());
-            assertEquals(3, responseNode.get("size").intValue());
-            assertEquals(0, responseNode.get("start").intValue());
-            assertTrue(responseNode.get("order").isNull());
-            assertTrue(responseNode.get("sort").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "total: 3,"
+                            + "size: 3,"
+                            + "start: 0,"
+                            + "order: null,"
+                            + "sort: null"
+                            + "}");
 
             // Check variables are actually returned
-            ArrayNode rows = (ArrayNode) responseNode.get("data");
-            assertNotNull(rows);
-            assertEquals(3, rows.size());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "data: [ {"
+                            + "      },"
+                            + "      {"
+                            + "      },"
+                            + "      {"
+                            + "      }"
+                            + "]"
+                            + "}");
 
             // Check sorting, ascending
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderAscendingColumn=LONG_"), HttpStatus.SC_OK);
-            responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals(3, responseNode.get("total").intValue());
-            assertEquals(3, responseNode.get("size").intValue());
-            assertEquals(0, responseNode.get("start").intValue());
-            assertEquals("asc", responseNode.get("order").textValue());
-            assertEquals("LONG_", responseNode.get("sort").textValue());
-            rows = (ArrayNode) responseNode.get("data");
-            assertNotNull(rows);
-            assertEquals(3, rows.size());
-
-            assertEquals("var1", rows.get(0).get("NAME_").textValue());
-            assertEquals("var2", rows.get(1).get("NAME_").textValue());
-            assertEquals("var3", rows.get(2).get("NAME_").textValue());
-
-            // Check sorting, descending
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderDescendingColumn=LONG_"), HttpStatus.SC_OK);
-            responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals(3, responseNode.get("total").intValue());
-            assertEquals(3, responseNode.get("size").intValue());
-            assertEquals(0, responseNode.get("start").intValue());
-            assertEquals("desc", responseNode.get("order").textValue());
-            assertEquals("LONG_", responseNode.get("sort").textValue());
-            rows = (ArrayNode) responseNode.get("data");
-            assertNotNull(rows);
-            assertEquals(3, rows.size());
-
-            assertEquals("var3", rows.get(0).get("NAME_").textValue());
-            assertEquals("var2", rows.get(1).get("NAME_").textValue());
-            assertEquals("var1", rows.get(2).get("NAME_").textValue());
-
-            // Finally, check result limiting
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderAscendingColumn=LONG_&start=1&size=1"),
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderAscendingColumn=LONG_"),
                     HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals(3, responseNode.get("total").intValue());
-            assertEquals(1, responseNode.get("size").intValue());
-            assertEquals(1, responseNode.get("start").intValue());
-            rows = (ArrayNode) responseNode.get("data");
-            assertNotNull(rows);
-            assertEquals(1, rows.size());
-            assertEquals("var2", rows.get(0).get("NAME_").textValue());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "total: 3,"
+                            + "size: 3,"
+                            + "start: 0,"
+                            + "order: 'asc',"
+                            + "sort: 'LONG_'"
+                            + "}");
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "data: [ {"
+                            + "            NAME_: 'var1'"
+                            + "      },"
+                            + "      {"
+                            + "            NAME_: 'var2'"
+                            + "      },"
+                            + "      {"
+                            + "            NAME_: 'var3'"
+                            + "      }"
+                            + "]"
+                            + "}");
+
+            // Check sorting, descending
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderDescendingColumn=LONG_"),
+                    HttpStatus.SC_OK);
+            responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "total: 3,"
+                            + "size: 3,"
+                            + "start: 0,"
+                            + "order: 'desc',"
+                            + "sort: 'LONG_'"
+                            + "}");
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "data: [ {"
+                            + "            NAME_: 'var3'"
+                            + "      },"
+                            + "      {"
+                            + "            NAME_: 'var2'"
+                            + "      },"
+                            + "      {"
+                            + "            NAME_: 'var1'"
+                            + "      }"
+                            + "]"
+                            + "}");
+
+            // Finally, check result limiting
+            response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName) + "?orderAscendingColumn=LONG_&start=1&size=1"),
+                    HttpStatus.SC_OK);
+            responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "total: 3,"
+                            + "size: 1,"
+                            + "start: 1,"
+                            + "order: 'asc',"
+                            + "sort: 'LONG_'"
+                            + "}");
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "data: [ {"
+                            + "            NAME_: 'var2'"
+                            + "      } ]"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -127,6 +176,16 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
                 taskService.deleteTask(task.getId(), true);
             }
         }
+    }
+
+    @Test
+    public void getTableColumnsException() throws Exception {
+        // Only one of 'orderAscendingColumn' or 'orderDescendingColumn' can be supplied.
+        String tableName = managementService.getTableName(VariableInstanceEntity.class);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_DATA, tableName)
+                        + "?orderAscendingColumn=LONG_&orderDescendingColumn=LONG_"),
+                HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test

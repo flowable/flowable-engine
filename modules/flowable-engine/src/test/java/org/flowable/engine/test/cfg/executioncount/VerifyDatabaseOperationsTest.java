@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.cfg.executioncount;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +26,6 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.test.profiler.CommandStats;
@@ -35,7 +36,6 @@ import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
 import org.flowable.job.api.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected boolean oldIsBulkInsertableValue;
@@ -65,7 +65,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         this.oldExecutionRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts();
         this.oldTaskRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
         this.oldenableProcessDefinitionInfoCacheValue = processEngineConfiguration.isEnableProcessDefinitionInfoCache();
-        oldHistoryLevel = ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).getHistoryLevel();
+        oldHistoryLevel = processEngineConfiguration.getHistoryLevel();
 
         processEngineConfiguration.setBulkInsertEnabled(true);
 
@@ -77,7 +77,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(true);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(false);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(HistoryLevel.AUDIT);
+        processEngineConfiguration.setHistoryLevel(HistoryLevel.AUDIT);
 
         // The time interceptor should be first
         CommandExecutorImpl commandExecutor = ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor());
@@ -117,7 +117,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         TaskServiceConfiguration.setEnableTaskRelationshipCounts(oldTaskRelationshipCountValue);
 
         processEngineConfiguration.setEnableProcessDefinitionInfoCache(oldenableProcessDefinitionInfoCacheValue);
-        ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).setHistoryLevel(oldHistoryLevel);
+        processEngineConfiguration.setHistoryLevel(oldHistoryLevel);
 
         ((CommandExecutorImpl) processEngineConfiguration.getCommandExecutor()).setFirst(oldFirstCommandInterceptor);
 
@@ -126,8 +126,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         // Validate (cause this tended to be screwed up)
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().list();
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-            Assert.assertNotNull(historicActivityInstance.getStartTime());
-            Assert.assertNotNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getStartTime()).isNotNull();
+            assertThat(historicActivityInstance.getEndTime()).isNotNull();
         }
 
         FlowableProfiler.getInstance().reset();
@@ -136,7 +136,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
 
-        assertEquals(runtimeService.createActivityInstanceQuery().count(), 0L);
+        assertThat(runtimeService.createActivityInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -146,7 +146,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
 
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L,
@@ -154,8 +155,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -166,15 +167,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricVariableInstanceEntityImpl-bulk-with-4", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -185,15 +187,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricVariableInstanceEntityImpl-bulk-with-50", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -204,14 +207,15 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-17", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -222,14 +226,96 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-13", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
+        }
+    }
+
+    @Test
+    public void testParallelForkAndJoinWithAsyncJobs() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            deployStartProcessInstanceAndProfile("parallelForkAndJoinWithAsyncTasks.bpmn20.xml", "parallelForkAndJoin");
+
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectLatestProcessDefinitionByKey", 1L);
+
+            assertDatabaseInserts("StartProcessInstanceCmd",
+                    "JobEntityImpl-bulk-with-2", 1L,
+                    "ExecutionEntityImpl-bulk-with-3", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-5", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-5", 1L,
+                    "HistoricProcessInstanceEntityImpl", 1L);
+            assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
+
+            Job job  = managementService.createJobQuery().elementId("left").singleResult();
+
+            restartProfiling("execute Left Job");
+            managementService.executeJob(job.getId());
+
+            assertDatabaseSelects("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
+                    "selectById org.flowable.job.service.impl.persistence.entity.JobEntityImpl", 1L,
+                    "selectExecutionsWithSameRootProcessInstanceId", 1L,
+                    "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L);
+
+            assertDatabaseInserts("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "ActivityInstanceEntityImpl-bulk-with-3", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L);
+
+            assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "JobEntityImpl", 1L);
+
+            assertDatabaseUpdates("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L
+                    );
+
+            stopProfiling();
+
+            job = managementService.createJobQuery().elementId("right").singleResult();
+            restartProfiling("execute Right Job");
+            managementService.executeJob(job.getId());
+
+            assertDatabaseSelects("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 1L,
+                    "selectById org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L,
+                    "selectById org.flowable.job.service.impl.persistence.entity.JobEntityImpl", 1L,
+                    // Almost all selectXXXByExecutionId are needed when the process instance is deleted
+                    "selectDeadLetterJobsByExecutionId", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L,
+                    "selectEventSubscriptionsByExecution", 1L,
+                    "selectExecutionsWithSameRootProcessInstanceId", 1L,
+                    "selectExternalWorkerJobsByExecutionId", 1L,
+                    "selectIdentityLinksByProcessInstance", 1L,
+                    "selectJobsByExecutionId", 1L,
+                    "selectSuspendedJobsByExecutionId", 1L,
+                    "selectTasksByExecutionId", 1L,
+                    "selectTimerJobsByExecutionId", 1L,
+                    "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 3L,
+                    "selectVariablesByQuery", 2L);
+
+            assertDatabaseInserts("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "HistoricActivityInstanceEntityImpl-bulk-with-5", 1L);
+
+            assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "JobEntityImpl", 1L,
+                    "ExecutionEntityImpl", 3L,
+                    "Bulk-delete-deleteTasksByExecutionId", 1L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
+
+            assertDatabaseUpdates("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                    "org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
+                    "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
+            stopProfiling();
+
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -240,15 +326,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-41", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -259,15 +346,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             assertDatabaseSelects("StartProcessInstanceCmd",
                     "selectLatestProcessDefinitionByKey", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L);
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "HistoricActivityInstanceEntityImpl-bulk-with-9", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
                     "HistoricVariableInstanceEntityImpl", 1L);
             assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -301,8 +389,8 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                             "Bulk-delete-deleteTasksByExecutionId", 1L,
                             "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
 
-            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1);
         }
     }
 
@@ -319,7 +407,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // Start process instance
             assertDatabaseSelects("StartProcessInstanceCmd", 
                             "selectLatestProcessDefinitionByKey", 1L,
-                            "selectEntityLinksByReferenceScopeIdAndType", 2L);
+                            "selectEntityLinksByReferenceScopeIdAndType", 1L);
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "ExecutionEntityImpl-bulk-with-2", 1L,
                     "TaskEntityImpl", 1L,
@@ -349,13 +437,14 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L,
                     "selectExecutionsWithSameRootProcessInstanceId", 1L,
                     "selectTasksByExecutionId", 2L,
-                    "selectVariablesByExecutionId", 1L,
+                    "selectVariablesByQuery", 2L,
                     "selectIdentityLinksByProcessInstance", 1L,
-                    "selectEntityLinksByScopeIdAndType", 1L,
+                    "selectEntityLinksByRootScopeIdAndRootScopeType", 1L,
                     "selectEventSubscriptionsByExecution", 1L,
                     "selectTimerJobsByExecutionId", 1L,
                     "selectSuspendedJobsByExecutionId", 1L,
                     "selectDeadLetterJobsByExecutionId", 1L,
+                    "selectExternalWorkerJobsByExecutionId", 1L,
                     "selectJobsByExecutionId", 1L);
 
             assertDatabaseInserts("CompleteTaskCmd",
@@ -372,7 +461,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "TaskEntityImpl", 1L, 
                     "ExecutionEntityImpl", 2L,
                     "Bulk-delete-deleteTasksByExecutionId", 1L,
-                    "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L,
+                    "Bulk-delete-deleteEntityLinksByRootScopeIdAndRootScopeType", 1L,
                     "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
         }
     }
@@ -389,15 +478,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
             // Start process instance
             assertDatabaseSelects("StartProcessInstanceCmd", 
-                            "selectLatestProcessDefinitionByKey", 1L,
-                            "selectEntityLinksByReferenceScopeIdAndType", 2L);
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectEntityLinksByReferenceScopeIdAndType", 1L);
+            
             assertDatabaseInserts("StartProcessInstanceCmd",
                     "ExecutionEntityImpl-bulk-with-3", 1L,
                     "TaskEntityImpl", 1L,
                     "TimerJobEntityImpl", 1L,
                     "EntityLinkEntityImpl", 1L,
-                    "ActivityInstanceEntityImpl-bulk-with-3", 1L,
-                    "HistoricActivityInstanceEntityImpl-bulk-with-3", 1L,
+                    "ActivityInstanceEntityImpl-bulk-with-4", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-4", 1L,
                     "HistoricTaskInstanceEntityImpl", 1L,
                     "HistoricTaskLogEntryEntityImpl", 1L,
                     "HistoricProcessInstanceEntityImpl", 1L,
@@ -407,12 +497,12 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             // org.flowable.task.service.Task Complete
 
             assertDatabaseDeletes("CompleteTaskCmd",
-                            "TaskEntityImpl", 1L,
-                            "TimerJobEntityImpl", 1L,
-                            "ExecutionEntityImpl", 3L,
-                            "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L,
-                            "Bulk-delete-deleteTasksByExecutionId", 1L,
-                            "Bulk-delete-deleteEntityLinksByScopeIdAndScopeType", 1L); 
+                    "TaskEntityImpl", 1L,
+                    "TimerJobEntityImpl", 1L,
+                    "ExecutionEntityImpl", 3L,
+                    "Bulk-delete-deleteTasksByExecutionId", 1L,
+                    "Bulk-delete-deleteEntityLinksByRootScopeIdAndRootScopeType", 1L,
+                    "Bulk-delete-deleteActivityInstancesByProcessInstanceId", 1L);
         }
     }
 
@@ -506,7 +596,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 "HistoricTaskLogEntryEntityImpl", 2L,
                     "CommentEntityImpl", 2L,
                     "HistoricIdentityLinkEntityImpl-bulk-with-2", 2L, 
-                    "IdentityLinkEntityImpl-bulk-with-2", 2l);
+                    "IdentityLinkEntityImpl-bulk-with-2", 2L);
             assertDatabaseSelects("AddIdentityLinkCmd", 
                     "selectById org.flowable.task.service.impl.persistence.entity.TaskEntityImpl", 2L, 
                     "selectById org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl", 2L,
@@ -605,71 +695,83 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                 System.out.println(command);
             }
         }
-        Assert.assertEquals(commands.length, allStats.size());
+        assertThat(allStats).hasSameSizeAs(commands);
 
         for (String command : commands) {
-            Assert.assertNotNull("Could not get stats for " + command, getStatsForCommand(command, allStats));
+            assertThat(getStatsForCommand(command, allStats)).as("Could not get stats for " + command).isNotNull();
         }
     }
 
     protected void assertDatabaseSelects(String commandClass, Object... expectedSelects) {
         CommandStats stats = getStats(commandClass);
 
-        Assert.assertEquals("Unexpected number of database selects for " + commandClass + ". ", expectedSelects.length / 2, stats.getDbSelects().size());
+        assertThat(stats.getDbSelects())
+                .as("Unexpected number of database selects for " + commandClass + ". ")
+                .hasSize(expectedSelects.length / 2);
 
         for (int i = 0; i < expectedSelects.length; i += 2) {
             String dbSelect = (String) expectedSelects[i];
             Long count = (Long) expectedSelects[i + 1];
 
-            Assert.assertEquals("Wrong select count for " + dbSelect, count, stats.getDbSelects().get(dbSelect));
+            assertThat(stats.getDbSelects())
+                    .as("Wrong select count for " + dbSelect)
+                    .containsEntry(dbSelect, count);
         }
     }
 
     protected void assertDatabaseUpdates(String commandClass, Object... expectedUpdates) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals("Unexpected number of database updates for " + commandClass + ". ", expectedUpdates.length / 2, stats.getDbUpdates().size());
+        assertThat(stats.getDbUpdates())
+                .as("Unexpected number of database updates for " + commandClass + ". ")
+                .hasSize(expectedUpdates.length / 2);
 
         for (int i = 0; i < expectedUpdates.length; i += 2) {
             String dbUpdate = (String) expectedUpdates[i];
             Long count = (Long) expectedUpdates[i + 1];
 
-            Assert.assertEquals("Wrong update count for " + dbUpdate, count, stats.getDbUpdates().get(dbUpdate));
+            assertThat(stats.getDbUpdates())
+                    .as("Wrong update count for " + dbUpdate)
+                    .containsEntry(dbUpdate, count);
         }
     }
 
     protected void assertDatabaseInserts(String commandClass, Object... expectedInserts) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedInserts.length / 2 != stats.getDbInserts().size()) {
-            Assert.fail("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2);
-        }
+        assertThat(stats.getDbInserts())
+                .as("Unexpected number of database inserts : " + stats.getDbInserts().size() + ", but expected " + expectedInserts.length / 2)
+                .hasSize(expectedInserts.length / 2);
 
         for (int i = 0; i < expectedInserts.length; i += 2) {
             String dbInsert = (String) expectedInserts[i];
             Long count = (Long) expectedInserts[i + 1];
 
-            Assert.assertEquals("Insert count for " + dbInsert + " not correct", count, stats.getDbInserts().get(getQualifiedClassName(dbInsert)));
+            assertThat(stats.getDbInserts())
+                    .as("Insert count for " + dbInsert + " not correct")
+                    .containsEntry(getQualifiedClassName(dbInsert), count);
         }
     }
 
     protected void assertDatabaseDeletes(String commandClass, Object... expectedDeletes) {
         CommandStats stats = getStats(commandClass);
 
-        if (expectedDeletes.length / 2 != stats.getDbDeletes().size()) {
-            Assert.fail("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + expectedDeletes.length);
-        }
+        assertThat(stats.getDbDeletes())
+                .as("Unexpected number of database deletes : " + stats.getDbDeletes().size() + ", expected: " + (expectedDeletes.length/2))
+                .hasSize(expectedDeletes.length / 2);
 
         for (int i = 0; i < expectedDeletes.length; i += 2) {
             String dbDelete = (String) expectedDeletes[i];
             Long count = (Long) expectedDeletes[i + 1];
 
-            Assert.assertEquals("Delete count count for " + dbDelete + " not correct", count, stats.getDbDeletes().get(getQualifiedClassName(dbDelete)));
+            assertThat(stats.getDbDeletes())
+                    .as("Delete count count for " + dbDelete + " not correct")
+                    .containsEntry(getQualifiedClassName(dbDelete), count);
         }
     }
 
     protected void assertNoInserts(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbInserts().size());
+        assertThat(stats.getDbInserts()).isEmpty();
     }
 
     protected void assertNoUpdatesAndDeletes(String commandClass) {
@@ -679,12 +781,12 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
     protected void assertNoDeletes(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbDeletes().size());
+        assertThat(stats.getDbDeletes()).isEmpty();
     }
 
     protected void assertNoUpdates(String commandClass) {
         CommandStats stats = getStats(commandClass);
-        Assert.assertEquals(0, stats.getDbUpdates().size());
+        assertThat(stats.getDbUpdates()).isEmpty();
     }
 
     protected CommandStats getStats(String commandClass) {
@@ -723,10 +825,16 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     }
 
     protected FlowableProfiler startProcessInstanceAndProfile(String processDefinitionKey) {
-        FlowableProfiler activitiProfiler = FlowableProfiler.getInstance();
-        activitiProfiler.startProfileSession("Profiling session");
+        FlowableProfiler flowableProfiler = restartProfiling("Profiling session");
         runtimeService.startProcessInstanceByKey(processDefinitionKey);
-        return activitiProfiler;
+        return flowableProfiler;
+    }
+
+    protected FlowableProfiler restartProfiling(String sessionName) {
+        FlowableProfiler flowableProfiler = FlowableProfiler.getInstance();
+        flowableProfiler.reset();
+        flowableProfiler.startProfileSession(sessionName);
+        return flowableProfiler;
     }
 
     protected void stopProfiling() {

@@ -24,6 +24,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -49,7 +50,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  * If the process instance is not currently waiting but actively running, then this would be a case for optimistic locking, meaning either the version update or the "real work" wins, i.e., this is a
  * race condition.
  * 
- * @see {http://forums.activiti.org/en/viewtopic.php?t=2918}
+ * @see <a href="http://forums.activiti.org/en/viewtopic.php?t=2918">http://forums.activiti.org/en/viewtopic.php?t=2918</a>
  * @author Falko Menge
  */
 public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializable {
@@ -126,11 +127,12 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
         execution.setProcessDefinitionKey(newProcessDefinition.getKey());
 
         // and change possible existing tasks (as the process definition id is stored there too)
-        List<TaskEntity> tasks = CommandContextUtil.getTaskService(commandContext).findTasksByExecutionId(execution.getId());
-        Clock clock = commandContext.getCurrentEngineConfiguration().getClock();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        List<TaskEntity> tasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByExecutionId(execution.getId());
+        Clock clock = processEngineConfiguration.getClock();
         for (TaskEntity taskEntity : tasks) {
             taskEntity.setProcessDefinitionId(newProcessDefinition.getId());
-            CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordTaskInfoChange(taskEntity, clock.getCurrentTime());
+            processEngineConfiguration.getActivityInstanceEntityManager().recordTaskInfoChange(taskEntity, clock.getCurrentTime());
         }
     }
 

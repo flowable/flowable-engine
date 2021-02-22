@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
-        
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
     }
 
@@ -79,22 +81,22 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testBaseProperties() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).singleResult();
-        assertNotNull(log.getId());
-        assertNotNull(log.getProcessDefinitionId());
-        assertNotNull(log.getStartActivityId());
-        assertNotNull(log.getDurationInMillis());
-        assertNotNull(log.getEndTime());
-        assertNotNull(log.getStartTime());
+        assertThat(log.getId()).isNotNull();
+        assertThat(log.getProcessDefinitionId()).isNotNull();
+        assertThat(log.getStartActivityId()).isNotNull();
+        assertThat(log.getDurationInMillis()).isNotNull();
+        assertThat(log.getEndTime()).isNotNull();
+        assertThat(log.getStartTime()).isNotNull();
     }
 
     @Test
     public void testIncludeTasks() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(2, events.size());
+        assertThat(events).hasSize(2);
 
         for (HistoricData event : events) {
-            assertTrue(event instanceof HistoricTaskInstance);
+            assertThat(event).isInstanceOf(HistoricTaskInstance.class);
         }
     }
 
@@ -102,10 +104,10 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     public void testIncludeComments() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeComments().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(3, events.size());
+        assertThat(events).hasSize(3);
 
         for (HistoricData event : events) {
-            assertTrue(event instanceof Comment);
+            assertThat(event).isInstanceOf(Comment.class);
         }
     }
 
@@ -113,7 +115,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     public void testIncludeTasksAndComments() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeComments().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(5, events.size());
+        assertThat(events).hasSize(5);
 
         int taskCounter = 0;
         int commentCounter = 0;
@@ -125,19 +127,19 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
                 commentCounter++;
             }
         }
-        
-        assertEquals(2, taskCounter);
-        assertEquals(3, commentCounter);
+
+        assertThat(taskCounter).isEqualTo(2);
+        assertThat(commentCounter).isEqualTo(3);
     }
 
     @Test
     public void testIncludeActivities() {
         ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeActivities().singleResult();
         List<HistoricData> events = log.getHistoricData();
-        assertEquals(9, events.size());
+        assertThat(events).hasSize(9);
 
         for (HistoricData event : events) {
-            assertTrue(event instanceof HistoricActivityInstance);
+            assertThat(event).isInstanceOf(HistoricActivityInstance.class);
         }
     }
 
@@ -146,10 +148,10 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariables().singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(2, events.size());
+            assertThat(events).hasSize(2);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableInstance);
+                assertThat(event).isInstanceOf(HistoricVariableInstance.class);
             }
         }
     }
@@ -159,10 +161,10 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(3, events.size());
+            assertThat(events).hasSize(3);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableUpdate);
+                assertThat(event).isInstanceOf(HistoricVariableUpdate.class);
             }
         }
     }
@@ -170,10 +172,11 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testEverything() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
-            ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities().includeComments().includeVariables()
+            ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId).includeTasks().includeActivities()
+                    .includeComments().includeVariables()
                     .includeVariableUpdates().singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(19, events.size());
+            assertThat(events).hasSize(19);
         }
     }
 

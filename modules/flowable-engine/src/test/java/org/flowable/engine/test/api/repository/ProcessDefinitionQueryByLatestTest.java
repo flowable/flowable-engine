@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,17 +63,19 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
 
         ProcessDefinitionQuery idQuery1 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(0)).latestVersion();
         List<ProcessDefinition> processDefinitions = idQuery1.list();
-        assertEquals(0, processDefinitions.size());
+        assertThat(processDefinitions).isEmpty();
 
         ProcessDefinitionQuery idQuery2 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(1)).latestVersion();
         processDefinitions = idQuery2.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess1", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess1");
 
         ProcessDefinitionQuery idQuery3 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(2)).latestVersion();
         processDefinitions = idQuery3.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess2");
 
         // Undeploy
         unDeploy(deploymentIdList);
@@ -86,16 +91,16 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // name
         ProcessDefinitionQuery nameQuery = repositoryService.createProcessDefinitionQuery().processDefinitionName("one").latestVersion();
         List<ProcessDefinition> processDefinitions = nameQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals(1, processDefinitions.get(0).getVersion());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getVersion, ProcessDefinition::getKey)
+                .containsExactly(tuple(1, "testProcess2"));
 
         // nameLike
         ProcessDefinitionQuery nameLikeQuery = repositoryService.createProcessDefinitionQuery().processDefinitionName("one").latestVersion();
         processDefinitions = nameLikeQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals(1, processDefinitions.get(0).getVersion());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getVersion, ProcessDefinition::getKey)
+                .containsExactly(tuple(1, "testProcess2"));
 
         // Undeploy
         unDeploy(deploymentIdList);
@@ -111,8 +116,9 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // version
         ProcessDefinitionQuery nameQuery = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion();
         List<ProcessDefinition> processDefinitions = nameQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess2");
 
         // Undeploy
         unDeploy(deploymentIdList);
@@ -128,12 +134,14 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // deploymentId
         ProcessDefinitionQuery deploymentQuery1 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdList.get(0)).latestVersion();
         List<ProcessDefinition> processDefinitions = deploymentQuery1.list();
-        assertEquals(0, processDefinitions.size());
+        assertThat(processDefinitions).isEmpty();
 
         ProcessDefinitionQuery deploymentQuery2 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdList.get(1)).latestVersion();
         processDefinitions = deploymentQuery2.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess1", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess1");
+
 
         // Undeploy
         unDeploy(deploymentIdList);

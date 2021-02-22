@@ -15,7 +15,6 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
@@ -23,46 +22,32 @@ import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager
 /**
  * @author Joram Barrez
  */
-public class EventLogEntryEntityManagerImpl extends AbstractEntityManager<EventLogEntryEntity> implements EventLogEntryEntityManager {
-
-    protected EventLogEntryDataManager eventLogEntryDataManager;
+public class EventLogEntryEntityManagerImpl
+    extends AbstractProcessEngineEntityManager<EventLogEntryEntity, EventLogEntryDataManager>
+    implements EventLogEntryEntityManager {
 
     public EventLogEntryEntityManagerImpl(ProcessEngineConfigurationImpl processEngineConfiguration, EventLogEntryDataManager eventLogEntryDataManager) {
-        super(processEngineConfiguration);
-        this.eventLogEntryDataManager = eventLogEntryDataManager;
-    }
-
-    @Override
-    protected DataManager<EventLogEntryEntity> getDataManager() {
-        return eventLogEntryDataManager;
+        super(processEngineConfiguration, eventLogEntryDataManager);
     }
 
     @Override
     public List<EventLogEntry> findAllEventLogEntries() {
-        return eventLogEntryDataManager.findAllEventLogEntries();
+        return dataManager.findAllEventLogEntries();
     }
 
     @Override
     public List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize) {
-        return eventLogEntryDataManager.findEventLogEntries(startLogNr, pageSize);
+        return dataManager.findEventLogEntries(startLogNr, pageSize);
     }
 
     @Override
     public List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId) {
-        return eventLogEntryDataManager.findEventLogEntriesByProcessInstanceId(processInstanceId);
+        return dataManager.findEventLogEntriesByProcessInstanceId(processInstanceId);
     }
 
     @Override
     public void deleteEventLogEntry(long logNr) {
-        eventLogEntryDataManager.deleteEventLogEntry(logNr);
-    }
-
-    public EventLogEntryDataManager getEventLogEntryDataManager() {
-        return eventLogEntryDataManager;
-    }
-
-    public void setEventLogEntryDataManager(EventLogEntryDataManager eventLogEntryDataManager) {
-        this.eventLogEntryDataManager = eventLogEntryDataManager;
+        dataManager.deleteEventLogEntry(logNr);
     }
 
 }

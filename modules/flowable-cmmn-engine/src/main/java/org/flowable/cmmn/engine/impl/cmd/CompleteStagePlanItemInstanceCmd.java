@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Joram Barrez
@@ -37,8 +38,10 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
     }
 
     public CompleteStagePlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
+            Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
             Map<String, Object> localVariables, Map<String, Object> transientVariables, boolean force) {
-        super(planItemInstanceId, variables, localVariables, transientVariables);
+        
+        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
         this.force = force;
     }
 
@@ -47,8 +50,8 @@ public class CompleteStagePlanItemInstanceCmd extends AbstractNeedsPlanItemInsta
         if (!PlanItemDefinitionType.STAGE.equals(planItemInstanceEntity.getPlanItemDefinitionType())) {
             throw new FlowableIllegalArgumentException("Can only complete plan item instances of type stage. Type is " + planItemInstanceEntity.getPlanItemDefinitionType());
         }
-        if (!force && !planItemInstanceEntity.isCompleteable()) { // if force is true, ignore the completeable flag
-            throw new FlowableIllegalArgumentException("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).");
+        if (!force && !planItemInstanceEntity.isCompletable()) { // if force is true, ignore the completable flag
+            throw new FlowableIllegalArgumentException("Can only complete a stage plan item instance that is marked as completable (there might still be active plan item instance).");
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }

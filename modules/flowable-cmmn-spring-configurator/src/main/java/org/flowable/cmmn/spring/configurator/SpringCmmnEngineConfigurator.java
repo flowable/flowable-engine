@@ -15,11 +15,12 @@ package org.flowable.cmmn.spring.configurator;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
-import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.spring.SpringEngineConfiguration;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -57,12 +58,25 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
         }
 
         ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
-        if (cmmnEngineConfiguration.getExpressionManager() == null) {
-            cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
-                springEngineConfiguration.getApplicationContext(), springEngineConfiguration.getBeans()));
+        if (cmmnEngineConfiguration.getBeans() == null) {
+            cmmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
         }
 
         initCmmnEngine();
+
+        if (springProcessEngineConfiguration != null) {
+            cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.BPMN, springProcessEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+
+            springProcessEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
+
+        JobServiceConfiguration engineJobServiceConfiguration = getJobServiceConfiguration(engineConfiguration);
+        if (engineJobServiceConfiguration != null) {
+            engineJobServiceConfiguration.getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
 
         initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }

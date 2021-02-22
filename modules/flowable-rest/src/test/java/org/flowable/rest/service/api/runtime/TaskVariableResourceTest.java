@@ -13,14 +13,13 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +43,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a single task variable.
  * 
@@ -63,63 +64,88 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.setVariableLocal(task.getId(), "localTaskVariable", "localValue");
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "localTaskVariable")),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "localTaskVariable")),
                     HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("local", responseNode.get("scope").asText());
-            assertEquals("localValue", responseNode.get("value").asText());
-            assertEquals("localTaskVariable", responseNode.get("name").asText());
-            assertEquals("string", responseNode.get("type").asText());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "scope: 'local',"
+                            + "value: 'localValue',"
+                            + "name: 'localTaskVariable',"
+                            + "type: 'string'"
+                            + "}");
 
             // Test variable behaviour for a process-task
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("sharedVariable", (Object) "processValue"));
+            ProcessInstance processInstance = runtimeService
+                    .startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("sharedVariable", (Object) "processValue"));
             Task processTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
             taskService.setVariableLocal(processTask.getId(), "sharedVariable", "taskValue");
 
             // ANY scope, local should get precedence
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable")), HttpStatus.SC_OK);
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable")),
+                    HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("local", responseNode.get("scope").asText());
-            assertEquals("taskValue", responseNode.get("value").asText());
-            assertEquals("sharedVariable", responseNode.get("name").asText());
-            assertEquals("string", responseNode.get("type").asText());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "scope: 'local',"
+                            + "value: 'taskValue',"
+                            + "name: 'sharedVariable',"
+                            + "type: 'string'"
+                            + "}");
 
             // LOCAL scope
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable") + "?scope=local"),
+            response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable") + "?scope=local"),
                     HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("local", responseNode.get("scope").asText());
-            assertEquals("taskValue", responseNode.get("value").asText());
-            assertEquals("sharedVariable", responseNode.get("name").asText());
-            assertEquals("string", responseNode.get("type").asText());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "scope: 'local',"
+                            + "value: 'taskValue',"
+                            + "name: 'sharedVariable',"
+                            + "type: 'string'"
+                            + "}");
 
             // GLOBAL scope
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable") + "?scope=global"),
+            response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable")
+                                    + "?scope=global"),
                     HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("global", responseNode.get("scope").asText());
-            assertEquals("processValue", responseNode.get("value").asText());
-            assertEquals("sharedVariable", responseNode.get("name").asText());
-            assertEquals("string", responseNode.get("type").asText());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "scope: 'global',"
+                            + "value: 'processValue',"
+                            + "name: 'sharedVariable',"
+                            + "type: 'string'"
+                            + "}");
 
             // Illegal scope
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable") + "?scope=illegal"),
+            closeResponse(executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "sharedVariable")
+                                    + "?scope=illegal"),
                     HttpStatus.SC_BAD_REQUEST));
 
             // Unexisting task
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, "unexisting", "sharedVariable")), HttpStatus.SC_NOT_FOUND));
+            closeResponse(executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, "unexisting", "sharedVariable")),
+                    HttpStatus.SC_NOT_FOUND));
 
             // Unexisting variable
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "unexistingVariable")), HttpStatus.SC_NOT_FOUND));
+            closeResponse(executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, processTask.getId(), "unexistingVariable")),
+                    HttpStatus.SC_NOT_FOUND));
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -145,13 +171,14 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
 
             // Force content-type to TEXT_PLAIN to make sure this is ignored and
             // application-octect-stream is always returned
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
                     HttpStatus.SC_OK);
 
-            String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+            String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
             closeResponse(response);
-            assertEquals("This is a binary piece of text", actualResponseBytesAsText);
-            assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
+            assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -176,16 +203,16 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
             taskService.setVariableLocal(task.getId(), "localTaskVariable", originalSerializable);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
                     HttpStatus.SC_OK);
 
             // Read the serializable from the stream
             ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
             Object readSerializable = stream.readObject();
-            assertNotNull(readSerializable);
-            assertTrue(readSerializable instanceof TestSerializableVariable);
-            assertEquals("This is some field", ((TestSerializableVariable) readSerializable).getSomeField());
-            assertEquals("application/x-java-serialized-object", response.getEntity().getContentType().getValue());
+            assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
+            assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
             closeResponse(response);
 
         } finally {
@@ -231,34 +258,37 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment
     public void testDeleteTaskVariable() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.setVariableLocal(task.getId(), "overlappingVariable", "taskValue");
         taskService.setVariableLocal(task.getId(), "anotherTaskVariable", "taskValue");
 
         // Delete variable without scope, local should be presumed -> local
         // removed and global should be retained
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "overlappingVariable"));
+        HttpDelete httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "overlappingVariable"));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
-        assertFalse(taskService.hasVariableLocal(task.getId(), "overlappingVariable"));
-        assertTrue(taskService.hasVariable(task.getId(), "overlappingVariable"));
+        assertThat(taskService.hasVariableLocal(task.getId(), "overlappingVariable")).isFalse();
+        assertThat(taskService.hasVariable(task.getId(), "overlappingVariable")).isTrue();
 
         // Delete local scope variable
-        httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "anotherTaskVariable") + "?scope=local");
+        httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "anotherTaskVariable") + "?scope=local");
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
-        assertFalse(taskService.hasVariableLocal(task.getId(), "anotherTaskVariable"));
+        assertThat(taskService.hasVariableLocal(task.getId(), "anotherTaskVariable")).isFalse();
 
         // Delete global scope variable
-        assertTrue(taskService.hasVariable(task.getId(), "overlappingVariable"));
-        httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "overlappingVariable") + "?scope=global");
+        assertThat(taskService.hasVariable(task.getId(), "overlappingVariable")).isTrue();
+        httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE, task.getId(), "overlappingVariable") + "?scope=global");
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
-        assertFalse(taskService.hasVariable(task.getId(), "overlappingVariable"));
+        assertThat(taskService.hasVariable(task.getId(), "overlappingVariable")).isFalse();
 
-        // Run the same delete again, variable is not there so 404 should be
-        // returned
+        // Run the same delete again, variable is not there so 404 should be returned
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
     }
 
@@ -286,13 +316,16 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("updatedLocalValue", responseNode.get("value").asText());
-        assertEquals("local", responseNode.get("scope").asText());
-        // Check local value is changed in engine and global one remains
-        // unchanged
-        assertEquals("updatedLocalValue", taskService.getVariableLocal(task.getId(), "overlappingVariable"));
-        assertEquals("processValue", runtimeService.getVariable(task.getExecutionId(), "overlappingVariable"));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "scope: 'local',"
+                        + "value: 'updatedLocalValue'"
+                        + "}");
+        // Check local value is changed in engine and global one remains unchanged
+        assertThat(taskService.getVariableLocal(task.getId(), "overlappingVariable")).isEqualTo("updatedLocalValue");
+        assertThat(runtimeService.getVariable(task.getExecutionId(), "overlappingVariable")).isEqualTo("processValue");
 
         // Update variable in local scope
         requestNode = objectMapper.createObjectNode();
@@ -304,13 +337,16 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpPut, HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("updatedLocalValueOnceAgain", responseNode.get("value").asText());
-        assertEquals("local", responseNode.get("scope").asText());
-        // Check local value is changed in engine and global one remains
-        // unchanged
-        assertEquals("updatedLocalValueOnceAgain", taskService.getVariableLocal(task.getId(), "overlappingVariable"));
-        assertEquals("processValue", runtimeService.getVariable(task.getExecutionId(), "overlappingVariable"));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "scope: 'local',"
+                        + "value: 'updatedLocalValueOnceAgain'"
+                        + "}");
+        // Check local value is changed in engine and global one remains unchanged
+        assertThat(taskService.getVariableLocal(task.getId(), "overlappingVariable")).isEqualTo("updatedLocalValueOnceAgain");
+        assertThat(runtimeService.getVariable(task.getExecutionId(), "overlappingVariable")).isEqualTo("processValue");
 
         // Update variable in global scope
         requestNode = objectMapper.createObjectNode();
@@ -322,13 +358,16 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpPut, HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("updatedInGlobalScope", responseNode.get("value").asText());
-        assertEquals("global", responseNode.get("scope").asText());
-        // Check global value is changed in engine and local one remains
-        // unchanged
-        assertEquals("updatedLocalValueOnceAgain", taskService.getVariableLocal(task.getId(), "overlappingVariable"));
-        assertEquals("updatedInGlobalScope", runtimeService.getVariable(task.getExecutionId(), "overlappingVariable"));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "scope: 'global',"
+                        + "value: 'updatedInGlobalScope'"
+                        + "}");
+        // Check global value is changed in engine and local one remains unchanged
+        assertThat(taskService.getVariableLocal(task.getId(), "overlappingVariable")).isEqualTo("updatedLocalValueOnceAgain");
+        assertThat(runtimeService.getVariable(task.getExecutionId(), "overlappingVariable")).isEqualTo("updatedInGlobalScope");
 
         // Try updating with mismatch between URL and body variableName
         // unexisting property
@@ -367,19 +406,21 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeBinaryRequest(httpPut, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("binaryVariable", responseNode.get("name").asText());
-            assertTrue(responseNode.get("value").isNull());
-            assertEquals("local", responseNode.get("scope").asText());
-            assertEquals("binary", responseNode.get("type").asText());
-            assertNotNull(responseNode.get("valueUrl"));
-            assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "name: 'binaryVariable',"
+                            + "value: null,"
+                            + "scope: 'local',"
+                            + "type: 'binary',"
+                            + "valueUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "binaryVariable") + "'"
+                            + "}");
 
             // Check actual value of variable in engine
             Object variableValue = taskService.getVariableLocal(task.getId(), "binaryVariable");
-            assertNotNull(variableValue);
-            assertTrue(variableValue instanceof byte[]);
-            assertEquals("This is binary content", new String((byte[]) variableValue));
+            assertThat(variableValue).isInstanceOf(byte[].class);
+            assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
 
         } finally {
             // Clean adhoc-tasks even if test fails

@@ -13,12 +13,14 @@
 
 package org.flowable.examples.bpmn.subprocess;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Assert;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,19 +39,17 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
 
         // Tasks are ordered by name (see query)
-        Assert.assertEquals(2, tasks.size());
-        org.flowable.task.api.Task investigateHardwareTask = tasks.get(0);
-        org.flowable.task.api.Task investigateSoftwareTask = tasks.get(1);
-        Assert.assertEquals("Investigate hardware", investigateHardwareTask.getName());
-        Assert.assertEquals("Investigate software", investigateSoftwareTask.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Investigate hardware", "Investigate software");
 
         // Completing both the tasks finishes the subprocess and enables the
         // task after the subprocess
-        taskService.complete(investigateHardwareTask.getId());
-        taskService.complete(investigateSoftwareTask.getId());
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
 
         org.flowable.task.api.Task writeReportTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        Assert.assertEquals("Write report", writeReportTask.getName());
+        assertThat(writeReportTask.getName()).isEqualTo("Write report");
 
         // Clean up
         repositoryService.deleteDeployment(deployment.getId(), true);

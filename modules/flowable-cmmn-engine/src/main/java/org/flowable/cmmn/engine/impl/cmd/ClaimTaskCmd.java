@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
@@ -35,8 +36,9 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
 
     @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (userId != null) {
-            Clock clock = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock();
+            Clock clock = cmmnEngineConfiguration.getClock();
             task.setClaimTime(clock.getCurrentTime());
 
             if (task.getAssignee() != null) {
@@ -45,10 +47,10 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                     // exception. Otherwise, ignore this, post-conditions of method already met.
                     throw new FlowableTaskAlreadyClaimedException(task.getId(), task.getAssignee());
                 }
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskInfoChange(task, clock.getCurrentTime());
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskInfoChange(task, clock.getCurrentTime());
                 
             } else {
-                TaskHelper.changeTaskAssignee(task, userId);
+                TaskHelper.changeTaskAssignee(task, userId, cmmnEngineConfiguration);
             }
             
         } else {
@@ -57,7 +59,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
                 task.setClaimTime(null);
                 
                 // Task should be assigned to no one
-                TaskHelper.changeTaskAssignee(task, null);
+                TaskHelper.changeTaskAssignee(task, null, cmmnEngineConfiguration);
             }
         }
 

@@ -320,34 +320,34 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
         for (String parameterName : paramMap.keySet()) {
             if (paramMap.get(parameterName).length > 0) {
 
-                if (parameterName.equalsIgnoreCase("name")) {
+                if ("name".equalsIgnoreCase(parameterName)) {
                     contentItem.setName(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("mimeType")) {
+                } else if ("mimeType".equalsIgnoreCase(parameterName)) {
                     contentItem.setMimeType(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("taskId")) {
+                } else if ("taskId".equalsIgnoreCase(parameterName)) {
                     contentItem.setTaskId(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("processInstanceId")) {
+                } else if ("processInstanceId".equalsIgnoreCase(parameterName)) {
                     contentItem.setProcessInstanceId(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("contentStoreId")) {
+                } else if ("contentStoreId".equalsIgnoreCase(parameterName)) {
                     contentItem.setContentStoreId(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("contentStoreName")) {
+                } else if ("contentStoreName".equalsIgnoreCase(parameterName)) {
                     contentItem.setContentStoreName(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("field")) {
+                } else if ("field".equalsIgnoreCase(parameterName)) {
                     contentItem.setField(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("createdBy")) {
+                } else if ("createdBy".equalsIgnoreCase(parameterName)) {
                     contentItem.setCreatedBy(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("lastModifiedBy")) {
+                } else if ("lastModifiedBy".equalsIgnoreCase(parameterName)) {
                     contentItem.setLastModifiedBy(paramMap.get(parameterName)[0]);
 
-                } else if (parameterName.equalsIgnoreCase("tenantId")) {
+                } else if ("tenantId".equalsIgnoreCase(parameterName)) {
                     contentItem.setTenantId(paramMap.get(parameterName)[0]);
                 }
             }

@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import org.flowable.cdi.BusinessProcess;
 
 /**
- * Allows to expose the process variables of the current business process as a java.util.Map<String,Object>
- * <p/>
+ * Allows to expose the process variables of the current business process as a {@code java.util.Map<String,Object>}.
+ * <p>
  * The map delegates changes to {@link BusinessProcess#setVariable(String, Object)} and {@link BusinessProcess#getVariable(String)}, so that they are not flushed prematurely.
  * 
  * @author Daniel Meyer

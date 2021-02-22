@@ -23,16 +23,23 @@ public interface PlanItemInstance {
     String getName();
     String getState();
     String getCaseDefinitionId();
+    String getDerivedCaseDefinitionId();
     String getCaseInstanceId();
     String getStageInstanceId();
     boolean isStage();
     String getElementId();
     String getPlanItemDefinitionId();
     String getPlanItemDefinitionType();
+    /**
+     * @deprecated use {@link #getCreateTime()} instead
+     */
     @Deprecated()
-    Date getStartTime();
+    default Date getStartTime() {
+        return getCreateTime();
+    }
     Date getCreateTime();
     Date getLastAvailableTime();
+    Date getLastUnavailableTime();
     Date getLastEnabledTime();
     Date getLastDisabledTime();
     Date getLastStartedTime();
@@ -45,9 +52,11 @@ public interface PlanItemInstance {
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
-    boolean isCompleteable();
+    boolean isCompletable();
     String getEntryCriterionId();
     String getExitCriterionId();
+    String getFormKey();
+    String getExtraValue();
     String getTenantId();
     
 }

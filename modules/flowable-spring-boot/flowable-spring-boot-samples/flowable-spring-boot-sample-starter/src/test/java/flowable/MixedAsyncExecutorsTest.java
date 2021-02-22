@@ -17,54 +17,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.flowable.app.api.AppRepositoryService;
-import org.flowable.app.engine.test.FlowableAppRule;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableRule;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.flowable.spring.impl.test.FlowableSpringExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@ExtendWith(FlowableCmmnSpringExtension.class)
+@ExtendWith(FlowableSpringExtension.class)
 public class MixedAsyncExecutorsTest {
 
-    @Rule
     @Autowired
-    public FlowableRule processRule;
+    protected ProcessEngine processEngine;
 
-    @Rule
     @Autowired
-    public FlowableCmmnRule cmmnRule;
-    
-    @Rule
+    private RuntimeService runtimeService;
+
     @Autowired
-    public FlowableAppRule appRule;
-    
+    protected TaskService taskService;
+
+    @Autowired
+    protected CmmnEngine cmmnEngine;
+
+    @Autowired
     private CmmnRuntimeService cmmnRuntimeService;
-    private CmmnTaskService cmmnTaskService;
-    private AppRepositoryService appRepositoryService;
 
-    @Before
-    public void setUp() {
-        cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
-        cmmnTaskService = cmmnRule.getCmmnEngine().getCmmnTaskService();
-        appRepositoryService = appRule.getAppRepositoryService();
-    }
+    @Autowired
+    private CmmnTaskService cmmnTaskService;
+
+    @Autowired
+    private AppRepositoryService appRepositoryService;
 
     @CmmnDeployment(resources = "stageAfterTimer.cmmn")
     @Deployment(resources = "timerAfterStart.bpmn20.xml")
@@ -77,32 +76,32 @@ public class MixedAsyncExecutorsTest {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageAfterTimerEventListener")
             .start();
 
-        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
 
         // Start the Process instance
-        ProcessInstance processInstance = processRule.getRuntimeService().createProcessInstanceBuilder().processDefinitionKey("testTimerEvent").start();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("testTimerEvent").start();
 
-        assertThat(processRule.getTaskService().createTaskQuery().count()).isEqualTo(0);
+        assertThat(taskService.createTaskQuery().count()).isZero();
 
         // Timer fires after 1 day, so setting it to 1 day + 1 second
         setClockTo(new Date(startTime.getTime() + (24 * 60 * 60 * 1000 + 1)));
 
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnRule.getCmmnEngine(), 10000L, 200L, true);
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processRule, 10000L, 200L);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 10000L, 200L, true);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngine.getProcessEngineConfiguration(), processEngine.getManagementService(), 10000L, 200L);
 
         // User task should be active after the timer has triggered
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
-        assertThat(processRule.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
     }
     
     @Test
     public void testAppDefinitions() {
-        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isEqualTo(0);
+        assertThat(appRepositoryService.createAppDefinitionQuery().count()).isZero();
     }
 
     protected void setClockTo(Date time) {
-        processRule.setCurrentTime(time);
-        cmmnRule.setCurrentTime(time);
+        processEngine.getProcessEngineConfiguration().getClock().setCurrentTime(time);
+        cmmnEngine.getCmmnEngineConfiguration().getClock().setCurrentTime(time);
 
     }
 }

@@ -39,7 +39,7 @@ import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.content.ContentEngineAutoConfiguration;
 import org.flowable.spring.boot.content.ContentEngineServicesAutoConfiguration;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -162,7 +162,7 @@ public class ContentEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, ContentEngine contentEngine) {
         List<Method> methods = Stream.of(ContentEngine.class.getDeclaredMethods())
-            .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName")))
+            .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName())))
             .collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {

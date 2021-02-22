@@ -25,12 +25,13 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
@@ -48,13 +49,12 @@ public class BpmnDeploymentHelper {
      * @throws FlowableException
      *             if any two processes have the same key
      */
-    public void verifyProcessDefinitionsDoNotShareKeys(
-            Collection<ProcessDefinitionEntity> processDefinitions) {
+    public void verifyProcessDefinitionsDoNotShareKeys(Collection<ProcessDefinitionEntity> processDefinitions) {
         Set<String> keySet = new LinkedHashSet<>();
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keySet.contains(processDefinition.getKey())) {
                 throw new FlowableException(
-                        "The deployment contains process definitions with the same key (process id attribute), this is not allowed");
+                        "The deployment contains process definitions with the same key '" + processDefinition.getKey() + "' (process id attribute), this is not allowed");
             }
             keySet.add(processDefinition.getKey());
         }
@@ -166,10 +166,9 @@ public class BpmnDeploymentHelper {
         BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
 
         eventSubscriptionManager.removeObsoleteMessageEventSubscriptions(previousProcessDefinition);
-        eventSubscriptionManager.addMessageEventSubscriptions(processDefinition, process, bpmnModel);
-
         eventSubscriptionManager.removeObsoleteSignalEventSubScription(previousProcessDefinition);
-        eventSubscriptionManager.addSignalEventSubscriptions(Context.getCommandContext(), processDefinition, process, bpmnModel);
+        eventSubscriptionManager.removeObsoleteEventRegistryEventSubScription(previousProcessDefinition);
+        eventSubscriptionManager.addEventSubscriptions(processDefinition, process, bpmnModel);
 
         timerManager.removeObsoleteTimers(processDefinition);
         timerManager.scheduleTimers(processDefinition, process);
@@ -193,7 +192,8 @@ public class BpmnDeploymentHelper {
             ProcessDefinitionEntity processDefinition, ExpressionType expressionType) {
 
         if (expressions != null) {
-            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            IdentityLinkService identityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService();
             Iterator<String> iterator = expressions.iterator();
             while (iterator.hasNext()) {
                 @SuppressWarnings("cast")

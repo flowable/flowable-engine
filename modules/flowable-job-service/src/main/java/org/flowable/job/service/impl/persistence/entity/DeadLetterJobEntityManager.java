@@ -25,7 +25,12 @@ import org.flowable.job.service.impl.JobQueryImpl;
 public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobEntity> {
 
     /**
-     * Returns all {@link DeadLetterJobEntity} instances related to an {@link ExecutionEntity}.
+     * Find the deadletter job with the given correlation id.
+     */
+    DeadLetterJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
+     * Returns all {@link DeadLetterJobEntity} instances related to an execution id.
      */
     List<DeadLetterJobEntity> findJobsByExecutionId(String id);
     
@@ -45,7 +50,7 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
+     * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     

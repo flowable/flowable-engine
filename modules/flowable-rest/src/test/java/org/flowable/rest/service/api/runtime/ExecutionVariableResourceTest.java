@@ -13,14 +13,13 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,9 +42,11 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to a single execution variable.
- * 
+ *
  * @author Frederik Heremans
  */
 public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
@@ -61,42 +62,58 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         runtimeService.setVariable(processInstance.getId(), "variable", "processValue");
 
         Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
         runtimeService.setVariableLocal(childExecution.getId(), "variable", "childValue");
 
         // Get local scope variable
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "variable")),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "variable")),
                 HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("local", responseNode.get("scope").asText());
-        assertEquals("childValue", responseNode.get("value").asText());
-        assertEquals("variable", responseNode.get("name").asText());
-        assertEquals("string", responseNode.get("type").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "   name: 'variable',"
+                        + "   type: 'string',"
+                        + "   value: 'childValue',"
+                        + "   scope: 'local'"
+                        + "}");
 
         // Get global scope variable
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "variable") + "?scope=global"),
-                HttpStatus.SC_OK);
-        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        response =
+
+                executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE,
+                        childExecution.getId(), "variable") + "?scope=global"),
+                        HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().
+
+                getContent());
+
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("global", responseNode.get("scope").asText());
-        assertEquals("processValue", responseNode.get("value").asText());
-        assertEquals("variable", responseNode.get("name").asText());
-        assertEquals("string", responseNode.get("type").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "   name: 'variable',"
+                        + "   type: 'string',"
+                        + "   value: 'processValue',"
+                        + "   scope: 'global'"
+                        + "}");
 
         // Illegal scope
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, processInstance.getId(), "variable") + "?scope=illegal"),
-                HttpStatus.SC_BAD_REQUEST);
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE,
+                processInstance.getId(), "variable") + "?scope=illegal"), HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
 
         // Unexisting process
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, "unexisting", "variable")), HttpStatus.SC_NOT_FOUND);
+        response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, "unexisting", "variable")),
+                HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
 
         // Unexisting variable
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, processInstance.getId(), "unexistingVariable")),
+        response = executeRequest(new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, processInstance.getId(), "unexistingVariable")),
                 HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
@@ -111,23 +128,25 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         runtimeService.setVariableLocal(processInstance.getId(), "var", "This is a binary piece of text".getBytes());
 
         Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
         runtimeService.setVariableLocal(childExecution.getId(), "var", "This is a binary piece of text in the child execution".getBytes());
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var")),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var")),
                 HttpStatus.SC_OK);
-        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+        String actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertEquals("This is a binary piece of text in the child execution", actualResponseBytesAsText);
-        assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
+        assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text in the child execution");
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
 
         // Test global scope
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var") + "?scope=global"),
+        response = executeRequest(new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "var") + "?scope=global"),
                 HttpStatus.SC_OK);
-        actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent());
+        actualResponseBytesAsText = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertEquals("This is a binary piece of text", actualResponseBytesAsText);
-        assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
+        assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
     }
 
     /**
@@ -143,19 +162,19 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
         runtimeService.setVariableLocal(processInstance.getId(), "var", originalSerializable);
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstance.getId(), "var")),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstance.getId(), "var")),
                 HttpStatus.SC_OK);
 
         // Read the serializable from the stream
         ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
         Object readSerializable = stream.readObject();
-        
+
         closeResponse(response);
-        
-        assertNotNull(readSerializable);
-        assertTrue(readSerializable instanceof TestSerializableVariable);
-        assertEquals("This is some field", ((TestSerializableVariable) readSerializable).getSomeField());
-        assertEquals("application/x-java-serialized-object", response.getEntity().getContentType().getValue());
+
+        assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
+        assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
     }
 
     /**
@@ -185,28 +204,32 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testDeleteExecutionVariable() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", Collections.singletonMap("myVariable", (Object) "processValue"));
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("processOne", Collections.singletonMap("myVariable", (Object) "processValue"));
 
         Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
         runtimeService.setVariableLocal(childExecution.getId(), "myVariable", "childValue");
 
         // Delete variable local
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "myVariable"));
+        HttpDelete httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "myVariable"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
-        assertFalse(runtimeService.hasVariableLocal(childExecution.getId(), "myVariable"));
+        assertThat(runtimeService.hasVariableLocal(childExecution.getId(), "myVariable")).isFalse();
         // Global variable should remain unaffected
-        assertTrue(runtimeService.hasVariable(childExecution.getId(), "myVariable"));
+        assertThat(runtimeService.hasVariable(childExecution.getId(), "myVariable")).isTrue();
 
         // Delete variable global
-        httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "myVariable") + "?scope=global");
+        httpDelete = new HttpDelete(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "myVariable")
+                        + "?scope=global");
         response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
         closeResponse(response);
 
-        assertFalse(runtimeService.hasVariableLocal(childExecution.getId(), "myVariable"));
-        assertFalse(runtimeService.hasVariable(childExecution.getId(), "myVariable"));
+        assertThat(runtimeService.hasVariableLocal(childExecution.getId(), "myVariable")).isFalse();
+        assertThat(runtimeService.hasVariable(childExecution.getId(), "myVariable")).isFalse();
 
         // Run the same delete again, variable is not there so 404 should be
         // returned
@@ -224,7 +247,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         runtimeService.setVariableLocal(processInstance.getId(), "myVar", "processValue");
 
         Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
         runtimeService.setVariableLocal(childExecution.getId(), "myVar", "childValue");
 
         // Update variable local
@@ -238,13 +261,17 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("updatedValue", responseNode.get("value").asText());
-        assertEquals("local", responseNode.get("scope").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   value: 'updatedValue',"
+                        + "   scope: 'local'"
+                        + "}");
 
         // Global value should be unaffected
-        assertEquals("processValue", runtimeService.getVariable(processInstance.getId(), "myVar"));
-        assertEquals("updatedValue", runtimeService.getVariableLocal(childExecution.getId(), "myVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("processValue");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("updatedValue");
 
         // Update variable global
         requestNode = objectMapper.createObjectNode();
@@ -258,13 +285,17 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpPut, HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("updatedValueGlobal", responseNode.get("value").asText());
-        assertEquals("global", responseNode.get("scope").asText());
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   value: 'updatedValueGlobal',"
+                        + "   scope: 'global'"
+                        + "}");
 
         // Local value should be unaffected
-        assertEquals("updatedValueGlobal", runtimeService.getVariable(processInstance.getId(), "myVar"));
-        assertEquals("updatedValue", runtimeService.getVariableLocal(childExecution.getId(), "myVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("updatedValueGlobal");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("updatedValue");
 
         requestNode.put("name", "unexistingVariable");
 
@@ -272,7 +303,8 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
 
-        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "unexistingVariable"));
+        httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "unexistingVariable"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         response = executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
@@ -289,7 +321,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         runtimeService.setVariableLocal(processInstance.getId(), "binaryVariable", "Initial binary value".getBytes());
 
         Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
-        assertNotNull(childExecution);
+        assertThat(childExecution).isNotNull();
         runtimeService.setVariableLocal(childExecution.getId(), "binaryVariable", "Initial binary value child".getBytes());
 
         InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
@@ -299,53 +331,58 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         additionalFields.put("name", "binaryVariable");
         additionalFields.put("type", "binary");
 
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "binaryVariable"));
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "binaryVariable"));
         httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
         CloseableHttpResponse response = executeBinaryRequest(httpPut, HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("binaryVariable", responseNode.get("name").asText());
-        assertTrue(responseNode.get("value").isNull());
-        assertEquals("local", responseNode.get("scope").asText());
-        assertEquals("binary", responseNode.get("type").asText());
-        assertNotNull(responseNode.get("valueUrl"));
-        assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "binaryVariable")));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "   name: 'binaryVariable',"
+                        + "   type: 'binary',"
+                        + "   value: null,"
+                        + "   scope: 'local',"
+                        + "   valueUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "binaryVariable") + "'"
+                        + "}");
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariableLocal(childExecution.getId(), "binaryVariable");
-        assertNotNull(variableValue);
-        assertTrue(variableValue instanceof byte[]);
-        assertEquals("This is binary content", new String((byte[]) variableValue));
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
 
         // Update variable in global scope
         additionalFields.put("scope", "global");
         binaryContent = new ByteArrayInputStream("This is binary content global".getBytes());
 
-        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "binaryVariable"));
+        httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE, childExecution.getId(), "binaryVariable"));
         httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
         response = executeBinaryRequest(httpPut, HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("binaryVariable", responseNode.get("name").asText());
-        assertTrue(responseNode.get("value").isNull());
-        assertEquals("global", responseNode.get("scope").asText());
-        assertEquals("binary", responseNode.get("type").asText());
-        assertNotNull(responseNode.get("valueUrl"));
-        assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "binaryVariable")));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "   name: 'binaryVariable',"
+                        + "   type: 'binary',"
+                        + "   value: null,"
+                        + "   scope: 'global',"
+                        + "   valueUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, childExecution.getId(), "binaryVariable") + "'"
+                        + "}");
 
         // Check actual global value of variable in engine
         variableValue = runtimeService.getVariableLocal(processInstance.getId(), "binaryVariable");
-        assertNotNull(variableValue);
-        assertTrue(variableValue instanceof byte[]);
-        assertEquals("This is binary content global", new String((byte[]) variableValue));
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content global");
 
         // local value should remain unchanged
         variableValue = runtimeService.getVariableLocal(childExecution.getId(), "binaryVariable");
-        assertNotNull(variableValue);
-        assertTrue(variableValue instanceof byte[]);
-        assertEquals("This is binary content", new String((byte[]) variableValue));
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }
 }

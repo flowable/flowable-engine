@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>6.6.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -115,16 +115,20 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>net.javacrumbs.json-unit</groupId>
+			<artifactId>json-unit-assertj</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>
     </dependencies>
 
     <build>
@@ -228,26 +232,6 @@
             </build>
         </profile>
 		<profile>
-			<id>distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>cleanDb</id>
 			<build>
 				<plugins>
@@ -323,6 +307,58 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <profile>
+            <id>databasemssqlform</id>
+            <activation>
+                <property>
+                    <name>databasemssqlform</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable form configuration to db ${databasemssqlform}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.form.cfg.xml"
+                                            tofile="target/test-classes/flowable.form.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlform}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqlform}" />
+                                        <java classname="org.flowable.form.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>databasewithschemaform</id>
@@ -386,7 +422,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
+					<groupId>com.oracle.database.jdbc</groupId>
 					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
@@ -403,7 +439,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
+					<groupId>com.oracle.database.jdbc</groupId>
 					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
@@ -431,7 +467,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databaseform</name>
+					<name>databasemssqlform</name>
 					<value>mssql</value>
 				</property>
 			</activation>

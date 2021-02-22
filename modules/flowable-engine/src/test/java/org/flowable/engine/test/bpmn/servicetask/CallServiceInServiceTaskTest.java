@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -35,37 +38,31 @@ public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
         // Starting the process should lead to two processes being started,
         // The other one started from the java delegate in the service task
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(2, processInstances.size());
+        assertThat(processInstances).hasSize(2);
 
         boolean startProcessFromDelegateFound = false;
         boolean oneTaskProcessFound = false;
         for (ProcessInstance processInstance : processInstances) {
             ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-            if (processDefinition.getKey().equals("startProcessFromDelegate")) {
+            if ("startProcessFromDelegate".equals(processDefinition.getKey())) {
                 startProcessFromDelegateFound = true;
-            } else if (processDefinition.getKey().equals("oneTaskProcess")) {
+            } else if ("oneTaskProcess".equals(processDefinition.getKey())) {
                 oneTaskProcessFound = true;
             }
         }
 
-        assertTrue(startProcessFromDelegateFound);
-        assertTrue(oneTaskProcessFound);
+        assertThat(startProcessFromDelegateFound).isTrue();
+        assertThat(oneTaskProcessFound).isTrue();
     }
 
     @Test
     @Deployment
     public void testRollBackOnException() {
-        Exception expectedException = null;
-        try {
-            runtimeService.startProcessInstanceByKey("startProcessFromDelegate");
-            fail("expected exception");
-        } catch (Exception e) {
-            expectedException = e;
-        }
-        assertNotNull(expectedException);
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("startProcessFromDelegate"))
+                .isInstanceOf(Exception.class);
 
         // Starting the process should cause a rollback of both processes
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
     @Test
@@ -75,10 +72,10 @@ public class CallServiceInServiceTaskTest extends PluggableFlowableTestCase {
 
         // The service task should have created a user which is part of the admin group
         User user = identityService.createUserQuery().singleResult();
-        assertEquals("Kermit", user.getId());
+        assertThat(user.getId()).isEqualTo("Kermit");
         Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
-        assertNotNull(group);
-        assertEquals("admin", group.getId());
+        assertThat(group).isNotNull();
+        assertThat(group.getId()).isEqualTo("admin");
 
         // Cleanup
         identityService.deleteUser("Kermit");

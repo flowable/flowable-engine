@@ -12,44 +12,23 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class ServiceTaskFailedJobRetryTimeCycleConverterTest extends AbstractConverterTest {
+class ServiceTaskFailedJobRetryTimeCycleConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "servicetaskfailedjobretrytimecyclemodel.bpmn20.xml";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("servicetaskfailedjobretrytimecyclemodel.bpmn20.xml")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ServiceTask);
-        assertEquals("servicetask", flowElement.getId());
-        ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Service task", serviceTask.getName());
-
-        assertEquals("R5/PT5M", serviceTask.getFailedJobRetryTimeCycleValue());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(ServiceTask.class, serviceTask -> {
+                    assertThat(serviceTask.getId()).isEqualTo("servicetask");
+                    assertThat(serviceTask.getName()).isEqualTo("Service task");
+                    assertThat(serviceTask.getFailedJobRetryTimeCycleValue()).isEqualTo("R5/PT5M");
+                });
     }
 }

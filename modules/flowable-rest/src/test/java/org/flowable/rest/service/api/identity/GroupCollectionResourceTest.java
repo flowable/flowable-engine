@@ -13,9 +13,8 @@
 
 package org.flowable.rest.service.api.identity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +31,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -59,10 +60,10 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
             savedGroups.add(group2);
 
             Group group3 = identityService.createGroupQuery().groupId("admin").singleResult();
-            assertNotNull(group3);
+            assertThat(group3).isNotNull();
             
             Group group4 = identityService.createGroupQuery().groupId("sales").singleResult();
-            assertNotNull(group4);
+            assertThat(group4).isNotNull();
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION);
@@ -108,13 +109,17 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertEquals("Test group", responseNode.get("name").textValue());
-            assertEquals("Test type", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: 'Test group',"
+                            + " type: 'Test type',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup") + "'"
+                            + "}");
 
-            assertNotNull(identityService.createGroupQuery().groupId("testgroup").singleResult());
+            assertThat(identityService.createGroupQuery().groupId("testgroup").singleResult()).isNotNull();
         } finally {
             try {
                 identityService.deleteGroup("testgroup");

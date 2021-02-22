@@ -12,18 +12,17 @@
  */
 package org.flowable.dmn.xml;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 public class MultipleDecisionsConverterTest extends AbstractConverterTest {
 
@@ -47,30 +46,30 @@ public class MultipleDecisionsConverterTest extends AbstractConverterTest {
 
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
-        assertEquals(2, decisions.size());
+        assertThat(decisions).hasSize(2);
 
         DecisionTable decisionTable1 = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable1);
+        assertThat(decisionTable1).isNotNull();
 
         List<InputClause> inputClauses1 = decisionTable1.getInputs();
-        assertEquals(2, inputClauses1.size());
+        assertThat(inputClauses1).hasSize(2);
 
         List<OutputClause> outputClauses1 = decisionTable1.getOutputs();
-        assertEquals(1, outputClauses1.size());
+        assertThat(outputClauses1).hasSize(1);
 
         List<DecisionRule> rules1 = decisionTable1.getRules();
-        assertEquals(2, rules1.size());
+        assertThat(rules1).hasSize(2);
 
         DecisionTable decisionTable2 = (DecisionTable) decisions.get(1).getExpression();
-        assertNotNull(decisionTable2);
+        assertThat(decisionTable2).isNotNull();
 
         List<InputClause> inputClauses2 = decisionTable2.getInputs();
-        assertEquals(2, inputClauses2.size());
+        assertThat(inputClauses2).hasSize(2);
 
         List<OutputClause> outputClauses2 = decisionTable2.getOutputs();
-        assertEquals(1, outputClauses2.size());
+        assertThat(outputClauses2).hasSize(1);
 
         List<DecisionRule> rules2 = decisionTable2.getRules();
-        assertEquals(2, rules2.size());
+        assertThat(rules2).hasSize(2);
     }
 }

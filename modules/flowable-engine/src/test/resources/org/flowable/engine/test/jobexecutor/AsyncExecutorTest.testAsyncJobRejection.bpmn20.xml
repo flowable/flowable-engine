@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="Examples"
+             xmlns:flowable="http://flowable.org/bpmn">
+
+    <process id="testRejection" name="Service and User task">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task"/>
+        <serviceTask id="task" name="Test task" flowable:async="true"
+                     flowable:class="org.flowable.engine.test.jobexecutor.AsyncExecutorTest$TestBlockingJavaDelegate"/>
+        <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+
+</definitions>

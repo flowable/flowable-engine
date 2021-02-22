@@ -14,6 +14,7 @@ package org.flowable.common.rest.exception;
 
 import org.flowable.common.engine.api.FlowableForbiddenException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.slf4j.Logger;
@@ -66,7 +67,14 @@ public class BaseExceptionHandlerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
     @ExceptionHandler(FlowableIllegalArgumentException.class)
     @ResponseBody
-    public ErrorInfo handleIllegal(FlowableIllegalArgumentException e) {
+    public ErrorInfo handleIllegalArgument(FlowableIllegalArgumentException e) {
+        return new ErrorInfo("Bad request", e);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    @ExceptionHandler(FlowableIllegalStateException.class)
+    @ResponseBody
+    public ErrorInfo handleIllegalState(FlowableIllegalStateException e) {
         return new ErrorInfo("Bad request", e);
     }
 

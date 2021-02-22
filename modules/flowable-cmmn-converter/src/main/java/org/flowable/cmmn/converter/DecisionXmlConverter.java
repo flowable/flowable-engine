@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Decision;
-
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author martin.grofcik

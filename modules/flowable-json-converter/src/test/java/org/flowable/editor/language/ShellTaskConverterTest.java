@@ -12,22 +12,18 @@
  */
 package org.flowable.editor.language;
 
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.ServiceTask;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.ServiceTask;
+import org.junit.jupiter.api.Test;
 
 public class ShellTaskConverterTest extends AbstractConverterTest {
 
@@ -68,21 +64,23 @@ public class ShellTaskConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ServiceTask);
-        assertEquals("servicetask", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(ServiceTask.class);
+        assertThat(flowElement.getId()).isEqualTo("servicetask");
         ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Shell", serviceTask.getName());
+        assertThat(serviceTask.getId()).isEqualTo("servicetask");
+        assertThat(serviceTask.getName()).isEqualTo("Shell");
 
         List<FieldExtension> fields = serviceTask.getFieldExtensions();
         Collection<String> expectedField = new HashSet<>(EXPECTED_FIELDS);
         for (FieldExtension field : fields) {
-            assertTrue(expectedField.contains(field.getFieldName()));
-            assertTrue(expectedField.contains(field.getStringValue()));
-            assertThat(field.getStringValue(), is(field.getFieldName()));
+            assertThat(expectedField)
+                    .contains(
+                            field.getFieldName(),
+                            field.getStringValue()
+                    );
+            assertThat(field.getStringValue()).isEqualTo(field.getFieldName());
             expectedField.remove(field.getFieldName());
         }
-        assertThat(expectedField.size(), is(0));
+        assertThat(expectedField).isEmpty();
     }
 }

@@ -19,6 +19,7 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -35,7 +36,8 @@ public class ProcessInstanceMigrationStatusJobHandler extends AbstractProcessIns
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        BatchService batchService = CommandContextUtil.getBatchService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         
         String batchId = getBatchIdFromHandlerCfg(configuration);
         Batch batch = batchService.getBatch(batchId);

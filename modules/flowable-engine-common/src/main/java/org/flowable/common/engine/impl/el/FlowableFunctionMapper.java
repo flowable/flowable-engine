@@ -14,7 +14,7 @@
 package org.flowable.common.engine.impl.el;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.javax.el.FunctionMapper;
@@ -23,29 +23,27 @@ import org.flowable.common.engine.impl.javax.el.FunctionMapper;
  * A date function mapper that can be used in EL expressions
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class FlowableFunctionMapper extends FunctionMapper {
 
-    protected List<FlowableFunctionDelegate> functionDelegates;
+    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver; // first parameter = prefix, second parameter = localName
 
-    public FlowableFunctionMapper(List<FlowableFunctionDelegate> functionDelegates) {
-        this.functionDelegates = functionDelegates;
+    public FlowableFunctionMapper(BiFunction<String, String, FlowableFunctionDelegate> functionResolver) {
+        setFunctionResolver(functionResolver);
+
     }
 
-    public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
-        this.functionDelegates = functionDelegates;
+    public void setFunctionResolver(BiFunction<String, String, FlowableFunctionDelegate> functionResolver) {
+        this.functionResolver = functionResolver;
     }
 
     @Override
     public Method resolveFunction(String prefix, String localName) {
-        if (functionDelegates != null) {
-            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
-                if (functionDelegate.prefix().equals(prefix) && functionDelegate.localName().equals(localName)) {
-                    return functionDelegate.functionMethod();
-                }
-            }
+        if (functionResolver != null) {
+            FlowableFunctionDelegate functionDelegate = functionResolver.apply(prefix, localName);
+            return functionDelegate != null ? functionDelegate.functionMethod() : null;
         }
-
         return null;
     }
 

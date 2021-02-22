@@ -72,7 +72,7 @@ public class MybatisSentryPartInstanceDataManagerImpl extends AbstractCmmnDataMa
         @Override
         public boolean isRetained(SentryPartInstanceEntity sentryPartInstanceEntity, Object param) {
             return sentryPartInstanceEntity.getPlanItemInstanceId() == null
-                    && sentryPartInstanceEntity.getCaseInstanceId().equals((String) param);
+                    && sentryPartInstanceEntity.getCaseInstanceId().equals(param);
         }
         
     }
@@ -82,7 +82,7 @@ public class MybatisSentryPartInstanceDataManagerImpl extends AbstractCmmnDataMa
         @Override
         public boolean isRetained(SentryPartInstanceEntity sentryPartInstanceEntity, Object param) {
             return sentryPartInstanceEntity.getPlanItemInstanceId() != null
-                    && sentryPartInstanceEntity.getPlanItemInstanceId().equals((String) param);
+                    && sentryPartInstanceEntity.getPlanItemInstanceId().equals(param);
         }
         
     }

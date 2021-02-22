@@ -1,0 +1,20 @@
+{
+    "key": "test",
+    "name": "My event",
+    "correlationParameters": [
+        {
+            "name": "customer",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "customer",
+            "type": "string"
+        },
+        {
+            "name": "name",
+            "type": "string"
+        }
+    ]
+}

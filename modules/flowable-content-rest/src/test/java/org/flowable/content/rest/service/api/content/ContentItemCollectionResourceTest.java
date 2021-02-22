@@ -12,6 +12,9 @@
  */
 package org.flowable.content.rest.service.api.content;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -19,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -31,6 +33,9 @@ import org.flowable.content.rest.service.api.HttpMultipartHelper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Tijs Rademakers
@@ -57,26 +62,30 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
 
             // Check if content item is created
             List<ContentItem> contentItems = contentService.createContentItemQuery().list();
-            assertEquals(1, contentItems.size());
+            assertThat(contentItems).hasSize(1);
 
             urlContentItem = contentItems.get(0);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(urlContentItem.getId(), responseNode.get("id").asText());
-            assertEquals("Simple content item", responseNode.get("name").asText());
-            assertEquals("application/pdf", responseNode.get("mimeType").asText());
-            assertEquals("12345", responseNode.get("taskId").asText());
-            assertEquals("123456", responseNode.get("processInstanceId").asText());
-            assertEquals("id", responseNode.get("contentStoreId").asText());
-            assertEquals("testStore", responseNode.get("contentStoreName").asText());
-            assertFalse(responseNode.get("contentAvailable").asBoolean());
-            assertEquals("testa", responseNode.get("createdBy").asText());
-            assertEquals("testb", responseNode.get("lastModifiedBy").asText());
-            assertEquals(urlContentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-            assertEquals(urlContentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
-            assertTrue(responseNode.get("url").textValue().endsWith(ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM, urlContentItem.getId())));
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: '" + urlContentItem.getId() + "',"
+                            + "  name: 'Simple content item',"
+                            + "  mimeType: 'application/pdf',"
+                            + "  taskId: '12345',"
+                            + "  processInstanceId: '123456',"
+                            + "  contentStoreId: 'id',"
+                            + "  contentStoreName: 'testStore',"
+                            + "  contentAvailable: false,"
+                            + "  created: " + new TextNode(getISODateStringWithTZ(urlContentItem.getCreated())) + ","
+                            + "  createdBy: 'testa',"
+                            + "  lastModified: " + new TextNode(getISODateStringWithTZ(urlContentItem.getLastModified())) + ","
+                            + "  lastModifiedBy: 'testb',"
+                            + "  url: '" + SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                            ContentRestUrls.URL_CONTENT_ITEM, urlContentItem.getId()) + "'"
+                            + "}");
 
         } finally {
             if (urlContentItem != null) {
@@ -106,28 +115,34 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
 
             // Check if content item is created
             List<ContentItem> contentItems = contentService.createContentItemQuery().list();
-            assertEquals(1, contentItems.size());
+            assertThat(contentItems).hasSize(1);
 
             urlContentItem = contentItems.get(0);
 
-            assertEquals("This is binary content", IOUtils.toString(contentService.getContentItemData(urlContentItem.getId())));
+            try (InputStream contentStream = contentService.getContentItemData(urlContentItem.getId())) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(urlContentItem.getId(), responseNode.get("id").asText());
-            assertEquals("Simple content item", responseNode.get("name").asText());
-            assertEquals("application/pdf", responseNode.get("mimeType").asText());
-            assertEquals("12345", responseNode.get("taskId").asText());
-            assertEquals("123456", responseNode.get("processInstanceId").asText());
-            assertEquals(urlContentItem.getContentStoreId(), responseNode.get("contentStoreId").asText());
-            assertEquals("file", responseNode.get("contentStoreName").asText());
-            assertTrue(responseNode.get("contentAvailable").asBoolean());
-            assertEquals("testa", responseNode.get("createdBy").asText());
-            assertEquals("testb", responseNode.get("lastModifiedBy").asText());
-            assertEquals(urlContentItem.getCreated(), getDateFromISOString(responseNode.get("created").asText()));
-            assertEquals(urlContentItem.getLastModified(), getDateFromISOString(responseNode.get("lastModified").asText()));
-            assertTrue(responseNode.get("url").textValue().endsWith(ContentRestUrls.createRelativeResourceUrl(
-                    ContentRestUrls.URL_CONTENT_ITEM, urlContentItem.getId())));
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: '" + urlContentItem.getId() + "',"
+                            + "  name: 'Simple content item',"
+                            + "  mimeType: 'application/pdf',"
+                            + "  taskId: '12345',"
+                            + "  processInstanceId: '123456',"
+                            + "  contentStoreId: '" + urlContentItem.getContentStoreId() + "',"
+                            + "  contentStoreName: 'file',"
+                            + "  contentAvailable: true,"
+                            + "  created: " + new TextNode(getISODateStringWithTZ(urlContentItem.getCreated())) + ","
+                            + "  createdBy: 'testa',"
+                            + "  lastModified: " + new TextNode(getISODateStringWithTZ(urlContentItem.getLastModified())) + ","
+                            + "  lastModifiedBy: 'testb',"
+                            + "  url: '" + SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
+                            ContentRestUrls.URL_CONTENT_ITEM, urlContentItem.getId()) + "'"
+                            + "}");
 
         } finally {
             if (urlContentItem != null) {

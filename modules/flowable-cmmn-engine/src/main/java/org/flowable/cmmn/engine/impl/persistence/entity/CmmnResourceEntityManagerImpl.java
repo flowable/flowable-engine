@@ -17,46 +17,32 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnResourceEntityManagerImpl extends AbstractCmmnEntityManager<CmmnResourceEntity> implements CmmnResourceEntityManager {
-
-    protected CmmnResourceDataManager resourceDataManager;
+public class CmmnResourceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, CmmnResourceEntity, CmmnResourceDataManager>
+    implements CmmnResourceEntityManager {
 
     public CmmnResourceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnResourceDataManager resourceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.resourceDataManager = resourceDataManager;
-    }
-
-    @Override
-    protected DataManager<CmmnResourceEntity> getDataManager() {
-        return resourceDataManager;
+        super(cmmnEngineConfiguration, resourceDataManager);
     }
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        resourceDataManager.deleteResourcesByDeploymentId(deploymentId);
+        dataManager.deleteResourcesByDeploymentId(deploymentId);
     }
 
     @Override
     public CmmnResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
-        return resourceDataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
+        return dataManager.findResourceByDeploymentIdAndResourceName(deploymentId, resourceName);
     }
 
     @Override
     public List<CmmnResourceEntity> findResourcesByDeploymentId(String deploymentId) {
-        return resourceDataManager.findResourcesByDeploymentId(deploymentId);
-    }
-
-    public CmmnResourceDataManager getResourceDataManager() {
-        return resourceDataManager;
-    }
-
-    public void setResourceDataManager(CmmnResourceDataManager resourceDataManager) {
-        this.resourceDataManager = resourceDataManager;
+        return dataManager.findResourcesByDeploymentId(deploymentId);
     }
 
 }

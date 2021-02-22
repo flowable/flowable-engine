@@ -20,11 +20,13 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.NativeDeploymentQuery;
@@ -130,7 +132,37 @@ public interface RepositoryService {
      *            The new tenant identifier.
      */
     void changeDeploymentTenantId(String deploymentId, String newTenantId);
-    
+
+    /**
+     *
+     * EXPERIMENTAL FEATURE!
+     *
+     * See more usage information {@link RepositoryService#changeDeploymentTenantId(String, String)}
+     *
+     * @param deploymentId
+     *            The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *            The new tenant identifier.
+     * @param mergeMode
+     *            Mode which is used to merge the deployment into the new tenant, in case the second tenant already has the same deployment key
+     */
+    void changeDeploymentTenantId(String deploymentId, String newTenantId, MergeMode mergeMode);
+
+    /**
+     *
+     * EXPERIMENTAL FEATURE!
+     *
+     * See more usage information {@link RepositoryService#changeDeploymentTenantId(String, String)}
+     *
+     * @param deploymentId
+     *            The id of the deployment of which the tenant identifier will be changed.
+     * @param newTenantId
+     *            The new tenant identifier.
+     * @param deploymentMergeStrategy
+     *            Strategy to be used to merge the deployment into the new tenant, in case the second tenant already has this deployment key
+     */
+    void changeDeploymentTenantId(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy);
+
     /**
      * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
      * 
@@ -358,7 +390,7 @@ public interface RepositoryService {
     /**
      * Creates a new model. The model is transient and must be saved using {@link #saveModel(Model)}.
      */
-    public Model newModel();
+    Model newModel();
 
     /**
      * Saves the model. If the model already existed, the model is updated otherwise a new model is created.
@@ -366,13 +398,13 @@ public interface RepositoryService {
      * @param model
      *            model to save, cannot be null.
      */
-    public void saveModel(Model model);
+    void saveModel(Model model);
 
     /**
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
-    public void deleteModel(String modelId);
+    void deleteModel(String modelId);
 
     /**
      * Saves the model editor source for a model
@@ -380,7 +412,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for a non-existent model, this operation is ignored.
      */
-    public void addModelEditorSource(String modelId, byte[] bytes);
+    void addModelEditorSource(String modelId, byte[] bytes);
 
     /**
      * Saves the model editor source extra for a model
@@ -388,10 +420,10 @@ public interface RepositoryService {
      * @param modelId
      *            id of model to delete, cannot be null. When an id is passed for an unexisting model, this operation is ignored.
      */
-    public void addModelEditorSourceExtra(String modelId, byte[] bytes);
+    void addModelEditorSourceExtra(String modelId, byte[] bytes);
 
     /** Query models. */
-    public ModelQuery createModelQuery();
+    ModelQuery createModelQuery();
 
     /**
      * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
@@ -404,7 +436,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public Model getModel(String modelId);
+    Model getModel(String modelId);
 
     /**
      * Returns the model editor source as a byte array
@@ -412,7 +444,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public byte[] getModelEditorSource(String modelId);
+    byte[] getModelEditorSource(String modelId);
 
     /**
      * Returns the model editor source extra as a byte array
@@ -420,7 +452,7 @@ public interface RepositoryService {
      * @param modelId
      *            id of model
      */
-    public byte[] getModelEditorSourceExtra(String modelId);
+    byte[] getModelEditorSourceExtra(String modelId);
 
     /**
      * Authorizes a candidate user for a process definition.
@@ -488,13 +520,24 @@ public interface RepositoryService {
     List<ValidationError> validateProcess(BpmnModel bpmnModel);
 
     /**
-     * Retrieves the {@link DmnDecisionTable}s associated with the given process definition.
+     * Retrieves the {@link DmnDecision}s associated with the given process definition.
      *
      * @param processDefinitionId
      *            id of the process definition, cannot be null.
      *
      */
-    List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId);
+    List<DmnDecision> getDecisionsForProcessDefinition(String processDefinitionId);
+
+    /**
+     * Retrieves the {@link DmnDecision}s associated with the given process definition.
+     *
+     * @param processDefinitionId
+     *            id of the process definition, cannot be null.
+     *
+     * @deprecated replaced by getDecisionsForProcessDefinition(String processDefinitionId)
+     */
+    @Deprecated
+    List<DmnDecision> getDecisionTablesForProcessDefinition(String processDefinitionId);
 
     /**
      * Retrieves the {@link FormDefinition}s associated with the given process definition.

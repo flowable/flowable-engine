@@ -23,6 +23,7 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
+import org.flowable.bpmn.converter.export.MapExceptionExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -70,6 +71,11 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(fallbackToDefaultTenant)) {
             callActivity.setFallbackToDefaultTenant(Boolean.valueOf(fallbackToDefaultTenant));
         }
+
+        String idVariableName = BpmnXMLUtil.getAttributeValue(BpmnXMLConstants.ATTRIBUTE_ID_VARIABLE_NAME, xtr);
+        if (StringUtils.isNotEmpty(idVariableName)) {
+            callActivity.setProcessInstanceIdVariableName(idVariableName);
+        }
         
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
@@ -108,6 +114,9 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (callActivity.getFallbackToDefaultTenant() != null) {
             writeQualifiedAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, callActivity.getFallbackToDefaultTenant().toString(), xtw);
         }
+        if (callActivity.getProcessInstanceIdVariableName() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ID_VARIABLE_NAME, callActivity.getProcessInstanceIdVariableName(), xtw);
+        }
     }
 
     @Override
@@ -117,6 +126,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
                 callActivity.getInParameters(), didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_OUT_PARAMETERS,
                 callActivity.getOutParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = MapExceptionExport.writeMapExceptionExtensions(callActivity.getMapExceptions(), didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;
     }
 

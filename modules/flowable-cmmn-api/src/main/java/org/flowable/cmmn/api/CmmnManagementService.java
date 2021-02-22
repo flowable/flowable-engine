@@ -15,8 +15,13 @@ package org.flowable.cmmn.api;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -42,6 +47,11 @@ public interface CmmnManagementService {
      * Returns a new JobQuery implementation, that can be used to query the jobs.
      */
     JobQuery createJobQuery();
+
+    /**
+     * Returns a new ExternalWorkerJobQuery implementation, that can be used to dynamically query the external worker jobs.
+     */
+    ExternalWorkerJobQuery createExternalWorkerJobQuery();
 
     /**
      * Returns a new TimerJobQuery implementation, that can be used to query the timer jobs.
@@ -103,6 +113,31 @@ public interface CmmnManagementService {
      *             when there is no job with the given id.
      */
     Job moveDeadLetterJobToExecutableJob(String jobId, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @param retries
+     *            the number of retries (value greater than 0) which will be set on the job.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     * @throws org.flowable.common.engine.api.FlowableIllegalArgumentException
+     *              when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
+
+    /**
+     * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.
+     *
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    Job moveSuspendedJobToExecutableJob(String jobId);
 
     /**
      * Delete the job with the provided id.
@@ -215,6 +250,15 @@ public interface CmmnManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+
+    /**
+     * Returns the full error details that were passed to the External worker {@link Job} when the job was last failed.
+     * Returns null when the job has no error details.
+     *
+     * @param jobId id of the job, cannot be null.
+     * @throws FlowableObjectNotFoundException when no job exists with the given id.
+     */
+    String getExternalWorkerJobErrorDetails(String jobId);
     
     void handleHistoryCleanupTimerJob();
     
@@ -232,5 +276,46 @@ public interface CmmnManagementService {
      *             when there is no historyJob with the given id.
      */
     void executeHistoryJob(String historyJobId);
+
+    /**
+     * Get the advanced configuration (storing the history json data) of a {@link HistoryJob}.
+     *
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     *
+     */
+    String getHistoryJobHistoryJson(String historyJobId);
+
+    /**
+     * Delete the history job with the provided id.
+     *
+     * @param jobId
+     *            id of the history job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    void deleteHistoryJob(String jobId);
+
+    // External Worker
+
+    /**
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
+     */
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
+
+    /**
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create a {@link CmmnExternalWorkerTransitionBuilder} that can be used to transition the status of the external worker job.
+     */
+    CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 
 }

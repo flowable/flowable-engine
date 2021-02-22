@@ -191,7 +191,7 @@ public abstract class ReflectUtil {
      */
     public static Method getSetter(String fieldName, Class<?> clazz, Class<?> fieldType) {
         String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) +
-                fieldName.substring(1, fieldName.length());
+                fieldName.substring(1);
         try {
             // Using getMethods(), getMethod(...) expects exact parameter type
             // matching and ignores inheritance-tree.
@@ -296,7 +296,7 @@ public abstract class ReflectUtil {
 
         // special for isXXX boolean
         if (name.startsWith("is")) {
-            return params.length == 0 && type.getSimpleName().equalsIgnoreCase("boolean");
+            return params.length == 0 && "boolean".equalsIgnoreCase(type.getSimpleName());
         }
 
         return params.length == 0 && !type.equals(Void.TYPE);

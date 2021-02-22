@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot-samples</artifactId>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>6.6.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>flowable-spring-boot-sample-integration</artifactId>
@@ -15,13 +15,8 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-integration</artifactId>
-            <version>6.5.0-SNAPSHOT</version>
+            <version>6.6.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
     </dependencies>
 
 </project>

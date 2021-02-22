@@ -107,7 +107,7 @@ Additionally, you can specify time cycle using cron expressions; the example bel
 ----
 
 
-Please see link:$$http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html$$[this tutorial] for using cron expressions.
+Please see link:$$http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html$$[this tutorial] for using cron expressions.
 
 *Note:* The first symbol denotes seconds, not minutes as in normal Unix cron.
 
@@ -1382,7 +1382,7 @@ A message intermediate event is defined as an <<bpmnIntermediateCatchingEvent,in
 [source,xml,linenums]
 ----
 <intermediateCatchEvent id="message">
-  <messageEventDefinition signalRef="newCustomerMessage" />
+  <messageEventDefinition messageRef="newCustomerMessage" />
 </intermediateCatchEvent>
 ----
 
@@ -2486,7 +2486,7 @@ Do note that the Groovy scripting engine is bundled with the groovy-jsr223 jar. 
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
     <artifactId>groovy-jsr223</artifactId>
-    <version>2.x.x<version>
+    <version>3.x.x<version>
 </dependency>
 ----
 
@@ -3045,7 +3045,7 @@ It is possible to throw BPMN Errors from user code inside Service Tasks or Scrip
 ----
 public class ThrowBpmnErrorDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     try {
       executeBusinessLogic();
     } catch (BusinessException e) {
@@ -3164,7 +3164,7 @@ For some use cases, it might be necessary to use the Flowable services from with
 ----
 public class StartProcessInstanceTestDelegate implements JavaDelegate {
 
-  public void execute(DelegateExecution execution) throws Exception {
+  public void execute(DelegateExecution execution) {
     RuntimeService runtimeService = Context.getProcessEngineConfiguration().getRuntimeService();
     runtimeService.startProcessInstanceByKey("myProcess");
   }
@@ -4340,7 +4340,7 @@ The first execution listener is notified when the process starts. The listener i
 ----
 public class ExampleExecutionListenerOne implements ExecutionListener {
 
-  public void notify(ExecutionListenerExecution execution) throws Exception {
+  public void notify(ExecutionListenerExecution execution) {
     execution.setVariable("variableSetInExecutionListener", "firstValue");
     execution.setVariable("eventReceived", execution.getEventName());
   }
@@ -4431,7 +4431,7 @@ public class ExampleFieldInjectedExecutionListener implements ExecutionListener 
 
   private Expression dynamicValue;
 
-  public void notify(ExecutionListenerExecution execution) throws Exception {
+  public void notify(ExecutionListenerExecution execution) {
     execution.setVariable("var", fixedValue.getValue(execution).toString() +
         dynamicValue.getValue(execution).toString());
   }
@@ -4488,7 +4488,7 @@ A _task listener_ supports the following attributes:
 ** *assignment*: occurs when the task is assigned to somebody. Note: when process execution arrives in a userTask, first an _assignment_ event will be fired, *before* the _create_ event is fired. This might seem an unnatural order, but the reason is pragmatic: when receiving the _create_ event, we usually want to inspect all properties of the task including the assignee.
 ** *complete*: occurs when the task is completed and just before the task is deleted from the runtime data.
 ** *delete*: occurs just before the task is going to be deleted. Notice that it will also be executed when task is normally finished via completeTask.
-* *class*: the delegation class that must be called. This class must implement the +org.flowable.engine.delegate.TaskListener+ interface.
+* *class*: the delegation class that must be called. This class must implement the +org.flowable.task.service.delegate.TaskListener+ interface.
 
 [source,java,linenums]
 ----

@@ -12,8 +12,7 @@
  */
 package org.flowable.management.jmx;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -49,20 +48,20 @@ public class JobExecutorJMXClientTest {
 
         // first check that job executor is not activated and correctly reported
         // as being inactive
-        assertFalse(processEngineConfig.isAsyncExecutorActivate());
-        assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+        assertThat(processEngineConfig.isAsyncExecutorActivate()).isFalse();
+        assertThat((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated")).isFalse();
         // now activate it remotely
         mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { true }, new String[] { Boolean.class.getName() });
 
         // check if it has the effect and correctly reported
         // assertTrue(processEngineConfig.getJobExecutor().isActive());
-        assertTrue((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+        assertThat((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated")).isTrue();
 
         // again disable and check it
         mbsc.invoke(jobExecutorBeanName, "setJobExecutorActivate", new Boolean[] { false }, new String[] { Boolean.class.getName() });
 
         // check if it has the effect and correctly reported
-        assertFalse(processEngineConfig.isAsyncExecutorActivate());
-        assertFalse((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated"));
+        assertThat(processEngineConfig.isAsyncExecutorActivate()).isFalse();
+        assertThat((Boolean) mbsc.getAttribute(jobExecutorBeanName, "JobExecutorActivated")).isFalse();
     }
 }

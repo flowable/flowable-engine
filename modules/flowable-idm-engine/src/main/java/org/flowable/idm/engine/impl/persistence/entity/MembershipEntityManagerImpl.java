@@ -13,7 +13,6 @@
 
 package org.flowable.idm.engine.impl.persistence.entity;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.delegate.event.impl.FlowableIdmEventBuilder;
@@ -23,18 +22,11 @@ import org.flowable.idm.engine.impl.persistence.entity.data.MembershipDataManage
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class MembershipEntityManagerImpl extends AbstractEntityManager<MembershipEntity> implements MembershipEntityManager {
-
-    protected MembershipDataManager membershipDataManager;
+public class MembershipEntityManagerImpl
+        extends AbstractIdmEngineEntityManager<MembershipEntity, MembershipDataManager> implements MembershipEntityManager {
 
     public MembershipEntityManagerImpl(IdmEngineConfiguration idmEngineConfiguration, MembershipDataManager membershipDataManager) {
-        super(idmEngineConfiguration);
-        this.membershipDataManager = membershipDataManager;
-    }
-
-    @Override
-    protected DataManager<MembershipEntity> getDataManager() {
-        return membershipDataManager;
+        super(idmEngineConfiguration, membershipDataManager);
     }
 
     @Override
@@ -45,34 +37,28 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
         insert(membershipEntity, false);
 
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_CREATED, groupId, userId));
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(
+                    FlowableIdmEventType.MEMBERSHIP_CREATED, groupId, userId), engineConfiguration.getEngineCfgKey());
         }
     }
 
     @Override
     public void deleteMembership(String userId, String groupId) {
-        membershipDataManager.deleteMembership(userId, groupId);
+        dataManager.deleteMembership(userId, groupId);
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(FlowableIdmEventType.MEMBERSHIP_DELETED, groupId, userId));
+            getEventDispatcher().dispatchEvent(FlowableIdmEventBuilder.createMembershipEvent(
+                    FlowableIdmEventType.MEMBERSHIP_DELETED, groupId, userId), engineConfiguration.getEngineCfgKey());
         }
     }
 
     @Override
     public void deleteMembershipByGroupId(String groupId) {
-        membershipDataManager.deleteMembershipByGroupId(groupId);
+        dataManager.deleteMembershipByGroupId(groupId);
     }
 
     @Override
     public void deleteMembershipByUserId(String userId) {
-        membershipDataManager.deleteMembershipByUserId(userId);
-    }
-
-    public MembershipDataManager getMembershipDataManager() {
-        return membershipDataManager;
-    }
-
-    public void setMembershipDataManager(MembershipDataManager membershipDataManager) {
-        this.membershipDataManager = membershipDataManager;
+        dataManager.deleteMembershipByUserId(userId);
     }
 
 }

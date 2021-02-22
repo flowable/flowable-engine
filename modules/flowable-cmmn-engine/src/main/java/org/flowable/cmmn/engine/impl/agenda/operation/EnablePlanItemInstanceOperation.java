@@ -31,12 +31,12 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.ENABLE;
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.ENABLED;
     }
     
@@ -49,6 +49,11 @@ public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInsta
         planItemInstanceEntity.setEntryCriterionId(entryCriterionId);
         planItemInstanceEntity.setLastEnabledTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceEnabled(planItemInstanceEntity);
+    }
+
+    @Override
+    public String getOperationName() {
+        return "[Enable plan item]";
     }
 
 }

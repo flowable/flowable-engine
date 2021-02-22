@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.shell;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -49,7 +51,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
 
     @Test
     public void testOsDetection() throws Exception {
-        assertNotSame(OsType.UNKOWN, osType);
+        assertThat(osType).isNotSameAs(OsType.UNKOWN);
     }
 
     @Test
@@ -61,8 +63,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellWindows");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 
@@ -75,8 +76,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellLinux");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 
@@ -89,8 +89,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellMac");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 }

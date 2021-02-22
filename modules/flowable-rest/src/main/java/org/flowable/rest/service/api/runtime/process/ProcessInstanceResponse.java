@@ -49,6 +49,9 @@ public class ProcessInstanceResponse {
     protected List<RestVariable> variables = new ArrayList<>();
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
 
     // Added by Ryan Johnston
@@ -197,6 +200,33 @@ public class ProcessInstanceResponse {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-bpmn-2.0-process")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    @ApiModelProperty(value = "The stage plan item instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage")
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     public void setTenantId(String tenantId) {

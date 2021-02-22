@@ -61,6 +61,14 @@ public interface DelegateExecution extends VariableScope {
     String getProcessDefinitionId();
 
     /**
+     * If this execution runs in the context of a case and stage, this method returns it's closest parent stage instance id (the stage plan item instance id to be
+     * precise).
+     *
+     * @return the stage instance id this execution belongs to or null, if this execution is not part of a case at all or is not a child element of a stage
+     */
+    String getPropagatedStageInstanceId();
+
+    /**
      * Gets the id of the parent of this execution. If null, the execution represents a process-instance.
      */
     String getParentId();
@@ -78,6 +86,7 @@ public interface DelegateExecution extends VariableScope {
     /**
      * Returns the tenant id, if any is set before on the process definition or process instance.
      */
+    @Override
     String getTenantId();
 
     /**
@@ -99,6 +108,13 @@ public interface DelegateExecution extends VariableScope {
      * Called when an {@link ExecutionListener} is being executed.
      */
     void setCurrentFlowableListener(FlowableListener currentListener);
+
+    /**
+     * Create a snapshot read only delegate execution of this delegate execution.
+     *
+     * @return a {@link ReadOnlyDelegateExecution}
+     */
+    ReadOnlyDelegateExecution snapshotReadOnly();
 
     /* Execution management */
 

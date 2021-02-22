@@ -50,7 +50,6 @@ public class BpmnModel {
     protected String sourceSystemId;
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
-    protected int nextFlowIdCounter = 1;
     protected Object eventSupport;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
@@ -61,8 +60,9 @@ public class BpmnModel {
         List<ExtensionAttribute> attributes = getDefinitionsAttributes().get(name);
         if (attributes != null && !attributes.isEmpty()) {
             for (ExtensionAttribute attribute : attributes) {
-                if (namespace.equals(attribute.getNamespace()))
+                if (namespace.equals(attribute.getNamespace())) {
                     return attribute.getValue();
+                }
             }
         }
         return null;
@@ -85,10 +85,16 @@ public class BpmnModel {
 
     public Process getMainProcess() {
         if (!getPools().isEmpty()) {
-            return getProcess(getPools().get(0).getId());
-        } else {
-            return getProcess(null);
+            Process process = getProcess(getPools().get(0).getId());
+            if (process != null) {
+                return process;
+            }
         }
+        return getProcessWithoutPool();
+    }
+
+    private Process getProcessWithoutPool() {
+        return getProcess(null);
     }
 
     public Process getProcess(String poolRef) {
@@ -107,11 +113,15 @@ public class BpmnModel {
                 }
             }
 
-            if (poolRef == null && !foundPool) {
+            if (poolRef == null && !foundPool && process.isExecutable()) {
                 return process;
             } else if (poolRef != null && foundPool) {
                 return process;
             }
+        }
+        
+        if (poolRef == null && !processes.isEmpty()) {
+            return processes.get(0);
         }
 
         return null;

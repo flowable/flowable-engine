@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
@@ -72,7 +73,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
     @Override
     public void insert(EntityImpl entity) {
-        getDbSqlSession().insert(entity);
+        getDbSqlSession().insert(entity, getIdGenerator());
     }
 
     @Override
@@ -142,9 +143,16 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return getList(getDbSqlSession(), dbQueryName, parameter, cachedEntityMatcher, checkCache);
     }
     
-    @SuppressWarnings("unchecked")
+    
     protected List<EntityImpl> getList(DbSqlSession dbSqlSession, String dbQueryName, Object parameter,
             CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache) {
+        
+        return getList(dbSqlSession, dbQueryName, parameter, cachedEntityMatcher, checkCache, false);
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected List<EntityImpl> getList(DbSqlSession dbSqlSession, String dbQueryName, Object parameter,
+            CachedEntityMatcher<EntityImpl> cachedEntityMatcher, boolean checkCache, boolean includeDeleted) {
 
         Collection<EntityImpl> result = dbSqlSession.selectList(dbQueryName, parameter);
 
@@ -192,7 +200,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         }
 
         // Remove entries which are already deleted
-        if (result.size() > 0) {
+        if (!includeDeleted && result.size() > 0) {
             Iterator<EntityImpl> resultIterator = result.iterator();
             while (resultIterator.hasNext()) {
                 if (dbSqlSession.isEntityToBeDeleted(resultIterator.next())) {
@@ -292,4 +300,5 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         return executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, entityId);
     }
 
+    protected abstract IdGenerator getIdGenerator();
 }

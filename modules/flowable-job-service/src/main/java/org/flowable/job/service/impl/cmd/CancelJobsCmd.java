@@ -21,10 +21,10 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * Send job cancelled event and delete job
@@ -34,44 +34,49 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class CancelJobsCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    List<String> jobIds;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
+    protected List<String> jobIds;
 
-    public CancelJobsCmd(List<String> jobIds) {
+    public CancelJobsCmd(List<String> jobIds, JobServiceConfiguration jobServiceConfiguration) {
         this.jobIds = jobIds;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public CancelJobsCmd(String jobId) {
+    public CancelJobsCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobIds = new ArrayList<>();
         jobIds.add(jobId);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
         JobEntity jobToDelete = null;
         for (String jobId : jobIds) {
-            jobToDelete = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+            jobToDelete = jobServiceConfiguration.getJobEntityManager().findById(jobId);
 
-            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+            FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
             if (jobToDelete != null) {
                 // When given job doesn't exist, ignore
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                    eventDispatcher
-                        .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                    eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                            jobServiceConfiguration.getEngineName());
                 }
 
-                CommandContextUtil.getJobEntityManager(commandContext).delete(jobToDelete);
+                jobServiceConfiguration.getJobEntityManager().delete(jobToDelete);
 
             } else {
-                TimerJobEntity timerJobToDelete = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
+                TimerJobEntity timerJobToDelete = jobServiceConfiguration.getTimerJobEntityManager().findById(jobId);
 
                 if (timerJobToDelete != null) {
                     // When given job doesn't exist, ignore
                     if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                        eventDispatcher
-                            .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
+                        eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete),
+                                jobServiceConfiguration.getEngineName());
                     }
 
-                    CommandContextUtil.getTimerJobEntityManager(commandContext).delete(timerJobToDelete);
+                    jobServiceConfiguration.getTimerJobEntityManager().delete(timerJobToDelete);
                 }
             }
         }

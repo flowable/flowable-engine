@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +22,11 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -34,7 +38,6 @@ public class CommandContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
-    protected AbstractEngineConfiguration currentEngineConfiguration;
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<>();
@@ -43,7 +46,12 @@ public class CommandContext {
     protected Map<String, Object> attributes; // General-purpose storing of anything during the lifetime of a command context
     protected boolean reused;
     protected LinkedList<Object> resultStack = new LinkedList<>(); // needs to be a stack, as JavaDelegates can do api calls again
-
+    protected CommandExecutor commandExecutor;
+    protected ClassLoader classLoader;
+    protected boolean useClassForNameClassLoading;
+    protected Clock clock;
+    protected ObjectMapper objectMapper;
+    
     public CommandContext(Command<?> command) {
         this.command = command;
     }
@@ -88,6 +96,7 @@ public class CommandContext {
                 // Sessions need to be closed, regardless of exceptions/commit/rollback
                 closeSessions();
             }
+            
         } catch (Throwable exception) {
             // Catch exceptions during session closing
             exception(exception);
@@ -131,7 +140,18 @@ public class CommandContext {
         if (closeListeners == null) {
             closeListeners = new ArrayList<>();
         }
+        
+        if (!commandContextCloseListener.multipleAllowed()) {
+            for (CommandContextCloseListener closeListenerItem : closeListeners) {
+    			if (closeListenerItem.getClass().equals(commandContextCloseListener.getClass())) {
+    				return;
+    			}
+    		}
+        }
+        
         closeListeners.add(commandContextCloseListener);
+        
+        closeListeners.sort(Comparator.comparing(CommandContextCloseListener::order));
     }
 
     public List<CommandContextCloseListener> getCloseListeners() {
@@ -141,8 +161,8 @@ public class CommandContext {
     protected void executeCloseListenersClosing() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closing(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closing(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -153,8 +173,8 @@ public class CommandContext {
     protected void executeCloseListenersAfterSessionFlushed() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.afterSessionsFlush(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).afterSessionsFlush(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -165,8 +185,8 @@ public class CommandContext {
     protected void executeCloseListenersClosed() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closed(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closed(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -177,8 +197,8 @@ public class CommandContext {
     protected void executeCloseListenersCloseFailure() {
         if (closeListeners != null) {
             try {
-                for (CommandContextCloseListener listener : closeListeners) {
-                    listener.closeFailure(this);
+                for (int i = 0; i < closeListeners.size(); i++) {
+                    closeListeners.get(i).closeFailure(this);
                 }
             } catch (Throwable exception) {
                 exception(exception);
@@ -257,32 +277,65 @@ public class CommandContext {
         this.sessionFactories = sessionFactories;
     }   
 
-    public AbstractEngineConfiguration getCurrentEngineConfiguration() {
-        return currentEngineConfiguration;
-    }
-
-    public void setCurrentEngineConfiguration(AbstractEngineConfiguration currentEngineConfiguration) {
-        this.currentEngineConfiguration = currentEngineConfiguration;
-    }
-
     public Map<String, AbstractEngineConfiguration> getEngineConfigurations() {
         return engineConfigurations;
     }
-
+    
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
     }
     
-    public void addEngineConfiguration(String engineKey, AbstractEngineConfiguration engineConfiguration) {
+    public void addEngineConfiguration(String engineKey, String scopeType, AbstractEngineConfiguration engineConfiguration) {
         if (engineConfigurations == null) {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(engineKey, engineConfiguration);
+        engineConfigurations.put(scopeType, engineConfiguration);
+    }
+    
+    public CommandExecutor getCommandExecutor() {
+        return commandExecutor;
+    }
+
+    public void setCommandExecutor(CommandExecutor commandExecutor) {
+        this.commandExecutor = commandExecutor;
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
+    public boolean isUseClassForNameClassLoading() {
+        return useClassForNameClassLoading;
+    }
+
+    public void setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
+        this.useClassForNameClassLoading = useClassForNameClassLoading;
+    }
+
+    public Clock getClock() {
+        return clock;
+    }
+
+    public void setClock(Clock clock) {
+        this.clock = clock;
+    }
+    
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
     
     // getters and setters
     // //////////////////////////////////////////////////////
-    
+
     public Command<?> getCommand() {
         return command;
     }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -43,38 +44,46 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+
+        // Remove event subscription when moving to a terminal state
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition) || PlanItemTransition.DISMISS.equals(transition)) {
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstance.getId());
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
             }
+
+        } else if (PlanItemTransition.CREATE.equals(transition)) {
+            String signalName = null;
+            if (StringUtils.isNotEmpty(signalRef)) {
+                Expression signalExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
+                    .getExpressionManager().createExpression(signalRef);
+                signalName = signalExpression.getValue(planItemInstance).toString();
+            }
+
+            cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
+                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                .eventName(signalName)
+                .subScopeId(planItemInstance.getId())
+                .scopeId(planItemInstance.getCaseInstanceId())
+                .scopeDefinitionId(planItemInstance.getCaseDefinitionId())
+                .scopeType(ScopeTypes.CMMN)
+                .tenantId(planItemInstance.getTenantId())
+                .create();
+
         }
     }
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        String signalName = null;
-        if (StringUtils.isNotEmpty(signalRef)) {
-            Expression signalExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                            .getExpressionManager().createExpression(signalRef);
-            signalName = signalExpression.getValue(planItemInstanceEntity).toString();
-        }
-
-        CommandContextUtil.getEventSubscriptionService(commandContext).createEventSubscriptionBuilder()
-                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                .eventName(signalName)
-                .subScopeId(planItemInstanceEntity.getId())
-                .scopeId(planItemInstanceEntity.getCaseInstanceId())
-                .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
-                .scopeType(ScopeTypes.CMMN)
-                .tenantId(planItemInstanceEntity.getTenantId())
-                .create();
+        // Nothing to do, logic happens on state transition
     }
 
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         
         String signalName = null;
         if (StringUtils.isNotEmpty(signalRef)) {

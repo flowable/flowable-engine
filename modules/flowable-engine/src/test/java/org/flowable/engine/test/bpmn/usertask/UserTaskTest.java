@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +24,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.interceptor.CreateUserTaskAfterContext;
 import org.flowable.engine.interceptor.CreateUserTaskBeforeContext;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
@@ -49,19 +50,19 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task.getId());
-        assertEquals("my task", task.getName());
-        assertEquals("Very important", task.getDescription());
-        assertTrue(task.getPriority() > 0);
-        assertEquals("kermit", task.getAssignee());
-        assertEquals(processInstance.getId(), task.getProcessInstanceId());
-        assertNotNull(task.getProcessDefinitionId());
-        assertNotNull(task.getTaskDefinitionKey());
-        assertNotNull(task.getCreateTime());
+        assertThat(task.getId()).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+        assertThat(task.getDescription()).isEqualTo("Very important");
+        assertThat(task.getPriority()).isGreaterThan(0);
+        assertThat(task.getAssignee()).isEqualTo("kermit");
+        assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(task.getProcessDefinitionId()).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isNotNull();
+        assertThat(task.getCreateTime()).isNotNull();
         
         // the next test verifies that if an execution creates a task, that no events are created during creation of the task.
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(0, taskService.getTaskEvents(task.getId()).size());
+            assertThat(taskService.getTaskEvents(task.getId())).isEmpty();
         }
     }
 
@@ -71,33 +72,33 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task.getId());
-        assertEquals("my task", task.getName());
-        assertEquals("Very important", task.getDescription());
-        assertTrue(task.getPriority() > 0);
-        assertEquals("kermit", task.getAssignee());
-        assertEquals(processInstance.getId(), task.getProcessInstanceId());
-        assertNotNull(task.getProcessDefinitionId());
-        assertNotNull(task.getTaskDefinitionKey());
-        assertNotNull(task.getCreateTime());
+        assertThat(task.getId()).isNotNull();
+        assertThat(task.getName()).isEqualTo("my task");
+        assertThat(task.getDescription()).isEqualTo("Very important");
+        assertThat(task.getPriority()).isGreaterThan(0);
+        assertThat(task.getAssignee()).isEqualTo("kermit");
+        assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(task.getProcessDefinitionId()).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isNotNull();
+        assertThat(task.getCreateTime()).isNotNull();
 
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
 
         List<EntityLink> entityLinksByScopeIdAndType = commandExecutor.execute(commandContext -> {
-            EntityLinkService entityLinkService = CommandContextUtil.getEntityLinkService(commandContext);
+            EntityLinkService entityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getEntityLinkService();
 
             return entityLinkService.findEntityLinksByScopeIdAndType(processInstance.getId(), ScopeTypes.BPMN, EntityLinkType.CHILD);
         });
 
-        assertEquals(1, entityLinksByScopeIdAndType.size());
-        assertEquals(HierarchyType.ROOT, entityLinksByScopeIdAndType.get(0).getHierarchyType());
+        assertThat(entityLinksByScopeIdAndType).hasSize(1);
+        assertThat(entityLinksByScopeIdAndType.get(0).getHierarchyType()).isEqualTo(HierarchyType.ROOT);
     }
 
     @Test
     @Deployment
     public void testQuerySortingWithParameter() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).list().size());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
     }
 
     @Test
@@ -108,12 +109,11 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         // start the process
         runtimeService.startProcessInstanceByKey("ForkProcess");
         List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().list();
-        assertNotNull(taskList);
-        assertEquals(2, taskList.size());
+        assertThat(taskList).hasSize(2);
 
         // make sure user task exists
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // attempt to complete the task and get PersistenceException pointing to
         // "referential integrity constraint violation"
@@ -128,18 +128,18 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Test if the property set in the model is shown in the task
         String testCategory = "My Category";
-        assertEquals(testCategory, task.getCategory());
+        assertThat(task.getCategory()).isEqualTo(testCategory);
 
         // Test if can be queried by query API
-        assertEquals("Task with category", taskService.createTaskQuery().taskCategory(testCategory).singleResult().getName());
-        assertEquals(0, taskService.createTaskQuery().taskCategory("Does not exist").count());
+        assertThat(taskService.createTaskQuery().taskCategory(testCategory).singleResult().getName()).isEqualTo("Task with category");
+        assertThat(taskService.createTaskQuery().taskCategory("Does not exist").count()).isZero();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             // Check historic task
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-            assertEquals(testCategory, historicTaskInstance.getCategory());
-            assertEquals("Task with category", historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).singleResult().getName());
-            assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCategory("Does not exist").count());
+            assertThat(historicTaskInstance.getCategory()).isEqualTo(testCategory);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).singleResult().getName()).isEqualTo("Task with category");
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskCategory("Does not exist").count()).isZero();
         }
 
         // Update category
@@ -148,18 +148,18 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         task = taskService.createTaskQuery().singleResult();
-        assertEquals(newCategory, task.getCategory());
-        assertEquals("Task with category", taskService.createTaskQuery().taskCategory(newCategory).singleResult().getName());
-        assertEquals(0, taskService.createTaskQuery().taskCategory(testCategory).count());
+        assertThat(task.getCategory()).isEqualTo(newCategory);
+        assertThat(taskService.createTaskQuery().taskCategory(newCategory).singleResult().getName()).isEqualTo("Task with category");
+        assertThat(taskService.createTaskQuery().taskCategory(testCategory).count()).isZero();
 
         // Complete task and verify history
         taskService.complete(task.getId());
             
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-            assertEquals(newCategory, historicTaskInstance.getCategory());
-            assertEquals("Task with category", historyService.createHistoricTaskInstanceQuery().taskCategory(newCategory).singleResult().getName());
-            assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).count());
+            assertThat(historicTaskInstance.getCategory()).isEqualTo(newCategory);
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskCategory(newCategory).singleResult().getName()).isEqualTo("Task with category");
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskCategory(testCategory).count()).isZero();
         }
     }
 
@@ -171,7 +171,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Set variables
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < 20; i++) {
             vars.put("var" + i, i * 2);
@@ -185,9 +185,9 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // Verify query and check form key
         task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertEquals(vars.size(), task.getProcessVariables().size());
+        assertThat(task.getProcessVariables()).hasSameSizeAs(vars);
 
-        assertEquals("test123", task.getFormKey());
+        assertThat(task.getFormKey()).isEqualTo("test123");
     }
     
     @Test
@@ -198,26 +198,26 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         variableMap.put("candidateUsers", null);
         variableMap.put("candidateGroups", null);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        assertNull(task.getAssignee());
+        assertThat(task).isNotNull();
+        assertThat(task.getAssignee()).isNull();
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
-        assertEquals(0, identityLinks.size());
+        assertThat(identityLinks).isEmpty();
         
         variableMap = new HashMap<>();
         variableMap.put("assignee", "");
         variableMap.put("candidateUsers", "");
         variableMap.put("candidateGroups", "");
         processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        assertNull(task.getAssignee());
+        assertThat(task).isNotNull();
+        assertThat(task.getAssignee()).isNull();
         identityLinks = taskService.getIdentityLinksForTask(task.getId());
-        assertEquals(0, identityLinks.size());
+        assertThat(identityLinks).isEmpty();
     }
     
     @Test
@@ -235,27 +235,27 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonStringProperties", vars);
         
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("1", task.getName());
-        assertEquals("2", task.getDescription());
-        assertEquals("3", task.getCategory());
-        assertEquals("4", task.getFormKey());
-        assertEquals("5", task.getAssignee());
-        assertEquals("6", task.getOwner());
+        assertThat(task.getName()).isEqualTo("1");
+        assertThat(task.getDescription()).isEqualTo("2");
+        assertThat(task.getCategory()).isEqualTo("3");
+        assertThat(task.getFormKey()).isEqualTo("4");
+        assertThat(task.getAssignee()).isEqualTo("5");
+        assertThat(task.getOwner()).isEqualTo("6");
         
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
-        assertEquals(4, identityLinks.size());
+        assertThat(identityLinks).hasSize(4);
         int candidateIdentityLinkCount = 0;
         for (IdentityLink identityLink : identityLinks) {
             if (identityLink.getType().equals(IdentityLinkType.CANDIDATE)) {
                 candidateIdentityLinkCount++;
                 if (identityLink.getGroupId() != null) {
-                    assertEquals("7", identityLink.getGroupId());
+                    assertThat(identityLink.getGroupId()).isEqualTo("7");
                 } else {
-                    assertEquals("8", identityLink.getUserId());
+                    assertThat(identityLink.getUserId()).isEqualTo("8");
                 }
             }
         }
-        assertEquals(2, candidateIdentityLinkCount);
+        assertThat(candidateIdentityLinkCount).isEqualTo(2);
     }
     
     @Test
@@ -268,17 +268,39 @@ public class UserTaskTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task.getId());
-            assertEquals("my task", task.getName());
-            assertEquals("Very important", task.getDescription());
-            assertEquals("testCategory", task.getCategory());
+            assertThat(task.getId()).isNotNull();
+            assertThat(task.getName()).isEqualTo("my task");
+            assertThat(task.getDescription()).isEqualTo("Very important");
+            assertThat(task.getCategory()).isEqualTo("testCategory");
             
-            assertEquals(1, testCreateUserTaskInterceptor.getBeforeCreateUserTaskCounter());
-            assertEquals(1, testCreateUserTaskInterceptor.getAfterCreateUserTaskCounter());
+            assertThat(testCreateUserTaskInterceptor.getBeforeCreateUserTaskCounter()).isEqualTo(1);
+            assertThat(testCreateUserTaskInterceptor.getAfterCreateUserTaskCounter()).isEqualTo(1);
             
         } finally {
             processEngineConfiguration.setCreateUserTaskInterceptor(null);
         }
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.userTaskIdVariableName.bpmn20.xml")
+    public void testUserTaskIdVariableName() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("userTaskIdVariableName");
+
+        // Normal string
+        Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+
+        String actualTaskId = firstTask.getId();
+        String myTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myTaskId");
+        assertThat(myTaskId).isEqualTo(actualTaskId);
+
+        // Expression
+        Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+
+        actualTaskId = secondTask.getId();
+        String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
+        assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
     protected class TestCreateUserTaskInterceptor implements CreateUserTaskInterceptor {

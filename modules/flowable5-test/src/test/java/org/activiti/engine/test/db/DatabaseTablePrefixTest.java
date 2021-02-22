@@ -17,9 +17,12 @@ import java.sql.Connection;
 
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.DeploymentProperties;
+import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 
 import junit.framework.TestCase;
 
@@ -55,6 +58,7 @@ public class DatabaseTablePrefixTest extends TestCase {
         config1.setValidateFlowable5EntitiesEnabled(false);
         config1.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
         config1.getPerformanceSettings().setValidateTaskRelationshipCountConfigOnBoot(false);
+        config1.setEventRegistryConfigurator(new CustomEventRegistryEngineConfigurator());
         ProcessEngine engine1 = config1.buildProcessEngine();
 
         ProcessEngineConfigurationImpl config2 = (ProcessEngineConfigurationImpl) ProcessEngineConfigurationImpl
@@ -66,6 +70,7 @@ public class DatabaseTablePrefixTest extends TestCase {
         config2.setValidateFlowable5EntitiesEnabled(false);
         config2.getPerformanceSettings().setValidateExecutionRelationshipCountConfigOnBoot(false);
         config2.getPerformanceSettings().setValidateTaskRelationshipCountConfigOnBoot(false);
+        config2.setEventRegistryConfigurator(new CustomEventRegistryEngineConfigurator());
         ProcessEngine engine2 = config2.buildProcessEngine();
 
         // create the tables in SCHEMA1
@@ -97,4 +102,17 @@ public class DatabaseTablePrefixTest extends TestCase {
         }
     }
 
+    public class CustomEventRegistryEngineConfigurator extends EventRegistryEngineConfigurator {
+
+        @Override
+        public void configure(AbstractEngineConfiguration engineConfiguration) {
+            if (eventEngineConfiguration == null) {
+                eventEngineConfiguration = new StandaloneEventRegistryEngineConfiguration();
+            }
+            
+            eventEngineConfiguration.setEnableEventRegistryChangeDetectionAfterEngineCreate(false);
+            
+            super.configure(engineConfiguration);
+        }
+    }
 }

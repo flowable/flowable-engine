@@ -23,9 +23,6 @@ import java.util.Collection;
  */
 public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
 
-    /** Only select tasks which don't have an assignee. */
-    TaskQuery taskUnassigned();
-
     /** Only select tasks with the given {@link DelegationState}. */
     TaskQuery taskDelegationState(DelegationState delegationState);
 
@@ -35,8 +32,6 @@ public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
      * GroupIdentityManager.
      */
     TaskQuery taskCandidateOrAssigned(String userIdForCandidateAndAssignee);
-
-    TaskQuery taskWithoutDeleteReason();
 
     /** Only select tasks that have no parent (i.e. do not select subtasks). */
     TaskQuery excludeSubtasks();

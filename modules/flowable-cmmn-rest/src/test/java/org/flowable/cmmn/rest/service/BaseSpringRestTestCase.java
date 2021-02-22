@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.rest.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
@@ -24,7 +26,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
@@ -44,7 +45,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.assertj.core.api.Assertions;
 import org.eclipse.jetty.server.Server;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -62,7 +62,7 @@ import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
 import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
@@ -70,7 +70,6 @@ import org.flowable.idm.api.User;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -88,7 +87,14 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected static final String EMPTY_LINE = "\n";
     protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
                     "ACT_GE_PROPERTY",
-                    "ACT_ID_PROPERTY");
+                    "ACT_ID_PROPERTY",
+                    "ACT_CMMN_DATABASECHANGELOG",
+                    "ACT_CMMN_DATABASECHANGELOGLOCK",
+                    "ACT_FO_DATABASECHANGELOG",
+                    "ACT_FO_DATABASECHANGELOGLOCK",
+                    "FLW_EV_DATABASECHANGELOG",
+                    "FLW_EV_DATABASECHANGELOGLOCK"
+    );
 
     protected static String SERVER_URL_PREFIX;
     protected static RestUrlBuilder URL_BUILDER;
@@ -261,7 +267,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             CloseableHttpResponse response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
@@ -271,7 +277,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 }
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
@@ -300,41 +306,19 @@ public abstract class BaseSpringRestTestCase extends TestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCounts();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(cmmnEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getName(),
+                LOGGER,
+                cmmnEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                commandContext -> {
+                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
+                    return null;
                 }
-            }
-        }
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
-            commandExecutor.execute(commandContext -> {
-                SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
-                schemaManager.schemaDrop();
-                schemaManager.schemaCreate();
-                return null;
-            });
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                Assert.fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.info("database was clean");
-        }
+        );
     }
 
     protected void closeHttpConnections() {
@@ -381,7 +365,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -389,7 +373,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             String id = aDataNode.get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
     /**
@@ -402,7 +386,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        Assertions.assertThat(dataNode)
+        assertThat(dataNode)
             .extracting(node -> node.get("id").textValue())
             .as("Expected result ids")
             .containsExactly(expectedResourceIds);
@@ -415,7 +399,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(0, dataNode.size());
+        assertThat(dataNode).isEmpty();
     }
 
     /**
@@ -440,7 +424,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -449,7 +433,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                     String id = aDataNode.get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
             }
         }
 

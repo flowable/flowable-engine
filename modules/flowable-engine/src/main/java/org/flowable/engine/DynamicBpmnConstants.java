@@ -37,12 +37,15 @@ public interface DynamicBpmnConstants {
     String USER_TASK_OWNER = "userTaskOwner";
     String USER_TASK_CANDIDATE_USERS = "userTaskCandidateUsers";
     String USER_TASK_CANDIDATE_GROUPS = "userTaskCandidateGroups";
-    
+    String USER_TASK_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
+
     String MULTI_INSTANCE_COMPLETION_CONDITION = "multiInstanceCompletionCondition";
 
     String DMN_TASK_DECISION_TABLE_KEY = "dmnTaskDecisionTableKey";
 
     String SEQUENCE_FLOW_CONDITION = "sequenceFlowCondition";
+
+    String CALL_ACTIVITY_CALLED_ELEMENT =  "callActivityCalledElement";
 
     String LOCALIZATION_LANGUAGE = "language";
     String LOCALIZATION_NAME = "name";

@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
@@ -47,6 +48,7 @@ public abstract class AbstractServiceConfiguration {
     protected ObjectMapper objectMapper;
 
     protected Clock clock;
+    protected IdGenerator idGenerator;
     
     public AbstractServiceConfiguration(String engineName) {
         this.engineName = engineName;
@@ -73,6 +75,10 @@ public abstract class AbstractServiceConfiguration {
 
     public void setEngineName(String engineName) {
         this.engineName = engineName;
+    }
+    
+    public boolean isEventDispatcherEnabled() {
+        return getEventDispatcher() != null && getEventDispatcher().isEnabled();
     }
 
     public boolean isEnableEventDispatcher() {
@@ -119,7 +125,7 @@ public abstract class AbstractServiceConfiguration {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
         return this;
     }
-    
+
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
@@ -144,6 +150,15 @@ public abstract class AbstractServiceConfiguration {
 
     public AbstractServiceConfiguration setClock(Clock clock) {
         this.clock = clock;
+        return this;
+    }
+
+    public IdGenerator getIdGenerator() {
+        return idGenerator;
+    }
+
+    public AbstractServiceConfiguration setIdGenerator(IdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
         return this;
     }
 }

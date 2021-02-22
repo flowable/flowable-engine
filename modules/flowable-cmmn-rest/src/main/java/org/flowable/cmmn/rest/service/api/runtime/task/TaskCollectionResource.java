@@ -50,7 +50,7 @@ public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
             @ApiImplicitParam(name = "priority", dataType = "string", value = "Only return tasks with the given priority.", paramType = "query"),
@@ -65,12 +65,21 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "candidateUser", dataType = "string", value = "Only return tasks that can be claimed by the given user. This includes both tasks where the user is an explicit candidate for and task that are claimable by a group that the user is a member of.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroups", dataType = "string", value = "Only return tasks that can be claimed by a user in the given groups. Values split by comma.", paramType = "query"),
+            @ApiImplicitParam(name = "ignoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with candidateGroups or candidateUser) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup or candidateUser)"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return tasks in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "Only return tasks with the given task definition id.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKeyLike", dataType = "string", value = "Only return tasks with a given task definition id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return tasks which are part of the case instance with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the case instance and its children with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return tasks which are part of a case instance which has a case definition with the given key like the passed parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
             @ApiImplicitParam(name = "createdOn", dataType = "string",format = "date-time", value = "Only return tasks which are created on the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string",format = "date-time", value = "Only return tasks which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string",format = "date-time", value = "Only return tasks which are created after the given date.", paramType = "query"),
@@ -81,7 +90,6 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "excludeSubTasks", dataType = "boolean", value = "Only return tasks that are not a subtask of another task.", paramType = "query"),
             @ApiImplicitParam(name = "active", dataType = "boolean", value = "If true, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.", paramType = "query"),
             @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "Indication to include task local variables in the result.", paramType = "query"),
-            @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return tasks with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -169,8 +177,24 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setCandidateGroupIn(groups);
         }
 
+        if (requestParams.containsKey("ignoreAssignee") && Boolean.valueOf(requestParams.get("ignoreAssignee"))) {
+            request.setIgnoreAssignee(true);
+        }
+
         if (requestParams.containsKey("caseDefinitionId")) {
             request.setCaseDefinitionId(requestParams.get("caseDefinitionId"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKey")) {
+            request.setCaseDefinitionKey(requestParams.get("caseDefinitionKey"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKeyLike")) {
+            request.setCaseDefinitionKeyLike(requestParams.get("caseDefinitionKeyLike"));
+        }
+
+        if (requestParams.containsKey("caseDefinitionKeyLikeIgnoreCase")) {
+            request.setCaseDefinitionKeyLikeIgnoreCase(requestParams.get("caseDefinitionKeyLikeIgnoreCase"));
         }
 
         if (requestParams.containsKey("caseInstanceId")) {
@@ -179,6 +203,26 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         if (requestParams.containsKey("caseInstanceIdWithChildren")) {
             request.setCaseInstanceIdWithChildren(requestParams.get("caseInstanceIdWithChildren"));
+        }
+
+        if (requestParams.containsKey("planItemInstanceId")) {
+            request.setPlanItemInstanceId(requestParams.get("planItemInstanceId"));
+        }
+
+        if (requestParams.containsKey("propagatedStageInstanceId")) {
+            request.setPropagatedStageInstanceId(requestParams.get("propagatedStageInstanceId"));
+        }
+
+        if (requestParams.containsKey("scopeId")) {
+            request.setScopeId(requestParams.get("scopeId"));
+        }
+
+        if (requestParams.containsKey("subScopeId")) {
+            request.setSubScopeId(requestParams.get("subScopeId"));
+        }
+
+        if (requestParams.containsKey("scopeType")) {
+            request.setScopeType(requestParams.get("scopeType"));
         }
 
         if (requestParams.containsKey("createdOn")) {

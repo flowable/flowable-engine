@@ -13,14 +13,19 @@
 
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
+import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
+
 /**
  * @author Tijs Rademakers
  */
 public class MessageEventSubscriptionEntityImpl extends EventSubscriptionEntityImpl implements MessageEventSubscriptionEntity {
 
     private static final long serialVersionUID = 1L;
+    
+    public MessageEventSubscriptionEntityImpl() {}
 
-    public MessageEventSubscriptionEntityImpl() {
+    public MessageEventSubscriptionEntityImpl(EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration) {
+        super(eventSubscriptionServiceConfiguration);
         eventType = EVENT_TYPE;
     }
 

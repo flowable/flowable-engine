@@ -15,7 +15,7 @@ package org.flowable.common.engine.impl.cfg.multitenant;
 import java.util.Collection;
 
 /**
- * Interface to be implemented when using the {@link MultiSchemaMultiTenantProcessEngineConfiguration} and used to set/get the current user and tenant identifier.
+ * Interface to be implemented when using the org.flowable.engine.impl.cfg.multitenant.MultiSchemaMultiTenantProcessEngineConfiguration and used to set/get the current user and tenant identifier.
  * 
  * The engine will call the {@link #getCurrentTenantId()} method when it needs to know which database to use.
  * 

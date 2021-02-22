@@ -27,7 +27,7 @@ public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
         // ProcessInstance processInstance =
         // runtimeService.startProcessInstanceByKey("repeating",
         // CollectionUtil.singletonMap("count", 0));
-        // assertTrue(processInstance.isEnded());
+        // assertThat(processInstance.isEnded()).isTrue();
     }
 
 }

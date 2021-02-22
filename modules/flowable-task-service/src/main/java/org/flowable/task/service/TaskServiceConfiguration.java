@@ -96,13 +96,13 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (taskDataManager == null) {
-            taskDataManager = new MybatisTaskDataManager();
+            taskDataManager = new MybatisTaskDataManager(this);
         }
         if (historicTaskInstanceDataManager == null) {
-            historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager();
+            historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager(this);
         }
         if (historicTaskLogDataManager == null) {
-            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager();
+            historicTaskLogDataManager = new MyBatisHistoricTaskLogEntryDataManager(this);
         }
     }
 

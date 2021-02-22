@@ -15,7 +15,6 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
@@ -28,10 +27,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  */
 public interface ActivityProcessor {
 
-    public void processPlanItems(Stage stage, CmmnModel model, ArrayNode shapesArrayNode,
-            Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY);
+    void processPlanItems(Stage stage, CmmnModel model, ArrayNode shapesArrayNode,
+        CmmnJsonConverterContext converterContex, double subProcessX, double subProcessY);
 
-    public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement,
-            Map<String, JsonNode> shapeMap, Map<String, String> formMap, Map<String, String> decisionTableMap, 
-            Map<String, String> caseModelMap, Map<String, String> processModelMap, CmmnModel bpmnModel, CmmnModelIdHelper cmmnModelIdHelper);
+    void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement,
+            Map<String, JsonNode> shapeMap, CmmnJsonConverterContext converterContext, CmmnModel bpmnModel, CmmnModelIdHelper cmmnModelIdHelper);
 }

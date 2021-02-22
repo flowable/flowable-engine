@@ -1,0 +1,13 @@
+{
+    "key": "myChannel",
+    "category": "channel2",
+    "name": "My channel2",
+    "description": "My channel description",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "testQueue2",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "fixedValue": "myEvent2"
+    }
+}

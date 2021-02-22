@@ -15,14 +15,14 @@ package org.flowable.dmn.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.query.AbstractNativeQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.NativeDecisionTableQuery;
+import org.flowable.common.engine.impl.query.AbstractNativeQuery;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.NativeDecisionQuery;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
-public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionTableQuery, DmnDecisionTable> implements NativeDecisionTableQuery {
+public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDecisionQuery, DmnDecision> implements NativeDecisionQuery {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,13 +37,13 @@ public class NativeDecisionTableQueryImpl extends AbstractNativeQuery<NativeDeci
     // results ////////////////////////////////////////////////////////////////
 
     @Override
-    public List<DmnDecisionTable> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTablesByNativeQuery(parameterMap);
+    public List<DmnDecision> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
+        return CommandContextUtil.getDecisionEntityManager(commandContext).findDecisionsByNativeQuery(parameterMap);
     }
 
     @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return CommandContextUtil.getDecisionTableEntityManager(commandContext).findDecisionTableCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getDecisionEntityManager(commandContext).findDecisionCountByNativeQuery(parameterMap);
     }
 
 }

@@ -24,15 +24,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ComponentScan({ "org.flowable.cmmn.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
@@ -42,32 +38,8 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     private ObjectMapper objectMapper;
 
     @Bean
-    public SessionLocaleResolver localeResolver() {
-        return new SessionLocaleResolver();
-    }
-
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        LOGGER.debug("Configuring localeChangeInterceptor");
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("language");
-        return localeChangeInterceptor;
-    }
-
-    @Bean
     public MultipartResolver multipartResolver() {
         return new PutAwareStandardServletMultiPartResolver();
-    }
-
-    @Bean
-    @Override
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        LOGGER.debug("Creating requestMappingHandlerMapping");
-        RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
-        requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
-        Object[] interceptors = { localeChangeInterceptor() };
-        requestMappingHandlerMapping.setInterceptors(interceptors);
-        return requestMappingHandlerMapping;
     }
 
     @Override
@@ -80,11 +52,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
                 break;
             }
         }
-    }
-
-    @Override
-    protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(false);
     }
 
 }

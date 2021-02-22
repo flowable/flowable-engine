@@ -47,7 +47,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @EnableConfigurationProperties({
     FlowableLdapProperties.class
 })
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class FlowableLdapAutoConfiguration {
 
     protected final FlowableLdapProperties properties;
@@ -85,7 +85,8 @@ public class FlowableLdapAutoConfiguration {
     @Bean
     public EngineConfigurationConfigurer<SpringIdmEngineConfiguration> ldapIdmEngineConfigurer(LDAPConfiguration ldapConfiguration) {
         return idmEngineConfiguration -> idmEngineConfiguration
-            .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, createCache(idmEngineConfiguration, ldapConfiguration)));
+            .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, 
+                    createCache(idmEngineConfiguration, ldapConfiguration), idmEngineConfiguration));
     }
 
     // We need a custom AuthenticationProvider for the LDAP Support

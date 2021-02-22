@@ -81,6 +81,7 @@ public interface DelegateTask extends VariableScope {
     boolean isSuspended();
 
     /** The tenant identifier of this task */
+    @Override
     String getTenantId();
 
     /** The form key for the user task */
@@ -100,7 +101,7 @@ public interface DelegateTask extends VariableScope {
     String getEventHandlerId();
     
     /**
-     * The current {@link org.flowable.engine.task.DelegationState} for this task.
+     * The current {@link org.flowable.task.api.DelegationState} for this task.
      */
     DelegationState getDelegationState();
 
@@ -116,19 +117,19 @@ public interface DelegateTask extends VariableScope {
     /** Adds multiple groups as candidate group to this task. */
     void addCandidateGroups(Collection<String> candidateGroups);
 
-    /** The {@link User.getId() userId} of the person responsible for this task. */
+    /** The user id of the person responsible for this task. */
     String getOwner();
 
-    /** The {@link User.getId() userId} of the person responsible for this task. */
+    /** The user id of the person responsible for this task. */
     void setOwner(String owner);
 
     /**
-     * The {@link User.getId() userId} of the person to which this task is delegated.
+     * The user id of the person to which this task is delegated.
      */
     String getAssignee();
 
     /**
-     * The {@link User.getId() userId} of the person to which this task is delegated.
+     * The user id of the person to which this task is delegated.
      */
     void setAssignee(String assignee);
 
@@ -183,7 +184,7 @@ public interface DelegateTask extends VariableScope {
     void deleteCandidateUser(String userId);
 
     /**
-     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String)}; with type {@link IdentityLinkType#CANDIDATE}
      *
      * @param groupId
      *            id of the group to use as candidate, cannot be null.

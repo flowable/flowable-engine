@@ -36,7 +36,6 @@ import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.deployer.AppDeployer;
 import org.flowable.app.engine.impl.deployer.AppDeploymentManager;
 import org.flowable.app.engine.impl.deployer.AppResourceConverterImpl;
-import org.flowable.app.engine.impl.el.AppExpressionManager;
 import org.flowable.app.engine.impl.interceptor.AppCommandInvoker;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManager;
 import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManagerImpl;
@@ -47,11 +46,9 @@ import org.flowable.app.engine.impl.persistence.entity.AppResourceEntityManagerI
 import org.flowable.app.engine.impl.persistence.entity.data.AppDefinitionDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDeploymentDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.AppResourceDataManager;
-import org.flowable.app.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDefinitionDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDeploymentDataManager;
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.app.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -66,11 +63,14 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
@@ -86,11 +86,13 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.flowable.variable.service.impl.types.LongJsonType;
+import org.flowable.variable.service.impl.types.LocalDateTimeType;
+import org.flowable.variable.service.impl.types.LocalDateType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
@@ -99,20 +101,17 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class AppEngineConfiguration extends AbstractEngineConfiguration implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 
-    protected String cmmnEngineName = AppEngines.NAME_DEFAULT;
+    protected String appEngineName = AppEngines.NAME_DEFAULT;
 
     protected AppManagementService appManagementService = new AppManagementServiceImpl(this);
     protected AppRepositoryService appRepositoryService = new AppRepositoryServiceImpl(this);
     
-    protected TableDataManager tableDataManager;
     protected AppDeploymentDataManager deploymentDataManager;
     protected AppResourceDataManager resourceDataManager;
     protected AppDefinitionDataManager appDefinitionDataManager;
@@ -122,6 +121,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected AppDefinitionEntityManager appDefinitionEntityManager;
 
     protected boolean disableIdmEngine;
+    protected boolean disableEventRegistry;
 
     protected boolean executeServiceSchemaManagers = true;
     
@@ -145,7 +145,18 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    /**
+     * This flag determines whether variables of the type 'json' and 'longJson' will be tracked.
+     * <p>
+     * This means that, when true, in a JavaDelegate you can write:
+     * <pre><code>
+     *     JsonNode jsonNode = (JsonNode) execution.getVariable("customer");
+     *     customer.put("name", "Kermit");
+     * </code></pre>
+     * And the changes to the JsonNode will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
+     */
+    protected boolean jsonVariableTypeTrackObjects = true;
+
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -186,10 +197,12 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initEngineConfigurations();
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initBeans();
         initExpressionManager();
         
         if (usingRelationalDatabase) {
@@ -201,8 +214,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             initSchemaManagementCommand();
         }
 
+        configureVariableServiceConfiguration();
         initVariableTypes();
-        initBeans();
         initTransactionFactory();
 
         if (usingRelationalDatabase) {
@@ -217,7 +230,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initAppDefinitionCache();
         initAppResourceConverter();
         initDeploymentManager();
-        initClock();
         initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
         configuratorsAfterInit();
@@ -268,7 +280,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new AppExpressionManager(beans);
+            expressionManager = new DefaultExpressionManager(beans);
         }
     }
 
@@ -284,10 +296,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initService(appRepositoryService);
     }
 
+    @Override
     public void initDataManagers() {
-        if (tableDataManager == null) {
-            tableDataManager = new TableDataManagerImpl();
-        }
+        super.initDataManagers();
         if (deploymentDataManager == null) {
             deploymentDataManager = new MybatisAppDeploymentDataManager(this);
         }
@@ -299,7 +310,9 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
+    @Override
     public void initEntityManagers() {
+        super.initEntityManagers();
         if (appDeploymentEntityManager == null) {
             appDeploymentEntityManager = new AppDeploymentEntityManagerImpl(this, deploymentDataManager);
         }
@@ -368,6 +381,11 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
+    public String getEngineScopeType() {
+        return ScopeTypes.APP;
+    }
+
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -398,12 +416,16 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             variableTypes.addType(new IntegerType());
             variableTypes.addType(new LongType());
             variableTypes.addType(new DateType());
+            variableTypes.addType(new InstantType());
+            variableTypes.addType(new LocalDateType());
+            variableTypes.addType(new LocalDateTimeType());
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper));
-            variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            // longJsonType only needed for reading purposes
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
             if (customPostVariableTypes != null) {
@@ -413,18 +435,22 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             }
         }
     }
-
-    public void initVariableServiceConfiguration() {
+    
+    public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = new VariableServiceConfiguration(ScopeTypes.APP);
 
         this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
-        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-
-        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        this.variableServiceConfiguration.setExpressionManager(expressionManager);
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+    }
+
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
 
         this.variableServiceConfiguration.init();
 
@@ -434,6 +460,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration(ScopeTypes.APP);
         this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
@@ -455,29 +482,45 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     
     @Override
     protected List<EngineConfigurator> getEngineSpecificEngineConfigurators() {
-        if (!disableIdmEngine) {
+        if (!disableIdmEngine || !disableEventRegistry) {
             List<EngineConfigurator> specificConfigurators = new ArrayList<>();
-            if (idmEngineConfigurator != null) {
-                specificConfigurators.add(idmEngineConfigurator);
-            } else {
-                specificConfigurators.add(new IdmEngineConfigurator());
+            
+            if (!disableIdmEngine) {
+                if (idmEngineConfigurator != null) {
+                    specificConfigurators.add(idmEngineConfigurator);
+                } else {
+                    specificConfigurators.add(new IdmEngineConfigurator());
+                }
             }
+            
+            if (!disableEventRegistry) {
+                if (eventRegistryConfigurator != null) {
+                    specificConfigurators.add(eventRegistryConfigurator);
+                } else {
+                    specificConfigurators.add(createDefaultEventRegistryEngineConfigurator());
+                }
+            }
+            
             return specificConfigurators;
         }
         return Collections.emptyList();
     }
 
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new EventRegistryEngineConfigurator();
+    }
+
     @Override
     public String getEngineName() {
-        return cmmnEngineName;
+        return appEngineName;
     }
 
-    public String getCmmnEngineName() {
-        return cmmnEngineName;
+    public String getAppEngineName() {
+        return appEngineName;
     }
 
-    public AppEngineConfiguration setCmmnEngineName(String cmmnEngineName) {
-        this.cmmnEngineName = cmmnEngineName;
+    public AppEngineConfiguration setAppEngineName(String appEngineName) {
+        this.appEngineName = appEngineName;
         return this;
     }
 
@@ -502,13 +545,16 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     public IdmIdentityService getIdmIdentityService() {
-        return ((IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)).getIdmIdentityService();
+        IdmIdentityService idmIdentityService = null;
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+
+        return idmIdentityService;
     }
 
-    public TableDataManager getTableDataManager() {
-        return tableDataManager;
-    }
-
+    @Override
     public AppEngineConfiguration setTableDataManager(TableDataManager tableDataManager) {
         this.tableDataManager = tableDataManager;
         return this;
@@ -712,12 +758,12 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
+    public boolean isJsonVariableTypeTrackObjects() {
+        return jsonVariableTypeTrackObjects;
     }
 
-    public AppEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public AppEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
+        this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
         return this;
     }
 
@@ -727,6 +773,15 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public AppEngineConfiguration setDisableIdmEngine(boolean disableIdmEngine) {
         this.disableIdmEngine = disableIdmEngine;
+        return this;
+    }
+
+    public boolean isDisableEventRegistry() {
+        return disableEventRegistry;
+    }
+
+    public AppEngineConfiguration setDisableEventRegistry(boolean disableEventRegistry) {
+        this.disableEventRegistry = disableEventRegistry;
         return this;
     }
 

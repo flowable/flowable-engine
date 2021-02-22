@@ -12,9 +12,14 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -49,38 +54,42 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
     public void testQueryWithException() throws InterruptedException {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             ProcessInstance processNoException = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_NO_EXCEPTION);
-            
+
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             HistoricProcessInstanceQuery queryNoException = historyService.createHistoricProcessInstanceQuery();
-            assertEquals(1, queryNoException.count());
-            assertEquals(1, queryNoException.list().size());
-            assertEquals(processNoException.getId(), queryNoException.list().get(0).getId());
+            assertThat(queryNoException.count()).isEqualTo(1);
+            assertThat(queryNoException.list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactly(processNoException.getId());
 
             HistoricProcessInstanceQuery queryWithException = historyService.createHistoricProcessInstanceQuery();
-            assertEquals(0, queryWithException.withJobException().count());
-            assertEquals(0, queryWithException.withJobException().list().size());
+            assertThat(queryWithException.withJobException().count()).isZero();
+            assertThat(queryWithException.withJobException().list()).isEmpty();
 
             ProcessInstance processWithException1 = startProcessInstanceWithFailingJob(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1);
             TimerJobQuery jobQuery1 = managementService.createTimerJobQuery().processInstanceId(processWithException1.getId());
-            assertEquals(1, jobQuery1.withException().count());
-            assertEquals(1, jobQuery1.withException().list().size());
-            
+            assertThat(jobQuery1.withException().count()).isEqualTo(1);
+            assertThat(jobQuery1.withException().list()).hasSize(1);
+
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-            assertEquals(1, queryWithException.withJobException().count());
-            assertEquals(1, queryWithException.withJobException().list().size());
-            assertEquals(processWithException1.getId(), queryWithException.withJobException().list().get(0).getId());
+            assertThat(queryWithException.withJobException().count()).isEqualTo(1);
+            assertThat(queryNoException.withJobException().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactly(processWithException1.getId());
 
             ProcessInstance processWithException2 = startProcessInstanceWithFailingJob(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2);
             TimerJobQuery jobQuery2 = managementService.createTimerJobQuery().processInstanceId(processWithException2.getId());
-            assertEquals(2, jobQuery2.withException().count());
-            assertEquals(2, jobQuery2.withException().list().size());
+            assertThat(jobQuery2.withException().count()).isEqualTo(2);
+            assertThat(jobQuery2.withException().list()).hasSize(2);
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-            assertEquals(2, queryWithException.withJobException().count());
-            assertEquals(2, queryWithException.withJobException().list().size());
-            assertEquals(processWithException1.getId(), queryWithException.withJobException().processDefinitionKey(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1).list().get(0).getId());
-            assertEquals(processWithException2.getId(), queryWithException.withJobException().processDefinitionKey(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2).list().get(0).getId());
+            assertThat(queryWithException.withJobException().count()).isEqualTo(2);
+            assertThat(queryWithException.withJobException().list()).hasSize(2);
+            assertThat(queryWithException.withJobException().processDefinitionKey(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1).list().get(0).getId())
+                    .isEqualTo(processWithException1.getId());
+            assertThat(queryWithException.withJobException().processDefinitionKey(PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2).list().get(0).getId())
+                    .isEqualTo(processWithException2.getId());
         }
     }
 
@@ -92,11 +101,8 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
                 .list();
 
         for (Job job : jobList) {
-            try {
-                managementService.executeJob(job.getId());
-                fail("RuntimeException");
-            } catch (RuntimeException re) {
-            }
+            assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                    .isInstanceOf(FlowableException.class);
         }
         return processInstance;
     }

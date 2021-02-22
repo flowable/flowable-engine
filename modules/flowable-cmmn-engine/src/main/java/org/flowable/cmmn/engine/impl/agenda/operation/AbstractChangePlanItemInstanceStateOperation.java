@@ -12,14 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Objects;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
-import org.flowable.cmmn.engine.impl.listener.PlanItemLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 
 /**
  * @author Joram Barrez
@@ -32,6 +36,14 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
     @Override
     public void run() {
+        String oldState = planItemInstanceEntity.getState();
+        String newState = getNewState();
+
+        if (isStateNotChanged(oldState, newState)) {
+            markAsNoop();
+            return;
+        }
+
         if (planItemInstanceEntity.getPlanItem() != null) { // can be null for the plan model
             Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
             if (behavior instanceof PlanItemActivityBehavior
@@ -40,13 +52,35 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             }
         }
 
-        String oldState = planItemInstanceEntity.getState();
-        String newState = getNewState();
         planItemInstanceEntity.setState(newState);
-        PlanItemLifeCycleListenerUtil.callLifecycleListeners(commandContext, planItemInstanceEntity, oldState, getNewState());
+        CmmnEngineConfiguration cmmnEngineConfiguration =CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
+                commandContext, planItemInstanceEntity, oldState, getNewState());
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
+        
+        if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
+            String loggingType = null;
+            String message = null;
+            if (oldState == null) {
+                loggingType = CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_CREATED;
+                message = "Plan item instance created with type " + planItemInstanceEntity.getPlanItemDefinitionType() + 
+                                ", new state " + planItemInstanceEntity.getState();
+                
+            } else {
+                loggingType = CmmnLoggingSessionConstants.TYPE_PLAN_ITEM_NEW_STATE;
+                message = "Plan item instance state change with type " + planItemInstanceEntity.getPlanItemDefinitionType() + 
+                                ", old state " + oldState + ", new state " + newState;
+            }
+            
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, message, oldState, newState, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+        }
+    }
+
+    public boolean isStateNotChanged(String oldState, String newState) {
+        // if the old and new state are the same, leave the operation as we don't execute any transition
+        return oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState();
     }
 
     protected abstract void internalExecute();
@@ -55,32 +89,55 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
     }
 
-    protected abstract String getNewState();
+    public abstract String getNewState();
 
-    protected abstract String getLifeCycleTransition();
+    public abstract String getLifeCycleTransition();
+
+    /**
+     * Overwrite this default implemented hook, if the operation should be aborted on a void transition which might be the case, if the old and new state
+     * will be the same.
+     *
+     * @return true, if this operation should be aborted, if the new plan item state is the same as the old one, false, if the operation is to be executed in any case
+     */
+    public boolean abortOperationIfNewStateEqualsOldState() {
+        return false;
+    }
+
+    public abstract String getOperationName();
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        stringBuilder.append("[Change PlanItem state] ");
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String operationName = getOperationName();
+        stringBuilder.append(operationName != null ? operationName : "[Change plan item state]").append(" ");
+
         if (planItem != null) {
-            if (planItem.getName() != null) {
-                stringBuilder.append(planItem.getName());
-                stringBuilder.append(" (id: ");
-                stringBuilder.append(planItem.getId());
-                stringBuilder.append(")");
-            } else {
-                stringBuilder.append(planItem.getId());
-            }
+            stringBuilder.append(planItem);
         } else {
-            stringBuilder.append("(plan item instance with id ").append(planItemInstanceEntity.getId()).append(")");
+            stringBuilder.append(planItemInstanceEntity);
         }
+
         stringBuilder.append(", ");
-        stringBuilder.append("new state: [").append(getNewState()).append("]");
-        stringBuilder.append(" with transition [");
-        stringBuilder.append(getLifeCycleTransition());
-        stringBuilder.append("]");
+
+        String currentState = planItemInstanceEntity.getState();
+        String newState = getNewState();
+
+        if (!Objects.equals(currentState, newState)) {
+
+            stringBuilder.append("new state: [").append(getNewState()).append("]");
+            stringBuilder.append(" with transition [");
+            stringBuilder.append(getLifeCycleTransition());
+            stringBuilder.append("]");
+
+        } else {
+            stringBuilder.append("will remain in state [").append(newState).append("]");
+
+        }
+
+
         return stringBuilder.toString();
     }
 

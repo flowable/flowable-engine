@@ -20,7 +20,6 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.UnacquireOwnedJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +92,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected abstract boolean executeAsyncJob(final JobInfo job, Runnable runnable);
 
     protected void unlockOwnedJobs() {
-        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId));
+        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId, jobServiceConfiguration));
     }
 
     protected Runnable createRunnableForJob(final JobInfo job) {
@@ -133,12 +132,12 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
-                ? jobEntityManager : CommandContextUtil.getJobServiceConfiguration().getJobEntityManager();
+                ? jobEntityManager : jobServiceConfiguration.getJobEntityManager();
 
         if (resetExpiredJobsRunnable == null) {
             String resetRunnableName = resetExpiredRunnableName != null ?
                     resetExpiredRunnableName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-reset-expired-jobs";
-            resetExpiredJobsRunnable = new ResetExpiredJobsRunnable(resetRunnableName, this, jobEntityManagerToUse);
+            resetExpiredJobsRunnable = createResetExpiredJobsRunnable(resetRunnableName);
         }
 
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
@@ -147,6 +146,8 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
         }
     }
+
+    protected abstract ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName);
 
     protected abstract void startAdditionalComponents();
 

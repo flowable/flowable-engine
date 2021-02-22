@@ -30,19 +30,4 @@ public abstract class AbstractTestCase {
 
     protected boolean isEmptyLinesEnabled = true;
 
-    /**
-     * Asserts if the provided text is part of some text.
-     */
-    public void assertTextPresent(String expected, String actual) {
-        if ((actual == null) || !actual.contains(expected)) {
-            throw new AssertionError("expected presence of [" + expected + "], but was [" + actual + "]");
-        }
-    }
-
-    /**
-     * Asserts if the provided text is part of some text, ignoring any uppercase characters
-     */
-    public void assertTextPresentIgnoreCase(String expected, String actual) {
-        assertTextPresent(expected.toLowerCase(), actual.toLowerCase());
-    }
 }

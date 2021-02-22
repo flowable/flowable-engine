@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+    
+    <case id="casePageCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+        
+            <planItem id="planItemTaskA" definitionRef="casePageTaskA" />
+            <planItem id="planItemTaskB" definitionRef="casePageTaskB">
+                <entryCriterion id="criterion" sentryRef="sentryTaskB" />
+            </planItem>
+            
+            <sentry id="sentryTaskB">
+                <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            
+            <task id="casePageTaskA" name="A" flowable:type="casePage" flowable:formKey="testKey" flowable:label="Label 1" flowable:icon="Icon 1" 
+                    flowable:assignee="johndoe" flowable:owner="janedoe" flowable:candidateUsers="johndoe,janedoe" flowable:candidateGroups="sales,management" />
+                    
+            <task id="casePageTaskB" name="B" flowable:type="casePage">
+                <extensionElements>
+                    <flowable:index>0</flowable:index>
+                </extensionElements>
+            </task>
+            
+        </casePlanModel>
+    </case>
+    
+</definitions>

@@ -55,7 +55,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Table Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentCollectionResource {
 
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
@@ -76,17 +76,17 @@ public class DmnDeploymentCollectionResource {
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of decision table deployments", tags = { "Deployment" }, nickname = "listDecisionTableDeployments")
+    @ApiOperation(value = "List of decision deployments", tags = { "Deployment" }, nickname = "listDecisionDeployments")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision table deployments with the given name.", paramType = "query"),
-            @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision table deployments with a name like the given name.", paramType = "query"),
-            @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision table deployments with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision table deployments which do not have the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return decision table deployments with the given parent deployment id.", paramType = "query"),
-            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return decision table deployments with a parent deployment id like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision table deployments with the given tenantId.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return decision table deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns decision table deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision deployments with the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision deployments with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision deployments with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return decision deployments which do not have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return decision deployments with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return decision deployments with a parent deployment id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision deployments with the given tenantId.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return decision deployments with a tenantId like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns decision deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
@@ -122,7 +122,7 @@ public class DmnDeploymentCollectionResource {
             deploymentQuery.deploymentTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            Boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 deploymentQuery.deploymentWithoutTenantId();
             }
@@ -135,7 +135,7 @@ public class DmnDeploymentCollectionResource {
         return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, dmnRestResponseFactory::createDmnDeploymentResponseList);
     }
 
-    @ApiOperation(value = "Create a new decision table deployment", nickname = "uploadDecisionTableDeployment", tags = {
+    @ApiOperation(value = "Create a new decision deployment", nickname = "uploadDecisionDeployment", tags = {
             "Deployment" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. If multiple resources need to be deployed in a single deployment, compress the resources in a zip and make sure the file-name ends with .bar or .zip.\n"
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")

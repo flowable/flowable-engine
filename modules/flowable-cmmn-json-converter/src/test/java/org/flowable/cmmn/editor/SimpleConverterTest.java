@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.data.Offset.offset;
 
 import java.util.List;
 
@@ -39,51 +39,49 @@ public class SimpleConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
-        assertEquals("testModel", caseModel.getId());
-        assertEquals("Test model", caseModel.getName());
+        assertThat(caseModel.getId()).isEqualTo("testModel");
+        assertThat(caseModel.getName()).isEqualTo("Test model");
 
         Stage planModelStage = caseModel.getPlanModel();
-        assertNotNull(planModelStage);
-        assertEquals("stage1", planModelStage.getId());
+        assertThat(planModelStage).isNotNull();
+        assertThat(planModelStage.getId()).isEqualTo("stage1");
 
         GraphicInfo graphicInfo = model.getGraphicInfo("stage1");
-        assertEquals(75.0, graphicInfo.getX(), 0.1);
-        assertEquals(60.0, graphicInfo.getY(), 0.1);
-        assertEquals(718.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(714.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(75.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(60.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(718.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(714.0, offset(0.1));
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
-        assertNotNull(planItem);
-        assertEquals("planItem1", planItem.getId());
-        assertEquals("Task B", planItem.getName());
+        assertThat(planItem).isNotNull();
+        assertThat(planItem.getId()).isEqualTo("planItem1");
+        assertThat(planItem.getName()).isEqualTo("Task B");
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        assertNotNull(planItemDefinition);
-        assertTrue(planItemDefinition instanceof HumanTask);
+        assertThat(planItemDefinition).isInstanceOf(HumanTask.class);
         HumanTask humanTask = (HumanTask) planItemDefinition;
-        assertEquals("task1", humanTask.getId());
-        assertEquals("Task B", humanTask.getName());
+        assertThat(humanTask.getId()).isEqualTo("task1");
+        assertThat(humanTask.getName()).isEqualTo("Task B");
 
-        assertEquals(1, planItem.getEntryCriteria().size());
-        assertEquals(0, planItem.getExitCriteria().size());
+        assertThat(planItem.getEntryCriteria()).hasSize(1);
+        assertThat(planItem.getExitCriteria()).isEmpty();
 
         graphicInfo = model.getGraphicInfo("planItem1");
-        assertEquals(435.0, graphicInfo.getX(), 0.1);
-        assertEquals(120.0, graphicInfo.getY(), 0.1);
-        assertEquals(100.0, graphicInfo.getWidth(), 0.1);
-        assertEquals(80.0, graphicInfo.getHeight(), 0.1);
+        assertThat(graphicInfo.getX()).isCloseTo(435.0, offset(0.1));
+        assertThat(graphicInfo.getY()).isCloseTo(120.0, offset(0.1));
+        assertThat(graphicInfo.getWidth()).isCloseTo(100.0, offset(0.1));
+        assertThat(graphicInfo.getHeight()).isCloseTo(80.0, offset(0.1));
 
         List<Sentry> sentries = planModelStage.getSentries();
-        assertEquals(1, sentries.size());
+        assertThat(sentries).hasSize(1);
 
         Sentry sentry = sentries.get(0);
 
         Criterion criterion = planItem.getEntryCriteria().get(0);
-        assertEquals(sentry.getId(), criterion.getSentryRef());
+        assertThat(criterion.getSentryRef()).isEqualTo(sentry.getId());
 
-        assertEquals(1, sentry.getOnParts().size());
-        SentryOnPart onPart = sentry.getOnParts().get(0);
-        assertEquals("complete", onPart.getStandardEvent());
-        assertEquals("planItem2", onPart.getSourceRef());
+        assertThat(sentry.getOnParts())
+                .extracting(SentryOnPart::getStandardEvent, SentryOnPart::getSourceRef)
+                .containsExactly(tuple("complete", "planItem2"));
 
     }
 }

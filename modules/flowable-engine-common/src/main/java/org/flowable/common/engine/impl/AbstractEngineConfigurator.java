@@ -206,6 +206,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
 
     protected void initialiseCommonProperties(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         initEngineConfigurations(engineConfiguration, targetEngineConfiguration);
+        initEventRegistryEventConsumers(engineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(engineConfiguration, targetEngineConfiguration);
         initIdGenerator(engineConfiguration, targetEngineConfiguration);
 
@@ -233,6 +234,10 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
             }
         }
     }
+    
+    protected void initEventRegistryEventConsumers(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setEventRegistryEventConsumers(engineConfiguration.getEventRegistryEventConsumers());
+    }
 
     protected void initCommandContextFactory(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setCommandContextFactory(engineConfiguration.getCommandContextFactory());
@@ -249,7 +254,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (engineConfiguration.getDataSource() != null) {
             targetEngineConfiguration.setDataSource(engineConfiguration.getDataSource());
         } else {
-            throw new FlowableException("A datasource is required for initializing the IDM engine ");
+            throw new FlowableException("A datasource is required for initializing the engine ");
         }
     }
 

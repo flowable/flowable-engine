@@ -76,9 +76,20 @@ public interface CmmnHistoryService {
     List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId);
     
     /**
+     * Retrieves the {@link HistoricIdentityLink}s associated with the given plan item instance. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a
+     * certain case instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
+     */
+    List<HistoricIdentityLink> getHistoricIdentityLinksForPlanItemInstance(String planItemInstanceId);
+    
+    /**
      * Retrieves the {@link HistoricEntityLink}s associated with the given case instance.
      */
     List<HistoricEntityLink> getHistoricEntityLinkChildrenForCaseInstance(String caseInstanceId);
+
+    /**
+     * Retrieves all the {@link HistoricEntityLink}s associated with same root as the given case instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsCaseInstance(String caseInstanceId);
 
     /**
      * Retrieves the {@link HistoricEntityLink}s where the given case instance is referenced.

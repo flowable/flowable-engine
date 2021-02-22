@@ -13,12 +13,8 @@
 
 package org.flowable.management.jmx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.net.URL;
 import java.util.List;
@@ -61,7 +57,7 @@ public class DeploymentsJMXClientTest {
 
         // no process deployed yet
         List<List<String>> deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertEquals(0, deployments.size());
+        assertThat(deployments).isEmpty();
 
         // deploy process remotely
 
@@ -70,117 +66,108 @@ public class DeploymentsJMXClientTest {
 
         // one process is there now, test remote deployments
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertNotNull(deployments);
-        assertEquals(1, deployments.size());
-        assertEquals(3, deployments.get(0).size());
+        assertThat(deployments).hasSize(1);
+        assertThat(deployments.get(0)).hasSize(3);
         String firstDeploymentId = deployments.get(0).get(0);
 
         // test remote process definition
         List<List<String>> pdList = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "ProcessDefinitions");
-        assertNotNull(pdList);
-        assertEquals(1, pdList.size());
-        assertEquals(5, pdList.get(0).size());
-        assertNotNull(pdList.get(0).get(0));
-        assertEquals("My process", pdList.get(0).get(1));
-        assertEquals("1", pdList.get(0).get(2)); // version
-        assertEquals("false", pdList.get(0).get(3)); // not suspended
-        assertEquals("This process to test JMX", pdList.get(0).get(4));
+        assertThat(pdList).hasSize(1);
+        assertThat(pdList.get(0)).hasSize(5);
+        assertThat(pdList.get(0).get(0)).isNotNull();
+        assertThat(pdList.get(0).get(1)).isEqualTo("My process");
+        assertThat(pdList.get(0).get(2)).isEqualTo("1"); // version
+        assertThat(pdList.get(0).get(3)).isEqualTo("false"); // not suspended
+        assertThat(pdList.get(0).get(4)).isEqualTo("This process to test JMX");
 
         // redeploy the same process
         mbsc.invoke(deploymentsBeanName, "deployProcessDefinition", new String[] { "trivialProcess.bpmn", fileName.getFile() }, new String[] { String.class.getName(), String.class.getName() });
 
         // now there should be two deployments
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertNotNull(deployments);
-        assertEquals(2, deployments.size());
-        assertEquals(3, deployments.get(0).size());
-        assertEquals(3, deployments.get(1).size());
+        assertThat(deployments).hasSize(2);
+        assertThat(deployments.get(0)).hasSize(3);
+        assertThat(deployments.get(1)).hasSize(3);
 
         // there should be two process definitions, one with version equals to
         // two
         pdList = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "ProcessDefinitions");
-        assertNotNull(pdList);
-        assertEquals(2, pdList.size());
-        assertEquals(5, pdList.get(0).size());
-        assertEquals(5, pdList.get(1).size());
+        assertThat(pdList).hasSize(2);
+        assertThat(pdList.get(0)).hasSize(5);
+        assertThat(pdList.get(1)).hasSize(5);
 
         // check there is one with version= = 1 and another one with version ==
         // 2, other attributed are the same
         String pidV2 = null;
         String pidV1 = null;
-        if (pdList.get(0).get(2).equals("1") && pdList.get(1).get(2).equals("2")) {
+        if ("1".equals(pdList.get(0).get(2)) && "2".equals(pdList.get(1).get(2))) {
             pidV2 = pdList.get(1).get(0);
             pidV1 = pdList.get(0).get(0);
-        } else if (pdList.get(1).get(2).equals("1") && pdList.get(0).get(2).equals("2")) {
+        } else if ("1".equals(pdList.get(1).get(2)) && "2".equals(pdList.get(0).get(2))) {
             pidV2 = pdList.get(0).get(0);
             pidV1 = pdList.get(1).get(0);
 
         } else
             fail("there should one process definition with version == 1 and another one with version == 2. It is not the case");
 
-        assertNotNull(pdList.get(0).get(0));
-        assertNotNull(pdList.get(1).get(0));
-        assertEquals("My process", pdList.get(0).get(1));
-        assertEquals("My process", pdList.get(1).get(1));
-        assertEquals("false", pdList.get(0).get(3)); // not suspended
-        assertEquals("false", pdList.get(1).get(3)); // not suspended
-        assertEquals("This process to test JMX", pdList.get(0).get(4));
-        assertEquals("This process to test JMX", pdList.get(1).get(4));
+        assertThat(pdList.get(0).get(0)).isNotNull();
+        assertThat(pdList.get(1).get(0)).isNotNull();
+        assertThat(pdList.get(0).get(1)).isEqualTo("My process");
+        assertThat(pdList.get(1).get(1)).isEqualTo("My process");
+        assertThat(pdList.get(0).get(3)).isEqualTo("false"); // not suspended
+        assertThat(pdList.get(1).get(3)).isEqualTo("false"); // not suspended
+        assertThat(pdList.get(0).get(4)).isEqualTo("This process to test JMX");
+        assertThat(pdList.get(1).get(4)).isEqualTo("This process to test JMX");
 
         // suspend the one with version == 2
         mbsc.invoke(deploymentsBeanName, "suspendProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
         RepositoryService repositoryService = processEngine.getRepositoryService();
 
         // test if it is really suspended and not the other one
-        assertTrue(repositoryService.getProcessDefinition(pidV2).isSuspended());
-        assertFalse(repositoryService.getProcessDefinition(pidV1).isSuspended());
+        assertThat(repositoryService.getProcessDefinition(pidV2).isSuspended()).isTrue();
+        assertThat(repositoryService.getProcessDefinition(pidV1).isSuspended()).isFalse();
 
         // test if it is reported as suspended and not the other one
         List<String> pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
-        assertNotNull(pd);
-        assertEquals(5, pd.size());
-        assertEquals("true", pd.get(3));
+        assertThat(pd).hasSize(5);
+        assertThat(pd.get(3)).isEqualTo("true");
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV1 }, new String[] { String.class.getName() });
-        assertNotNull(pd);
-        assertEquals(5, pd.size());
-        assertEquals("false", pd.get(3));
+        assertThat(pd).hasSize(5);
+        assertThat(pd.get(3)).isEqualTo("false");
 
         // now reactivate the same suspended process
         mbsc.invoke(deploymentsBeanName, "activatedProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
 
         // test if both processes are active again
-        assertFalse(repositoryService.getProcessDefinition(pidV2).isSuspended());
-        assertFalse(repositoryService.getProcessDefinition(pidV1).isSuspended());
+        assertThat(repositoryService.getProcessDefinition(pidV2).isSuspended()).isFalse();
+        assertThat(repositoryService.getProcessDefinition(pidV1).isSuspended()).isFalse();
 
         // test if they are properly reported as activated
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV2 }, new String[] { String.class.getName() });
-        assertNotNull(pd);
-        assertEquals(5, pd.size());
-        assertEquals("false", pd.get(3));
+        assertThat(pd).hasSize(5);
+        assertThat(pd.get(3)).isEqualTo("false");
 
         pd = (List<String>) mbsc.invoke(deploymentsBeanName, "getProcessDefinitionById", new String[] { pidV1 }, new String[] { String.class.getName() });
-        assertNotNull(pd);
-        assertEquals(5, pd.size());
-        assertEquals("false", pd.get(3));
+        assertThat(pd).hasSize(5);
+        assertThat(pd.get(3)).isEqualTo("false");
 
         // now undeploy the one with version == 1
         mbsc.invoke(deploymentsBeanName, "deleteDeployment", new String[] { firstDeploymentId }, new String[] { String.class.getName() });
 
         // now there should be only one deployment and only one process
         // definition with version 2, first check it with API
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
 
-        assertNotEquals(repositoryService.createDeploymentQuery().singleResult().getId(), firstDeploymentId);
+        assertThat(firstDeploymentId).isNotEqualTo(repositoryService.createDeploymentQuery().singleResult().getId());
 
         // check if it is also affected in returned results.
 
         deployments = (List<List<String>>) mbsc.getAttribute(deploymentsBeanName, "Deployments");
-        assertNotNull(deployments);
-        assertEquals(1, deployments.size());
-        assertEquals(3, deployments.get(0).size());
-        assertNotEquals(deployments.get(0).get(0), firstDeploymentId);
+        assertThat(deployments).hasSize(1);
+        assertThat(deployments.get(0)).hasSize(3);
+        assertThat(firstDeploymentId).isNotEqualTo(deployments.get(0).get(0));
 
     }
 

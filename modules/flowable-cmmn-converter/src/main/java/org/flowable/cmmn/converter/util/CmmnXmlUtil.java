@@ -127,7 +127,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         return result;
     }
 
-    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
+    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws XMLStreamException {
         if (StringUtils.isNotEmpty(value) && !"null".equalsIgnoreCase(value)) {
             xtw.writeAttribute(attributeName, value);
         }
@@ -244,9 +244,9 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                 for (ExtensionAttribute attribute : attributeList) {
                     if (!isBlacklisted(attribute, blackLists)) {
                         if (attribute.getNamespacePrefix() == null) {
-                            if (attribute.getNamespace() == null)
+                            if (attribute.getNamespace() == null) {
                                 xtw.writeAttribute(attribute.getName(), attribute.getValue());
-                            else {
+                            } else {
                                 xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
                             }
                         } else {

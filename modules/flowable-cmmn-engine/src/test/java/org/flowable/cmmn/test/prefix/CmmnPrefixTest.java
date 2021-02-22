@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.prefix;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
@@ -65,19 +66,19 @@ public class CmmnPrefixTest {
                     .caseDefinitionKey("oneHumanTaskCase")
                     .variable("testPrefix", "tested")
                     .start();
-            assertTrue(caseInstance.getId().startsWith("CAS-"));
+            assertThat(caseInstance.getId()).startsWith("CAS-");
             
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            assertTrue(task.getId().startsWith("TSK-"));
+            assertThat(task.getId()).startsWith("TSK-");
             cmmnTaskService.complete(task.getId());
 
-            if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-                assertTrue(historicTaskInstance.getId().startsWith("TSK-"));
+                assertThat(historicTaskInstance.getId()).startsWith("TSK-");
                 
                 if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
                     HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
-                    assertTrue(historicVariableInstance.getId().startsWith("VAR-"));
+                    assertThat(historicVariableInstance.getId()).startsWith("VAR-");
                 }
             }
             

@@ -1,11 +1,15 @@
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+	typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" 
+	targetNamespace="http://www.flowable.org/test">
   <process id="process" name="process1" isExecutable="true">
-    <callActivity id="callactivity" name="Call activity" calledElement="processId"
-    activiti:fallbackToDefaultTenant="true">
+    <callActivity id="callactivity" name="Call activity" calledElement="processId" flowable:fallbackToDefaultTenant="true">
       <extensionElements>
-        <activiti:in source="test" target="test"></activiti:in>
-        <activiti:in sourceExpression="${test}" target="test"></activiti:in>
-        <activiti:out source="test" target="test"></activiti:out>
+        <flowable:in source="test" target="test"></flowable:in>
+        <flowable:in sourceExpression="${test}" target="test"></flowable:in>
+        <flowable:out source="test" target="test"></flowable:out>
+        <flowable:mapException errorCode="myErrorCode" rootCause="org.flowable.Exception">org.flowable.Something</flowable:mapException>
       </extensionElements>
     </callActivity>
     <sequenceFlow id="sid-7D914C2B-2A0F-4CC8-A23D-DFC6317BF72E" sourceRef="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11" targetRef="callactivity"></sequenceFlow>

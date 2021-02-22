@@ -12,24 +12,28 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.model.DmnDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.model.DmnDefinition;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
+ *
+ * @deprecated use {@link DecisionModelResource} instead.
  */
+@Deprecated
 @RestController
 @Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
-public class DecisionTableModelResource extends BaseDecisionTableResource {
+public class DecisionTableModelResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision table DMN (definition) model", tags = { "Decision Tables" }, nickname = "getDecisionTableModel")
     @ApiResponses(value = {
@@ -38,7 +42,7 @@ public class DecisionTableModelResource extends BaseDecisionTableResource {
     })
     @GetMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/model", produces = "application/json")
     public DmnDefinition getDmnModelResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId) {
-        DmnDecisionTable decisionTable = getDecisionTableFromRequest(decisionTableId);
+        DmnDecision decisionTable = getDecisionFromRequest(decisionTableId);
         return dmnRepositoryService.getDmnDefinition(decisionTable.getId());
     }
 }

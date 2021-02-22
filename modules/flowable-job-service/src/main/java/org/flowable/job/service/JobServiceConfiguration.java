@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,10 +35,10 @@ import org.flowable.job.service.impl.history.async.AsyncHistoryJobHandler;
 import org.flowable.job.service.impl.history.async.transformer.HistoryJsonTransformer;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManagerImpl;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityManagerImpl;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManager;
-import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
@@ -45,14 +46,14 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManagerImpl;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
+import org.flowable.job.service.impl.persistence.entity.data.ExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisDeadLetterJobDataManager;
+import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisExternalWorkerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisHistoryJobDataManager;
-import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobByteArrayDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
@@ -86,7 +87,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected SuspendedJobDataManager suspendedJobDataManager;
     protected TimerJobDataManager timerJobDataManager;
     protected HistoryJobDataManager historyJobDataManager;
-    protected JobByteArrayDataManager jobByteArrayDataManager;
+    protected ExternalWorkerJobDataManager externalWorkerJobDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
 
@@ -95,7 +96,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected SuspendedJobEntityManager suspendedJobEntityManager;
     protected TimerJobEntityManager timerJobEntityManager;
     protected HistoryJobEntityManager historyJobEntityManager;
-    protected JobByteArrayEntityManager jobByteArrayEntityManager;
+    protected ExternalWorkerJobEntityManager externalWorkerJobEntityManager;
 
     protected CommandExecutor commandExecutor;
 
@@ -115,6 +116,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected FailedJobCommandFactory failedJobCommandFactory;
     protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
     protected List<JobProcessor> jobProcessors;
+    
+    protected List<String> enabledJobCategories;
     
     protected AsyncExecutor asyncHistoryExecutor;
     protected int asyncHistoryExecutorNumberOfRetries;
@@ -179,10 +182,10 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
             jobDataManager = new MybatisJobDataManager(this);
         }
         if (deadLetterJobDataManager == null) {
-            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager();
+            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager(this);
         }
         if (suspendedJobDataManager == null) {
-            suspendedJobDataManager = new MybatisSuspendedJobDataManager();
+            suspendedJobDataManager = new MybatisSuspendedJobDataManager(this);
         }
         if (timerJobDataManager == null) {
             timerJobDataManager = new MybatisTimerJobDataManager(this);
@@ -190,8 +193,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (historyJobDataManager == null) {
             historyJobDataManager = new MybatisHistoryJobDataManager(this);
         }
-        if (jobByteArrayDataManager == null) {
-            jobByteArrayDataManager = new MybatisJobByteArrayDataManager();
+        if (externalWorkerJobDataManager == null) {
+            externalWorkerJobDataManager = new MybatisExternalWorkerJobDataManager(this);
         }
     }
 
@@ -211,8 +214,8 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (historyJobEntityManager == null) {
             historyJobEntityManager = new HistoryJobEntityManagerImpl(this, historyJobDataManager);
         }
-        if (jobByteArrayEntityManager == null) {
-            jobByteArrayEntityManager = new JobByteArrayEntityManagerImpl(this, jobByteArrayDataManager);
+        if (externalWorkerJobEntityManager == null) {
+            externalWorkerJobEntityManager = new ExternalWorkerJobEntityManagerImpl(this, externalWorkerJobDataManager);
         }
     }
 
@@ -303,12 +306,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public JobByteArrayDataManager getJobByteArrayDataManager() {
-        return jobByteArrayDataManager;
+    public ExternalWorkerJobDataManager getExternalWorkerJobDataManager() {
+        return externalWorkerJobDataManager;
     }
 
-    public JobServiceConfiguration setJobByteArrayDataManager(JobByteArrayDataManager jobByteArrayDataManager) {
-        this.jobByteArrayDataManager = jobByteArrayDataManager;
+    public JobServiceConfiguration setExternalWorkerJobDataManager(ExternalWorkerJobDataManager externalWorkerJobDataManager) {
+        this.externalWorkerJobDataManager = externalWorkerJobDataManager;
         return this;
     }
 
@@ -357,12 +360,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public JobByteArrayEntityManager getJobByteArrayEntityManager() {
-        return jobByteArrayEntityManager;
+    public ExternalWorkerJobEntityManager getExternalWorkerJobEntityManager() {
+        return externalWorkerJobEntityManager;
     }
 
-    public JobServiceConfiguration setJobByteArrayEntityManager(JobByteArrayEntityManager jobByteArrayEntityManager) {
-        this.jobByteArrayEntityManager = jobByteArrayEntityManager;
+    public JobServiceConfiguration setExternalWorkerJobEntityManager(ExternalWorkerJobEntityManager externalWorkerJobEntityManager) {
+        this.externalWorkerJobEntityManager = externalWorkerJobEntityManager;
         return this;
     }
 
@@ -523,6 +526,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         if (historyJobHandlers != null 
                 && historyJobHandler instanceof AsyncHistoryJobHandler
                 && !historyJobHandlers.containsKey(historyJobHandler.getType())) {
+            
             for (HistoryJobHandler existingHistoryJobHandler : historyJobHandlers.values()) {
                 if (existingHistoryJobHandler.getClass().equals(historyJobHandler.getClass())) {
                     copyHistoryJsonTransformers((AsyncHistoryJobHandler) historyJobHandler, (AsyncHistoryJobHandler) existingHistoryJobHandler);
@@ -599,6 +603,22 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return jobParentStateResolver;
     }
     
+    public List<String> getEnabledJobCategories() {
+        return enabledJobCategories;
+    }
+
+    public void setEnabledJobCategories(List<String> enabledJobCategories) {
+        this.enabledJobCategories = enabledJobCategories;
+    }
+
+    public void addEnabledJobCategory(String jobCategory) {
+        if (enabledJobCategories == null) {
+            enabledJobCategories = new ArrayList<>();
+        }
+        
+        enabledJobCategories.add(jobCategory);
+    }
+
     public String getJobTypeAsyncHistory() {
         return jobTypeAsyncHistory;
     }

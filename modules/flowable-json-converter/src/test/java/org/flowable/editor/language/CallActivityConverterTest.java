@@ -12,9 +12,8 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CallActivityConverterTest extends AbstractConverterTest {
 
@@ -46,33 +45,30 @@ public class CallActivityConverterTest extends AbstractConverterTest {
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("callactivity", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof CallActivity);
+        assertThat(flowElement).isInstanceOf(CallActivity.class);
         CallActivity callActivity = (CallActivity) flowElement;
-        assertEquals("callactivity", callActivity.getId());
-        assertEquals("Call activity", callActivity.getName());
+        assertThat(callActivity.getId()).isEqualTo("callactivity");
+        assertThat(callActivity.getName()).isEqualTo("Call activity");
 
-        assertEquals("processId", callActivity.getCalledElement());
-        assertEquals("id", callActivity.getCalledElementType());
-        assertTrue(callActivity.getFallbackToDefaultTenant());
-        assertTrue(callActivity.isInheritVariables());
-        assertTrue(callActivity.isSameDeployment());
-        assertTrue(callActivity.isInheritBusinessKey());
-        assertTrue(callActivity.isUseLocalScopeForOutParameters());
+        assertThat(callActivity.getCalledElement()).isEqualTo("processId");
+        assertThat(callActivity.getCalledElementType()).isEqualTo("id");
+        assertThat(callActivity.getFallbackToDefaultTenant()).isTrue();
+        assertThat(callActivity.isInheritVariables()).isTrue();
+        assertThat(callActivity.isSameDeployment()).isTrue();
+        assertThat(callActivity.isInheritBusinessKey()).isTrue();
+        assertThat(callActivity.isUseLocalScopeForOutParameters()).isTrue();
 
         List<IOParameter> parameters = callActivity.getInParameters();
-        assertEquals(2, parameters.size());
-        IOParameter parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
-        parameter = parameters.get(1);
-        assertEquals("${test}", parameter.getSourceExpression());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                .containsExactly(
+                        tuple("test", "test", null),
+                        tuple(null, "test", "${test}")
+                );
 
         parameters = callActivity.getOutParameters();
-        assertEquals(1, parameters.size());
-        parameter = parameters.get(0);
-        assertEquals("test", parameter.getSource());
-        assertEquals("test", parameter.getTarget());
+        assertThat(parameters)
+                .extracting(IOParameter::getSource, IOParameter::getTarget)
+                .containsExactly(tuple("test", "test"));
     }
 }

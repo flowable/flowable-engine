@@ -1,0 +1,17 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/test">
+
+    <process id="process" name="process1" isExecutable="true">
+        <serviceTask id="sendEventServiceTask" flowable:type="send-event" name="Send sync event task">
+            <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+                <flowable:sendSynchronously>true</flowable:sendSynchronously>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow sourceRef="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11" targetRef="sendEventServiceTask"/>
+        <endEvent id="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"/>
+        <startEvent id="sid-4D8B3541-C9E5-45BB-8BB1-F6C94B9A4C11"/>
+        <sequenceFlow sourceRef="sendEventServiceTask" targetRef="sid-DC3F9E0D-7CE0-4A8E-847E-823110F71807"/>
+    </process>
+</definitions>

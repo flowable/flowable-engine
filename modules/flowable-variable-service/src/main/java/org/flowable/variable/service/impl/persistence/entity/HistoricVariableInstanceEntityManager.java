@@ -25,6 +25,8 @@ import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
  */
 public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
 
+    HistoricVariableInstanceEntity create(VariableInstanceEntity variableInstance, Date createTime);
+
     HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance, Date createTime);
 
     void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime);
@@ -33,9 +35,13 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
 
     HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
     
-    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String subScopeId, String scopeType);
-    
-    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String scopeId, String scopeType);
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId);
+
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByTaskId(String taskId);
+
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType);
+
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 

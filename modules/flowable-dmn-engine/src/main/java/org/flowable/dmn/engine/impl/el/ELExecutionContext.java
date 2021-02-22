@@ -33,9 +33,10 @@ public class ELExecutionContext {
     protected BuiltinAggregator aggregator;
     protected String instanceId;
     protected String scopeType;
+    protected String tenantId;
+    protected boolean forceDMN11;
 
     public void checkExecutionContext(String variableId) {
-
         if (StringUtils.isEmpty(variableId)) {
             throw new IllegalArgumentException("Variable id cannot be empty");
         }
@@ -106,5 +107,20 @@ public class ELExecutionContext {
 
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public boolean isForceDMN11() {
+        return forceDMN11;
+    }
+    public void setForceDMN11(boolean forceDMN11) {
+        this.forceDMN11 = forceDMN11;
     }
 }

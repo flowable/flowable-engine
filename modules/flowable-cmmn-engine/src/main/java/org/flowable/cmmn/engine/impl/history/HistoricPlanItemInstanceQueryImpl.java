@@ -12,14 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.query.QueryCacheValues;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
@@ -28,7 +30,7 @@ import org.flowable.common.engine.impl.query.AbstractQuery;
  * @author Dennis Federico
  */
 public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPlanItemInstanceQuery, HistoricPlanItemInstance> 
-        implements HistoricPlanItemInstanceQuery, QueryCacheValues {
+        implements HistoricPlanItemInstanceQuery, CacheAwareQuery<HistoricPlanItemInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,6 +38,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String planItemInstanceName;
     protected String state;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected String elementId;
@@ -46,6 +49,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date createdAfter;
     protected Date lastAvailableBefore;
     protected Date lastAvailableAfter;
+    protected Date lastUnavailableBefore;
+    protected Date lastUnavailableAfter;
     protected Date lastEnabledBefore;
     protected Date lastEnabledAfter;
     protected Date lastDisabledBefore;
@@ -71,6 +76,10 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean notEnded;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String formKey;
+    protected String extraValue;
+    protected String involvedUser;
+    protected Collection<String> involvedGroups;
     protected boolean onlyStages;
     protected String tenantId;
     protected String tenantIdLike;
@@ -105,6 +114,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
         return this;
     }
 
@@ -190,6 +205,42 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     
     @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceFormKey(String formKey) {
+        if (formKey == null) {
+            throw new FlowableIllegalArgumentException("formKey is null");
+        }
+        this.formKey = formKey;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceExtraValue(String extraValue) {
+        if (extraValue == null) {
+            throw new FlowableIllegalArgumentException("extraValue is null");
+        }
+        this.extraValue = extraValue;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery involvedUser(String involvedUser) {
+        if (involvedUser == null) {
+            throw new FlowableIllegalArgumentException("involvedUser is null");
+        }
+        this.involvedUser = involvedUser;
+        return this;
+    }
+    
+    @Override
+    public HistoricPlanItemInstanceQuery involvedGroups(Collection<String> involvedGroups) {
+        if (involvedGroups == null) {
+            throw new FlowableIllegalArgumentException("involvedGroups is null");
+        }
+        this.involvedGroups = involvedGroups;
+        return this;
+    }
+    
+    @Override
     public HistoricPlanItemInstanceQuery onlyStages() {
         this.onlyStages = true;
         return this;
@@ -237,6 +288,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery lastAvailableAfter(Date lastAvailableAfter) {
         this.lastAvailableAfter = lastAvailableAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastUnavailableAfter(Date unavailableAfter) {
+        this.lastUnavailableAfter = unavailableAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery lastUnavailableBefore(Date unavailableBefore) {
+        this.lastUnavailableBefore = unavailableBefore;
         return this;
     }
 
@@ -371,6 +434,56 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery orderByLastAvailableTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_AVAILABLE_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastEnabledTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_ENABLED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastDisabledTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_DISABLED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastStartedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_STARTED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastSuspendedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_SUSPENDED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByLastUpdatedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.LAST_UPDATED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByCompletedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.COMPLETED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByOccurredTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.OCCURRED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByTerminatedTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.TERMINATED_TIME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery orderByExitTime() {
+        return orderBy(HistoricPlanItemInstanceQueryProperty.EXIT_TIME);
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery orderByName() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.NAME);
     }
@@ -388,6 +501,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
     }
+    @Override
     public String getId() {
         return planItemInstanceId;
     }
@@ -399,6 +513,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getCaseDefinitionId() {
         return caseDefinitionId;
+    }
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
     }
     public String getCaseInstanceId() {
         return caseInstanceId;
@@ -429,6 +546,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public Date getLastAvailableAfter() {
         return lastAvailableAfter;
+    }
+    public Date getLastUnavailableBefore() {
+        return lastUnavailableBefore;
+    }
+    public Date getLastUnavailableAfter() {
+        return lastUnavailableAfter;
     }
     public Date getLastEnabledBefore() {
         return lastEnabledBefore;
@@ -504,6 +627,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getExitCriterionId() {
         return exitCriterionId;
+    }
+    public String getFormKey() {
+        return formKey;
+    }
+    public String getExtraValue() {
+        return extraValue;
+    }
+    public String getInvolvedUser() {
+        return involvedUser;
+    }
+    public Collection<String> getInvolvedGroups() {
+        return involvedGroups;
     }
     public boolean isOnlyStages() {
         return onlyStages;

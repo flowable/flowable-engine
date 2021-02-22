@@ -15,7 +15,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
@@ -25,51 +25,43 @@ import org.flowable.form.engine.impl.persistence.entity.data.FormInstanceDataMan
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class FormInstanceEntityManagerImpl extends AbstractEntityManager<FormInstanceEntity> implements FormInstanceEntityManager {
-
-    protected FormInstanceDataManager formInstanceDataManager;
+public class FormInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<FormEngineConfiguration, FormInstanceEntity, FormInstanceDataManager>
+    implements FormInstanceEntityManager {
 
     public FormInstanceEntityManagerImpl(FormEngineConfiguration formEngineConfiguration, FormInstanceDataManager formInstanceDataManager) {
-        super(formEngineConfiguration);
-        this.formInstanceDataManager = formInstanceDataManager;
+        super(formEngineConfiguration, formInstanceDataManager);
     }
 
     @Override
     public long findFormInstanceCountByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-        return formInstanceDataManager.findFormInstanceCountByQueryCriteria(formInstanceQuery);
+        return dataManager.findFormInstanceCountByQueryCriteria(formInstanceQuery);
     }
 
     @Override
     public List<FormInstance> findFormInstancesByQueryCriteria(FormInstanceQueryImpl formInstanceQuery) {
-        return formInstanceDataManager.findFormInstancesByQueryCriteria(formInstanceQuery);
+        return dataManager.findFormInstancesByQueryCriteria(formInstanceQuery);
     }
     
     @Override
     public void deleteFormInstancesByFormDefinitionId(String formDefinitionId) {
-        formInstanceDataManager.deleteFormInstancesByFormDefinitionId(formDefinitionId);
+        dataManager.deleteFormInstancesByFormDefinitionId(formDefinitionId);
+        // The form instance values are persisted as bytes in the Form Resource with a name having form-<formDefinitionId>
+        // Have a look at FormInstanceEntityImpl#setFormValueBytes
+        getResourceEntityManager().deleteResourcesByName("form-" + formDefinitionId);
     }
     
     @Override
     public void deleteFormInstancesByProcessDefinitionId(String processDefinitionId) {
-        formInstanceDataManager.deleteFormInstancesByProcessDefinitionId(processDefinitionId);
+        dataManager.deleteFormInstancesByProcessDefinitionId(processDefinitionId);
     }
 
     @Override
     public void deleteFormInstancesByScopeDefinitionId(String scopeDefinitionId) {
-        formInstanceDataManager.deleteFormInstancesByScopeDefinitionId(scopeDefinitionId);
+        dataManager.deleteFormInstancesByScopeDefinitionId(scopeDefinitionId);
     }
 
-    @Override
-    protected DataManager<FormInstanceEntity> getDataManager() {
-        return formInstanceDataManager;
+    protected FormResourceEntityManager getResourceEntityManager() {
+        return engineConfiguration.getResourceEntityManager();
     }
-
-    public FormInstanceDataManager getFormInstanceDataManager() {
-        return formInstanceDataManager;
-    }
-
-    public void setFormInstanceDataManager(FormInstanceDataManager formInstanceDataManager) {
-        this.formInstanceDataManager = formInstanceDataManager;
-    }
-
 }

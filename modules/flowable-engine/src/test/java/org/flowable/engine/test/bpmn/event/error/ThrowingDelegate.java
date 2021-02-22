@@ -19,15 +19,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ThrowingDelegate implements JavaDelegate {
-	private static final Logger logger = LoggerFactory.getLogger(ThrowingDelegate.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThrowingDelegate.class);
 	
 	@Override
 	public void execute(DelegateExecution execution) {
-		logger.info("Entered throwing delegate");
+		LOGGER.info("Entered throwing delegate");
 		Boolean localError = (Boolean) execution.getVariable("localError");
 		
 		if (localError) {
-			logger.info("Throwing local error");
+			LOGGER.info("Throwing local error");
 			throw new BpmnError("localError");			
 		}
 	}

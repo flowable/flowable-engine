@@ -12,11 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.dynamic;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -29,8 +26,9 @@ import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Created by Pardo David on 1/12/2016.
@@ -43,7 +41,7 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
 
     @Test
     public void testProcessDefinitionInfoCacheIsEnabledWithPluggableActivitiTestCase() throws Exception {
-        assertThat(processEngineConfiguration.isEnableProcessDefinitionInfoCache(), is(true));
+        assertThat(processEngineConfiguration.isEnableProcessDefinitionInfoCache()).isTrue();
     }
 
     @Test
@@ -52,40 +50,47 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // setup
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processInstance.getProcessDefinitionId());
-        ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-        ArrayNode candidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-        candidateUsers.add("david");
 
         // first task
         JsonNode jsonNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-        assertThat(jsonNode.get(USER_TASK_NAME).get(BPMN_MODEL_VALUE).asText(), is("Taak 1"));
-        assertThat(jsonNode.get(USER_TASK_NAME).get(DYNAMIC_VALUE), is(nullValue()));
+        assertThatJson(jsonNode)
+                .isEqualTo("{"
+                        + "    userTaskName: {"
+                        + "       bpmnmodel: 'Taak 1'"
+                        + "    },"
+                        + "    userTaskAssignee: { },"
+                        + "    userTaskCandidateUsers: {"
+                        + "       bpmnmodel: [ 'david' ]"
+                        + "    },"
+                        + "    userTaskCandidateGroups: {"
+                        + "       bpmnmodel: [ ]"
+                        + "    }"
+                        + " }");
 
-        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
-        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
-
-        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(candidateUsers));
-        assertThat(jsonNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(nullValue()));
-
-        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
-        assertThat(jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(nullValue()));
-
-        // second tasks
-        candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-        candidateGroups.add("HR");
-        candidateGroups.add("SALES");
-
+        // second task
         jsonNode = summary.getElement(TASK_TWO_SID).get(ELEMENT_PROPERTIES);
-        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(BPMN_MODEL_VALUE), is(nullValue()));
-        assertThat(jsonNode.get(USER_TASK_ASSIGNEE).get(DYNAMIC_VALUE), is(nullValue()));
+        assertThatJson(jsonNode)
+                .isEqualTo("{"
+                        + "    userTaskName: {"
+                        + "       bpmnmodel: 'Taak 2'"
+                        + "    },"
+                        + "    userTaskAssignee: { },"
+                        + "    userTaskCandidateUsers: {"
+                        + "       bpmnmodel: [ 'david' ]"
+                        + "    },"
+                        + "    userTaskCandidateGroups: {"
+                        + "       bpmnmodel: [ 'HR', 'SALES' ]"
+                        + "    }"
+                        + " }");
 
-        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(candidateUsers));
-        assertThat((ArrayNode) jsonNode.get(USER_TASK_CANDIDATE_GROUPS).get(BPMN_MODEL_VALUE), is(candidateGroups));
-
-        // script tasks
+        // script task
         jsonNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
-        assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(BPMN_MODEL_VALUE).asText(), is("var test = \"hallo\";"));
-        assertThat(jsonNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE), is(nullValue()));
+        assertThatJson(jsonNode)
+                .isEqualTo("{"
+                        + "    scriptTaskScript: {"
+                        + "        bpmnmodel: 'var test = \"hallo\";'"
+                        + "    }"
+                        + " }");
     }
 
     @Test
@@ -99,24 +104,28 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
 
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
-        ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-        bpmnModelCandidateUsers.add("david");
-
-        ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-        dynamicCandidateUsers.add("bob");
-
         JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
+        assertThatJson(taskOneNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "    userTaskCandidateUsers: {"
+                        + "       bpmnmodel: [ 'david' ],"
+                        + "       dynamic:   [ 'bob']"
+                        + "    }"
+                        + " }");
 
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
         // bob and david both should have a single task.
         org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
-        assertThat("Bob must have one task", bobTask, is(notNullValue()));
+        assertThat(bobTask)
+                .as("Bob must have one task")
+                .isNotNull();
 
         org.flowable.task.api.Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
-        assertThat("David must have one task", davidTask, is(not(nullValue())));
+        assertThat(davidTask)
+                .as("David must have one task")
+                .isNotNull();
     }
 
     @Test
@@ -129,27 +138,30 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         dynamicBpmnService.changeUserTaskCandidateUser(TASK_ONE_SID, "david", false, processInfo);
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-        ArrayNode bpmnModelCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-        bpmnModelCandidateUsers.add("david");
-
-        ArrayNode dynamicCandidateUsers = processEngineConfiguration.getObjectMapper().createArrayNode();
-        dynamicCandidateUsers.add("bob");
-        dynamicCandidateUsers.add("david");
-
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
         JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(BPMN_MODEL_VALUE), is(bpmnModelCandidateUsers));
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_USERS).get(DYNAMIC_VALUE), is(dynamicCandidateUsers));
+        assertThatJson(taskOneNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "    userTaskCandidateUsers: {"
+                        + "       bpmnmodel: [ 'david' ],"
+                        + "       dynamic:   [ 'david', 'bob']"
+                        + "    }"
+                        + " }");
 
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
 
         org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
-        assertThat("Bob must have one task", bobTask, is(notNullValue()));
+        assertThat(bobTask)
+                .as("Bob must have one task")
+                .isNotNull();
 
         List<org.flowable.task.api.Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
-        assertThat("David must have two task", davidTasks.size(), is(2));
+        assertThat(davidTasks)
+                .as("David must have one task")
+                .isNotNull();
     }
 
     @Test
@@ -161,13 +173,16 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         ObjectNode processInfo = dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "HR", false);
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-        ArrayNode dynamicCandidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-        dynamicCandidateGroups.add("HR");
-
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
 
         JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(dynamicCandidateGroups));
+        assertThatJson(taskOneNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .isEqualTo("{"
+                        + "    userTaskCandidateGroups: {"
+                        + "       dynamic:   [ 'HR']"
+                        + "    }"
+                        + " }");
     }
 
     @Test
@@ -180,14 +195,15 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         dynamicBpmnService.changeUserTaskCandidateGroup(TASK_ONE_SID, "SALES", false, processInfo);
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, processInfo);
 
-        ArrayNode candidateGroups = processEngineConfiguration.getObjectMapper().createArrayNode();
-        candidateGroups.add("HR");
-        candidateGroups.add("SALES");
-
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
         JsonNode taskOneNode = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES);
-
-        assertThat((ArrayNode) taskOneNode.get(USER_TASK_CANDIDATE_GROUPS).get(DYNAMIC_VALUE), is(candidateGroups));
+        assertThatJson(taskOneNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                .isEqualTo("{"
+                        + "    userTaskCandidateGroups: {"
+                        + "       dynamic:   [ 'HR', 'SALES' ]"
+                        + "    }"
+                        + " }");
     }
 
     @Test
@@ -201,8 +217,13 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
 
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
         JsonNode scriptTaskNode = summary.getElement(SCRIPT_TASK_SID).get(ELEMENT_PROPERTIES);
-
-        assertThat(scriptTaskNode.get(SCRIPT_TASK_SCRIPT).get(DYNAMIC_VALUE).asText(), is("var x = \"hallo\";"));
+        assertThatJson(scriptTaskNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "    scriptTaskScript: {"
+                        + "        dynamic: 'var x = \"hallo\";'"
+                        + "    }"
+                        + " }");
     }
 
     @Test
@@ -222,15 +243,14 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         runtimeService.startProcessInstanceByKey("dynamicServiceTest");
 
         long count = taskService.createTaskQuery().taskCandidateUser("david").count();
-        assertThat(count, is(2L));
+        assertThat(count).isEqualTo(2);
 
         // additional checks of summary
-        ArrayNode candidateUsersNode = processEngineConfiguration.getObjectMapper().createArrayNode();
-        candidateUsersNode.add("david");
-
         DynamicProcessDefinitionSummary summary = dynamicBpmnService.getDynamicProcessDefinitionSummary(processDefinitionId);
         JsonNode candidateUsers = summary.getElement(TASK_ONE_SID).get(ELEMENT_PROPERTIES).get(USER_TASK_CANDIDATE_USERS);
-        assertThat((ArrayNode) candidateUsers.get(BPMN_MODEL_VALUE), is(candidateUsersNode));
-        assertThat(candidateUsers.get(DYNAMIC_VALUE), is(nullValue()));
+        assertThatJson(candidateUsers)
+                .isEqualTo("{"
+                        + "     bpmnmodel: [ 'david' ]"
+                        + " }");
     }
 }

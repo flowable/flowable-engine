@@ -42,8 +42,8 @@ public class JobRetryCmd implements Command<Object> {
 
     @Override
     public Object execute(CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
-        TimerJobService timerJobService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
         
         JobEntity job = jobService.findJobById(jobId);
         if (job == null) {

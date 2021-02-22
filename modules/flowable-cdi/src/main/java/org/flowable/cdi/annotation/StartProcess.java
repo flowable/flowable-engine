@@ -24,7 +24,7 @@ import org.flowable.cdi.BusinessProcess;
 
 /**
  * Starts a new process instance after the annotated method returns. The process instance is subsequently managed.
- * <p/>
+ * <p>
  * Each process variable set through {@link BusinessProcess#setVariable(String, Object)} within this conversation is flushed to the process instance at process instantiation. The same is true for
  * instances of {@link BusinessProcessScoped} beans.
  * 

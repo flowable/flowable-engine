@@ -27,7 +27,7 @@ import org.flowable.common.engine.impl.Direction;
  */
 public class ListQueryParameterObject {
     
-    public static enum ResultType {
+    public enum ResultType {
         LIST, LIST_PAGE, SINGLE_RESULT, COUNT
     }
     

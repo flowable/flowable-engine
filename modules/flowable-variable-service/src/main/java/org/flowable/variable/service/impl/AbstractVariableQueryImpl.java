@@ -18,11 +18,10 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
-import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * Abstract query class that adds methods to query for variable values.
@@ -32,18 +31,22 @@ import org.flowable.variable.service.impl.util.CommandContextUtil;
 public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extends AbstractQuery<T, U> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
     public AbstractVariableQueryImpl() {
     }
 
-    public AbstractVariableQueryImpl(CommandContext commandContext) {
+    public AbstractVariableQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public AbstractVariableQueryImpl(CommandExecutor commandExecutor) {
+    public AbstractVariableQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     @Override
@@ -164,6 +167,9 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     @SuppressWarnings("unchecked")
     protected T variableValueLikeIgnoreCase(String name, String value, boolean localScope) {
+        if (value == null) {
+            throw new FlowableIllegalArgumentException("value is null");
+        }
         addVariable(name, value.toLowerCase(), QueryOperator.LIKE_IGNORE_CASE, localScope);
         return (T) this;
     }
@@ -203,6 +209,8 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
                     throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'greater than or equal' condition");
                 case LESS_THAN_OR_EQUAL:
                     throw new FlowableIllegalArgumentException("Booleans and null cannot be used in 'less than or equal' condition");
+                default:
+                    break;
             }
 
             if (operator == QueryOperator.EQUALS_IGNORE_CASE && !(value instanceof String)) {
@@ -229,9 +237,8 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?, ?>, U> extend
 
     protected void ensureVariablesInitialized() {
         if (!queryVariableValues.isEmpty()) {
-            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
             for (QueryVariableValue queryVariableValue : queryVariableValues) {
-                queryVariableValue.initialize(variableTypes);
+                queryVariableValue.initialize(variableServiceConfiguration);
             }
         }
     }

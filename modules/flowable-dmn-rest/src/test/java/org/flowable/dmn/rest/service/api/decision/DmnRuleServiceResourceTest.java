@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.rest.service.api.decision;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -55,7 +57,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
 
         ArrayNode resultVariables = (ArrayNode) responseNode.get("resultVariables");
 
-        assertEquals(3, resultVariables.size());
+        assertThat(resultVariables).hasSize(3);
     }
 
 
@@ -91,7 +93,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
 
         ArrayNode resultVariables = (ArrayNode) responseNode.get("resultVariables");
 
-        assertEquals(1, resultVariables.size());
+        assertThat(resultVariables).hasSize(1);
     }
 
 

@@ -1,0 +1,64 @@
+{
+  "docs": {
+    "Flowable Open Source": ["oss-introduction"],
+    "BPMN User Guide": [
+    	"bpmn/ch02-GettingStarted",
+    	"bpmn/ch03-Configuration",
+    	"bpmn/ch04-API",
+    	"bpmn/ch05-Spring",
+    	"bpmn/ch05a-Spring-Boot",
+    	"bpmn/ch06-Deployment",
+    	"bpmn/ch07a-BPMN-Introduction",
+    	"bpmn/ch07b-BPMN-Constructs",
+    	"bpmn/ch08-Forms",
+    	"bpmn/ch09-ProcessInstanceMigration",
+    	"bpmn/ch10-JPA",
+    	"bpmn/ch11-History",
+    	"bpmn/ch12-IDM",
+    	"bpmn/ch15-REST",
+    	"bpmn/ch16-Cdi",
+    	"bpmn/ch17-Ldap",
+    	"bpmn/ch18-Advanced",
+    	"bpmn/ch19-tooling"
+    ],
+    "CMMN User Guide": [
+    	"cmmn/ch02-Configuration",
+    	"cmmn/ch03-API",
+    	"cmmn/ch04-Spring",
+    	"cmmn/ch05-Deployment",
+    	"cmmn/ch06-cmmn",
+    	"cmmn/ch07-architecture",
+		"cmmn/ch08-REST"
+    ],
+    "Event Registry User Guide": [
+		"eventregistry/ch02-Configuration",
+		"eventregistry/ch03-API",
+		"eventregistry/ch04-Spring",
+		"eventregistry/ch05-Deployment",
+		"eventregistry/ch06-EventRegistry-Introduction",
+		"eventregistry/ch07-REST"
+    ],
+    "DMN User Guide": [
+		"dmn/ch02-Configuration",
+		"dmn/ch03-API",
+		"dmn/ch04-Spring",
+		"dmn/ch05-Deployment",
+		"dmn/ch06-DMN-Introduction",
+		"dmn/ch07-REST"
+    ],
+    "Forms User Guide": [
+		"form/ch02-Configuration",
+		"form/ch03-API",
+		"form/ch04-Spring",
+		"form/ch05-Deployment",
+		"form/ch06-Form-Introduction",
+		"form/ch07-REST"
+	],
+    "Applications Guide": [
+    	"bpmn/ch14-Applications",
+    	"bpmn/ch13-Designer"
+	],
+    "Migration from v5": ["migration"],
+    "Disclaimer": ["disclaimer"]
+  }
+}

@@ -12,7 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.editor.language.xml.util.XmlTestUtils.exportAndReadXMLFile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,12 +28,12 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
+class BpmnModelWithDataObjectTest {
 
     @Test
-    public void convertModelToXML() throws Exception {
+    public void convertModelToXML() {
         BpmnModel bpmnModel = new BpmnModel();
         Process process = new Process();
         process.setId("myProcess");
@@ -65,10 +66,10 @@ public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
         BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
         
         Process mainProcess = parsedModel.getMainProcess();
-        
+
         // verify the main process data objects
         List<ValuedDataObject> processDataObjects = mainProcess.getDataObjects();
-        assertEquals(1, processDataObjects.size());
+        assertThat(processDataObjects).hasSize(1);
 
         Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
@@ -76,14 +77,9 @@ public class BpmnModelWithDataObjectTest extends AbstractConverterTest {
         }
 
         ValuedDataObject dataObj = objectMap.get("dObj1");
-        assertEquals("dObj1", dataObj.getId());
-        assertEquals("stringDataObject", dataObj.getName());
-        assertEquals("xsd:string", dataObj.getItemSubjectRef().getStructureRef());
-        assertEquals("test", dataObj.getValue());
-    }
-
-    @Override
-    protected String getResource() {
-        return null;
+        assertThat(dataObj.getId()).isEqualTo("dObj1");
+        assertThat(dataObj.getName()).isEqualTo("stringDataObject");
+        assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:string");
+        assertThat(dataObj.getValue()).isEqualTo("test");
     }
 }

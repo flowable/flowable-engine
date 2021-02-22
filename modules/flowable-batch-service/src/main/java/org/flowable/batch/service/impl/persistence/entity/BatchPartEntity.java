@@ -16,6 +16,7 @@ import java.util.Date;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
@@ -28,6 +29,7 @@ public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
 
     void setCompleteTime(Date completeTime);
 
+    @Override
     boolean isCompleted();
 
     void setBatchSearchKey(String searchKey);
@@ -42,9 +44,9 @@ public interface BatchPartEntity extends BatchPart, Entity, HasRevision {
     
     void setSubScopeId(String subScopeId);
 
-    BatchByteArrayRef getResultDocRefId();
+    ByteArrayRef getResultDocRefId();
 
-    void setResultDocumentJson(String resultDocumentJson);
+    void setResultDocumentJson(String resultDocumentJson, String engineType);
     
     void setTenantId(String tenantId);
 }

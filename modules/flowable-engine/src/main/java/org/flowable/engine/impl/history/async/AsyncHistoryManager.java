@@ -42,8 +42,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
 
-    public AsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration, HistoryLevel historyLevel, boolean usePrefixId) {
-        super(processEngineConfiguration, historyLevel, usePrefixId);
+    public AsyncHistoryManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
     }
 
     public AsyncHistorySession getAsyncHistorySession() {
@@ -294,7 +294,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     @Override
     public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }
@@ -341,7 +341,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }
@@ -359,7 +359,7 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     @Override
     public void recordVariableRemoved(VariableInstanceEntity variable) {
         String processDefinitionId = null;
-        if (enableProcessDefinitionHistoryLevel && variable.getProcessInstanceId() != null) {
+        if (isEnableProcessDefinitionHistoryLevel() && variable.getProcessInstanceId() != null) {
             ExecutionEntity processInstanceExecution = CommandContextUtil.getExecutionEntityManager().findById(variable.getProcessInstanceId());
             processDefinitionId = processInstanceExecution.getProcessDefinitionId();
         }

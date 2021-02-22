@@ -12,14 +12,13 @@
  */
 package org.flowable.editor.language;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Zheng Ji
  */
@@ -45,12 +44,10 @@ public class ServiceTaskUseLocalScopeForResultVariableConverterTest extends Abst
 
     private void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("shareniuservice", true);
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ServiceTask);
-        assertEquals("shareniuservice", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(ServiceTask.class);
+        assertThat(flowElement.getId()).isEqualTo("shareniuservice");
         ServiceTask serviceTask = (ServiceTask) flowElement;
-        assertEquals("shareniuservice", serviceTask.getId());
-        assertTrue(serviceTask.isUseLocalScopeForResultVariable());
-
+        assertThat(serviceTask.getId()).isEqualTo("shareniuservice");
+        assertThat(serviceTask.isUseLocalScopeForResultVariable()).isTrue();
     }
 }

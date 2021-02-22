@@ -5,7 +5,7 @@ services:
     depends_on:
       - flowable-db
     environment:
-      - SERVER_PORT=9977
+      - SERVER_PORT=8080
       - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_URL=jdbc:postgresql://flowable-db:5432/flowable
       - SPRING_DATASOURCE_USERNAME=flowable
@@ -16,7 +16,7 @@ services:
       - FLOWABLE_REST_APP_ADMIN_LAST-NAME=Admin
     expose:
       - "9977"
-    entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "app.war"]
+    entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "/flowable-entrypoint.sh"]
   flowable-db:
     image: postgres:9.6-alpine
     container_name: flowable-postgres

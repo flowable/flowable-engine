@@ -15,15 +15,19 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.DeadLetterJobsByExecutionIdMatcher;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +35,14 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.D
 public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
 
     protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
+    protected SingleCachedEntityMatcher<DeadLetterJobEntity> deadLetterByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
+    public MybatisDeadLetterJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {
         return DeadLetterJobEntityImpl.class;
@@ -40,6 +51,11 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
     @Override
     public DeadLetterJobEntity create() {
         return new DeadLetterJobEntityImpl();
+    }
+
+    @Override
+    public DeadLetterJobEntity findJobByCorrelationId(String correlationId) {
+        return getEntity("selectDeadLetterJobByCorrelationId", correlationId, deadLetterByCorrelationIdMatcher, true);
     }
 
     @Override
@@ -78,6 +94,11 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
+    }
+    
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return jobServiceConfiguration.getIdGenerator();
     }
     
 }

@@ -15,13 +15,17 @@
                  jdbcType="VARCHAR"/>
   </typeHandlers>
   <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+    <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+
+    <!-- Engine mappers -->
     <mapper resource="org/flowable/idm/db/mapping/common.xml" />
-    <mapper resource="org/flowable/idm/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/idm/db/mapping/entity/IdmByteArray.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Group.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/IdentityInfo.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Membership.xml" />
-    <mapper resource="org/flowable/idm/db/mapping/entity/Property.xml" />
-    <mapper resource="org/flowable/idm/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/idm/db/mapping/entity/IdmProperty.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Token.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/User.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Privilege.xml" />

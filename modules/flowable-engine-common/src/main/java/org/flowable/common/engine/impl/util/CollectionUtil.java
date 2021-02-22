@@ -32,7 +32,7 @@ public class CollectionUtil {
     /**
      * Helper method that creates a singleton map.
      * 
-     * Alternative for Collections.singletonMap(), since that method returns a generic typed map <K,T> depending on the input type, but we often need a <String, Object> map.
+     * Alternative for Collections.singletonMap(), since that method returns a generic typed map depending on the input type, but we often need a String, Object map.
      */
     public static Map<String, Object> singletonMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>(1);

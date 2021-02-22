@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.deployment;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.job.api.Job;
 import org.junit.jupiter.api.Test;
@@ -57,7 +59,7 @@ public class TimerEventsAndNewVersionDeploymentsTest extends PluggableFlowableTe
         repositoryService.deleteDeployment(deploymentId4, true);
         assertTimerJobs(1);
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId(), job.getProcessDefinitionId());
+        assertThat(job.getProcessDefinitionId()).isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId3).singleResult().getId());
 
         cleanup(deploymentId1, deploymentId2, deploymentId3);
     }
@@ -78,7 +80,7 @@ public class TimerEventsAndNewVersionDeploymentsTest extends PluggableFlowableTe
         repositoryService.deleteDeployment(deploymentId4, true);
         assertTimerJobs(1);
         Job job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId(), job.getProcessDefinitionId());
+        assertThat(job.getProcessDefinitionId()).isEqualTo(repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId1).singleResult().getId());
 
         cleanup(deploymentId1);
     }
@@ -105,7 +107,7 @@ public class TimerEventsAndNewVersionDeploymentsTest extends PluggableFlowableTe
     }
 
     private void assertTimerJobs(long count) {
-        assertEquals(count, managementService.createTimerJobQuery().timers().count());
+        assertThat(managementService.createTimerJobQuery().timers().count()).isEqualTo(count);
     }
 
     private void cleanup(String... deploymentIds) {

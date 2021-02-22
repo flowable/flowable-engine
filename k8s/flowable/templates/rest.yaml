@@ -1,0 +1,124 @@
+{{- if .Values.rest.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flowable.template" . }}
+  labels:
+    {{ include "flowable.defaultlabels" . }}
+spec:
+  replicas: {{ .Values.rest.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "flowable.template" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "flowable.template" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      initContainers:
+      {{- if .Values.postgres.enabled }}
+      - name: check-db-ready
+        image: postgres:9.6.5
+        command: ['sh', '-c', 'until pg_isready -h {{ .Values.postgres.service.name }} -p 5432; do echo waiting for database; sleep 2; done;']
+      {{- end }}
+      containers:
+      - name: {{ include "flowable.template" . }}
+        image: "{{ .Values.rest.image.repository }}:{{ .Values.rest.image.tag }}"
+        imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.rest.contextPath }}/actuator/health
+            port: 8080
+            httpHeaders:
+            - name: Authorization
+              ### is using the default rest-admin:test
+              ### generate new with; echo -n "<username:<passwd>" | base64
+              #value: Basic cmVzdC1hZG1pbjp0ZXN0
+              value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.rest.contextPath }}/actuator/health
+            port: 8080
+            httpHeaders:
+            - name: Authorization
+              ### is using the default rest-admin:test
+              ### generate new with; echo -n "<username:<passwd>" | base64
+              #value: Basic cmVzdC1hZG1pbjp0ZXN0
+              value: Basic: {{-  printf "%s:%s" .Values.rest.admin.username .Values.rest.admin.password | b64enc }}
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          failureThreshold: 10
+        envFrom:
+        - configMapRef:
+            name: {{ include "flowable.template" . }}-configmap
+        volumeMounts:
+        resources:
+{{ toYaml .Values.rest.resources | indent 10 }}
+      {{- if .Values.cloudSql.enabled }}
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy",
+                  "-instances={{ .Values.cloudSql.instanceConnectionName }}=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/{{ .Values.cloudSql.credentials }}"]
+        securityContext:
+          runAsUser: 2  # non-root user
+          allowPrivilegeEscalation: false
+        volumeMounts:
+          - name: cloudsql-credentials
+            mountPath: "/secrets/cloudsql"
+            readOnly: true
+      {{- end }}
+      volumes:
+      {{- if .Values.cloudSql.enabled }}
+      - name: cloudsql-credentials
+        secret:
+          secretName: cloudsql-credentials
+      {{- end }}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.rest.service.name }}
+  labels:
+    {{ include "flowable.defaultlabels" . }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "flowable.template" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flowable.template" . }}-configmap
+data:
+  JAVA_OPTS: "{{ .Values.rest.javaOpts }} -Djava.security.egd=file:/dev/./urandom"
+  SERVER_SERVLET_CONTEXT_PATH: {{ .Values.rest.contextPath | quote }}
+  SERVER_SERVLET_SESSION_TIMEOUT: 1h
+  {{- if and .Values.database.datasourceDriverClassName .Values.database.datasourceUrl }}
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: {{ .Values.database.datasourceDriverClassName | quote }}
+  SPRING_DATASOURCE_URL: {{ .Values.database.datasourceUrl | quote }}
+  {{- else if .Values.postgres.enabled }}
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+  SPRING_DATASOURCE_URL: jdbc:postgresql://{{ .Values.postgres.service.name }}:5432/{{ .Values.database.name }}
+  {{- else if .Values.cloudSql.enabled }}
+  SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+  SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/{{ .Values.database.name }}
+  {{- end }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.database.username }}
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.database.password }}
+  FLOWABLE_REST_APP_ADMIN_USER-ID: {{ .Values.rest.admin.username }}
+  FLOWABLE_REST_APP_ADMIN_PASSWORD: {{ .Values.rest.admin.password }}
+{{- end }}

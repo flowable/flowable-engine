@@ -12,8 +12,7 @@
  */
 package org.flowable.rest.service.api.management;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -42,25 +41,26 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
 
         TableMetaData metaData = managementService.getTableMetaData(tableName);
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_COLUMNS, tableName)), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_COLUMNS, tableName)), HttpStatus.SC_OK);
 
         // Check table
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(tableName, responseNode.get("tableName").textValue());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.get("tableName").textValue()).isEqualTo(tableName);
 
         ArrayNode names = (ArrayNode) responseNode.get("columnNames");
         ArrayNode types = (ArrayNode) responseNode.get("columnTypes");
-        assertNotNull(names);
-        assertNotNull(types);
+        assertThat(names).isNotNull();
+        assertThat(types).isNotNull();
 
-        assertEquals(metaData.getColumnNames().size(), names.size());
-        assertEquals(metaData.getColumnTypes().size(), types.size());
+        assertThat(names).hasSameSizeAs(metaData.getColumnNames());
+        assertThat(types).hasSameSizeAs(metaData.getColumnTypes());
 
         for (int i = 0; i < names.size(); i++) {
-            assertEquals(names.get(i).textValue(), metaData.getColumnNames().get(i));
-            assertEquals(types.get(i).textValue(), metaData.getColumnTypes().get(i));
+            assertThat(metaData.getColumnNames().get(i)).isEqualTo(names.get(i).textValue());
+            assertThat(metaData.getColumnTypes().get(i)).isEqualTo(types.get(i).textValue());
         }
     }
 

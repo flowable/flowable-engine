@@ -15,9 +15,11 @@ package org.flowable.engine.impl.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Bassam Al-Sarori
@@ -29,11 +31,15 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     protected String processDefinitionId;
     protected String processDefinitionKey;
+    protected String processDefinitionParentDeploymentId;
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String stageInstanceId;
     protected String tenantId;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
@@ -41,6 +47,9 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected Map<String, Object> transientVariables;
     protected Map<String, Object> startFormVariables;
     protected String outcome;
+    protected Map<String, Object> extraFormVariables;
+    protected FormInfo extraFormInfo;
+    protected String extraFormOutcome;
     protected boolean fallbackToDefaultTenant;
 
     public ProcessInstanceBuilderImpl(RuntimeServiceImpl runtimeService) {
@@ -50,6 +59,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId) {
+        this.processDefinitionParentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -86,6 +101,24 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder callbackType(String callbackType) {
         this.callbackType = callbackType;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder referenceType(String referenceType) {
+        this.referenceType = referenceType;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder stageInstanceId(String stageInstanceId) {
+        this.stageInstanceId = stageInstanceId;
         return this;
     }
 
@@ -174,6 +207,26 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     }
 
     @Override
+    public ProcessInstanceBuilder formVariables(Map<String, Object> formVariables, FormInfo formInfo, String formOutcome) {
+        if (formInfo == null) {
+            throw new FlowableIllegalArgumentException("formInfo is null");
+        }
+
+        if (this.extraFormVariables == null) {
+            this.extraFormVariables = new HashMap<>();
+        }
+
+        if (formVariables != null) {
+            this.extraFormVariables.putAll(formVariables);
+        }
+
+        this.extraFormInfo = formInfo;
+        this.extraFormOutcome = formOutcome;
+        return this;
+    }
+
+
+    @Override
     public ProcessInstanceBuilder fallbackToDefaultTenant() {
         this.fallbackToDefaultTenant = true;
         return this;
@@ -197,6 +250,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return processDefinitionKey;
     }
 
+    public String getProcessDefinitionParentDeploymentId() {
+        return processDefinitionParentDeploymentId;
+    }
+
     public String getMessageName() {
         return messageName;
     }
@@ -215,6 +272,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public String getStageInstanceId() {
+        return stageInstanceId;
     }
 
     public String getTenantId() {
@@ -242,6 +311,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     }
     public String getOutcome() {
         return outcome;
+    }
+
+    public Map<String, Object> getExtraFormVariables() {
+        return extraFormVariables;
+    }
+
+    public FormInfo getExtraFormInfo() {
+        return extraFormInfo;
+    }
+
+    public String getExtraFormOutcome() {
+        return extraFormOutcome;
     }
 
     public boolean isFallbackToDefaultTenant() {

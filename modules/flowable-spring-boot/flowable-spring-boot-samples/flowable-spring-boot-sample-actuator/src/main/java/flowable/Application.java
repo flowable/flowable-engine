@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Bean;
  * definition.
  *
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     @Bean
@@ -43,7 +43,7 @@ public class Application {
         };
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }

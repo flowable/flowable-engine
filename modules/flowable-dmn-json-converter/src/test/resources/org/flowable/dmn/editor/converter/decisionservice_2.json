@@ -1,0 +1,371 @@
+{
+  "modelId": "77e9ae37-0234-11eb-8714-da53bc415bea",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "drd_id": "decisionServiceTest1",
+    "name": "Decision Service Test One",
+    "documentation": ""
+  },
+  "childShapes": [
+    {
+      "resourceId": "expandedDecisionService",
+      "properties": {},
+      "stencil": {
+        "id": "ExpandedDecisionService"
+      },
+      "childShapes": [
+        {
+          "resourceId": "outputDecisions",
+          "properties": {
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "OutputDecisionsDecisionServiceSection"
+          },
+          "childShapes": [
+            {
+              "resourceId": "sid-846BDBB3-1F19-4C8B-B590-647E274E98AF",
+              "properties": {
+                "overrideid": "decision1",
+                "name": "Decision One",
+                "documentation": "",
+                "decisiondecisiontablereference": {
+                  "id": "4ac08bc4-fcee-11ea-ad91-fe931497745f",
+                  "name": "Decision Table One",
+                  "key": "decisionTableOne"
+                }
+              },
+              "stencil": {
+                "id": "Decision"
+              },
+              "childShapes": [],
+              "outgoing": [],
+              "bounds": {
+                "lowerRight": {
+                  "x": 205,
+                  "y": 108
+                },
+                "upperLeft": {
+                  "x": 105,
+                  "y": 46
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-7908D875-E3D0-4429-89B0-D3629692AD82",
+              "properties": {
+                "overrideid": "decision2",
+                "name": "Decision Two",
+                "documentation": "",
+                "decisiondecisiontablereference": {
+                  "id": "4ac0d9e5-fcee-11ea-ad91-fe931497745f",
+                  "name": "Decision Table Two",
+                  "key": "decisionTableTwo"
+                }
+              },
+              "stencil": {
+                "id": "Decision"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-4F1CAFCC-EF29-4804-A56A-336AA190CD74"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 445,
+                  "y": 183
+                },
+                "upperLeft": {
+                  "x": 345,
+                  "y": 121
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 602,
+              "y": 240
+            },
+            "upperLeft": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "encapsulatedDecisions",
+          "properties": {
+            "showcaption": true
+          },
+          "stencil": {
+            "id": "EncapsulatedDecisionsDecisionServiceSection"
+          },
+          "childShapes": [
+            {
+              "resourceId": "sid-E1AE6AD9-4716-44C6-97F8-4A15D461BEA9",
+              "properties": {
+                "overrideid": "decision3",
+                "name": "Decision Three",
+                "documentation": "",
+                "decisiondecisiontablereference": {
+                  "id": "64ab40ba-023c-11eb-8714-ce78eb9343a4",
+                  "name": "Decision Table Three",
+                  "key": "decisionTableThree"
+                }
+              },
+              "stencil": {
+                "id": "Decision"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-C75DCAF1-9BF0-4C61-8F2F-3AA421ADC31F"
+                },
+                {
+                  "resourceId": "sid-6ECF7583-FB65-42D0-A102-0ECEF69144DA"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 205,
+                  "y": 123
+                },
+                "upperLeft": {
+                  "x": 105,
+                  "y": 61
+                }
+              },
+              "dockers": []
+            },
+            {
+              "resourceId": "sid-B65EF91B-4BA2-40B7-B94D-2243A186FA41",
+              "properties": {
+                "overrideid": "decision4",
+                "name": "Decision Four",
+                "documentation": "",
+                "decisiondecisiontablereference": {
+                  "id": "6ddb3e1c-023c-11eb-8714-ce78eb9343a4",
+                  "name": "Decision Table Four",
+                  "key": "decisionTableFour"
+                }
+              },
+              "stencil": {
+                "id": "Decision"
+              },
+              "childShapes": [],
+              "outgoing": [
+                {
+                  "resourceId": "sid-A68F82DB-8DF3-4B67-AFDE-E4BAE74079E3"
+                }
+              ],
+              "bounds": {
+                "lowerRight": {
+                  "x": 475,
+                  "y": 168
+                },
+                "upperLeft": {
+                  "x": 375,
+                  "y": 106
+                }
+              },
+              "dockers": []
+            }
+          ],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 602,
+              "y": 480
+            },
+            "upperLeft": {
+              "x": 0,
+              "y": 240
+            }
+          },
+          "dockers": []
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 752,
+          "y": 554
+        },
+        "upperLeft": {
+          "x": 150,
+          "y": 74
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-4F1CAFCC-EF29-4804-A56A-336AA190CD74",
+      "properties": {},
+      "stencil": {
+        "id": "InformationRequirement"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-846BDBB3-1F19-4C8B-B590-647E274E98AF"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 494.358020021965,
+          "y": 210.17438125686405
+        },
+        "upperLeft": {
+          "x": 355.641979978035,
+          "y": 166.82561874313595
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 31
+        },
+        {
+          "x": 50,
+          "y": 31
+        }
+      ],
+      "target": {
+        "resourceId": "sid-846BDBB3-1F19-4C8B-B590-647E274E98AF"
+      }
+    },
+    {
+      "resourceId": "sid-A68F82DB-8DF3-4B67-AFDE-E4BAE74079E3",
+      "properties": {},
+      "stencil": {
+        "id": "InformationRequirement"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-E1AE6AD9-4716-44C6-97F8-4A15D461BEA9"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 524.4432935761679,
+          "y": 442.57388226269467
+        },
+        "upperLeft": {
+          "x": 355.55670642383217,
+          "y": 414.42611773730533
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 31
+        },
+        {
+          "x": 50,
+          "y": 31
+        }
+      ],
+      "target": {
+        "resourceId": "sid-E1AE6AD9-4716-44C6-97F8-4A15D461BEA9"
+      }
+    },
+    {
+      "resourceId": "sid-C75DCAF1-9BF0-4C61-8F2F-3AA421ADC31F",
+      "properties": {},
+      "stencil": {
+        "id": "InformationRequirement"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-7908D875-E3D0-4429-89B0-D3629692AD82"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 502.95,
+          "y": 374.4625
+        },
+        "upperLeft": {
+          "x": 347.05,
+          "y": 257.5375
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 31
+        },
+        {
+          "x": 50,
+          "y": 31
+        }
+      ],
+      "target": {
+        "resourceId": "sid-7908D875-E3D0-4429-89B0-D3629692AD82"
+      }
+    },
+    {
+      "resourceId": "sid-6ECF7583-FB65-42D0-A102-0ECEF69144DA",
+      "properties": {},
+      "stencil": {
+        "id": "InformationRequirement"
+      },
+      "childShapes": [],
+      "outgoing": [
+        {
+          "resourceId": "sid-846BDBB3-1F19-4C8B-B590-647E274E98AF"
+        }
+      ],
+      "bounds": {
+        "lowerRight": {
+          "x": 305,
+          "y": 374.12109375
+        },
+        "upperLeft": {
+          "x": 305,
+          "y": 182.87890625
+        }
+      },
+      "dockers": [
+        {
+          "x": 50,
+          "y": 31
+        },
+        {
+          "x": 50,
+          "y": 31
+        }
+      ],
+      "target": {
+        "resourceId": "sid-846BDBB3-1F19-4C8B-B590-647E274E98AF"
+      }
+    }
+  ],
+  "stencil": {
+    "id": "DMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/dmn1.2#",
+    "url": "../editor/stencilsets/dmn1.1/dmn1.2.json"
+  },
+  "name": "Decision Service Test One",
+  "key": "decisionServiceTest1"
+}

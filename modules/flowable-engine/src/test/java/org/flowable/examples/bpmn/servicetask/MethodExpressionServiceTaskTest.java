@@ -12,6 +12,8 @@
  */
 package org.flowable.examples.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +35,7 @@ public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariables", variables);
 
-        assertEquals("ok", runtimeService.getVariable(pi.getId(), "result"));
+        assertThat(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("ok");
     }
 
     @Test
@@ -45,7 +47,7 @@ public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables);
 
-        assertEquals("ok", runtimeService.getVariable(pi.getId(), "result"));
+        assertThat(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("ok");
 
         Map<String, Object> variables2 = new HashMap<>();
         variables2.put("okReturningService", new OkReturningService());
@@ -54,7 +56,7 @@ public class MethodExpressionServiceTaskTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables2);
 
-        assertNull(runtimeService.getVariable(pi2.getId(), "result"));
+        assertThat(runtimeService.getVariable(pi2.getId(), "result")).isNull();
 
     }
 }

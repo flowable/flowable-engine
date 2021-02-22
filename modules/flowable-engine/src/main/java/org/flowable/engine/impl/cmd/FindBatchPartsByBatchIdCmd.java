@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class FindBatchPartsByBatchIdCmd implements Command<List<BatchPart>> {
@@ -35,10 +36,11 @@ public class FindBatchPartsByBatchIdCmd implements Command<List<BatchPart>> {
     
     @Override
     public List<BatchPart> execute(CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (status != null) {
-            return CommandContextUtil.getBatchService(commandContext).findBatchPartsByBatchIdAndStatus(batchId, status);
+            return processEngineConfiguration.getBatchServiceConfiguration().getBatchService().findBatchPartsByBatchIdAndStatus(batchId, status);
         } else {
-            return CommandContextUtil.getBatchService(commandContext).findBatchPartsByBatchId(batchId);
+            return processEngineConfiguration.getBatchServiceConfiguration().getBatchService().findBatchPartsByBatchId(batchId);
         }
     }
 }

@@ -155,4 +155,18 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
         return null;
     }
 
+    @Override
+    public String getReferenceId() {
+        return null;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return null;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return null;
+    }
 }

@@ -12,8 +12,7 @@
  */
 package org.flowable.dmn.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CollectionsRegressionTest extends AbstractConverterTest {
 
@@ -46,24 +45,24 @@ public class CollectionsRegressionTest extends AbstractConverterTest {
 
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
-        assertEquals(1, decisions.size());
+        assertThat(decisions).hasSize(1);
 
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable);
+        assertThat(decisionTable).isNotNull();
 
         List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(2, inputClauses.size());
+        assertThat(inputClauses).hasSize(2);
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(1, outputClauses.size());
+        assertThat(outputClauses).hasSize(1);
 
-        assertEquals("ALL OF", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("\"VAL1\", \"VAL2\"", decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("IS NOT IN", decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("10, 20", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("ALL OF", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("\"VAL1\", \"VAL2\"", decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("IS IN", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("10, 20", decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("ALL OF");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("\"VAL1\", \"VAL2\"");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(1).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("IS NOT IN");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("10, 20");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("ALL OF");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("\"VAL1\", \"VAL2\"");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("IS IN");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(1).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("10, 20");
     }
 }

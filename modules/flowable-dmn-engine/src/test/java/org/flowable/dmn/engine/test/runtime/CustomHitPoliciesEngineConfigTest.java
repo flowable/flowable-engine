@@ -12,11 +12,12 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,7 +44,7 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule1.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        Assert.assertEquals(1, dmnEngineConfiguration.getHitPolicyBehaviors().size());
+        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(1);
     }
 
     @Test
@@ -51,9 +52,9 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule2.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        Assert.assertEquals(7, dmnEngineConfiguration.getHitPolicyBehaviors().size());
+        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(7);
         AbstractHitPolicy overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
-        Assert.assertEquals("CUSTOM_HIT_POLICY", overwrittenHitPolicyBehavior.getHitPolicyName());
+        assertThat(overwrittenHitPolicyBehavior.getHitPolicyName()).isEqualTo("CUSTOM_HIT_POLICY");
     }
 
     @Test
@@ -61,8 +62,9 @@ public class CustomHitPoliciesEngineConfigTest {
         DmnEngine dmnEngine = flowableDmnRule3.getDmnEngine();
         DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-        Assert.assertEquals(8, dmnEngineConfiguration.getHitPolicyBehaviors().size());
-        Assert.assertTrue(dmnEngineConfiguration.getHitPolicyBehaviors().containsKey("CUSTOM_HIT_POLICY"));
+        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors())
+                .hasSize(8)
+                .containsKey("CUSTOM_HIT_POLICY");
     }
 
 }

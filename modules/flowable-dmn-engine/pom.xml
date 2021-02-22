@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>6.6.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -35,6 +35,10 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-xml-converter</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-dmn-image-generator</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common-api</artifactId>
@@ -124,8 +128,19 @@
 			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.json-unit</groupId>
+			<artifactId>json-unit-assertj</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
     <build>
 		<plugins>
@@ -228,26 +243,6 @@
             </build>
         </profile>
 		<profile>
-			<id>distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>cleanDb</id>
 			<build>
 				<plugins>
@@ -323,6 +318,58 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <profile>
+            <id>databasemssqldmn</id>
+            <activation>
+                <property>
+                    <name>databasemssqldmn</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable dmn configuration to db ${databasemssqldmn}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.dmn.cfg.xml"
+                                            tofile="target/test-classes/flowable.dmn.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqldmn}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqldmn}" />
+                                        <java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>databasewithschemadmn</id>
@@ -386,7 +433,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
+					<groupId>com.oracle.database.jdbc</groupId>
 					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
@@ -403,7 +450,7 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
+					<groupId>com.oracle.database.jdbc</groupId>
 					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
@@ -431,7 +478,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databasedmn</name>
+					<name>databasemssqldmn</name>
 					<value>mssql</value>
 				</property>
 			</activation>

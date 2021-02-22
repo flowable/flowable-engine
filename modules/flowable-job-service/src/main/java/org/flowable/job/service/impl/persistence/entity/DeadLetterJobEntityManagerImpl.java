@@ -16,6 +16,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -25,47 +26,54 @@ import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataMa
 /**
  * @author Tijs Rademakers
  */
-public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLetterJobEntity> implements DeadLetterJobEntityManager {
-
-    protected DeadLetterJobDataManager jobDataManager;
+public class DeadLetterJobEntityManagerImpl
+        extends AbstractJobServiceEngineEntityManager<DeadLetterJobEntity, DeadLetterJobDataManager>
+        implements DeadLetterJobEntityManager {
 
     public DeadLetterJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, DeadLetterJobDataManager jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
+    }
+
+    @Override
+    public DeadLetterJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String id) {
-        return jobDataManager.findJobsByExecutionId(id);
+        return dataManager.findJobsByExecutionId(id);
     }
     
     @Override
     public List<DeadLetterJobEntity> findJobsByProcessInstanceId(String id) {
-        return jobDataManager.findJobsByProcessInstanceId(id);
+        return dataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override
     public void insert(DeadLetterJobEntity jobEntity, boolean fireCreateEvent) {
-        if (getJobServiceConfiguration().getInternalJobManager() != null) {
-            getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (getServiceConfiguration().getInternalJobManager() != null) {
+            getServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
         }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getServiceConfiguration().getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
     }
 
@@ -81,16 +89,24 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        if (getJobServiceConfiguration().getInternalJobManager() != null) {
-            getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
+        // If the job used to be a history job, the configuration contains the id of the byte array containing the history json
+        // (because deadletter jobs don't have an advanced configuration column)
+        if (HistoryJobEntity.HISTORY_JOB_TYPE.equals(jobEntity.getJobType()) && jobEntity.getJobHandlerConfiguration() != null) {
+            // To avoid duplicating the byteArrayEntityManager lookup, a (fake) ByteArrayRef is created.
+            new ByteArrayRef(jobEntity.getJobHandlerConfiguration(), serviceConfiguration.getCommandExecutor()).delete(serviceConfiguration.getEngineName());
+        }
+
+        if (getServiceConfiguration().getInternalJobManager() != null) {
+            getServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
         }
 
         // Send event
         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.ENTITY_DELETED, jobEntity), engineType);
         }
     }
-    
+
     protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
@@ -114,12 +130,4 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         return newJobEntity;
     }
 
-    @Override
-    protected DeadLetterJobDataManager getDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(DeadLetterJobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-    }
 }

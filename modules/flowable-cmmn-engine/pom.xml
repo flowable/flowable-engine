@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.5.0-SNAPSHOT</version>
+        <version>6.6.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -53,6 +53,14 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-eventsubscription-service</artifactId>
         </dependency>
         <dependency>
@@ -78,6 +86,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-content-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-http-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -125,13 +137,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -172,6 +184,16 @@
         <dependency>
             <groupId>org.subethamail</groupId>
             <artifactId>subethasmtp-wiser</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -386,6 +408,63 @@
                 </plugins>
             </build>
         </profile>
+        
+        <profile>
+            <id>databasemssql</id>
+            <activation>
+                <property>
+                    <name>databasemssql</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to db ${databasemssql}" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/flowable.mssql.cmmn.cfg.xml"
+                                            tofile="target/test-classes/flowable.cmmn.cfg.xml"
+                                            overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasemssql}" />
+                                        <java
+                                            classname="org.flowable.cmmn.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
         <profile>
             <id>databasewithschema</id>
@@ -453,7 +532,7 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
+                    <groupId>com.oracle.database.jdbc</groupId>
                     <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
@@ -470,7 +549,7 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
+                    <groupId>com.oracle.database.jdbc</groupId>
                     <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
@@ -487,7 +566,7 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
+                    <groupId>com.oracle.database.jdbc</groupId>
                     <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
@@ -551,25 +630,53 @@
         </profile>
 
         <profile>
-            <id>distro</id>
+            <id>cfghistoryasync</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.4</version>
                         <executions>
                             <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
                                 <goals>
-                                    <goal>jar-no-fork</goal>
+                                    <goal>run</goal>
                                 </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                                message="updating flowable configuration flowable.cmmn.cfg.xml to qa/cfg/historyasync.flowable.cmmn.cfg.xml" />
+                                        <copy
+                                                file="${basedir}/../../qa/cfg/historyasync.flowable.cmmn.cfg.xml"
+                                                tofile="target/test-classes/flowable.cmmn.cfg.xml"
+                                                overwrite="true" />
+                                    </tasks>
+                                </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/AsyncCmmnHistoryTest.java</exclude>
+                                <exclude>**/CacheTaskTest.java</exclude>
+                                <exclude>**/PlanItemInjectionTest.java</exclude>
+                                <exclude>**/CmmnStandaloneTaskBuilderTest.java</exclude>
+
+                                <!-- Needs investigation -->
+                                <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>
+                                <exclude>**/CmmnHistoryServiceTaskLogTest.java</exclude>
+
+                            </excludes>
+                            <argLine>${argLine} -Xmx4g</argLine>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
+
     </profiles>
 
 </project>

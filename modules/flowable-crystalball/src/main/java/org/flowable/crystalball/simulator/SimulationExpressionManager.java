@@ -17,8 +17,6 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.flowable.common.engine.api.variable.VariableContainer;
-import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.PropertyNotWritableException;
@@ -26,7 +24,7 @@ import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 
 /**
- * {@link org.flowable.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
+ * {@link org.flowable.common.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
  *
  * @author martin.grofcik
  */
@@ -34,25 +32,12 @@ public class SimulationExpressionManager extends ProcessExpressionManager {
 
     public SimulationExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans) {
         super(delegateInterceptor, beans);
-    }
-    
-    @Override
-    protected ELResolver createElResolver(VariableContainer variableContainer) {
-        CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new SimulationScopeElResolver(variableContainer));
-        compositeElResolver.add(super.createElResolver(variableContainer));
-        return compositeElResolver;
+        addPreDefaultResolver(new SimulationScopeElResolver());
     }
 
     private class SimulationScopeElResolver extends ELResolver {
 
         public static final String EVENT_CALENDAR_KEY = "eventCalendar";
-
-        protected VariableContainer variableContainer;
-
-        public SimulationScopeElResolver(VariableContainer variableContainer) {
-            this.variableContainer = variableContainer;
-        }
 
         @Override
         public Object getValue(ELContext context, Object base, Object property) {

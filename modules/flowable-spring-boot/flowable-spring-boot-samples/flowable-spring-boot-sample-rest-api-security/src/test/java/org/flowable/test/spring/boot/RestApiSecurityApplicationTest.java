@@ -12,7 +12,13 @@
  */
 package org.flowable.test.spring.boot;
 
-import flowable.Application;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.io.IOException;
+import java.util.Base64;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.common.rest.api.DataResponse;
@@ -21,9 +27,8 @@ import org.flowable.dmn.rest.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,23 +42,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
-import java.io.IOException;
-import java.util.Base64;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import flowable.Application;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebClient(registerRestTemplate = true)
 public class RestApiSecurityApplicationTest {
@@ -67,34 +64,22 @@ public class RestApiSecurityApplicationTest {
     @LocalServerPort
     private int serverPort;
 
-    @After
+    @AfterEach
     public void tearDown() {
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
     }
 
     @Test
     public void userDetailsService() {
-        assertThat(userDetailsService.loadUserByUsername("jlong"))
-            .as("jlong user")
-            .isNotNull()
-            .satisfies(user -> {
-                assertThat(user.getAuthorities())
-                    .as("jlong authorities")
-                    .hasSize(1)
-                    .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("user-privilege");
-            });
+        assertThat(userDetailsService.loadUserByUsername("jlong").getAuthorities())
+                .as("jlong user's authorities")
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactly("user-privilege");
 
-        assertThat(userDetailsService.loadUserByUsername("jbarrez"))
-            .as("jbarrez user")
-            .isNotNull()
-            .satisfies(user -> {
-                assertThat(user.getAuthorities())
-                    .as("jbarrez authorities")
-                    .hasSize(2)
-                    .extracting(GrantedAuthority::getAuthority)
-                    .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
-            });
+        assertThat(userDetailsService.loadUserByUsername("jbarrez").getAuthorities())
+                .as("jbarrez user's authorities")
+                .extracting(GrantedAuthority::getAuthority)
+                .containsExactlyInAnyOrder("user-privilege", "admin-privilege");
     }
 
     @Test
@@ -121,7 +106,7 @@ public class RestApiSecurityApplicationTest {
         latch401.await(500, TimeUnit.MILLISECONDS);
         assertThat(latch401.getCount())
             .as("401 Latch")
-            .isEqualTo(0);
+            .isZero();
     }
 
     @Test
@@ -181,7 +166,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(contentItems).isNotNull();
         assertThat(contentItems.getData())
             .isEmpty();
-        assertThat(contentItems.getTotal()).isEqualTo(0);
+        assertThat(contentItems.getTotal()).isZero();
     }
     @Test
     public void testDmnRestApiIntegrationWithAuthentication() {
@@ -199,7 +184,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(deployments).isNotNull();
         assertThat(deployments.getData())
             .isEmpty();
-        assertThat(deployments.getTotal()).isEqualTo(0);
+        assertThat(deployments.getTotal()).isZero();
     }
     @Test
     public void testFormRestApiIntegrationWithAuthentication() {
@@ -217,7 +202,7 @@ public class RestApiSecurityApplicationTest {
         assertThat(formDefinitions).isNotNull();
         assertThat(formDefinitions.getData())
             .isEmpty();
-        assertThat(formDefinitions.getTotal()).isEqualTo(0);
+        assertThat(formDefinitions.getTotal()).isZero();
     }
     @Test
     public void testIdmRestApiIntegrationWithAuthentication() {
@@ -244,11 +229,11 @@ public class RestApiSecurityApplicationTest {
 
     protected static HttpHeaders createHeaders(String username, String password) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, base64Auhentication(username, password));
+        headers.set(HttpHeaders.AUTHORIZATION, base64Authentication(username, password));
         return headers;
     }
 
-    protected static String base64Auhentication(String username, String password) {
+    protected static String base64Authentication(String username, String password) {
         String auth = username + ":" + password;
         return "Basic " + Base64.getEncoder().encodeToString(auth.getBytes());
     }

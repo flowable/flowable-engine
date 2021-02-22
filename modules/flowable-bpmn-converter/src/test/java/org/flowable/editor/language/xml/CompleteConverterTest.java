@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
@@ -23,53 +21,32 @@ import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class CompleteConverterTest extends AbstractConverterTest {
+class CompleteConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "completemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("completemodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("userTask1", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(UserTask.class);
+        assertThat(flowElement.getId()).isEqualTo("userTask1");
 
         flowElement = model.getMainProcess().getFlowElement("catchsignal");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof IntermediateCatchEvent);
-        assertEquals("catchsignal", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(IntermediateCatchEvent.class);
+        assertThat(flowElement.getId()).isEqualTo("catchsignal");
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertEquals(1, catchEvent.getEventDefinitions().size());
-        assertTrue(catchEvent.getEventDefinitions().get(0) instanceof SignalEventDefinition);
+        assertThat(catchEvent.getEventDefinitions()).hasSize(1);
+        assertThat(catchEvent.getEventDefinitions().get(0)).isInstanceOf(SignalEventDefinition.class);
         SignalEventDefinition signalEvent = (SignalEventDefinition) catchEvent.getEventDefinitions().get(0);
-        assertEquals("testSignal", signalEvent.getSignalRef());
+        assertThat(signalEvent.getSignalRef()).isEqualTo("testSignal");
 
         flowElement = model.getMainProcess().getFlowElement("subprocess");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(SubProcess.class);
+        assertThat(flowElement.getId()).isEqualTo("subprocess");
         SubProcess subProcess = (SubProcess) flowElement;
 
         flowElement = subProcess.getFlowElement("receiveTask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ReceiveTask);
-        assertEquals("receiveTask", flowElement.getId());
+        assertThat(flowElement).isInstanceOf(ReceiveTask.class);
+        assertThat(flowElement.getId()).isEqualTo("receiveTask");
     }
 }

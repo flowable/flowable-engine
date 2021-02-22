@@ -18,11 +18,14 @@ import java.util.Map;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Joram Barrez
  */
 public interface HistoricActivityInstanceEntityManager extends EntityManager<HistoricActivityInstanceEntity> {
+
+    HistoricActivityInstanceEntity create(ActivityInstance activityInstance);
 
     List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
     

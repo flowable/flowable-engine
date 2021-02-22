@@ -13,22 +13,38 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
+import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
+import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -39,6 +55,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.servicetask.ValueBean;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.JobInfo;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -67,21 +84,21 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey(processDefinitionKey, CollectionUtil.singletonMap("nrOfLoops", 3)).getId();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-        assertEquals("kermit_0", task.getAssignee());
+        assertThat(task.getName()).isEqualTo("My Task");
+        assertThat(task.getAssignee()).isEqualTo("kermit_0");
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-        assertEquals("kermit_1", task.getAssignee());
+        assertThat(task.getName()).isEqualTo("My Task");
+        assertThat(task.getAssignee()).isEqualTo("kermit_1");
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-        assertEquals("kermit_2", task.getAssignee());
+        assertThat(task.getName()).isEqualTo("My Task");
+        assertThat(task.getAssignee()).isEqualTo("kermit_2");
         taskService.complete(task.getId());
 
-        assertNull(taskService.createTaskQuery().singleResult());
+        assertThat(taskService.createTaskQuery().singleResult()).isNull();
         assertProcessEnded(procId);
     }
 
@@ -97,21 +114,21 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
-            assertEquals(4, historicTaskInstances.size());
+            assertThat(historicTaskInstances).hasSize(4);
             for (HistoricTaskInstance ht : historicTaskInstances) {
-                assertNotNull(ht.getAssignee());
-                assertNotNull(ht.getStartTime());
-                assertNotNull(ht.getEndTime());
+                assertThat(ht.getAssignee()).isNotNull();
+                assertThat(ht.getStartTime()).isNotNull();
+                assertThat(ht.getEndTime()).isNotNull();
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
-            assertEquals(4, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(4);
             for (HistoricActivityInstance hai : historicActivityInstances) {
-                assertNotNull(hai.getActivityId());
-                assertNotNull(hai.getActivityName());
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
-                assertNotNull(hai.getAssignee());
+                assertThat(hai.getActivityId()).isNotNull();
+                assertThat(hai.getActivityName()).isNotNull();
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
+                assertThat(hai.getAssignee()).isNotNull();
             }
 
         }
@@ -131,7 +148,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
         assertProcessEnded(procId);
     }
@@ -146,7 +163,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             taskService.complete(task.getId());
         }
-        assertNull(taskService.createTaskQuery().singleResult());
+        assertThat(taskService.createTaskQuery().singleResult()).isNull();
         assertProcessEnded(procId);
     }
 
@@ -157,7 +174,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         for (int i = 0; i < 3; i++) {
             org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
-            assertEquals("My Task", task.getName());
+            assertThat(task.getName()).isEqualTo("My Task");
             taskService.complete(task.getId());
         }
 
@@ -170,10 +187,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasks").getId();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
-        assertEquals("My Task 0", tasks.get(0).getName());
-        assertEquals("My Task 1", tasks.get(1).getName());
-        assertEquals("My Task 2", tasks.get(2).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("My Task 0", "My Task 1", "My Task 2");
 
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
@@ -186,9 +202,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelUserTasksHistory() {
         runtimeService.startProcessInstanceByKey("miParallelUserTasks");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
         for (int i = 0; i < tasks.size(); i++) {
-            assertEquals("My Task " + i, tasks.get(i).getName());
+            assertThat(tasks.get(i).getName()).isEqualTo("My Task " + i);
             taskService.complete(tasks.get(i).getId());
         }
 
@@ -197,19 +213,19 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().orderByTaskAssignee().asc().list();
             for (int i = 0; i < historicTaskInstances.size(); i++) {
                 HistoricTaskInstance hi = historicTaskInstances.get(i);
-                assertNotNull(hi.getStartTime());
-                assertNotNull(hi.getEndTime());
-                assertEquals("My Task " + i, hi.getName());
-                assertEquals("kermit_" + i, hi.getAssignee());
+                assertThat(hi.getStartTime()).isNotNull();
+                assertThat(hi.getEndTime()).isNotNull();
+                assertThat(hi.getName()).isEqualTo("My Task " + i);
+                assertThat(hi.getAssignee()).isEqualTo("kermit_" + i);
             }
 
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
-            assertEquals(3, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(3);
             for (HistoricActivityInstance hai : historicActivityInstances) {
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
-                assertNotNull(hai.getAssignee());
-                assertEquals("userTask", hai.getActivityType());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
+                assertThat(hai.getAssignee()).isNotNull();
+                assertThat(hai.getActivityType()).isEqualTo("userTask");
             }
         }
     }
@@ -228,7 +244,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
         assertProcessEnded(procId);
     }
@@ -238,12 +254,12 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelUserTasksCompletionCondition() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksCompletionCondition").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(5, tasks.size());
+        assertThat(tasks).hasSize(5);
 
         // Completing 3 tasks gives 50% of tasks completed, which triggers
         // completionCondition
         for (int i = 0; i < 3; i++) {
-            assertEquals(5 - i, taskService.createTaskQuery().count());
+            assertThat(taskService.createTaskQuery().count()).isEqualTo(5 - i);
             taskService.complete(tasks.get(i).getId());
         }
         assertProcessEnded(procId);
@@ -256,18 +272,15 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection", CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
-        assertEquals(5, tasks.size());
-        assertEquals("bubba", tasks.get(0).getAssignee());
-        assertEquals("fozzie", tasks.get(1).getAssignee());
-        assertEquals("gonzo", tasks.get(2).getAssignee());
-        assertEquals("kermit", tasks.get(3).getAssignee());
-        assertEquals("mispiggy", tasks.get(4).getAssignee());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsExactly("bubba", "fozzie", "gonzo", "kermit", "mispiggy");
 
         // Completing 3 tasks will trigger completioncondition
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         taskService.complete(tasks.get(2).getId());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isZero();
         assertProcessEnded(procId);
     }
 
@@ -281,23 +294,25 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
 
         List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
-        assertEquals(1, tasks.size());
-        assertEquals("My Task 0", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("My Task 0");
 
         tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
-        assertEquals(1, tasks.size());
-        assertEquals("My Task 1", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("My Task 1");
 
         // should be 2 tasks total
         tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("My Task 0", tasks.get(0).getName());
-        assertEquals("My Task 1", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("My Task 0", "My Task 1");
 
         // Completing 3 tasks will trigger completion condition
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isZero();
         assertProcessEnded(processInstance.getProcessInstanceId());
     }
 
@@ -371,21 +386,20 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(3, tasks.size());
-        assertEquals("My Task 0", tasks.get(0).getName());
-        assertEquals("My Task 1", tasks.get(1).getName());
-        assertEquals("My Task 2", tasks.get(2).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("My Task 0", "My Task 1", "My Task 2");
 
         tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
-        assertEquals("fozzie", tasks.get(0).getAssignee());
-        assertEquals("gonzo", tasks.get(1).getAssignee());
-        assertEquals("kermit", tasks.get(2).getAssignee());
+        assertThat(tasks)
+                .extracting(Task::getAssignee)
+                .containsExactly("fozzie", "gonzo", "kermit");
 
         // Completing 3 tasks will trigger completion condition
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         taskService.complete(tasks.get(2).getId());
-        assertEquals(0, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isZero();
         assertProcessEnded(processInstance.getProcessInstanceId());
     }
 
@@ -399,10 +413,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         }
 
         Execution waitState = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertNotNull(waitState);
+        assertThat(waitState).isNotNull();
 
-        assertEquals(3, runtimeService.getVariable(processInstance.getId(), "taskListenerCounter"));
-        assertEquals(3, runtimeService.getVariable(processInstance.getId(), "executionListenerCounter"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "taskListenerCounter")).isEqualTo(3);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "executionListenerCounter")).isEqualTo(3);
 
         runtimeService.trigger(waitState.getId());
         assertProcessEnded(processInstance.getId());
@@ -419,14 +433,14 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("countersignAssigneeList", countersigns);
         vars.put("approveResult", "notpass");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
                         processEngineConfiguration.getManagementService(), 7000, 200);
 
         List<Task> tasks = taskService.createTaskQuery().list();
         for (Task task : tasks){
-            assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+            assertThat(taskService.getVariable(task.getId(), "csAssignee")).isEqualTo(task.getAssignee());
             taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
             taskService.complete(task.getId());
             
@@ -448,13 +462,13 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("countersignAssigneeList", countersigns);
         vars.put("approveResult", "notpass");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
                         processEngineConfiguration.getManagementService(), 7000, 200);
 
         Task task = taskService.createTaskQuery().singleResult();
-        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        assertThat(taskService.getVariable(task.getId(), "csAssignee")).isEqualTo(task.getAssignee());
         taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
         taskService.complete(task.getId());
         
@@ -462,7 +476,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                         processEngineConfiguration.getManagementService(), 7000, 200);
         
         task = taskService.createTaskQuery().singleResult();
-        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        assertThat(taskService.getVariable(task.getId(), "csAssignee")).isEqualTo(task.getAssignee());
         taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
         taskService.complete(task.getId());
         
@@ -470,7 +484,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                         processEngineConfiguration.getManagementService(), 7000, 200);
         
         task = taskService.createTaskQuery().singleResult();
-        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        assertThat(taskService.getVariable(task.getId(), "csAssignee")).isEqualTo(task.getAssignee());
         taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
         taskService.complete(task.getId());
         
@@ -487,7 +501,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
         for (org.flowable.task.api.Task task : tasks) {
-            assertEquals("My Task", task.getName());
+            assertThat(task.getName()).isEqualTo("My Task");
             taskService.complete(task.getId());
         }
 
@@ -502,7 +516,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("nrOfLoops", 5);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialScriptTask", vars);
         int sum = (Integer) runtimeService.getVariable(processInstance.getId(), "sum");
-        assertEquals(10, sum);
+        assertThat(sum).isEqualTo(10);
     }
 
     @Test
@@ -516,13 +530,13 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         // Validate history
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").orderByActivityId().asc().list();
-            assertEquals(7, historicInstances.size());
+            assertThat(historicInstances).hasSize(7);
             for (int i = 0; i < 7; i++) {
                 HistoricActivityInstance hai = historicInstances.get(i);
                 assertActivityInstancesAreSame(hai, runtimeService.createActivityInstanceQuery().activityInstanceId(hai.getId()).singleResult());
-                assertEquals("scriptTask", hai.getActivityType());
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getActivityType()).isEqualTo("scriptTask");
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
         }
     }
@@ -532,7 +546,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testSequentialScriptTasksCompletionCondition() {
         runtimeService.startProcessInstanceByKey("miSequentialScriptTaskCompletionCondition").getId();
         List<Execution> executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Execution processInstanceExecution = null;
         Execution waitStateExecution = null;
         for (Execution execution : executions) {
@@ -542,10 +556,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 waitStateExecution = execution;
             }
         }
-        assertNotNull(processInstanceExecution);
-        assertNotNull(waitStateExecution);
+        assertThat(processInstanceExecution).isNotNull();
+        assertThat(waitStateExecution).isNotNull();
         int sum = (Integer) runtimeService.getVariable(waitStateExecution.getId(), "sum");
-        assertEquals(5, sum);
+        assertThat(sum).isEqualTo(5);
     }
 
     @Test
@@ -556,7 +570,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("nrOfLoops", 10);
         runtimeService.startProcessInstanceByKey("miParallelScriptTask", vars);
         List<Execution> executions = runtimeService.createExecutionQuery().list();
-        assertEquals(2, executions.size());
+        assertThat(executions).hasSize(2);
         Execution processInstanceExecution = null;
         Execution waitStateExecution = null;
         for (Execution execution : executions) {
@@ -566,10 +580,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 waitStateExecution = execution;
             }
         }
-        assertNotNull(processInstanceExecution);
-        assertNotNull(waitStateExecution);
+        assertThat(processInstanceExecution).isNotNull();
+        assertThat(waitStateExecution).isNotNull();
         int sum = (Integer) runtimeService.getVariable(waitStateExecution.getId(), "sum");
-        assertEquals(45, sum);
+        assertThat(sum).isEqualTo(45);
     }
 
     @Test
@@ -582,12 +596,98 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
-            assertEquals(4, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(4);
             for (HistoricActivityInstance hai : historicActivityInstances) {
                 assertActivityInstancesAreSame(hai, runtimeService.createActivityInstanceQuery().activityInstanceId(hai.getId()).singleResult());
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testParallelAsyncScriptTasks() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("miParallelAsyncScriptTask")
+                .variable("nrOfLoops", 10)
+                .start();
+        List<Job> jobs = managementService.createJobQuery().list();
+        // There are 10 jobs for each async execution
+        assertThat(jobs).hasSize(10);
+
+        // When a job fails it is moved to the timer jobs, so it can be executed later
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000000, 200);
+        jobs = managementService.createJobQuery().list();
+        assertThat(jobs).isEmpty();
+        List<Job> timerJobs = managementService.createTimerJobQuery().list();
+        assertThat(timerJobs).isEmpty();
+
+        List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
+        assertThat(deadLetterJobs).isEmpty();
+
+
+        List<Execution> executions = runtimeService.createExecutionQuery().list();
+        assertThat(executions).hasSize(2);
+        Execution processInstanceExecution = null;
+        Execution waitStateExecution = null;
+        for (Execution execution : executions) {
+            if (execution.getId().equals(execution.getProcessInstanceId())) {
+                processInstanceExecution = execution;
+            } else {
+                waitStateExecution = execution;
+            }
+        }
+        assertThat(processInstanceExecution).isNotNull();
+        assertThat(waitStateExecution).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelAsyncScriptTasks.bpmn20.xml")
+    public void testParallelAsyncScriptTasksWithoutAsyncLeave() {
+        boolean originalAsyncLeave = processEngineConfiguration.isParallelMultiInstanceAsyncLeave();
+        processEngineConfiguration.setParallelMultiInstanceAsyncLeave(false);
+        try {
+
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("miParallelAsyncScriptTask")
+                    .variable("nrOfLoops", 10)
+                    .start();
+            List<Job> jobs = managementService.createJobQuery().list();
+            // There are 10 jobs for each async execution
+            assertThat(jobs).hasSize(10);
+
+            // When a job fails it is moved to the timer jobs, so it can be executed later
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000, 200);
+            jobs = managementService.createJobQuery().list();
+            assertThat(jobs).isEmpty();
+            List<Job> timerJobs = managementService.createTimerJobQuery().list();
+            assertThat(timerJobs)
+                    .isNotEmpty()
+                    .extracting(JobInfo::getExceptionMessage)
+                    .allSatisfy(message -> {
+                        assertThat(message)
+                                .contains("was updated by another transaction concurrently");
+                    });
+
+            List<String> timerJobsExceptionStacktraces = timerJobs.stream()
+                    .map(JobInfo::getId)
+                    .map(managementService::getTimerJobExceptionStacktrace)
+                    .collect(Collectors.toList());
+            assertThat(timerJobsExceptionStacktraces)
+                    .allSatisfy(stacktrace -> {
+                        assertThat(stacktrace).contains("FlowableOptimisticLockingException");
+                    });
+
+            List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
+            assertThat(deadLetterJobs).isEmpty();
+
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSizeGreaterThan(timerJobs.size());
+            Execution waitStateExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
+            assertThat(waitStateExecution).isNull();
+        } finally {
+            processEngineConfiguration.setParallelMultiInstanceAsyncLeave(originalAsyncLeave);
         }
     }
 
@@ -596,9 +696,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelScriptTasksCompletionCondition() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelScriptTaskCompletionCondition");
         Execution waitStateExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertNotNull(waitStateExecution);
+        assertThat(waitStateExecution).isNotNull();
         int sum = (Integer) runtimeService.getVariable(processInstance.getId(), "sum");
-        assertEquals(2, sum);
+        assertThat(sum).isEqualTo(2);
         runtimeService.trigger(waitStateExecution.getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -609,7 +709,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("miParallelScriptTaskCompletionCondition");
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("scriptTask").list();
-            assertEquals(2, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(2);
         }
     }
 
@@ -621,18 +721,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         for (int i = 0; i < 4; i++) {
             List<org.flowable.task.api.Task> tasks = query.list();
-            assertEquals(2, tasks.size());
-
-            assertEquals("task one", tasks.get(0).getName());
-            assertEquals("task two", tasks.get(1).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
 
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
 
             if (i != 3) {
                 List<String> activities = runtimeService.getActiveActivityIds(procId);
-                assertNotNull(activities);
-                assertEquals(3, activities.size());
+                assertThat(activities).hasSize(3);
             }
         }
 
@@ -648,17 +746,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         for (int i = 0; i < 4; i++) {
             List<org.flowable.task.api.Task> tasks = query.list();
-            assertEquals(1, tasks.size());
-
-            assertEquals("task one", tasks.get(0).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one");
 
             taskService.complete(tasks.get(0).getId());
 
             // Last run, the execution no longer exists
             if (i != 3) {
                 List<String> activities = runtimeService.getActiveActivityIds(procId);
-                assertNotNull(activities);
-                assertEquals(2, activities.size());
+                assertThat(activities).hasSize(2);
             }
         }
 
@@ -678,20 +775,20 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         // Validate history
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> onlySubProcessInstances = historyService.createHistoricActivityInstanceQuery().activityType("subProcess").list();
-            assertEquals(4, onlySubProcessInstances.size());
+            assertThat(onlySubProcessInstances).hasSize(4);
 
             List<HistoricActivityInstance> historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("subProcess").list();
-            assertEquals(4, historicInstances.size());
+            assertThat(historicInstances).hasSize(4);
             for (HistoricActivityInstance hai : historicInstances) {
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
 
             historicInstances = historyService.createHistoricActivityInstanceQuery().activityType("userTask").list();
-            assertEquals(8, historicInstances.size());
+            assertThat(historicInstances).hasSize(8);
             for (HistoricActivityInstance hai : historicInstances) {
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
         }
     }
@@ -703,11 +800,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         // Complete one subprocess
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
         tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         // Fire timer
         Job timer = managementService.createTimerJobQuery().singleResult();
@@ -715,7 +812,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -729,10 +826,9 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
         for (int i = 0; i < 3; i++) {
             List<org.flowable.task.api.Task> tasks = query.list();
-            assertEquals(2, tasks.size());
-
-            assertEquals("task one", tasks.get(0).getName());
-            assertEquals("task two", tasks.get(1).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
 
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
@@ -776,7 +872,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -787,7 +883,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelSubProcess() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocess").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
 
         for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
@@ -807,10 +903,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         // Validate history
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("miSubProcess").list();
-            assertEquals(2, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(2);
             for (HistoricActivityInstance hai : historicActivityInstances) {
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
         }
     }
@@ -820,7 +916,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelSubProcessWithTimer() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessWithTimer").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(6, tasks.size());
+        assertThat(tasks).hasSize(6);
 
         // Complete two tasks
         taskService.complete(tasks.get(0).getId());
@@ -832,7 +928,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -843,13 +939,13 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testParallelSubProcessCompletionCondition() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelSubprocessCompletionCondition").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
 
         List<org.flowable.task.api.Task> subProcessTasks1 = taskService.createTaskQuery().taskDefinitionKey("subProcessTask1").list();
-        assertEquals(2, subProcessTasks1.size());
+        assertThat(subProcessTasks1).hasSize(2);
 
         List<org.flowable.task.api.Task> subProcessTasks2 = taskService.createTaskQuery().taskDefinitionKey("subProcessTask2").list();
-        assertEquals(2, subProcessTasks2.size());
+        assertThat(subProcessTasks2).hasSize(2);
 
         Execution taskExecution = runtimeService.createExecutionQuery().executionId(subProcessTasks1.get(0).getExecutionId()).singleResult();
         String parentExecutionId = taskExecution.getParentId();
@@ -863,7 +959,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             }
         }
 
-        assertNotNull(subProcessTask2);
+        assertThat(subProcessTask2).isNotNull();
         taskService.complete(tasks.get(0).getId());
         taskService.complete(subProcessTask2.getId());
 
@@ -877,15 +973,15 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         for (int i = 0; i < 5; i++) {
             List<Execution> waitSubExecutions = runtimeService.createExecutionQuery().activityId("subProcessWait").list();
-            assertTrue(waitSubExecutions.size() > 0);
+            assertThat(waitSubExecutions).isNotEmpty();
             runtimeService.trigger(waitSubExecutions.get(0).getId());
         }
 
         List<Execution> waitSubExecutions = runtimeService.createExecutionQuery().activityId("subProcessWait").list();
-        assertEquals(0, waitSubExecutions.size());
+        assertThat(waitSubExecutions).isEmpty();
 
         Execution waitState = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertEquals(10, runtimeService.getVariable(waitState.getId(), "sum"));
+        assertThat(runtimeService.getVariable(waitState.getId(), "sum")).isEqualTo(10);
 
         runtimeService.trigger(waitState.getId());
         assertProcessEnded(procId);
@@ -898,15 +994,15 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         for (int i = 0; i < 6; i++) {
             List<Execution> waitSubExecutions = runtimeService.createExecutionQuery().activityId("subProcessWait").list();
-            assertTrue(waitSubExecutions.size() > 0);
+            assertThat(waitSubExecutions).isNotEmpty();
             runtimeService.trigger(waitSubExecutions.get(0).getId());
         }
 
         List<Execution> waitSubExecutions = runtimeService.createExecutionQuery().activityId("subProcessWait").list();
-        assertEquals(0, waitSubExecutions.size());
+        assertThat(waitSubExecutions).isEmpty();
 
         Execution waitState = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertEquals(12, runtimeService.getVariable(procId, "sum"));
+        assertThat(runtimeService.getVariable(procId, "sum")).isEqualTo(12);
 
         runtimeService.trigger(waitState.getId());
         assertProcessEnded(procId);
@@ -917,7 +1013,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testNestedParallelSubProcess() {
         String procId = runtimeService.startProcessInstanceByKey("miNestedParallelSubProcess").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(8, tasks.size());
+        assertThat(tasks).hasSize(8);
 
         for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
@@ -930,7 +1026,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testNestedParallelSubProcessWithTimer() {
         String procId = runtimeService.startProcessInstanceByKey("miNestedParallelSubProcess").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(12, tasks.size());
+        assertThat(tasks).hasSize(12);
 
         for (int i = 0; i < 3; i++) {
             taskService.complete(tasks.get(i).getId());
@@ -942,7 +1038,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -957,21 +1053,21 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
         for (int i = 0; i < 4; i++) {
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(2, tasks.size());
-            assertEquals("task one", tasks.get(0).getName());
-            assertEquals("task two", tasks.get(1).getName());
-            
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
+
             Map<String, Object> taskVariables = Collections.singletonMap("output", (Object) ("run" + i + 1));
             taskService.complete(tasks.get(0).getId(), taskVariables);
             taskService.complete(tasks.get(1).getId());
             
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
-            assertNotNull(task);
-            assertEquals("task", task.getTaskDefinitionKey());
+            assertThat(task).isNotNull();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
             
             ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(procId).activityId("task").singleResult();
-            assertEquals("run" + i + 1, runtimeService.getVariableLocal(execution.getId(), "output"));
-            assertNull(runtimeService.getVariable(procId, "output"));
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "output")).isEqualTo("run" + i + 1);
+            assertThat(runtimeService.getVariable(procId, "output")).isNull();
             
             taskService.complete(task.getId());
         }
@@ -988,21 +1084,21 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         
         for (int i = 0; i < 4; i++) {
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(2, tasks.size());
-            assertEquals("task one", tasks.get(0).getName());
-            assertEquals("task two", tasks.get(1).getName());
-            
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
+
             Map<String, Object> taskVariables = Collections.singletonMap("output", (Object) ("run" + i + 1));
             taskService.complete(tasks.get(0).getId(), taskVariables);
             taskService.complete(tasks.get(1).getId());
             
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(procId).singleResult();
-            assertNotNull(task);
-            assertEquals("task", task.getTaskDefinitionKey());
+            assertThat(task).isNotNull();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
             
             ExecutionEntity execution = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(procId).activityId("task").singleResult();
-            assertNull(runtimeService.getVariableLocal(execution.getId(), "output"));
-            assertEquals("run" + i + 1, runtimeService.getVariable(procId, "output"));
+            assertThat(runtimeService.getVariableLocal(execution.getId(), "output")).isNull();
+            assertThat(runtimeService.getVariable(procId, "output")).isEqualTo("run" + i + 1);
             
             taskService.complete(task.getId());
         }
@@ -1013,20 +1109,20 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
     "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
-public void testSequentialCallActivity() {
-String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
+    public void testSequentialCallActivity() {
+        String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
 
-for (int i = 0; i < 3; i++) {
-    List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-    assertEquals(2, tasks.size());
-    assertEquals("task one", tasks.get(0).getName());
-    assertEquals("task two", tasks.get(1).getName());
-    taskService.complete(tasks.get(0).getId());
-    taskService.complete(tasks.get(1).getId());
-}
+        for (int i = 0; i < 3; i++) {
+            List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
+            taskService.complete(tasks.get(0).getId());
+            taskService.complete(tasks.get(1).getId());
+        }
 
-assertProcessEnded(procId);
-}
+        assertProcessEnded(procId);
+    }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithList.bpmn20.xml")
@@ -1043,8 +1139,8 @@ assertProcessEnded(procId);
         org.flowable.task.api.Task task1 = taskService.createTaskQuery().processVariableValueEquals("element", "one").singleResult();
         org.flowable.task.api.Task task2 = taskService.createTaskQuery().processVariableValueEquals("element", "two").singleResult();
 
-        assertNotNull(task1);
-        assertNotNull(task2);
+        assertThat(task1).isNotNull();
+        assertThat(task2).isNotNull();
 
         HashMap<String, Object> subVariables = new HashMap<>();
         subVariables.put("x", "y");
@@ -1053,11 +1149,11 @@ assertProcessEnded(procId);
         taskService.complete(task2.getId(), subVariables);
 
         org.flowable.task.api.Task task3 = taskService.createTaskQuery().processDefinitionKey("midProcess").singleResult();
-        assertNotNull(task3);
+        assertThat(task3).isNotNull();
         taskService.complete(task3.getId(), null);
 
         org.flowable.task.api.Task task4 = taskService.createTaskQuery().processDefinitionKey("parentProcess").singleResult();
-        assertNotNull(task4);
+        assertThat(task4).isNotNull();
         taskService.complete(task4.getId(), null);
 
         assertProcessEnded(procId);
@@ -1071,9 +1167,9 @@ assertProcessEnded(procId);
 
         // Complete first subprocess
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("task one", tasks.get(0).getName());
-        assertEquals("task two", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("task one", "task two");
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
 
@@ -1083,7 +1179,7 @@ assertProcessEnded(procId);
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -1095,7 +1191,7 @@ assertProcessEnded(procId);
     public void testParallelCallActivity() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelCallActivity").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(12, tasks.size());
+        assertThat(tasks).hasSize(12);
         for (int i = 0; i < tasks.size(); i++) {
             taskService.complete(tasks.get(i).getId());
         }
@@ -1109,7 +1205,7 @@ assertProcessEnded(procId);
     public void testParallelCallActivityHistory() {
         runtimeService.startProcessInstanceByKey("miParallelCallActivity");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(12, tasks.size());
+        assertThat(tasks).hasSize(12);
         for (int i = 0; i < tasks.size(); i++) {
             taskService.complete(tasks.get(i).getId());
         }
@@ -1117,29 +1213,29 @@ assertProcessEnded(procId);
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // Validate historic processes
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-            assertEquals(7, historicProcessInstances.size()); // 6 subprocesses
+            assertThat(historicProcessInstances).hasSize(7); // 6 subprocesses
                                                               // + main process
             for (HistoricProcessInstance hpi : historicProcessInstances) {
-                assertNotNull(hpi.getStartTime());
-                assertNotNull(hpi.getEndTime());
+                assertThat(hpi.getStartTime()).isNotNull();
+                assertThat(hpi.getEndTime()).isNotNull();
             }
 
             // Validate historic tasks
             List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
-            assertEquals(12, historicTaskInstances.size());
+            assertThat(historicTaskInstances).hasSize(12);
             for (HistoricTaskInstance hti : historicTaskInstances) {
-                assertNotNull(hti.getStartTime());
-                assertNotNull(hti.getEndTime());
-                assertNotNull(hti.getAssignee());
-                assertNull(hti.getDeleteReason());
+                assertThat(hti.getStartTime()).isNotNull();
+                assertThat(hti.getEndTime()).isNotNull();
+                assertThat(hti.getAssignee()).isNotNull();
+                assertThat(hti.getDeleteReason()).isNull();
             }
 
             // Validate historic activities
             List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityType("callActivity").list();
-            assertEquals(6, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(6);
             for (HistoricActivityInstance hai : historicActivityInstances) {
-                assertNotNull(hai.getStartTime());
-                assertNotNull(hai.getEndTime());
+                assertThat(hai.getStartTime()).isNotNull();
+                assertThat(hai.getEndTime()).isNotNull();
             }
         }
     }
@@ -1150,7 +1246,7 @@ assertProcessEnded(procId);
     public void testParallelCallActivityWithTimer() {
         String procId = runtimeService.startProcessInstanceByKey("miParallelCallActivity").getId();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(6, tasks.size());
+        assertThat(tasks).hasSize(6);
         for (int i = 0; i < 2; i++) {
             taskService.complete(tasks.get(i).getId());
         }
@@ -1161,7 +1257,7 @@ assertProcessEnded(procId);
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -1175,9 +1271,9 @@ assertProcessEnded(procId);
 
         for (int i = 0; i < 4; i++) {
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-            assertEquals(2, tasks.size());
-            assertEquals("task one", tasks.get(0).getName());
-            assertEquals("task two", tasks.get(1).getName());
+            assertThat(tasks)
+                    .extracting(Task::getName)
+                    .containsExactly("task one", "task two");
             taskService.complete(tasks.get(0).getId());
             taskService.complete(tasks.get(1).getId());
         }
@@ -1193,15 +1289,15 @@ assertProcessEnded(procId);
 
         // first instance
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
-        assertEquals(2, tasks.size());
-        assertEquals("task one", tasks.get(0).getName());
-        assertEquals("task two", tasks.get(1).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("task one", "task two");
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
 
         // one task of second instance
         tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         taskService.complete(tasks.get(0).getId());
 
         // Fire timer
@@ -1210,7 +1306,7 @@ assertProcessEnded(procId);
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -1223,7 +1319,7 @@ assertProcessEnded(procId);
         String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivity").getId();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(14, tasks.size());
+        assertThat(tasks).hasSize(14);
         for (int i = 0; i < 14; i++) {
             taskService.complete(tasks.get(i).getId());
         }
@@ -1238,7 +1334,7 @@ assertProcessEnded(procId);
         String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivityWithTimer").getId();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(4, tasks.size());
+        assertThat(tasks).hasSize(4);
         for (int i = 0; i < 3; i++) {
             taskService.complete(tasks.get(i).getId());
         }
@@ -1249,7 +1345,7 @@ assertProcessEnded(procId);
         managementService.executeJob(timer.getId());
 
         org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().singleResult();
-        assertEquals("taskAfterTimer", taskAfterTimer.getTaskDefinitionKey());
+        assertThat(taskAfterTimer.getTaskDefinitionKey()).isEqualTo("taskAfterTimer");
         taskService.complete(taskAfterTimer.getId());
 
         assertProcessEnded(procId);
@@ -1261,12 +1357,12 @@ assertProcessEnded(procId);
     public void testNestedParallelCallActivityCompletionCondition() {
         String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivityCompletionCondition").getId();
 
-        assertEquals(8, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(8);
 
         for (int i = 0; i < 2; i++) {
             ProcessInstance nextSubProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("externalSubProcess").listPage(0, 1).get(0);
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(nextSubProcessInstance.getId()).list();
-            assertEquals(2, tasks.size());
+            assertThat(tasks).hasSize(2);
             for (org.flowable.task.api.Task task : tasks) {
                 taskService.complete(task.getId());
             }
@@ -1281,7 +1377,7 @@ assertProcessEnded(procId);
     public void testSequentialServiceTaskWithClass() {
         ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask", CollectionUtil.singletonMap("result", 5));
         Integer result = (Integer) runtimeService.getVariable(procInst.getId(), "result");
-        assertEquals(160, result.intValue());
+        assertThat(result.intValue()).isEqualTo(160);
 
         Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(procInst.getId()).activityId("wait").singleResult();
         runtimeService.trigger(waitExecution.getId());
@@ -1298,7 +1394,7 @@ assertProcessEnded(procId);
 
         ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask", vars);
         Integer result = (Integer) runtimeService.getVariable(procInst.getId(), "result");
-        assertEquals(720, result.intValue());
+        assertThat(result.intValue()).isEqualTo(720);
 
         Execution waitExecution = runtimeService.createExecutionQuery().processInstanceId(procInst.getId()).activityId("wait").singleResult();
         runtimeService.trigger(waitExecution.getId());
@@ -1317,7 +1413,7 @@ assertProcessEnded(procId);
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + 61000L)); // timer is set to one minute
         List<Job> timers = managementService.createTimerJobQuery().list();
-        assertEquals(5, timers.size());
+        assertThat(timers).hasSize(5);
 
         // Execute all timers one by one (single thread vs thread pool of job
         // executor, which leads to optimisticlockingexceptions!)
@@ -1328,7 +1424,7 @@ assertProcessEnded(procId);
 
         // All tasks should be canceled
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
     }
 
     @Test
@@ -1341,7 +1437,7 @@ assertProcessEnded(procId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
 
         // finish first call activity with error
         variableMap = new HashMap<>();
@@ -1349,12 +1445,12 @@ assertProcessEnded(procId);
         taskService.complete(tasks.get(0).getId(), variableMap);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         taskService.complete(tasks.get(0).getId());
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1368,7 +1464,7 @@ assertProcessEnded(procId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         // finish first call activity with error
         variableMap = new HashMap<>();
@@ -1376,12 +1472,12 @@ assertProcessEnded(procId);
         taskService.complete(tasks.get(0).getId(), variableMap);
 
         tasks = taskService.createTaskQuery().list();
-        assertEquals(1, tasks.size());
+        assertThat(tasks).hasSize(1);
 
         taskService.complete(tasks.get(0).getId());
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1390,7 +1486,7 @@ assertProcessEnded(procId);
     public void testMultiInstanceParallelReceiveTask() {
         runtimeService.startProcessInstanceByKey("multi-instance-receive");
         List<Execution> executions = runtimeService.createExecutionQuery().activityId("theReceiveTask").list();
-        assertEquals(4, executions.size());
+        assertThat(executions).hasSize(4);
 
         // Complete all four of the executions
         for (Execution execution : executions) {
@@ -1399,10 +1495,10 @@ assertProcessEnded(procId);
 
         // There is one task after the task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -1413,7 +1509,7 @@ assertProcessEnded(procId);
 
         runtimeService.startProcessInstanceByKey("multiInstanceReceiveWithTimer");
         List<Execution> executions = runtimeService.createExecutionQuery().activityId("theReceiveTask").list();
-        assertEquals(3, executions.size());
+        assertThat(executions).hasSize(3);
 
         // Signal only one execution. Then the timer will fire
         runtimeService.trigger(executions.get(1).getId());
@@ -1422,11 +1518,11 @@ assertProcessEnded(procId);
 
         // The process should now be in the task after the timer
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Task after timer", task.getName());
+        assertThat(task.getName()).isEqualTo("Task after timer");
 
         // Completing it should end the process
         taskService.complete(task.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -1434,7 +1530,7 @@ assertProcessEnded(procId);
     public void testMultiInstanceSequentialReceiveTask() {
         runtimeService.startProcessInstanceByKey("multi-instance-receive");
         Execution execution = runtimeService.createExecutionQuery().activityId("theReceiveTask").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // Complete all four of the executions
         while (execution != null) {
@@ -1444,10 +1540,10 @@ assertProcessEnded(procId);
 
         // There is one task after the task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
 
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -1462,14 +1558,14 @@ assertProcessEnded(procId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
-        assertEquals(processes.size() * assignees.size(), tasks.size());
+        assertThat(tasks).hasSize(processes.size() * assignees.size());
 
         for (org.flowable.task.api.Task t : tasks) {
             taskService.complete(t.getId(), Collections.singletonMap("assignee", "1"));
         }
 
         List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("miNestedMultiInstanceTasks").list();
-        assertEquals(0, processInstances.size());
+        assertThat(processInstances).isEmpty();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1480,9 +1576,9 @@ assertProcessEnded(procId);
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("collection", collection);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialSubProcessEmptyCollection", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1493,9 +1589,9 @@ assertProcessEnded(procId);
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("collection", collection);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1506,9 +1602,9 @@ assertProcessEnded(procId);
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("collection", collection);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -1520,9 +1616,9 @@ assertProcessEnded(procId);
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("collection", collection);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
         assertProcessEnded(processInstance.getId());
     }
 
@@ -1533,9 +1629,9 @@ assertProcessEnded(procId);
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("collection", collection);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
     }
@@ -1557,7 +1653,7 @@ assertProcessEnded(procId);
             Map<String, Object> params = new HashMap<>();
             params.put("sampleValues", Arrays.asList("eins", "zwei", "drei"));
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("infiniteLoopTest", params);
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
         } finally {
 
@@ -1576,7 +1672,7 @@ assertProcessEnded(procId);
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi", vars);
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count()).isEqualTo(1L);
         }
     }
 
@@ -1587,7 +1683,7 @@ assertProcessEnded(procId);
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi");
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count()).isEqualTo(1L);
         }
     }
 
@@ -1600,7 +1696,7 @@ assertProcessEnded(procId);
             runtimeService.startProcessInstanceByKey("sequentialMiSubprocess", vars);
 
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1L);
         }
     }
 
@@ -1614,7 +1710,7 @@ assertProcessEnded(procId);
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(1L);
         }
     }
 
@@ -1630,11 +1726,49 @@ assertProcessEnded(procId);
         variableMap.put("assignees", assignees);
         runtimeService.startProcessInstanceByKey("MultiInstanceTest", variableMap);
 
-        assertEquals(3, TestStartExecutionListener.countWithLoopCounter.get());
-        assertEquals(3, TestEndExecutionListener.countWithLoopCounter.get());
+        assertThat(TestStartExecutionListener.countWithLoopCounter.get()).isEqualTo(3);
+        assertThat(TestEndExecutionListener.countWithLoopCounter.get()).isEqualTo(3);
 
-        assertEquals(1, TestStartExecutionListener.countWithoutLoopCounter.get());
-        assertEquals(1, TestEndExecutionListener.countWithoutLoopCounter.get());
+        assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+        assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+    }
+    
+    @Deployment(resources = {
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testExecutionListenersOnMultiInstanceSubprocess.bpmn20.xml" })
+    @Test
+    public void testDispatchFlowableMultiInstanceActivityCompletedEventLoopVariables() {
+        MultiInstanceUserActivityEventListener testListener = new MultiInstanceUserActivityEventListener();
+        processEngineConfiguration.getEventDispatcher().addEventListener(testListener);
+        
+        try {
+            Map<String, Object> variableMap = new HashMap<>();
+            List<String> assignees = new ArrayList<>();
+            assignees.add("john");
+            assignees.add("jane");
+            assignees.add("matt");
+            variableMap.put("assignees", assignees);
+            runtimeService.startProcessInstanceByKey("MultiInstanceTest", variableMap);
+            
+            List<FlowableMultiInstanceActivityCompletedEvent> multiInstanceEvents = testListener.getEventsReceived().stream()
+                    .filter(event -> event instanceof FlowableMultiInstanceActivityCompletedEvent)
+                    .map(event -> (FlowableMultiInstanceActivityCompletedEvent) event).collect(Collectors.toList());
+            assertThat(multiInstanceEvents.size()).isEqualTo(1);
+            
+            Integer numberOfActiveInstances = multiInstanceEvents.stream()
+                    .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfActiveInstances).findFirst().get();
+            Integer numberOfCompletedInstances = multiInstanceEvents.stream()
+                    .map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfCompletedInstances).findFirst().get();
+            Integer numberOfInstances = multiInstanceEvents.stream().map(FlowableMultiInstanceActivityCompletedEvent::getNumberOfInstances)
+                    .findFirst().get();
+            
+            assertThat(numberOfActiveInstances).isEqualTo(0);
+            assertThat(numberOfCompletedInstances).isEqualTo(3);
+            assertThat(numberOfInstances).isEqualTo(3);
+            
+        } finally {
+            testListener.clearEventsReceived();
+            processEngineConfiguration.getEventDispatcher().removeEventListener(testListener);
+        }
     }
 
     @Test
@@ -1648,13 +1782,13 @@ assertProcessEnded(procId);
             taskService.complete(task.getId());
         }
 
-        assertEquals(4, TestTaskCompletionListener.count.get());
+        assertThat(TestTaskCompletionListener.count.get()).isEqualTo(4);
 
-        assertEquals(4, TestStartExecutionListener.countWithLoopCounter.get());
-        assertEquals(4, TestEndExecutionListener.countWithLoopCounter.get());
+        assertThat(TestStartExecutionListener.countWithLoopCounter.get()).isEqualTo(4);
+        assertThat(TestEndExecutionListener.countWithLoopCounter.get()).isEqualTo(4);
 
-        assertEquals(1, TestStartExecutionListener.countWithoutLoopCounter.get());
-        assertEquals(1, TestEndExecutionListener.countWithoutLoopCounter.get());
+        assertThat(TestStartExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
+        assertThat(TestEndExecutionListener.countWithoutLoopCounter.get()).isEqualTo(1);
     }
 
     @Test
@@ -1664,7 +1798,7 @@ assertProcessEnded(procId);
         // Used to throw a nullpointer exception
 
         runtimeService.startProcessInstanceByKey("multiInstance");
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -1678,19 +1812,19 @@ assertProcessEnded(procId);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceSubProcessParallelTasks");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
-        assertEquals("User Task 1", tasks.get(0).getName());
-        assertEquals("User Task 1", tasks.get(1).getName());
-        
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("User Task 1", "User Task 1");
+
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         // End time should not be set for the subprocess
         List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
-        assertEquals(2, historicActivityInstances.size());
+        assertThat(historicActivityInstances).hasSize(2);
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
             assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
-            assertNotNull(historicActivityInstance.getStartTime());
-            assertNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getStartTime()).isNotNull();
+            assertThat(historicActivityInstance.getEndTime()).isNull();
         }
 
         // Complete one of the user tasks. This should not trigger setting of end time of the subprocess, but due to a bug it did exactly that
@@ -1699,10 +1833,10 @@ assertProcessEnded(procId);
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
-        assertEquals(2, historicActivityInstances.size());
+        assertThat(historicActivityInstances).hasSize(2);
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
             assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
-            assertNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getEndTime()).isNull();
         }
 
         taskService.complete(tasks.get(1).getId());
@@ -1710,30 +1844,30 @@ assertProcessEnded(procId);
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
-        assertEquals(2, historicActivityInstances.size());
+        assertThat(historicActivityInstances).hasSize(2);
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
             assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
-            assertNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getEndTime()).isNull();
         }
 
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("User Task 3").list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
             
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
             
             historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
-            assertEquals(2, historicActivityInstances.size());
+            assertThat(historicActivityInstances).hasSize(2);
             for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
                 assertActivityInstancesAreSame(historicActivityInstance, runtimeService.createActivityInstanceQuery().activityInstanceId(historicActivityInstance.getId()).singleResult());
-                assertNull(historicActivityInstance.getEndTime());
+                assertThat(historicActivityInstance.getEndTime()).isNull();
             }
         }
 
         // Finishing the tasks should also set the end time
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        assertEquals(2, tasks.size());
+        assertThat(tasks).hasSize(2);
         for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
@@ -1741,9 +1875,9 @@ assertProcessEnded(procId);
         waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("subprocess1").list();
-        assertEquals(2, historicActivityInstances.size());
+        assertThat(historicActivityInstances).hasSize(2);
         for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
-            assertNotNull(historicActivityInstance.getEndTime());
+            assertThat(historicActivityInstance.getEndTime()).isNotNull();
         }
     }
 
@@ -1753,24 +1887,22 @@ assertProcessEnded(procId);
         Map<String, Object> vars = new HashMap<>();
         vars.put("multi_users", Collections.singletonList("testuser"));
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("test_multi", vars);
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("multi", task.getTaskDefinitionKey());
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("multi");
         vars.put("multi_users", new ArrayList<String>()); // <-- Problem here.
         taskService.complete(task.getId(), vars);
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().list();
-        assertEquals(0, instances.size());
+        assertThat(instances).isEmpty();
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.simpleMultiInstanceWithCollectionVariable.bpmn20.xml")
     public void testCollectionVariableMissing() {
-        try {
-            runtimeService.startProcessInstanceByKey("simple_multi");
-            fail("Should have failed with missing collection variable");
-        } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Variable 'elements' was not found", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simple_multi"))
+                .as("Should have failed with missing collection variable")
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Variable 'elements' was not found");
     }
 
     @Test
@@ -1779,12 +1911,10 @@ assertProcessEnded(procId);
         Map<String, Object> vars = new HashMap<>();
         ValueBean valueBean = new ValueBean("test");
         vars.put("elements", valueBean);
-        try {
-            runtimeService.startProcessInstanceByKey("simple_multi", vars);
-            fail("Should have failed with collection variable not a collection");
-        } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Variable 'elements':" + valueBean + " is not a Collection", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simple_multi", vars))
+                .as("Should have failed with collection variable not a collection")
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Variable 'elements':" + valueBean + " is not a Collection");
     }
 
     @Test
@@ -1799,6 +1929,105 @@ assertProcessEnded(procId);
     public void testZeroLoopCardinalityOnParallelSubprocessWithEventSubscription() {
         String procId = runtimeService.startProcessInstanceByKey("parallelSubprocessMi_withEventSubscription").getId();
         assertProcessEnded(procId);
+    }
+
+    @Test
+    @Deployment
+    public void testLoopCounterVariableForSequentialMultiInstance() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        for (int i = 0; i < myCollection.size(); i++) {
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+            Integer loopCounter = (Integer) runtimeService.getVariableLocal(task.getExecutionId(), "loopCounter");
+            assertThat(loopCounter).isEqualTo(i);
+
+            String myElement = (String) runtimeService.getVariableLocal(task.getExecutionId(), "myElement");
+            assertThat(myElement).isEqualTo(myCollection.get(i));
+
+            taskService.complete(task.getId());
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testLoopCounterVariableForParallelMultiInstance() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(4);
+
+        List<Integer> loopCounters = new ArrayList<>();
+        for (Task task : tasks) {
+            loopCounters.add((Integer) runtimeService.getVariableLocal(task.getExecutionId(), "loopCounter"));
+
+            String myElement = (String) runtimeService.getVariableLocal(task.getExecutionId(), "myElement");
+            assertThat(myElement).isNotNull();
+        }
+
+        assertThat(loopCounters).containsOnly(0, 1 , 2, 3);
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testMapLoopCounterIntoAsyncParallelMultiInstanceCallActivity.bpmn20.xml"
+    })
+    public void testMapLoopCounterIntoAsyncParallelMultiInstanceCallActivity() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSameSizeAs(myCollection);
+        for (Job job : jobs) {
+            managementService.executeJob(job.getId());
+        }
+
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+        assertThat(processInstances).hasSameSizeAs(myCollection);
+
+        List<Integer> loopCounters = new ArrayList<>();
+        for (ProcessInstance instance : processInstances) {
+            loopCounters.add(((Integer) runtimeService.getVariable(instance.getId(), "copiedLoopCounter")));
+        }
+        assertThat(loopCounters).containsOnly(0, 1 , 2, 3);
+    }
+
+    @Test
+    @Deployment(resources = {
+        "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testMapLoopCounterIntoAsyncSequentialMultiInstanceCallActivity.bpmn20.xml"
+    })
+    public void testMapLoopCounterIntoAsyncSequentialMultiInstanceCallActivity() {
+        List<String> myCollection = Arrays.asList("a", "b", "c", "d");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .variable("myCollection", myCollection)
+            .processDefinitionKey("loopCounterTest")
+            .start();
+
+        for (int i = 0; i < myCollection.size(); i++) {
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            managementService.executeJob(job.getId());
+
+            ProcessInstance calledProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+
+            Integer copiedLoopCounter = (Integer) runtimeService.getVariable(calledProcessInstance.getId(), "copiedLoopCounter");
+            assertThat(i).isEqualTo(copiedLoopCounter);
+
+            Task task = taskService.createTaskQuery().processInstanceId(calledProcessInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+        }
     }
 
     protected void resetTestCounts() {
@@ -1852,6 +2081,108 @@ assertProcessEnded(procId);
             count.incrementAndGet();
         }
 
+    }
+    
+    class MultiInstanceUserActivityEventListener extends AbstractFlowableEngineEventListener {
+
+        private List<FlowableEvent> eventsReceived;
+
+        public MultiInstanceUserActivityEventListener() {
+            super(new HashSet<>(Arrays.asList(
+                    FlowableEngineEventType.ACTIVITY_STARTED,
+                    FlowableEngineEventType.ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.ACTIVITY_CANCELLED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_CANCELLED,
+                    FlowableEngineEventType.TASK_CREATED,
+                    FlowableEngineEventType.TASK_COMPLETED,
+                    FlowableEngineEventType.PROCESS_STARTED,
+                    FlowableEngineEventType.PROCESS_COMPLETED,
+                    FlowableEngineEventType.PROCESS_CANCELLED,
+                    FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT
+            )));
+            eventsReceived = new ArrayList<>();
+        }
+
+        public List<FlowableEvent> getEventsReceived() {
+            return eventsReceived;
+        }
+
+        public void clearEventsReceived() {
+            eventsReceived.clear();
+        }
+
+        @Override
+        protected void activityStarted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void activityCompleted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCreated(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processStarted(FlowableProcessStartedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompleted(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompletedWithTerminateEnd(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCancelled(FlowableCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityStarted(FlowableMultiInstanceActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityCompletedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCompletedWithCondition(FlowableMultiInstanceActivityCompletedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCancelled(FlowableMultiInstanceActivityCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        public boolean isFailOnException() {
+            return false;
+        }
     }
 
 }

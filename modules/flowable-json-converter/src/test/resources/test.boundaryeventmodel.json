@@ -173,8 +173,9 @@
             "overrideid" : "timerEvent",
             "timercycledefinition" : "",
             "timerdatedefinition" : "",
-            "timerdurationdefinition" : "PT5M"
-          },
+            "timerdurationdefinition" : "PT5M",
+            "calendarname": "myCalendarName"
+        },
         "resourceId" : "sid-DA1374FF-562E-43E9-9CDA-23B9D88FDA32",
         "stencil" : { "id" : "BoundaryTimerEvent" }
       },

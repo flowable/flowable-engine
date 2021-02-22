@@ -12,8 +12,8 @@
  */
 package org.flowable.bpmn.converter.child;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.UserTask;
 
 /**

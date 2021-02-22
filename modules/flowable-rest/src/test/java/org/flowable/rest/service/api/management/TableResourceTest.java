@@ -12,9 +12,8 @@
  */
 package org.flowable.rest.service.api.management;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
@@ -42,22 +41,22 @@ public class TableResourceTest extends BaseSpringRestTestCase {
     public void testGetTables() throws Exception {
         Map<String, Long> tableCounts = managementService.getTableCount();
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLES_COLLECTION)), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLES_COLLECTION)),
+                HttpStatus.SC_OK);
 
         // Check table array
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(tableCounts.size(), responseNode.size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThat(responseNode).hasSize(tableCounts.size());
 
         for (int i = 0; i < responseNode.size(); i++) {
             ObjectNode table = (ObjectNode) responseNode.get(i);
-            assertNotNull(table.get("name").textValue());
-            assertNotNull(table.get("count").longValue());
-            assertTrue(table.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, table.get("name").textValue())));
-
-            assertEquals(tableCounts.get(table.get("name").textValue()).longValue(), table.get("count").longValue());
+            assertThat(table.get("name").textValue()).isNotNull();
+            assertThat(table.get("count").longValue()).isNotNull();
+            assertThat(table.get("url").textValue()).endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, table.get("name").textValue()));
+            assertThat(table.get("count").longValue()).isEqualTo(tableCounts.get(table.get("name").textValue()).longValue());
         }
     }
 
@@ -70,15 +69,19 @@ public class TableResourceTest extends BaseSpringRestTestCase {
 
         String tableNameToGet = tableCounts.keySet().iterator().next();
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, tableNameToGet)), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, tableNameToGet)),
+                HttpStatus.SC_OK);
 
         // Check table
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(tableNameToGet, responseNode.get("name").textValue());
-        assertEquals(tableCounts.get(responseNode.get("name").textValue()).longValue(), responseNode.get("count").longValue());
-        assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, tableNameToGet)));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "name: '" + tableNameToGet + "',"
+                        + "count: " + tableCounts.get(tableNameToGet) + ","
+                        + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE, tableNameToGet) + "'"
+                        + "}");
     }
 
     @Test

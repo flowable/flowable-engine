@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,8 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.event;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 
@@ -30,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to attachments.
- * 
+ *
  * @author Frederik Heremans
  */
 public class AttachmentEventsTest extends PluggableFlowableTestCase {
@@ -48,44 +50,45 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
 
             // Create link-attachment
-            Attachment attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://flowable.org");
-            assertNull(attachment.getUserId());
-            assertEquals(2, listener.getEventsReceived().size());
+            Attachment attachment = taskService
+                    .createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", "http://flowable.org");
+            assertThat(attachment.getUserId()).isNull();
+            assertThat(listener.getEventsReceived()).hasSize(2);
             FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertEquals(processInstance.getId(), event.getProcessInstanceId());
-            assertEquals(processInstance.getId(), event.getExecutionId());
-            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+            assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(event.getExecutionId()).isEqualTo(processInstance.getId());
+            assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
             Attachment attachmentFromEvent = (Attachment) event.getEntity();
-            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
-            assertEquals(processInstance.getId(), event.getProcessInstanceId());
-            assertEquals(processInstance.getId(), event.getExecutionId());
-            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
+            assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(event.getExecutionId()).isEqualTo(processInstance.getId());
+            assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
             attachmentFromEvent = (Attachment) event.getEntity();
-            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
             listener.clearEventsReceived();
 
             // Create binary attachment
             Authentication.setAuthenticatedUserId("testuser");
-            attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
-            assertNotNull(attachment.getUserId());
-            assertEquals("testuser", attachment.getUserId());
-            assertEquals(2, listener.getEventsReceived().size());
+            attachment = taskService.createAttachment("test", task.getId(), processInstance.getId(), "attachment name", "description",
+                    new ByteArrayInputStream("test".getBytes()));
+            assertThat(attachment.getUserId()).isEqualTo("testuser");
+            assertThat(listener.getEventsReceived()).hasSize(2);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-            assertEquals(processInstance.getId(), event.getProcessInstanceId());
-            assertEquals(processInstance.getId(), event.getExecutionId());
-            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+            assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(event.getExecutionId()).isEqualTo(processInstance.getId());
+            assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
             attachmentFromEvent = (Attachment) event.getEntity();
-            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
 
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
             listener.clearEventsReceived();
 
             // Update attachment
@@ -93,27 +96,27 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
             attachment.setDescription("Description");
             taskService.saveAttachment(attachment);
 
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-            assertEquals(processInstance.getId(), event.getProcessInstanceId());
-            assertEquals(processInstance.getId(), event.getExecutionId());
-            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+            assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(event.getExecutionId()).isEqualTo(processInstance.getId());
+            assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
             attachmentFromEvent = (Attachment) event.getEntity();
-            assertEquals(attachment.getId(), attachmentFromEvent.getId());
-            assertEquals("Description", attachmentFromEvent.getDescription());
+            assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
+            assertThat(attachmentFromEvent.getDescription()).isEqualTo("Description");
             listener.clearEventsReceived();
 
             // Finally, delete attachment
             taskService.deleteAttachment(attachment.getId());
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-            assertEquals(processInstance.getId(), event.getProcessInstanceId());
-            assertEquals(processInstance.getId(), event.getExecutionId());
-            assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+            assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+            assertThat(event.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            assertThat(event.getExecutionId()).isEqualTo(processInstance.getId());
+            assertThat(event.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
             attachmentFromEvent = (Attachment) event.getEntity();
-            assertEquals(attachment.getId(), attachmentFromEvent.getId());
+            assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
         }
     }
 
@@ -127,35 +130,36 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);
-                assertNotNull(task);
+                assertThat(task).isNotNull();
 
                 // Create link-attachment
                 Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://flowable.org");
-                assertEquals(2, listener.getEventsReceived().size());
+                assertThat(listener.getEventsReceived()).hasSize(2);
                 FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-                assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-                assertNull(event.getProcessInstanceId());
-                assertNull(event.getExecutionId());
-                assertNull(event.getProcessDefinitionId());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+                assertThat(event.getProcessInstanceId()).isNull();
+                assertThat(event.getExecutionId()).isNull();
+                assertThat(event.getProcessDefinitionId()).isNull();
                 Attachment attachmentFromEvent = (Attachment) event.getEntity();
-                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
                 event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-                assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
                 listener.clearEventsReceived();
 
                 // Create binary attachment
-                attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
-                assertEquals(2, listener.getEventsReceived().size());
+                attachment = taskService
+                        .createAttachment("test", task.getId(), null, "attachment name", "description", new ByteArrayInputStream("test".getBytes()));
+                assertThat(listener.getEventsReceived()).hasSize(2);
                 event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-                assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
-                assertNull(event.getProcessInstanceId());
-                assertNull(event.getExecutionId());
-                assertNull(event.getProcessDefinitionId());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_CREATED);
+                assertThat(event.getProcessInstanceId()).isNull();
+                assertThat(event.getExecutionId()).isNull();
+                assertThat(event.getProcessDefinitionId()).isNull();
                 attachmentFromEvent = (Attachment) event.getEntity();
-                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
 
                 event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
-                assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
                 listener.clearEventsReceived();
 
                 // Update attachment
@@ -163,27 +167,27 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
                 attachment.setDescription("Description");
                 taskService.saveAttachment(attachment);
 
-                assertEquals(1, listener.getEventsReceived().size());
+                assertThat(listener.getEventsReceived()).hasSize(1);
                 event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-                assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
-                assertNull(event.getProcessInstanceId());
-                assertNull(event.getExecutionId());
-                assertNull(event.getProcessDefinitionId());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_UPDATED);
+                assertThat(event.getProcessInstanceId()).isNull();
+                assertThat(event.getExecutionId()).isNull();
+                assertThat(event.getProcessDefinitionId()).isNull();
                 attachmentFromEvent = (Attachment) event.getEntity();
-                assertEquals(attachment.getId(), attachmentFromEvent.getId());
-                assertEquals("Description", attachmentFromEvent.getDescription());
+                assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
+                assertThat(attachmentFromEvent.getDescription()).isEqualTo("Description");
                 listener.clearEventsReceived();
 
                 // Finally, delete attachment
                 taskService.deleteAttachment(attachment.getId());
-                assertEquals(1, listener.getEventsReceived().size());
+                assertThat(listener.getEventsReceived()).hasSize(1);
                 event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-                assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-                assertNull(event.getProcessInstanceId());
-                assertNull(event.getExecutionId());
-                assertNull(event.getProcessDefinitionId());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+                assertThat(event.getProcessInstanceId()).isNull();
+                assertThat(event.getExecutionId()).isNull();
+                assertThat(event.getProcessDefinitionId()).isNull();
                 attachmentFromEvent = (Attachment) event.getEntity();
-                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
 
             } finally {
                 if (task != null && task.getId() != null) {
@@ -200,7 +204,7 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);
-                assertNotNull(task);
+                assertThat(task).isNotNull();
 
                 // Create link-attachment
                 Attachment attachment = taskService.createAttachment("test", task.getId(), null, "attachment name", "description", "http://flowable.org");
@@ -210,14 +214,14 @@ public class AttachmentEventsTest extends PluggableFlowableTestCase {
                 taskService.deleteTask(task.getId());
                 historyService.deleteHistoricTaskInstance(task.getId());
 
-                assertEquals(1, listener.getEventsReceived().size());
+                assertThat(listener.getEventsReceived()).hasSize(1);
                 FlowableEngineEntityEvent event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
-                assertEquals(FlowableEngineEventType.ENTITY_DELETED, event.getType());
-                assertNull(event.getProcessInstanceId());
-                assertNull(event.getExecutionId());
-                assertNull(event.getProcessDefinitionId());
+                assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+                assertThat(event.getProcessInstanceId()).isNull();
+                assertThat(event.getExecutionId()).isNull();
+                assertThat(event.getProcessDefinitionId()).isNull();
                 Attachment attachmentFromEvent = (Attachment) event.getEntity();
-                assertEquals(attachment.getId(), attachmentFromEvent.getId());
+                assertThat(attachmentFromEvent.getId()).isEqualTo(attachment.getId());
 
             } finally {
                 if (task != null && task.getId() != null) {

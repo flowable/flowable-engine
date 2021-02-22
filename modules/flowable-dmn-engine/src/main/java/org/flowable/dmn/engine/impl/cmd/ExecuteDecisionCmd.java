@@ -12,25 +12,24 @@
  */
 package org.flowable.dmn.engine.impl.cmd;
 
-import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
-import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DmnDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<List<Map<String, Object>>> {
-    
+public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<Void> {
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteDecisionCmd.class);
 
     public ExecuteDecisionCmd(ExecuteDecisionBuilderImpl decisionBuilder) {
         super(decisionBuilder);
@@ -42,31 +41,29 @@ public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Co
 
     public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
-        executeDecisionInfo.setParentDeploymentId(parentDeploymentId);
+        executeDecisionContext.setParentDeploymentId(parentDeploymentId);
     }
 
     public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
-        executeDecisionInfo.setTenantId(tenantId);
+        executeDecisionContext.setTenantId(tenantId);
+    }
+
+    public ExecuteDecisionCmd(ExecuteDecisionContext executeDecisionContext) {
+        super(executeDecisionContext);
     }
 
     @Override
-    public List<Map<String, Object>> execute(CommandContext commandContext) {
-        if (executeDecisionInfo.getDecisionKey() == null) {
+    public Void execute(CommandContext commandContext) {
+        if (executeDecisionContext.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
-        DmnDecisionTable decisionTable = resolveDecisionTable();
-        Decision decision = resolveDecision(decisionTable);
+        DmnDefinition definition = resolveDefinition();
 
-        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
+        execute(commandContext, definition);
 
-        if (executionResult != null) {
-            return executionResult.getDecisionResult();
-        } else {
-            return null;
-        }
+        return null;
     }
 
 }

@@ -53,10 +53,10 @@ public interface VariableScope extends VariableContainer {
     Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames);
 
     /**
-     * Similar to {@link #getVariables(Collection))}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
+     * Similar to {@link #getVariables(Collection)}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
      * 
      * If set to false, only the specific variables will be fetched. Depending on the use case, this can be better for performance, as it avoids fetching and processing the other variables. However,
-     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one {@link Command} execution).
+     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one Command execution).
      */
     Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables);
 
@@ -169,14 +169,14 @@ public interface VariableScope extends VariableContainer {
      * 
      * <p>
      * A variable is set according to the following algorithm:
-     * 
-     * <p>
+     *
+     * <ul>
      * <li>If variable name is an expression, resolve expression and set the value on the resolved object.</li>
      * <li>If this scope already contains a variable by the provided name as a <strong>local</strong> variable, its value is overwritten to the provided value.</li>
      * <li>If this scope does <strong>not</strong> contain a variable by the provided name as a local variable, the variable is set to this scope's parent scope, if there is one. If there is no parent
      * scope (meaning this scope is the root scope of the hierarchy it belongs to), this scope is used. This applies recursively up the parent scope chain until, if no scope contains a local variable
      * by the provided name, ultimately the root scope is reached and the variable value is set on that scope.</li>
-     * <p>
+     * </ul>
      * In practice for most cases, this algorithm will set variables to the scope of the execution at the process instance’s root level, if there is no execution-local variable by the provided name.
      * 
      * @param variableName
@@ -206,7 +206,7 @@ public interface VariableScope extends VariableContainer {
     Object setVariableLocal(String variableName, Object value);
 
     /**
-     * Similar to {@link #setVariableLocal(String, Object, value)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
+     * Similar to {@link #setVariableLocal(String, Object)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
      */
     Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
 
@@ -248,32 +248,32 @@ public interface VariableScope extends VariableContainer {
     boolean hasVariableLocal(String variableName);
 
     /**
-     * Removes the variable and creates a new;@link HistoricVariableUpdateEntity}
+     * Removes the variable and creates a new HistoricVariableUpdate.
      */
     void removeVariable(String variableName);
 
     /**
-     * Removes the local variable and creates a new {@link HistoricVariableUpdate}.
+     * Removes the local variable and creates a new HistoricVariableUpdate.
      */
     void removeVariableLocal(String variableName);
 
     /**
-     * Removes the variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables(Collection<String> variableNames);
 
     /**
-     * Removes the local variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the local variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal(Collection<String> variableNames);
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables();
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal();
 

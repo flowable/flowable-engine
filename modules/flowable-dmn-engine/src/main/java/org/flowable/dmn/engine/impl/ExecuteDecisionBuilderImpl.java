@@ -17,14 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 
 /**
  * @author Tijs Rademakers
  */
 public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
 
-    protected DmnRuleServiceImpl ruleService;
+    protected DmnDecisionService decisionService;
 
     protected String decisionKey;
     protected String parentDeploymentId;
@@ -36,8 +39,8 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected Map<String, Object> variables;
     protected boolean fallbackToDefaultTenant;
 
-    public ExecuteDecisionBuilderImpl(DmnRuleServiceImpl ruleService) {
-        this.ruleService = ruleService;
+    public ExecuteDecisionBuilderImpl(DmnDecisionService decisionService) {
+        this.decisionService = decisionService;
     }
 
     @Override
@@ -110,19 +113,54 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return this;
     }
 
+    /**
+     * @deprecated
+     */
     @Override
+    @Deprecated
     public List<Map<String, Object>> execute() {
-        return ruleService.executeDecision(this);
+        return decisionService.executeDecision(this);
     }
-    
+
+    @Override
+    public List<Map<String, Object>> executeDecision() {
+        return decisionService.executeDecision(this);
+    }
+
+    @Override
+    public Map<String, List<Map<String, Object>>> executeDecisionService() {
+        return decisionService.executeDecisionService(this);
+    }
+
     @Override
     public Map<String, Object> executeWithSingleResult() {
-        return ruleService.executeDecisionWithSingleResult(this);
+        return decisionService.executeWithSingleResult(this);
     }
-    
+
+    @Override
+    public Map<String, Object> executeDecisionWithSingleResult() {
+        return decisionService.executeDecisionWithSingleResult(this);
+    }
+
+    @Override
+    public Map<String, Object> executeDecisionServiceWithSingleResult() {
+        return decisionService.executeDecisionServiceWithSingleResult(this);
+    }
+
+
     @Override
     public DecisionExecutionAuditContainer executeWithAuditTrail() {
-        return ruleService.executeDecisionWithAuditTrail(this);
+        return decisionService.executeWithAuditTrail(this);
+    }
+
+    @Override
+    public DecisionExecutionAuditContainer executeDecisionWithAuditTrail() {
+        return decisionService.executeDecisionWithAuditTrail(this);
+    }
+
+    @Override
+    public DecisionServiceExecutionAuditContainer executeDecisionServiceWithAuditTrail() {
+        return decisionService.executeDecisionServiceWithAuditTrail(this);
     }
 
     public String getDecisionKey() {
@@ -161,6 +199,19 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return variables;
     }
 
-   
+    @Override
+    public ExecuteDecisionContext buildExecuteDecisionContext() {
+        ExecuteDecisionContext executeDecisionContext = new ExecuteDecisionContext();
+        executeDecisionContext.setDecisionKey(decisionKey);
+        executeDecisionContext.setParentDeploymentId(parentDeploymentId);
+        executeDecisionContext.setInstanceId(instanceId);
+        executeDecisionContext.setExecutionId(executionId);
+        executeDecisionContext.setActivityId(activityId);
+        executeDecisionContext.setScopeType(scopeType);
+        executeDecisionContext.setVariables(variables);
+        executeDecisionContext.setTenantId(tenantId);
+        executeDecisionContext.setFallbackToDefaultTenant(fallbackToDefaultTenant);
 
+        return executeDecisionContext;
+    }
 }

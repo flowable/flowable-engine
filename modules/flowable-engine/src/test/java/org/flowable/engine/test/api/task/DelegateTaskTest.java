@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.Set;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
@@ -38,19 +41,17 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("DelegateTaskTest.testGetCandidates");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         @SuppressWarnings("unchecked")
         Set<String> candidateUsers = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
-        assertEquals(2, candidateUsers.size());
-        assertTrue(candidateUsers.contains("kermit"));
-        assertTrue(candidateUsers.contains("gonzo"));
+        assertThat(candidateUsers)
+                .containsOnly("kermit", "gonzo");
 
         @SuppressWarnings("unchecked")
         Set<String> candidateGroups = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
-        assertEquals(2, candidateGroups.size());
-        assertTrue(candidateGroups.contains("management"));
-        assertTrue(candidateGroups.contains("accountancy"));
+        assertThat(candidateGroups)
+                .containsOnly("management", "accountancy");
     }
 
     @Test
@@ -65,16 +66,21 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         // Assert there are three tasks with the default category
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         for (org.flowable.task.api.Task task : tasks) {
-            assertEquals("approval", task.getCategory());
+            assertThat(task.getCategory()).isEqualTo("approval");
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("outcome", "approve");
-            taskService.complete(task.getId(), taskVariables, true);
+
+            TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
+            taskCompletionBuilder
+                    .taskId(task.getId())
+                    .variablesLocal(taskVariables)
+                    .complete();
         }
 
         // After completion, the task category should be changed in the script listener working on the delegate task
-        assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
         for (HistoricTaskInstance historicTaskInstance : historyService.createHistoricTaskInstanceQuery().list()) {
-            assertEquals("approved", historicTaskInstance.getCategory());
+            assertThat(historicTaskInstance.getCategory()).isEqualTo("approved");
         }
     }
 

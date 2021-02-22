@@ -13,8 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers

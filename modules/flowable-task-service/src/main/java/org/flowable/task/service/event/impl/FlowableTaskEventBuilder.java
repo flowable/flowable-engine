@@ -15,8 +15,8 @@ package org.flowable.task.service.event.impl;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
-import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.task.api.Task;
 
 /**
@@ -44,9 +44,16 @@ public class FlowableTaskEventBuilder {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Task) {
                 Task taskObject = (Task) persistedObject;
-                event.setProcessInstanceId(taskObject.getProcessInstanceId());
-                event.setExecutionId(taskObject.getExecutionId());
-                event.setProcessDefinitionId(taskObject.getProcessDefinitionId());   
+                if (taskObject.getScopeType() == null) {
+                    event.setProcessInstanceId(taskObject.getProcessInstanceId());
+                    event.setExecutionId(taskObject.getExecutionId());
+                    event.setProcessDefinitionId(taskObject.getProcessDefinitionId());
+                } else {
+                    event.setScopeType(taskObject.getScopeType());
+                    event.setScopeId(taskObject.getScopeId());
+                    event.setSubScopeId(taskObject.getSubScopeId());
+                    event.setScopeDefinitionId(taskObject.getScopeDefinitionId());
+                }
             }
         }
     }

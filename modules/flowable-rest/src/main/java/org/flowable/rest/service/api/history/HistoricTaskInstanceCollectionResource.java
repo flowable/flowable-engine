@@ -67,6 +67,8 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskOwner", dataType = "string", value = "The owner of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskOwnerLike", dataType = "string", value = "The owner with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskInvolvedUser", dataType = "string", value = "An involved user of the historic task instance", paramType = "query"),
+            @ApiImplicitParam(name = "taskCandidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
+            @ApiImplicitParam(name = "taskIgnoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)"),
             @ApiImplicitParam(name = "taskPriority", dataType = "string", value = "The priority of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic task instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "processFinished", dataType = "boolean", value = "Indication if the process instance of the historic task instance is finished.", paramType = "query"),
@@ -86,6 +88,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return historic task instances with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return historic task instances with the given scopeId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic task instances with the given scopeType.", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -281,6 +284,26 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("taskCandidateGroup") != null) {
             queryRequest.setTaskCandidateGroup(allRequestParams.get("taskCandidateGroup"));
+        }
+
+        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.valueOf(allRequestParams.get("ignoreTaskAssignee"))) {
+            queryRequest.setIgnoreTaskAssignee(true);
+        }
+
+        if (allRequestParams.get("scopeDefinitionId") != null) {
+            queryRequest.setScopeDefinitionId(allRequestParams.get("scopeDefinitionId"));
+        }
+
+        if (allRequestParams.get("scopeId") != null) {
+            queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+
+        if (allRequestParams.get("scopeType") != null) {
+            queryRequest.setScopeType(allRequestParams.get("scopeType"));
+        }
+
+        if (allRequestParams.get("propagatedStageInstanceId") != null) {
+            queryRequest.setPropagatedStageInstanceId(allRequestParams.get("propagatedStageInstanceId"));
         }
 
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/history/historic-task-instances", ""));

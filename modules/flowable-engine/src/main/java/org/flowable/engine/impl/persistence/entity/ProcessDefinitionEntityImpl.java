@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.bpmn.data.IOSpecification;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
@@ -33,7 +34,9 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     private static final long serialVersionUID = 1L;
 
     protected String name;
+    protected String localizedName;
     protected String description;
+    protected String localizedDescription;
     protected String key;
     protected int version;
     protected String category;
@@ -70,7 +73,9 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
-            definitionIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().findIdentityLinksByProcessDefinitionId(id);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            definitionIdentityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                    .getIdentityLinkService().findIdentityLinksByProcessDefinitionId(id);
             isIdentityLinksInitialized = true;
         }
 
@@ -89,12 +94,24 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getName() {
+        if (localizedName != null && localizedName.length() > 0) {
+            return localizedName;
+        }
         return name;
     }
 
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
     }
 
     @Override
@@ -104,7 +121,19 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
 
     @Override
     public String getDescription() {
+        if (localizedDescription != null && localizedDescription.length() > 0) {
+            return localizedDescription;
+        }
         return description;
+    }
+
+    public String getLocalizedDescription() {
+        return localizedDescription;
+    }
+
+    @Override
+    public void setLocalizedDescription(String localizedDescription) {
+        this.localizedDescription = localizedDescription;
     }
 
     @Override

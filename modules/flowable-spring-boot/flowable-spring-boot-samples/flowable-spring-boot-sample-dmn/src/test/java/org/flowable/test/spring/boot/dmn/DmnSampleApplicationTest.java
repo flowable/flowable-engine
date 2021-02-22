@@ -18,24 +18,21 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.dmn.api.DmnRuleService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.flowable.dmn.api.DmnDecisionService;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.DmnSampleApplication;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = DmnSampleApplication.class)
 public class DmnSampleApplicationTest {
 
     @Autowired
-    private DmnRuleService ruleService;
+    private DmnDecisionService ruleService;
 
     @Test
     public void contextLoads() {

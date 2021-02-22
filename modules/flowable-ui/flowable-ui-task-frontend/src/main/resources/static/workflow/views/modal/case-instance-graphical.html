@@ -1,0 +1,39 @@
+
+<div class="modal" ng-controller="ShowCaseDiagramCtrl">
+    <div class="modal-dialog wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="pull-right">
+                    <button type="button" class="close" ng-click="$hide()">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="error-message" ng-if="model.errorMessage">
+                    <span>{{model.errorMessage}}</span>
+                </div>
+                <div class="alert-wrapper" ng-cloak>
+                    <div class="alert {{alerts.current.type}}" ng-if="alerts.current" ng-click="dismissAlert()">
+                        <span>{{alerts.current.message}}</span>
+                        <span class="badge" ng-show="alerts.queue.length">{{alerts.queue.length + 1}}</span>
+                    </div>
+                </div>
+
+                <div class="popup-wrapper clearfix">
+                    <div class="model-preview-wrapper">
+                        <div id="cmmnModel"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-sm btn-default" ng-click="$hide()">
+                            {{'GENERAL.ACTION.CLOSE' | translate}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,6 +17,10 @@ import java.io.InputStream;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -58,8 +62,22 @@ public abstract class FlowableCmmnTestCase extends AbstractFlowableCmmnTestCase 
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.dynamicCmmnService = cmmnEngineConfiguration.getDynamicCmmnService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
     }
 
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+    
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+    
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) cmmnEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
 }

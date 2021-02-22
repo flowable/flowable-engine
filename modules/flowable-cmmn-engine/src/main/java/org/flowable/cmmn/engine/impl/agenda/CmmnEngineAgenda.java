@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import java.util.Map;
-
+import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.common.engine.impl.agenda.Agenda;
 
 /**
@@ -37,10 +37,14 @@ public interface CmmnEngineAgenda extends Agenda {
     void planDismissPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
-    
+
+    void planEvaluateToActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
     
-    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Map<String, Object> variables);
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, ChildTaskActivityBehavior.VariableInfo childTaskVariableInfo);
+    
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, MigrationContext migrationContext);
     
     void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId);
 
@@ -52,9 +56,9 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId);
+    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType);
 
-    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType);
 
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
@@ -64,7 +68,7 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planManualTerminateCaseInstanceOperation(String caseInstanceEntityId);
 
-    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId);
+    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, String exitCriterionId, String exitType, String exitEventType);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId);
     

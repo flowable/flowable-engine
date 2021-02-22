@@ -14,6 +14,7 @@ package org.flowable.dmn.rest.service.api.management;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.rest.service.api.DmnRestApiInterceptor;
@@ -42,12 +43,12 @@ public class DmnEngineResource {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/dmn-management/engine", produces = "application/json")
-    public DmnEngineInfoResponse getEngineInfo() {
+    public EngineInfoResponse getEngineInfo() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessDmnManagementInfo();
         }
         
-        DmnEngineInfoResponse response = new DmnEngineInfoResponse();
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             EngineInfo dmnEngineInfo = DmnEngines.getDmnEngineInfo(DmnEngines.getDefaultDmnEngine().getName());
@@ -63,7 +64,7 @@ public class DmnEngineResource {
             throw new FlowableException("Error retrieving DMN engine info", e);
         }
 
-        response.setVersion(DmnEngine.VERSION);
+        response.setVersion(DmnEngine.class.getPackage().getImplementationVersion());
 
         return response;
     }

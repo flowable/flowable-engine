@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.SuspendedJobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -33,20 +33,27 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job> implements SuspendedJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
     protected String id;
     protected String processInstanceId;
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String category;
+    protected String categoryLike;
     protected String elementId;
     protected String elementName;
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
+    protected boolean onlyExternalWorkers;
     protected Date duedateHigherThan;
     protected Date duedateLowerThan;
     protected Date duedateHigherThanOrEqual;
@@ -63,12 +70,14 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     public SuspendedJobQueryImpl() {
     }
 
-    public SuspendedJobQueryImpl(CommandContext commandContext) {
+    public SuspendedJobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public SuspendedJobQueryImpl(CommandExecutor commandExecutor) {
+    public SuspendedJobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -95,6 +104,24 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl category(String category) {
+        if (category == null) {
+            throw new FlowableIllegalArgumentException("Provided category is null");
+        }
+        this.category = category;
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl categoryLike(String categoryLike) {
+        if (categoryLike == null) {
+            throw new FlowableIllegalArgumentException("Provided categoryLike is null");
+        }
+        this.categoryLike = categoryLike;
         return this;
     }
     
@@ -127,7 +154,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     
     @Override
     public SuspendedJobQueryImpl subScopeId(String subScopeId) {
-        if (scopeId == null) {
+        if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
         this.subScopeId = subScopeId;
@@ -183,6 +210,15 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     @Override
+    public SuspendedJobQueryImpl correlationId(String correlationId) {
+        if (correlationId == null) {
+            throw new FlowableIllegalArgumentException("Provided correlationId is null");
+        }
+        this.correlationId = correlationId;
+        return this;
+    }
+
+    @Override
     public SuspendedJobQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
@@ -217,6 +253,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
         this.onlyTimers = true;
         return this;
     }
@@ -226,7 +266,26 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         if (onlyTimers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
+
+        if (onlyExternalWorkers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
+        }
+
         this.onlyMessages = true;
+        return this;
+    }
+
+    @Override
+    public SuspendedJobQueryImpl externalWorkers() {
+        if (onlyMessages) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyMessages() with onlyExternalWorkers() in the same query");
+        }
+
+        if (onlyTimers) {
+            throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
+        }
+
+        this.onlyTimers = true;
         return this;
     }
 
@@ -325,6 +384,11 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     @Override
+    public SuspendedJobQuery orderByJobCreateTime() {
+        return orderBy(JobQueryProperty.CREATE_TIME);
+    }
+
+    @Override
     public SuspendedJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
@@ -353,12 +417,12 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getSuspendedJobEntityManager().findJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<Job> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getSuspendedJobEntityManager().findJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -384,7 +448,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     }
 
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {
@@ -407,16 +471,28 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         return withoutTenantId;
     }
 
-    public static long getSerialversionuid() {
-        return serialVersionUID;
-    }
-
     public String getId() {
         return id;
     }
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
+    public String getElementName() {
+        return elementName;
     }
     
     public String getScopeId() {
@@ -435,12 +511,20 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         return scopeDefinitionId;
     }
 
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
     public boolean isOnlyTimers() {
         return onlyTimers;
     }
 
     public boolean isOnlyMessages() {
         return onlyMessages;
+    }
+
+    public boolean isOnlyExternalWorkers() {
+        return onlyExternalWorkers;
     }
 
     public Date getDuedateHigherThan() {

@@ -12,14 +12,13 @@
  */
 package org.flowable.engine.test.cfg;
 
-import static org.flowable.engine.impl.test.AbstractTestCase.assertEquals;
-import static org.flowable.engine.impl.test.AbstractTestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji
@@ -40,14 +39,14 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemProcessEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
 
         // then
         // if the process engine is closed
         processEngine.close();
 
         // the idle connections are closed
-        assertEquals(0, state.getIdleConnectionCount());
+        assertThat(state.getIdleConnectionCount()).isZero();
     }
 
     @Test
@@ -62,17 +61,17 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemProcessEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
 
         // then
         // if the process engine is closed
         processEngine.close();
 
         // the idle connections are not closed
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isGreaterThan(0);
 
         pooledDataSource.forceCloseAll();
-        assertEquals(0, state.getIdleConnectionCount());
+        assertThat(state.getIdleConnectionCount()).isZero();
     }
 
 }

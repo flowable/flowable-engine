@@ -37,6 +37,12 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     TimerJobQuery processDefinitionId(String processDefinitionid);
     
+    /** Only select jobs which exist for the given category */
+    TimerJobQuery category(String category);
+    
+    /** Only select jobs like for the given category value */
+    TimerJobQuery categoryLike(String categoryLike);
+    
     /** Only select jobs which exist for the given element id */
     TimerJobQuery elementId(String elementId);
     
@@ -63,6 +69,9 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     
     /** Only select jobs for the given plan item instance.  */
     TimerJobQuery planItemInstanceId(String planItemInstanceId);
+
+    /** Only select jobs with the given correlationId.  */
+    TimerJobQuery correlationId(String correlationId);
 
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past
@@ -120,6 +129,11 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     TimerJobQuery orderByJobDuedate();
+
+    /**
+     * Order by create time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    TimerJobQuery orderByJobCreateTime();
 
     /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).

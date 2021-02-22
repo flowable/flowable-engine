@@ -1,0 +1,437 @@
+{
+    "COMMON" : {
+        "SELECT-FOLDER": "Selecciona una carpeta..."
+    },
+    "GENERAL": {
+        "MAIN-TITLE": "Flowable - Mis Tareas",
+        "ERROR": {
+            "GENERIC": "Lo sentimos, ocurrió un error...",
+            "UNKNOWN": "Lo sentimos, ocurrió un error mientras se ejecutaba la operación seleccionada.",
+            "BAD_REQUEST": "Ocurrió un error mientras se ejecutaba la operación seleccionada",
+            "NOT_FOUND": "El recurso que intentas acceder no existe",
+            "UNAUTHORIZED": "Debes iniciar sesión para realizar la operación seleccionada.",
+            "FORBIDDEN": "No tienes permitido realizar la operación seleccionada",
+            "INTERNAL_SERVER_ERROR": "Lo sentimos, ocurrió un error inesperado mientras se realizaba la operación seleccionada."
+        },
+        "NAVIGATION": {
+            "TASKS": "Tareas",
+            "PROCESSES": "Procesos",
+            "CASES": "Casos",
+            "DESIGN": "Diseño",
+            "CREATE": "+ Crear",
+            "LOGIN": "Iniciar sesión"
+        },
+        "TITLE": {
+            "ADD-COMMENT": "Crear comentario",
+            "INVOLVE-PEOPLE": "Seleccionar persona",
+            "RECENT-PEOPLE": "Personas recientes",
+            "MATCHING-PEOPLE": "Personas similares",
+            "SELECT-GROUP": "Seleccionar grupo",
+            "MATCHING-GROUPS": "Grupos similares",
+            "FILTER": "Filtro",
+            "SELECT-DATE": "Selecciona una fecha"
+        },
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "DASHBOARD": "Dashboard",
+            "ADD-COMMENT": "Agregar comentario",
+            "SAVE": "Guardar",
+            "CANCEL": "Cancelar",
+            "CLOSE": "Cerrar",
+            "CONFIRM": "Confirmar",
+            "SHOW-MORE": "Mostrar mas..."
+        },
+        "MESSAGE": {
+            "SELECT-PEOPLE-HELP": "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar",
+            "SELECT-GROUP-HELP": "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar",
+            "SELECT-GROUP-SEARCH-PLACEHOLDER": "Buscar grupo",
+            "SELECT-GROUP-NO-MATCHING-RESULTS": "Usa el campo buscar de arriba para encontrar grupos.",
+            "UPLOAD-CONTENT": "Selecciona o arrastra archivo",
+            "UPLOAD-CONTENT-NO-DROP": "Seleciona un archivo para subir",
+            "DROPZONE": "Arrastra el archivo para subir",
+            "YES": "Si",
+            "NO": "No"
+        },
+        "TIME": {
+            "HOURS": "horas",
+            "MINUTES": "minutos",
+            "SECONDS": "segundos"
+        },
+        "ABOUT": {
+            "TYPE": "Tipo",
+            "LICENSED-TO": "Licenciado a",
+            "EXPIRES": "Expira",
+            "COPYRIGHT": "© 2005-2015 Alfresco Software Inc. Todos los derechos reservados.",
+            "LEGAL": "Legal y licencia"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Iniciar sesión",
+        "USERNAME": "Usuario",
+        "USERNAME-PLACEHOLDER": "Ingresa tu usuario",
+        "PASSWORD": "Contraseña",
+        "PASSWORD-PLACEHOLDER": "Ingresa tu contraseña",
+        "ACTION": {
+            "CONFIRM": "Iniciar sesión"
+        }
+    },
+    "TASK": {
+        "SECTION": {
+            "PEOPLE": "Personas",
+            "CONTENT": "Contenido",
+            "COMMENTS": "Comentarios",
+            "NOTES": "Notas"
+        },
+        "FILTER": {
+            "CREATED-DESC": "El más reciente primero",
+            "CREATED-ASC": "El más antiguo primero",
+            "DUE-DESC": "El último que vence",
+            "DUE-ASC": "El primero que vence",
+            "TEXT": "Filtro",
+            "TEXT-PLACEHOLDER": "Buscar por nombre de tarea",
+            "TEXT-SUMMARY": "Filtrado por: {{text}}",
+            "PROCESS-DEFINITION": "Definición de proceso",
+            "PROCESS-DEFINITION-PLACEHOLDER": "Seleccionar definición de proceso ...",
+            "STATE": "Estado",
+            "STATE-OPEN": "abierta",
+            "STATE-COMPLETED": "completa",
+            "ASSIGNMENT": "Asignación",
+            "ASSIGNMENT-INVOLVED": "Tareas en la que participo",
+            "ASSIGNMENT-ASSIGNEE": "Tareas que me asignaron",
+            "ASSIGNMENT-CANDIDATE": "Tareas que puedo realizar",
+            "ASSIGNMENT-GROUP": "Tareas asignadas al grupo \"{{name}}\"",
+            "RESET": "Resetear filtros"
+        },
+        "ALERT": {
+            "COMMENT-ADDED": "Se agrego un comentario a \"{{name}}\"",
+            "PERSON-INVOLVED": "{{firstName}} {{lastName}} está ahora participando en \"{{taskName}}\"",
+            "PERSON-NO-LONGER-INVOLVED": "{{firstName}} {{lastName}} no está participando más en \"{{taskName}}\"",
+            "CREATED": "La tarea \"{{name}}\" fue creada",
+            "COMPLETED": "Tarea completa",
+            "SAVED": "Formulario de la tarea guardado",
+            "ASSIGNED": "Tarea \"{{taskName}}\" se asignó a {{firstName}} {{lastName}}",
+            "RELATED-CONTENT-ADDED": "\"{{name}}\" fue agregado a la tarea",
+            "RELATED-CONTENT-ADDED-LOADING": "\"{{name}}\" fue agregado a la tarea. El contenido estará disponible cuando se termine de cargar desde la fuente externa."
+        },
+        "ACTION": {
+            "COMPLETE-TASK-WITH-FORM": "Completar formulario",
+            "COMPLETE": "Completar",
+            "CLAIM": "Reclamar",
+            "ASSIGN": "Asignar",
+            "REASSIGN": "Reasignar",
+            "CREATE": "+ Crear Tarea",
+            "CREATE-SUB-TASK": "Crear subtarea",
+            "CREATE-CONFIRM": "Crear",
+            "INVOLVE": "+ Involucrar personas",
+            "ADD-COMMENT": "+ Agregar comentario",
+            "ADD-COMMENT-CONFIRM": "Agregar comentario",
+            "ADD-CONTENT": "+ Agregar contenido",
+            "CLEAR-DUEDATE": "Borrar fecha de vencimiento",
+            "DUE-TODAY": "Vencimiento el dia de hoy",
+            "CLEAR-DATE": "Limpiar fecha",
+            "DATE-TODAY": "Fecha de hoy",
+            "AUDIT-LOG": "Registro de auditoría"
+        },
+        "TITLE": {
+            "ASSIGN": "Seleccionar participante",
+            "ASSIGNEE": "Asignado",
+            "CONTENT": "Contenido relacionado",
+            "SUBTASK": "Subtarea",
+            "CREATE-NEW": "Nueva tarea",
+            "FORM": "Formulario",
+            "DETAILS": "Detalles",
+            "ADD-RELATED-CONTENT": "Agregar contenido relacionado",
+            "SELECT-DUEDATE": "Seleccionar fecha de vencimiento",
+            "SELECT-DATE": "Seleccionar fecha",
+            "NO-CONTENT-ITEMS": "No hay contenido relacionado",
+            "NO-PEOPLE-INVOLVED": "No hay personas involucradas",
+            "NO-COMMENTS": "No hay comentarios",
+            "COMMENT-COUNT": "comentario",
+            "COMMENTS-COUNT": "comentarios",
+            "NO-SUBTASKS": "No hay subtareas",
+            "SUBTASK-COUNT": "subtarea",
+            "SUBTASKS-COUNT": "subtareas",
+            "SHOW-DETAILS": "Mostrar detalles",
+            "SHOW-FORM": "Mostrar formularios"
+        },
+        "FIELD": {
+            "NAME": "Nombre",
+            "DESCRIPTION": "Descripción",
+            "ASSIGNEE": "Asignado",
+            
+            "DUE": "Vencimiento",
+            "PROCESS-INSTANCE": "Parte del proceso",
+            "CASE-INSTANCE": "Parte del caso",
+            "PARENT-TASK": "Parte de la tarea",
+            "ENDED": "Finalizado",
+            "DURATION": "Duración"
+        },
+        "MESSAGE": {
+            "NO-NAME": "Tarea sin nombre",
+            "NO-ASSIGNEE": "Sin asignación",
+            "NO-DUEDATE": "Sin vencimiento",
+            "DUE-ON": "Vencimiento",
+            "CREATED-ON": "Creada",
+            "ENDED-ON": "Completada",
+            "REACHED-ON": "Alcanzado",
+            "COMPLETED-BY": "Completada por",
+            "NO-DESCRIPTION": "Esta tarea no tiene descripción",
+            "NO-RELATED-CONTENT": "Esta tarea aún no tiene contenido relacionado...",
+            "NO-PEOPLE-INVOLVED": "Esta tarea aún no tiene personas involucradas...",
+            "NO-COMMENTS": "Esta tarea aún no tiene comentarios...",
+            "INVOLVE-PEOPLE-PLACEHOLDER": "+ Agregar persona",
+            "CONTENT-UPLOADED-BY": "Agregado por ",
+            "ASSIGNEE": "Asignado a",
+            "NEW-COMMENT-PLACEHOLDER": "Ingresa un comentario a agregar a esta tarea",
+            "COMMENT-HEADER": "Agregado por {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
+            "NO-FILTER": "Mostrando tus tareas, ningún filtro aplicado",
+            "FILTERED": "Mostrando tus tareas, filtradas",
+            "NO-TASKS": "No se encontraron tareas similares...",
+            "DURATION": "Tomó {{duration}}",
+            "CLAIM-TASK-FIRST": "Para ver y llenar el formulario de esta tarea, primero necesitas reclamar esta tarea. Puedes hacer eso presionando el boton azul en la esquina superior derecha de la página.",
+            "NO-TASKS-HELP": "Parece que no hay tareas para ti! Para iniciar algo tu puedes:",
+            "NO-SUCH-TASK-HELP": "La tarea que estas buscando no puede ser encontrada!  Si gustas puedes en lugar de:",
+            "NO-SUCH-TASK-RETURN-TO-LIST": "Regresar a tu lista de tareas",
+            "NO-TASKS-CREATE-TASK": "Crear una tarea para ti mismo o asignarsela a alguien más",
+            "NO-TASKS-CREATE-PROCESS": "Inicia un nuevo proceso y despues rastrea su progreso"
+        },
+        "HELP" : {
+            "DESCRIPTION": "Esta tarea no tiene detalles aún. Puedes cambiar esto eligiendo una de las siguientes acciones:",
+            "COMPLETED-DESCRIPTION": "Esta tarea completa no tiene detalles.",
+            "DESCRIPTION-WITH-CLAIM": "Esta tarea no tiene detalles aún. Puedes cambiar esto eligiendo una de las siguientes acciones. para completar esta tarea necesitas reclamarla primero. puedes hacer eso presionando el boton azul en la esquina superior derecha de la página.",
+            "ADD-PEOPLE": "Involucra a alguien mas y comienza a colaborar",
+            "ADD-COMMENT": "Ilumina a otros agregando un comentario",
+            "ADD-CONTENT": "Agrega un documento y comparte conocimiento",
+            "ADD-SUBTASK": "Crear una subtarea"
+        }
+    },
+    "PROCESS": {
+        "ALERT": {
+            "COMMENT-ADDED": "Se agregó un comentario",
+            "STARTED": "Se inició un nuevo proceso \"{{processDefinitionName}}\"",
+            "START-PROCESS-CONTENT-ADD-FAILED": "No se pudo agregar {{noOfFiles}} archivo(s) al proceso"
+        },
+        "TITLE": {
+            "DIAGRAM": "Diagrama de proceso",
+            "EXECUTION": "Ejecución",
+            "EXECUTIONS": "Ejecuciones",
+            "EXPRESSION": "Expresión",
+            "SCRIPT": "Script",
+            "RESULT": "Resultado",
+            "VARIABLES": "Variables",
+            "LOG": "Registro"
+        },
+        "FILTER": {
+            "CREATED-DESC": "El más reciente primero",
+            "CREATED-ASC": "El más antiguo primero",
+            "ENDED-DESC": "Completado más reciente",
+            "ENDED-ASC": "Completado más antiguo",
+            "STATE-SUMMARY": "Mostrando {{state.title | translate}} procesos",
+            "STATE": "Estado del proceso ",
+            "STATE-RUNNING": "en ejecución",
+            "STATE-COMPLETED": "completo",
+            "STATE-ALL": "todo"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "Esta instancia de procesos no tiene descripción",
+            "NO-FILTER": "Mostrando todas las instancias de proceso, no filtradas",
+            "NO-INSTANCES": "No se encontraron instancias de proceso similares...",
+            "NO-INSTANCES-HELP": "No hay proceso que estén en ejecución ahora. Si tus proceso se han completado, puedes encontrarlos utilizando el filtro para la lista de procesos. Para iniciar algo nuevo tu puedes:",
+            "NO-INSTANCES-HELP-START": "Iniciar un nuevo proceso y rastrear su progreso",
+            "NO-TASKS": "No hay tareas activas en este momento ...",
+            "NO-COMPLETED-TASKS": "Aún no hay tareas completas...",
+            "NO-BUSINESS-KEY": "No se fijó la business key",
+            "NO-ACTIVE-MILESTONES": "No hay hitos activos",
+            "CATEGORY": "Categoría: {{processDefinitionCategory}}",
+            "NEW-COMMENT-PLACEHOLDER": "Introduce un comentario para agregarlo a este proceso",
+            "COMMENT-HEADER": "Agregado por {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
+            "SELECT-DEFINITION": "Selecciona un proceso para iniciar de la siguiente lista",
+            "NO-PROCESS-DEFINITIONS": "No puedes iniciar un proceso ya que no hay definiciones disponibles",
+            "START-PROCESS": "Iniciar un proceso",
+            "STARTED-BY": "Iniciado por",
+            "NO-PROCESS-DEFINITION-SELECTED-HELP": "Por favor selecciona una definición de proceso"
+        },
+        "ACTION" : {
+            "CREATE": "+ Iniciar un proceso",
+            "BACK-TO-LIST": "Regresar a instancias de proceso",
+            "SHOW-DIAGRAM": "Mostrar diagrama",
+            "CANCEL": "Cancelar proceso",
+            "EXECUTE": "Ejecutar",
+            "DELETE": "Borrar proceso",
+            "ADD-COMMENT": "+ Agregar comentario",
+            "ADD-COMMENT-CONFIRM": "Agregar comentario",
+            "AUDIT-LOG": "Registro de auditoría"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Categoría",
+            "PROCESS-DEFINITION": "Definición de proceso",
+            "STARTED": "Iniciado",
+            "STARTED-BY": "Iniciado por",
+            "ENDED": "Finalizado",
+            "NAME": "Nombre de la instancia de proceso",
+            "NAME-PLACEHOLDER" : "Ingresa un nombre opcional para el proceso que está siendo iniciado"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Tareas activas",
+            "START-FORM": "Formulario inicial",
+            "COMPLETED-TASKS": "Tareas completas",
+            "COMMENTS": "Comentarios",
+            "CONTENT" : "Contenido"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "¿Cancelar el proceso?",
+            "CANCEL-DESCRIPTION": "¿Deseas cancelar el proceso {{name}}?",
+            "DELETE-TITLE": "¿Eliminar el proceso?",
+            "DELETE-DESCRIPTION": "¿Deseas borrar el proceso {{name}}? Todas las tareas, comentarios y contenido relacionado a este proceso se borrarán permanentemente."
+        }
+    },
+    "CASE": {
+        "ALERT": {
+            "STARTED": "Un nuevo caso \"{{caseDefinitionName}}\" ha comenzado",
+            "START-CASE-CONTENT-ADD-FAILED": "No se pudo agregar {{noOfFiles}} archivos(s) al caso"
+        },
+        "TITLE": {
+            "DIAGRAM": "Diagrama de caso"
+        },
+        "FILTER": {
+            "CREATED-DESC": "El más reciente primero",
+            "CREATED-ASC": "El más antiguo primero",
+            "ENDED-DESC": "Completado más reciente",
+            "ENDED-ASC": "Completado más antiguo",
+            "STATE-SUMMARY": "Mostrando {{state.title | translate}} casos",
+            "STATE": "Estado del caso",
+            "STATE-RUNNING": "en ejecución",
+            "STATE-COMPLETED": "completo",
+            "STATE-ALL": "todos"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "Esta instancia de caso no tiene descripción",
+            "NO-FILTER": "Mostrando todos los casos, sin filtro",
+            "NO-INSTANCES": "No se han encontrado instancias de caso que coincidan...",
+            "NO-INSTANCES-HELP": "No hay casos en ejecución. Los casos completados pueden encontrarse usando el filtro. Para iniciar algo nuevo, puede:",
+            "NO-INSTANCES-HELP-START": "Inicar un nuevo caso y seguir su progreso",
+            "NO-TASKS": "No hay tareas activas actualmente ...",
+            "NO-COMPLETED-TASKS": "No se han completado tareas aún ...",
+            "NO-BUSINESS-KEY": "No se ha especificado la business key",
+            "CATEGORY": "Categoría: {{processDefinitionCategory}}",
+            "SELECT-DEFINITION": "Seleccione un caso para inicar de la lista",
+            "NO-CASE-DEFINITIONS": "No puede iniciar un caso ya que no hay definiciones disponibles",
+            "START-CASE": "Iniciar un caso",
+            "STARTED-BY": "Iniciado por",
+            "STAGE-STARTED": "Iniciada",
+            "STAGE-ENDED": "Terminada",
+            "STAGE-NOT-STARTED": "No comenzada aún",
+            "STATE": "Estado",
+            "STAGE-NO-NAME": "Etapa sin nombre",
+            "MILESTONE-REACHED-ON": "Alcanzado",
+            "MILESTONE-TERMINATED-ON": "Terminado",
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Por favor escoja una definición de caso",
+            "NO-ACTIVE-STAGES": "No hay etapas activas",
+            "NO-ENDED-STAGES": "No hay etapas finalizadas",
+            "NO-AVAILABLE-MILESTONES": "No hay hitos disponibles",
+            "NO-REACHED-MILESTONES": "No se han alcanzado hitos",
+            "NO-AVAILABLE-USER-EVENT-LISTENERS":"No hay eventos de usuario disponibles",
+            "NO-COMPLETED-USER-EVENT-LISTENERS":"No hay eventos de usuario completos",
+            "USER-EVENT-LISTENER-NO-NAME": "Evento de usuario sin nombre",
+            "USER-EVENT-LISTENER-COMPLETED": "Completo",
+            "ENABLED-PLAN-ITEM_INSTANCE-NO-NAME": "Sin nombre",
+            "START-PLAN-ITEM-INSTANCE": "Iniciar"
+        },
+        "ACTION" : {
+            "CREATE": "+ Iniciar un caso",
+            "BACK-TO-LIST": "Regresar a las instancias de caso",
+            "SHOW-DIAGRAM": "Mostrar digrama",
+            "CANCEL": "Cancelar caso",
+            "DELETE": "Borrar caso",
+            "TRIGGER-USER-EVENT-LISTENER": "Disparar",
+            "AUDIT-LOG": "Bitácora de Auditoría"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Categoría",
+            "CASE-DEFINITION": "Definición de caso",
+            "STARTED": "Comenzado",
+            "STARTED-BY": "Comenzado por",
+            "ENDED": "Finalizado",
+            "NAME": "Nombre de la instancia de caso",
+            "NAME-PLACEHOLDER" : "Introduzca un nombre opcional para el caso a iniciar"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Tareas activas",
+            "COMPLETED-TASKS": "Tareas completas",
+            "ACTIVE-STAGES": "Etapas disponibles/activas",
+            "ENDED-STAGES": "Etapas finalizadas",
+            "AVAILABLE-MILESTONES": "Hitos disponibles",
+            "REACHED-MILESTONES": "Hitos alcanzados",
+            "AVAILABLE-USER-EVENT-LISTENERS": "Eventos de usuario disponibles",
+            "COMPLETED-USER-EVENT-LISTENERS": "Eventos de usuario completos",
+            "CONTENT" : "Contenido",
+            "ENABLED-PLAN-ITEM-INSTANCES": "Instancia de plan item habilitado"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "¿Cancelar el caso?",
+            "CANCEL-DESCRIPTION": "¿Desea cancelar el caso {{name}}?",
+            "DELETE-TITLE": "¿Borrar el caso?",
+            "DELETE-DESCRIPTION": "¿Desea borrar el caso {{name}}? Todas las tareas y contenido relacionado al caso se borrarán de manera permanente."
+        }
+    },
+    "INVOLVE-PEOPLE": {
+        "NO-MATCHING-RESULTS": "Usa el campo buscar usuario de arriba para encontrar usuarios",
+        "SEARCH-PLACEHOLDER": "Buscar usuario",
+        "BACK-TO-SEARCH": "Regresar a la busqueda",
+        "ACTION-SELECT": "Seleccionar"
+    },
+    "INTEGRATION": {
+        "ALERT": {
+        }
+    },
+    "CONTENT": {
+        "SIMPLE-TYPE": {
+            "WORD": "Documento",
+            "EXCEL": "Hoja de calculo",
+            "PDF": "PDF",
+            "IMAGE": "Imagen",
+            "FOLDER": "Carpeta",
+            "CONTENT": "Contenido"
+        },
+        "MESSAGE": {
+            "NO-PREVIEW-AVAILABLE": "No hay vista previa disponible",
+            "PREVIEW-PENDING": "Creando vista previa...",
+            "CONTENT-PENDING": "Obteniendo contenido...",
+            "NOT-FOUND": "El contenido no puede ser encontrado",
+            "DELETE-CONFIRMATION": "¿Deseas borrar {{name}}?",
+            "DROP": "Arrastrar o ",
+            "SELECT": "Selecciona un archivo",
+            "DRAGOVER": "Arrastra un archivo para subirlo",
+            "EXTERNAL-ONLY": "Selecciona la fuente del contenido"
+        },
+        "TITLE": {
+            "DELETE": "Borrar contenido",
+            "NOT-FOUND": "Archivo no encontrado"
+        },
+        "ACTION":  {
+        }
+    },
+    "FORM" : {
+        "ACTION": {
+            "SAVE": "Guardar"
+        },
+        "DEFAULT-OUTCOME": {
+            "COMPLETE": "Completar",
+            "START-PROCESS": "Iniciar un proceso",
+            "START-CASE": "Iniciar un caso"
+        },
+        "MESSAGE" : {
+            "SELECT-PERSON": "No hay persona seleccionada...",
+            "SELECT-GROUP": "No hay grupo seleccionado...",
+            "EMPTY": "(vacio)"
+        }
+    },
+    "APP-DEFINITION" : {
+        "MESSAGE" : {
+            "NOT-FOUND": "No se encontro una app con el identificador proporcionado",
+            "MISSING": "Flowable se está ejecutando en modo integración, pero no se encuentra la definción de la app requerida"
+        }
+    }
+}

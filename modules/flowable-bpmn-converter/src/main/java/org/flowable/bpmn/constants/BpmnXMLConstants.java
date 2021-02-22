@@ -72,8 +72,6 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_ORDERING = "ordering";
     public static final String ATTRIBUTE_CANCEL_REMAINING_INSTANCES = "cancelRemainingInstances";
     public static final String ELEMENT_COMPLETION_CONDITION = "completionCondition";
-    public static final String ATTRIBUTE_MESSAGE_EXPRESSION = "messageExpression";
-    public static final String ATTRIBUTE_SIGNAL_EXPRESSION = "signalExpression";
 
     public static final String ELEMENT_DATA_STATE = "dataState";
 
@@ -181,6 +179,11 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS = "class";
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
 
+    public static final String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_STORE_AS_TRANSIENT_VARIABLE = "storeAsTransientVariable";
+    public static final String ATTRIBUTE_VARIABLE_AGGREGATION_CREATE_OVERVIEW = "createOverviewVariable";
+
     public static final String ATTRIBUTE_TASK_IMPLEMENTATION = "implementation";
     public static final String ATTRIBUTE_TASK_OPERATION_REF = "operationRef";
 
@@ -196,6 +199,11 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_EXTENSIONID = "extensionId";
     public static final String ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_SERVICE_USE_LOCAL_SCOPE_FOR_RESULT_VARIABLE = "useLocalScopeForResultVariable";
+    public static final String ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
+
+    public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC = "topic";
+
+    public static final String ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 
     public static final String ATTRIBUTE_TASK_USER_ASSIGNEE = "assignee";
     public static final String ATTRIBUTE_TASK_USER_OWNER = "owner";
@@ -206,6 +214,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_USER_CATEGORY = "category";
     public static final String ATTRIBUTE_TASK_USER_PRIORITY = "priority";
     public static final String ATTRIBUTE_TASK_USER_SKIP_EXPRESSION = "skipExpression";
+    public static final String ATTRIBUTE_TASK_ID_VARIABLE_NAME = "taskIdVariableName";
 
     public static final String ATTRIBUTE_TASK_RULE_VARIABLES_INPUT = "ruleVariablesInput";
     public static final String ATTRIBUTE_TASK_RULE_RESULT_VARIABLE = "resultVariable";
@@ -217,6 +226,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
     public static final String ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT = "fallbackToDefaultTenant";
+    public static final String ATTRIBUTE_ID_VARIABLE_NAME = "idVariableName";
     public static final String ELEMENT_IN_PARAMETERS = "in";
     public static final String ELEMENT_OUT_PARAMETERS = "out";
 
@@ -229,9 +239,20 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
+    public static final String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
     
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";
     public static final String ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME = "caseInstanceName";
+
+    public static final String ELEMENT_EVENT_TYPE = "eventType";
+    public static final String ELEMENT_TRIGGER_EVENT_TYPE = "triggerEventType";
+    public static final String ELEMENT_SEND_SYNCHRONOUSLY = "sendSynchronously";
+    public static final String START_EVENT_CORRELATION_CONFIGURATION = "startEventCorrelationConfiguration";
+    public static final String START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID = "storeAsUniqueReferenceId";
+
+    public static final String ATTRIBUTE_TRIGGERABLE = "triggerable";
+    public static final String ELEMENT_TRIGGER_EVENT_CORRELATION_PARAMETER = "triggerEventCorrelationParameter";
 
     public static final String ELEMENT_SEQUENCE_FLOW = "sequenceFlow";
     public static final String ELEMENT_FLOW_CONDITION = "conditionExpression";
@@ -269,9 +290,11 @@ public interface BpmnXMLConstants {
     
     public static final String ELEMENT_EVENT_MESSAGEDEFINITION = "messageEventDefinition";
     public static final String ATTRIBUTE_MESSAGE_REF = "messageRef";
+    public static final String ATTRIBUTE_MESSAGE_EXPRESSION = "messageExpression";
     
     public static final String ELEMENT_EVENT_SIGNALDEFINITION = "signalEventDefinition";
     public static final String ATTRIBUTE_SIGNAL_REF = "signalRef";
+    public static final String ATTRIBUTE_SIGNAL_EXPRESSION = "signalExpression";
     public static final String ATTRIBUTE_SCOPE = "scope";
     
     public static final String ELEMENT_EVENT_TIMERDEFINITION = "timerEventDefinition";
@@ -294,6 +317,10 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_COMPENSATEDEFINITION = "compensateEventDefinition";
     public static final String ATTRIBUTE_COMPENSATE_ACTIVITYREF = "activityRef";
     public static final String ATTRIBUTE_COMPENSATE_WAITFORCOMPLETION = "waitForCompletion";
+    
+    public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
+    public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
+    public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
 
     public static final String ELEMENT_FORMPROPERTY = "formProperty";
     public static final String ATTRIBUTE_FORM_ID = "id";
@@ -334,6 +361,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DATA_ID = "id";
     public static final String ATTRIBUTE_DATA_NAME = "name";
     public static final String ATTRIBUTE_DATA_ITEM_REF = "itemSubjectRef";
+    
     // only used by valued data objects
     public static final String ELEMENT_DATA_VALUE = "value";
 

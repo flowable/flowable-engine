@@ -25,15 +25,23 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.HistoricActivityInstanceMatcher;
+import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.UnfinishedHistoricActivityInstanceByProcessInstanceIdMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.UnfinishedHistoricActivityInstanceMatcher;
+import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessDataManager<HistoricActivityInstanceEntity> implements HistoricActivityInstanceDataManager {
 
-    protected CachedEntityMatcher<HistoricActivityInstanceEntity> unfinishedHistoricActivityInstanceMatcher = new UnfinishedHistoricActivityInstanceMatcher();
-    protected CachedEntityMatcher<HistoricActivityInstanceEntity> historicActivityInstanceMatcher = new HistoricActivityInstanceMatcher();
+    protected CachedEntityMatcher<HistoricActivityInstanceEntity> unfinishedHistoricActivityInstanceMatcher
+        = new UnfinishedHistoricActivityInstanceMatcher();
+
+    protected CachedEntityMatcher<HistoricActivityInstanceEntity> unfinishedHistoricActivityInstanceByProcessInstanceIdMatcher
+        = new UnfinishedHistoricActivityInstanceByProcessInstanceIdMatcher();
+
+    protected CachedEntityMatcher<HistoricActivityInstanceEntity> historicActivityInstanceMatcher
+        = new HistoricActivityInstanceMatcher();
 
     public MybatisHistoricActivityInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -47,6 +55,11 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
     @Override
     public HistoricActivityInstanceEntity create() {
         return new HistoricActivityInstanceEntityImpl();
+    }
+
+    @Override
+    public HistoricActivityInstanceEntity create(ActivityInstance activityInstance) {
+        return new HistoricActivityInstanceEntityImpl(activityInstance);
     }
 
     @Override
@@ -69,7 +82,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
     public List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByProcessInstanceId(final String processInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
-        return getList("selectUnfinishedHistoricActivityInstanceByProcessInstanceId", params, unfinishedHistoricActivityInstanceMatcher, true);
+        return getList("selectUnfinishedHistoricActivityInstanceByProcessInstanceId", params, unfinishedHistoricActivityInstanceByProcessInstanceIdMatcher, true);
     }
 
     @Override

@@ -101,7 +101,7 @@ public class HistoricProcessInstanceBaseResource {
             query.processDefinitionName(queryRequest.getProcessDefinitionName());
         }
         if (queryRequest.getProcessDefinitionVersion() != null) {
-            query.processDefinitionVersion(Integer.valueOf(queryRequest.getProcessDefinitionVersion()));
+            query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
         }
         if (queryRequest.getProcessDefinitionCategory() != null) {
             query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());
@@ -114,6 +114,15 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
+        }
+        if (queryRequest.getProcessBusinessKeyLike() != null) {
+            query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
+        if (queryRequest.getActiveActivityId() != null) {
+            query.activeActivityId(queryRequest.getActiveActivityId());
+        }
+        if (queryRequest.getActiveActivityIds() != null) {
+            query.activeActivityIds(queryRequest.getActiveActivityIds());
         }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());

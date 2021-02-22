@@ -109,6 +109,7 @@ public class DefaultCaseDiagramCanvas {
     protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage PROCESSTASK_IMAGE;
     protected static BufferedImage DECISIONTASK_IMAGE;
+    protected static BufferedImage SENDEVENTTASK_IMAGE;
 
     protected int canvasWidth = -1;
     protected int canvasHeight = -1;
@@ -202,6 +203,7 @@ public class DefaultCaseDiagramCanvas {
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             PROCESSTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/processTask.png", customClassLoader));
             DECISIONTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/decisionTask.png", customClassLoader));
+            SENDEVENTTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/sendEventTask.png", customClassLoader));
 
         } catch (IOException e) {
             LOGGER.warn("Could not load image for case diagram creation: {}", e.getMessage());
@@ -218,22 +220,12 @@ public class DefaultCaseDiagramCanvas {
             throw new FlowableImageException("CaseDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(caseDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating case image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
@@ -272,15 +264,15 @@ public class DefaultCaseDiagramCanvas {
         Stroke originalStroke = g.getStroke();
 
         g.setPaint(CONNECTION_COLOR);
-        if (connectionType.equals("association")) {
+        if ("association".equals(connectionType)) {
             g.setStroke(ASSOCIATION_STROKE);
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -321,7 +313,7 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
-    
+
     public void drawGenericEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, null, scaleFactor);
     }
@@ -333,7 +325,7 @@ public class DefaultCaseDiagramCanvas {
     public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
     }
-    
+
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();
         g.setPaint(EVENT_COLOR);
@@ -455,6 +447,7 @@ public class DefaultCaseDiagramCanvas {
 
         g.setPaint(originalPaint);
         // text
+
         if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             int boxWidth = width - (2 * TEXT_PADDING);
             int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;
@@ -555,6 +548,10 @@ public class DefaultCaseDiagramCanvas {
 
     public void drawServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SERVICETASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+    
+    public void drawSendEventTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDEVENTTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawCaseTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

@@ -1,0 +1,17 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://www.flowable.org/test">
+
+    <process id="process" name="process1" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow sourceRef="start" targetRef="externalWorkerServiceTask"/>
+        <serviceTask id="externalWorkerServiceTask" flowable:type="external-worker" name="External worker task" flowable:skipExpression="skipExpression"
+                     flowable:topic="topic">
+            <extensionElements>
+                <flowable:customValue>test</flowable:customValue>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow sourceRef="externalWorkerServiceTask" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

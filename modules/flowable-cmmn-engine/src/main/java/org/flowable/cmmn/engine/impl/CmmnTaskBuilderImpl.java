@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CreateCmmnTaskCmd;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.task.api.Task;
@@ -22,9 +23,12 @@ import org.flowable.task.service.impl.BaseTaskBuilderImpl;
  * {@link TaskBuilder} implementation
  */
 public class CmmnTaskBuilderImpl extends BaseTaskBuilderImpl {
+    
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
-    CmmnTaskBuilderImpl(CommandExecutor commandExecutor) {
+    CmmnTaskBuilderImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(commandExecutor);
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override

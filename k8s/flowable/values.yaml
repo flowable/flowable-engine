@@ -1,0 +1,106 @@
+host:
+  # Public / external hostname (f.e. LB)
+  external: localhost
+# Global database name, user and password
+database:
+  name: flowable
+  username: flowable
+  password: flowable
+  # specify to overwrite dynamic template values 
+  # datasourceDriverClassName:
+  # datasourceUrl:
+cloudSql:
+  enabled: false
+  # Google Cloud SQL instance connection name
+  # instanceConnectionName: 
+  # Google credentials file name stored as secret in the cluster
+  credentials: cloudsql-credentials.json
+
+ingress:
+  enabled: true
+  sslRedirect: false
+  useHost: false
+  # To enable LetsEncrypt signed certificates rather than self-signed ones
+  # you must deploy a ClusterIssuer object and specify the privateKeySecretRef's
+  # name here
+  #clusterIssuer: "letsencrypt-prod"
+
+# Enable either Flowable UI or Flowable REST
+ui:
+  enabled: true
+  replicas: 1
+  service:
+    name: flowable-ui
+  contextPath: /flowable-ui
+  ingressPath: /
+  image:
+    repository: flowable/flowable-ui
+    tag: 6.6.0
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  javaOpts: "-Xmx1g -Xms1g"
+  admin:
+    username: admin
+    password: test
+  idm:
+    admin:
+      username: admin
+      password: test
+
+# Enable either Flowable UI or Flowable REST
+rest:
+  enabled: false
+  replicas: 1
+  service:
+    name: flowable-rest
+  contextPath: /flowable-rest
+  ingressPath: /
+  image:
+    repository: flowable/flowable-rest
+    tag: 6.6.0
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  javaOpts: "-Xmx1g -Xms1g"
+  admin:
+    username: rest-admin
+    password: test
+
+# NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
+nginx-ingress:
+  # disable when the cluster already has an nginx-ingress deployed
+  enabled: false
+  rbac:
+    create: true
+  # the controller will set the endpoint records on the ingress objects to reflect those on the service
+  controller:
+    publishService:
+      enabled: true
+
+postgres:
+  enabled: true
+  service:
+    name: flowable-postgres
+  image: postgres:9.6
+  storage:
+    storageClassName: "standard"
+#    storageClassName: "ssd"
+    size: 1Gi
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"

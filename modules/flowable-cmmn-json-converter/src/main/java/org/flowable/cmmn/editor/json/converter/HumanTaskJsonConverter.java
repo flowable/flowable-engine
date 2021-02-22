@@ -21,7 +21,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
-import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -38,10 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
-
-    protected Map<String, String> formMap;
-    protected Map<String, CmmnModelInfo> formKeyMap;
+public class HumanTaskJsonConverter extends BaseCmmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -64,7 +60,8 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement,
+            CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         PlanItem planItem = (PlanItem) baseElement;
         HumanTask humanTask = (HumanTask) planItem.getPlanItemDefinition();
         String assignee = humanTask.getAssignee();
@@ -76,12 +73,12 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         }
 
         if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
-            if (formKeyMap != null && formKeyMap.containsKey(humanTask.getFormKey())) {
+            Map<String, String> modelInfo = converterContext.getFormModelInfoForFormModelKey(humanTask.getFormKey());
+            if (modelInfo != null) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                CmmnModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
-                formRefNode.put("id", modelInfo.getId());
-                formRefNode.put("name", modelInfo.getName());
-                formRefNode.put("key", modelInfo.getKey());
+                formRefNode.put("id", modelInfo.get("id"));
+                formRefNode.put("name", modelInfo.get("name"));
+                formRefNode.put("key", modelInfo.get("key"));
                 propertiesNode.set(PROPERTY_FORM_REFERENCE, formRefNode);
 
             } else {
@@ -91,6 +88,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         setPropertyValue(PROPERTY_USERTASK_DUEDATE, humanTask.getDueDate(), propertiesNode);
         setPropertyValue(PROPERTY_USERTASK_CATEGORY, humanTask.getCategory(), propertiesNode);
+        setPropertyValue(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, humanTask.getTaskIdVariableName(), propertiesNode);
 
         convertTaskListenersToJson(propertiesNode, humanTask);
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, humanTask);
@@ -253,16 +251,17 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
 
         HumanTask task = new HumanTask();
 
         task.setPriority(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
-        task.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(elementNode, formMap));
+        task.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(elementNode, converterContext));
         task.setValidateFormFields(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORM_FIELD_VALIDATION, elementNode));
 
         task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
+        task.setTaskIdVariableName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_TASK_ID_VARIABLE_NAME, elementNode));
 
         convertJsonToTaskListeners(elementNode, task);
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
@@ -452,13 +451,4 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         }
     }
 
-    @Override
-    public void setFormMap(Map<String, String> formMap) {
-        this.formMap = formMap;
-    }
-
-    @Override
-    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap) {
-        this.formKeyMap = formKeyMap;
-    }
 }

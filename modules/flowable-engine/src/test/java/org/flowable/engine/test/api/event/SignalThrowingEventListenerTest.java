@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,6 +11,9 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.event;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -25,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throws a signal BPMN event when an {@link FlowableEvent} has been dispatched.
- * 
+ *
  * @author Frederik Heremans
  */
 public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
@@ -42,22 +45,23 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
             // Fetch the task and re-assign it to trigger the event-listener
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
             taskService.setAssignee(task.getId(), "kermit");
 
             // Boundary-event should have been signaled and a new task should be
             // available, on top of the already
             // existing one, since the cancelActivity='false'
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
-            assertNotNull(task);
-            assertEquals("kermit", task.getAssignee());
+            assertThat(task).isNotNull();
+            assertThat(task.getAssignee()).isEqualTo("kermit");
 
-            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
-            assertNotNull(boundaryTask);
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask")
+                    .singleResult();
+            assertThat(boundaryTask).isNotNull();
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -68,22 +72,23 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
     @Deployment
     public void testThrowSignalDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // Fetch the task and re-assign it to trigger the event-listener
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         taskService.setAssignee(task.getId(), "kermit");
 
         // Boundary-event should have been signaled and a new task should be
         // available, on top of the already
         // existing one, since the cancelActivity='false'
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
-        assertNotNull(task);
-        assertEquals("kermit", task.getAssignee());
+        assertThat(task).isNotNull();
+        assertThat(task.getAssignee()).isEqualTo("kermit");
 
-        org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
-        assertNotNull(boundaryTask);
+        org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask")
+                .singleResult();
+        assertThat(boundaryTask).isNotNull();
     }
 
     @Test
@@ -97,21 +102,22 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
             // Fetch the task and re-assign it to trigger the event-listener
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
             taskService.setAssignee(task.getId(), "kermit");
 
             // Boundary-event should have been signalled and a new task should
             // be available, the already existing one is gone, since the cancelActivity='true'
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
-            assertNull(task);
+            assertThat(task).isNull();
 
-            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
-            assertNotNull(boundaryTask);
-            
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask")
+                    .singleResult();
+            assertThat(boundaryTask).isNotNull();
+
             waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
         } finally {
@@ -133,33 +139,26 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.JOB_RETRIES_DECREMENTED);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
             Job signalJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-            try {
-                managementService.executeJob(signalJob.getId());
-                fail("Exception expected");
-            } catch (FlowableException ae) {
-                // Ignore, expected exception
-            }
+            assertThatThrownBy(() -> managementService.executeJob(signalJob.getId()))
+                    .isInstanceOf(FlowableException.class);
 
             Job failedJob = managementService.createTimerJobQuery().withException().processInstanceId(processInstance.getId()).singleResult();
 
-            assertNotNull(failedJob);
-            assertEquals(2, failedJob.getRetries());
+            assertThat(failedJob).isNotNull();
+            assertThat(failedJob.getRetries()).isEqualTo(2);
 
             // One retry should have triggered dispatching of a retry-decrement event
-            assertEquals(1, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
-            try {
-                managementService.moveTimerToExecutableJob(failedJob.getId());
-                managementService.executeJob(failedJob.getId());
-                fail("Exception expected");
-            } catch (FlowableException ae) {
-                // Ignore, expected exception
-                assertEquals(2, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
-            }
+            managementService.moveTimerToExecutableJob(failedJob.getId());
+            assertThatThrownBy(() -> managementService.executeJob(signalJob.getId()))
+                    .isInstanceOf(FlowableException.class);
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
@@ -180,33 +179,25 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.JOB_EXECUTION_FAILURE);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignal");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
             Job signalJob = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
 
-            try {
-                managementService.executeJob(signalJob.getId());
-                fail("Exception expected");
-            } catch (FlowableException ae) {
-                // Ignore, expected exception
-            }
+            assertThatThrownBy(() -> managementService.executeJob(signalJob.getId()))
+                    .isInstanceOf(FlowableException.class);
 
             Job failedJob = managementService.createTimerJobQuery().withException().processInstanceId(processInstance.getId()).singleResult();
 
-            assertNotNull("Expected job with exception, found no such job", failedJob);
-            assertEquals(2, failedJob.getRetries());
+            assertThat(failedJob).as("Expected job with exception, found no such job").isNotNull();
+            assertThat(failedJob.getRetries()).isEqualTo(2);
 
             // Three retries should each have triggered dispatching of a retry-decrement event
-            assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
-            try {
-                managementService.moveTimerToExecutableJob(failedJob.getId());
-                managementService.executeJob(failedJob.getId());
-                fail("Exception expected");
-            } catch (FlowableException ae) {
-                // Ignore, expected exception
-                assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
-            }
+            managementService.moveTimerToExecutableJob(failedJob.getId());
+            assertThatThrownBy(() -> managementService.executeJob(signalJob.getId()))
+                    .isInstanceOf(FlowableException.class);
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
@@ -228,28 +219,28 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             processEngineConfiguration.getEventDispatcher().addEventListener(listener, FlowableEngineEventType.TASK_ASSIGNED);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("globalSignalProcess");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
 
             ProcessInstance externalProcess = runtimeService.startProcessInstanceByKey("globalSignalProcessExternal");
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
             // Make sure process is not ended yet by querying it again
             externalProcess = runtimeService.createProcessInstanceQuery().processInstanceId(externalProcess.getId()).singleResult();
-            assertNotNull(externalProcess);
+            assertThat(externalProcess).isNotNull();
 
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
+            assertThat(task).isNotNull();
 
             // Assign task to trigger signal
             taskService.setAssignee(task.getId(), "kermit");
 
             // Second process should have been signaled
             externalProcess = runtimeService.createProcessInstanceQuery().processInstanceId(externalProcess.getId()).singleResult();
-            assertNull(externalProcess);
+            assertThat(externalProcess).isNull();
 
             // org.flowable.task.service.Task assignee should still be set
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            assertNotNull(task);
-            assertEquals("kermit", task.getAssignee());
+            assertThat(task).isNotNull();
+            assertThat(task.getAssignee()).isEqualTo("kermit");
 
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -265,27 +256,27 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/SignalThrowingEventListenerTest.globalSignalExternalProcess.bpmn20.xml" })
     public void testGlobalSignalDefinedInProcessDefinition() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("globalSignalProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         ProcessInstance externalProcess = runtimeService.startProcessInstanceByKey("globalSignalProcessExternal");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         // Make sure process is not ended yet by querying it again
         externalProcess = runtimeService.createProcessInstanceQuery().processInstanceId(externalProcess.getId()).singleResult();
-        assertNotNull(externalProcess);
+        assertThat(externalProcess).isNotNull();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Assign task to trigger signal
         taskService.setAssignee(task.getId(), "kermit");
 
         // Second process should have been signaled
         externalProcess = runtimeService.createProcessInstanceQuery().processInstanceId(externalProcess.getId()).singleResult();
-        assertNull(externalProcess);
+        assertThat(externalProcess).isNull();
 
         // org.flowable.task.service.Task assignee should still be set
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
-        assertEquals("kermit", task.getAssignee());
+        assertThat(task).isNotNull();
+        assertThat(task.getAssignee()).isEqualTo("kermit");
     }
 }

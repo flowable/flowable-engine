@@ -1,0 +1,1586 @@
+{
+  "GENERAL": {
+    "YES": "はい",
+    "NO": "いいえ",
+    "ACTION": {
+      "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
+      "DISMISS-ALERT": "クリックしてメッセージを消す",
+      "RETURN-TO-LIST": "一覧に戻る",
+      "SHOW-RESULTS": "{{size}} 件の結果",
+      "REFRESH-LIST": "一覧を更新",
+      "SORT-BY": "{{sort}}でソート",
+      "CLEAR-FILTERS": "フィルターをクリア",
+      "CANCEL-AND-CLOSE": "キャンセルして閉じる",
+      "CANCEL": "キャンセル",
+      "OK": "OK",
+      "NEXT": "次へ",
+      "PREVIOUS": "前へ",
+      "CLOSE": "閉じる",
+      "SHOWLICENSE": "ライセンス情報"
+    },
+    "TITLE": {
+      "MAIN": "Activiti管理者",
+      "ACTIONS": "アクション",
+      "FILTERS": "フィルター"
+    },
+    "MENU": {
+      "PROCESS-ENGINE": "プロセスエンジン",
+      "CMMN-ENGINE": "CMMNエンジン",
+      "APP-ENGINE": "アプリエンジン",
+      "FORM-ENGINE": "フォームエンジン",
+      "CONTENT-ENGINE": "コンテンツエンジン",
+      "DMN-ENGINE": "DMNエンジン",
+      "DEPLOYMENTS": "デプロイ",
+      "DEFINITIONS": "定義",
+      "INSTANCES": "インスタンス",
+      "TASKS": "タスク",
+      "JOBS": "ジョブ",
+      "BATCHES": "バッチ",
+      "EVENT-SUBSCRIPTIONS": "イベント購読",
+      "CONFIGURATION": "設定",
+      "CONFIGURATION-ENGINE": "エンジン",
+      "DECISION-TABLES": "判断",
+      "DECISION-TABLE-EXECUTIONS": "実行",
+      "CONTENT-ITEMS": "コンテンツアイテム"
+    },
+    "RESULT-SIZES": {
+      "10": "10",
+      "25": "25",
+      "50": "50",
+      "100": "100",
+      "100000000": "すべて"
+    }
+  },
+  "PROCESS-DEFINITION": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "VERSION": "バージョン:",
+    "DESCRIPTION": "説明:",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "SUSPENDED": "保留中:",
+    "DEPLOYMENT": "デプロイ:",
+    "TENANT": "テナント:",
+    "START-FORM-DEFINED": "定義された開始フォーム:",
+    "GRAPHICAL-NOTATION-DEFINED": "定義されたグラフィカル記述:",
+    "PROCESS-INSTANCES-SIZE": " {{total}}個のプロセスが実行中",
+    "PROCESS-INSTANCES-SHOWING": "- 最近開始された{{size}} 個を表示",
+    "PROCESS-INSTANCES-EMPTY": "実行中のプロセスはありません",
+    "JOBS-SIZE": "{{total}}個のジョブが実行中",
+    "JOBS-EMPTY": "実行中のジョブはありません",
+    "DECISION-TABLES-SIZE": "{{total}}個の判断があります。",
+    "DECISION-TABLES-EMPTY": "判断がありません。",
+    "FORM-DEFINITIONS-SIZE": "{{total}}個のフォーム定義があります。",
+    "FORM-DEFINITIONS-EMPTY": "フォーム定義はありません。",
+    "TITLE": {
+      "PROCESS-INSTANCES": "プロセスインスタンス",
+      "JOBS": "ジョブ",
+      "DECISION-TABLES": "判断",
+      "FORMS": "フォーム定義"
+    },
+    "ACTION": {
+      "EDIT-CATEGORY": "カテゴリーを編集",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-ALL-PROCESSES": "全プロセスの表示",
+      "SHOW-DIAGRAM": "プロセス図の表示",
+      "MIGRATE-PROCESSDEFINITION": "プロセス定義インスタンスの移行"
+    },
+    "POPUP": {
+      "EDIT-CATEGORY": {
+        "TITLE": "カテゴリーを編集",
+        "MESSAGE": "カテゴリーの初期値はBPMN 2.0 XMLのtargetNameSpace属性から取得されます。デプロイ後に変更可能です。",
+        "CATEGORY": "カテゴリー",
+        "CATEGORY-PLACEHOLDER": "カテゴリーを入力",
+        "CONFIRM": "カテゴリーを更新"
+      },
+      "SHOW-PROCESS-MODEL": {
+        "TITLE": "プロセス図"
+      },
+      "MIGRATE": {
+        "TITLE": "プロセスインスタンスの移行",
+        "MESSAGE": "プロセス定義の別バージョンへプロセスインスタンスを移行し、アクティビティマッピングを定義します。",
+        "CURRENT-DEFINITION": "現在のプロセス定義",
+        "TARGET-DEFINITION": "移行後のプロセス定義"
+      }
+    }
+  },
+  "PROCESS-DEFINITIONS": {
+    "LIST-MESSAGE": "条件にあった{{total}}個の定義のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうプロセス定義はありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "KEY": "キー（大文字小文字を区別）",
+      "DEPLOYMENT-ID": "デプロイID",
+      "TENANT-ID": "テナントID",
+      "LATEST": "最新バージョン",
+      "LATEST-HELP": "最新バージョンのみ表示"
+    },
+    "TITLE": {
+      "MAIN": "プロセス定義"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン",
+      "KEY": "キー",
+      "TENANT": "テナント"
+    },
+    "ACTIONS": {
+      "UPLOAD-FROM-MODELER": "Flowableエディターからアップロード"
+    },
+    "POPUP": {
+      "UPLOAD-FROM-MODELER": {
+        "NAME": "ユーザー名",
+        "PASSWORD": "パスワード",
+        "ERROR": "エディターと通信できません",
+        "UNAUTHORIZED": "不正な認証情報",
+        "UPLOAD-DESCRIPTION": "プロセスモデルが取得され、現在アクティブなFlowableクラスターにデプロイされます。適切なデプロイパッケージ名を選択してください。"
+      }
+    }
+  },
+  "PROCESS-INSTANCE": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "DESCRIPTION": "説明:",
+    "BUSINESS-KEY": "ビジネスキー:",
+    "TENANT-ID": "テナント:",
+    "STATUS": "ステータス:",
+    "STATUS-ACTIVE": "アクティブ",
+    "STATUS-COMPLETED": "完了",
+    "ACTIVITY-ID-STARTED": "開始したアクティビティID:",
+    "ACTIVITY-ID-ENDED": "アクティビティ内終了済:",
+    "DELETE-REASON": "削除理由:",
+    "STARTED-BY": "開始者:",
+    "END-TIME": "終了時間:",
+    "DURATION": "期間:",
+    "SUPER-PROCESS-INSTANCE-ID": "親プロセスのインスタンスID:",
+    "TASKS-SIZE": "このプロセスインスタンスには{{total}}個のタスクがあります。",
+    "TASKS-EMPTY": "このプロセスインスタンスにはタスクがありません。",
+    "VARIABLES-SIZE": "このプロセスインスタンスには{{total}}個の変数があります。",
+    "VARIABLES-EMPTY": "このプロセスインスタンスには変数がありません。",
+    "JOBS-SIZE": "このプロセスインスタンスには{{total}}個のジョブがあります。",
+    "JOBS-EMPTY": "このプロセスインスタンスにはジョブがありません。",
+    "SUBPROCESSES-SIZE": "このプロセスインスタンスには{{total}}個のサブプロセスがあります。",
+    "SUBPROCESSES-EMPTY": "このプロセスインスタンスにはサブプロセスがありません。",
+    "DECISION-TABLES-SIZE": "このプロセスインスタンスには{{total}}個の判断があります。",
+    "DECISION-TABLES-EMPTY": "このプロセスインスタンスには判断がありません。",
+    "FORM-INSTANCES-SIZE": "このプロセスインスタンスには{{total}}個のフォームインスタンスがあります。",
+    "FORM-INSTANCES-EMPTY": "このプロセスインスタンスにはフォームインスタンスがありません。",
+    "TITLE": {
+      "TASKS": "タスク",
+      "VARIABLES": "変数",
+      "JOBS": "ジョブ",
+      "SUBPROCESSES": "サブプロセス",
+      "DECISION-TABLES": "判断",
+      "FORM-INSTANCES": "フォームインスタンス"
+    },
+    "ACTION": {
+      "DELETE": "プロセスインスタンスの削除",
+      "TERMINATE": "プロセスインスタンスの停止",
+      "SHOW-ALL-TASKS": "全タスクの表示",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-ALL-SUBPROCESSES": "全サブプロセスの表示",
+      "SHOW-DIAGRAM": "プロセス図の表示",
+      "MIGRATE-PROCESSINSTANCE": "プロセスインスタンスの移行",
+      "TITLE-VARIABLES": "選択した変数へのアクション",
+      "DELETE-VARIABLE": "変数の削除",
+      "UPDATE-VALUE": "変数の更新",
+      "ADD-VARIABLE": "変数の追加"
+    },
+    "POPUP": {
+      "DELETE": {
+        "TITLE": "プロセスインスタンスの削除",
+        "MESSAGE-DELETE": "このプロセスインスタンスを削除しますか？",
+        "MESSAGE-TERMINATE": "このプロセスインスタンスを停止しますか？",
+        "DELETE-REASON": "削除理由",
+        "DELETE-REASON-HELP": "削除理由を入力",
+        "CONFIRM-DELETE": "プロセスインスタンスの削除",
+        "CONFIRM-TERMINATE": "プロセスインスタンスの停止"
+      },
+      "SHOW-PROCESS-MODEL": {
+        "TITLE": "プロセス図"
+      },
+      "CREATE-VARIABLE": {
+        "TITLE": "変数の作成",
+        "NAME": "変数名",
+        "TYPE": "Activiti変数タイプ",
+        "VALUE": "変数値",
+        "CREATE": "作成"
+      },
+      "UPDATE-VARIABLE": {
+        "TITLE": "変数“{{name}}”の更新",
+        "NAME": "変数名",
+        "VALUE": "値",
+        "CHECKED": "true",
+        "UNCHECKED": "false",
+        "DATE-HELP": "ISO-8601 フォーマット (例 : 2016-01-28T23:00:00Z)",
+        "ACTION-UPDATE": "更新"
+      },
+      "DELETE-VARIABLE": {
+        "TITLE": "変数“{{name}}”の削除",
+        "MESSAGE": "この変数を削除しますか？",
+        "DELETE": "削除"
+      }
+    }
+  },
+  "PROCESS-INSTANCES": {
+    "TITLE": "プロセスインスタンス",
+    "LIST-MESSAGE": "条件にあった{{total}}個のプロセスインスタンスのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうプロセスインスタンスはありません。",
+    "FILTER": {
+      "NAME": "名前",
+      "PROCESS-DEFINITION": "プロセス定義",
+      "ALL-PROCESS-DEFINITIONS": "すべてのプロセス定義",
+      "STATUS": "ステータス",
+      "STATUS-ANY": "任意のステータス",
+      "STATUS-ACTIVE": "Activitiインスタンス",
+      "STATUS-COMPLETE": "完了したインスタンス",
+      "BUSINESS-KEY": "ビジネスキー",
+      "SUPER-PROCESS-INSTANCE-ID": "親プロセスのインスタンスID",
+      "STARTED-BEFORE": "〜以前に開始",
+      "STARTED-AFTER": "〜以降に開始",
+      "ENDED-BEFORE": "〜以前に終了",
+      "ENDED-AFTER": "〜以降に終了",
+      "VARIABLE": "変数",
+      "VARIABLE-NAME": "変数名",
+      "VARIABLE-VALUE": "変数値",
+      "VARIABLE-BOOLEAN-VALUE": "ブーリアン値:{{value}}",
+      "TENANT-ID": "テナント識別子"
+    },
+    "SORT": {
+      "ID": "ID",
+      "START-TIME": "開始時"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "BUSINESS-KEY": "ビジネスキー",
+      "PROCESS-DEFINITION": "プロセス定義",
+      "CREATE-TIME": "作成",
+      "END-TIME": "終了",
+      "STATUS": "ステータス"
+    }
+  },
+  "TASK": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "STATUS": "ステータス:",
+    "STATUS-COMPLETED": "完了",
+    "STATUS-ACTIVE": "アクティブ",
+    "DESCRIPTION": "説明:",
+    "TASK-DEFINITION-KEY": "定義キー:",
+    "FORM-KEY": "フォームキー:",
+    "PRIORITY": "優先度:",
+    "DELEGATION-STATE": "委任状態:",
+    "CATEGORY": "カテゴリー:",
+    "TENANT-ID": "テナント:",
+    "PARENT": "親タスク:",
+    "ASSIGNEE": "担当者:",
+    "OWNER": "所有者:",
+    "START-DATE": "開始日:",
+    "DUE-DATE": "期日:",
+    "END-DATE": "終了日:",
+    "DELETE-REASON": "削除理由:",
+    "PROCESS-INSTANCE": "プロセスインスタンス",
+    "PROCESS-DEFINITION": "プロセス定義",
+    "CASE-INSTANCE": "ケースインスタンス",
+    "CASE-DEFINITION": "ケース定義",
+    "EXECUTION-ID": "実行ID:",
+    "SUBTASKS-MESSAGE": "このタスクには{{total}} 個のサブタスクがあり、{{size}}個を表示しています。",
+    "SUBTASKS-MESSAGE-EMPTY": "このタスクにはサブタスクはありません。",
+    "VARIABLES-MESSAGE": "このタスクには{{size}}個の変数があります。",
+    "VARIABLES-MESSAGE-EMPTY": "このタスクには変数はありません。",
+    "IDENTITY-LINKS-MESSAGE": "このタスクには{{size}}個のアイデンティティーリンクがあります。",
+    "IDENTITY-LINKS-MESSAGE-EMPTY": "このタスクにはアイデンティティーリンクはありません。",
+    "ACTION": {
+      "EDIT": "タスクを編集",
+      "ASSIGN-CLAIM": "タスクの割当",
+      "DELEGATE": "タスクの委譲",
+      "RESOLVE": "タスクの解決",
+      "COMPLETE": "タスクの完了",
+      "DELETE": "タスクの削除",
+      "SHOW-ALL-SUBTASKS": "全サブタスクの表示",
+      "SHOW-SUBMITTED-FORM": "フォームインスタンスの表示"
+    },
+    "TITLE": {
+      "SUBTASKS": "サブタスク",
+      "IDENTITY-LINKS": "アイデンティティリンク",
+      "VARIABLES": "変数"
+    },
+    "POPUP": {
+      "ASSIGN": {
+        "TITLE": "タスクの割当",
+        "MESSAGE": "タスクの割当を実行しますか？",
+        "NEW-ASSIGNEE": "新しい担当者",
+        "NEW-ASSIGNEE-HELP": "誰に割当をしたくない場合は担当者フィールドを空のままにしてください。注意: 指定されたユーザIDが存在することを確認してください。",
+        "CONFIRM": "タスクの割当"
+      },
+      "COMPLETE": {
+        "TITLE": "タスクの完了",
+        "MESSAGE": "タスクを完了しますか？",
+        "CONFIRM": "タスクの完了"
+      },
+      "DELEGATE": {
+        "TITLE": "タスクの委譲",
+        "MESSAGE": "タスクを委譲しますか？",
+        "CONFIRM": "タスクの委譲",
+        "DELEGATE-TO": "委譲するユーザー"
+      },
+      "RESOLVE": {
+        "TITLE": "タスクの解決",
+        "MESSAGE": "タスクを解決しますか？",
+        "CONFIRM": "タスクの解決"
+      },
+      "DELETE": {
+        "TITLE": "タスクの削除",
+        "MESSAGE": "タスクを削除しますか？",
+        "CONFIRM": "タスクの削除"
+      },
+      "EDIT": {
+        "TITLE": "タスクを編集",
+        "CONFIRM": "タスクの更新",
+        "NAME": "名前",
+        "DESCRIPTION": "説明",
+        "PRIORITY": "優先度",
+        "CATEGORY": "カテゴリー",
+        "ASSIGNEE": "担当者",
+        "OWNER": "所有者",
+        "DUE-DATE": "期日"
+      }
+    }
+  },
+  "TASKS": {
+    "TITLE": "タスク",
+    "LIST-MESSAGE": "条件にあった{{total}}個のタスクのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうタスクはありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "ASSIGNEE": "担当者（大文字小文字を区別）",
+      "STATUS": "ステータス",
+      "STATUS-ANY": "任意のステータス",
+      "STATUS-ACTIVE": "アクティブなタスク",
+      "STATUS-COMPLETE": "完了したタスク",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "TENANT-ID": "テナント識別子",
+      "OWNER": "所有者（大文字小文字を区別）",
+      "PARENT-TASK-ID": "親タスクID",
+      "CREATED-BEFORE": "〜以前に作成",
+      "CREATED-AFTER": "〜以降に作成",
+      "ENDED-BEFORE": "〜以前に終了",
+      "ENDED-AFTER": "〜以降に終了",
+      "DUE-BEFORE": "〜以前に期日",
+      "DUE-AFTER": "〜以降に期日",
+      "TASK-VARIABLE": "タスクローカル変数",
+      "PROCESS-VARIABLE": "プロセス変数",
+      "VARIABLE-NAME": "変数名",
+      "VARIABLE-VALUE": "変数値",
+      "VARIABLE-BOOLEAN-VALUE": "ブーリアン値:{{value}}"
+    },
+    "SORT": {
+      "NAME": "名前",
+      "DUE-DATE": "期日",
+      "START-TIME": "開始時",
+      "END-TIME": "終了時",
+      "PRIORITY": "優先度"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "ASSIGNEE": "担当者",
+      "OWNER": "所有者",
+      "CREATE-TIME": "作成",
+      "END-TIME": "終了",
+      "PRIORITY": "優先度"
+    }
+  },
+  "DEPLOYMENTS": {
+    "TITLE": "デプロイ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のデプロイのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうデプロイはありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "TENANTID": "テナント識別子（大文字小文字を区別）"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "DEPLOY-TIME": "デプロイ時間",
+      "CATEGORY": "カテゴリー",
+      "TENANT": "テナント"
+    },
+    "ACTION": {
+      "UPLOAD": "プロセス／パッケージのアップロード",
+      "DELETE": "デプロイの削除"
+    },
+    "POPUP": {
+      "UPLOAD": {
+        "DESCRIPTION": "デプロイする.bpmn、.bpmn20.xmlのプロセスファイルもしくはアセット付きプロセスパッケージを含む.zip、.barファイルを選択、アップロードしてください。",
+        "DROPZONE": "もしくは、ここにファイルをドロップ",
+        "NO-DROP": "ご使用のブラウザではファイルのドロップ機能はサポートされていません",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "アップロードに失敗しました"
+      },
+      "DELETE": {
+        "CONFIRM-MESSAGE": "デプロイ “{{name}}”を削除しますか？"
+      }
+    }
+  },
+  "DEPLOYMENT": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "TIME": "デプロイ時間:",
+    "CATEGORY": "カテゴリー:",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID:",
+    "TENANTID": "テナント識別子:",
+    "DEFINITIONS-MESSAGE": "このデプロイに存在する{{total}}個のプロセス定義のうち{{size}}個を表示しています。",
+    "DEFINITIONS-MESSAGE-EMPTY": "このデプロイにはプロセス定義はありません。",
+    "TITLE": {
+      "DEFINITIONS": "プロセス定義",
+      "RESOURCES": "リソース"
+    },
+    "ACTION": {
+      "SHOW-ALL-DEFINITIONS": "全定義の表示"
+    }
+  },
+  "JOB": {
+    "TITLE": {
+      "MAIN": "ジョブ“{{id}}”",
+      "EXCEPTION": "例外"
+    },
+    "ACTIONS": {
+      "EXECUTE": "ジョブの実行",
+      "MOVE": "ジョブの移動",
+      "DELETE": "ジョブの削除"
+    },
+    "POPUP": {
+      "DELETE-JOB": {
+        "TITLE": "ジョブ“{{id}}”の削除",
+        "MESSAGE": "ジョブ“{{id}}”を削除しますか？",
+        "CONFIRM": "ジョブの削除"
+      }
+    },
+    "ID": "ID:",
+    "EXECUTION-ID": "実行ID:",
+    "PROCESS-INSTANCE": "プロセスインスタンス:",
+    "PROCESS-DEFINITION": "プロセス定義:",
+    "CASE-INSTANCE": "ケースインスタンス:",
+    "CASE-DEFINITION": "ケース定義:",
+    "DUEDATE": "期日:",
+    "RETRIES-LEFT": "残りの再試行:",
+    "TENANT-ID": "テナント:"
+  },
+  "JOBS": {
+    "TITLE": "ジョブ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のジョブのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうジョブはありません。",
+    "FILTER": {
+      "JOBTYPE": {
+        "LABEL": "ジョブタイプ",
+        "EXECUTABLE-JOB": "ジョブの実行",
+        "TIMER-JOB": "タイマージョブ",
+        "SUSPENDED-JOB": "休止されたジョブ",
+        "DEADLETTER-JOB": "デッドレタージョブ"
+      },
+      "PROCESS-DEFINITION": "プロセス定義",
+      "ALL-PROCESS-DEFINITIONS": "すべてのプロセス定義",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-DEFINITION": "ケース定義",
+      "ALL-CASE-DEFINITIONS": "すべてのケース定義",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "TENANT-ID": "テナント識別子",
+      "DUE-BEFORE": "〜以前に期日",
+      "DUE-AFTER": "〜以降に期日",
+      "EXCEPTION": "例外",
+      "EXCEPTION-HELP": "例外のあったジョブのみ表示"
+    },
+    "SORT": {
+      "ID": "ジョブID",
+      "DUE-DATE": "期日",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "DUE-DATE": "期日",
+      "PROCESS-DEFINITION": "プロセス定義",
+      "CASE-DEFINITION": "ケース定義",
+      "RETRIES": "再試行",
+      "EXCEPTION": "例外"
+    }
+  },
+  "BATCHES": {
+    "TITLE": "バッチ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のバッチのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうバッチはありません。",
+    "FILTER": {
+      "BATCH-TYPE": "バッチタイプ",
+      "SEARCH-KEY": "検索キー",
+      "SEARCH-KEY2": "検索キー2",
+      "TENANT-ID": "テナント識別子",
+      "CREATE-TIME-BEFORE": "〜以前に作成",
+      "CREATE-TIME-AFTER": "〜以降に作成"
+    },
+    "SORT": {
+      "ID": "バッチID",
+      "CREATE-TIME": "作成日時"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "CREATE-TIME": "作成日時",
+      "SEARCH-KEY": "検索キー",
+      "SEARCH-KEY2": "検索キー2"
+    }
+  },
+  "BATCH": {
+    "ID": "ID:",
+    "TYPE": "バッチタイプ:",
+    "SEARCH-KEY": "検索キー:",
+    "SEARCH-KEY2": "検索キー2:",
+    "CREATE-TIME": "作成日時:",
+    "COMPLETE-TIME": "完了日時:",
+    "STATUS": "ステータス:",
+    "TENANT": "テナント:",
+    "TO-PROCESS-DEFINITION": "移行先プロセス定義:",
+    "ACTIVITY-MAPPINGS": "アクティビティマッピング:",
+    "SUCCESS-BATCH-PARTS-SIZE": "このバッチの{{length}}個の部品が成功しました。",
+    "SUCCESS-BATCH-PARTS-EMPTY": "このバッチに成功した部品はありません。",
+    "FAIL-BATCH-PARTS-SIZE": "このバッチの{{length}}個の部品が失敗しました。",
+    "FAIL-BATCH-PARTS-EMPTY": "このバッチに失敗した部品はありません。",
+    "TITLE": {
+      "BATCH-DOCUMENT": "バッチドキュメント",
+      "SUCCESS-PARTS": "成功した部品",
+      "FAIL-PARTS": "失敗した部品"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "CREATE-TIME": "作成日時",
+      "SCOPE-ID": "スコープID",
+      "SCOPE-TYPE": "スコープタイプ"
+    },
+    "ACTION": {
+      "DELETE": "バッチの削除"
+    },
+    "POPUP": {
+      "DELETE": {
+        "TITLE": "バッチの削除",
+        "CONFIRM-DELETE": "バッチの削除"
+      }
+    }
+  },
+  "BATCH-PART": {
+    "ID": "ID:",
+    "TYPE": "バッチタイプ:",
+    "SEARCH-KEY": "検索キー:",
+    "SEARCH-KEY2": "検索キー2:",
+    "CREATE-TIME": "作成日時:",
+    "COMPLETE-TIME": "完了日時:",
+    "STATUS": "ステータス:",
+    "STATUS-SUCCESS": "このインスタンスは無事移行されました",
+    "STATUS-FAIL": "インスタンスの移行に失敗しました",
+    "STATUS-MESSAGE": "移行メッセージ",
+    "TENANT": "テナント:",
+    "TITLE": {
+      "BATCH-PART-DOCUMENT": "バッチ部品ドキュメント"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "CREATE-TIME": "作成日時",
+      "SCOPE-ID": "スコープID",
+      "SCOPE-TYPE": "スコープタイプ"
+    },
+    "ACTION": {
+      "RETURN-TO-BATCH": "バッチに戻る"
+    }
+  },
+  "EVENT-SUBSCRIPTION": {
+    "TITLE": {
+      "MAIN": "イベント購読“{{id}}”"
+    },
+    "ACTIONS": {
+      "TRIGGER": "トリガーイベント"
+    },
+    "ID": "ID:",
+    "ACTIVITY-ID": "アクティビティID:",
+    "EXECUTION-ID": "実行ID:",
+    "PROCESS-INSTANCE": "プロセスインスタンス:",
+    "PROCESS-DEFINITION": "プロセス定義:",
+    "CREATE-DATE": "作成日:",
+    "EVENT-TYPE": "イベントのタイプ:",
+    "EVENT-NAME": "イベント名:",
+    "TENANT-ID": "テナント:"
+  },
+  "EVENT-SUBSCRIPTIONS": {
+    "TITLE": "イベント購読",
+    "LIST-MESSAGE": "条件にあった{{total}}個のイベント購読のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうイベント購読はありません。",
+    "FILTER": {
+      "PROCESS-DEFINITION": "プロセス定義",
+      "ALL-PROCESS-DEFINITIONS": "すべてのプロセス定義",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "TENANT-ID": "テナント識別子",
+      "CREATED-BEFORE": "〜以前に作成",
+      "CREATED-AFTER": "〜以降に作成"
+    },
+    "SORT": {
+      "ID": "イベント購読ID",
+      "CREATE-DATE": "作成",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "CREATE-DATE": "作成",
+      "PROCESS-DEFINITION": "プロセス定義",
+      "EVENT-TYPE": "イベントタイプ",
+      "EVENT-NAME": "イベント名"
+    }
+  },
+  "LOGIN": {
+    "TITLE": "サインイン",
+    "USERNAME": "ユーザー名",
+    "USERNAME-PLACEHOLDER": "ユーザー名を入力",
+    "PASSWORD": "パスワード",
+    "PASSWORD-PLACEHOLDER": "パスワードを入力",
+    "ACTION": {
+      "CONFIRM": "サインイン"
+    }
+  },
+  "USER": {
+    "POPUP": {
+      "CHANGE-PASSWORD": {
+        "TITLE": "“{{login}}”のパスワードを変更",
+        "OLD-PASSWORD": "旧パスワード",
+        "NEW-PASSWORD": "新パスワード",
+        "CONFIRM": "パスワードの変更"
+      },
+      "DELETE": {
+        "TITLE": "ユーザー {{login}} の削除",
+        "MESSAGE": "ユーザー“{{login}}”を削除しますか？",
+        "CONFIRM": "ユーザーの削除"
+      },
+      "EDIT": {
+        "TITLE": "ユーザー {{login}} の更新",
+        "LOGIN": "ログイン",
+        "EMAIL": "メールアドレス",
+        "FIRSTNAME": "名",
+        "LASTNAME": "姓",
+        "CONFIRM": "ユーザの更新"
+      },
+      "NEW": {
+        "TITLE": "新しいユーザーの作成",
+        "LOGIN": "ログイン",
+        "EMAIL": "メールアドレス",
+        "FIRSTNAME": "名",
+        "LASTNAME": "姓",
+        "PASSWORD": "パスワード",
+        "ADMIN": "管理者権限あり",
+        "CONFIRM": "ユーザの作成"
+      }
+    }
+  },
+  "USERS": {
+    "TITLE": "ユーザー",
+    "ACTION": {
+      "EDIT": "ユーザーの編集",
+      "NEW": "新しいユーザーの作成",
+      "DELETE": "ユーザーの削除",
+      "CHANGE-PASSWORD": "パスワードの変更"
+    },
+    "HEADER": {
+      "LOGIN": "ログイン",
+      "FIRSTNAME": "名",
+      "LASTNAME": "姓",
+      "EMAIL": "メールアドレス",
+      "CLUSTER_USER": "クラスターユーザー"
+    }
+  },
+  "LICENSE": {
+    "POPUP": {
+      "TITLE": "ライセンス情報",
+      "HOLDER": "ホルダー",
+      "SUBJECT": "件名",
+      "PRODUCTKEY": "プロダクトタイプ",
+      "GOODAFTERDATE": "ライセンス有効開始",
+      "GOODBEFOREDATE": "ライセンス有効期限",
+      "NUMBER_OF_PROCESSES": "アクティブなプロセスの数",
+      "NUMBER_OF_ADMINS": "管理者ユーザーの数",
+      "MULTI_TENANT": "マルチテナント",
+      "DEFAULT_TENANT": "デフォルトテナント"
+    }
+  },
+  "CLUSTER": {
+    "NAME": "名前: ",
+    "USER": "ユーザー:",
+    "MASTER-MANDATORY": "必須マスタ設定:",
+    "METRICS-SEND-INTERVAL": "メトリクス送信間隔:",
+    "ENDPOINT-HELP": "エンドポイント設定（クラスター毎に1つ）に単一のFlowable REST環境を指定する必要があります。このエンドポイントはこのアプリケーションの他のセクション（例えばデプロイやプロセス定義など）で使われているデータを取得し管理するために使われます。",
+    "ENDPOINT-NAME": "名前: ",
+    "ENDPOINT-DESCRIPTION": "説明:",
+    "ENDPOINT-ADDRESS": "サーバーアドレス:",
+    "ENDPOINT-PORT": "サーバーポート:",
+    "ENDPOINT-CONTEXT-ROOT": "コンテクストルート:",
+    "ENDPOINT-REST-ROOT": "RESTルート:",
+    "ENDPOINT-USERNAME": "ユーザー名:",
+    "PROCESS-ENGINE-HELP": "このセクションでクラスターの「マスター設定」を定義できます。クラスター内のすべてのインスタンスは起動時にこの設定を使います。（クラスター設定jarがクラスパスに配置されているか所定のプロパティが設定されている必要があります）もし設定がない場合はローカルの設定ファイルの値が採用されます。",
+    "NO-MASTER-DEFINED": "マスター設定は定義されていません",
+    "ACTION": {
+      "SHOW-PASSWORD": "パスワードの表示",
+      "EDIT-CLUSTER-CONFIG": "クラスター設定の編集",
+      "CREATE-CLUSTER-CONFIG": "新規クラスターの作成",
+      "DELETE-CLUSTER-CONFIG": "クラスター設定の削除",
+      "GENERATE-JAR": "クラスター設定jarの生成",
+      "EDIT-ENDPOINT": "RESTエンドポイントの編集",
+      "CHECK-ENDPOINT": "RESTエンドポイントのチェック",
+      "SELECT-MASTER": "マスター設定の選択",
+      "ADD-CONFIGURATION": "マスター設定の追加",
+      "EDIT-CONFIGURATION": "マスター設定の編集",
+      "DELETE-CONFIGURATION": "マスター設定の削除"
+    },
+    "TITLE": {
+      "PROCESS-ENDPOINT": "プロセスAPIエンドポイント設定",
+      "CMMN-ENDPOINT": "CMMN APIエンドポイント設定",
+      "DMN-ENDPOINT": "DMN APIエンドポイント設定",
+      "FORM-ENDPOINT": "フォームAPIエンドポイント設定",
+      "CONTENT-ENDPOINT": "コンテンツAPIエンドポイント設定",
+      "APP-ENDPOINT": "アプリAPIエンドポイント設定"
+    },
+    "POPUP": {
+      "EDIT-ENDPOINT": {
+        "ENDPOINT-NAME": "名前",
+        "ENDPOINT-DESCRIPTION": "説明",
+        "ENDPOINT-ADDRESS": "サーバーアドレス",
+        "ENDPOINT-PORT": "サーバーポート",
+        "ENDPOINT-CONTEXT-ROOT": "コンテクストルート",
+        "ENDPOINT-REST-ROOT": "RESTルート",
+        "ENDPOINT-USERNAME": "ユーザー名",
+        "ENDPOINT-PASSWORD": "パスワード",
+        "ENDPOINT-PASSWORD-HELP": "変更しない場合は空白のまま",
+        "ENDPOINT-URL-PREVIEW": "URLプレビュー",
+        "ACTION-CONFIRM": "エンドポイント設定の保存",
+        "ERROR-401": "エラー: 不正な認証情報",
+        "ERROR-403": "エラー: 不正な認証情報もしくはURL",
+        "ERROR-404": "エラー: URLが見つかりません",
+        "ERROR-500": "エラー: サーバーエラーサーバーログを確認してください"
+      }
+    }
+  },
+  "VARIABLES": {
+    "HEADER": {
+      "NAME": "名前",
+      "TYPE": "タイプ",
+      "VALUE": "値"
+    }
+  },
+  "IDENTITY-LINKS": {
+    "HEADER": {
+      "GROUP-ID": "グループID",
+      "TYPE": "タイプ",
+      "USER-ID": "ユーザーID"
+    }
+  },
+  "ALERT": {
+    "GENERAL": {
+      "HTTP-ERROR": "サーバからデータを取得できません",
+      "AUTHENTICATION-ERROR": "不正なログイン情報が入力されました"
+    },
+    "ENGINE": {
+      "ENDPOINT-UPDATED": "エンドポイント“{{name}}”が更新されました。",
+      "ENDPOINT-INVALID": "エンドポイント“{{name}}”の設定が不正です。",
+      "ENDPOINT-VALID": "エンドポイントは適性です。エンジン: {{name}} - {{version}}"
+    },
+    "JOB": {
+      "DELETED": "ジョブ“{{id}}”を削除しました。",
+      "MOVED": "ジョブ“{{id}}”を移動しました。",
+      "EXECUTED": "ジョブ“{{id}}”を実行しました。"
+    },
+    "EVENT-SUBSCRIPTION": {
+      "TRIGGERED": "イベント購読“{{id}}”をトリガーしました。"
+    },
+    "PROCESS-INSTANCE": {
+      "DELETED": "プロセスインスタンス“{{id}}”を削除しました。",
+      "TERMINATED": "プロセスインスタンス“{{id}}”を停止しました。"
+    },
+    "TASK": {
+      "DELETED": "タスク“{{id}}”を削除しました。",
+      "COMPLETED": "タスク“{{id}}”を完了しました。",
+      "DELEGATED": "タスク“{{id}}”をユーザー“{{user}}”に委譲しました。",
+      "RESOLVED": "タスク“{{id}}”を解決しました。",
+      "ASSIGNED": "タスク“{{id}}”はユーザ“{{user}}”に割当られています。",
+      "UNASSIGNED": "タスク“{{id}}”は未割当です。",
+      "UPDATED": "タスク“{{id}}”を更新しました。"
+    },
+    "USER": {
+      "DELETED": "ユーザー“{{login}}”を削除しました。",
+      "UPDATED": "ユーザー“{{login}}”を更新しました。",
+      "CREATED": "ユーザー“{{login}}”を作成しました。",
+      "PASSWORD-CHANGED": "ユーザー“{{login}}”のパスワードを変更しました。"
+    },
+    "PROCESS-DEFINITION": {
+      "CATEGORY-UPDATED": "プロセス定義の更新済カテゴリー"
+    },
+    "DEPLOYMENT": {
+      "DELETED-DEPLOYMENT": "デプロイ “{{name}}”を削除",
+      "DELETE-ERROR": "デプロイを削除できません。{{exception || ''}}",
+      "DEPLOYMENT-SUCCESS": "デプロイ成功"
+    },
+    "APP-DEPLOYMENT": {
+      "DELETED-APP": "アプリ“{{appDefinition.name}}”の削除",
+      "DELETE-ERROR": "アプリを削除できません。{{message || ''}}"
+    }
+  },
+  "CMMN-DEPLOYMENTS": {
+    "TITLE": "デプロイ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のデプロイのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうデプロイはありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "TENANTID": "テナント識別子（大文字小文字を区別）"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "DEPLOY-TIME": "デプロイ時間",
+      "CATEGORY": "カテゴリー",
+      "TENANT": "テナント"
+    },
+    "ACTION": {
+      "UPLOAD": "ケース／パッケージのアップロード",
+      "DELETE": "デプロイの削除"
+    },
+    "POPUP": {
+      "UPLOAD": {
+        "DESCRIPTION": "デプロイする.cmmn、.cmmn.xmlのケースファイルもしくはアセット付きケースパッケージを含む.zip、.barファイルを選択、アップロードしてください。",
+        "DROPZONE": "もしくは、ここにファイルをドロップ",
+        "NO-DROP": "ご使用のブラウザではファイルのドロップ機能はサポートされていません",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "アップロードに失敗しました"
+      },
+      "DELETE": {
+        "CONFIRM-MESSAGE": "デプロイ “{{name}}”を削除しますか？"
+      }
+    }
+  },
+  "CMMN-DEPLOYMENT": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "TIME": "デプロイ時間:",
+    "CATEGORY": "カテゴリー:",
+    "TENANTID": "テナント識別子:",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID:",
+    "DEFINITIONS-MESSAGE": "このデプロイに存在する{{total}}個のケース定義のうち{{size}}個を表示しています。",
+    "DEFINITIONS-MESSAGE-EMPTY": "このデプロイにはケース定義はありません。",
+    "TITLE": {
+      "CASE-DEFINITIONS": "ケース定義",
+      "RESOURCES": "リソース"
+    },
+    "ACTION": {
+      "SHOW-ALL-DEFINITIONS": "全定義の表示"
+    }
+  },
+  "CASE-DEFINITIONS": {
+    "LIST-MESSAGE": "条件にあった{{total}}個の定義のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうケース定義はありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "KEY": "キー（大文字小文字を区別）",
+      "DEPLOYMENT-ID": "デプロイID",
+      "TENANT-ID": "テナントID",
+      "LATEST": "最新バージョン",
+      "LATEST-HELP": "最新バージョンのみ表示"
+    },
+    "TITLE": {
+      "MAIN": "ケース定義"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン",
+      "KEY": "キー",
+      "TENANT": "テナント"
+    },
+    "ACTIONS": {
+      "UPLOAD-FROM-MODELER": "Flowableエディターからアップロード"
+    },
+    "POPUP": {
+      "UPLOAD-FROM-MODELER": {
+        "NAME": "ユーザー名",
+        "PASSWORD": "パスワード",
+        "ERROR": "エディターと通信できません",
+        "UNAUTHORIZED": "不正な認証情報",
+        "UPLOAD-DESCRIPTION": "プロセスモデルが取得され、現在アクティブなFlowableクラスターにデプロイされます。適切なデプロイパッケージ名を選択してください。"
+      }
+    }
+  },
+  "CASE-DEFINITION": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "VERSION": "バージョン:",
+    "DESCRIPTION": "説明:",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "DEPLOYMENT": "デプロイ:",
+    "TENANT": "テナント:",
+    "START-FORM-DEFINED": "定義された開始フォーム:",
+    "GRAPHICAL-NOTATION-DEFINED": "定義されたグラフィカル記述:",
+    "CASE-INSTANCES-SIZE": "この定義には {{total}}個の実行中のケースインスタンスがあります",
+    "CASE-INSTANCES-SHOWING": "- 最近開始された{{size}} 個を表示",
+    "CASE-INSTANCES-EMPTY": "この定義には実行中のケースインスタンスはありません。",
+    "JOBS-SIZE": "{{total}}個のジョブが実行中",
+    "JOBS-EMPTY": "実行中のジョブはありません",
+    "DECISION-TABLES-SIZE": "{{total}}個の判断があります。",
+    "DECISION-TABLES-EMPTY": "判断がありません。",
+    "FORM-DEFINITIONS-SIZE": "{{total}}個のフォーム定義があります。",
+    "FORM-DEFINITIONS-EMPTY": "フォーム定義はありません。",
+    "TITLE": {
+      "CASE-INSTANCES": "ケースインスタンス",
+      "JOBS": "ジョブ",
+      "DECISION-TABLES": "判断",
+      "FORMS": "フォーム定義"
+    },
+    "ACTION": {
+      "EDIT-CATEGORY": "カテゴリーを編集",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-ALL-CASES": "全ケースの表示",
+      "SHOW-DIAGRAM": "ケース図の表示"
+    },
+    "POPUP": {
+      "EDIT-CATEGORY": {
+        "TITLE": "カテゴリーを編集",
+        "MESSAGE": "カテゴリーの初期値はCMMN 1.1 XMLのtargetNameSpace属性から取得されます。デプロイ後に変更可能です。",
+        "CATEGORY": "カテゴリー",
+        "CATEGORY-PLACEHOLDER": "カテゴリーを入力",
+        "CONFIRM": "カテゴリーを更新"
+      },
+      "SHOW-CASE-MODEL": {
+        "TITLE": "ケース図"
+      }
+    }
+  },
+  "CASE-INSTANCES": {
+    "TITLE": "ケースインスタンス",
+    "LIST-MESSAGE": "条件にあった{{total}}個のケースインスタンスのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうケースインスタンスはありません。",
+    "FILTER": {
+      "NAME": "名前",
+      "CASE-DEFINITION": "ケース定義",
+      "ALL-CASE-DEFINITIONS": "すべてのケース定義",
+      "STATUS": "ステータス",
+      "STATUS-ANY": "任意のステータス",
+      "STATUS-ACTIVE": "Activitiインスタンス",
+      "STATUS-COMPLETE": "完了したインスタンス",
+      "BUSINESS-KEY": "ビジネスキー",
+      "STARTED-BEFORE": "〜以前に開始",
+      "STARTED-AFTER": "〜以降に開始",
+      "ENDED-BEFORE": "〜以前に終了",
+      "ENDED-AFTER": "〜以降に終了",
+      "VARIABLE": "変数",
+      "VARIABLE-NAME": "変数名",
+      "VARIABLE-VALUE": "変数値",
+      "VARIABLE-BOOLEAN-VALUE": "ブーリアン値:{{value}}",
+      "TENANT-ID": "テナント識別子"
+    },
+    "SORT": {
+      "ID": "ID",
+      "START-TIME": "開始時"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "BUSINESS-KEY": "ビジネスキー",
+      "CASE-DEFINITION": "ケース定義",
+      "CREATE-TIME": "作成",
+      "END-TIME": "終了",
+      "STATUS": "ステータス"
+    }
+  },
+  "CASE-INSTANCE": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "DESCRIPTION": "説明:",
+    "BUSINESS-KEY": "ビジネスキー:",
+    "TENANT-ID": "テナント:",
+    "STATUS": "ステータス:",
+    "STATUS-ACTIVE": "アクティブ",
+    "STATUS-COMPLETED": "完了",
+    "DELETE-REASON": "削除理由:",
+    "STARTED-BY": "開始者:",
+    "END-TIME": "終了時間:",
+    "DURATION": "期間:",
+    "TASKS-SIZE": "このケースインスタンスには{{total}}個のタスクがあります。",
+    "TASKS-EMPTY": "このケースインスタンスにはタスクがありません。",
+    "VARIABLES-SIZE": "このケースインスタンスには{{total}}個の変数があります。",
+    "VARIABLES-EMPTY": "このケースインスタンスには変数がありません。",
+    "JOBS-SIZE": "このケースインスタンスには{{total}}個のジョブがあります。",
+    "JOBS-EMPTY": "このケースインスタンスにはジョブがありません。",
+    "DECISION-TABLES-SIZE": "このケースインスタンスには{{total}}個の判断があります。",
+    "DECISION-TABLES-EMPTY": "このケースインスタンスには判断がありません。",
+    "FORM-INSTANCES-SIZE": "このケースインスタンスには{{total}}個のフォームインスタンスがあります。",
+    "FORM-INSTANCES-EMPTY": "このケースインスタンスにはフォームインスタンスがありません。",
+    "TITLE": {
+      "TASKS": "タスク",
+      "VARIABLES": "変数",
+      "JOBS": "ジョブ",
+      "DECISION-TABLES": "判断",
+      "FORM-INSTANCES": "フォームインスタンス"
+    },
+    "ACTION": {
+      "DELETE": "ケースインスタンスの削除",
+      "TERMINATE": "ケースインスタンスの停止",
+      "SHOW-ALL-TASKS": "全タスクの表示",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-DIAGRAM": "ケース図の表示",
+      "TITLE-VARIABLES": "選択した変数へのアクション",
+      "DELETE-VARIABLE": "変数の削除",
+      "UPDATE-VALUE": "変数の更新",
+      "ADD-VARIABLE": "変数の追加"
+    },
+    "POPUP": {
+      "DELETE": {
+        "TITLE": "ケースインスタンスの削除",
+        "MESSAGE-DELETE": "このケースインスタンスを削除しますか？",
+        "MESSAGE-TERMINATE": "このケースインスタンスを停止しますか？",
+        "DELETE-REASON": "削除理由",
+        "DELETE-REASON-HELP": "削除理由を入力",
+        "CONFIRM-DELETE": "ケースインスタンスの削除",
+        "CONFIRM-TERMINATE": "ケースインスタンスの停止"
+      },
+      "SHOW-CASE-MODEL": {
+        "TITLE": "ケース図"
+      },
+      "CREATE-VARIABLE": {
+        "TITLE": "変数の作成",
+        "NAME": "変数名",
+        "TYPE": "Flowable変数タイプ",
+        "VALUE": "変数値",
+        "CREATE": "作成"
+      },
+      "UPDATE-VARIABLE": {
+        "TITLE": "変数“{{name}}”の更新",
+        "NAME": "変数名",
+        "VALUE": "値",
+        "CHECKED": "true",
+        "UNCHECKED": "false",
+        "DATE-HELP": "ISO-8601 フォーマット (例 : 2016-01-28T23:00:00Z)",
+        "ACTION-UPDATE": "更新"
+      },
+      "DELETE-VARIABLE": {
+        "TITLE": "変数“{{name}}”の削除",
+        "MESSAGE": "この変数を削除しますか？",
+        "DELETE": "削除"
+      }
+    }
+  },
+  "APP-DEPLOYMENTS": {
+    "TITLE": "アプリのデプロイ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のアプリのデプロイのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうアプリのデプロイはありません。",
+    "FILTER": {
+      "NAME": "名前",
+      "TENANTID": "テナント識別子",
+      "LATEST": "最新バージョン",
+      "LATEST-HELP": "最新バージョンのみ表示"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "APP-DEFINITION-ID": "アプリID",
+      "DEPLOYMENT-ID": "プロセスデプロイID",
+      "DMN-DEPLOYMENT-ID": "DMNデプロイID",
+      "NAME": "名前",
+      "DEPLOY-TIME": "デプロイ時間",
+      "DEPLOYED-BY": "デプロイ者",
+      "CATEGORY": "カテゴリー",
+      "TENANT": "テナントID"
+    },
+    "ACTION": {
+      "UPLOAD": "アプリのアップロードと公開",
+      "DELETE": "デプロイの削除"
+    },
+    "POPUP": {
+      "UPLOAD": {
+        "DESCRIPTION": "デプロイする.appのアプリ定義ファイルもしくはアセット付きアプリパッケージを含む.zip、.barファイルを選択、アップロードしてください。",
+        "WARNING": "アプリのアップロードはFlowable UIインスタンスに対してのみ実行可能です。",
+        "DROPZONE": "もしくは、ここにファイルをドロップ",
+        "NO-DROP": "ご使用のブラウザではファイルのドロップ機能はサポートされていません",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "アップロードに失敗しました"
+      },
+      "DELETE": {
+        "CONFIRM-MESSAGE": "デプロイ “{{name}}”を削除しますか？"
+      }
+    }
+  },
+  "APP-DEPLOYMENT": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "TIME": "デプロイ時間:",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "TENANTID": "テナント識別子:",
+    "DEFINITIONS-MESSAGE": "このデプロイに存在する{{total}}個のアプリ定義のうち{{size}}個を表示しています。",
+    "DEFINITIONS-MESSAGE-EMPTY": "このデプロイにはアプリ定義はありません。",
+    "TITLE": {
+      "APP-DEFINITIONS": "アプリ定義",
+      "RESOURCES": "リソース"
+    },
+    "ACTION": {
+      "SHOW-ALL-DEFINITIONS": "全定義の表示"
+    }
+  },
+  "APP-DEFINITIONS": {
+    "LIST-MESSAGE": "条件にあった{{total}}個の定義のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうアプリ定義はありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "KEY": "キー（大文字小文字を区別）",
+      "DEPLOYMENT-ID": "デプロイID",
+      "TENANT-ID": "テナントID",
+      "LATEST": "最新バージョン",
+      "LATEST-HELP": "最新バージョンのみ表示"
+    },
+    "TITLE": {
+      "MAIN": "アプリ定義"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン",
+      "KEY": "キー",
+      "TENANT": "テナント"
+    }
+  },
+  "APP-DEFINITION": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "VERSION": "バージョン:",
+    "DESCRIPTION": "説明:",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "DEPLOYMENT": "デプロイ:",
+    "TENANT": "テナント:",
+    "PROCESS-DEFINITIONS-SIZE": "アプリには{{total}}個のプロセス定義があります",
+    "PROCESS-DEFINITIONS-EMPTY": "アプリにはプロセス定義はありません",
+    "CASE-DEFINITIONS-SIZE": "アプリには{{total}}個のケース定義があります",
+    "CASE-DEFINITIONS-EMPTY": "アプリにはケース定義がありません",
+    "DECISION-TABLES-SIZE": "アプリには{{total}}個の判断があります。",
+    "DECISION-TABLES-EMPTY": "アプリには判断がありません。",
+    "FORM-DEFINITIONS-SIZE": "アプリには{{total}}個のフォーム定義があります。",
+    "FORM-DEFINITIONS-EMPTY": "アプリにはフォーム定義がありません。",
+    "TITLE": {
+      "PROCESS-DEFINITIONS": "プロセス定義",
+      "CASE-DEFINITIONS": "ケース定義",
+      "DECISION-TABLES": "判断",
+      "FORM-DEFINITIONS": "フォーム定義"
+    },
+    "ACTION": {
+      "EDIT-CATEGORY": "カテゴリーを編集"
+    }
+  },
+  "DECISION-TABLE-DEPLOYMENTS": {
+    "TITLE": "デシジョンテーブルのデプロイ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のデプロイのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうデプロイはありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "TENANTID": "テナント識別子（大文字小文字を区別）"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "DEPLOY-TIME": "デプロイ時間",
+      "CATEGORY": "カテゴリー",
+      "TENANT": "テナント"
+    },
+    "ACTION": {
+      "UPLOAD": "判断のアップロード",
+      "DELETE": "デプロイの削除"
+    },
+    "POPUP": {
+      "UPLOAD": {
+        "DESCRIPTION": "デプロイする.dmn、.dmn.xmlの定義ファイルを選択してください。",
+        "DROPZONE": "もしくは、ここにファイルをドロップ",
+        "NO-DROP": "ご使用のブラウザではファイルのドロップ機能はサポートされていません",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "アップロードに失敗しました"
+      },
+      "DELETE": {
+        "CONFIRM-MESSAGE": "デプロイ “{{name}}”を削除しますか？"
+      }
+    }
+  },
+  "DECISION-TABLE-DEPLOYMENT": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "TIME": "デプロイ時間:",
+    "CATEGORY": "カテゴリー:",
+    "TENANTID": "テナント識別子:",
+    "DECISION-TABLES-MESSAGE": "このデプロイに存在する{{total}}個の判断のうち{{size}}個を表示しています。",
+    "DECISION-TABLES-MESSAGE-EMPTY": "このデプロイには判断がありません。",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID",
+    "TITLE": {
+      "DECISION-TABLES": "判断",
+      "RESOURCES": "リソース"
+    },
+    "ACTION": {
+      "SHOW-ALL-DEFINITIONS": "全判断の表示"
+    }
+  },
+  "DECISION-TABLES": {
+    "TITLE": "判断",
+    "LIST-MESSAGE": "条件にあった{{total}}個の判断のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあう判断はありません。",
+    "FILTER": {
+      "NAME": "名前",
+      "KEY": "キー",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "VERSION": "バージョン",
+      "KEY": "キー",
+      "DEPLOY-TIME": "デプロイ時間",
+      "TENANT-ID": "テナントID"
+    }
+  },
+  "DECISION-TABLE": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "VERSION": "バージョン:",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "DEPLOYMENT-ID": "デプロイID:",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID",
+    "RESOURCE-NAME": "リソース名:",
+    "DESCRIPTION": "説明:",
+    "TENANT": "テナント:",
+    "TITLE": {
+      "DECISION-AUDITS": "デシジョン監査"
+    },
+    "DECISION-EXECUTION-MESSAGE": "この判断に存在する{{total}}個の実行のうち{{size}}個を表示しています。",
+    "DECISION-EXECUTION-MESSAGE-EMPTY": "この判断には実行はありません。",
+    "ACTION": {
+      "EDIT-CATEGORY": "カテゴリーを編集",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-ALL-PROCESSES": "全プロセスの表示",
+      "SHOW-DIAGRAM": "プロセス図の表示",
+      "SHOW-DECISION-TABLE": "判断の表示",
+      "SHOW-ALL-EXECUTIONS": "全実行の表示"
+    },
+    "POPUP": {
+      "TITLE": "デシジョンテーブル（判断）:",
+      "KEY": "キー:",
+      "HIT-POLICY": "ヒットポリシー:",
+      "HIT-POLICIES": {
+        "FIRST": "初回（シングルパス）",
+        "ANY": "任意（シングルパス）"
+      }
+    }
+  },
+  "DECISION-TABLE-EXECUTIONS": {
+    "TITLE": "判断の実行",
+    "LIST-MESSAGE": "条件にあった{{total}}個の判断の実行のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあう判断の実行はありません。",
+    "FILTER": {
+      "DEFINITION-ID": "定義ID",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "START-TIME": "開始時",
+      "END-TIME": "終了時",
+      "TENANT-ID": "テナントID"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "DECISION-DEFINITION-KEY": "判断キー",
+      "DECISION-DEFINITION-NAME": "判断名",
+      "FAILED": "失敗",
+      "END-TIME": "終了時",
+      "TENANT-ID": "テナントID"
+    }
+  },
+  "DECISION-TABLE-EXECUTION": {
+    "TITLE": "デシジョンテーブル（判断）の実行",
+    "LIST-MESSAGE": "条件にあった{{total}}個の判断のうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあう判断はありません。",
+    "DEFINITION-ID": "判断定義ID",
+    "DEPLOYMENT-ID": "デプロイID",
+    "DEFINITION-KEY": "判断キー",
+    "DEFINITION-NAME": "判断名",
+    "DEFINITION-VERSION": "判断バージョン",
+    "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+    "CASE-INSTANCE-ID": "ケースインスタンスID",
+    "EXECUTION-START-TIME": "開始時",
+    "EXECUTION-END-TIME": "終了時",
+    "FAILED": "失敗",
+    "FILTER": {
+      "DEFINITION-ID": "定義ID",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "START-TIME": "開始時",
+      "END-TIME": "終了時",
+      "TENANT-ID": "テナントID"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "DECISION-DEFINITION-ID": "定義ID",
+      "DECISION-KEY": "判断キー",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "FAILED": "失敗",
+      "START-TIME": "開始時",
+      "END-TIME": "終了時",
+      "TENANT-ID": "テナントID"
+    },
+    "AUDIT-DATA": {
+      "HEADER": "監査データ",
+      "HIT-POLICY": "ヒットポリシー",
+      "STRICT-MODE": "厳格モード有効化",
+      "EXCEPTION-MESSAGE": "例外メッセージ",
+      "VALIDATION-MESSAGE": "検証メッセージ",
+      "RESULT": "結果",
+      "RULE-EXECUTIONS": "ルールの実行",
+      "INPUT-VARIABLES": "入力変数",
+      "VARIABLE-KEY": "キー",
+      "VARIABLE-VALUE": "値"
+    }
+  },
+  "FORM-DEFINITIONS": {
+    "TITLE": "フォーム定義",
+    "LIST-MESSAGE": "条件にあった{{total}}個のフォームのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうフォーム定義はありません。",
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "DEPLOYMENTID": "デプロイID",
+      "TENANTID": "テナントID",
+      "KEY": "キー",
+      "VERSION": "バージョン"
+    },
+    "FILTER": {
+      "NAME": "名前",
+      "APPID": "アプリのデプロイID",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    }
+  },
+  "FORM-DEFINITION": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "KEY": "キー:",
+    "CATEGORY": "カテゴリー:",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID:",
+    "DEPLOYMENT-ID": "デプロイID:",
+    "DESCRIPTION": "説明:",
+    "TENANT": "テナント:",
+    "MESSAGE-EMPTY": "(なし)",
+    "TITLE": {
+      "FORM-INSTANCES": "フォームインスタンス"
+    },
+    "FORM-INSTANCES-MESSAGE": "この定義に存在する{{total}}個のフォームインスタンスのうち{{size}}個を表示しています。",
+    "FORM-INSTANCES-MESSAGE-EMPTY": "この定義にはフォームインスタンスはありません。",
+    "ACTION": {
+      "EDIT-CATEGORY": "カテゴリーを編集",
+      "SHOW-ALL-JOBS": "全ジョブの表示",
+      "SHOW-ALL-PROCESSES": "全プロセスの表示",
+      "SHOW-DIAGRAM": "プロセス図の表示",
+      "SHOW-FORM": "フォームの表示"
+    },
+    "POPUP": {
+      "TITLE": "フォーム:"
+    },
+    "FIELD-PREVIEW": {
+      "DISPLAY-REF": "表示される値",
+      "SELECT-FIELD": "（フィールド未選択）",
+      "FIELD-VALUE": "フィールド“{{name}}”の値の表示",
+      "UNKNOWN-TYPE": "不明なフィールドタイプ“{{type}}”",
+      "TEXT-VALUE": "テキスト",
+      "MULTI-TEXT-VALUE": "複数行テキスト",
+      "NUMBER-VALUE": "123",
+      "DATE-VALUE": "日付",
+      "DROPDOWN-VALUE": "選択...",
+      "UPLOAD-VALUE": "コンテンツのアップロード／インポート",
+      "RADIOS-OPTION1": "オプション1",
+      "SELECT-PERSON": "人の選択",
+      "SELECT-GROUP": "グループの選択"
+    }
+  },
+  "FORM-DEPLOYMENTS": {
+    "TITLE": "フォームのデプロイ",
+    "LIST-MESSAGE": "条件にあった{{total}}個のフォームのデプロイのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうフォームのデプロイはありません。",
+    "FILTER": {
+      "NAME": "名前（大文字小文字を区別）",
+      "TENANTID": "テナント識別子（大文字小文字を区別）"
+    },
+    "SORT": {
+      "ID": "ID",
+      "NAME": "名前"
+    },
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "DEPLOY-TIME": "デプロイ時間",
+      "CATEGORY": "カテゴリー",
+      "TENANT": "テナント"
+    },
+    "ACTION": {
+      "UPLOAD": "フォームのアップロード",
+      "DELETE": "デプロイの削除"
+    },
+    "POPUP": {
+      "UPLOAD": {
+        "DESCRIPTION": "デプロイする.form、.jsonのフォームファイルを選択してください。",
+        "DROPZONE": "もしくは、ここにファイルをドロップ",
+        "NO-DROP": "ご使用のブラウザではファイルのドロップ機能はサポートされていません",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "アップロードに失敗しました"
+      },
+      "DELETE": {
+        "CONFIRM-MESSAGE": "デプロイ “{{name}}”を削除しますか？"
+      }
+    }
+  },
+  "FORM-DEPLOYMENT": {
+    "ID": "ID:",
+    "NAME": "名前: ",
+    "TIME": "デプロイ時間:",
+    "CATEGORY": "カテゴリー:",
+    "TENANTID": "テナント識別子:",
+    "PARENT-DEPLOYMENT-ID": "親デプロイID",
+    "DEFINITIONS-MESSAGE": "このデプロイに存在する{{total}}個のフォーム定義のうち{{size}}個を表示しています。",
+    "DEFINITIONS-MESSAGE-EMPTY": "このデプロイにはフォーム定義はありません。",
+    "TITLE": {
+      "FORM-DEFINITIONS": "フォーム定義",
+      "RESOURCES": "リソース"
+    },
+    "ACTION": {
+      "SHOW-ALL-DEFINITIONS": "全フォーム定義の表示"
+    }
+  },
+  "FORM-INSTANCES": {
+    "TITLE": "フォームインスタンス",
+    "LIST-MESSAGE": "条件にあった{{total}}個のフォームインスタンスのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうフォームインスタンスはありません。",
+    "HEADER": {
+      "ID": "ID",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "TASK-ID": "タスクID",
+      "SUBMITTED-ON": "提出日",
+      "SUBMITTED-BY": "提出者",
+      "TENANT-ID": "テナントID"
+    },
+    "FILTER": {
+      "NAME": "名前",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "SUBMITTED-DATE": "提出日"
+    }
+  },
+  "FORM-INSTANCE": {
+    "HEADER": {
+      "ID": "ID",
+      "TASK-ID": "タスクID",
+      "PROCESS-ID": "プロセスインスタンスID",
+      "CASE-INSTANCE-ID": "ケースインスタンスID",
+      "SUBMITTED": "提出日",
+      "SUBMITTED-BY": "提出者",
+      "FORM-DEFINITION-ID": "フォーム定義ID"
+    },
+    "FORM-FIELD-VALUES-MESSAGE": "このインスタンスに存在する{{total}}個のフォームフィールド値のうち{{size}}個を表示しています",
+    "FORM-FIELD-VALUES-MESSAGE-EMPTY": "このインスタンスにはフォームフィールド値はありません。",
+    "ACTION": {
+      "SHOW-FORM-INSTANCE": "フォームインスタンスの表示"
+    },
+    "TITLE": {
+      "FORM-FIELD-VALUES": "フォームフィールド値"
+    },
+    "FORM-FIELD-VALUES": {
+      "ID": "フォームフィールドID",
+      "NAME": "フォームフィールド名",
+      "TYPE": "フォームフィールドタイプ",
+      "VALUE": "フォームフィールド値"
+    }
+  },
+  "CONTENT-ITEMS": {
+    "TITLE": "コンテンツアイテム",
+    "LIST-MESSAGE": "条件にあった{{total}}個のコンテンツのうち{{size}}個を表示しています。",
+    "LIST-MESSAGE-EMPTY": "条件にあうコンテンツアイテムはありません。",
+    "HEADER": {
+      "ID": "ID",
+      "NAME": "名前",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "TASK-ID": "タスクID",
+      "LAST-MODIFIED-ON": "最終更新日",
+      "LAST-MODIFIED-BY": "最終更新者",
+      "TENANT-ID": "テナントID"
+    },
+    "FILTER": {
+      "NAME": "名前",
+      "TENANTID": "テナント識別子"
+    },
+    "SORT": {
+      "CREATED": "作成日"
+    }
+  },
+  "CONTENT-ITEM": {
+    "HEADER": {
+      "ID": "ID",
+      "TASK-ID": "タスクID",
+      "PROCESS-INSTANCE-ID": "プロセスインスタンスID",
+      "CREATED-ON": "作成日",
+      "CREATED-BY": "作成者",
+      "LAST-MODIFIED-ON": "最終更新日",
+      "LAST-MODIFIED-BY": "最終更新者",
+      "CONTENT-STORE-ID": "コンテンツストアID"
+    },
+    "ACTION": {
+      "SHOW-CONTENT-ITEM": "コンテンツアイテムの表示"
+    }
+  }
+}

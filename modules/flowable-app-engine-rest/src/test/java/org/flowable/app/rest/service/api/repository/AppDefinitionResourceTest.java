@@ -12,6 +12,9 @@
  */
 package org.flowable.app.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -27,6 +30,8 @@ import org.flowable.app.rest.service.BaseSpringRestTestCase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to single a Process Definition resource.
@@ -47,16 +52,18 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(appDefinition.getId(), responseNode.get("id").textValue());
-        assertEquals(appDefinition.getKey(), responseNode.get("key").textValue());
-        assertEquals(appDefinition.getCategory(), responseNode.get("category").textValue());
-        assertEquals(appDefinition.getVersion(), responseNode.get("version").intValue());
-        assertEquals(appDefinition.getDescription(), responseNode.get("description").textValue());
-        assertEquals(appDefinition.getName(), responseNode.get("name").textValue());
-        
-        // Check URL's
-        assertEquals(httpGet.getURI().toString(), responseNode.get("url").asText());
-        assertEquals(appDefinition.getDeploymentId(), responseNode.get("deploymentId").textValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "    id: '" + appDefinition.getId() + "',"
+                        + "    key: '" + appDefinition.getKey() + "',"
+                        + "    category: null,"
+                        + "    version: " + appDefinition.getVersion() + ","
+                        + "    description: null,"
+                        + "    name: '" + appDefinition.getName() + "',"
+                        + "    deploymentId: '" + appDefinition.getDeploymentId() + "',"
+                        + "    url: '" + httpGet.getURI().toString() + "'"
+                        + "}");
     }
 
     /**
@@ -72,14 +79,16 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     public void testGetAppDefinitionResourceData() throws Exception {
         AppDefinition appDefinition = repositoryService.createAppDefinitionQuery().singleResult();
 
-        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_APP_DEFINITION_RESOURCE_CONTENT, appDefinition.getId()));
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_APP_DEFINITION_RESOURCE_CONTENT, appDefinition.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
         // Check "OK" status
         String content = IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8);
         closeResponse(response);
-        assertNotNull(content);
-        assertTrue(content.contains("oneApp"));
+        assertThat(content)
+                .isNotNull()
+                .contains("oneApp");
     }
 
     /**
@@ -94,7 +103,7 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     @AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testUpdateAppDefinitionCategory() throws Exception {
         AppDefinition appDefinition = repositoryService.createAppDefinitionQuery().singleResult();
-        assertEquals(1, repositoryService.createAppDefinitionQuery().count());
+        assertThat(repositoryService.createAppDefinitionQuery().count()).isEqualTo(1);
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("category", "updatedcategory");
@@ -106,10 +115,14 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals("updatedcategory", responseNode.get("category").textValue());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "    category: 'updatedcategory'"
+                        + "}");
 
         // Check actual entry in DB
-        assertEquals(1, repositoryService.createAppDefinitionQuery().appDefinitionCategory("updatedcategory").count());
+        assertThat(repositoryService.createAppDefinitionQuery().appDefinitionCategory("updatedcategory").count()).isEqualTo(1);
 
     }
 

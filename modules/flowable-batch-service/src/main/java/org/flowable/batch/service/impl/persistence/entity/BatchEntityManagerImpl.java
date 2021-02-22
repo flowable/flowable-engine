@@ -21,61 +21,56 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchDataManager;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 
-public class BatchEntityManagerImpl extends AbstractEntityManager<BatchEntity> implements BatchEntityManager {
-
-    protected BatchDataManager batchDataManager;
+public class BatchEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<BatchServiceConfiguration, BatchEntity, BatchDataManager>
+    implements BatchEntityManager {
 
     public BatchEntityManagerImpl(BatchServiceConfiguration batchServiceConfiguration, BatchDataManager batchDataManager) {
-        super(batchServiceConfiguration);
-        this.batchDataManager = batchDataManager;
-    }
-
-    @Override
-    protected DataManager<BatchEntity> getDataManager() {
-        return batchDataManager;
+        super(batchServiceConfiguration, batchServiceConfiguration.getEngineName(), batchDataManager);
     }
     
     @Override
     public List<Batch> findBatchesBySearchKey(String searchKey) {
-        return batchDataManager.findBatchesBySearchKey(searchKey);
+        return dataManager.findBatchesBySearchKey(searchKey);
     }
     
     @Override
     public List<Batch> findAllBatches() {
-        return batchDataManager.findAllBatches();
+        return dataManager.findAllBatches();
     }
     
     @Override
     public List<Batch> findBatchesByQueryCriteria(BatchQueryImpl batchQuery) {
-        return batchDataManager.findBatchesByQueryCriteria(batchQuery);
+        return dataManager.findBatchesByQueryCriteria(batchQuery);
     }
 
     @Override
     public long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery) {
-        return batchDataManager.findBatchCountByQueryCriteria(batchQuery);
+        return dataManager.findBatchCountByQueryCriteria(batchQuery);
     }
 
     @Override
     public BatchEntity createBatch(BatchBuilder batchBuilder) {
-        BatchEntityImpl batchEntity = (BatchEntityImpl) batchDataManager.create();
+        BatchEntityImpl batchEntity = (BatchEntityImpl) dataManager.create();
         batchEntity.setBatchType(batchBuilder.getBatchType());
         batchEntity.setBatchSearchKey(batchBuilder.getSearchKey());
         batchEntity.setBatchSearchKey2(batchBuilder.getSearchKey2());
         batchEntity.setCreateTime(getClock().getCurrentTime());
         batchEntity.setStatus(batchBuilder.getStatus());
-        batchEntity.setBatchDocumentJson(batchBuilder.getBatchDocumentJson());
+        batchEntity.setBatchDocumentJson(batchBuilder.getBatchDocumentJson(), serviceConfiguration.getEngineName());
         batchEntity.setTenantId(batchBuilder.getTenantId());
         
-        batchDataManager.insert(batchEntity);
+        dataManager.insert(batchEntity);
         
         return batchEntity;
     }
 
     @Override
     public void delete(String batchId) {
-        BatchEntity batch = batchDataManager.findById(batchId);
+        BatchEntity batch = dataManager.findById(batchId);
         List<BatchPart> batchParts = getBatchPartEntityManager().findBatchPartsByBatchId(batch.getId());
         if (batchParts != null && batchParts.size() > 0) {
             for (BatchPart batchPart : batchParts) {
@@ -83,12 +78,16 @@ public class BatchEntityManagerImpl extends AbstractEntityManager<BatchEntity> i
             }
         }
 
-        BatchByteArrayRef batchDocRefId = batch.getBatchDocRefId();
+        ByteArrayRef batchDocRefId = batch.getBatchDocRefId();
 
         if (batchDocRefId != null && batchDocRefId.getId() != null) {
-            batchDocRefId.delete();
+            batchDocRefId.delete(serviceConfiguration.getEngineName());
         }
 
         delete(batch);
+    }
+
+    protected BatchPartEntityManager getBatchPartEntityManager() {
+        return serviceConfiguration.getBatchPartEntityManager();
     }
 }

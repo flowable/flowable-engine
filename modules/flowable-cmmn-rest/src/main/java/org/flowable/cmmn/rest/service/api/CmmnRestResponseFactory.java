@@ -40,10 +40,11 @@ import org.flowable.cmmn.rest.service.api.history.planitem.HistoricPlanItemInsta
 import org.flowable.cmmn.rest.service.api.history.task.HistoricIdentityLinkResponse;
 import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceResponse;
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceResponse;
+import org.flowable.cmmn.rest.service.api.management.HistoryJobResponse;
 import org.flowable.cmmn.rest.service.api.management.JobResponse;
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.repository.CmmnDeploymentResponse;
-import org.flowable.cmmn.rest.service.api.repository.DecisionTableResponse;
+import org.flowable.cmmn.rest.service.api.repository.DecisionResponse;
 import org.flowable.cmmn.rest.service.api.repository.DeploymentResourceResponse;
 import org.flowable.cmmn.rest.service.api.repository.FormDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceResponse;
@@ -57,15 +58,20 @@ import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
+import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateRestVariableConverter;
+import org.flowable.common.rest.variable.LocalDateTimeRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -106,7 +112,7 @@ public class CmmnRestResponseFactory {
 
     public List<TaskResponse> createTaskResponseList(List<Task> tasks) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<TaskResponse> responseList = new ArrayList<>();
+        List<TaskResponse> responseList = new ArrayList<>(tasks.size());
         for (Task instance : tasks) {
             responseList.add(createTaskResponse(instance, urlBuilder));
         }
@@ -150,7 +156,7 @@ public class CmmnRestResponseFactory {
 
     public List<CmmnDeploymentResponse> createDeploymentResponseList(List<CmmnDeployment> deployments) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<CmmnDeploymentResponse> responseList = new ArrayList<>();
+        List<CmmnDeploymentResponse> responseList = new ArrayList<>(deployments.size());
         for (CmmnDeployment instance : deployments) {
             responseList.add(createDeploymentResponse(instance, urlBuilder));
         }
@@ -168,7 +174,7 @@ public class CmmnRestResponseFactory {
     public List<DeploymentResourceResponse> createDeploymentResourceResponseList(String deploymentId, List<String> resourceList, ContentTypeResolver contentTypeResolver) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         // Add additional metadata to the artifact-strings before returning
-        List<DeploymentResourceResponse> responseList = new ArrayList<>();
+        List<DeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
             String contentType = null;
             if (resourceId.toLowerCase().endsWith(".cmmn")) {
@@ -203,7 +209,7 @@ public class CmmnRestResponseFactory {
 
     public List<CaseDefinitionResponse> createCaseDefinitionResponseList(List<CaseDefinition> caseDefinitions) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<CaseDefinitionResponse> responseList = new ArrayList<>();
+        List<CaseDefinitionResponse> responseList = new ArrayList<>(caseDefinitions.size());
         for (CaseDefinition instance : caseDefinitions) {
             responseList.add(createCaseDefinitionResponse(instance, urlBuilder));
         }
@@ -247,7 +253,7 @@ public class CmmnRestResponseFactory {
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<RestVariable> result = new ArrayList<>();
+        List<RestVariable> result = new ArrayList<>(variables.size());
 
         for (Entry<String, Object> pair : variables.entrySet()) {
             result.add(createRestVariable(pair.getKey(), pair.getValue(), null, id, variableType, false, urlBuilder));
@@ -258,7 +264,7 @@ public class CmmnRestResponseFactory {
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType, RestVariableScope scope) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<RestVariable> result = new ArrayList<>();
+        List<RestVariable> result = new ArrayList<>(variables.size());
 
         for (Entry<String, Object> pair : variables.entrySet()) {
             result.add(createRestVariable(pair.getKey(), pair.getValue(), scope, id, variableType, false, urlBuilder));
@@ -390,7 +396,7 @@ public class CmmnRestResponseFactory {
 
     public List<RestIdentityLink> createRestIdentityLinks(List<IdentityLink> links) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<RestIdentityLink> responseList = new ArrayList<>();
+        List<RestIdentityLink> responseList = new ArrayList<>(links.size());
         for (IdentityLink instance : links) {
             responseList.add(createRestIdentityLink(instance, urlBuilder));
         }
@@ -434,7 +440,7 @@ public class CmmnRestResponseFactory {
 
     public List<CaseInstanceResponse> createCaseInstanceResponseList(List<CaseInstance> caseInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<CaseInstanceResponse> responseList = new ArrayList<>();
+        List<CaseInstanceResponse> responseList = new ArrayList<>(caseInstances.size());
         for (CaseInstance instance : caseInstances) {
             responseList.add(createCaseInstanceResponse(instance, urlBuilder));
         }
@@ -459,6 +465,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
 
         for (String name : caseInstance.getCaseVariables().keySet()) {
@@ -484,6 +492,8 @@ public class CmmnRestResponseFactory {
         result.setParentId(caseInstance.getParentId());
         result.setCallbackId(caseInstance.getCallbackId());
         result.setCallbackType(caseInstance.getCallbackType());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
         result.setCompleted(false);
 
@@ -501,7 +511,7 @@ public class CmmnRestResponseFactory {
     }
 
     public List<PlanItemInstanceResponse> createPlanItemInstanceResponseList(List<PlanItemInstance> planItemInstances) {
-        List<PlanItemInstanceResponse> responseList = new ArrayList<>();
+        List<PlanItemInstanceResponse> responseList = new ArrayList<>(planItemInstances.size());
         for (PlanItemInstance planItemInstance : planItemInstances) {
             responseList.add(createPlanItemInstanceResponse(planItemInstance));
         }
@@ -513,12 +523,19 @@ public class CmmnRestResponseFactory {
         PlanItemInstanceResponse result = new PlanItemInstanceResponse();
         result.setId(planItemInstance.getId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getId()));
+        result.setName(planItemInstance.getName());
         result.setCaseDefinitionId(planItemInstance.getCaseDefinitionId());
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItemInstance.getCaseDefinitionId()));
+        if (planItemInstance.getDerivedCaseDefinitionId() != null) {
+            result.setDerivedCaseDefinitionId(planItemInstance.getDerivedCaseDefinitionId());
+            result.setDerivedCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, planItemInstance.getDerivedCaseDefinitionId()));
+        }
         result.setCaseInstanceId(planItemInstance.getCaseInstanceId());
         result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, planItemInstance.getCaseInstanceId()));
-        result.setStageInstanceId(planItemInstance.getStageInstanceId());
-        result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getStageInstanceId()));
+        if (planItemInstance.getStageInstanceId() != null) {
+            result.setStageInstanceId(planItemInstance.getStageInstanceId());
+            result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, planItemInstance.getStageInstanceId()));
+        }
         result.setPlanItemDefinitionId(planItemInstance.getPlanItemDefinitionId());
         result.setPlanItemDefinitionType(planItemInstance.getPlanItemDefinitionType());
         result.setState(planItemInstance.getState());
@@ -526,9 +543,23 @@ public class CmmnRestResponseFactory {
         result.setReferenceId(planItemInstance.getReferenceId());
         result.setReferenceType(planItemInstance.getReferenceType());
         result.setCreateTime(planItemInstance.getCreateTime());
+        result.setLastAvailableTime(planItemInstance.getLastAvailableTime());
+        result.setLastEnabledTime(planItemInstance.getLastEnabledTime());
+        result.setLastDisabledTime(planItemInstance.getLastDisabledTime());
+        result.setLastStartedTime(planItemInstance.getLastStartedTime());
+        result.setLastSuspendedTime(planItemInstance.getLastSuspendedTime());
+        result.setCompletedTime(planItemInstance.getCompletedTime());
+        result.setOccurredTime(planItemInstance.getOccurredTime());
+        result.setTerminatedTime(planItemInstance.getTerminatedTime());
+        result.setExitTime(planItemInstance.getExitTime());
+        result.setEndedTime(planItemInstance.getEndedTime());
         result.setStartUserId(planItemInstance.getStartUserId());
         result.setStage(planItemInstance.isStage());
-        result.setCompleteable(planItemInstance.isCompleteable());
+        result.setCompletable(planItemInstance.isCompletable());
+        result.setEntryCriterionId(planItemInstance.getEntryCriterionId());
+        result.setExitCriterionId(planItemInstance.getExitCriterionId());
+        result.setFormKey(planItemInstance.getFormKey());
+        result.setExtraValue(planItemInstance.getExtraValue());
         result.setTenantId(planItemInstance.getTenantId());
 
         return result;
@@ -536,7 +567,7 @@ public class CmmnRestResponseFactory {
 
     public List<HistoricCaseInstanceResponse> createHistoricCaseInstanceResponseList(List<HistoricCaseInstance> caseInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<HistoricCaseInstanceResponse> responseList = new ArrayList<>();
+        List<HistoricCaseInstanceResponse> responseList = new ArrayList<>(caseInstances.size());
         for (HistoricCaseInstance instance : caseInstances) {
             responseList.add(createHistoricCaseInstanceResponse(instance, urlBuilder));
         }
@@ -565,12 +596,17 @@ public class CmmnRestResponseFactory {
             }
         }
         result.setTenantId(caseInstance.getTenantId());
+        result.setState(caseInstance.getState());
+        result.setReferenceId(caseInstance.getReferenceId());
+        result.setReferenceType(caseInstance.getReferenceType());
+        result.setCallbackId(caseInstance.getCallbackId());
+        result.setCallbackType(caseInstance.getCallbackType());
         return result;
     }
 
     public List<HistoricTaskInstanceResponse> createHistoricTaskInstanceResponseList(List<HistoricTaskInstance> taskInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<HistoricTaskInstanceResponse> responseList = new ArrayList<>();
+        List<HistoricTaskInstanceResponse> responseList = new ArrayList<>(taskInstances.size());
         for (HistoricTaskInstance instance : taskInstances) {
             responseList.add(createHistoricTaskInstanceResponse(instance, urlBuilder));
         }
@@ -596,6 +632,14 @@ public class CmmnRestResponseFactory {
         result.setOwner(taskInstance.getOwner());
         result.setParentTaskId(taskInstance.getParentTaskId());
         result.setPriority(taskInstance.getPriority());
+        result.setScopeDefinitionId(taskInstance.getScopeDefinitionId());
+        result.setScopeId(taskInstance.getScopeId());
+        result.setSubScopeId(taskInstance.getSubScopeId());
+        result.setScopeType(taskInstance.getScopeType());
+        result.setPropagatedStageInstanceId(taskInstance.getPropagatedStageInstanceId());
+        result.setExecutionId(taskInstance.getExecutionId());
+        result.setProcessInstanceId(taskInstance.getProcessInstanceId());
+        result.setProcessDefinitionId(taskInstance.getProcessDefinitionId());
         result.setTenantId(taskInstance.getTenantId());
         result.setCategory(taskInstance.getCategory());
         if (taskInstance.getScopeDefinitionId() != null && ScopeTypes.CMMN.equals(taskInstance.getScopeType())) {
@@ -628,7 +672,7 @@ public class CmmnRestResponseFactory {
 
     public List<HistoricVariableInstanceResponse> createHistoricVariableInstanceResponseList(List<HistoricVariableInstance> variableInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<HistoricVariableInstanceResponse> responseList = new ArrayList<>();
+        List<HistoricVariableInstanceResponse> responseList = new ArrayList<>(variableInstances.size());
         for (HistoricVariableInstance instance : variableInstances) {
             responseList.add(createHistoricVariableInstanceResponse(instance, urlBuilder));
         }
@@ -653,7 +697,7 @@ public class CmmnRestResponseFactory {
 
     public List<HistoricIdentityLinkResponse> createHistoricIdentityLinkResponseList(List<HistoricIdentityLink> identityLinks) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<HistoricIdentityLinkResponse> responseList = new ArrayList<>();
+        List<HistoricIdentityLinkResponse> responseList = new ArrayList<>(identityLinks.size());
         for (HistoricIdentityLink instance : identityLinks) {
             responseList.add(createHistoricIdentityLinkResponse(instance, urlBuilder));
         }
@@ -725,6 +769,7 @@ public class CmmnRestResponseFactory {
         result.setName(historicPlanItemInstance.getName());
         result.setState(historicPlanItemInstance.getState());
         result.setCaseDefinitionId(historicPlanItemInstance.getCaseDefinitionId());
+        result.setDerivedCaseDefinitionId(historicPlanItemInstance.getDerivedCaseDefinitionId());
         result.setCaseInstanceId(historicPlanItemInstance.getCaseInstanceId());
         result.setStageInstanceId(historicPlanItemInstance.getStageInstanceId());
         result.setStage(historicPlanItemInstance.isStage());
@@ -742,39 +787,51 @@ public class CmmnRestResponseFactory {
         result.setTerminatedTime(historicPlanItemInstance.getTerminatedTime());
         result.setExitTime(historicPlanItemInstance.getExitTime());
         result.setEndedTime(historicPlanItemInstance.getEndedTime());
+        result.setLastUpdatedTime(historicPlanItemInstance.getLastUpdatedTime());
         result.setStartUserId(historicPlanItemInstance.getStartUserId());
         result.setReferenceId(historicPlanItemInstance.getReferenceId());
         result.setReferenceType(historicPlanItemInstance.getReferenceType());
+        result.setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
+        result.setExitCriterionId(historicPlanItemInstance.getExitCriterionId());
+        result.setFormKey(historicPlanItemInstance.getFormKey());
+        result.setExtraValue(historicPlanItemInstance.getExtraValue());
+        result.setShowInOverview(historicPlanItemInstance.isShowInOverview());
         result.setTenantId(historicPlanItemInstance.getTenantId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getId()));
-        result.setHistoricCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicPlanItemInstance.getCaseInstanceId()));
+        result.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, historicPlanItemInstance.getCaseInstanceId()));
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicPlanItemInstance.getCaseDefinitionId()));
+        if (historicPlanItemInstance.getDerivedCaseDefinitionId() != null) {
+            result.setDerivedCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, historicPlanItemInstance.getDerivedCaseDefinitionId()));
+        }
+        if (historicPlanItemInstance.getStageInstanceId() != null) {
+            result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getStageInstanceId()));
+        }
         return result;
     }
 
-    public List<DecisionTableResponse> createDecisionTableResponseList(List<DmnDecisionTable> decisionTables, String processDefinitionId) {
+    public List<DecisionResponse> createDecisionResponseList(List<DmnDecision> decisions, String processDefinitionId) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<DecisionTableResponse> responseList = new ArrayList<>();
-        for (DmnDecisionTable decisionTable : decisionTables) {
-            responseList.add(createDecisionTableResponse(decisionTable, processDefinitionId, urlBuilder));
+        List<DecisionResponse> responseList = new ArrayList<>(decisions.size());
+        for (DmnDecision decision : decisions) {
+            responseList.add(createDecisionResponse(decision, processDefinitionId, urlBuilder));
         }
         return responseList;
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String processDefinitionId) {
-        return createDecisionTableResponse(decisionTable, processDefinitionId, createUrlBuilder());
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String processDefinitionId) {
+        return createDecisionResponse(decision, processDefinitionId, createUrlBuilder());
     }
 
-    public DecisionTableResponse createDecisionTableResponse(DmnDecisionTable decisionTable, String caseDefinitionId, RestUrlBuilder urlBuilder) {
-        DecisionTableResponse decisionTableResponse = new DecisionTableResponse(decisionTable);
-        decisionTableResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_DECISION_TABLES_COLLECTION, caseDefinitionId));
+    public DecisionResponse createDecisionResponse(DmnDecision decision, String caseDefinitionId, RestUrlBuilder urlBuilder) {
+        DecisionResponse decisionResponse = new DecisionResponse(decision);
+        decisionResponse.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION_DECISION_COLLECTION, caseDefinitionId));
 
-        return decisionTableResponse;
+        return decisionResponse;
     }
 
     public List<FormDefinitionResponse> createFormDefinitionResponseList(List<FormDefinition> formDefinitions, String processDefinitionId) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<FormDefinitionResponse> responseList = new ArrayList<>();
+        List<FormDefinitionResponse> responseList = new ArrayList<>(formDefinitions.size());
         for (FormDefinition formDefinition : formDefinitions) {
             responseList.add(createFormDefinitionResponse(formDefinition, processDefinitionId, urlBuilder));
         }
@@ -794,7 +851,7 @@ public class CmmnRestResponseFactory {
 
     public List<JobResponse> createJobResponseList(List<Job> jobs) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
-        List<JobResponse> responseList = new ArrayList<>();
+        List<JobResponse> responseList = new ArrayList<>(jobs.size());
         for (Job instance : jobs) {
             responseList.add(createJobResponse(instance, urlBuilder));
         }
@@ -813,6 +870,8 @@ public class CmmnRestResponseFactory {
         response.setRetries(job.getRetries());
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
+        response.setElementId(job.getElementId());
+        response.setElementName(job.getElementName());
 
         response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_JOB, job.getId()));
 
@@ -835,6 +894,36 @@ public class CmmnRestResponseFactory {
         return response;
     }
 
+    public List<HistoryJobResponse> createHistoryJobResponseList(List<HistoryJob> jobs) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoryJobResponse> responseList = new ArrayList<>(jobs.size());
+        for (HistoryJob job : jobs) {
+            responseList.add(createHistoryJobResponse(job, urlBuilder));
+        }
+        return responseList;
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job) {
+        return createHistoryJobResponse(job, createUrlBuilder());
+    }
+
+    public HistoryJobResponse createHistoryJobResponse(HistoryJob job, RestUrlBuilder urlBuilder) {
+        HistoryJobResponse response = new HistoryJobResponse();
+        response.setId(job.getId());
+        response.setExceptionMessage(job.getExceptionMessage());
+        response.setRetries(job.getRetries());
+        response.setCreateTime(job.getCreateTime());
+        response.setScopeType(job.getScopeType());
+        response.setJobHandlerType(job.getJobHandlerType());
+        response.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        response.setCustomValues(job.getCustomValues());
+        response.setTenantId(job.getTenantId());
+
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORY_JOB, job.getId()));
+
+        return response;
+    }
+
     /**
      * @return list of {@link RestVariableConverter} which are used by this factory. Additional converters can be added and existing ones replaced ore removed.
      */
@@ -853,6 +942,10 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new DoubleRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
+        variableConverters.add(new InstantRestVariableConverter());
+        variableConverters.add(new LocalDateRestVariableConverter());
+        variableConverters.add(new LocalDateTimeRestVariableConverter());
+        variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

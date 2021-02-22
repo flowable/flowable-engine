@@ -17,7 +17,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 
 /**
- * Base class for all {@link FlowableIdmEvent} implementations.
+ * Base class for all IDM event implementations.
  * 
  * @author Tijs Rademakers
  */

@@ -24,11 +24,11 @@ import java.lang.annotation.RetentionPolicy;
 @Repeatable(MockServiceTasks.class)
 public @interface MockServiceTask {
 
-    public String id() default "";
+    String id() default "";
 
-    public String originalClassName() default "";
+    String originalClassName() default "";
 
-    public String mockedClassName() default "";
+    String mockedClassName() default "";
 
     Class<?> mockedClass() default Void.class;
 

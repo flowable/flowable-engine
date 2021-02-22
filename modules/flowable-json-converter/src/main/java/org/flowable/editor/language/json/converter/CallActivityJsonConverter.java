@@ -51,7 +51,8 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
+        BpmnJsonConverterContext converterContext) {
         CallActivity callActivity = (CallActivity) baseElement;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
@@ -93,6 +94,10 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
             propertiesNode.put(PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT, callActivity.getFallbackToDefaultTenant());
         }
 
+        if (callActivity.getProcessInstanceIdVariableName() != null) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_ID_VARIABLE_NAME, callActivity.getProcessInstanceIdVariableName());
+        }
+
         addJsonParameters(PROPERTY_CALLACTIVITY_IN, "inParameters", callActivity.getInParameters(), propertiesNode);
         addJsonParameters(PROPERTY_CALLACTIVITY_OUT, "outParameters", callActivity.getOutParameters(), propertiesNode);
     }
@@ -126,7 +131,8 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
+    protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap,
+        BpmnJsonConverterContext converterContext) {
         CallActivity callActivity = new CallActivity();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode))) {
             callActivity.setCalledElement(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode));
@@ -168,6 +174,11 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
 
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT, elementNode))) {
             callActivity.setFallbackToDefaultTenant(getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_FALLBACK_TO_DEFAULT_TENANT, elementNode));
+        }
+
+        String idVariableName = getPropertyValueAsString(PROPERTY_CALLACTIVITY_ID_VARIABLE_NAME, elementNode);
+        if (StringUtils.isNotEmpty(idVariableName)) {
+            callActivity.setProcessInstanceIdVariableName(idVariableName);
         }
 
         callActivity.getInParameters().addAll(convertToIOParameters(PROPERTY_CALLACTIVITY_IN, "inParameters", elementNode));

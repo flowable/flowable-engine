@@ -12,58 +12,37 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class TimerDefinitionConverterTest extends AbstractConverterTest {
+class TimerDefinitionConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "timerCalendarDefinition.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("timerCalendarDefinition.bpmn")
+    void validateModel(BpmnModel model) {
         IntermediateCatchEvent timer = (IntermediateCatchEvent) model.getMainProcess().getFlowElement("timer");
-        assertNotNull(timer);
+        assertThat(timer).isNotNull();
         TimerEventDefinition timerEvent = (TimerEventDefinition) timer.getEventDefinitions().get(0);
-        assertThat(timerEvent.getCalendarName(), is("custom"));
-        assertEquals("PT5M", timerEvent.getTimeDuration());
+        assertThat(timerEvent.getCalendarName()).isEqualTo("custom");
+        assertThat(timerEvent.getTimeDuration()).isEqualTo("PT5M");
 
         StartEvent start = (StartEvent) model.getMainProcess().getFlowElement("theStart");
-        assertNotNull(start);
+        assertThat(start).isNotNull();
         TimerEventDefinition startTimerEvent = (TimerEventDefinition) start.getEventDefinitions().get(0);
-        assertThat(startTimerEvent.getCalendarName(), is("custom"));
-        assertEquals("R2/PT5S", startTimerEvent.getTimeCycle());
-        assertEquals("${EndDate}", startTimerEvent.getEndDate());
+        assertThat(startTimerEvent.getCalendarName()).isEqualTo("custom");
+        assertThat(startTimerEvent.getTimeCycle()).isEqualTo("R2/PT5S");
+        assertThat(startTimerEvent.getEndDate()).isEqualTo("${EndDate}");
 
         BoundaryEvent boundaryTimer = (BoundaryEvent) model.getMainProcess().getFlowElement("boundaryTimer");
-        assertNotNull(boundaryTimer);
+        assertThat(boundaryTimer).isNotNull();
         TimerEventDefinition boundaryTimerEvent = (TimerEventDefinition) boundaryTimer.getEventDefinitions().get(0);
-        assertThat(boundaryTimerEvent.getCalendarName(), is("custom"));
-        assertEquals("PT10S", boundaryTimerEvent.getTimeDuration());
-        assertNull(boundaryTimerEvent.getEndDate());
+        assertThat(boundaryTimerEvent.getCalendarName()).isEqualTo("custom");
+        assertThat(boundaryTimerEvent.getTimeDuration()).isEqualTo("PT10S");
+        assertThat(boundaryTimerEvent.getEndDate()).isNull();
     }
 }

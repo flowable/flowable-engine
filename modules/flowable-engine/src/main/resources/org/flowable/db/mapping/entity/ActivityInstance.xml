@@ -35,13 +35,13 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{processDefinitionId, jdbcType=VARCHAR},
+        1, #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
@@ -52,6 +52,7 @@
         #{assignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
+        #{transactionOrder ,jdbcType=INTEGER},
         #{durationInMillis ,jdbcType=BIGINT},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR}
@@ -73,14 +74,14 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values 
       <foreach collection="list" item="activityInstance" index="index" separator=",">
          (#{activityInstance.id ,jdbcType=VARCHAR},
-          1,
-          #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+          1, #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
           #{activityInstance.processInstanceId, jdbcType=VARCHAR},
           #{activityInstance.executionId, jdbcType=VARCHAR},
           #{activityInstance.activityId ,jdbcType=VARCHAR},
@@ -91,6 +92,7 @@
           #{activityInstance.assignee ,jdbcType=VARCHAR},
           #{activityInstance.startTime, jdbcType=TIMESTAMP},
           #{activityInstance.endTime, jdbcType=TIMESTAMP},
+          #{activityInstance.transactionOrder, jdbcType=INTEGER},
           #{activityInstance.durationInMillis ,jdbcType=BIGINT},
           #{activityInstance.deleteReason ,jdbcType=VARCHAR},
           #{activityInstance.tenantId, jdbcType=VARCHAR})
@@ -114,13 +116,13 @@
           ASSIGNEE_,
           START_TIME_,
           END_TIME_,
+          TRANSACTION_ORDER_,
           DURATION_,
           DELETE_REASON_,
           TENANT_ID_
         ) VALUES 
            (#{activityInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+            1, #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
             #{activityInstance.processInstanceId, jdbcType=VARCHAR},
             #{activityInstance.executionId, jdbcType=VARCHAR},
             #{activityInstance.activityId ,jdbcType=VARCHAR},
@@ -131,6 +133,7 @@
             #{activityInstance.assignee ,jdbcType=VARCHAR},
             #{activityInstance.startTime, jdbcType=TIMESTAMP},
             #{activityInstance.endTime, jdbcType=TIMESTAMP},
+            #{activityInstance.transactionOrder, jdbcType=INTEGER},
             #{activityInstance.durationInMillis ,jdbcType=BIGINT},
             #{activityInstance.deleteReason ,jdbcType=VARCHAR},
             #{activityInstance.tenantId, jdbcType=VARCHAR})
@@ -159,6 +162,9 @@
         <if test="originalPersistentState.endTime != endTime">
             END_TIME_ = #{endTime, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.transactionOrder != transactionOrder">
+        	TRANSACTION_ORDER_ = #{transactionOrder, jdbcType=INTEGER}, 
+        </if>
         <if test="originalPersistentState.durationInMillis != durationInMillis">
             DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
         </if>
@@ -166,7 +172,7 @@
             DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
-            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.activityId != activityId">
             ACT_ID_ = #{activityId, jdbcType=VARCHAR},
@@ -189,6 +195,17 @@
     delete from ${prefix}ACT_RU_ACTINST where PROC_DEF_ID_ = #{processDefinitionId}
   </delete>
 
+  <delete id="deleteActivityInstance">
+    delete from ${prefix}ACT_RU_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteActivityInstance" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_RU_ACTINST where
+    <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+      ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+
   <!-- ACTIVITY INSTANCE RESULT MAP -->
 
   <resultMap id="ActivityInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl">
@@ -205,6 +222,7 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -298,9 +316,20 @@
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
 
-   <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+  <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
     select * from ${prefix}ACT_RU_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
+  </select>
+  
+  <select id="selectActivityInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where PROC_INST_ID_ = #{parameter}
+  </select>
+
+  <select id="selectActivityInstanceByTaskId" parameterType="string" resultMap="ActivityInstanceResultMap">
+    select *
+    from ${prefix}ACT_RU_ACTINST RES
+    where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
   </select>
   
 </mapper>

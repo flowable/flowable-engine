@@ -183,6 +183,9 @@ public class TaskBaseResource {
         if (request.getCandidateGroupIn() != null) {
             taskQuery.taskCandidateGroupIn(request.getCandidateGroupIn());
         }
+        if (request.isIgnoreAssignee()) {
+            taskQuery.ignoreAssigneeValue();
+        }
         if (request.getProcessInstanceId() != null) {
             taskQuery.processInstanceId(request.getProcessInstanceId());
         }
@@ -296,6 +299,10 @@ public class TaskBaseResource {
         
         if (request.getScopeType() != null) {
             taskQuery.scopeType(request.getScopeType());
+        }
+
+        if (request.getPropagatedStageInstanceId() != null) {
+            taskQuery.propagatedStageInstanceId(request.getPropagatedStageInstanceId());
         }
 
         if (request.getTenantId() != null) {

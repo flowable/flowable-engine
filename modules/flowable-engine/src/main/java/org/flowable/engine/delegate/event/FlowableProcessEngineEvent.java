@@ -27,7 +27,7 @@ public interface FlowableProcessEngineEvent extends FlowableEngineEvent {
     /**
      * Return the execution this event is associated with. Returns null, if the event was not related to an active execution.
      * 
-     * Note that this will only retun a {@link DelegateExecution} instance when a command context is active.
+     * Note that this will only return a {@link DelegateExecution} instance when a command context is active.
      */
     DelegateExecution getExecution();
 

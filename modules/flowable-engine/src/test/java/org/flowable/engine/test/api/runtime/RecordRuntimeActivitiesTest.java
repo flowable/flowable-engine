@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
@@ -34,7 +36,7 @@ public class RecordRuntimeActivitiesTest extends AbstractTestCase {
         try {
             processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
-            assertTrue(processEngine.getRuntimeService().createActivityInstanceQuery().count() > 0L);
+            assertThat(processEngine.getRuntimeService().createActivityInstanceQuery().count()).isGreaterThan(0);
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
             processEngine.close();

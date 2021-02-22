@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.cfg;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.identitylink.api.IdentityLink;
@@ -29,19 +30,25 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManager {
     
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
+    public DefaultTaskAssignmentManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
+    
     @Override
     public void changeAssignee(Task task, String assignee) {
-        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee);
+        TaskHelper.changeTaskAssignee((TaskEntity) task, assignee, cmmnEngineConfiguration);
     }
 
     @Override
     public void changeOwner(Task task, String owner) {
-        TaskHelper.changeTaskOwner((TaskEntity) task, owner);
+        TaskHelper.changeTaskOwner((TaskEntity) task, owner, cmmnEngineConfiguration);
     }
 
     @Override
     public void addCandidateUser(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, cmmnEngineConfiguration);
     }
 
     @Override
@@ -50,12 +57,12 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateUsers) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, cmmnEngineConfiguration);
     }
 
     @Override
     public void addCandidateGroup(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, cmmnEngineConfiguration);
     }
 
     @Override
@@ -64,31 +71,31 @@ public class DefaultTaskAssignmentManager implements InternalTaskAssignmentManag
         for (IdentityLink identityLink : candidateGroups) {
             identityLinks.add((IdentityLinkEntity) identityLink);
         }
-        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks);
+        IdentityLinkUtil.handleTaskIdentityLinkAdditions((TaskEntity) task, identityLinks, cmmnEngineConfiguration);
     }
 
     @Override
     public void addUserIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, cmmnEngineConfiguration);
     }
 
     @Override
     public void addGroupIdentityLink(Task task, IdentityLink identityLink) {
-        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink);
+        IdentityLinkUtil.handleTaskIdentityLinkAddition((TaskEntity) task, (IdentityLinkEntity) identityLink, cmmnEngineConfiguration);
     }
 
     @Override
     public void deleteUserIdentityLink(Task task, IdentityLink identityLink) {
         List<IdentityLinkEntity> identityLinks = new ArrayList<>();
         identityLinks.add((IdentityLinkEntity) identityLink);
-        IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true);
+        IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true, cmmnEngineConfiguration);
     }
 
     @Override
     public void deleteGroupIdentityLink(Task task, IdentityLink identityLink) {
         List<IdentityLinkEntity> identityLinks = new ArrayList<>();
         identityLinks.add((IdentityLinkEntity) identityLink);
-        IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true);
+        IdentityLinkUtil.handleTaskIdentityLinkDeletions((TaskEntity) task, identityLinks, true, cmmnEngineConfiguration);
     }
 
 }

@@ -28,12 +28,12 @@ public class DisablePlanItemInstanceOperation extends AbstractChangePlanItemInst
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.DISABLE;
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.DISABLED;
     }
     
@@ -42,5 +42,10 @@ public class DisablePlanItemInstanceOperation extends AbstractChangePlanItemInst
         planItemInstanceEntity.setLastDisabledTime(getCurrentTime(commandContext));
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceDisabled(planItemInstanceEntity);
     }
-    
+
+    @Override
+    public String getOperationName() {
+        return "[Disable plan item]";
+    }
+
 }

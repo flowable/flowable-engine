@@ -12,44 +12,40 @@
  */
 package org.flowable.cmmn.test.cfg;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji
  */
 public class ForceCloseMybatisConnectionPoolTest {
 
-
     @Test
     public void testForceCloseMybatisConnectionPoolTrue() {
 
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = true
-        StandaloneInMemCmmnEngineConfiguration standaloneInMemCmmnEngineConfiguration =  new StandaloneInMemCmmnEngineConfiguration();
+        StandaloneInMemCmmnEngineConfiguration standaloneInMemCmmnEngineConfiguration = new StandaloneInMemCmmnEngineConfiguration();
         standaloneInMemCmmnEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-cmmn-" + this.getClass().getName());
         standaloneInMemCmmnEngineConfiguration.setForceCloseMybatisConnectionPool(true);
 
         CmmnEngine cmmnEngine = standaloneInMemCmmnEngineConfiguration.buildCmmnEngine();
 
-
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemCmmnEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
         cmmnEngine.close();
 
         // the idle connections are closed
-        assertEquals(0, state.getIdleConnectionCount());
-
+        assertThat(state.getIdleConnectionCount()).isZero();
     }
 
     @Test
@@ -57,7 +53,7 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         // given
         // that the AbstractEngineConfiguration is configured with forceCloseMybatisConnectionPool = false
-        StandaloneInMemCmmnEngineConfiguration standaloneInMemCmmnEngineConfiguration =  new StandaloneInMemCmmnEngineConfiguration();
+        StandaloneInMemCmmnEngineConfiguration standaloneInMemCmmnEngineConfiguration = new StandaloneInMemCmmnEngineConfiguration();
         standaloneInMemCmmnEngineConfiguration.setJdbcUrl("jdbc:h2:mem:flowable-cmmn-" + this.getClass().getName());
         standaloneInMemCmmnEngineConfiguration.setForceCloseMybatisConnectionPool(false);
 
@@ -65,17 +61,17 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemCmmnEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
         standaloneInMemCmmnEngineConfiguration.close();
 
         // the idle connections are not closed
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         pooledDataSource.forceCloseAll();
-        assertEquals(0, state.getIdleConnectionCount());
+        assertThat(state.getIdleConnectionCount()).isZero();
     }
 
 }

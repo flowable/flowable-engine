@@ -12,11 +12,8 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FieldExtension;
@@ -25,52 +22,29 @@ import org.flowable.bpmn.model.FlowableHttpRequestHandler;
 import org.flowable.bpmn.model.FlowableHttpResponseHandler;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class HttpServiceTaskConverterTest extends AbstractConverterTest {
+class HttpServiceTaskConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "httpservicetaskmodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("httpservicetaskmodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("servicetask");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof HttpServiceTask);
-        assertEquals("servicetask", flowElement.getId());
-        HttpServiceTask serviceTask = (HttpServiceTask) flowElement;
-        assertEquals("servicetask", serviceTask.getId());
-        assertEquals("Service task", serviceTask.getName());
-
-        List<FieldExtension> fields = serviceTask.getFieldExtensions();
-        assertEquals(2, fields.size());
-        FieldExtension field = fields.get(0);
-        assertEquals("url", field.getFieldName());
-        assertEquals("test", field.getStringValue());
-        field = fields.get(1);
-        assertEquals("method", field.getFieldName());
-        assertEquals("GET", field.getExpression());
-        
-        FlowableHttpRequestHandler httpRequestHandler = serviceTask.getHttpRequestHandler();
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, httpRequestHandler.getImplementationType());
-        assertEquals("${delegateExpression}", httpRequestHandler.getImplementation());
-
-        FlowableHttpResponseHandler httpResponseHandler = serviceTask.getHttpResponseHandler();
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, httpResponseHandler.getImplementationType());
-        assertEquals("org.flowable.Test", httpResponseHandler.getImplementation());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(HttpServiceTask.class, httpServiceTask -> {
+                    assertThat(httpServiceTask.getId()).isEqualTo("servicetask");
+                    assertThat(httpServiceTask.getName()).isEqualTo("Service task");
+                    assertThat(httpServiceTask.getFieldExtensions())
+                            .extracting(FieldExtension::getFieldName, FieldExtension::getStringValue, FieldExtension::getExpression)
+                            .containsExactly(
+                                    tuple("url", "test", null),
+                                    tuple("method", null, "GET")
+                            );
+                    assertThat(httpServiceTask.getHttpRequestHandler())
+                            .extracting(FlowableHttpRequestHandler::getImplementationType, FlowableHttpRequestHandler::getImplementation)
+                            .containsExactly(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, "${delegateExpression}");
+                    assertThat(httpServiceTask.getHttpResponseHandler())
+                            .extracting(FlowableHttpResponseHandler::getImplementationType, FlowableHttpResponseHandler::getImplementation)
+                            .containsExactly(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.flowable.Test");
+                });
     }
 }

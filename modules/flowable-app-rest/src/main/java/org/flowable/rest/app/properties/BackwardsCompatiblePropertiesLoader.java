@@ -77,7 +77,7 @@ public class BackwardsCompatiblePropertiesLoader implements EnvironmentPostProce
                     logger.info("Properties location [{}] not resolvable: {}", location, ex.getMessage());
                 }
             } catch (IOException ex) {
-                throw new UncheckedIOException("Failed to creaty property source", ex);
+                throw new UncheckedIOException("Failed to create property source", ex);
             }
         }
     }

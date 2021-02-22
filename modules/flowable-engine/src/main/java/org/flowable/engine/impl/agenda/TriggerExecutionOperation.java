@@ -12,17 +12,17 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncTriggerJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
@@ -55,29 +55,13 @@ public class TriggerExecutionOperation extends AbstractOperation {
             ActivityBehavior activityBehavior = (ActivityBehavior) ((FlowNode) currentFlowElement).getBehavior();
             if (activityBehavior instanceof TriggerableActivityBehavior) {
 
-                if (currentFlowElement instanceof BoundaryEvent
-                        || currentFlowElement instanceof ServiceTask) { // custom service task with no automatic leave (will not have a activity-start history entry in ContinueProcessOperation)
-                    
-                    CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(execution);
-                }
-
                 if (!triggerAsync) {
                     ((TriggerableActivityBehavior) activityBehavior).trigger(execution, null, null);
                     
                 } else {
-                    JobService jobService = CommandContextUtil.getJobService();
-                    JobEntity job = jobService.createJob();
-                    job.setExecutionId(execution.getId());
-                    job.setProcessInstanceId(execution.getProcessInstanceId());
-                    job.setProcessDefinitionId(execution.getProcessDefinitionId());
-                    job.setElementId(currentFlowElement.getId());
-                    job.setElementName(currentFlowElement.getName());
-                    job.setJobHandlerType(AsyncTriggerJobHandler.TYPE);
-                    
-                    // Inherit tenant id (if applicable)
-                    if(execution.getTenantId() != null) {
-                        job.setTenantId(execution.getTenantId());
-                    }
+                    ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                    JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
+                    JobEntity job = JobUtil.createJob(execution, currentFlowElement, AsyncTriggerJobHandler.TYPE, processEngineConfiguration);
 
                     jobService.createAsyncJob(job, true);
                     jobService.scheduleAsyncJob(job);

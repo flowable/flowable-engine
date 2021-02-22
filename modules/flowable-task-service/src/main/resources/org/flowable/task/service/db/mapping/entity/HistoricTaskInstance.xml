@@ -32,6 +32,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -51,8 +52,7 @@
         LAST_UPDATED_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{taskDefinitionId, jdbcType=VARCHAR},
+        1, #{taskDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -60,6 +60,7 @@
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{propagatedStageInstanceId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -92,6 +93,7 @@
         SUB_SCOPE_ID_,
         SCOPE_TYPE_,
         SCOPE_DEFINITION_ID_,
+        PROPAGATED_STAGE_INST_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -112,8 +114,7 @@
       ) values
         <foreach collection="list" item="historicTask" index="index" separator=",">
           (#{historicTask.id ,jdbcType=VARCHAR},
-           1,
-           #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
+           1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processInstanceId, jdbcType=VARCHAR},
            #{historicTask.executionId, jdbcType=VARCHAR},
@@ -121,6 +122,7 @@
            #{historicTask.subScopeId, jdbcType=VARCHAR},
            #{historicTask.scopeType, jdbcType=VARCHAR},
            #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+           #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
            #{historicTask.name ,jdbcType=VARCHAR},
            #{historicTask.parentTaskId ,jdbcType=VARCHAR},
            #{historicTask.description ,jdbcType=VARCHAR},
@@ -155,6 +157,7 @@
             SUB_SCOPE_ID_,
             SCOPE_TYPE_,
             SCOPE_DEFINITION_ID_,
+            PROPAGATED_STAGE_INST_ID_,
             NAME_,
             PARENT_TASK_ID_,
             DESCRIPTION_,
@@ -174,8 +177,7 @@
             LAST_UPDATED_TIME_
           ) VALUES
             (#{historicTask.id ,jdbcType=VARCHAR},
-             1,
-             #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
+             1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processInstanceId, jdbcType=VARCHAR},
              #{historicTask.executionId, jdbcType=VARCHAR},
@@ -183,6 +185,7 @@
              #{historicTask.subScopeId, jdbcType=VARCHAR},
              #{historicTask.scopeType, jdbcType=VARCHAR},
              #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+             #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
              #{historicTask.name ,jdbcType=VARCHAR},
              #{historicTask.parentTaskId ,jdbcType=VARCHAR},
              #{historicTask.description ,jdbcType=VARCHAR},
@@ -220,16 +223,19 @@
 	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
 	      </if>
           <if test="originalPersistentState.scopeId != scopeId">
-            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.subScopeId != subScopeId">
-            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeType != scopeType">
-            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
           </if>
           <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+          </if>
+          <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
+            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
           </if>
 	      <if test="originalPersistentState.name != name">
 	      	NAME_ = #{name, jdbcType=VARCHAR},
@@ -274,7 +280,7 @@
 	      	CATEGORY_ = #{category, jdbcType=VARCHAR},
 	  	  </if>
 	  	  <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
-	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP}
+	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP},
 	      </if>
   	  </set>
     where ID_ = #{id}
@@ -295,7 +301,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and TASK.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.PROC_INST_ID_ is not null and TASK.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where TASK.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   
@@ -310,18 +316,18 @@
   </delete>
   
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_ID_ != '' and TASK.SCOPE_TYPE_ = 'cmmn' and
-    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> TASK </if> from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_ID_ != '' and TASK.SCOPE_TYPE_ = 'cmmn' and
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
   </delete>
   
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
     delete from ${prefix}ACT_HI_TASKINST TASK where TASK.SCOPE_ID_ is not null and TASK.SCOPE_TYPE_ = 'cmmn' and
-    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
+    NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where TASK.SCOPE_ID_ = CASEINST.ID_)
   </delete>
 
   <delete id="bulkDeleteHistoricTaskInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_TASKINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
-    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
+    SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
   </delete>
 
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
@@ -337,6 +343,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -367,6 +374,7 @@
     <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
     <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
     <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -427,7 +435,7 @@
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if> <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if>
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
@@ -569,6 +577,9 @@
     <if test="cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0)">
       left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C.ID_
     </if>
+    <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0)">
+      inner join ${prefix}ACT_CMMN_CASEDEF CD on RES.SCOPE_DEFINITION_ID_ = CD.ID_
+    </if>
     <foreach collection="queryVariableValues" index="index" item="var">
       <if test="!var.operator.equals('EXISTS') &amp;&amp; !var.operator.equals('NOT_EXISTS')">
           <choose>
@@ -593,6 +604,9 @@
       </if>
       <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
+      </if>
+      <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0)">
+        left outer join ${prefix}ACT_CMMN_CASEDEF CD_OR${orIndex} on RES.SCOPE_DEFINITION_ID_ = CD_OR${orIndex}.ID_
       </if>
       <if test="orQueryObject.queryVariableValues.size() &gt; 0">
         <if test="orQueryObject.hasValueComparisonQueryVariables()">
@@ -680,6 +694,21 @@
             </foreach>
         )
       </if>
+      <if test="caseDefinitionKey != null">
+        and CD.KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionKeyLike != null">
+        and CD.KEY_ like #{caseDefinitionKeyLike}${wildcardEscapeClause}
+      </if>
+      <if test="caseDefinitionKeyLikeIgnoreCase != null">
+        and lower(CD.KEY_) like #{caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0">
+        and CD.KEY_ in
+        <foreach item="item" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
       <if test="processFinished">
         and HPI.END_TIME_ is not null
       </if>
@@ -728,17 +757,17 @@
                   <!-- Match-all variable-names when name is null -->
                   and A${index}.NAME_= #{queryVar.name}
                 </if>
-                <if test="!queryVar.type.equals('null')">
+                <if test="queryVar.needsTypeCheck()">
                   and A${index}.VAR_TYPE_ = #{queryVar.type}
                 </if>
                 <!-- Variable value -->
                 <if test="queryVar.textValue != null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
                   <choose>
                     <when test="queryVar.operator.equals('EQUALS_IGNORE_CASE') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">
-                      and lower(A${index}.TEXT_)
+                      and (lower(A${index}.TEXT_)
                     </when>
                     <otherwise>
-                      and A${index}.TEXT_
+                      and (A${index}.TEXT_
                     </otherwise>
                   </choose>
                   <choose>
@@ -749,6 +778,10 @@
                   <choose>
         			<when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
         		  </choose>
+                  <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                    or A${index}.TEXT_ is null
+                  </if>
+                  )
                 </if>
                 <if test="queryVar.textValue2 != null">
                   and A${index}.TEXT2_
@@ -762,14 +795,22 @@
         		  </choose>
                 </if>
                 <if test="queryVar.longValue != null">
-                  and A${index}.LONG_
+                  and (A${index}.LONG_
                   <include refid="executionVariableOperator" />
                   #{queryVar.longValue}
+                  <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                    or A${index}.LONG_ is null
+                  </if>
+                  )
                 </if>
                 <if test="queryVar.doubleValue != null">
-                  and A${index}.DOUBLE_
+                  and (A${index}.DOUBLE_
                   <include refid="executionVariableOperator" />
                   #{queryVar.doubleValue}
+                  <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                    or A${index}.DOUBLE_ is null
+                  </if>
+                  )
                 </if>
                 <!-- Null variable type -->
                 <if test="queryVar.textValue == null &amp;&amp; queryVar.textValue2 == null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
@@ -846,6 +887,21 @@
               #{deployment}
             </foreach>
           </if>
+          <if test="orQueryObject.caseDefinitionKey != null">
+            or CD_OR${orIndex}.KEY_ = #{orQueryObject.caseDefinitionKey}
+          </if>
+          <if test="orQueryObject.caseDefinitionKeyLike != null">
+            or CD_OR${orIndex}.KEY_ like #{orQueryObject.caseDefinitionKeyLike}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.caseDefinitionKeyLikeIgnoreCase != null">
+            or lower(CD_OR${orIndex}.KEY_) like #{orQueryObject.caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0">
+            or CD_OR${orIndex}.KEY_ in
+            <foreach item="item" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </if>
           <if test="orQueryObject.processInstanceBusinessKey != null">
             or HPI_OR${orIndex}.BUSINESS_KEY_ = #{orQueryObject.processInstanceBusinessKey}
           </if>
@@ -902,17 +958,17 @@
                     <!-- Match-all variable-names when name is null -->
                     and A_${orLocal}OR${orIndex}.NAME_= #{queryVar.name}
                   </if>
-                  <if test="!queryVar.type.equals('null')">
+                  <if test="queryVar.needsTypeCheck()">
                     and A_${orLocal}OR${orIndex}.VAR_TYPE_ = #{queryVar.type}
                   </if>
                   <!-- Variable value -->
                   <if test="queryVar.textValue != null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
                     <choose>
                       <when test="queryVar.operator.equals('EQUALS_IGNORE_CASE') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">
-                        and lower(A_${orLocal}OR${orIndex}.TEXT_)
+                        and (lower(A_${orLocal}OR${orIndex}.TEXT_)
                       </when>
                       <otherwise>
-                        and A_${orLocal}OR${orIndex}.TEXT_
+                        and (A_${orLocal}OR${orIndex}.TEXT_
                       </otherwise>
                     </choose>
                     <choose>
@@ -923,6 +979,10 @@
                     <choose>
                       <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
+                    <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A_${orLocal}OR${orIndex}.TEXT_ is null
+                    </if>
+                    )
                   </if>
                   <if test="queryVar.textValue2 != null">
                     and A_${orLocal}OR${orIndex}.TEXT2_
@@ -936,14 +996,22 @@
                     </choose>
                   </if>
                   <if test="queryVar.longValue != null">
-                    and A_${orLocal}OR${orIndex}.LONG_
+                    and (A_${orLocal}OR${orIndex}.LONG_
                     <include refid="executionVariableOperator" />
                     #{queryVar.longValue}
+                    <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A_${orLocal}OR${orIndex}.LONG_ is null
+                    </if>
+                    )
                   </if>
                   <if test="queryVar.doubleValue != null">
-                    and A_OR${orIndex}_${index}.DOUBLE_
+                    and (A_OR${orIndex}_${index}.DOUBLE_
                     <include refid="executionVariableOperator" />
                     #{queryVar.doubleValue}
+                    <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                      or A_${orLocal}OR${orIndex}.DOUBLE_ is null
+                    </if>
+                    )
                   </if>
                   <!-- Null variable type -->
                   <if test="queryVar.textValue == null &amp;&amp; queryVar.textValue2 == null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
@@ -1011,6 +1079,9 @@
       </if>
       <if test="scopeDefinitionId != null">
         and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="propagatedStageInstanceId != null">
+        and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
       </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
@@ -1087,6 +1158,12 @@
                  open="(" separator="," close=")">
           #{assigneeId}
         </foreach>
+      </if>
+      <if test="withAssignee">
+        and ${queryTablePrefix}ASSIGNEE_ IS NOT NULL
+      </if>
+      <if test="withoutAssignee">
+        and ${queryTablePrefix}ASSIGNEE_ IS NULL
       </if>
       <if test="taskPriority != null">
         and ${queryTablePrefix}PRIORITY_ = #{taskPriority}
@@ -1241,6 +1318,9 @@
       <if test="orQueryObject.scopeDefinitionId != null">
         or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
       </if>
+      <if test="orQueryObject.propagatedStageInstanceId != null">
+        or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}
+      </if>
       <if test="orQueryObject.processInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
             ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
@@ -1309,6 +1389,12 @@
       </if>
        <if test="orQueryObject.taskAssigneeLikeIgnoreCase != null">
         or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.withAssignee">
+        or ${queryTablePrefix}ASSIGNEE_ IS NOT NULL
+      </if>
+      <if test="orQueryObject.withoutAssignee">
+        or ${queryTablePrefix}ASSIGNEE_ IS NULL
       </if>
       <if test="orQueryObject.taskAssigneeIds != null &amp;&amp; orQueryObject.taskAssigneeIds.size() &gt; 0">
         or ${queryTablePrefix}ASSIGNEE_ IN

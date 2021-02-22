@@ -12,11 +12,11 @@
  */
 package org.flowable.crystalball.simulator;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -31,12 +31,12 @@ public class SimulationEventComparatorTest {
         SimulationEvent eq1_0 = new SimulationEvent.Builder("type").simulationTime(0).build();
         SimulationEvent event1_1 = new SimulationEvent.Builder("type").simulationTime(0).priority(1).build();
         SimulationEvent event2 = new SimulationEvent.Builder("type").simulationTime(1).build();
-        assertEquals(0, comparator.compare(event1_0, eq1_0));
-        assertEquals(-1, comparator.compare(event1_0, event2));
-        assertEquals(1, comparator.compare(event2, event1_0));
-        assertEquals(-1, comparator.compare(event1_0, event1_1));
-        assertEquals(1, comparator.compare(event1_1, event1_0));
-        assertEquals(-1, comparator.compare(event1_1, event2));
-        assertEquals(1, comparator.compare(event2, event1_1));
+        assertThat(comparator.compare(event1_0, eq1_0)).isZero();
+        assertThat(comparator.compare(event1_0, event2)).isEqualTo(-1);
+        assertThat(comparator.compare(event2, event1_0)).isEqualTo(1);
+        assertThat(comparator.compare(event1_0, event1_1)).isEqualTo(-1);
+        assertThat(comparator.compare(event1_1, event1_0)).isEqualTo(1);
+        assertThat(comparator.compare(event1_1, event2)).isEqualTo(-1);
+        assertThat(comparator.compare(event2, event1_1)).isEqualTo(1);
     }
 }

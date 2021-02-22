@@ -79,12 +79,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         ProcessDefinition processDefinition = null;
 
-        if(sameDeployment) {
+        if (sameDeployment) {
             String deploymentId = deploymentManager.findDeployedProcessDefinitionById(execution.getProcessDefinitionId()).getDeploymentId();
             processDefinition = Context.getCommandContext().getProcessDefinitionEntityManager().findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitonKey);
         }
 
-        if(processDefinition == null) {
+        if (processDefinition == null) {
             if (execution.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(execution.getTenantId())) {
                 processDefinition = deploymentManager.findDeployedLatestProcessDefinitionByKey(processDefinitonKey);
             } else {

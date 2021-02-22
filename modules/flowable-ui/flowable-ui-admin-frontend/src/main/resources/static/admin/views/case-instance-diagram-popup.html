@@ -1,0 +1,26 @@
+<div class="modal-header-wrapper">
+	<div class="modal-header">
+		<div class="pull-right">
+            <a class="action" ng-click="cancel()">&times; {{'GENERAL.ACTION.CANCEL-AND-CLOSE' | translate}}</a>
+        </div>
+		<h2>{{'CASE-INSTANCE.POPUP.SHOW-CASE-MODEL.TITLE' | translate}} '{{model.name &amp;&amp; model.name || model.id}}'</h2>	
+	</div>
+</div>
+<div class="modal-body modal-body-medium">
+	<div class="text-center">
+        <button type="button" id="changeStateToActivateButton" class="btn btn-sm btn-default" style="display:none">Activate plan item</button>
+        <button type="button" id="changeStateToAvailableButton" class="btn btn-sm btn-default" style="display:none">Move to available state</button>
+        <button type="button" id="changeStateToTerminateButton" class="btn btn-sm btn-default" style="display:none">Terminate plan item</button>
+    </div>
+    <div id="cmmnModel" style="margin-left:auto;margin-right:auto"></div>
+</div>
+
+<div class="modal-footer-wrapper">
+	<div class="modal-footer">
+		<div class="pull-right">
+	       <button type="button" class="btn btn-sm btn-default" ng-click="cancel()" ng-disabled="status.loading"
+		       	translate="GENERAL.ACTION.CLOSE">
+	       	</button>
+		</div>
+	</div>
+</div>	

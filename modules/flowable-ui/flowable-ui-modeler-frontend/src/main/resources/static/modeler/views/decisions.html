@@ -1,0 +1,106 @@
+<div class="subheader" id="list-header">
+    <div class="fixed-container">
+        <div class="btn-group pull-right">
+            <button ng-if="model.activeFilter.type === 'decision-services'" type="button" class="btn btn-default" ng-click="createDecisionService()"
+                    ng-disabled="readOnly" translate>DECISIONS-LIST.ACTION.CREATE-DECISION-SERVICE
+            </button>
+            <button ng-if="model.activeFilter.type === 'decision-tables'" type="button" class="btn btn-default" ng-click="createDecisionTable()"
+                    ng-disabled="readOnly" translate>DECISIONS-LIST.ACTION.CREATE
+            </button>
+            <button ng-if="model.activeFilter.type === 'decision-services'" type="button" class="btn btn-default" ng-click="importDecisionService()"
+                    ng-disabled="readOnly" translate>DECISIONS-LIST.ACTION.IMPORT-DECISION-SERVICE
+            </button>
+            <button ng-if="model.activeFilter.type === 'decision-tables'" type="button" class="btn btn-default" ng-click="importDecisionTable()"
+                    ng-disabled="readOnly" translate>DECISIONS-LIST.ACTION.IMPORT-DECISION-TABLE
+            </button>
+        </div>
+        <h2>{{'DECISIONS-LIST.TITLE' | translate}}</h2>
+    </div>
+</div>
+<div class="container-fluid content" id="list-container" auto-height offset="40">
+    <div class="col-xs-2 filter-wrapper">
+        <div class="input-group">
+                <span class="input-group-addon"> <i
+                        class="glyphicon glyphicon-search"></i>
+                </span> <input type="text" ng-model="model.pendingFilterText" class="form-control" ng-change="filterDelayed()"
+                               placeholder="{{'DECISIONS-LIST.SEARCH-PLACEHOLDER' | translate}}">
+        </div>
+        <ul class="filter-list">
+            <li ng-repeat="filter in model.filters" ng-class="{'current' : filter.id == model.activeFilter.id}">
+                <a ng-href="#/{{filter.type}}">
+                    {{'DECISIONS-LIST.FILTER.' + filter.labelKey | translate}}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-xs-10 item-wrapper" id="list-items">
+        <div class="dropdown-subtle pull-right">
+            <div class="btn-group btn-group-sm" activiti-fix-dropdown-bug>
+                <button type="button" class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown">{{'DECISIONS-LIST.SORT.' + model.activeSort.labelKey | translate}} <i class="caret"></i></button>
+                <ul class="dropdown-menu pull-right">
+                    <li ng-repeat="sort in model.sorts">
+                        <a ng-click="activateSort(sort)">{{'DECISIONS-LIST.SORT.' + sort.labelKey | translate}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="message clearfix">
+            <div class="loading pull-left" ng-show="model.loading">
+                <div class="l1"></div>
+                <div class="l2"></div>
+                <div class="l2"></div>
+            </div>
+            <div ng-if="!model.loading">
+                <span ng-if="model.decisions.size > 1">{{'DECISIONS-LIST.FILTER.' + model.activeFilter.labelKey + '-COUNT' | translate:model.decisions}}</span>
+                <span ng-if="model.decisions.size == 1">{{'DECISIONS-LIST.FILTER.' + model.activeFilter.labelKey + '-ONE' | translate}}</span>
+                <span ng-if="model.decisions.size == 0 && (!model.filterText || model.filterText == '')">{{'DECISIONS-LIST.FILTER.' + model.activeFilter.labelKey + '-EMPTY' | translate}}</span>
+                <span ng-if="model.decisions.size > 0 && model.filterText !='' && model.filterText !== undefined">{{'DECISIONS-LIST.FILTER.FILTER-TEXT' | translate:model}}</span>
+                <span ng-if="model.decisions.size == 0 && model.filterText !='' && model.filterText !== undefined">{{'DECISIONS-LIST.FILTER.FILTER-TEXT-EMPTY' | translate:model}}</span>
+            </div>
+        </div>
+
+        <div class="create-inline" ng-if="model.decisions.size == 0 && (!model.filterText || model.filterText == '')">
+            <span>{{'DECISIONS-LIST.FILTER.' + model.activeFilter.labelKey + '-EMPTY' | translate}}</span>
+            <span>
+                <button type="button" class="btn btn-default" ng-click="createDecision()" ng-disabled="readOnly">
+                    <i class="glyphicon glyphicon-plus-sign"></i>{{'DECISIONS-LIST.ACTION.CREATE-' + model.activeFilter.labelKey + '-INLINE' | translate}}
+                </button>
+            </span>
+        </div>
+
+        <div class="item fadein" ng-repeat="decision in model.decisions.data track by $index">
+            <div class="item-box" style="background-size: 90%" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(decision.id, imageVersion) + '\')'}"
+                 ng-click="showDecisionDetails(decision);">
+                <div class="actions">
+                    <span class="badge">v{{decision.version}}</span>
+                    <div class="btn-group pull-right">
+                        <button type="button" ng-click="showDecisionDetails(decision); $event.stopPropagation();" class="btn btn-default"
+                                title="{{'DECISION-TABLE.ACTION.DETAILS' | translate}}">
+                            <i class="glyphicon glyphicon-search"></i>
+                        </button>
+                        <button type="button" ng-click="editDecisionDetails(decision); $event.stopPropagation();" class="btn btn-default"
+                                title="{{'DECISION-TABLE.ACTION.OPEN-IN-EDITOR' | translate}}">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="details">
+                    <h3 class="truncate" title="{{decision.name}}">
+                        {{decision.name}}
+                    </h3>
+                    <div class="basic-details truncate">
+                        <span><i class="glyphicon glyphicon-user"></i> {{decision.createdBy}}</span> <span title="{{decision.lastUpdated | dateformat:'LLLL'}}"><i
+                            class="glyphicon glyphicon-pencil"></i> {{decision.lastUpdated | dateformat}}</span>
+                    </div>
+                    <p>{{decision.description}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="show-more" ng-if="model.decisions.data.length < model.decisions.total">
+            <a>{{'DECISIONS-LIST.ACTION.SHOW-MORE' | translate}}</a>
+        </div>
+    </div>
+</div>

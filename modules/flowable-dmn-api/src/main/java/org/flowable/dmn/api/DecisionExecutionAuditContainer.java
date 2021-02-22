@@ -43,6 +43,7 @@ public class DecisionExecutionAuditContainer {
     protected Map<String, Object> inputVariables;
     protected Map<String, String> inputVariableTypes;
     protected List<Map<String, Object>> decisionResult = new ArrayList<>();
+    protected boolean multipleResults = false;
     protected Map<String, String> decisionResultTypes = new HashMap<>();
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
@@ -51,6 +52,17 @@ public class DecisionExecutionAuditContainer {
     protected Boolean strictMode;
 
     public DecisionExecutionAuditContainer() {
+    }
+
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, Boolean strictMode, Map<String, Object> inputVariables) {
+        this.startTime = new Date();
+        this.decisionKey = decisionKey;
+        this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
+        this.strictMode = strictMode;
+        this.inputVariableTypes = getVariablesTypeMap(inputVariables);
+        // create defensive copy of input variables
+        this.inputVariables = createDefensiveCopyInputVariables(inputVariables);
     }
 
     public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
@@ -132,7 +144,15 @@ public class DecisionExecutionAuditContainer {
     public void setDecisionResult(List<Map<String, Object>> decisionResult) {
         this.decisionResult = decisionResult;
     }
-    
+
+    public boolean isMultipleResults() {
+        return multipleResults;
+    }
+
+    public void setMultipleResults(boolean multipleResults) {
+        this.multipleResults = multipleResults;
+    }
+
     public void addDecisionResultObject(Map<String, Object> decisionResultObject) {
         this.decisionResult.add(decisionResultObject);
     }

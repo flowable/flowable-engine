@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.cmmn.rest.service.api.runtime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +31,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the plan item instance query resource.
- * 
+ *
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
@@ -41,10 +43,10 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
         // Type
         List<PlanItemInstance> planItemInstanceList = runtimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
-            .list();
-        assertEquals(2, planItemInstanceList.size());
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertThat(planItemInstanceList).hasSize(2);
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -54,20 +56,20 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
         // Multiple types
         planItemInstanceList = runtimeService.createPlanItemInstanceQuery()
-            .caseInstanceId(caseInstance.getId())
-            .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.HUMAN_TASK, PlanItemDefinitionType.STAGE))
-            .list();
-        assertEquals(4, planItemInstanceList.size());
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionTypes(Arrays.asList(PlanItemDefinitionType.HUMAN_TASK, PlanItemDefinitionType.STAGE))
+                .list();
+        assertThat(planItemInstanceList).hasSize(4);
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance.getId());
         requestNode.putArray("planItemDefinitionTypes").add("humantask").add("stage");
         assertResultsPresentInPostDataResponse(url, requestNode,
-            planItemInstanceList.get(0).getId(),
-            planItemInstanceList.get(1).getId(),
-            planItemInstanceList.get(2).getId(),
-            planItemInstanceList.get(3).getId());
+                planItemInstanceList.get(0).getId(),
+                planItemInstanceList.get(1).getId(),
+                planItemInstanceList.get(2).getId(),
+                planItemInstanceList.get(3).getId());
     }
 
     /**
@@ -81,7 +83,7 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
         caseVariables.put("booleanVar", false);
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
-        
+
         PlanItemInstance planItem = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);

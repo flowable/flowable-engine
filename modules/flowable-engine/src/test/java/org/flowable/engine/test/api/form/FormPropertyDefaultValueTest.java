@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.form;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,31 +37,24 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
 
         TaskFormData formData = formService.getTaskFormData(task.getId());
         List<FormProperty> formProperties = formData.getFormProperties();
-        assertEquals(4, formProperties.size());
-
-        for (FormProperty prop : formProperties) {
-            if ("booleanProperty".equals(prop.getId())) {
-                assertEquals("true", prop.getValue());
-            } else if ("stringProperty".equals(prop.getId())) {
-                assertEquals("someString", prop.getValue());
-            } else if ("longProperty".equals(prop.getId())) {
-                assertEquals("42", prop.getValue());
-            } else if ("longExpressionProperty".equals(prop.getId())) {
-                assertEquals("23", prop.getValue());
-            } else {
-                fail("Invalid form property: " + prop.getId());
-            }
-        }
+        assertThat(formProperties)
+                .extracting(FormProperty::getId, FormProperty::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("booleanProperty", "true"),
+                        tuple("stringProperty", "someString"),
+                        tuple("longProperty", "42"),
+                        tuple("longExpressionProperty", "23")
+                );
 
         Map<String, String> formDataUpdate = new HashMap<>();
         formDataUpdate.put("longExpressionProperty", "1");
         formDataUpdate.put("booleanProperty", "false");
         formService.submitTaskFormData(task.getId(), formDataUpdate);
 
-        assertEquals(false, runtimeService.getVariable(processInstance.getId(), "booleanProperty"));
-        assertEquals("someString", runtimeService.getVariable(processInstance.getId(), "stringProperty"));
-        assertEquals(42L, runtimeService.getVariable(processInstance.getId(), "longProperty"));
-        assertEquals(1L, runtimeService.getVariable(processInstance.getId(), "longExpressionProperty"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "booleanProperty")).isEqualTo(false);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringProperty")).isEqualTo("someString");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "longProperty")).isEqualTo(42L);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "longExpressionProperty")).isEqualTo(1L);
     }
 
     @Test
@@ -69,32 +65,24 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
         StartFormData startForm = formService.getStartFormData(processDefinitionId);
 
         List<FormProperty> formProperties = startForm.getFormProperties();
-        assertEquals(4, formProperties.size());
+        assertThat(formProperties)
+                .extracting(FormProperty::getId, FormProperty::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("booleanProperty", "true"),
+                        tuple("stringProperty", "someString"),
+                        tuple("longProperty", "42"),
+                        tuple("longExpressionProperty", "23")
+                );
 
-        for (FormProperty prop : formProperties) {
-            if ("booleanProperty".equals(prop.getId())) {
-                assertEquals("true", prop.getValue());
-            } else if ("stringProperty".equals(prop.getId())) {
-                assertEquals("someString", prop.getValue());
-            } else if ("longProperty".equals(prop.getId())) {
-                assertEquals("42", prop.getValue());
-            } else if ("longExpressionProperty".equals(prop.getId())) {
-                assertEquals("23", prop.getValue());
-            } else {
-                fail("Invalid form property: " + prop.getId());
-            }
-        }
-
-        // Override 2 properties. The others should pe posted as the
-        // default-value
+        // Override 2 properties. The others should pe posted as the default-value
         Map<String, String> formDataUpdate = new HashMap<>();
         formDataUpdate.put("longExpressionProperty", "1");
         formDataUpdate.put("booleanProperty", "false");
         ProcessInstance processInstance = formService.submitStartFormData(processDefinitionId, formDataUpdate);
 
-        assertEquals(false, runtimeService.getVariable(processInstance.getId(), "booleanProperty"));
-        assertEquals("someString", runtimeService.getVariable(processInstance.getId(), "stringProperty"));
-        assertEquals(42L, runtimeService.getVariable(processInstance.getId(), "longProperty"));
-        assertEquals(1L, runtimeService.getVariable(processInstance.getId(), "longExpressionProperty"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "booleanProperty")).isEqualTo(false);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringProperty")).isEqualTo("someString");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "longProperty")).isEqualTo(42L);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "longExpressionProperty")).isEqualTo(1L);
     }
 }

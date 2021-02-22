@@ -135,6 +135,12 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
         return getBpmnProcessModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisiontablereference", allowedStencilTypes);
     }
 
+    public static List<JsonLookupResult> getBpmnProcessModelDecisionServiceReferences(JsonNode editorJsonNode) {
+        List<String> allowedStencilTypes = new ArrayList<>();
+        allowedStencilTypes.add(STENCIL_TASK_DECISION);
+        return getBpmnProcessModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisionservicereference", allowedStencilTypes);
+    }
+
     // APP MODEL
 
     public static List<JsonNode> getAppModelReferencedProcessModels(JsonNode appModelJson) {
@@ -167,7 +173,7 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
         Set<Long> result = new HashSet<>(); // Using a Set to filter out doubles
         for (JsonNode node : jsonNodes) {
             if (node.has(propertyName)) {
-                Long propertyValue = node.get(propertyName).asLong();
+                long propertyValue = node.get(propertyName).asLong();
                 if (propertyValue > 0) { // Just to be safe
                     result.add(propertyValue);
                 }

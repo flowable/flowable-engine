@@ -109,7 +109,7 @@ BPMN 2.0标准对流程的所有的参与者都很有用。最终用户不会因
 ----
 
 
-请参考link:$$http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html$$[这个教程]了解如何使用cron表达式。
+请参考link:$$http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html$$[这个教程]了解如何使用cron表达式。
 
 **请注意:** 与普通的Unix cron不同，第一个符号代表的是秒，而不是分钟。
 
@@ -2459,14 +2459,14 @@ image::images/bpmn.scripttask.png[align="center"]
 
 **scriptFormat**属性的值，必须是兼容link:$$http://jcp.org/en/jsr/detail?id=223$$[JSR-223]（Java平台脚本）的名字。默认情况下，JavaScript包含在每一个JDK中，因此不需要添加任何JAR文件。如果想使用其它（兼容JSR-223的）脚本引擎，则需要在classpath中添加相应的jar，并使用适当的名字。例如，Flowable单元测试经常使用Groovy，因为其语法与Java十分相似。
 
-请注意Groovy脚本引擎与groovy-all JAR捆绑在一起。在Groovy 2.0版本以前，脚本引擎是Groovy JAR的一部分。因此，必须添加如下依赖：
+请注意Groovy脚本引擎与groovy-jsr223 JAR捆绑在一起。在Groovy 3.0版本以前，脚本引擎是Groovy JAR的一部分。因此，必须添加如下依赖：
 
 [source,xml,linenums]
 ----
 <dependency>
     <groupId>org.codehaus.groovy</groupId>
-    <artifactId>groovy-all</artifactId>
-    <version>2.x.x<version>
+    <artifactId>groovy-jsr223</artifactId>
+    <version>3.x.x<version>
 </dependency>
 ----
 
@@ -4466,7 +4466,7 @@ __任务监听器__包含下列属性：
 ** **assignment（指派）**：当任务已经指派给某人时触发。请注意：当流程执行到达用户任务时，在触发__create__事件**之前**，会首先触发__assignment__事件。这顺序看起来不太自然，但是有实际原因的：当收到__create__事件时，我们通常希望能看到任务的所有参数，包括办理人。
 ** **complete（完成）**：当任务已经完成，从运行时数据中删除前触发。
 ** **delete（删除）**：在任务即将被删除前触发。请注意任务由completeTask正常完成时也会触发。
-* **class**：需要调用的委托类。这个类必须实现++org.flowable.engine.delegate.TaskListener++接口。
+* **class**：需要调用的委托类。这个类必须实现++org.flowable.task.service.delegate.TaskListener++接口。
 
 [source,java,linenums]
 ----

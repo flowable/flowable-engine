@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
@@ -45,47 +43,39 @@ public class UserEventListenerConverterTest extends AbstractConverterTest {
     @Override
     protected void validateModel(CmmnModel cmmnModel) {
         Stage model = cmmnModel.getPrimaryCase().getPlanModel();
-        assertEquals(4, model.getPlanItemDefinitionMap().size());
-
-
-        assertNotNull(model.getPlanItemDefinitionMap().get("taskA"));
-        assertNotNull(model.getPlanItemDefinitionMap().get("taskB"));
-        assertNotNull(model.getPlanItemDefinitionMap().get("startTaskAUserEvent"));
-        assertNotNull(model.getPlanItemDefinitionMap().get("stopTaskBUserEvent"));
+        assertThat(model.getPlanItemDefinitionMap())
+                .containsOnlyKeys("taskA", "taskB", "startTaskAUserEvent", "stopTaskBUserEvent");
 
         Map<String, Sentry> sentries = model.getSentries().stream()
                 .collect(Collectors.toMap(Sentry::getName, Function.identity(), (s1, s2) -> s1));
-        assertEquals(2, sentries.size());
+        assertThat(sentries).hasSize(2);
         Sentry sentry = sentries.get("entryTaskASentry");
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         List<SentryOnPart> onParts = sentry.getOnParts();
-        assertEquals(1, onParts.size());
+        assertThat(onParts).hasSize(1);
         SentryOnPart onPart = onParts.get(0);
-        assertEquals(PlanItemTransition.OCCUR, onPart.getStandardEvent());
-        assertEquals("startTaskAUserEvent", onPart.getSource().getPlanItemDefinition().getId());
+        assertThat(onPart.getStandardEvent()).isEqualTo(PlanItemTransition.OCCUR);
+        assertThat(onPart.getSource().getPlanItemDefinition().getId()).isEqualTo("startTaskAUserEvent");
         PlanItem task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskA").getPlanItemRef());
         List<Criterion> criterions = task.getEntryCriteria();
-        assertNotNull(criterions);
-        assertEquals(1, criterions.size());
-        assertEquals(criterions.get(0).getSentryRef(), sentry.getId());
-
+        assertThat(criterions).hasSize(1);
+        assertThat(sentry.getId()).isEqualTo(criterions.get(0).getSentryRef());
 
         sentry = sentries.get("exitTaskBSentry");
-        assertNotNull(sentry);
+        assertThat(sentry).isNotNull();
         onParts = sentry.getOnParts();
-        assertEquals(1, onParts.size());
+        assertThat(onParts).hasSize(1);
         onPart = onParts.get(0);
-        assertEquals(PlanItemTransition.OCCUR, onPart.getStandardEvent());
-        assertEquals("stopTaskBUserEvent", onPart.getSource().getPlanItemDefinition().getId());
+        assertThat(onPart.getStandardEvent()).isEqualTo(PlanItemTransition.OCCUR);
+        assertThat(onPart.getSource().getPlanItemDefinition().getId()).isEqualTo("stopTaskBUserEvent");
         task = model.findPlanItemInPlanFragmentOrUpwards(model.findPlanItemDefinitionInStageOrUpwards("taskB").getPlanItemRef());
         criterions = task.getExitCriteria();
-        assertNotNull(criterions);
-        assertEquals(1, criterions.size());
-        assertEquals(criterions.get(0).getSentryRef(), sentry.getId());
+        assertThat(criterions).hasSize(1);
+        assertThat(sentry.getId()).isEqualTo(criterions.get(0).getSentryRef());
 
         PlanItemDefinition planItemDefinition = model.findPlanItemDefinitionInStageOrDownwards("stopTaskBUserEvent");
-        assertTrue(planItemDefinition instanceof EventListener);
-        assertEquals("${someCondition}", ((EventListener) planItemDefinition).getAvailableConditionExpression());
+        assertThat(planItemDefinition).isInstanceOf(EventListener.class);
+        assertThat(((EventListener) planItemDefinition).getAvailableConditionExpression()).isEqualTo("${someCondition}");
 
     }
 

@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -27,6 +28,7 @@ import org.flowable.task.api.Task;
 public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
     protected String parentTaskId;
 
     public GetSubTasksCmd(String parentTaskId) {
@@ -35,7 +37,8 @@ public class GetSubTasksCmd implements Command<List<Task>>, Serializable {
 
     @Override
     public List<Task> execute(CommandContext commandContext) {
-        return CommandContextUtil.getTaskService().findTasksByParentTaskId(parentTaskId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        return cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByParentTaskId(parentTaskId);
     }
 
 }

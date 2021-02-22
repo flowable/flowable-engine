@@ -12,6 +12,8 @@
  */
 package org.flowable.scripting.secure.impl;
 
+import java.util.Map;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -26,10 +28,12 @@ public class SecureScriptScope implements Scriptable {
     private static final String KEYWORD_TASK = "task";
 
     protected VariableScope variableScope;
+    protected Map<Object, Object> beans;
 
-    public SecureScriptScope(VariableScope variableScope) {
+    public SecureScriptScope(VariableScope variableScope, Map<Object, Object> beans) {
         super();
         this.variableScope = variableScope;
+        this.beans = beans;
     }
 
     @Override
@@ -45,6 +49,8 @@ public class SecureScriptScope implements Scriptable {
             return variableScope;
         } else if (variableScope.hasVariable(s)) {
             return variableScope.getVariable(s);
+        } else if (beans != null && beans.containsKey(s)){
+            return beans.get(s);
         }
         return null;
     }

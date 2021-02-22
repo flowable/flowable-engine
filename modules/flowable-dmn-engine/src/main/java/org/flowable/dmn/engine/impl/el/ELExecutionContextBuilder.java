@@ -14,14 +14,16 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
@@ -36,13 +38,26 @@ public class ELExecutionContextBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ELExecutionContextBuilder.class);
 
-    public static ELExecutionContext build(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
+    public static ELExecutionContext build(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
         ELExecutionContext executionContext = new ELExecutionContext();
         executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
         executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
+
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionServiceExecutionAudit(decisionService, executeDecisionInfo));
+
+        return executionContext;
+    }
+
+    public static ELExecutionContext build(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
+        ELExecutionContext executionContext = new ELExecutionContext();
+        executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
+        executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
+        executionContext.setForceDMN11(decision.isForceDMN11());
 
         // initialize audit trail
-        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, executeDecisionInfo));
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionExecutionAudit(decision, executeDecisionInfo));
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 
@@ -104,6 +119,11 @@ public class ELExecutionContextBuilder {
                 if (inputVariable.getValue() instanceof LocalDate) {
                     Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
                     inputVariables.put(inputVariable.getKey(), transformedDate);
+                } else if (inputVariable.getValue() instanceof java.time.LocalDate) {
+                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariable.getValue()).atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());
+                    inputVariables.put(inputVariable.getKey(), transformedDate);
                 } else if (inputVariable.getValue() instanceof Long || inputVariable.getValue() instanceof Integer) {
                     BigInteger transformedNumber = new BigInteger(inputVariable.getValue().toString());
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
@@ -111,7 +131,7 @@ public class ELExecutionContextBuilder {
                     BigDecimal transformedNumber = new BigDecimal((Double) inputVariable.getValue());
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 } else if (inputVariable.getValue() instanceof Float) {
-                    Double doubleValue = Double.valueOf(inputVariable.getValue().toString());
+                    double doubleValue = Double.parseDouble(inputVariable.getValue().toString());
                     BigDecimal transformedNumber = new BigDecimal(doubleValue);
                     inputVariables.put(inputVariable.getKey(), transformedNumber);
                 }

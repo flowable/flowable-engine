@@ -323,14 +323,30 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             }
 
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
-            if (StringUtils.isNotEmpty(ioParameter.getSource())) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
-            }
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression(), xtw);
+                
+            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
             }
-            if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
+            
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, "sourceType"))) {
+                writeDefaultAttribute("sourceType", ioParameter.getAttributeValue(null, "sourceType"), xtw);
+            }
+            
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression(), xtw);
+                
+            } else if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
+            }
+            
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, "targetType"))) {
+                writeDefaultAttribute("targetType", ioParameter.getAttributeValue(null, "targetType"), xtw);
+            }
+            
+            if (ioParameter.isTransient()) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT, "true", xtw);
             }
 
             xtw.writeEndElement();
@@ -432,9 +448,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 for (ExtensionAttribute attribute : attributeList) {
                     if (!isBlacklisted(attribute, blackLists)) {
                         if (attribute.getNamespacePrefix() == null) {
-                            if (attribute.getNamespace() == null)
+                            if (attribute.getNamespace() == null) {
                                 xtw.writeAttribute(attribute.getName(), attribute.getValue());
-                            else {
+                            } else {
                                 xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
                             }
                         } else {

@@ -12,19 +12,18 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,54 +66,25 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected Thread resetExpiredJobThread;
 
     /**
-     * The minimal number of threads that are kept alive in the threadpool for
-     * job execution
-     */
-    protected int corePoolSize = 2;
-
-    /**
-     * The maximum number of threads that are kept alive in the threadpool for
-     * job execution
-     */
-    protected int maxPoolSize = 10;
-
-    /**
-     * The time (in milliseconds) a thread used for job execution must be kept
-     * alive before it is destroyed. Default setting is 0. Having a non-default
-     * setting of 0 takes resources, but in the case of many job executions it
-     * avoids creating new threads all the time.
-     */
-    protected long keepAliveTime = 5000L;
-
-    /** The size of the queue on which jobs to be executed are placed */
-    protected int queueSize = 100;
-
-    /**
      * Whether to unlock jobs that are owned by this executor (have the same
-     * lockOwner) at startup
+     * lockOwner) at startup or shutdown.
      */
-    protected boolean unlockOwnedJobs;
-
-    /** The queue used for job execution work */
-    protected BlockingQueue<Runnable> threadPoolQueue;
-
-    /** The executor service used for job execution */
-    protected ExecutorService executorService;
+    protected boolean unlockOwnedJobs = true;
 
     /**
-     * The time (in seconds) that is waited to gracefully shut down the
-     * threadpool used for job execution
+     * The async task executor used for job execution.
      */
-    protected long secondsToWaitOnShutdown = 60L;
-
-    protected String threadPoolNamingPattern = "flowable-async-job-executor-thread-%d";
+    protected AsyncTaskExecutor taskExecutor;
+    protected boolean shutdownTaskExecutor;
 
     @Override
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
         try {
-            executorService.execute(runnable);
+            taskExecutor.execute(runnable);
             return true;
+
         } catch (RejectedExecutionException e) {
+            sendRejectedEvent(job);
             unacquireJobAfterRejection(job);
 
             // Job queue full, returning false so (if wanted) the acquiring can be throttled
@@ -122,31 +92,30 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         }
     }
 
+    protected void sendRejectedEvent(JobInfo job) {
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                FlowableEngineEventType.JOB_REJECTED, job), jobServiceConfiguration.getEngineName());
+        }
+    }
+
     protected void unacquireJobAfterRejection(final JobInfo job) {
+
         // When a RejectedExecutionException is caught, this means that the
         // queue for holding the jobs that are to be executed is full and can't store more.
         // The job is now 'unlocked', meaning that the lock owner/time is set to null,
         // so other executors can pick the job up (or this async executor, the next time the
         // acquire query is executed.
 
-        // This can happen while already in a command context (for example in a transaction listener
-        // after the async executor has been hinted that a new async job is created)
-        // or not (when executed in the acquire thread runnable)
-
-        CommandContext commandContext = Context.getCommandContext();
-        if (commandContext != null) {
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
-
-        } else {
-            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    CommandContextUtil.getJobManager(commandContext).unacquire(job);
-                    return null;
-                }
-            });
-        }
+        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+        jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<Void>() {
+            @Override
+            public Void execute(CommandContext commandContext) {
+                jobServiceConfiguration.getJobManager().unacquire(job);
+                return null;
+            }
+        });
     }
 
     @Override
@@ -179,37 +148,30 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     }
 
+    @Override
+    protected ResetExpiredJobsRunnable createResetExpiredJobsRunnable(String resetRunnableName) {
+        return new ResetExpiredJobsRunnable(resetRunnableName, this,
+                jobServiceConfiguration.getJobEntityManager(),
+                jobServiceConfiguration.getTimerJobEntityManager(),
+                jobServiceConfiguration.getExternalWorkerJobEntityManager()
+        );
+    }
+
     protected void initAsyncJobExecutionThreadPool() {
-        if (threadPoolQueue == null) {
-            LOGGER.info("Creating thread pool queue of size {}", queueSize);
-            threadPoolQueue = new ArrayBlockingQueue<>(queueSize);
-        }
-
-        if (executorService == null) {
-            LOGGER.info("Creating executor service with corePoolSize {}, maxPoolSize {} and keepAliveTime {}", corePoolSize, maxPoolSize, keepAliveTime);
-
-            BasicThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern(threadPoolNamingPattern).build();
-            executorService = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, threadPoolQueue, threadFactory);
+        if (taskExecutor == null) {
+            // This is for backwards compatibility
+            // If there is no task executor then use the Default one and start it immediately.
+            DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor();
+            defaultAsyncTaskExecutor.start();
+            this.taskExecutor = defaultAsyncTaskExecutor;
+            this.shutdownTaskExecutor = true;
         }
     }
 
     protected void stopExecutingAsyncJobs() {
-        if (executorService != null) {
-
-            // Ask the thread pool to finish and exit
-            executorService.shutdown();
-
-            // Waits for 1 minute to finish all currently executing jobs
-            try {
-                if (!executorService.awaitTermination(secondsToWaitOnShutdown, TimeUnit.SECONDS)) {
-                    LOGGER.warn("Timeout during shutdown of async job executor. The current running jobs could not end within {} seconds after shutdown operation.",
-                                    secondsToWaitOnShutdown);
-                }
-            } catch (InterruptedException e) {
-                LOGGER.warn("Interrupted while shutting down the async job executor. ", e);
-            }
-
-            executorService = null;
+        if (taskExecutor != null && shutdownTaskExecutor) {
+            taskExecutor.shutdown();
+            taskExecutor = null;
         }
     }
 
@@ -326,55 +288,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.resetExpiredJobThread = resetExpiredJobThread;
     }
 
-    public int getQueueSize() {
-        return queueSize;
-    }
-
     @Override
     public int getRemainingCapacity() {
-        if (threadPoolQueue != null) {
-            return threadPoolQueue.remainingCapacity();
-        } else {
-            // return plenty of remaining capacity if there's no thread pool queue
-            return 99;
-        }
+        //TODO evaluate removing this method
+        // return plenty of remaining capacity
+        return 99;
     }
 
-    public void setQueueSize(int queueSize) {
-        this.queueSize = queueSize;
-    }
-
-    public int getCorePoolSize() {
-        return corePoolSize;
-    }
-
-    public void setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-    }
-
-    public int getMaxPoolSize() {
-        return maxPoolSize;
-    }
-
-    public void setMaxPoolSize(int maxPoolSize) {
-        this.maxPoolSize = maxPoolSize;
-    }
-
-    public long getKeepAliveTime() {
-        return keepAliveTime;
-    }
-
-    public void setKeepAliveTime(long keepAliveTime) {
-        this.keepAliveTime = keepAliveTime;
-    }
-
-    public long getSecondsToWaitOnShutdown() {
-        return secondsToWaitOnShutdown;
-    }
-
-    public void setSecondsToWaitOnShutdown(long secondsToWaitOnShutdown) {
-        this.secondsToWaitOnShutdown = secondsToWaitOnShutdown;
-    }
 
     public boolean isUnlockOwnedJobs() {
         return unlockOwnedJobs;
@@ -384,28 +304,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.unlockOwnedJobs = unlockOwnedJobs;
     }
 
-    public BlockingQueue<Runnable> getThreadPoolQueue() {
-        return threadPoolQueue;
+    @Override
+    public AsyncTaskExecutor getTaskExecutor() {
+        return taskExecutor;
     }
 
-    public void setThreadPoolQueue(BlockingQueue<Runnable> threadPoolQueue) {
-        this.threadPoolQueue = threadPoolQueue;
+    @Override
+    public void setTaskExecutor(AsyncTaskExecutor taskExecutor) {
+        this.taskExecutor = taskExecutor;
     }
-
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
-    }
-
-    public String getThreadPoolNamingPattern() {
-        return threadPoolNamingPattern;
-    }
-
-    public void setThreadPoolNamingPattern(String threadPoolNamingPattern) {
-        this.threadPoolNamingPattern = threadPoolNamingPattern;
-    }
-
 }

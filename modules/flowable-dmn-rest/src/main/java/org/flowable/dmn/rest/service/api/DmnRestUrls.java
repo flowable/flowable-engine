@@ -28,31 +28,64 @@ public final class DmnRestUrls {
     public static final String SEGMENT_DEPLOYMENT_RESOURCE = "deployments";
     public static final String SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT = "resourcedata";
     public static final String SEGMENT_DECISION_TABLE_RESOURCE = "decision-tables";
+    public static final String SEGMENT_DECISION_RESOURCE = "decisions";
     public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_RESOURCE = "historic-decision-executions";
     public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_AUDITDATA = "auditdata";
-    public static final String SEGMENT_DECISION_TABLE_MODEL = "model";
+    public static final String SEGMENT_DECISION_MODEL = "model";
     public static final String SEGMENT_EXECUTE_RESOURCE = "execute";
     public static final String SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE = "single-result";
 
     /**
      * URL template for a decision table collection: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
+     *
+     * @deprecated use {@link #URL_DECISION_COLLECTION} instead.
      */
+    @Deprecated
     public static final String[] URL_DECISION_TABLE_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE };
 
     /**
      * URL template for a single decision table: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
+     *
+     * @deprecated use {@link #URL_DECISION} instead.
      */
+    @Deprecated
     public static final String[] URL_DECISION_TABLE = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}" };
 
     /**
      * URL template for a single decision table model: <i>/dmn-repository/decision-tables/{0:decisionTableId}/model</i>
+     *
+     * @deprecated use {@link #URL_DECISION_MODEL} instead.
      */
-    public static final String[] URL_DECISION_TABLE_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}", SEGMENT_DECISION_TABLE_MODEL };
+    @Deprecated
+    public static final String[] URL_DECISION_TABLE_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}", SEGMENT_DECISION_MODEL };
 
     /**
-     * URL template for the resource of a single decision table: <i>/dmn-repository/decision-tables/{0:decisionTableId}/resourcedata</i>
+     * URL template for the resource of a single decision table: <i>/dmn-repository/decision-tables/{0:decisionId}/resourcedata</i>
+     *
+     * @deprecated use {@link #URL_DECISION_RESOURCE_CONTENT} instead.
      */
+    @Deprecated
     public static final String[] URL_DECISION_TABLE_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT };
+
+    /**
+     * URL template for a decision collection: <i>/dmn-repository/decisions</i>
+     */
+    public static final String[] URL_DECISION_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_RESOURCE };
+
+    /**
+     * URL template for a single decision: <i>/dmn-repository/decisions/{0:decisionId}</i>
+     */
+    public static final String[] URL_DECISION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_RESOURCE, "{0}" };
+
+    /**
+     * URL template for a single decision model: <i>/dmn-repository/decisions/{0:decisionId}/model</i>
+     */
+    public static final String[] URL_DECISION_MODEL = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_RESOURCE, "{0}", SEGMENT_DECISION_MODEL };
+
+    /**
+     * URL template for the resource of a single decision: <i>/dmn-repository/decisions/{0:decisionId}/resourcedata</i>
+     */
+    public static final String[] URL_DECISION_RESOURCE_CONTENT = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_RESOURCE, "{0}", SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT };
 
     /**
      * URL template for a deployment collection: <i>/dmn-repository/deployments</i>

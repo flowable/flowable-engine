@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +13,11 @@
 
 package org.flowable.rest.service.api.repository;
 
-import org.apache.commons.io.IOUtils;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,10 +28,6 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Frederik Heremans
@@ -50,8 +50,10 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
             // Check "OK" status
-            assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
-            assertEquals("This is the editor source", IOUtils.toString(response.getEntity().getContent()));
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is the editor source");
+            }
             closeResponse(response);
 
         } finally {
@@ -100,8 +102,10 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
 
             // Check "OK" status
-            assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
-            assertEquals("This is the extra editor source", IOUtils.toString(response.getEntity().getContent()));
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is the extra editor source");
+            }
             closeResponse(response);
 
         } finally {
@@ -157,10 +161,11 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
             repositoryService.saveModel(model);
 
             HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, model.getId()));
-            httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("sourcefile", "application/octet-stream", new ByteArrayInputStream("This is the new editor source".getBytes()), null));
+            httpPut.setEntity(HttpMultipartHelper
+                    .getMultiPartEntity("sourcefile", "application/octet-stream", new ByteArrayInputStream("This is the new editor source".getBytes()), null));
             closeResponse(executeBinaryRequest(httpPut, HttpStatus.SC_NO_CONTENT));
 
-            assertEquals("This is the new editor source", new String(repositoryService.getModelEditorSource(model.getId())));
+            assertThat(new String(repositoryService.getModelEditorSource(model.getId()))).isEqualTo("This is the new editor source");
 
         } finally {
             try {
@@ -182,10 +187,12 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
             repositoryService.saveModel(model);
 
             HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, model.getId()));
-            httpPut.setEntity(HttpMultipartHelper.getMultiPartEntity("sourcefile", "application/octet-stream", new ByteArrayInputStream("This is the new extra editor source".getBytes()), null));
+            httpPut.setEntity(HttpMultipartHelper
+                    .getMultiPartEntity("sourcefile", "application/octet-stream", new ByteArrayInputStream("This is the new extra editor source".getBytes()),
+                            null));
             closeResponse(executeBinaryRequest(httpPut, HttpStatus.SC_NO_CONTENT));
 
-            assertEquals("This is the new extra editor source", new String(repositoryService.getModelEditorSourceExtra(model.getId())));
+            assertThat(new String(repositoryService.getModelEditorSourceExtra(model.getId()))).isEqualTo("This is the new extra editor source");
 
         } finally {
             try {

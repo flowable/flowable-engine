@@ -54,6 +54,7 @@ public class PlanItemDefinition extends CaseElement implements HasLifecycleListe
         super.setValues(otherElement);
         setPlanItemRef(otherElement.getPlanItemRef());
         setDefaultControl(otherElement.getDefaultControl());
+        setLifecycleListeners(otherElement.lifecycleListeners);
     }
     
     @Override

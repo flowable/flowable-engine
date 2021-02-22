@@ -64,7 +64,7 @@ image::images/getting.started.new.maven3.png[align="center"]
   <dependency>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-engine</artifactId>
-    <version>6.5.0-SNAPSHOT</version>
+    <version>6.5.0.event-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>com.h2database</groupId>
@@ -315,7 +315,7 @@ System.out.println("Why do you need them?");
 String description = scanner.nextLine();
 ----
 
-截下来，我们使用__RuntimeService__启动一个__流程实例__。收集的数据作为一个__java.util.Map__实例传递，其中的键就是之后用于获取变量的标识符。这个流程实例使用__key__启动。这个__key__就是BPMN 2.0 XML文件中设置的__id__属性，在这个例子里是__holidayRequest__。
+接下来，我们使用__RuntimeService__启动一个__流程实例__。收集的数据作为一个__java.util.Map__实例传递，其中的键就是之后用于获取变量的标识符。这个流程实例使用__key__启动。这个__key__就是BPMN 2.0 XML文件中设置的__id__属性，在这个例子里是__holidayRequest__。
 
 （请注意：除了使用key之外，在后面你还会看到有很多其他方式启动一个流程实例）
 

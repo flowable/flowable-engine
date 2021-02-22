@@ -42,7 +42,6 @@ public class SignalEventHandler extends AbstractEventHandler {
     @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
         if (eventSubscription.getExecutionId() != null) {
-
             super.handleEvent(eventSubscription, payload, commandContext);
 
         } else if (eventSubscription.getProcessDefinitionId() != null) {

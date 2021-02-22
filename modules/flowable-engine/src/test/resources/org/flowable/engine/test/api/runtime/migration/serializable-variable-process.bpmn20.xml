@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+
+    <process id="MP" name="MyProcess" isExecutable="true">
+        <documentation>My process documentation</documentation>
+        <startEvent id="startEvent1"/>
+        <sequenceFlow id="seqFlow1Id" sourceRef="startEvent1" targetRef="before"/>
+        <receiveTask id="before"/>
+        <sequenceFlow id="seqFlow2Id" sourceRef="before" targetRef="addItemToList"/>
+        <scriptTask id="addItemToList" scriptFormat="groovy">
+            <script><![CDATA[
+                listVariable << "new value"
+                ]]>
+            </script>
+        </scriptTask>
+        <sequenceFlow id="seqFlow3Id" sourceRef="addItemToList" targetRef="afterFirst"/>
+        <receiveTask id="afterFirst"/>
+        <sequenceFlow id="seqFlow4Id" sourceRef="afterFirst" targetRef="addSecondItemToList"/>
+        <scriptTask id="addSecondItemToList" scriptFormat="groovy">
+            <script><![CDATA[
+                listVariable << "new value 2"
+                ]]>
+            </script>
+        </scriptTask>
+        <sequenceFlow id="seqFlow5Id" sourceRef="addSecondItemToList" targetRef="afterSecond"/>
+        <receiveTask id="afterSecond"/>
+        <sequenceFlow id="seqFlow6Id" sourceRef="afterSecond" targetRef="endEvent1"/>
+        <endEvent id="endEvent1"/>
+    </process>
+
+</definitions>

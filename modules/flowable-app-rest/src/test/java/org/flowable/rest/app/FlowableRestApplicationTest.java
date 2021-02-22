@@ -13,19 +13,18 @@ package org.flowable.rest.app;/* Licensed under the Apache License, Version 2.0 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.actuate.metrics.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMetrics
 public class FlowableRestApplicationTest {
 
     @Autowired
@@ -43,7 +42,7 @@ public class FlowableRestApplicationTest {
                 "random",
                 "class path resource [db.properties]",
                 "class path resource [engine.properties]",
-                "applicationConfig: [classpath:/application.properties]",
+                "Config resource 'class path resource [application.properties]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
                 "flowable-liquibase-override",
                 "Management Server"

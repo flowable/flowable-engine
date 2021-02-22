@@ -16,9 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.security.Principal;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,13 +34,13 @@ public class SpringSecurityAuthenticationContextTest {
 
     private Authentication initial;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         initial = SecurityContextHolder.getContext().getAuthentication();
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         SecurityContextHolder.getContext().setAuthentication(initial);
     }

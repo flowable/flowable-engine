@@ -19,6 +19,8 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,12 +31,16 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
+import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.EngineServiceUtil;
@@ -46,13 +52,17 @@ import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineAutoConfiguration;
 import org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
 
 public class DmnEngineAutoConfigurationTest {
 
@@ -86,6 +96,149 @@ public class DmnEngineAutoConfigurationTest {
                         .containsExactly(
                             SpringDmnEngineConfiguration.class
                         );
+                });
+
+            SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngine.getDmnEngineConfiguration();
+            Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+            assertThat(deploymentStrategies).element(0)
+                .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
+            assertThat(deploymentStrategies).element(1)
+                .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
+            assertThat(deploymentStrategies).element(2)
+                .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                    assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isTrue();
+                    assertThat(strategy.getLockName()).isNull();
+                });
+
+            deleteDeployments(dmnEngine);
+        });
+
+    }
+
+    @Test
+    public void standaloneDmnEngineWithBasicDataSourceAndAutoDeploymentWithLocking() {
+        contextRunner
+            .withPropertyValues(
+                "flowable.auto-deployment.engine.dmn.use-lock=true",
+                "flowable.auto-deployment.engine.dmn.lock-wait-time=10m",
+                "flowable.auto-deployment.engine.dmn.throw-exception-on-deployment-failure=false",
+                "flowable.auto-deployment.engine.dmn.lock-name=testLock"
+            )
+            .run(context -> {
+                assertThat(context)
+                    .doesNotHaveBean(AppEngine.class)
+                    .doesNotHaveBean(ProcessEngine.class)
+                    .doesNotHaveBean("dmnProcessEngineConfigurationConfigurer")
+                    .doesNotHaveBean("dmnAppEngineConfigurationConfigurer");
+                DmnEngine dmnEngine = context.getBean(DmnEngine.class);
+                assertThat(dmnEngine).as("Dmn engine").isNotNull();
+
+                assertAllServicesPresent(context, dmnEngine);
+                assertAutoDeployment(context.getBean(DmnRepositoryService.class));
+
+                assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                    .getBean(CustomUserEngineConfigurerConfiguration.class)
+                    .satisfies(configuration -> {
+                        assertThat(configuration.getInvokedConfigurations())
+                            .containsExactly(
+                                SpringDmnEngineConfiguration.class
+                            );
+                    });
+
+                SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngine.getDmnEngineConfiguration();
+                Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+                assertThat(deploymentStrategies).element(0)
+                    .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                assertThat(deploymentStrategies).element(1)
+                    .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                assertThat(deploymentStrategies).element(2)
+                    .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                        assertThat(strategy.isUseLockForDeployments()).isTrue();
+                        assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(10));
+                        assertThat(strategy.isThrowExceptionOnDeploymentFailure()).isFalse();
+                        assertThat(strategy.getLockName()).isEqualTo("testLock");
+                    });
+
+                deleteDeployments(dmnEngine);
+            });
+
+    }
+
+    @Test
+    public void standaloneDmnEngineWithBasicDataSourceAndCustomAutoDeploymentStrategies() {
+        contextRunner
+            .withUserConfiguration(CustomAutoDeploymentStrategyConfiguration.class)
+            .run(context -> {
+            assertThat(context)
+                .doesNotHaveBean(AppEngine.class)
+                .doesNotHaveBean(ProcessEngine.class)
+                .doesNotHaveBean("dmnProcessEngineConfigurationConfigurer")
+                .doesNotHaveBean("dmnAppEngineConfigurationConfigurer");
+            DmnEngine dmnEngine = context.getBean(DmnEngine.class);
+            assertThat(dmnEngine).as("Dmn engine").isNotNull();
+
+            assertAllServicesPresent(context, dmnEngine);
+            assertAutoDeployment(context.getBean(DmnRepositoryService.class));
+
+            assertThat(context).hasSingleBean(CustomUserEngineConfigurerConfiguration.class)
+                .getBean(CustomUserEngineConfigurerConfiguration.class)
+                .satisfies(configuration -> {
+                    assertThat(configuration.getInvokedConfigurations())
+                        .containsExactly(
+                            SpringDmnEngineConfiguration.class
+                        );
+                });
+
+            SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngine.getDmnEngineConfiguration();
+            Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = engineConfiguration.getDeploymentStrategies();
+
+            assertThat(deploymentStrategies).element(0)
+                .isInstanceOf(TestDmnEngineAutoDeploymentStrategy.class);
+
+            assertThat(deploymentStrategies).element(1)
+                .isInstanceOfSatisfying(DefaultAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                });
+
+            assertThat(deploymentStrategies).element(2)
+                .isInstanceOfSatisfying(SingleResourceAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
+                });
+
+            assertThat(deploymentStrategies).element(3)
+                .isInstanceOfSatisfying(ResourceParentFolderAutoDeploymentStrategy.class, strategy -> {
+                    assertThat(strategy.isUseLockForDeployments()).isFalse();
+                    assertThat(strategy.getDeploymentLockWaitTime()).isEqualTo(Duration.ofMinutes(5));
                 });
 
             deleteDeployments(dmnEngine);
@@ -171,7 +324,7 @@ public class DmnEngineAutoConfigurationTest {
 
     private void assertAllServicesPresent(ApplicationContext context, DmnEngine dmnEngine) {
         List<Method> methods = Stream.of(DmnEngine.class.getDeclaredMethods())
-                        .filter(method -> !(method.getName().equals("close") || method.getName().equals("getName"))).collect(Collectors.toList());
+                        .filter(method -> !("close".equals(method.getName()) || "getName".equals(method.getName()))).collect(Collectors.toList());
 
         assertThat(methods).allSatisfy(method -> {
             try {
@@ -183,35 +336,37 @@ public class DmnEngineAutoConfigurationTest {
     }
 
     protected void assertAutoDeployment(DmnRepositoryService repositoryService) {
-        List<DmnDecisionTable> decisions = repositoryService.createDecisionTableQuery().list();
-        assertThat(decisions)
-            .extracting(DmnDecisionTable::getKey, DmnDecisionTable::getName)
-            .containsExactlyInAnyOrder(
-                tuple("RiskRating", "Risk Rating Decision Table"),
-                tuple("simple", "Full Decision"),
-                tuple("strings1", "Simple decision"),
-                tuple("strings2", "Simple decision")
-            );
-    }
-
-    protected void assertAutoDeploymentWithAppEngine(AssertableApplicationContext context) {
-        DmnRepositoryService repositoryService = context.getBean(DmnRepositoryService.class);
-        List<DmnDecisionTable> decisions = repositoryService.createDecisionTableQuery().list();
-        assertThat(decisions)
-            .extracting(DmnDecisionTable::getKey, DmnDecisionTable::getName)
+        List<DmnDecision> definitions = repositoryService.createDecisionQuery().list();
+        assertThat(definitions)
+            .extracting(DmnDecision::getKey, DmnDecision::getName)
             .containsExactlyInAnyOrder(
                 tuple("RiskRating", "Risk Rating Decision Table"),
                 tuple("simple", "Full Decision"),
                 tuple("strings1", "Simple decision"),
                 tuple("strings2", "Simple decision"),
-                tuple("managerApprovalNeeded", "Manager approval needed2")
+                tuple("decisionService13", "Decision Service 1_3")
+            );
+    }
+
+    protected void assertAutoDeploymentWithAppEngine(AssertableApplicationContext context) {
+        DmnRepositoryService repositoryService = context.getBean(DmnRepositoryService.class);
+        List<DmnDecision> definitions = repositoryService.createDecisionQuery().list();
+        assertThat(definitions)
+            .extracting(DmnDecision::getKey, DmnDecision::getName)
+            .containsExactlyInAnyOrder(
+                tuple("RiskRating", "Risk Rating Decision Table"),
+                tuple("simple", "Full Decision"),
+                tuple("strings1", "Simple decision"),
+                tuple("strings2", "Simple decision"),
+                tuple("managerApprovalNeeded", "Manager approval needed2"),
+                tuple("decisionService13", "Decision Service 1_3")
             );
         
-        DmnDecisionTable dmnDecisionTable = repositoryService.createDecisionTableQuery().latestVersion().decisionTableKey("strings1").singleResult();
-        assertThat(dmnDecisionTable.getVersion()).isOne();
+        DmnDecision definition = repositoryService.createDecisionQuery().latestVersion().decisionKey("strings1").singleResult();
+        assertThat(definition.getVersion()).isOne();
         
-        dmnDecisionTable = repositoryService.createDecisionTableQuery().latestVersion().decisionTableKey("managerApprovalNeeded").singleResult();
-        assertThat(dmnDecisionTable.getVersion()).isOne();
+        definition = repositoryService.createDecisionQuery().latestVersion().decisionKey("managerApprovalNeeded").singleResult();
+        assertThat(definition.getVersion()).isOne();
         
         List<DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
 
@@ -246,5 +401,28 @@ public class DmnEngineAutoConfigurationTest {
     private static DmnEngineConfigurationApi dmnEngine(AppEngine appEngine) {
         AppEngineConfiguration appEngineConfiguration = appEngine.getAppEngineConfiguration();
         return EngineServiceUtil.getDmnEngineConfiguration(appEngineConfiguration);
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    static class CustomAutoDeploymentStrategyConfiguration {
+
+        @Bean
+        @Order(10)
+        public TestDmnEngineAutoDeploymentStrategy testDmnEngineAutoDeploymentStrategy() {
+            return new TestDmnEngineAutoDeploymentStrategy();
+        }
+    }
+
+    static class TestDmnEngineAutoDeploymentStrategy implements AutoDeploymentStrategy<DmnEngine> {
+
+        @Override
+        public boolean handlesMode(String mode) {
+            return false;
+        }
+
+        @Override
+        public void deployResources(String deploymentNameHint, Resource[] resources, DmnEngine engine) {
+
+        }
     }
 }

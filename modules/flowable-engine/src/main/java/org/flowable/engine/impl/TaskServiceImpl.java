@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -75,9 +76,12 @@ import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -205,7 +209,7 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public void complete(String taskId) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, null));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, (Map<String, Object>) null));
     }
 
     @Override
@@ -234,7 +238,6 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
-
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
@@ -284,12 +287,13 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
 
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor, configuration.getDatabaseType());
+        return new TaskQueryImpl(commandExecutor, configuration.getDatabaseType(), configuration.getTaskServiceConfiguration(), 
+                configuration.getVariableServiceConfiguration(), getIdmIdentityService());
     }
 
     @Override
     public NativeTaskQuery createNativeTaskQuery() {
-        return new NativeTaskQueryImpl(commandExecutor);
+        return new NativeTaskQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration());
     }
 
     @Override
@@ -577,4 +581,21 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     public TaskBuilder createTaskBuilder() {
         return new TaskBuilderImpl(commandExecutor);
     }
+    
+    protected IdmIdentityService getIdmIdentityService() {
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) configuration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        IdmIdentityService idmIdentityService = null;
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+        
+        return idmIdentityService;
+    }
+
+    @Override
+    public TaskCompletionBuilder createTaskCompletionBuilder() {
+        return new TaskCompletionBuilderImpl(commandExecutor);
+    }
+
 }

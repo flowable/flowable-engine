@@ -48,7 +48,7 @@ class FlowableCmmnJupiterTest {
         assertThat(task.getName()).isEqualTo("The Task");
 
         taskService.complete(task.getId());
-        assertThat(runtimeService.createCaseInstanceQuery().count()).isEqualTo(0);
+        assertThat(runtimeService.createCaseInstanceQuery().count()).isZero();
 
         assertThat(cmmnEngine.getName()).as("cmmn engine name").isEqualTo(CmmnEngines.NAME_DEFAULT);
     }

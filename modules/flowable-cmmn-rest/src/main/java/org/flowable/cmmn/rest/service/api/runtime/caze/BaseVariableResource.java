@@ -238,13 +238,13 @@ public class BaseVariableResource {
 
             if (paramMap.get(parameterName).length > 0) {
 
-                if (parameterName.equalsIgnoreCase("scope")) {
+                if ("scope".equalsIgnoreCase(parameterName)) {
                     variableScope = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("name")) {
+                } else if ("name".equalsIgnoreCase(parameterName)) {
                     variableName = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("type")) {
+                } else if ("type".equalsIgnoreCase(parameterName)) {
                     variableType = paramMap.get(parameterName)[0];
                 }
             }

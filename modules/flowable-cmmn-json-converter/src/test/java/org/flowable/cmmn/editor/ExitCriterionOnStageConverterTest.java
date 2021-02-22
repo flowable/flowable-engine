@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.editor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -35,15 +33,15 @@ public class ExitCriterionOnStageConverterTest extends AbstractConverterTest {
         Case caseModel = model.getPrimaryCase();
         Stage planModelStage = caseModel.getPlanModel();
         PlanItemDefinition planItemDefinition = planModelStage.findPlanItemDefinitionInStageOrDownwards("sid-46EAD2FE-4D89-42ED-9B1E-5005AE5BF2F7");
-        assertTrue(planItemDefinition instanceof Stage);
+        assertThat(planItemDefinition).isInstanceOf(Stage.class);
 
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(planItemDefinition.getPlanItemRef());
-        assertEquals(1, planItem.getEntryCriteria().size());
+        assertThat(planItem.getEntryCriteria()).hasSize(1);
         Criterion entryCriterion = planItem.getEntryCriteria().get(0);
-        assertNotNull(entryCriterion.getSentryRef());
+        assertThat(entryCriterion.getSentryRef()).isNotNull();
 
-        assertEquals(1, planItem.getExitCriteria().size());
+        assertThat(planItem.getExitCriteria()).hasSize(1);
         Criterion exitCriterion = planItem.getExitCriteria().get(0);
-        assertNotNull(exitCriterion.getSentryRef());
+        assertThat(exitCriterion.getSentryRef()).isNotNull();
     }
 }

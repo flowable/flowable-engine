@@ -13,13 +13,9 @@
 package org.flowable.job.service.impl.history.async;
 
 import org.flowable.common.engine.impl.cfg.TransactionListener;
-import org.flowable.common.engine.impl.cfg.TransactionPropagation;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * A {@link TransactionListener} that will, typically on post-commit, trigger 
@@ -31,29 +27,19 @@ public class TriggerAsyncHistoryExecutorTransactionListener implements Transacti
     
     protected HistoryJobEntity historyJobEntity;
     
-    protected  JobServiceConfiguration jobServiceConfiguration;
+    protected JobServiceConfiguration jobServiceConfiguration;
     
-    public TriggerAsyncHistoryExecutorTransactionListener(CommandContext commandContext) {
-        this(commandContext,null);
-    }
-    
-    public TriggerAsyncHistoryExecutorTransactionListener(CommandContext commandContext, HistoryJobEntity historyJobEntity) {
+    public TriggerAsyncHistoryExecutorTransactionListener(JobServiceConfiguration jobServiceConfiguration, HistoryJobEntity historyJobEntity) {
         // The execution of this listener will reference components that might 
         // not be available when the command context is closing (when typically 
         // the history jobs are created and scheduled), so they are already referenced here.
-        this.jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
         this.historyJobEntity = historyJobEntity;
     }
     
     @Override
     public void execute(CommandContext commandContext) {
-        jobServiceConfiguration.getCommandExecutor().execute(new CommandConfig(false, TransactionPropagation.REQUIRES_NEW), new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
-                return null;
-            }
-        });
+        jobServiceConfiguration.getAsyncHistoryExecutor().executeAsyncJob(historyJobEntity);
     }
 
 }

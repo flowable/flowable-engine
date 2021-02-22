@@ -20,11 +20,14 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 
 /**
  * @author Tom Baeyens
@@ -33,9 +36,10 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
 
     public void testNoTables() {
         try {
-            ProcessEngineConfiguration
+            ProcessEngineConfiguration processEngineConfiguration = (ProcessEngineConfiguration) ProcessEngineConfiguration
                     .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
-                    .buildProcessEngine();
+                    .setEventRegistryConfigurator(new CustomEventRegistryEngineConfigurator());
+            processEngineConfiguration.buildProcessEngine();
             fail("expected exception");
         } catch (Exception e) {
             // OK
@@ -44,10 +48,12 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
 
     public void testVersionMismatch() {
         // first create the schema
-        ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngineConfiguration
-                .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
-                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
-                .buildProcessEngine();
+        ProcessEngineConfiguration processEngineConfiguration = (ProcessEngineConfiguration) ProcessEngineConfiguration
+                    .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
+                    .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP)
+                    .setEventRegistryConfigurator(new CustomEventRegistryEngineConfigurator());
+        
+        ProcessEngineImpl processEngine = (ProcessEngineImpl) processEngineConfiguration.buildProcessEngine();
 
         // then update the version to something that is different to the library
         // version
@@ -77,10 +83,12 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
         try {
             // now we can see what happens if when a process engine is being
             // build with a version mismatch between library and db tables
-            ProcessEngineConfiguration
+            ProcessEngineConfiguration newProcessEngineConfiguration = (ProcessEngineConfiguration) ProcessEngineConfiguration
                     .createProcessEngineConfigurationFromResource("org/activiti/standalone/initialization/notables.flowable.cfg.xml")
                     .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
-                    .buildProcessEngine();
+                    .setEventRegistryConfigurator(new CustomEventRegistryEngineConfigurator());
+            
+            newProcessEngineConfiguration.buildProcessEngine();
 
             fail("expected exception");
         } catch (FlowableWrongDbException e) {
@@ -91,5 +99,19 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
 
         // closing the original process engine to drop the db tables
         processEngine.close();
+    }
+    
+    public class CustomEventRegistryEngineConfigurator extends EventRegistryEngineConfigurator {
+
+        @Override
+        public void configure(AbstractEngineConfiguration engineConfiguration) {
+            if (eventEngineConfiguration == null) {
+                eventEngineConfiguration = new StandaloneEventRegistryEngineConfiguration();
+            }
+            
+            eventEngineConfiguration.setEnableEventRegistryChangeDetectionAfterEngineCreate(false);
+            
+            super.configure(engineConfiguration);
+        }
     }
 }

@@ -19,7 +19,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
- * Contains the possible properties that can be used in a {@link ContentInstanceQuery}.
+ * Contains the possible properties that can be used in a {@link org.flowable.content.api.ContentItemQuery}.
  * 
  * @author Tijs Rademakers
  */

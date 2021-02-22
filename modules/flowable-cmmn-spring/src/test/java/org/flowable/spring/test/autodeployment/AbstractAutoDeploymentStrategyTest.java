@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
@@ -32,6 +33,9 @@ import org.springframework.core.io.Resource;
  * @author Tiese Barrell
  */
 public class AbstractAutoDeploymentStrategyTest {
+
+    @Mock
+    protected CmmnEngine cmmnEngineMock;
 
     @Mock
     protected CmmnRepositoryService repositoryServiceMock;
@@ -71,6 +75,8 @@ public class AbstractAutoDeploymentStrategyTest {
 
     @Before
     public void before() throws Exception {
+
+        when(cmmnEngineMock.getCmmnRepositoryService()).thenReturn(repositoryServiceMock);
 
         when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
         when(resourceMock1.getFile()).thenReturn(fileMock1);

@@ -1,0 +1,2736 @@
+{
+  "GENERAL" : {
+    "MAIN-TITLE": "Flowable编辑器",
+    "NAVIGATION" : {
+      "PROCESSES": "流程",
+      "CASEMODELS": "案例模型",
+      "FORMS": "表单",
+      "DECISIONS": "决策表",
+      "APPS": "应用程序"
+    },
+    "TITLE": {
+      "SELECT-GROUP" :"选择组",
+      "MATCHING-GROUPS": "匹配组",
+      "FILTER": "过滤",
+      "HISTORY": "历史"
+    },
+    "ACTION": {
+      "LOGOUT": "退出",
+      "DASHBOARD": "Dashboard",
+      "RETURN-TO-LIST": "显示所有定义",
+      "CANCEL": "取消",
+      "CLOSE": "关闭",
+      "EDIT": "编辑",
+      "SAVE": "保存",
+      "OPEN": "打开",
+      "OK": "Ok",
+      "CONFIRM": "确认",
+      "CONFIRM-AND-CLOSE": "确认并且关闭",
+      "NEW-FORM": "新表单",
+      "CREATE-FORM": "创建表单",
+      "NEW-DECISION-TABLE": "新决策表",
+      "CREATE-DECISION-TABLE": "创建决策表"
+    },
+    "MESSAGE": {
+      "SELECT-GROUP-HELP": "使用 &uparrow; 和 &downarrow; 选择并按回车确认",
+      "PEOPLE-NO-MATCHING-RESULTS": "没有找到匹配的用户",
+      "GROUP-NO-MATCHING-RESULTS": "没有找到匹配的组",
+      "GROUP-SOURCE-TYPE": "组源",
+      "GROUP-SOURCE-SEARCH-OPTION": "组搜索",
+      "GROUP-SOURCE-FIELD-OPTION": "表单字段"
+    },
+    "OTHERS" : {
+      "PROCESS" : "流程",
+      "PROCESS_NAVIGATOR" : "流程导航",
+      "NO_STRUCTURAL_ELEMENTS_USED" : "未使用结构元素。"
+    }
+  },
+
+  "BPMN" : {
+    "TITLE": "BPMN 2.0标准工具",
+    "DESCRIPTION" : "BPMN流程编辑器",
+    "PROPERTYPACKAGES" : {
+      "PROCESS_IDPACKAGE" : {
+        "PROCESS_ID" : {
+          "TITLE" : "流程标识",
+          "DESCRIPTION" : "进程定义的唯一标识符。"
+        }
+      },
+      "OVERRIDEIDPACKAGE" : {
+        "OVERRIDEID" : {
+          "TITLE" : "主键ID",
+          "DESCRIPTION" : "元素的唯一标识"
+        }
+      },
+      "NAMEPACKAGE" : {
+        "NAME" : {
+          "TITLE" : "名称",
+          "DESCRIPTION" : "BPMN元素的描述名称."
+        }
+      },
+      "DOCUMENTATIONPACKAGE" : {
+        "DOCUMENTATION" : {
+          "TITLE" : "描述信息",
+          "DESCRIPTION" : "BPMN元素的描述信息"
+        }
+      },
+      "CATEGORYPACKAGE" : {
+        "CATEGORYDEFINITION" : {
+          "TITLE" : "分类",
+          "DESCRIPTION" : "BPMN元素的分类."
+        }
+      },
+      "PROCESS_AUTHORPACKAGE" : {
+        "PROCESS_AUTHOR" : {
+          "TITLE" : "流程作者",
+          "DESCRIPTION" : "流程定义的作者."
+        }
+      },
+      "PROCESS_VERSIONPACKAGE" : {
+        "PROCESS_VERSION" : {
+          "TITLE" : "流程版本字符串（仅备注）",
+          "DESCRIPTION" : "文档的目的为版本标识"
+        }
+      },
+      "PROCESS_HISTORYLEVELPACKAGE" : {
+        "PROCESS_HISTORYLEVEL" : {
+          "TITLE" : "为此流程定义设置特定的历史级别",
+          "DESCRIPTION" : "为此流程定义设置特定的历史级别"
+        }
+      },
+      "ISEXECUTABLEPACKAGE" : {
+        "ISEXECUTABLE" : {
+          "TITLE" : "是否可执行",
+          "DESCRIPTION" : "这个流程是可执行的吗?"
+        }
+      },
+      "PROCESS_POTENTIALSTARTERUSERPACKAGE" : {
+        "PROCESS_POTENTIALSTARTERUSER" : {
+          "TITLE" : "流程启动者",
+          "DESCRIPTION" : "哪个用户，可以启动流程?"
+        }
+      },
+      "PROCESS_POTENTIALSTARTERGROUPPACKAGE" : {
+        "PROCESS_POTENTIALSTARTERGROUP" : {
+          "TITLE" : "流程启动者组",
+          "DESCRIPTION" : "哪个组，可以启动流程?"
+        }
+      },
+      "PROCESS_NAMESPACEPACKAGE" : {
+        "PROCESS_NAMESPACE" : {
+          "TITLE" : "目标命名空间",
+          "DESCRIPTION" : "流程定义的目标命名空间"
+        }
+      },
+      "PROCESS_ISEAGEREXECUTIONFETCHPACKAGE" : {
+        "ISEAGEREXECUTIONFETCH" : {
+          "TITLE" : "即时执行抓取",
+          "DESCRIPTION" : "是否为该流程定义启用即时执行抓取"
+        }
+      },
+      "ASYNCHRONOUSDEFINITIONPACKAGE" : {
+        "ASYNCHRONOUSDEFINITION" : {
+          "TITLE" : "异步",
+          "DESCRIPTION" : "定义异步的活动"
+        }
+      },
+      "DATAPROPERTIESPACKAGE" : {
+        "DATAPROPERTIES" : {
+          "TITLE" : "数据对象",
+          "DESCRIPTION" : "数据对象属性的定义"
+        }
+      },
+      "EXCLUSIVEDEFINITIONPACKAGE" : {
+        "EXCLUSIVEDEFINITION" : {
+          "TITLE" : "独占任务",
+          "DESCRIPTION" : "定义排它的活动"
+        }
+      },
+      "EXECUTIONLISTENERSPACKAGE" : {
+        "EXECUTIONLISTENERS" : {
+          "TITLE" : "执行监听器",
+          "DESCRIPTION" : "活动、流程、流程跳转，开始、结事事件的监听器"
+        }
+      },
+      "TASKLISTENERSPACKAGE" : {
+        "TASKLISTENERS" : {
+          "TITLE" : "任务监听器",
+          "DESCRIPTION" : "人工任务的监听器"
+        }
+      },
+      "EVENTLISTENERSPACKAGE" : {
+        "EVENTLISTENERS" : {
+          "TITLE" : "事件监听器",
+          "DESCRIPTION" : "监听Flowable引擎的任何发生的事件. 同样可能是任何抛出的信号、信息、出错的事件。"
+        }
+      },
+      "USERTASKASSIGNMENTPACKAGE" : {
+        "USERTASKASSIGNMENT" : {
+          "TITLE" : "分配用户",
+          "DESCRIPTION" : "分配任务给用户"
+        }
+      },
+      "FORMPROPERTIESPACKAGE" : {
+        "FORMPROPERTIES" : {
+          "TITLE" : "动态表单属性",
+          "DESCRIPTION" : "定义带有属性列表的表单"
+        }
+      },
+      "FORMKEYDEFINITIONPACKAGE" : {
+        "FORMKEYDEFINITION" : {
+          "TITLE" : "表单的标识",
+          "DESCRIPTION" : "表单的Key(指向关联的表单)"
+        }
+      },
+      "FORMFIELDVALIDATIONPACKAGE" : {
+        "FORMFIELDVALIDATION" : {
+          "TITLE" : "验证表单字段",
+          "DESCRIPTION" : "验证表单提交上的表单字段。(允许的值是“true”、“false”或表达式)"
+        }
+      },
+      "DUEDATEDEFINITIONPACKAGE" : {
+        "DUEDATEDEFINITION" : {
+          "TITLE" : "到期时间",
+          "DESCRIPTION" : "用户任务到期时间"
+        }
+      },
+      "PRIORITYDEFINITIONPACKAGE" : {
+        "PRIORITYDEFINITION" : {
+          "TITLE" : "优先级",
+          "DESCRIPTION" : "用户任务的优先级"
+        }
+      },
+      "SERVICETASKCLASSPACKAGE" : {
+        "SERVICETASKCLASS" : {
+          "TITLE" : "类",
+          "DESCRIPTION" : "实现服务任务逻辑的类"
+        }
+      },
+      "SERVICETASKEXPRESSIONPACKAGE" : {
+        "SERVICETASKEXPRESSION" : {
+          "TITLE" : "表达式",
+          "DESCRIPTION" : "定义服务任务逻辑的表达式"
+        }
+      },
+      "SERVICETASKDELEGATEEXPRESSIONPACKAGE" : {
+        "SERVICETASKDELEGATEEXPRESSION" : {
+          "TITLE" : "委托表达式",
+          "DESCRIPTION" : "通过代理表达式定义任务服务逻辑"
+        }
+      },
+      "SERVICETASKFIELDSPACKAGE" : {
+        "SERVICETASKFIELDS" : {
+          "TITLE" : "类中的字段",
+          "DESCRIPTION" : "字段扩展"
+        }
+      },
+      "SERVICETASKRESULTVARIABLEPACKAGE" : {
+        "SERVICETASKRESULTVARIABLE" : {
+          "TITLE" : "结果变量名",
+          "DESCRIPTION" : "流程变量存储服务任务的执行结果"
+        }
+      },
+      "SERVICETASKRESULTVARIABLEPACKAGE" : {
+        "SERVICETASKUSELOCALSCOPEFORRESULTVARIABLE" : {
+          "TITLE" : "对结果变量使用局部作用域",
+          "DESCRIPTION" : "标记需要将使用的结果变量保存为局部变量"
+        }
+      },
+      "SERVICETASKTRIGGERABLEPACKAGE" : {
+        "SERVICETASKTRIGGERABLE" : {
+          "TITLE" : "将服务任务设置为可触发的",
+          "DESCRIPTION" : "将服务任务设置为可触发的"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
+        }
+      },
+      "SCRIPTFORMATPACKAGE" : {
+        "SCRIPTFORMAT" : {
+          "TITLE" : "脚本格式",
+          "DESCRIPTION" : "脚本任务的脚本格式化"
+        }
+      },
+      "SCRIPTTEXTPACKAGE" : {
+        "SCRIPTTEXT" : {
+          "TITLE" : "脚本",
+          "DESCRIPTION" : "脚本任务的脚本文本"
+        }
+      },
+      "SCRIPTAUTOSTOREVARIABLESPACKAGE" : {
+        "SCRIPTAUTOSTOREVARIABLES" : {
+          "TITLE" : "自动存储变量",
+          "DESCRIPTION" : "自动存储流程的所有脚本变量"
+        }
+      },
+      "SHELLCOMMANDPACKAGE" : {
+        "SHELLCOMMAND" : {
+          "TITLE" : "命令",
+          "DESCRIPTION" : "Shell任务命令"
+        }
+      },
+      "SHELLARG1PACKAGE" : {
+        "SHELLARG1" : {
+          "TITLE" : "参数1",
+          "DESCRIPTION" : "Shell 命令的参数1"
+        }
+      },
+      "SHELLARG2PACKAGE" : {
+        "SHELLARG2" : {
+          "TITLE" : "参数2",
+          "DESCRIPTION" : "Shell 命令的参数2"
+        }
+      },
+      "SHELLARG3PACKAGE" : {
+        "SHELLARG3" : {
+          "TITLE" : "参数3",
+          "DESCRIPTION" : "Shell 命令的参数3"
+        }
+      },
+      "SHELLARG4PACKAGE" : {
+        "SHELLARG4" : {
+          "TITLE" : "参数4",
+          "DESCRIPTION" : "Shell 命令的参数4"
+        }
+      },
+      "SHELLARG5PACKAGE" : {
+        "SHELLARG5" : {
+          "TITLE" : "参数5",
+          "DESCRIPTION" : "Shell 命令的参数5"
+        }
+      },
+      "SHELLWAITPACKAGE" : {
+        "SHELLWAIT" : {
+          "TITLE" : "等待",
+          "DESCRIPTION" : "等待shell命令执行结束的标志"
+        }
+      },
+      "SHELLOUTPUTVARIABLEPACKAGE" : {
+        "SHELLOUTPUTVARIABLE" : {
+          "TITLE" : "输出变量",
+          "DESCRIPTION" : "存储shell 命令的输出变量"
+        }
+      },
+      "SHELLERRORCODEVARIABLEPACKAGE" : {
+        "SHELLERRORCODEVARIABLE" : {
+          "TITLE" : "错误代码变量",
+          "DESCRIPTION" : "存储shell 命令错误代码的变量"
+        }
+      },
+      "SHELLREDIRECTERRORPACKAGE" : {
+        "SHELLREDIRECTERROR" : {
+          "TITLE" : "重定向错误",
+          "DESCRIPTION" : "当设置为true,使用标准输出合并错误输出"
+        }
+      },
+      "SHELLCLEANENVPACKAGE" : {
+        "SHELLCLEANENV" : {
+          "TITLE" : "清除环境变量",
+          "DESCRIPTION" : "清理shell执行环境"
+        }
+      },
+      "SHELLDIRECTORYPACKAGE" : {
+        "SHELLDIRECTORY" : {
+          "TITLE" : "Shell目录",
+          "DESCRIPTION" : "Shell 进程工作目录"
+        }
+      },
+      "RULETASK_RULESPACKAGE" : {
+        "RULETASK_RULES" : {
+          "TITLE" : "规则",
+          "DESCRIPTION" : "规则任务的规则"
+        }
+      },
+      "RULETASK_VARIABLES_INPUTPACKAGE" : {
+        "RULETASK_VARIABLES_INPUT" : {
+          "TITLE" : "输入变量",
+          "DESCRIPTION" : "规则任务的输入变量"
+        }
+      },
+      "RULETASK_EXCLUDEPACKAGE" : {
+        "RULETASK_EXCLUDE" : {
+          "TITLE" : "排除",
+          "DESCRIPTION" : "使用作为排它性的规则属性"
+        }
+      },
+      "RULETASK_RESULTPACKAGE" : {
+        "RULETASK_RESULT" : {
+          "TITLE" : "结果变量",
+          "DESCRIPTION" : "规则任务的结果变量"
+        }
+      },
+      "MAILTASKHEADERSPACKAGE" : {
+        "MAILTASKHEADERS" : {
+          "TITLE" : "邮件头",
+          "DESCRIPTION" : "行分隔邮件头（例如-x-attribute:value）。"
+        }
+      },
+      "MAILTASKTOPACKAGE" : {
+        "MAILTASKTO" : {
+          "TITLE" : "接收人",
+          "DESCRIPTION" : "接收者，格式为邮件。多个接收者请用逗号分割的列表来定义"
+        }
+      },
+      "MAILTASKFROMPACKAGE" : {
+        "MAILTASKFROM" : {
+          "TITLE" : "发件人",
+          "DESCRIPTION" : "发送者的邮箱.若不提供，默认将使用配置中的来源地址."
+        }
+      },
+      "MAILTASKSUBJECTPACKAGE" : {
+        "MAILTASKSUBJECT" : {
+          "TITLE" : "主题",
+          "DESCRIPTION" : "Email中的主题"
+        }
+      },
+      "MAILTASKCCPACKAGE" : {
+        "MAILTASKCC" : {
+          "TITLE" : "抄送",
+          "DESCRIPTION" : "抄送的Email地址，多个接收者请用逗号分隔开。"
+        }
+      },
+      "MAILTASKBCCPACKAGE" : {
+        "MAILTASKBCC" : {
+          "TITLE" : "密送",
+          "DESCRIPTION" : "密送的Email地址. 多个接收者请用逗号分隔开"
+        }
+      },
+      "MAILTASKTEXTPACKAGE" : {
+        "MAILTASKTEXT" : {
+          "TITLE" : "正文",
+          "DESCRIPTION" : "Email中的内容, 案例一需要发送纯文件的邮件. 可使用Html格式的邮件进行发送，若邮件的接收的客户端不支持这种格式，客户端可转为纯文本的邮件"
+        }
+      },
+      "MAILTASKHTMLPACKAGE" : {
+        "MAILTASKHTML" : {
+          "TITLE" : "Html",
+          "DESCRIPTION" : "HTML中的一片段作为邮件的内容."
+        }
+      },
+      "MAILTASKCHARSETPACKAGE" : {
+        "MAILTASKCHARSET" : {
+          "TITLE" : "字符集",
+          "DESCRIPTION" : "对于很多非英语语言来说，允许更改邮件的编码设置是必要的  "
+        }
+      },
+      "HTTPTASKREQUESTMETHODPACKAGE" : {
+        "HTTPTASKREQUESTMETHOD" : {
+          "TITLE" : "请求方法",
+          "DESCRIPTION" : "请求方法（例如 -  GET，POST，PUT等）。"
+        }
+      },
+      "HTTPTASKREQUESTURLPACKAGE" : {
+        "HTTPTASKREQUESTURL" : {
+          "TITLE" : "请求 URL",
+          "DESCRIPTION" : "请求URL（例如 -  http://flowable.org）。"
+        }
+      },
+      "HTTPTASKREQUESTHEADERSPACKAGE" : {
+        "HTTPTASKREQUESTHEADERS" : {
+          "TITLE" : "请求头",
+          "DESCRIPTION" : "行分隔的HTTP请求标头（例如 -  Content-Type:application/json）。"
+        }
+      },
+      "HTTPTASKREQUESTBODYPACKAGE" : {
+        "HTTPTASKREQUESTBODYPACKAGE" : {
+          "TITLE" : "请求体",
+          "DESCRIPTION" : "请求正文（例如 -  ${sampleBody}）。"
+        }
+      },
+      "HTTPTASKREQUESTBODYENCODINGPACKAGE" : {
+        "HTTPTASKREQUESTBODYENCODING" : {
+          "TITLE" : "请求体编码",
+          "DESCRIPTION" : "请求正文编码（例如-UTF-8）。"
+        }
+      },
+      "HTTPTASKREQUESTTIMEOUTPACKAGE" : {
+        "HTTPTASKREQUESTTIMEOUT" : {
+          "TITLE" : "请求超时时间（ms）",
+          "DESCRIPTION" : "请求超时（以毫秒为单位）（例如 -  5000）。"
+        }
+      },
+      "HTTPTASKDISALLOWREDIRECTSPACKAGE" : {
+        "HTTPTASKDISALLOWREDIRECTS" : {
+          "TITLE" : "不允许重定向",
+          "DESCRIPTION" : "不允许HTTP重定向的标记。"
+        }
+      },
+      "HTTPTASKFAILSTATUSCODESPACKAGE" : {
+        "HTTPTASKFAILSTATUSCODES" : {
+          "TITLE" : "失败时状态码",
+          "DESCRIPTION" : "逗号分隔的HTTP响应状态代码列表以重试，例如400,5XX。"
+        }
+      },
+      "HTTPTASKHANDLESTATUSCODESPACKAGE" : {
+        "HTTPTASKHANDLESTATUSCODES" : {
+          "TITLE" : "处理状态码",
+          "DESCRIPTION" : "要忽略的逗号分隔的HTTP响应状态代码列表，例如404,3XX。"
+        }
+      },
+      "HTTPTASKIGNOREEXCEPTIONPACKAGE" : {
+        "HTTPTASKIGNOREEXCEPTION" : {
+          "TITLE" : "忽略异常",
+          "DESCRIPTION" : "标记以忽略异常。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE" : {
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT" : {
+          "TITLE" : "将响应保存为瞬态变量",
+          "DESCRIPTION" : "指示存储响应变量瞬态的标志"
+        }
+      },
+      "HTTPTASKSAVERESPONSEASJSONPACKAGE" : {
+        "HTTPTASKSAVERESPONSEASJSON" : {
+          "TITLE" : "将响应保存为JSON",
+          "DESCRIPTION" : "指示将响应变量存储为JSON变量而不是String的标志"
+        }
+      },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
+        }
+      },
+      "SKIPEXPRESSIONPACKAGE" : {
+        "SKIPEXPRESSION" : {
+          "TITLE" : "跳过表达式",
+          "DESCRIPTION" : "跳过与任务或关联关联的表达式执行与否。"
+        }
+      },
+      "HTTPTASKRESPONSEVARIABLENAMEPACKAGE" : {
+        "HTTPTASKRESPONSEVARIABLENAME" : {
+          "TITLE" : "响应变量名",
+          "DESCRIPTION" : "定义变量名称以存储http响应。"
+        }
+      },
+      "HTTPTASKSAVEREQUESTVARIABLESPACKAGE" : {
+        "HTTPTASKSAVEREQUESTVARIABLES" : {
+          "TITLE" : "保存请求变量",
+          "DESCRIPTION" : "用于保存请求变量的标志。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE" : {
+        "HTTPTASKSAVERESPONSEPARAMETERS" : {
+          "TITLE" : "保存响应状态、头",
+          "DESCRIPTION" : "用于保存响应状态，标题等的标志"
+        }
+      },
+      "HTTPTASKRESULTVARIABLEPREFIXPACKAGE" : {
+        "HTTPTASKRESULTVARIABLEPREFIX" : {
+          "TITLE" : "结果变量的前缀",
+          "DESCRIPTION" : "执行变量名称的前缀。"
+        }
+      },
+      "CALLACTIVITYCALLEDELEMENTPACKAGE" : {
+        "CALLACTIVITYCALLEDELEMENT" : {
+          "TITLE" : "被调用元素",
+          "DESCRIPTION" : "流程引用"
+        }
+      },
+      "CALLACTIVITYCALLEDELEMENTTYPEPACKAGE" : {
+        "CALLACTIVITYCALLEDELEMENTTYPE" : {
+          "TITLE" : "被调用元素类型",
+          "DESCRIPTION" : "使用流程参考的类型。."
+        }
+      },
+      "CALLACTIVITYINPARAMETERSPACKAGE" : {
+        "CALLACTIVITYINPARAMETERS" : {
+          "TITLE" : "输入参数",
+          "DESCRIPTION" : "定义输入参数"
+        }
+      },
+      "CALLACTIVITYOUTPARAMETERSPACKAGE" : {
+        "CALLACTIVITYOUTPARAMETERS" : {
+          "TITLE" : "输出参数",
+          "DESCRIPTION" : "输出参数的定义"
+        }
+      },
+      "CALLACTIVITYINHERITVARIABLESPACKAGE" : {
+        "CALLACTIVITYINHERITVARIABLES" : {
+          "TITLE" : "在子流程中继承变量",
+          "DESCRIPTION" : "在子流程中继承父流程变量。"
+        }
+      },
+      "CALLACTIVITYSAMEDEPLOYMENTPACKAGE" : {
+        "CALLACTIVITYSAMEDEPLOYMENT" : {
+          "TITLE" : "从相同的部署中启动引用的流程",
+          "DESCRIPTION" : "使用同一部署中引用的流程。"
+        }
+      },
+      "CALLACTIVITYFALLBACKTODEFAULTTENANTPACKAGE" : {
+        "CALLACTIVITYFALLBACKTODEFAULTTENANT" : {
+          "TITLE" : "回退到默认租户",
+          "DESCRIPTION" : "当前租户搜索失败时，在默认租户中按键查找定义。"
+        }
+      },
+      "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE" : {
+        "CALLACTIVITYPROCESSINSTANCENAME" : {
+          "TITLE" : "流程实例名称",
+          "DESCRIPTION" : "解析为子流程实例名称的表达式"
+        }
+      },
+      "CALLACTIVITYINHERITBUSINESSKEYPACKAGE" : {
+        "CALLACTIVITYINHERITBUSINESSKEY" : {
+          "TITLE" : "继承业务键",
+          "DESCRIPTION" : "从父流程继承业务键。"
+        }
+      },
+      "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERSPACKAGE" : {
+        "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERS" : {
+          "TITLE" : "对输出参数使用局部作用域",
+          "DESCRIPTION" : "对输出参数使用局部变量范围。"
+        }
+      },
+      "CALLACTIVITYBUSINESSKEYPACKAGE" : {
+        "CALLACTIVITYBUSINESSKEY" : {
+          "TITLE" : "业务键表达式",
+          "DESCRIPTION" : "解析为子流程实例的业务键的表达式"
+        }
+      },
+      "CALLACTIVITYCOMPLETEASYNCPACKAGE" : {
+        "CALLACTIVITYCOMPLETEASYNC" : {
+          "TITLE" : "完成异步",
+          "DESCRIPTION" : "如果设置，则子流程结束并完成调用活动是异步完成的。将并行多实例与具有异步任务的被调用流程定义一起使用时非常有用。"
+        }
+      },
+      "CAMELTASKCAMELCONTEXTPACKAGE" : {
+        "CAMELTASKCAMELCONTEXT" : {
+          "TITLE" : "驼峰内容",
+          "DESCRIPTION" : "可选的Camel 上下文定义,若为空，则使用系统缺省的."
+        }
+      },
+      "MULETASKENDPOINTURLPACKAGE" : {
+        "MULETASKENDPOINTURL" : {
+          "TITLE" : "终端url",
+          "DESCRIPTION" : "发送消息到Mule的必须的端点URL"
+        }
+      },
+      "MULETASKLANGUAGEPACKAGE" : {
+        "MULETASKLANGUAGE" : {
+          "TITLE" : "语言",
+          "DESCRIPTION" : "必须的语言定义来解析装载的表达式，如JUEL."
+        }
+      },
+      "MULETASKPAYLOADEXPRESSIONPACKAGE" : {
+        "MULETASKPAYLOADEXPRESSION" : {
+          "TITLE" : "有效载荷表达式",
+          "DESCRIPTION" : "发送至Mule的必须执行的消息定义"
+        }
+      },
+      "MULETASKRESULTVARIABLEPACKAGE" : {
+        "MULETASKRESULTVARIABLE" : {
+          "TITLE" : "返回变量",
+          "DESCRIPTION" : "可选的装载返回的结果的变量"
+        }
+      },
+      "CONDITIONSEQUENCEFLOWPACKAGE" : {
+        "CONDITIONSEQUENCEFLOWPACKAGE" : {
+          "TITLE" : "流条件",
+          "DESCRIPTION" : "流程跳线的条件定义"
+        }
+      },
+      "DEFAULTFLOWPACKAGE" : {
+        "DEFAULTFLOW" : {
+          "TITLE" : "默认流",
+          "DESCRIPTION" : "将序列流定义为默认值"
+        }
+      },
+      "CONDITIONALFLOWPACKAGE" : {
+        "CONDITIONALFLOW" : {
+          "TITLE" : "条件流",
+          "DESCRIPTION" : "用条件定义序列流"
+        }
+      },
+      "TIMERCYCLEDEFINITIONPACKAGE" : {
+        "TIMERCYCLEDEFINITION" : {
+          "TITLE" : "循环时间(例：R3/PT10H)",
+          "DESCRIPTION" : "定义ISO-8601时间周期"
+        }
+      },
+      "TIMERDATEDEFINITIONPACKAGE" : {
+        "TIMERDATEDEFINITION" : {
+          "TITLE" : "开始时间（ISO-8601）",
+          "DESCRIPTION" : "定义(ISO-8601格式标准)的定时器."
+        }
+      },
+      "TIMERDURATIONDEFINITIONPACKAGE" : {
+        "TIMERDURATIONDEFINITION" : {
+          "TITLE" : "持续时间(例：PT5M)",
+          "DESCRIPTION" : "定义(ISO-8601)持续的定时器"
+        }
+      },
+      "TIMERENDDATEDEFINITIONPACKAGE" : {
+        "TIMERENDDATEDEFINITION" : {
+          "TITLE" : "结束时间（ISO-8601）",
+          "DESCRIPTION" : "定义带(ISO-8601 duration)定时器."
+        }
+      },
+      "MESSAGEREFPACKAGE" : {
+        "MESSAGEREF" : {
+          "TITLE" : "消息引用",
+          "DESCRIPTION" : "定义消息的名字。"
+        }
+      },
+      "SIGNALREFPACKAGE" : {
+        "SIGNALREF" : {
+          "TITLE" : "信号引用",
+          "DESCRIPTION" : "定义信号的名称"
+        }
+      },
+      "ERRORREFPACKAGE" : {
+        "ERRORREF" : {
+          "TITLE" : "错误引用",
+          "DESCRIPTION" : "定义错误名称"
+        }
+      },
+      "ESCALATIONREFPACKAGE" : {
+        "ESCALATIONREF" : {
+          "TITLE" : "升级引用",
+          "DESCRIPTION" : "定义升级名称"
+        }
+      },
+      "CONDITIONALEVENTPACKAGE" : {
+        "CONDITION" : {
+          "TITLE" : "条件表达式",
+          "DESCRIPTION" : "定义条件表达式."
+        }
+      },
+      "CANCELACTIVITYPACKAGE" : {
+        "CANCELACTIVITY" : {
+          "TITLE" : "取消活动",
+          "DESCRIPTION" : "活动是否应取消？"
+        }
+      },
+      "INITIATORPACKAGE" : {
+        "INITIATOR" : {
+          "TITLE" : "发起人",
+          "DESCRIPTION" : "流程的发起方。"
+        }
+      },
+      "TEXTPACKAGE" : {
+        "TEXT" : {
+          "TITLE" : "文本",
+          "DESCRIPTION" : "文本批注的文本。"
+        }
+      },
+      "MULTIINSTANCE_TYPEPACKAGE" : {
+        "MULTIINSTANCE_TYPE" : {
+          "TITLE" : "多实例类型",
+          "DESCRIPTION" : "重复的活动执行（并行或顺序）可以通过不同的循环类型显示。"
+        }
+      },
+      "MULTIINSTANCE_CARDINALITYPACKAGE" : {
+        "MULTIINSTANCE_CARDINALITY" : {
+          "TITLE" : "基数(多实例)",
+          "DESCRIPTION" : "定义多实例的基数"
+        }
+      },
+      "MULTIINSTANCE_COLLECTIONPACKAGE" : {
+        "MULTIINSTANCE_COLLECTION" : {
+          "TITLE" : "集合(多实例)",
+          "DESCRIPTION" : "定义多实例的集合"
+        }
+      },
+      "MULTIINSTANCE_VARIABLEPACKAGE" : {
+        "MULTIINSTANCE_VARIABLE" : {
+          "TITLE" : "元素变量(多实例)",
+          "DESCRIPTION" : "为多实例定义变量元素"
+        }
+      },
+      "MULTIINSTANCE_CONDITIONPACKAGE" : {
+        "MULTIINSTANCE_CONDITION" : {
+          "TITLE" : "完成条件(多实例)",
+          "DESCRIPTION" : "定义多实例的完成条件"
+        }
+      },
+      "ISFORCOMPENSATIONPACKAGE" : {
+        "ISFORCOMPENSATION" : {
+          "TITLE" : "是否为补偿",
+          "DESCRIPTION" : "标识此活动是否用于补偿的标志。"
+        }
+      },
+      "SEQUENCEFLOWORDERPACKAGE" : {
+        "SEQUENCEFLOWORDER" : {
+          "TITLE" : "流顺序",
+          "DESCRIPTION" : "流程走向的顺序"
+        }
+      },
+      "SIGNALDEFINITIONSPACKAGE" : {
+        "SIGNALDEFINITIONS" : {
+          "TITLE" : "信号定义",
+          "DESCRIPTION" : "信号定义"
+        }
+      },
+      "MESSAGEDEFINITIONSPACKAGE" : {
+        "MESSAGEDEFINITIONS" : {
+          "TITLE" : "消息定义",
+          "DESCRIPTION" : "消息定义"
+        }
+      },
+      "ESCALATIONDEFINITIONSPACKAGE" : {
+        "ESCALATIONDEFINITIONS" : {
+          "TITLE" : "升级的定义",
+          "DESCRIPTION" : "升级的定义"
+        }
+      },
+
+      "EVENTREGISTRYPACKAGE" : {
+        "EVENTKEY" : {
+          "TITLE" : "事件key",
+          "DESCRIPTION" : "事件key定义"
+        },
+        "EVENTNAME" : {
+          "TITLE" : "事件名称",
+          "DESCRIPTION" : "事件名称定义"
+        },
+        "EVENTINPARAMETERS" : {
+          "TITLE" : "事件载体映射",
+          "DESCRIPTION" : "将流程变量映射到事件有效载体的属性"
+        },
+        "EVENTOUTPARAMETERS" : {
+          "TITLE" : "从事件有效载体映射到流程",
+          "DESCRIPTION" : "将事件有效载体的属性映射到流程变量"
+        },
+        "EVENTCORRELATIONPARAMETERS" : {
+          "TITLE" : "相关参数",
+          "DESCRIPTION" : "相关参数定义"
+        },
+        "CHANNELKEY" : {
+          "TITLE" : "通道key",
+          "DESCRIPTION" : "通道key定义"
+        },
+        "CHANNELNAME" : {
+          "TITLE" : "通道名称",
+          "DESCRIPTION" : "通道名称定义"
+        },
+        "CHANNELTYPE" : {
+          "TITLE" : "通道类型",
+          "DESCRIPTION" : "通道类型定义"
+        },
+        "CHANNELDESTINATION" : {
+          "TITLE" : "通道目的地",
+          "DESCRIPTION" : "通道目的地定义"
+        },
+        "TRIGGEREVENTKEY" : {
+          "TITLE" : "触发事件key",
+          "DESCRIPTION" : "触发事件key定义"
+        },
+        "TRIGGEREVENTNAME" : {
+          "TITLE" : "触发事件名称",
+          "DESCRIPTION" : "触发事件名称定义"
+        },
+        "TRIGGERCHANNELKEY" : {
+          "TITLE" : "触发管道key",
+          "DESCRIPTION" : "触发管道key定义"
+        },
+        "TRIGGERCHANNELNAME" : {
+          "TITLE" : "触发管道名称",
+          "DESCRIPTION" : "触发管道名称"
+        },
+        "TRIGGERCHANNELTYPE" : {
+          "TITLE" : "触发通道类型",
+          "DESCRIPTION" : "触发通道类型定义"
+        },
+        "TRIGGERCHANNELDESTINATION" : {
+          "TITLE" : "触发通道目的地",
+          "DESCRIPTION" : "触发通道目的地定义"
+        },
+        "KEYDETECTIONFIXEDVALUE" : {
+          "TITLE" : "事件key固定值",
+          "DESCRIPTION" : "事件key固定值定义"
+        },
+        "KEYDETECTIONJSONFIELD" : {
+          "TITLE" : "事件key json 字段",
+          "DESCRIPTION" : "事件key json 字段"
+        },
+        "KEYDETECTIONJSONPOINTER" : {
+          "TITLE" : "事件key json 指针",
+          "DESCRIPTION" : "事件key json 指针"
+        }
+      },
+      "ISTRANSACTIONPACKAGE" : {
+        "ISTRANSACTION" : {
+          "TITLE" : "是事务子流程",
+          "DESCRIPTION" : "标识此子流程是否为事务类型的标志。"
+        }
+      },
+      "FORMREFERENCEPACKAGE" : {
+        "FORMREFERENCE" : {
+          "TITLE" : "表单引用",
+          "DESCRIPTION" : "关联到一个表单"
+        }
+      },
+      "TERMINATEALLPACKAGE" : {
+        "TERMINATEALL" : {
+          "TITLE" : "终止所有",
+          "DESCRIPTION" : "启用以终止流程实例"
+        }
+      },
+      "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE" : {
+        "DECISIONTASKDECISIONTABLEREFERENCE" : {
+          "TITLE" : "决策表参考",
+          "DESCRIPTION" : "设置决策表引用"
+        }
+      },
+      "DECISIONTASKTHROWERRORONNOHITSPACKAGE" : {
+        "DECISIONTASKTHROWERRORONNOHITS" : {
+          "TITLE" : "如果未命中任何规则，则引发错误",
+          "DESCRIPTION" : "如果未命中决策表的规则，因而找不到结果，则应引发错误。"
+        }
+      },
+      "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE" : {
+        "DECISIONTASKFALLBACKTODEFAULTTENANT" : {
+          "TITLE" : "回退到默认租户",
+          "DESCRIPTION" : "当上一次尝试用租户查找决策定义失败时，查找不带租户的决策定义。"
+        }
+      },
+      "INTERRUPTINGPACKAGE" : {
+        "INTERRUPTING" : {
+          "TITLE" : "中断",
+          "DESCRIPTION" : "是否应终止所有父级执行？"
+        }
+      },
+      "COMPLETIONCONDITIONPACKAGE" : {
+        "COMPLETIONCONDITION" : {
+          "TITLE" : "完成条件",
+          "DESCRIPTION" : "自组网子流程的完成条件"
+        }
+      },
+      "ORDERINGPACKAGE" : {
+        "ORDERING" : {
+          "TITLE" : "排序",
+          "DESCRIPTION" : "自组网子流程的排序"
+        }
+      },
+      "CANCELREMAININGINSTANCESPACKAGE" : {
+        "CANCELREMAININGINSTANCES" : {
+          "TITLE" : "取消剩余的实例",
+          "DESCRIPTION" : "取消自组网子流程的剩余实例？"
+        }
+      }
+
+    },
+    "STENCILS" : {
+      "GROUPS" : {
+        "STARTEVENTS" : "启动事件",
+        "ENDEVENTS" : "结束事件",
+        "DIAGRAM" : "图解",
+        "ACTIVITIES" : "活动",
+        "STRUCTURAL" : "结构",
+        "GATEWAYS" : "网关",
+        "BOUNDARYEVENTS" : "边界事件",
+        "INTERMEDIATECATCHINGEVENTS" : "中间捕捉事件",
+        "INTERMEDIATETHROWINGEVENTS" : "中间抛出事件",
+        "SWIMLANES" : "泳道",
+        "CONNECTINGOBJECTS" : "连接对象",
+        "ARTIFACTS" : "工件"
+      },
+      "BPMNDIAGRAM" : {
+        "TITLE" : "BPMN流程图",
+        "DESCRIPTION" : "BPMN 2.0 流程图."
+      },
+      "STARTNONEEVENT" : {
+        "TITLE" : "空启动事件",
+        "DESCRIPTION" : "无特定触发器的启动事件"
+      },
+      "STARTTIMEREVENT" : {
+        "TITLE" : "定时器启动事件",
+        "DESCRIPTION" : "带定时器触发的启动事件"
+      },
+      "STARTSIGNALEVENT" : {
+        "TITLE" : "信号启动事件",
+        "DESCRIPTION" : "通过信号触发启动事件"
+      },
+      "STARTMESSAGEEVENT" : {
+        "TITLE" : "消息启动事件",
+        "DESCRIPTION" : "通过消息触发启动事件"
+      },
+      "STARTCONDITIONALEVENT" : {
+        "TITLE" : "条件启动事件",
+        "DESCRIPTION" : "通过条件触发启动事件"
+      },
+      "STARTERROREVENT" : {
+        "TITLE" : "异常启动事件",
+        "DESCRIPTION" : "用于捕获BPMN抛出的异常启动事件"
+      },
+      "STARTESCALATIONEVENT" : {
+        "TITLE" : "升级开始事件",
+        "DESCRIPTION" : "捕获抛出的BPMN升级的启动事件"
+      },
+      "STARTEVENTREGISTRYEVENT" : {
+        "TITLE" : "注册开始事件",
+        "DESCRIPTION" : "注册开始事件"
+      },
+
+      "USERTASK" : {
+        "TITLE" : "用户任务",
+        "DESCRIPTION" : "分配给特定人的任务"
+      },
+      "SERVICETASK" : {
+        "TITLE" : "服务任务",
+        "DESCRIPTION" : "带有服务逻辑的自动任务"
+      },
+      "SCRIPTTASK" : {
+        "TITLE" : "脚本任务",
+        "DESCRIPTION" : "带有脚本逻辑的自动任务"
+      },
+      "BUSINESSRULE" : {
+        "TITLE" : "业务规则任务",
+        "DESCRIPTION" : "带有业务规则的自动任务"
+      },
+      "RECEIVETASK" : {
+        "TITLE" : "接收任务",
+        "DESCRIPTION" : "等待接收信号来触发的任务"
+      },
+      "MANUALTASK" : {
+        "TITLE" : "手动任务",
+        "DESCRIPTION" : "不带任何逻辑的自动任务"
+      },
+      "MAILTASK" : {
+        "TITLE" : "邮件任务",
+        "DESCRIPTION" : "邮件任务"
+      },
+      "CAMELTASK" : {
+        "TITLE" : "驼峰任务",
+        "DESCRIPTION" : "发送消息给Camel容器的任务"
+      },
+      "HTTPTASK" : {
+        "TITLE" : "Http任务",
+        "DESCRIPTION" : "Http任务"
+      },
+      "MULETASK" : {
+        "TITLE" : "Mule任务",
+        "DESCRIPTION" : "An task that sends a message to Mule"
+      },
+      "SENDTASK" : {
+        "TITLE" : "发送任务",
+        "DESCRIPTION" : "发送消息的任务"
+      },
+      "DECISIONTASK" : {
+        "TITLE" : "决策任务",
+        "DESCRIPTION" : "使用Flowable DMN规则引擎的任务"
+      },
+      "SHELLTASK" : {
+        "TITLE" : "Shell任务",
+        "DESCRIPTION" : "具有shell批处理逻辑的自动任务"
+      },
+      "SUBPROCESS" : {
+        "TITLE" : "子流程",
+        "DESCRIPTION" : "子流程范围"
+      },
+      "SENDEVENTTASK" : {
+        "TITLE" : "事件发送任务",
+        "DESCRIPTION" : "事件发送任务"
+      },
+
+      "COLLAPSEDSUBPROCESS" : {
+        "TITLE" : "折叠子流程",
+        "DESCRIPTION" : "子流程范围"
+      },
+      "EVENTSUBPROCESS" : {
+        "TITLE" : "事件子流程",
+        "DESCRIPTION" : "事件子流程范围"
+      },
+      "CALLACTIVITY" : {
+        "TITLE" : "调用活动",
+        "DESCRIPTION" : "一个调用活动"
+      },
+      "EXCLUSIVEGATEWAY" : {
+        "TITLE" : "排他网关",
+        "DESCRIPTION" : "一个选择的网关"
+      },
+      "PARALLELGATEWAY" : {
+        "TITLE" : "并行网关",
+        "DESCRIPTION" : "一个并行的网关"
+      },
+      "INCLUSIVEGATEWAY" : {
+        "TITLE" : "包容网关",
+        "DESCRIPTION" : "一个包容性网关"
+      },
+      "EVENTGATEWAY" : {
+        "TITLE" : "事件网关",
+        "DESCRIPTION" : "一个事件网关"
+      },
+      "BOUNDARYCONDITIONALEVENT" : {
+        "TITLE" : "边界条件事件",
+        "DESCRIPTION" : "捕获指定条件的边界事件"
+      },
+      "BOUNDARYERROREVENT" : {
+        "TITLE" : "边界错误事件",
+        "DESCRIPTION" : "捕捉bpmn错误的边界事件"
+      },
+      "BOUNDARYESCALATIONEVENT" : {
+        "TITLE" : "边界升级事件",
+        "DESCRIPTION" : "捕获BPMN升级的边界事件"
+      },
+      "BOUNDARYTIMEREVENT" : {
+        "TITLE" : "边界计时器事件",
+        "DESCRIPTION" : "具有计时器触发器的边界事件"
+      },
+      "BOUNDARYSIGNALEVENT" : {
+        "TITLE" : "边界信号事件",
+        "DESCRIPTION" : "一个信号触发的边界事件"
+      },
+      "BOUNDARYMESSAGEEVENT" : {
+        "TITLE" : "边界消息事件",
+        "DESCRIPTION" : "一个边界消息事件"
+      },
+      "BOUNDARYCANCELEVENT" : {
+        "TITLE" : "边界取消事件",
+        "DESCRIPTION" : "一个边界取消事件"
+      },
+      "BOUNDARYEVENTREGISTRYEVENT" : {
+        "TITLE" : "边界注册事件",
+        "DESCRIPTION" : "边界注册事件"
+      },
+      "BOUNDARYCOMPENSATIONEVENT" : {
+        "TITLE" : "边界补偿事件",
+        "DESCRIPTION" : "边界补偿事件"
+      },
+      "CATCHTIMEREVENT" : {
+        "TITLE" : "中间计时器捕获事件",
+        "DESCRIPTION" : "使用计时器触发器的中间捕获事件"
+      },
+      "CATCHSIGNALEVENT" : {
+        "TITLE" : "中间信号捕获事件",
+        "DESCRIPTION" : "带有信号触发器的中间捕获事件"
+      },
+      "CATCHMESSAGEEVENT" : {
+        "TITLE" : "中间消息捕获事件",
+        "DESCRIPTION" : "带有消息触发器的中间捕获事件"
+      },
+      "CATCHCONDITIONALEVENT" : {
+        "TITLE" : "中间条件捕获事件",
+        "DESCRIPTION" : "带有条件触发器的中间捕获事件"
+      },
+      "THROWNONEEVENT" : {
+        "TITLE" : "中间无抛出事件",
+        "DESCRIPTION" : "没有特定触发器的中间事件"
+      },
+      "THROWSIGNALEVENT" : {
+        "TITLE" : "中间信号抛出事件",
+        "DESCRIPTION" : "带有信号触发器的中间事件"
+      },
+      "THROWESCALATIONEVENT" : {
+        "TITLE" : "中间升级抛出事件",
+        "DESCRIPTION" : "具有升级触发器的中间事件"
+      },
+      "ENDNONEEVENT" : {
+        "TITLE" : "结束事件",
+        "DESCRIPTION" : "没有特定触发器的结束事件"
+      },
+      "ENDERROREVENT" : {
+        "TITLE" : "结束错误事件",
+        "DESCRIPTION" : "引发错误事件的结束事件"
+      },
+      "ENDESCALATIONEVENT" : {
+        "TITLE" : "结束升级事件",
+        "DESCRIPTION" : "抛出升级事件的结束时间"
+      },
+      "ENDCANCELEVENT" : {
+        "TITLE" : "结束取消事件",
+        "DESCRIPTION" : "取消结束事件"
+      },
+      "ENDTERMINATEEVENT" : {
+        "TITLE" : "结束终止事件",
+        "DESCRIPTION" : "终止结束事件"
+      },
+      "POOL" : {
+        "TITLE" : "池",
+        "DESCRIPTION" : "用于构造流程定义的池"
+      },
+      "LANE" : {
+        "TITLE" : "泳道",
+        "DESCRIPTION" : "构建流程定义的泳道"
+      },
+      "SEQUENCEFLOW" : {
+        "TITLE" : "顺序流",
+        "DESCRIPTION" : "序列流定义了活动的执行顺序。"
+      },
+      "MESSAGEFLOW" : {
+        "TITLE" : "消息流",
+        "DESCRIPTION" : "用于连接不同池中的元素的消息流。"
+      },
+      "ASSOCIATION" : {
+        "TITLE" : "关联",
+        "DESCRIPTION" : "将文本注释与元素关联。"
+      },
+      "DATAASSOCIATION" : {
+        "TITLE" : "数据关联",
+        "DESCRIPTION" : "将数据元素与活动关联。"
+      },
+      "TEXTANNOTATION" : {
+        "TITLE" : "文本注释",
+        "DESCRIPTION" : "用描述文本注释元素。"
+      },
+      "DATASTORE" : {
+        "TITLE" : "数据存储",
+        "DESCRIPTION" : "对数据存储的引用。"
+      },
+      "ADHOCSUBPROCESS" : {
+        "TITLE" : "自组网子流程",
+        "DESCRIPTION" : "自组网子流程"
+      }
+    }
+  },
+
+  "CMMN" : {
+    "TITLE": "CMMN编辑器",
+    "DESCRIPTION": "CMMN案例编辑器",
+    "PROPERTYPACKAGES": {
+      "CASE_IDPACKAGE": {
+        "CASE_ID": {
+          "TITLE": "案例标识符",
+          "DESCRIPTION": "案例定义的唯一标识符。"
+        }
+      },
+      "OVERRIDEIDPACKAGE": {
+        "OVERRIDEID": {
+          "TITLE": "主键Id",
+          "DESCRIPTION": "元素的唯一标识符"
+        }
+      },
+      "NAMEPACKAGE": {
+        "NAME": {
+          "TITLE": "案例名称",
+          "DESCRIPTION": "CMMN元素的描述性名称。"
+        }
+      },
+      "DOCUMENTATIONPACKAGE": {
+        "DOCUMENTATION": {
+          "TITLE": "描述文档",
+          "DESCRIPTION": "CMMN元素的描述性名称。"
+        }
+      },
+      "BLOCKINGPACKAGE": {
+        "ISBLOCKING": {
+          "TITLE": "阻塞",
+          "DESCRIPTION": "布尔属性，默认为true。如果为false，则任务将在执行任何关联逻辑后自动完成任务"
+        },
+        "ISBLOCKINGEXPRESSION": {
+          "TITLE": "阻塞表达式",
+          "DESCRIPTION": "在运行时控制此任务是否阻塞的表达式。设置后，将忽略阻塞属性的值。"
+        }
+      },
+      "CASE_INITIATORVARIABLENAMEPACKAGE": {
+        "CASE_INITIATORVARIABLENAME": {
+          "TITLE": "启动器变量名称",
+          "DESCRIPTION": "设置要用于案例启动程序值的变量名称。"
+        }
+      },
+      "CASE_AUTHORPACKAGE": {
+        "CASE_AUTHOR": {
+          "TITLE": "案例作者",
+          "DESCRIPTION": "案例定义的作者"
+        }
+      },
+      "CASE_VERSIONPACKAGE": {
+        "CASE_VERSION": {
+          "TITLE": "案例版本字符串（仅文档）",
+          "DESCRIPTION": "版本标识符用于文档目的。"
+        }
+      },
+      "CASE_NAMESPACEPACKAGE": {
+        "CASE_NAMESPACE": {
+          "TITLE": "目标命名空间",
+          "DESCRIPTION": "案例定义的目标名称空间。"
+        }
+      },
+      "USERTASKASSIGNMENTPACKAGE": {
+        "USERTASKASSIGNMENT": {
+          "TITLE": "分配任务",
+          "DESCRIPTION": "用户任务的分配定义"
+        }
+      },
+      "TASKLISTENERSPACKAGE": {
+        "TASKLISTENERS": {
+          "TITLE": "任务监听器",
+          "DESCRIPTION": "人工任务的监听器"
+        }
+      },
+      "FORMPROPERTIESPACKAGE": {
+        "FORMPROPERTIES": {
+          "TITLE": "表单属性",
+          "DESCRIPTION": "具有表单属性列表的表单定义"
+        }
+      },
+      "FORMKEYDEFINITIONPACKAGE": {
+        "FORMKEYDEFINITION": {
+          "TITLE": "表单键",
+          "DESCRIPTION": "提供对表单的引用的表单键。"
+        }
+      },
+      "FORMFIELDVALIDATIONPACKAGE": {
+        "FORMFIELDVALIDATION": {
+          "TITLE": "验证表单字段",
+          "DESCRIPTION": "在表单提交时验证表单字段。（允许值为“true”、“false”或表达式）"
+        }
+      },
+      "DUEDATEDEFINITIONPACKAGE": {
+        "DUEDATEDEFINITION": {
+          "TITLE": "到期日",
+          "DESCRIPTION": "用户任务的截止日期"
+        }
+      },
+      "PRIORITYDEFINITIONPACKAGE": {
+        "PRIORITYDEFINITION": {
+          "TITLE": "优先级",
+          "DESCRIPTION": "用户任务的优先级。"
+        }
+      },
+      "SERVICETASKCLASSPACKAGE": {
+        "SERVICETASKCLASS": {
+          "TITLE": "类",
+          "DESCRIPTION": "实现服务任务逻辑的类。"
+        }
+      },
+      "SERVICETASKEXPRESSIONPACKAGE": {
+        "SERVICETASKEXPRESSION": {
+          "TITLE": "表达式",
+          "DESCRIPTION": "用表达式定义的服务任务逻辑。"
+        }
+      },
+      "SERVICETASKDELEGATEEXPRESSIONPACKAGE": {
+        "SERVICETASKDELEGATEEXPRESSION": {
+          "TITLE": "委托表达式",
+          "DESCRIPTION": "用委托表达式定义的服务任务逻辑。"
+        }
+      },
+      "SERVICETASKFIELDSPACKAGE": {
+        "SERVICETASKFIELDS": {
+          "TITLE": "类字段",
+          "DESCRIPTION": "字段扩展"
+        }
+      },
+      "SERVICETASKRESULTVARIABLEPACKAGE": {
+        "SERVICETASKRESULTVARIABLE": {
+          "TITLE": "结果变量名称",
+          "DESCRIPTION": "存储服务任务结果的进程变量名。"
+        }
+      },
+      "ASYNCPACKAGE": {
+        "ISASYNC": {
+          "TITLE": "异步",
+          "DESCRIPTION": "指示是否需要异步执行任务。"
+        },
+        "ISEXCLUSIVE": {
+          "TITLE": "独占",
+          "DESCRIPTION": "指示是否必须以独占方式执行异步任务"
+        }
+      },
+      "MAILTASKHEADERSPACKAGE": {
+        "MAILTASKHEADERS": {
+          "TITLE": "报头",
+          "DESCRIPTION": "行分隔邮件头（例如 - X-Attribute: value）"
+        }
+      },
+      "MAILTASKTOPACKAGE": {
+        "MAILTASKTO": {
+          "TITLE": "接收者",
+          "DESCRIPTION": "如果是电子邮件，则为收件人。在逗号分隔的列表中定义了多个收件人。"
+        }
+      },
+      "MAILTASKFROMPACKAGE": {
+        "MAILTASKFROM": {
+          "TITLE": "发件者",
+          "DESCRIPTION": "发件人电子邮件地址。如果未提供，则使用从地址配置的默认值。"
+        }
+      },
+      "MAILTASKSUBJECTPACKAGE": {
+        "MAILTASKSUBJECT": {
+          "TITLE": "主题",
+          "DESCRIPTION": "电子邮件的主题。"
+        }
+      },
+      "MAILTASKCCPACKAGE": {
+        "MAILTASKCC": {
+          "TITLE": "抄送",
+          "DESCRIPTION": "电子邮件的抄送。在逗号分隔的列表中定义了多个收件人"
+        }
+      },
+      "MAILTASKBCCPACKAGE": {
+        "MAILTASKBCC": {
+          "TITLE": "密送",
+          "DESCRIPTION": "电子邮件的密件抄送。在逗号分隔的列表中定义了多个收件人"
+        }
+      },
+      "MAILTASKTEXTPACKAGE": {
+        "MAILTASKTEXT": {
+          "TITLE": "文本",
+          "DESCRIPTION": "电子邮件的内容，以防需要发送不丰富的普通电子邮件。可与HTML结合使用，用于不支持丰富内容的电子邮件客户端。然后，客户机将返回到此文本唯一的备选方案。"
+        }
+      },
+      "MAILTASKHTMLPACKAGE": {
+        "MAILTASKHTML": {
+          "TITLE": "Html",
+          "DESCRIPTION": "一段HTML，它是电子邮件的内容。"
+        }
+      },
+      "MAILTASKCHARSETPACKAGE": {
+        "MAILTASKCHARSET": {
+          "TITLE": "字符集",
+          "DESCRIPTION": "允许更改电子邮件的字符集，这对于许多非英语语言是必需的。"
+        }
+      },
+      "TEXTPACKAGE": {
+        "TEXT": {
+          "TITLE": "文本",
+          "DESCRIPTION": "文本批注的文本。"
+        }
+      },
+      "FORMREFERENCEPACKAGE": {
+        "FORMREFERENCE": {
+          "TITLE": "表单引用",
+          "DESCRIPTION": "一个表单的引用"
+        }
+      },
+      "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONTABLEREFERENCE": {
+          "TITLE": "决策表参考",
+          "DESCRIPTION": "设置决策表引用"
+        }
+      },
+      "DECISIONTASKTHROWERRORONNOHITSPACKAGE": {
+        "DECISIONTASKTHROWERRORONNOHITS": {
+          "TITLE": "如果未命中任何规则，则抛出错误",
+          "DESCRIPTION": "如果未命中决策表的规则，因而找不到结果，则应抛出错误。"
+        }
+      },
+      "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE": {
+        "DECISIONTASKFALLBACKTODEFAULTTENANT": {
+          "TITLE": "回退到默认租户",
+          "DESCRIPTION": "当上一次尝试用租户查找决策定义失败时，查找不带租户的决策定义。"
+        }
+      },
+      "HTTPTASKREQUESTMETHODPACKAGE": {
+        "HTTPTASKREQUESTMETHOD": {
+          "TITLE": "请求方法",
+          "DESCRIPTION": "请求方法（例如GET、POST、PUT等）。"
+        }
+      },
+      "HTTPTASKREQUESTURLPACKAGE": {
+        "HTTPTASKREQUESTURL": {
+          "TITLE": "请求URL",
+          "DESCRIPTION": "请求URL（例如-http://flowable.org）。"
+        }
+      },
+      "HTTPTASKREQUESTHEADERSPACKAGE": {
+        "HTTPTASKREQUESTHEADERS": {
+          "TITLE": "请求头",
+          "DESCRIPTION": "行分隔的HTTP请求头（例如-content-type:application/json）。"
+        }
+      },
+      "HTTPTASKREQUESTBODYPACKAGE": {
+        "HTTPTASKREQUESTBODY": {
+          "TITLE": "请求正文",
+          "DESCRIPTION": "请求主体（例如-$samplebody）。"
+        }
+      },
+      "HTTPTASKREQUESTBODYENCODINGPACKAGE": {
+        "HTTPTASKREQUESTBODYENCODING": {
+          "TITLE": "请求正文编码",
+          "DESCRIPTION": "Request body encoding (For example- UTF-8)."
+        }
+      },
+      "HTTPTASKREQUESTTIMEOUTPACKAGE": {
+        "HTTPTASKREQUESTTIMEOUT": {
+          "TITLE": "请求超时（ms）",
+          "DESCRIPTION": "请求超时（毫秒）（例如-5000）。"
+        }
+      },
+      "HTTPTASKDISALLOWREDIRECTSPACKAGE": {
+        "HTTPTASKDISALLOWREDIRECTS": {
+          "TITLE": "不允许重定向",
+          "DESCRIPTION": "禁止HTTP重定向的标志。"
+        }
+      },
+      "HTTPTASKFAILSTATUSCODESPACKAGE": {
+        "HTTPTASKFAILSTATUSCODES": {
+          "TITLE": "故障状态代码",
+          "DESCRIPTION": "以逗号分隔的要重试的HTTP响应状态代码列表，例如400,5xx。"
+        }
+      },
+      "HTTPTASKHANDLESTATUSCODESPACKAGE": {
+        "HTTPTASKHANDLESTATUSCODES": {
+          "TITLE": "处理状态代码",
+          "DESCRIPTION": "要忽略的HTTP响应状态代码的逗号分隔列表，例如404、3xx。"
+        }
+      },
+      "HTTPTASKIGNOREEXCEPTIONPACKAGE": {
+        "HTTPTASKIGNOREEXCEPTION": {
+          "TITLE": "忽略异常",
+          "DESCRIPTION": "忽略异常的标志。"
+        }
+      },
+      "HTTPTASKRESPONSEVARIABLENAMEPACKAGE": {
+        "HTTPTASKRESPONSEVARIABLENAME": {
+          "TITLE": "响应变量名",
+          "DESCRIPTION": "定义存储HTTP响应的变量名。"
+        }
+      },
+      "HTTPTASKSAVEREQUESTVARIABLESPACKAGE": {
+        "HTTPTASKSAVEREQUESTVARIABLES": {
+          "TITLE": "保存请求变量",
+          "DESCRIPTION": "保存请求变量的标志。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERS": {
+          "TITLE": "保存响应状态，标题",
+          "DESCRIPTION": "保存响应状态、标题等的标志。"
+        }
+      },
+      "HTTPTASKRESULTVARIABLEPREFIXPACKAGE": {
+        "HTTPTASKRESULTVARIABLEPREFIX": {
+          "TITLE": "结果变量前缀",
+          "DESCRIPTION": "执行变量名称的前缀。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT": {
+          "TITLE": "使結果變量瞬态變的",
+          "DESCRIPTION": "指示存储响应变量瞬态的标志"
+        }
+      },
+      "HTTPTASKSAVERESPONSEASJSONPACKAGE": {
+        "HTTPTASKSAVERESPONSEASJSON": {
+          "TITLE": "将响应另存为JSON",
+          "DESCRIPTION": "指示将响应变量存储为JSON变量而不是字符串的标志"
+        }
+      },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
+        }
+      },
+      "CASETASKCASEREFERENCEPACKAGE": {
+        "CASETASKCASEREFERENCE": {
+          "TITLE": "案例参考",
+          "DESCRIPTION": "设置案例参考"
+        }
+      },
+      "PROCESSTASKPROCESSREFERENCEPACKAGE": {
+        "PROCESSTASKPROCESSREFERENCE": {
+          "TITLE": "工艺参考",
+          "DESCRIPTION": "设置进程引用"
+        }
+      },
+      "FALLBACKTODEFAULTTENANTPACKAGE": {
+        "FALLBACKTODEFAULTTENANT": {
+          "TITLE": "回退到默认租户",
+          "DESCRIPTION": "当指定租户中的键找不到定义时，使用默认租户作为回退"
+        }
+      },
+      "PROCESSTASKINPARAMETERSPACKAGE": {
+        "PROCESSTASKINPARAMETERS": {
+          "TITLE": "在参数中",
+          "DESCRIPTION": "输入参数的定义"
+        }
+      },
+      "PROCESSTASKOUTPARAMETERSPACKAGE": {
+        "PROCESSTASKOUTPARAMETERS": {
+          "TITLE": "输出参数",
+          "DESCRIPTION": "输出参数的定义"
+        }
+      },
+      "TIMEREXPRESSIONPACKAGE": {
+        "TIMEREXPRESSION": {
+          "TITLE": "计时器表达式",
+          "DESCRIPTION": "一个iso-8601字符串或表达式，它解析为iso-8601字符串或java.util.Date。"
+        }
+      },
+      "TIMERSTARTTRIGGERPACKAGE": {
+        "TIMERSTARTTRIGGERSOURCEREF": {
+          "TITLE": "启动触发计划项",
+          "DESCRIPTION": "对计划项的引用，为其配置的标准事件需要发生才能启动计时器（可选）"
+        },
+        "TRANSITIONEVENT": {
+          "TITLE": "启动触发器转换事件",
+          "DESCRIPTION": "过渡事件的类型. 仅在设置开始触发计划项时使用"
+        }
+      },
+      "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONREFERENCE": {
+          "TITLE": "决策参考",
+          "DESCRIPTION": "设置决策参考"
+        }
+      },
+      "IFPARTCONDITIONPACKAGE": {
+        "IFPARTCONDITION": {
+          "TITLE": "条件",
+          "DESCRIPTION": ""
+        }
+      },
+      "TRIGGERMODEPACKAGE": {
+        "TRIGGERMODE": {
+          "TITLE": "触发模式",
+          "DESCRIPTION": "确定是否使用内存（默认）为without（on event）评估哨兵条件。默认值意味着满足的哨兵部分（on和ifparts）将被存储。当重新评估哨兵时，后续评估将使用存储的部分。使用“on event”，对所有部分进行评估，如果所有部分均为真，则哨兵满意。否则，所有结果都将被丢弃而不存储。"
+        }
+      },
+      "AUTOCOMPLETEPACKAGE": {
+        "AUTOCOMPLETEENABLED": {
+          "TITLE": "自动完成",
+          "DESCRIPTION": "当所有必需的子级都处于结束状态且没有其他子级处于活动状态时，指示阶段将自动完成的标志。"
+        },
+        "AUTOCOMPLETECONDITION": {
+          "TITLE": "自动完成条件",
+          "DESCRIPTION": "如果阶段可以自动完成，则解析为的表达式。"
+        }
+      },
+      "REQUIREDRULEPACKAGE": {
+        "REQUIREDENABLED": {
+          "TITLE": "必须的",
+          "DESCRIPTION": "指示在确定父阶段完成时是否需要阶段、任务或里程碑的标志。默认为false。"
+        },
+        "REQUIREDRULECONDITION": {
+          "TITLE": "必需规则",
+          "DESCRIPTION": "在确定父阶段完成时，决定阶段、任务或里程碑是否需要的表达式。"
+        }
+      },
+      "REPETITIONRULEPACKAGE": {
+        "REPETITIONENABLED": {
+          "TITLE": "重复",
+          "DESCRIPTION": "指示是否启用重复的标志"
+        },
+        "REPETITIONRULECONDITION": {
+          "TITLE": "重复规则",
+          "DESCRIPTION": "用于确定是否需要创建计划的新实例的表达式。"
+        },
+        "REPETITIONCOUNTERVARIABLENAME": {
+          "TITLE": "重复计数器变量",
+          "DESCRIPTION": "存储重复实例计数器的局部变量的名称。默认值为“repetitionCounter”。"
+        }
+      },
+      "MANUALACTIVATIONRULEPACKAGE": {
+        "MANUALACTIVATIONENABLED": {
+          "TITLE": "手动激活",
+          "DESCRIPTION": "指示任务或阶段是否需要手动激活的标志。默认为false。"
+        },
+        "MANUALACTIVATIONRULECONDITION": {
+          "TITLE": "手动激活规则",
+          "DESCRIPTION": "一种表达式，用于确定阶段或任务是否需要手动激活。"
+        }
+      },
+      "COMPLETIONNEUTRALRULEPACKAGE": {
+        "COMPLETIONNEUTRALENABLED": {
+          "TITLE": "完成中性",
+          "DESCRIPTION": "指示计划项是否处于非完成状态的标志。默认为false。"
+        },
+        "COMPLETIONNEUTRALRULECONDITION": {
+          "TITLE": "完成中性规则",
+          "DESCRIPTION": "用于确定计划项是否为非完成状态的表达式。"
+        }
+      },
+      "PLANITEMLIFECYCLELISTENERSPACKAGE": {
+        "PLANITEMLIFECYCLELISTENERS": {
+          "TITLE": "生命周期监听器",
+          "DESCRIPTION": "计划项生命周期事件的监听器"
+        }
+      },
+      "DISPLAYORDERPACKAGE": {
+        "DISPLAYORDER": {
+          "TITLE": "显示顺序",
+          "DESCRIPTION": "表示获取或显示阶段概述时与其他阶段相比的顺序的数值。"
+        }
+      },
+      "INCLUDEINSTAGEOVERVIEWPACKAGE": {
+        "INCLUDEINSTAGEOVERVIEW": {
+          "TITLE": "包括在概述中",
+          "DESCRIPTION": "指示是否应为阶段概述考虑此阶段"
+        }
+      },
+      "MILESTONEVARIABLEPACKAGE" : {
+        "MILESTONEVARIABLE": {
+          "TITLE": "Milestone variable",
+          "DESCRIPTION": "If set, a variable with this name and boolean value true will be created when this milestone is reached"
+        }
+      },
+      "SCRIPTFORMATPACKAGE": {
+        "SCRIPTFORMAT": {
+          "TITLE": "脚本格式",
+          "DESCRIPTION": "脚本任务的脚本格式（javascript、groovy等）。"
+        }
+      },
+      "SCRIPTTEXTPACKAGE": {
+        "SCRIPTTEXT": {
+          "TITLE": "脚本",
+          "DESCRIPTION": "脚本任务的脚本文本。"
+        }
+      },
+      "TRANSITIONEVENTPACKAGE": {
+        "TRANSITIONEVENT": {
+          "TITLE": "过渡事件类型",
+          "DESCRIPTION": "过渡事件类型"
+        }
+      },
+      "AVAILABLECONDITIONPACKAGE": {
+        "AVAILABLECONDITION": {
+          "TITLE": "可用条件",
+          "DESCRIPTION": "事件监听器上的可选条件表达式，用于指示何时可用。"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE" : {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT" : {
+          "TITLE" : "使結果變量瞬變",
+          "DESCRIPTION" : "指示存储結果變量变量瞬态的标志"
+        }
+      }
+    },
+    "STENCILS" : {
+      "GROUPS" : {
+        "DIAGRAM" : "图解",
+        "CONTAINERS" : "容器",
+        "ACTIVITIES" : "活动",
+        "EVENTLISTENERS" : "事件监听器",
+        "SENTRIES" : "哨兵",
+        "CONNECTORS" : "连接器"
+      },
+      "CMMNDIAGRAM" : {
+        "TITLE" : "CMMN-图",
+        "DESCRIPTION" : "CMMN 2.0 图表。"
+      },
+      "CASEPLANMODEL" : {
+        "TITLE" : "案例计划模型",
+        "DESCRIPTION" : "案例计划模型"
+      },
+      "STAGE" : {
+        "TITLE" : "阶段",
+        "DESCRIPTION" : "阶段"
+      },
+      "TASK" : {
+        "TITLE" : "任务",
+        "DESCRIPTION" : "手动任务"
+      },
+      "HUMANTASK" : {
+        "TITLE" : "人工任务",
+        "DESCRIPTION" : "分配给特定人员的手动任务"
+      },
+      "SERVICETASK" : {
+        "TITLE" : "服务任务",
+        "DESCRIPTION" : "具有服务逻辑的自动任务"
+      },
+      "DECISIONTASK" : {
+        "TITLE" : "决策任务",
+        "DESCRIPTION" : "调用DMN决策的任务"
+      },
+      "HTTPTASK" : {
+        "TITLE" : "HTTP任务",
+        "DESCRIPTION" : "一个HTTP任务"
+      },
+      "SCRIPTTASK" : {
+        "TITLE" : "脚本任务",
+        "DESCRIPTION" : "具有脚本逻辑的自动任务"
+      },
+      "MILESTONE" : {
+        "TITLE" : "里程碑",
+        "DESCRIPTION" : "里程碑"
+      },
+      "CASETASK" : {
+        "TITLE" : "案例任务",
+        "DESCRIPTION" : "引用案例定义以启动新实例"
+      },
+      "PROCESSTASK" : {
+        "TITLE" : "流程任务",
+        "DESCRIPTION" : "对流程定义的引用以启动新实例"
+      },
+      "EVENTLISTENER" : {
+        "TITLE" : "事件监听器",
+        "DESCRIPTION" : "通用事件监听器"
+      },
+      "TIMEREVENTLISTENER" : {
+        "TITLE" : "计时器事件监听器",
+        "DESCRIPTION" : "带有计时器触发器的事件监听器"
+      },
+      "USEREVENTLISTENER" : {
+        "TITLE" : "用户事件监听器",
+        "DESCRIPTION" : "用户事件的监听器"
+      },
+      "ENTRYCRITERION" : {
+        "TITLE" : "进入准则",
+        "DESCRIPTION" : "定义进入标准的哨兵"
+      },
+      "EXITCRITERION" : {
+        "TITLE" : "退出准则",
+        "DESCRIPTION" : "定义出口标准的哨兵"
+      },
+      "ASSOCIATION" : {
+        "TITLE" : "关联",
+        "DESCRIPTION" : "将哨兵与计划项目联系起来"
+      }
+    }
+  },
+
+  "EDITOR": {
+    "POPUP": {
+      "UNSAVED-CHANGES": {
+        "TITLE": "您有未保存的更改",
+        "DESCRIPTION": "您想如何处理未保存的更改?",
+        "ACTION": {
+          "SAVE": "保存更改",
+          "DISCARD": "放弃更改",
+          "CONTINUE": "继续编辑"
+        }
+      }
+    }
+  },
+
+  "PROCESS-LIST" : {
+    "TITLE" : "业务流程模型",
+    "SEARCH-PLACEHOLDER": "搜索",
+    "ACTION" : {
+      "CREATE": "创建流程",
+      "IMPORT": "导入流程"
+    },
+
+    "FILTER" : {
+      "PROCESSES": "流程模型",
+      "PROCESSES-COUNT": "一共有 {{total}}个流程模型",
+      "PROCESSES-ONE": "有一个流程模型",
+      "PROCESSES-EMPTY": "目前还没有创建流程模型。您可以设计流程模型、用户表单，然后将它们捆绑到app中。第一步是创建流程模型:",
+      "PROCESSES-BPMN-HINT": "使用BPMN可视化编辑器创建BPMN模型.",
+      "PROCESSES-BPMN-IMPORT-HINT": "还可以导入现有的BPMN模型。",
+      "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY": "没有匹配到流程模型 \"{{filterText}}\"",
+      "RECENT": "最近",
+      "RECENT-COUNT": "{{total}} 最近使用的模型",
+      "RECENT-ONE": "最近使用的模型",
+      "RECENT-EMPTY": "最近没有使用模型"
+    },
+
+    "SORT": {
+      "MODIFIED-ASC": "按照修改时间升序",
+      "MODIFIED-DESC": "按照修改时间降序",
+      "NAME-ASC": "按照名称升序",
+      "NAME-DESC": "按照名称降序"
+    }
+  },
+
+  "CASE-LIST" : {
+    "TITLE" : "案例模型",
+    "SEARCH-PLACEHOLDER": "搜索",
+    "ACTION" : {
+      "CREATE": "创建案例",
+      "IMPORT": "导入案例"
+    },
+
+    "FILTER" : {
+      "CASES": "案例模型",
+      "CASES-COUNT": "一共有 {{total}}个案例模型",
+      "CASES-ONE": "有一个case模型",
+      "CASES-EMPTY": "目前还没有创建案例模型。您可以设计实例模型、用户表单，然后将它们捆绑到app应用程序定义中。第一步是创建一个案例模型。:",
+      "CASES-CMMN-HINT": "使用CMMN可视化编辑器创建CMMN模型.",
+      "CASES-CMMN-IMPORT-HINT": "还可以导入现有CMMN模型。",
+      "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY": "没有匹配到case模型 \"{{filterText}}\"",
+      "RECENT": "最近",
+      "RECENT-COUNT": "{{total}} 最近使用的模型",
+      "RECENT-ONE": "最近使用的模型",
+      "RECENT-EMPTY": "最近没有使用模型"
+    },
+
+    "SORT": {
+      "MODIFIED-ASC": "按照修改时间升序",
+      "MODIFIED-DESC": "按照修改时间降序",
+      "NAME-ASC": "按照名称升序",
+      "NAME-DESC": "按照名称降序"
+    }
+  },
+
+  "FORMS-LIST" : {
+    "TITLE" : "表单",
+    "SEARCH-PLACEHOLDER": "搜索",
+    "ACTION" : {
+      "CREATE": "创建表单",
+      "CREATE-INLINE": "现在创建一个新表单!",
+      "SHOW-MORE": "显示更多..."
+    },
+
+    "FILTER" : {
+      "FORMS": "表单",
+      "FORMS-COUNT": "一共有{{total}} 个表单",
+      "FORMS-ONE": "有一个表单",
+      "FORMS-EMPTY": "没有表单。若要添加一个，请单击创建表单 ",
+      "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY": "没有匹配到表单 \"{{filterText}}\""
+    },
+
+    "SORT": {
+      "MODIFIED-ASC": "按照修改时间升序",
+      "MODIFIED-DESC": "按照修改时间降序",
+      "NAME-ASC": "按照名称升序",
+      "NAME-DESC": "按照名称降序"
+    }
+  },
+
+  "DECISIONS-LIST": {
+    "TITLE": "决策表",
+    "SEARCH-PLACEHOLDER": "搜索",
+    "ACTION": {
+      "CREATE": "创建决策表",
+      "IMPORT": "导入决策表",
+      "CREATE-INLINE": "现在创建一个新的决策表!",
+      "SHOW-MORE": "显示更多..."
+    },
+
+    "FILTER": {
+      "DECISION-TABLES": "决策表",
+      "DECISION-TABLES-COUNT": "一共有 {{total}} 个决策表",
+      "DECISION-TABLES-ONE": "有一个决策表",
+      "DECISION-TABLES-EMPTY": "没有决策表。若要添加一个，请单击创建决策表 ",
+      "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY": "没有匹配到决策表 \"{{filterText}}\""
+    },
+
+    "SORT": {
+      "MODIFIED-ASC": "按照修改时间升序",
+      "MODIFIED-DESC": "按照修改时间降序",
+      "NAME-ASC": "按照名称升序",
+      "NAME-DESC": "按照名称降序"
+    }
+  },
+
+  "APPS-LIST" : {
+    "TITLE" : "应用程序定义",
+    "SEARCH-PLACEHOLDER": "搜索",
+    "ACTION" : {
+      "CREATE": "创建应用程序",
+      "IMPORT": "导入应用程序",
+      "SHOW-MORE": "显示更多..."
+    },
+
+    "FILTER" : {
+      "APPS": "应用程序定义",
+      "APPS-COUNT": "一共有 {{total}}个应用程序定义",
+      "APPS-ONE": "有一个app定义",
+      "APPS-EMPTY": "没有应用程序定义。若要添加一个，请单击创建应用程序定义",
+      "FILTER-TEXT": ", 匹配 \"{{filterText}}\"",
+      "FILTER-TEXT-EMPTY": "没有匹配到应用程序定义  \"{{filterText}}\"",
+
+      "NO-APPS": " 您可以通过发布一批流程模型来创建应用程序定义",
+      "NO-APPS-CALL-TO-ACTION": "现在可以创建一个应用程序定义 ",
+      "NO-APPS-NOTE": "当你准备好使用它时，记得要发布它。"
+    },
+
+    "SORT": {
+      "MODIFIED-ASC": "按照修改时间升序",
+      "MODIFIED-DESC": "按照修改时间降序",
+      "NAME-ASC": "按照名称升序",
+      "NAME-DESC": "按照名称降序"
+    }
+  },
+  "PROCESS": {
+    "NAME": "模型名称",
+    "KEY": "模型key",
+    "DESCRIPTION": "描述",
+    "VERSION-COMMENT": "版本注释",
+    "ACTION": {
+      "DETAILS": "显示详细信息",
+      "EDIT": "修改模型属性",
+      "DUPLICATE": "复制这个模型",
+      "EXPORT_BPMN20": "导出到BPMN2",
+      "DELETE": "删除这个模型",
+      "CREATE-CONFIRM": "创建新模型",
+      "DUPLICATE-CONFIRM": "复制这个模型",
+      "OPEN-IN-EDITOR": "可视化编辑器",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "删除流程模型",
+      "USE-AS-NEW-VERSION": "作为新版本使用",
+      "FAVORITE": "喜欢这个模型"
+
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "历史",
+      "LAST-UPDATED-BY": "最后被{{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
+      "CREATED-BY": "被{{createdBy}}创建",
+      "NO-DESCRIPTION": "这个模型没有描述信息，可以通过修改模型来添加一个描述"
+    },
+
+    "POPUP": {
+      "CREATE-TITLE": "创建一个新的业务流程模型",
+      "DUPLICATE-TITLE": "复制这个业务流程模型",
+      "CREATE-DESCRIPTION": "您需要为新模型命名，并且您可以在这个操作中添加描述信息。",
+      "DUPLICATE-DESCRIPTION": "您可以更改新模型的名称，并且此时您可以更改描述信息。",
+      "EDIT-DESCRIPTION": "更改下面的任何模型属性，然后按下保存去更新模型。",
+      "DELETE-DESCRIPTION": "确实要删除进程模型吗？ \"{{name}}\"?",
+      "EDIT-TITLE":"编辑模型详细信息",
+      "DELETE-TITLE": "删除模型",
+      "DELETE-LOADING-RELATIONS": "检查模型使用...",
+      "DELETE-RELATIONS-DESCRIPTION-SINGLE": "无法删除此模型，因为另一个模型正在使用它:",
+      "DELETE-RELATIONS-DESCRIPTION": "无法删除此模型，因为另一个模型正在使用它:",
+      "DELETE-PROCESS-RELATION": "流程模型",
+      "DELETE-FORM-RELATION": "表单模型",
+      "DELETE-APP-RELATION": "App模型",
+      "IMPORT-DESCRIPTION": "请浏览或拖拽.bpmn或.bpmn20.xml扩展名的BPMN XML定义",
+      "IMPORT-TITLE": "导入一个流程模型",
+      "USE-AS-NEW-TITLE": "作为一个新版本使用",
+      "USE-AS-NEW-DESCRIPTION": "您确定要使用 {{version}}版本 去创建一个关于 \"{{name}}\"的新版本?",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新app模型。缺失模型:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "模型 '{{name}}' 内部id {{id}}, 被 {{createdBy}}创建",
+      "SHARED-WITH": "分享",
+      "PERMISSION": "许可",
+      "ACTIONS": "动作",
+      "IMPORT": {
+        "DROPZONE": "拖拽一个 .bpmn 或者 .bpmn20.xml BPMN XML 文件",
+        "CANCEL-UPLOAD": "取消上传",
+        "ERROR": "处理BPMN XML文件时出错",
+        "NO-DROP": "不支持拖放"
+      }
+    },
+    "ALERT": {
+      "EDIT-CONFIRM": "模型被更新"
+    },
+    "ERROR": {
+      "NOT-FOUND": "所请求的模型不存在"
+    }
+  },
+
+  "SUBPROCESS": {
+    "NAME": "子流程名称",
+    "DESCRIPTION": "描述信息",
+    "ACTION": {
+      "CREATE-CONFIRM": "创建一个子流程"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "创建一个新的子流程",
+      "CREATE-DESCRIPTION": "您需要为新的子流程命名，并且您可能希望同时添加描述。"
+    }
+  },
+
+  "CASE": {
+    "NAME": "模型名称",
+    "KEY": "模型key",
+    "DESCRIPTION": "描述信息",
+    "VERSION-COMMENT": "版本注释",
+    "ACTION": {
+      "DETAILS": "显示详细信息",
+      "EDIT": "修改模型属性",
+      "DUPLICATE": "复制这个模型",
+      "EXPORT_CMMN": "导出到CMMN1.1",
+      "DELETE": "删除这个模型",
+      "CREATE-CONFIRM": "创建新模型",
+      "DUPLICATE-CONFIRM": "复制这个模型",
+      "OPEN-IN-EDITOR": "可视化编辑器",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "删除case模型",
+      "USE-AS-NEW-VERSION": "作为新版本使用",
+      "FAVORITE": "喜欢这个模型"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "历史",
+      "LAST-UPDATED-BY": "最后被 {{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
+      "CREATED-BY": "被{{createdBy}}创建",
+      "NO-DESCRIPTION": "这个模型没有描述信息，可以通过修改模型来添加一个描述"
+    },
+
+    "POPUP": {
+      "CREATE-TITLE": "创建一个新的案例模型",
+      "DUPLICATE-TITLE": "复制这个案例模型",
+      "CREATE-DESCRIPTION": "您需要为新模型命名，并且您可以在这个操作中添加描述信息。",
+      "DUPLICATE-DESCRIPTION": "您可以更改新模型的名称，并且此时您可以更改描述信息。",
+      "EDIT-DESCRIPTION": "更改下面的任何模型属性，然后按下保存去更新模型。",
+      "DELETE-DESCRIPTION": "确实要删除进程流程吗 \"{{name}}\"?",
+      "EDIT-TITLE":"编辑模型详细信",
+      "DELETE-TITLE": "删除模型",
+      "DELETE-LOADING-RELATIONS": "检查模型使用...",
+      "DELETE-RELATIONS-DESCRIPTION-SINGLE": "无法删除此模型，因为另一个模型正在使用它:",
+      "DELETE-RELATIONS-DESCRIPTION": "无法删除此模型，因为另一个模型正在使用它:",
+      "DELETE-PROCESS-RELATION": "案例模型",
+      "DELETE-FORM-RELATION": "表单模型",
+      "DELETE-APP-RELATION": "应用程序模型",
+      "IMPORT-DESCRIPTION": "请浏览或拖拽.cmmn 或者.cmmn.xml 扩展名的CMMN XML",
+      "IMPORT-TITLE": "导入一个案例模型",
+      "USE-AS-NEW-TITLE": "作为一个新版本使用",
+      "USE-AS-NEW-DESCRIPTION": "您确定要使用 {{version}}版本 去创建一个关于 \"{{name}}\"的新版本?",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新应用程序模型。缺失模型:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "模型 '{{name}}' 内部id {{id}}, 被 {{createdBy}}创建",
+      "SHARED-WITH": "分享",
+      "PERMISSION": "许可",
+      "ACTIONS": "动作",
+      "IMPORT": {
+        "DROPZONE": "拖拽一个 .cmmn or .cmmn.xml CMMN XML文件",
+        "CANCEL-UPLOAD": "取消上传",
+        "ERROR": "处理CMMN XML文件时出错",
+        "NO-DROP": "不支持拖放"
+      }
+    },
+    "ALERT": {
+      "EDIT-CONFIRM": "模型被更新"
+    },
+    "ERROR": {
+      "NOT-FOUND": "所请求的模型不存在"
+    }
+  },
+
+  "FORM": {
+    "NAME": "表单名称",
+    "KEY": "表单key",
+    "DESCRIPTION": "描述",
+    "ACTION": {
+      "DETAILS": "显示详细信息",
+      "EDIT": "修改模型属性",
+      "DELETE": "复制这个表单",
+      "CREATE-CONFIRM": "创建新表单",
+      "DUPLICATE": "复制这个表单",
+      "DUPLICATE-CONFIRM": "复制这个表单",
+      "OPEN-IN-EDITOR": "表单编辑器",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "删除表单",
+      "USE-AS-NEW-VERSION": "作为新版本使用"
+
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "历史",
+      "LAST-UPDATED-BY": "最后被{{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
+      "CREATED-BY": "被{{createdBy}}创建"
+    },
+
+    "POPUP": {
+      "CREATE-TITLE": "创建一个新的表单",
+      "DUPLICATE-TITLE": "复制这个表单",
+      "CREATE-DESCRIPTION": "您需要为新表单命名，并且您可以在这个操作中添加描述信息。",
+      "DUPLICATE-DESCRIPTION": "您需要为新表单命名，并且您可以在这个操作中添加描述信息。",
+      "SAVE-FORM-TITLE": "保存表单",
+      "EDIT-DESCRIPTION": "更改下面的任何模型属性，然后按下保存去更新表单。",
+      "DELETE-DESCRIPTION": "确实要删除表单 \"{{name}}\"?",
+      "EDIT-TITLE":"编辑表单详细信息",
+      "DELETE-TITLE": "删除表单",
+      "USE-AS-NEW-TITLE": "作为一个新版本使用",
+      "USE-AS-NEW-VERSION": "作为一个新版本使用",
+      "USE-AS-NEW-DESCRIPTION": "您确定要使用 {{version}}版本 去创建一个关于 \"{{name}}\"的新版本?",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新app模型。缺失模型:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "模型 '{{name}}' 内部id {{id}}, 被 {{createdBy}}创建"
+    }
+  },
+
+  "DECISION-TABLE": {
+    "NAME": "决策表 名称",
+    "KEY": "决策表 key",
+    "DESCRIPTION": "描述",
+    "VERSION-COMMENT": "版本注释",
+    "HIT-POLICY": "命中策略:",
+    "ACTION": {
+      "DETAILS": "显示详细信息",
+      "EDIT": "修改模型属性",
+      "SHARE": "分享决策表",
+      "DELETE": "删除决策表",
+      "ADD-COMMENT": "+ 添加评论",
+      "CREATE-CONFIRM": "创建新的决策表",
+      "OPEN-IN-EDITOR": "决策表编辑器",
+      "EXPORT": "Export 决策表",
+      "DELETE-CONFIRM": "删除决策表",
+      "USE-AS-NEW-VERSION": "作为新版本使用",
+      "FAVORITE": "喜欢这个决策表",
+      "DUPLICATE": "复制这个决策表"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "历史",
+      "COMMENTS-TITLE": "评论",
+      "LAST-UPDATED-BY": "最后被{{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
+      "CREATED-BY": "被{{createdBy}}创建"
+    },
+    "HIT-POLICIES": {
+      "FIRST": "第一个",
+      "ANY": "任何",
+      "UNIQUE": "唯一",
+      "PRIORITY": "优先级",
+      "RULE ORDER": "规则顺序",
+      "OUTPUT ORDER": "输出顺序",
+      "COLLECT": "采集"
+    },
+    "COLLECT-OPERATORS": {
+      "SUM": "和",
+      "MIN": "最小",
+      "MAX": "最大",
+      "COUNT": "总数"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "创建一个新的决策表",
+      "CREATE-DESCRIPTION": "您需要为新决策表命名，并且您可以在这个操作中添加描述信息。",
+      "SAVE-DESCRIPTION": "您可以更改新决策表的名称，并且此时您可以更改描述信息。",
+      "DUPLICATE-TITLE": "复制决策表",
+      "DUPLICATE-DESCRIPTION": "您需要为新决策表命名，并且您可以在这个操作中添加描述信息。",
+      "DELETE-TITLE": "删除决策表",
+      "DELETE-DESCRIPTION": "确实要删除决策表 \"{{name}}\"?",
+      "SAVE-DECISION-TABLE-TITLE": "保存决策表",
+      "IMPORT-DESCRIPTION": "请浏览或拖拽.dmn or .dmn.xml扩展名的的 DMN XML文件",
+      "IMPORT-TITLE": "导入DMN模型",
+      "IMPORT": {
+        "DROPZONE": "拖拽一个 .dmn or .dmn.xml DMN XML文件",
+        "CANCEL-UPLOAD": "取消上传",
+        "ERROR": "处理DMN XML文件时出错",
+        "NO-DROP": "不支持拖放"
+      },
+      "USE-AS-NEW-TITLE": "作为一个新版本使用",
+      "USE-AS-NEW-VERSION": "作为一个新版本使用",
+      "USE-AS-NEW-DESCRIPTION": "您确定要使用 {{version}}版本 去创建一个关于 \"{{name}}\"的新版本?",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "无法完全恢复app模型到所选择的版本：由于一些引用的模型过去被删除而丢失。请相应地更新app模型。缺失模型:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "模型 '{{name}}' 内部id {{id}}, 被 {{createdBy}}创建"
+    },
+    "ALERT": {
+      "FAVORITE-CONFIRM": "喜欢这个决策表",
+      "UN-FAVORITE-CONFIRM": "这个决策表不再流行了"
+    }
+  },
+
+  "APP": {
+    "NAME": "应用程序定义名称",
+    "KEY": "应用程序定义key",
+    "DESCRIPTION": "描述",
+    "ICON": "图标",
+    "THEME": "主题",
+    "GROUPS-ACCESS": "组访问，用逗号分隔",
+    "USERS-ACCESS": "用户访问，用逗号分隔",
+    "ACTION": {
+      "DETAILS": "显示详细信息",
+      "EDIT": "修改应用程序定义属性",
+      "DUPLICATE": "复制这个应用",
+      "SHARE": "分享应用程序定义",
+      "DELETE": "删除应用程序定义",
+      "CREATE-CONFIRM": "创建新的应用程序定义",
+      "DUPLICATE-CONFIRM": "复制这个应用程序定义",
+      "DELETE-CONFIRM": "删除应用程序定义",
+      "USE-AS-NEW-VERSION": "作为新版本使用",
+      "OPEN-IN-EDITOR": "应用程序编辑器",
+      "PUBLISH": "发布",
+      "PUBLISH-CONFIRM": "发布应用程序定义",
+      "SELECT-ICON": "修改图标...",
+      "SELECT-THEME": "修改主题...",
+      "EDIT-MODELS": "编辑包含的模型",
+      "EXPORT-ZIP": "将app定义导出为zip文件",
+      "EXPORT-BAR": "将app定义导出为可部署的bar文件"
+
+    },
+    "DETAILS": {
+      "TITLE": "App定义详细信息: {{name}}",
+      "HISTORY-TITLE": "历史",
+      "MODELS-TITLE": "app定义中包含的模型",
+      "LAST-UPDATED-BY": "最后被{{lastUpdatedBy}} - {{lastUpdated | dateformat}}更新",
+      "CREATED-BY": "被{{createdBy}}创建",
+      "NO-DESCRIPTION": "这个应用程序定义没有描述信息，可以通过修改应用程序定义来添加一个描述",
+      "NO-MODELS-SELECTED": "没有为这个应用程序选择模型"
+    },
+    "TITLE": {
+      "SELECT-ICON": "选择应用图标",
+      "SELECT-THEME": "选择应用主题",
+      "PREVIEW": "预览"
+
+    },
+    "POPUP": {
+      "CREATE-TITLE": "创建新的应用程序定义",
+      "DUPLICATE-TITLE": "复制一个应用程序定义",
+      "SAVE-APP-TITLE": "保存应用程序定义",
+      "SAVE-APP-SAVE-SUCCESS": "保存的应用程序定义",
+      "CREATE-DESCRIPTION": "您需要为新的应用程序定义命名，并且您可以在这个操作中添加描述信息。",
+      "DUPLICATE-DESCRIPTION": "您需要为新的应用程序定义命名，并且您可以在这个操作中添加描述信息。",
+      "PUBLISH-TITLE": "发布应用程序定义",
+      "PUBLISH-DESCRIPTION": "您确定要发布应用程序定义 \"{{name}}\"? 注意这个应用程序定义将版本化，如果已经存在，则将更新工作流应用程序。",
+      "PUBLISH-FIELD": "发布？请注意，如果启用了发布，则将版本化此应用程序定义，如果已经存在，则将更新工作流应用程序。",
+      "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "你的流程模型 \"{{modelInAppName}}\"具有相同的标识符\"{{processDefinitionKey}}\"作为已经存在的部署流程\"{{conflictingModelName}}\" ，关于这个应用程序 \"{{conflictingAppName}}\". 请修改这个 \"id\"流程模型的属性。",
+      "PUBLISH-ERROR-PROCESS-ALREADY-USED": "下面的流程模型已经在另一个应用程序中使用了。这样行吗？",
+      "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "应用程序",
+      "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "无效的应用程序: 找到重复的流程标识符 (修改这个非法的流程模型  \"id\"属性):",
+      "DELETE-TITLE": "删除应用程序定义",
+      "DELETE-DESCRIPTION": "确实要删除应用程序定义 \"{{name}}\"?",
+      "DELETE-DESCRIPTION-WITH-RUNTIME": "确实要删应用程序定义 \"{{name}}\"? 注意，这个应用程序定义已经部署到任务landing页面，并且通过确认，该应用程序将从任务应用程序landing页面中删除。",
+      "DELETE-CASCADE-FALSE": "只删除当前版本的应用程序定义 (v{{version}})",
+      "DELETE-CASCADE-TRUE": "也删除所有以前的版本应用程序定义",
+      "HAS-CUSTOM-STENCILITEM" : "模型 \"{{modelName}}\" 使用带有自定义模板项目的模板. 在这个模型中使用这个模型是不可能的.",
+      "HAS-VALIDATIONERROR" : "模型 \"{{modelName}}\"  有验证错误，不能添加到应用程序定义.在编辑器中打开模型以查看关于验证错误的更多细节。",
+      "IMPORT-DESCRIPTION":"请使用.zip扩展的应用程序定义浏览或拖拽一个",
+      "IMPORT-TITLE":"导入应用程序定义模型",
+      "IMPORT": {
+        "DROPZONE": "扩拽一个.zip 应用程序定义文件",
+        "CANCEL-UPLOAD": "取消上传",
+        "RENEWIDM-IDS": "Renew the user and group identifiers when importing step and BPMN models. This is often required when importing the 应用程序定义 into a different Flowable environment. It will try to link the human steps and user tasks to the right user and group in this target environment.",
+        "ERROR": "处理应用程序定义文件时出错",
+        "NO-DROP": "不支持拖放"
+      },
+      "INCLUDE-MODELS-TITLE": "包含在应用程序定义中的模型"
+    },
+    "ALERT": {
+      "DELETE-CONFIRM": "应用程序定义删除了",
+      "PUBLISH-CONFIRM": "应用程序定义已经被发布了",
+      "PUBLISH-ERROR": "不能发布应用程序定义. 请检查引用的流程模型的有效性。"
+    }
+  },
+
+  "SHARE-INFO": {
+    "ACTION": {
+      "ADD": "添加另一个人"
+    }
+  },
+
+  "FORM-BUILDER": {
+    "PALLETTE": {
+      "TEXT": "文本",
+      "MULTILINE-TEXT": "多行文本",
+      "PASSWORD": "密码",
+      "NUMBER": "数字",
+      "CHECKBOX": "多选",
+      "DATE": "日期",
+      "DROPDOWN": "下拉",
+      "RADIO": "单选按钮",
+      "PEOPLE": "选择人",
+      "GROUP-OF-PEOPLE": "选择组",
+      "UPLOAD": "上传文件",
+      "EXPRESSION": "表达式",
+      "DECIMAL": "小数",
+      "HYPERLINK": "超链接",
+      "SPACER": "垫片",
+      "HORIZONTAL-LINE": "横线",
+      "HEADLINE": "标题",
+      "HEADLINE-WITH-LINE":"标题和线"
+    },
+    "TABS": {
+      "GENERAL": "一般",
+      "OPTIONS": "选项",
+      "UPLOAD-OPTIONS": "上传选项",
+      "ADVANCED-OPTIONS":"高级"
+    },
+    "VERSION": "版本 {{version}}",
+    "LAST-UPDATED": "最后更新的 {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
+    "TITLE": {
+      "DESIGN": "设计",
+      "OUTCOME": "结果"
+    },
+    "POPUP": {
+      "EDIT-TITLE": "编辑字段 '{{name}}'",
+      "EXPRESSION-TITLE": "编辑表达式"
+    },
+    "MESSAGE": {
+      "EMPTY-EXPRESSION": "(没有表达值)",
+      "EXPRESSION-HELP": "您还可以使用如下的符号来引用先前以任何形式提交的值，作为文本的一部分 ${myFieldId}.",
+      "OPTIONS-EXPRESSION-HELP": "可以使用表达式来动态填充选项，例如通过引用这样的变量 ${optionsVariable}. 这个表达式需要产生一个java对象(java.util)。带有选项对象的列表)或其json表示。"
+    },
+    "LABEL" : {
+      "FUNCTIONAL-GROUP": "选择组..",
+      "PERSON": "选择人.."
+    },
+    "COMPONENT": {
+      "LABEL": "标签:",
+      "OVERRIDEID": "覆盖id?",
+      "ID": "Id:",
+      "PLACEHOLDER": "默认值:",
+      "OPTIONS": "选项",
+      "RADIO-BUTTON-DEFAULT": "选项 1",
+      "DROPDOWN-DEFAULT-EMPTY-SELECTION": "请选择一个...",
+      "DROPDOWN-EMPTY-VALUE-HELP": " 这是‘空值’选项。在运行时选择它意味着‘没有值’或’空’。这允许用于可选字段，但不允许用于必需字段。",
+      "OPTIONS-EXPRESSION": "选择表达:",
+      "OPTIONS-EXPRESSION-ENABLED": "启用选项表达",
+      "REQUIRED": "必填",
+      "READONLY": "只读",
+      "EXPRESSION": "表达式",
+      "ADD-OPTION": "+ 添加一个新选项",
+      "UPLOAD-ALLOW-MULTIPLE": "允许上传多个文件",
+      "SIZE": "大小",
+      "MAX-LENGTH":"最大长度:",
+      "MIN-LENGTH":"最小长度:",
+      "PASSWORD-UNMASK-OPTION": "密码屏蔽/揭露选项",
+      "HYPERLINK-URL": "超链接地址",
+      "REGEX-PATTERN":"正则表达式的标准",
+      "MASK":{
+        "TITLE":"输入掩码",
+        "EXAMPLES":{
+          "TITLE":"例子:",
+          "NUMBER":"任何数字",
+          "LETTER":"任何字母",
+          "NUMBERORLETTER":"任何字母或数字",
+          "OPTIONAL":"使蒙版可选(无效)",
+          "PHONE":"电话"
+        }
+      }
+    },
+    "OUTCOMES": {
+      "DESCRIPTION": "您可以为这个任务定义多个结果。在完成一个任务时，用户选择一个可用的结果，可在后续的流程中使用结果变量",
+      "NO-OUTCOMES-OPTION": "不要使用自定义结果，只显示'完成'按钮。",
+      "OUTCOMES-OPTION": "使用此表单的定制结果。",
+      "POSSIBLE-OUTCOMES": "可能的结果",
+      "NEW-OUTCOME-PLACEHOLDER": "输入新的结果",
+      "ADD": "添加结果",
+      "REMOVE": "移除"
+    }
+  },
+
+  "DECISION-TABLE-EDITOR": {
+    "EMPTY-MESSAGES": {
+      "NO-VARIABLE-SELECTED": "未定义"
+    },
+    "POPUP": {
+      "EXPRESSION-EDITOR": {
+        "INPUT-TITLE": "编辑输入列",
+        "INPUT-DESCRIPTION": "选择输入变量作为列的输入",
+        "OUTPUT-TITLE": "编辑输出列",
+        "OUTPUT-DESCRIPTION": "选择一个现有的输出变量或创建一个新的变量",
+        "EXPRESSION-LABEL": "列标签:",
+        "EXPRESSION-PLACEHOLDER": "输入可选标签",
+        "EXPRESSION-VARIABLE-NAME": "变量名称:",
+        "EXPRESSION-VARIABLE-TYPE": "变量类型:",
+        "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "输入变量名",
+        "OUTPUT-NEW-VARIABLE-ID": "变量ID:",
+        "OUTPUT-NEW-VARIABLE-TYPE": "变量类型:",
+        "COMPLEX-EXPRESSION-LABEL": "复杂表达式:",
+        "ALLOWED-VALUES": "允许值（可选）:",
+        "OUTPUT-VALUES": "输出值",
+        "OUTPUT-VALUES-OPTIONAL": "(可选):",
+        "OUTPUT-VALUES-NOT-OPTIONAL": "(为优先级/输出顺序拖动行):"
+      }
+    },
+    "BUTTON-ACTIONS-LABEL": "动作",
+    "BUTTON-ADD-INPUT-LABEL": "添加输入",
+    "BUTTON-ADD-OUTPUT-LABEL": "添加输出",
+    "BUTTON-ADD-RULE-LABEL": "添加规则",
+    "BUTTON-MOVE-RULE-UPWARDS-LABEL": "向上移动",
+    "BUTTON-MOVE-RULE-DOWNWARDS-LABEL": "向下移动",
+    "BUTTON-REMOVE-RULE-LABEL": "移除规则",
+    "ALERT": {
+      "EXPRESSION-VARIABLE-REQUIRED-ERROR": "所有输入和输出表达式都必须引用表单字段或变量。",
+      "SAVE-CONFIRM": "保存决策表'{{name}}'"
+    }
+  },
+
+  "TOUR": {
+    "WELCOME-TITLE": "欢迎, {{userName}}",
+    "WELCOME-CONTENT": "这是一个短暂的flowable编辑器. 接下来的几个步骤将指导您通过应用程序的不同部分来启动。按ESC键随时停止。" ,
+    "PALETTE-TITLE": "调色板",
+    "PALETTE-CONTENT": "在这里可以找到创建业务流程的所有可用构成。它们是按逻辑组排列的。只需点击它就可以打开一组:",
+    "CANVAS-TITLE": "画布",
+    "CANVAS-CONTENT": "这是创建业务流程的工作空间。从左侧的调色板中拖动元素，并将它们放在画布上以开始建模",
+    "DRAGDROP-TITLE": "拖放示例",
+    "DRAGDROP-CONTENT": "下面是一个如何开始建模的例子:",
+    "PROPERTIES-TITLE": "属性",
+    "PROPERTIES-CONTENT": "在这里您可以配置业务流程构造的属性。只需选择画布上的项目，它的属性就会显示出来。如果要编辑该属性，请单击该属性。",
+    "TOOLBAR-TITLE": "工具栏",
+    "TOOLBAR-CONTENT": "可以在这里找到所有的动作：保存或验证模型, 复制和粘贴一个流程的部分, 等等. 在按钮上悬停以此获得对动作的描述信息.",
+    "END-TITLE": "终点",
+    "END-CONTENT": "就是这样！现在可以开始建模过程。如果你有任何问题，可以问他们。 <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable论坛</a> "
+  },
+
+  "FEATURE-TOUR" : {
+    "BENDPOINT" : {
+      "TITLE": "教程",
+      "DESCRIPTION" : "当使用连线流将流程按照步骤彼此连接的时候，您可能会发现，这些连线彼此交叉，或者您希望以不同的方式排列它们。这样做, 可以向连线添加或移除一个弯曲点。<br/><br/>如下图所示，你首先应该点击 '添加弯曲点' 然后单击连线添加它。注意，连线将在绿色中显示一个微妙的指示，以显示可以在那里添加弯曲点。<br/><br/>删除一个弯曲点再次遵循类似的模式: 点击 '移除弯曲点' 按钮 ，然后点击弯曲点再次移除。"
+    }
+  },
+
+  "ACTION.OK" : "Ok",
+  "ACTION.SAVE" : "保存",
+  "ACTION.SAVE-AND-CLOSE" : "保存和关闭编辑器",
+  "ACTION.SEND" : "发送",
+  "ACTION.CANCEL" : "取消",
+  "ACTION.SELECT" : "选择",
+  "ACTION.ADD" : "添加",
+  "ACTION.REMOVE" : "移除",
+  "ACTION.MOVE.UP" : "移动入口",
+  "ACTION.MOVE.DOWN" : "向下移动",
+
+  "TOOLBAR.ACTION.CLOSE" : "关闭编辑器并返回到概览页面",
+  "TOOLBAR.ACTION.SAVE" : "保存模型",
+  "TOOLBAR.ACTION.VALIDATE" : "验证模型",
+  "TOOLBAR.ACTION.CUT" : "剪切 (在业务流程中选择一个或多个元素)",
+  "TOOLBAR.ACTION.COPY" : "拷贝 (在业务流程中选择一个或多个元素)",
+  "TOOLBAR.ACTION.PASTE" : "粘贴",
+  "TOOLBAR.ACTION.DELETE" : "删除选定元素",
+  "TOOLBAR.ACTION.UNDO" : "撤消",
+  "TOOLBAR.ACTION.REDO" : "重做",
+  "TOOLBAR.ACTION.ZOOMIN" : "放大",
+  "TOOLBAR.ACTION.ZOOMOUT" : "缩小",
+  "TOOLBAR.ACTION.ZOOMACTUAL" : "缩放到实际尺寸",
+  "TOOLBAR.ACTION.ZOOMFIT" : "缩放到适当大小",
+  "TOOLBAR.ACTION.BENDPOINT.ADD" : "向选定的连线添加弯曲点",
+  "TOOLBAR.ACTION.BENDPOINT.REMOVE" : "向选定的连线移除弯曲点",
+  "TOOLBAR.ACTION.ALIGNHORIZONTAL" : "水平对齐",
+  "TOOLBAR.ACTION.ALIGNVERTICAL" : "垂直对齐",
+  "TOOLBAR.ACTION.SAMESIZE" : "相同大小",
+  "TOOLBAR.ACTION.HELP": "开始导游",
+  "TOOLBAR.ACTION.FEEDBACK": "提供反馈",
+
+  "FORM_TOOLBAR.ACTION.SAVE" : "保存模型",
+
+  "APP_DEFINITION_TOOLBAR.ACTION.SAVE" : "保存应用程序定义",
+
+  "BUTTON.ACTION.DELETE.TOOLTIP": "从模型中删除元素",
+  "BUTTON.ACTION.MORPH.TOOLTIP": "更改元素类型",
+
+  "ELEMENT.AUTHOR" : "作者",
+  "ELEMENT.DATE_CREATED" : "创建日期",
+
+  "PROPERTY.REMOVED" : "移除",
+  "PROPERTY.EMPTY" : "空值",
+  "PROPERTY.PROPERTY.EDIT.TITLE" : "更改值为",
+
+  "PROPERTY.FEEDBACK.TITLE" : "请填写您的反馈意见",
+
+  "PROPERTY.ASSIGNMENT.TITLE" : "分配",
+  "PROPERTY.ASSIGNMENT.TYPE" : "类型",
+  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE" : "身份存储",
+  "PROPERTY.ASSIGNMENT.TYPE.STATIC" : "固定值",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE" : "分配",
+  "PROPERTY.ASSIGNMENT.MATCHING" : "使用 &uparrow; 和 &downarrow;选择并按Enter确认或使用鼠标",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "输入分配人",
+  "PROPERTY.ASSIGNMENT.EMPTY" : "没有选择分配人",
+  "PROPERTY.ASSIGNMENT.NONE" : "未分配经办人",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "搜索用户",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "搜索组",
+  "PROPERTY.ASSIGNMENT.SEARCH": "搜索: ",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "分配人 {{assignee}}",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} 候选用户",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "候选用户",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY" :  "{{length}} 候选组",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS" :  "候选组",
+  "PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY": "用户 {{firstName}} {{lastName}}",
+  "PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY": "用户 {{email}}",
+  "PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY": "字段 {{name}}",
+  "PROPERTY.ASSIGNMENT.IDM_EMPTY" : "流程发起人",
+  "PROPERTY.ASSIGNMENT.IDM.TYPE" : "分配",
+  "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_USERS" : "没有选择候选人...",
+  "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_GROUPS" : "没有选择候选组...",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.INITIATOR" : "分配给流程发起人",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USER" : "分配给单个用户",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USERS" : "候选用户",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.GROUPS" : "候选组",
+  "PROPERTY.ASSIGNMENT.INITIATOR-CAN-COMPLETE" : "允许流程发起人完成任务",
+  "PROPERTY.EXECUTIONLISTENERS.DISPLAY" : "{{length}} 执行监听器",
+  "PROPERTY.EXECUTIONLISTENERS.EMPTY" : "没有配置执行监听器",
+  "PROPERTY.EXECUTIONLISTENERS.EVENT" : "事件",
+  "PROPERTY.EXECUTIONLISTENERS.CLASS" : "类",
+  "PROPERTY.EXECUTIONLISTENERS.CLASS.PLACEHOLDER" : "输入一个类名",
+  "PROPERTY.EXECUTIONLISTENERS.EXPRESSION" : "表达式",
+  "PROPERTY.EXECUTIONLISTENERS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION" : "委托表达式",
+  "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "输入一个委托表达式",
+  "PROPERTY.EXECUTIONLISTENERS.UNSELECTED" : "没有选择执行监听器",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME" : "名称",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION" : "表达式",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE" : "字符串值",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "输入一个字符串值",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING" : "字符串",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING.PLACEHOLDER" : "输入一个字符串",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.IMPLEMENTATION" : "实现",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY" : "未选择字段",
+
+  "PROPERTY.FIELDS" : "{{length}} 字段",
+  "PROPERTY.FIELDS.EMPTY" : "未选择字段",
+  "PROPERTY.FIELDS.NAME" : "名称",
+  "PROPERTY.FIELDS.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.FIELDS.EXPRESSION" : "表达式",
+  "PROPERTY.FIELDS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.FIELDS.STRINGVALUE" : "字符串值",
+  "PROPERTY.FIELDS.STRINGVALUE.PLACEHOLDER" : "输入一个字符串值",
+  "PROPERTY.FIELDS.STRING" : "字符串",
+  "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "输入一个字符串",
+  "PROPERTY.FIELDS.IMPLEMENTATION" : "实现",
+
+  "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} 数据对象",
+  "PROPERTY.DATAPROPERTIES.EMPTY" : "没有配置数据对象",
+  "PROPERTY.DATAPROPERTIES.ID" : "Id",
+  "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER" : "输入一个id",
+  "PROPERTY.DATAPROPERTIES.NAME" : "名称",
+  "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.DATAPROPERTIES.TYPE" : "类型",
+  "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER" : "输入一个值 (可选)",
+  "PROPERTY.DATAPROPERTIES.VALUE" : "默认值",
+
+  "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} 表单属性",
+  "PROPERTY.FORMPROPERTIES.EMPTY" : "没有选择表单属性",
+  "PROPERTY.FORMPROPERTIES.ID" : "Id",
+  "PROPERTY.FORMPROPERTIES.ID.PLACEHOLDER" : "输入一个id",
+  "PROPERTY.FORMPROPERTIES.NAME" : "名称",
+  "PROPERTY.FORMPROPERTIES.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.FORMPROPERTIES.TYPE" : "类型",
+  "PROPERTY.FORMPROPERTIES.DATEPATTERN" : "日期格式",
+  "PROPERTY.FORMPROPERTIES.DATEPATTERN.PLACEHOLDER" : "输入日期格式",
+  "PROPERTY.FORMPROPERTIES.VALUES" : "值",
+  "PROPERTY.FORMPROPERTIES.ENUMVALUES.EMPTY" : "未选择枚举值",
+  "PROPERTY.FORMPROPERTIES.VALUES.ID" : "Id",
+  "PROPERTY.FORMPROPERTIES.VALUES.NAME" : "名称",
+  "PROPERTY.FORMPROPERTIES.VALUES.ID.PLACEHOLDER" : "输入id值",
+  "PROPERTY.FORMPROPERTIES.VALUES.NAME.PLACEHOLDER" : "输入名称值",
+  "PROPERTY.FORMPROPERTIES.EXPRESSION" : "表达式",
+  "PROPERTY.FORMPROPERTIES.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.FORMPROPERTIES.VARIABLE" : "变量",
+  "PROPERTY.FORMPROPERTIES.VARIABLE.PLACEHOLDER" : "输入一个变量",
+  "PROPERTY.FORMPROPERTIES.DEFAULT" : "默认值",
+  "PROPERTY.FORMPROPERTIES.DEFAULT.PLACEHOLDER" : "输入一个默认值",
+  "PROPERTY.FORMPROPERTIES.REQUIRED" : "必须的",
+  "PROPERTY.FORMPROPERTIES.READABLE" : "可读的",
+  "PROPERTY.FORMPROPERTIES.WRITABLE" : "可写的",
+
+  "PROPERTY.INPARAMETERS.VALUE" : "{{length}}个输入参数",
+  "PROPERTY.INPARAMETERS.EMPTY" : "没有配置输入参数",
+
+  "PROPERTY.OUTPARAMETERS.VALUE" : "{{length}}个输出参数",
+  "PROPERTY.OUTPARAMETERS.EMPTY" : "没有配置输出参数",
+
+  "PROPERTY.PARAMETER.SOURCE" : "源",
+  "PROPERTY.PARAMETER.SOURCE.PLACEHOLDER" : "输入一个源",
+  "PROPERTY.PARAMETER.SOURCEEXPRESSION" : "源表达式",
+  "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "输入一个源表达式",
+  "PROPERTY.PARAMETER.TARGET" : "目标",
+  "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "输入一个目标",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION" : "目标表达式",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER" : "输入一个目标表达式",
+  "PROPERTY.PARAMETER.EMPTY" : "没有选择参数",
+
+  "PROPERTY.PROCESSREFERENCE.EMPTY" : "没有选择引用",
+  "PROPERTY.PROCESSREFERENCE.TITLE" : "流程参考",
+  "PROPERTY.PROCESSREFERENCE.ERROR.PROCESS" : "加载流程出错。稍后再试一次",
+  "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING" : "加载流程...",
+  "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY" : "此文件夹不包含流程",
+
+  "PROPERTY.FORMREFERENCE.EMPTY" : "没有选择参考",
+  "PROPERTY.FORMREFERENCE.TITLE" : "表单引用",
+  "PROPERTY.FORMREFERENCE.DESCRIPTION" : "引用表单",
+  "PROPERTY.FORMREFERENCE.ERROR.FORM" : "加载表单出错。稍后再试一次",
+  "PROPERTY.FORMREFERENCE.FORM.LOADING" : "加载表单...",
+  "PROPERTY.FORMREFERENCE.FORM.EMPTY" : "此文件夹不包含表单",
+
+  "PROPERTY.TASKLISTENERS.VALUE" : "{{length}}任务监听器",
+  "PROPERTY.TASKLISTENERS.EMPTY" : "没有配置任务监听器",
+  "PROPERTY.TASKLISTENERS.EVENT" : "事件",
+  "PROPERTY.TASKLISTENERS.CLASS" : "类",
+  "PROPERTY.TASKLISTENERS.CLASS.PLACEHOLDER" : "输入一个类名",
+  "PROPERTY.TASKLISTENERS.EXPRESSION" : "表达式",
+  "PROPERTY.TASKLISTENERS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION" : "委托表达式",
+  "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "输入一个委托表达式",
+  "PROPERTY.TASKLISTENERS.UNSELECTED" : "没有选择任务监听器",
+  "PROPERTY.TASKLISTENERS.FIELDS.NAME" : "名称",
+  "PROPERTY.TASKLISTENERS.FIELDS.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION" : "表达式",
+  "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE" : "字符串值",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "输入一个字符串值",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRING" : "字符串",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRING.PLACEHOLDER" : "输入一个字符串",
+  "PROPERTY.TASKLISTENERS.FIELDS.IMPLEMENTATION" : "实现",
+  "PROPERTY.TASKLISTENERS.FIELDS.EMPTY" : "没有选择字段",
+
+  "PROPERTY.EVENTLISTENERS.DISPLAY" : "{{length}} 事件监听器",
+  "PROPERTY.EVENTLISTENERS.EMPTY" : "没有配置事件监听器",
+  "PROPERTY.EVENTLISTENERS.EVENTS": "事件",
+  "PROPERTY.EVENTLISTENERS.RETHROW": "Rethrow event?",
+  "PROPERTY.EVENTLISTENERS.CLASS" : "类",
+  "PROPERTY.EVENTLISTENERS.CLASS.PLACEHOLDER" : "输入一个类名",
+  "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION" : "委托表达式",
+  "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "输入一个委托表达式",
+  "PROPERTY.EVENTLISTENERS.ENTITYTYPE" : "实体类型",
+  "PROPERTY.EVENTLISTENERS.ENTITYTYPE.PLACEHOLDER" : "输入一个实体类型",
+  "PROPERTY.EVENTLISTENERS.RETHROWTYPE": "Rethrow event type",
+  "PROPERTY.EVENTLISTENERS.ERRORCODE" : "错误码",
+  "PROPERTY.EVENTLISTENERS.ERRORCODE.PLACEHOLDER" : "输入一个错误码",
+  "PROPERTY.EVENTLISTENERS.MESSAGENAME" : "消息名称",
+  "PROPERTY.EVENTLISTENERS.MESSAGENAME.PLACEHOLDER" : "输入一个消息名称",
+  "PROPERTY.EVENTLISTENERS.SIGNALNAME" : "信号名称",
+  "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER" : "输入信号名称",
+  "PROPERTY.EVENTLISTENERS.UNSELECTED" : "没有选择事件监听器",
+
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.VALUE" : "{{length}}个生命周期侦听器",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EMPTY" : "未配置生命周期侦听器",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EVENT" : "事件",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.SOURCE_STATE" : "源状态",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.TARGET_STATE" : "目标状态",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS" : "类",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS.PLACEHOLDER" : "输入一个类名",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION" : "表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION" : "委托表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "输入一个委托表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.UNSELECTED" : "未选择任务监听器",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME" : "名称",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME.PLACEHOLDER" : "输入一个名称",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION" : "表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "输入一个表达式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE" : "字符值",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "输入一个字符值",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING" : "字符",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING.PLACEHOLDER" : "输入一个字符值",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.IMPLEMENTATION" : "实现",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EMPTY" : "没有选中字段",
+
+  "PROPERTY.SIGNALDEFINITIONS.DISPLAY" : "{{length}} 信号定义",
+  "PROPERTY.SIGNALDEFINITIONS.EMPTY" : "没有配置信号定义",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "全局",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "流程实例",
+  "PROPERTY.SIGNALDEFINITIONS.ID" : "Id",
+  "PROPERTY.SIGNALDEFINITIONS.NAME" : "名称",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE" : "Scope",
+
+  "PROPERTY.MESSAGEDEFINITIONS.DISPLAY" : "{{length}} 消息定义",
+  "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "没有配置消息定义",
+  "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
+  "PROPERTY.MESSAGEDEFINITIONS.NAME" : "名称",
+
+  "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} 个升级定义",
+  "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "没有配置升级定义",
+  "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
+  "PROPERTY.ESCALATIONDEFINITIONS.NAME" : "名称",
+
+  "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "没有确定连线的顺序",
+  "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "设置连线的顺序",
+  "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "没有发现流出连线.",
+  "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION" : "设置需要评估连线的顺序:",
+  "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE" : "连线到 {{targetType}} {{targetTitle}}",
+
+  "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE" : "连线条件",
+  "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC" : "条件表达式",
+  "PROPERTY.SEQUENCEFLOW.CONDITION.NO-CONDITION-DISPLAY": "没有设置条件",
+
+  "PROPERTY.DUEDATE.EMPTY" : "没有到期",
+  "PROPERTY.DUEDATE.DEFINED" : "定义到期日",
+  "PROPERTY.DUEDATE.TITLE" : "到期日",
+  "PROPERTY.DUEDATE.EXPRESSION-LABEL" : "到期日表达式",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.NO-DUEDATE" : "没有到期日",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "表达式定义",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "任务创建后的固定持续时间",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "基于字段",
+
+  "MODEL.SAVE.TITLE" : "保存模型",
+  "MODEL.VALIDATE.TITLE" : "验证结果",
+  "MODEL.NAME" : "名称",
+  "MODEL.KEY" : "Key",
+  "MODEL.DESCRIPTION" : "描述",
+  "MODEL.SAVE.NEWVERSION" : "将此保存为新版本？这意味着你可以回到以前的版本。",
+  "MODEL.SAVE.COMMENT" : "评论",
+  "MODEL.SAVE.SAVING" : "正在保存模型",
+  "MODEL.LASTMODIFIEDDATE" : "最后保存",
+  "MODEL.SAVE.ERROR": "Unexpected error: 不能保存模型",
+  "MODEL.VALIDATIONERRORS": " 注意，模型包含验证错误。这意味着该模型在当前状态下不能部署在Flowable引擎上。",
+  "MODEL.CONFLICT.WRITE": "不能保存模型: '{{userFullName}}'对该模型进行了更改",
+  "MODEL.CONFLICT.WRITE.OPTIONS": "选择一个选项来解决此冲突:",
+  "MODEL.CONFLICT.WRITE.OPTION.OVERWRITE": "覆盖其他模型",
+  "MODEL.CONFLICT.WRITE.OPTION.DISCARDCHANGES": "放弃我的改变",
+  "MODEL.CONFLICT.WRITE.OPTION.SAVEAS": "保存为新模型",
+  "MODEL.CONFLICT.WRITE.OPTION.NEWVERSION": "创建新版本",
+  "MODEL.CONFLICT.SAVEAS" : "另存为:",
+
+  "EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP": "一项活动将作为对另一活动的补偿而被执行。事件针对即将执行的活动进行补偿。",
+  "EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP": "一项活动已圆满完成。",
+  "EVENT_TYPE.ACTIVITY.ERROR.RECEIVED.TOOLTIP": "活动已接收到错误事件。在活动接收到实际错误之前发送",
+  "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "创建了新的membership",
+  "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "单个membership已被删除",
+  "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "相关组中的所有成员已被删除。由于可能的原因，个别事件不会被派遣。",
+  "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "一个任务已经被分配人了。这将抛出一个实体更新事件",
+  "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "一个任务已经被完成。在删除任务实体之前调度",
+  "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "当BPMN错误被抛出，但未在流程中捕获时",
+  "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "已经创建了一个新的变量",
+  "EVENT_TYPE.VARIABLE.DELETED.TOOLTIP": "已删除现有变量",
+  "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "已更新现有变量",
+
+  "PROPERTY.DECISIONTABLEREFERENCE.EMPTY" : "没有选择引用",
+  "PROPERTY.DECISIONTABLEREFERENCE.TITLE" : "决策表引用",
+  "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "加载决策表出现错误. 稍后再试一次",
+  "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "加载决策表...",
+  "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "此文件夹不包含任何决策表",
+
+  "PROPERTY.CASEREFERENCE.EMPTY" : "没有选择引用",
+  "PROPERTY.CASEREFERENCE.TITLE" : "案例型引用",
+  "PROPERTY.CASEREFERENCE.ERROR.FORM" : "加载案例模型时出错。稍后再试一次",
+  "PROPERTY.CASEREFERENCE.CASE.LOADING" : "加载案例模型...",
+  "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "此文件夹不包含任何案例模型"
+}

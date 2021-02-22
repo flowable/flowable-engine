@@ -12,17 +12,21 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableException;
@@ -60,13 +64,14 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if ((PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(timerEventListener.getAvailableConditionExpression()))
                 || PlanItemTransition.INITIATE.equals(transition)) {
+            
             handleCreateTransition(commandContext, (PlanItemInstanceEntity) planItemInstance);
 
         } else if (PlanItemTransition.DISMISS.equals(transition)
                 || PlanItemTransition.TERMINATE.equals(transition)
                 || PlanItemTransition.EXIT.equals(transition)) {
+            
             removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
-
         }
     }
 
@@ -110,11 +115,15 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
 
                 }
 
+            } else if (timerValue instanceof Instant) {
+                timerDueDate = Date.from((Instant) timerValue);
+
             }
         }
 
         if (timerDueDate == null) {
             throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
+                    + "java.time.Instant, "
                     + "an ISO8601 date/duration/repetition string or a cron expression");
         }
 
@@ -125,7 +134,8 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             Object timerValue, Date timerDueDate, boolean isRepeating) {
         
         if (timerDueDate != null) {
-            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            JobServiceConfiguration jobServiceConfiguration = cmmnEngineConfiguration.getJobServiceConfiguration();
             TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
             timer.setJobType(JobEntity.JOB_TYPE_TIMER);
             timer.setJobHandlerType(TriggerTimerEventJobHandler.TYPE);
@@ -135,6 +145,20 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
             timer.setSubScopeId(planItemInstanceEntity.getId());
+            
+            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
+            List<ExtensionElement> jobCategoryElements = planItemDefinition.getExtensionElements().get("jobCategory");
+            if (jobCategoryElements != null && jobCategoryElements.size() > 0) {
+                ExtensionElement jobCategoryElement = jobCategoryElements.get(0);
+                if (StringUtils.isNotEmpty(jobCategoryElement.getElementText())) {
+                    Expression categoryExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(jobCategoryElement.getElementText());
+                    Object categoryValue = categoryExpression.getValue(planItemInstanceEntity);
+                    if (categoryValue != null) {
+                        timer.setCategory(categoryValue.toString());
+                    }
+                }
+            }
+            
             timer.setScopeType(ScopeTypes.CMMN);
             timer.setElementId(timerEventListener.getId());
             timer.setElementName(timerEventListener.getName());

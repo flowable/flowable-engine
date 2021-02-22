@@ -47,7 +47,7 @@ public class FormRestResponseFactory {
 
     public List<FormInstanceResponse> createFormInstanceResponse(List<FormInstance> formInstances) {
         FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
-        List<FormInstanceResponse> responseList = new ArrayList<>();
+        List<FormInstanceResponse> responseList = new ArrayList<>(formInstances.size());
         for (FormInstance formInstance : formInstances) {
             responseList.add(createFormInstanceResponse(formInstance, urlBuilder));
         }
@@ -68,7 +68,7 @@ public class FormRestResponseFactory {
 
     public List<FormInstanceModelResponse> createFormInstanceModelResponse(List<FormInstanceInfo> formInstanceModels) {
         FormRestUrlBuilder urlBuilder = new FormRestUrlBuilder();
-        List<FormInstanceModelResponse> responseList = new ArrayList<>();
+        List<FormInstanceModelResponse> responseList = new ArrayList<>(formInstanceModels.size());
         for (FormInstanceInfo formInstanceModel : formInstanceModels) {
             responseList.add(createFormInstanceModelResponse(formInstanceModel, urlBuilder));
         }
@@ -100,7 +100,7 @@ public class FormRestResponseFactory {
 
     public List<FormDefinitionResponse> createFormResponseList(List<FormDefinition> formDefinitions) {
         FormRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<FormDefinitionResponse> responseList = new ArrayList<>();
+        List<FormDefinitionResponse> responseList = new ArrayList<>(formDefinitions.size());
         for (FormDefinition formDefinition : formDefinitions) {
             responseList.add(createFormDefinitionResponse(formDefinition, urlBuilder));
         }
@@ -109,7 +109,7 @@ public class FormRestResponseFactory {
 
     public List<FormDeploymentResponse> createFormDeploymentResponseList(List<FormDeployment> deployments) {
         FormRestUrlBuilder urlBuilder = createUrlBuilder();
-        List<FormDeploymentResponse> responseList = new ArrayList<>();
+        List<FormDeploymentResponse> responseList = new ArrayList<>(deployments.size());
         for (FormDeployment instance : deployments) {
             responseList.add(createFormDeploymentResponse(instance, urlBuilder));
         }

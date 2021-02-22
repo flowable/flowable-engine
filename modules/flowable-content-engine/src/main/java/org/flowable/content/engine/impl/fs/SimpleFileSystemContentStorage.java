@@ -12,24 +12,27 @@
  */
 package org.flowable.content.engine.impl.fs;
 
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.content.api.ContentMetaDataKeys;
-import org.flowable.content.api.ContentObject;
-import org.flowable.content.api.ContentStorage;
-import org.flowable.content.api.ContentStorageException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.content.api.ContentMetaDataKeys;
+import org.flowable.content.api.ContentObject;
+import org.flowable.content.api.ContentObjectStorageMetadata;
+import org.flowable.content.api.ContentStorage;
+import org.flowable.content.api.ContentStorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedGenerator;
 
 /**
  * (Very) simple implementation of the {@link ContentStorage} that relies on the passed metadata to store content.
@@ -91,7 +94,13 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     }
 
     @Override
+    @Deprecated
     public ContentObject createContentObject(InputStream contentStream, Map<String, Object> metaData) {
+        return createContentObject(contentStream, new MapBasedContentObjectStorageMetadata(metaData));
+    }
+
+    @Override
+    public ContentObject createContentObject(InputStream contentStream, ContentObjectStorageMetadata metaData) {
         String uuid = UUID_GENERATOR.generate().toString();
         File file = getContentFile(metaData, uuid);
         try (FileOutputStream fos = new FileOutputStream(file, false)) {
@@ -103,22 +112,22 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
         }
     }
 
-    protected String generateContentId(String uuid, Map<String, Object> metaData) {
+    protected String generateContentId(String uuid, ContentObjectStorageMetadata metaData) {
         String contentId = "";
         String type = determineType(metaData);
         switch (type) {
             case TYPE_PROCESS_INSTANCE:
-                String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
+                String processInstanceId = metaData.getScopeId();
                 contentId = PROCESS_INSTANCE_PREFIX + "." + processInstanceId;
                 break;
 
             case TYPE_TASK:
-                String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
+                String taskId = metaData.getScopeId();
                 contentId = TASK_PREFIX + "." + taskId;
                 break;
 
             case TYPE_CASE_INSTANCE:
-                String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
+                String caseId = metaData.getScopeId();
                 contentId = CASE_PREFIX + "." + caseId;
                 break;
 
@@ -127,14 +136,20 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
                 break;
 
             default:
-                contentId = type + "." + metaData.get(ContentMetaDataKeys.SCOPE_ID);
+                contentId = type + "." + metaData.getScopeId();
         }
         contentId += "." + uuid;
         return contentId;
     }
 
     @Override
+    @Deprecated
     public ContentObject updateContentObject(String id, InputStream contentStream, Map<String, Object> metaData) {
+        return updateContentObject(id, contentStream, new MapBasedContentObjectStorageMetadata(metaData));
+    }
+
+    @Override
+    public ContentObject updateContentObject(String id, InputStream contentStream, ContentObjectStorageMetadata metaData) {
         File contentFile = getContentFile(id);
 
         // Write stream to a temporary file and rename when content is read
@@ -201,7 +216,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             File subFolder=null;
             if (PROCESS_INSTANCE_PREFIX.equals(typePrefix)) {
                 subFolder = processInstanceFolder;
-            } else if(TASK_PREFIX.equals(typePrefix)) {
+            } else if (TASK_PREFIX.equals(typePrefix)) {
                 subFolder = taskFolder;
             } else if (CASE_PREFIX.equals(typePrefix)) {
                 subFolder = caseFolder;
@@ -247,49 +262,43 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
         return "file";
     }
 
-    protected File getContentFile(Map<String, Object> metaData, String contentId) {
+    protected File getContentFile(ContentObjectStorageMetadata metaData, String contentId) {
         return new File(createOrGetFolderBasedOnMetaData(metaData), contentId);
     }
 
-    protected String determineType(Map<String, Object> metaData) {
-        String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
-        if (StringUtils.isNotEmpty(processInstanceId)) {
+    protected String determineType(ContentObjectStorageMetadata metaData) {
+        String scopeType = metaData.getScopeType();
+        if (ScopeTypes.BPMN.equals(scopeType)) {
             return TYPE_PROCESS_INSTANCE;
-        }
-
-        String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
-        if (StringUtils.isNotEmpty(taskId)) {
+        } else if (ScopeTypes.TASK.equals(scopeType)) {
             return TYPE_TASK;
-        }
-
-        String scopeType = (String) metaData.get(ContentMetaDataKeys.SCOPE_TYPE);
-        if (StringUtils.isNotEmpty(scopeType)) {
+        } else if (StringUtils.isNotEmpty(scopeType)) {
             return scopeType;
         }
 
         return TYPE_UNCATEGORIZED;
     }
 
-    protected File createOrGetFolderBasedOnMetaData(Map<String, Object> metaData) {
+    protected File createOrGetFolderBasedOnMetaData(ContentObjectStorageMetadata metaData) {
         String type = determineType(metaData);
         switch (type) {
         case TYPE_PROCESS_INSTANCE:
-            String processInstanceId = (String) metaData.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
+            String processInstanceId = metaData.getScopeId();
             return internalCreateOrGetFolder(processInstanceFolder, processInstanceId);
 
         case TYPE_TASK:
-            String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
+            String taskId = metaData.getScopeId();
             return internalCreateOrGetFolder(taskFolder, taskId);
 
         case TYPE_CASE_INSTANCE:
-            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
+            String caseId = metaData.getScopeId();
             return internalCreateOrGetFolder(caseFolder, caseId);
 
         case TYPE_UNCATEGORIZED:
             return uncategorizedFolder;
 
         default:
-            return internalCreateOrGetFolder(validateOrCreateFolder(type), (String) metaData.get(ContentMetaDataKeys.SCOPE_ID));
+            return internalCreateOrGetFolder(validateOrCreateFolder(type), metaData.getScopeId());
         }
     }
 
@@ -299,6 +308,57 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             folder.mkdir();
         }
         return folder;
+    }
+
+    protected static class MapBasedContentObjectStorageMetadata implements ContentObjectStorageMetadata {
+
+        protected final Map<String, Object> map;
+
+        public MapBasedContentObjectStorageMetadata(Map<String, Object> map) {
+            this.map = map;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public String getScopeId() {
+            if (map.containsKey(ContentMetaDataKeys.TASK_ID)) {
+                return (String) map.get(ContentMetaDataKeys.TASK_ID);
+            } else if (map.containsKey(ContentMetaDataKeys.PROCESS_INSTANCE_ID)) {
+                return (String) map.get(ContentMetaDataKeys.PROCESS_INSTANCE_ID);
+            } else {
+                return (String) map.get(ContentMetaDataKeys.SCOPE_ID);
+            }
+        }
+
+        @Override
+        public String getScopeType() {
+            if (map.containsKey(ContentMetaDataKeys.TASK_ID)) {
+                return ScopeTypes.TASK;
+            } else if (map.containsKey(ContentMetaDataKeys.PROCESS_INSTANCE_ID)) {
+                return ScopeTypes.BPMN;
+            } else {
+                return (String) map.get(ContentMetaDataKeys.SCOPE_TYPE);
+            }
+        }
+
+        @Override
+        public String getMimeType() {
+            return null;
+        }
+
+        @Override
+        public String getTenantId() {
+            return null;
+        }
+
+        @Override
+        public Object getStoredObject() {
+            return null;
+        }
     }
 
 }

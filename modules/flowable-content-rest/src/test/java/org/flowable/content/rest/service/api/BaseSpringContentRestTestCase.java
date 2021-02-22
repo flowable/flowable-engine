@@ -12,16 +12,13 @@
  */
 package org.flowable.content.rest.service.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -58,12 +55,18 @@ import org.flowable.content.rest.ContentRestUrlBuilder;
 import org.flowable.content.rest.conf.ApplicationConfiguration;
 import org.flowable.content.rest.util.TestServerUtil;
 import org.flowable.content.rest.util.TestServerUtil.TestServer;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 public abstract class BaseSpringContentRestTestCase extends AbstractContentTestCase {
 
@@ -178,22 +181,20 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                 request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json"));
             }
             response = client.execute(request);
-            Assert.assertNotNull(response.getStatusLine());
+            assertThat(response.getStatusLine()).isNotNull();
 
             int responseStatusCode = response.getStatusLine().getStatusCode();
             if (expectedStatusCode != responseStatusCode) {
                 LOGGER.info("Wrong status code : {}, but should be {}", responseStatusCode, expectedStatusCode);
-                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent()));
+                LOGGER.info("Response body: {}", IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8));
             }
 
-            Assert.assertEquals(expectedStatusCode, responseStatusCode);
+            assertThat(responseStatusCode).isEqualTo(expectedStatusCode);
             httpResponses.add(response);
             return response;
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
         return null;
     }
@@ -244,7 +245,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
@@ -253,7 +254,9 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             String id = it.next().get("id").textValue();
             toBeFound.remove(id);
         }
-        assertTrue("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+        assertThat(toBeFound)
+                .as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                .isEmpty();
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
@@ -275,7 +278,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
             // Check status and size
             JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
             JsonNode dataNode = rootNode.get("data");
-            assertEquals(numberOfResultsExpected, dataNode.size());
+            assertThat(dataNode).hasSize(numberOfResultsExpected);
 
             // Check presence of ID's
             if (expectedResourceIds != null) {
@@ -285,7 +288,9 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
                     String id = it.next().get("id").textValue();
                     toBeFound.remove(id);
                 }
-                assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+                assertThat(toBeFound)
+                        .as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "))
+                        .isEmpty();
             }
         }
 
@@ -299,7 +304,7 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(0, dataNode.size());
+        assertThat(dataNode).isEmpty();
     }
 
     /**
@@ -352,5 +357,12 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         contentItem.setLastModifiedBy(lastModifiedBy);
 
         return contentItem;
+    }
+
+    protected String getISODateStringWithTZ(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 }

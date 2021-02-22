@@ -34,6 +34,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private String processInstanceNameLike;
     private String processInstanceNameLikeIgnoreCase;
     private String processBusinessKey;
+    private String processBusinessKeyLike;
     private String processDefinitionId;
     private Set<String> processDefinitionIds;
     private String processDefinitionKey;
@@ -47,6 +48,8 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private String superProcessInstanceId;
     private String subProcessInstanceId;
     private Boolean excludeSubprocesses;
+    private String activeActivityId;
+    private Set<String> activeActivityIds;
     private String involvedUser;
     private String startedBy;
     private Date startedBefore;
@@ -108,6 +111,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
         this.processBusinessKey = processBusinessKey;
     }
 
+    public String getProcessBusinessKeyLike() {
+        return processBusinessKeyLike;
+    }
+
+    public void setProcessBusinessKeyLike(String processBusinessKeyLike) {
+        this.processBusinessKeyLike = processBusinessKeyLike;
+    }
+    
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -234,6 +245,22 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setStartedAfter(Date startedAfter) {
         this.startedAfter = startedAfter;
+    }
+
+    public String getActiveActivityId() {
+        return activeActivityId;
+    }
+
+    public void setActiveActivityId(String activeActivityId) {
+        this.activeActivityId = activeActivityId;
+    }
+
+    public Set<String> getActiveActivityIds() {
+        return activeActivityIds;
+    }
+
+    public void setActiveActivityIds(Set<String> activeActivityIds) {
+        this.activeActivityIds = activeActivityIds;
     }
 
     public String getInvolvedUser() {

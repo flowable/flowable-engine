@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens
@@ -58,6 +58,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use @{link #allOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean contains(Object collection, Object value) {
         return allOf(collection, value);
@@ -97,6 +100,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use @{link #noneOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean notContains(Object collection, Object value) {
         return noneOf(collection, value);
@@ -124,18 +130,21 @@ public class CollectionUtil {
         // elements to check
         if (DMNParseUtil.isParseableCollection(value)) {
             Collection valueCollection = DMNParseUtil.parseCollection(value, targetCollection);
-            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
+            return CollectionUtils.containsAny(targetCollection, valueCollection);
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
             Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
-            return valueCollection != null && CollectionUtils.containsAny(targetCollection, valueCollection);
+            return CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
             return targetCollection.contains(formattedValue);
         }
     }
 
+    /**
+     * @deprecated use @{link #anyof(Object, Object)} instead
+     */
     @Deprecated
     public static boolean containsAny(Object collection, Object value) {
         return anyOf(collection, value);
@@ -175,6 +184,9 @@ public class CollectionUtil {
         }
     }
 
+    /**
+     * @deprecated use {@link #notAllOf(Object, Object)} instead
+     */
     @Deprecated
     public static boolean notContainsAny(Object collection, Object value) {
         return notAllOf(collection, value);

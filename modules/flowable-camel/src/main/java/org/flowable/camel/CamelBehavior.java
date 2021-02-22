@@ -31,6 +31,7 @@ import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.context.Flowable5CompatibilityContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -48,7 +49,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  * now extend one one or the other. 
  * <p>
  * The chosen implementation can be set using extension elements:
- * <p>
+ *
  * <pre>
  * {@code
  * <serviceTask id="serviceTask1" flowable:type="camel">
@@ -113,7 +114,14 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     public void execute(DelegateExecution execution) {
         setAppropriateCamelContext(execution);
 
-        final FlowableEndpoint endpoint = createEndpoint(execution);
+        boolean isV5Execution = false;
+        if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
+            (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
+
+            isV5Execution = true;
+        }
+
+        final FlowableEndpoint endpoint = createEndpoint(execution, isV5Execution);
         final Exchange exchange = createExchange(execution, endpoint);
 
         try {
@@ -122,13 +130,6 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
             throw new FlowableException("Exception while processing exchange", e);
         }
         execution.setVariables(ExchangeUtils.prepareVariables(exchange, endpoint));
-
-        boolean isV5Execution = false;
-        if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-                (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
-
-            isV5Execution = true;
-        }
 
         if (!handleCamelException(exchange, execution, isV5Execution)) {
             if (isV5Execution) {
@@ -140,8 +141,8 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         }
     }
 
-    protected FlowableEndpoint createEndpoint(DelegateExecution execution) {
-        String uri = "flowable://" + getProcessDefinitionKey(execution) + ":" + execution.getCurrentActivityId();
+    protected FlowableEndpoint createEndpoint(DelegateExecution execution, boolean isV5Execution) {
+        String uri = "flowable://" + getProcessDefinitionKey(execution, isV5Execution) + ":" + execution.getCurrentActivityId();
         return getEndpoint(uri);
     }
 
@@ -213,8 +214,13 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         }
     }
 
-    protected String getProcessDefinitionKey(DelegateExecution execution) {
-        Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+    protected String getProcessDefinitionKey(DelegateExecution execution, boolean isV5Execution) {
+        Process process = null;
+        if (isV5Execution) {
+            process = Flowable5CompatibilityContext.getFallbackFlowable5CompatibilityHandler().getProcessDefinitionProcessObject(execution.getProcessDefinitionId());
+        } else {
+            process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+        }
         return process.getId();
     }
 

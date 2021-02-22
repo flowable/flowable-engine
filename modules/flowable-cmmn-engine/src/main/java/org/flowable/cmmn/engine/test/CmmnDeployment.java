@@ -22,8 +22,23 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CmmnDeployment {
 
-    public String[] resources() default {};
+    /**
+     * Specify all the resources that make up the deployment.
+     * When using this property, all resources should be passed, as no automatic detection will be done.
+     */
+    String[] resources() default {};
 
-    public String tenantId() default "";
+    /**
+     * Specify resources that are extra, on top of the automatically detected test resources.
+     *
+     * This is for example useful when testing a CMMN model with a case task and that case definition needs to be included too.
+     * When using the 'resources' property, both should be passed. With this property, only the called case definition needs to be set.
+     */
+    String[] extraResources() default {};
+
+    /**
+     * Specify tenantId to deploy for
+     */
+    String tenantId() default "";
     
 }

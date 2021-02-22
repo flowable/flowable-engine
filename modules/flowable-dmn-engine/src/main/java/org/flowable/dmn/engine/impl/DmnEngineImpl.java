@@ -12,10 +12,11 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
@@ -32,7 +33,7 @@ public class DmnEngineImpl implements DmnEngine {
     protected String name;
     protected DmnManagementService dmnManagementService;
     protected DmnRepositoryService dmnRepositoryService;
-    protected DmnRuleService dmnRuleService;
+    protected DmnDecisionService dmnDecisionService;
     protected DmnHistoryService dmnHistoryService;
     protected DmnEngineConfiguration dmnEngineConfiguration;
 
@@ -41,7 +42,7 @@ public class DmnEngineImpl implements DmnEngine {
         this.name = dmnEngineConfiguration.getEngineName();
         this.dmnManagementService = dmnEngineConfiguration.getDmnManagementService();
         this.dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        this.dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+        this.dmnDecisionService = dmnEngineConfiguration.getDmnDecisionService();
         this.dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
         
         if (dmnEngineConfiguration.getSchemaManagementCmd() != null) {
@@ -55,12 +56,24 @@ public class DmnEngineImpl implements DmnEngine {
         }
 
         DmnEngines.registerDmnEngine(this);
+
+        if (dmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : dmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
 
     @Override
     public void close() {
         DmnEngines.unregister(this);
         dmnEngineConfiguration.close();
+
+        if (dmnEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : dmnEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
 
     // getters and setters
@@ -82,8 +95,8 @@ public class DmnEngineImpl implements DmnEngine {
     }
 
     @Override
-    public DmnRuleService getDmnRuleService() {
-        return dmnRuleService;
+    public DmnDecisionService getDmnDecisionService() {
+        return dmnDecisionService;
     }
     
     @Override

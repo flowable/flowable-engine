@@ -15,6 +15,7 @@ package org.flowable.dmn.converter.child;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.converter.util.DmnXMLUtil;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
@@ -35,7 +36,7 @@ public class InputEntryParser extends BaseChildElementParser {
     }
 
     @Override
-    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
+    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
         if (!(parentElement instanceof DecisionRule))
             return;
 
@@ -46,6 +47,7 @@ public class InputEntryParser extends BaseChildElementParser {
 
         // determine corresponding input clause based on position
         InputClause inputClause = null;
+        DecisionTable decisionTable = (DecisionTable) decision.getExpression();
         if (decisionTable.getInputs() != null) {
             if (decisionTable.getInputs().get(rule.getInputEntries().size()) != null) {
                 inputClause = decisionTable.getInputs().get(rule.getInputEntries().size());

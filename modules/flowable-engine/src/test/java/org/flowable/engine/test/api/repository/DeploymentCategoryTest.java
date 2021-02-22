@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,29 +48,29 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
             deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").category("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
             DeploymentQuery query = repositoryService.createDeploymentQuery();
-            assertEquals(4, query.list().size());
+            assertThat(query.list()).hasSize(4);
 
             Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategory("one").list());
 
             Set<String> expectedDeploymentNames = new HashSet<>();
             expectedDeploymentNames.add("1");
 
-            assertEquals(expectedDeploymentNames, deploymentNames);
+            assertThat(deploymentNames).isEqualTo(expectedDeploymentNames);
 
             deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentCategoryNotEquals("two").list());
 
             expectedDeploymentNames.add("0");
 
-            assertEquals(expectedDeploymentNames, deploymentNames);
+            assertThat(deploymentNames).isEqualTo(expectedDeploymentNames);
 
             deploymentTwoNoCategory = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
             Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
-            assertNull(deploymentNoCategory.getCategory());
+            assertThat(deploymentNoCategory.getCategory()).isNull();
 
             repositoryService.setDeploymentCategory(deploymentTwoNoCategory, "newCategory");
             deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoCategory).singleResult();
-            assertEquals("newCategory", deploymentNoCategory.getCategory());
+            assertThat(deploymentNoCategory.getCategory()).isEqualTo("newCategory");
 
         } finally {
             if (noCategoryDeploymentId != null)
@@ -102,23 +104,23 @@ public class DeploymentCategoryTest extends PluggableFlowableTestCase {
             deploymentTwoV2Id = repositoryService.createDeployment().name("2v2").key("two").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
             DeploymentQuery query = repositoryService.createDeploymentQuery();
-            assertEquals(4, query.list().size());
+            assertThat(query.list()).hasSize(4);
 
             Set<String> deploymentNames = getDeploymentNames(repositoryService.createDeploymentQuery().deploymentKey("one").list());
 
             Set<String> expectedDeploymentNames = new HashSet<>();
             expectedDeploymentNames.add("1");
 
-            assertEquals(expectedDeploymentNames, deploymentNames);
+            assertThat(deploymentNames).isEqualTo(expectedDeploymentNames);
 
             deploymentTwoNoKey = repositoryService.createDeployment().name("noCategory").addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml").deploy().getId();
 
             Deployment deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
-            assertNull(deploymentNoCategory.getCategory());
+            assertThat(deploymentNoCategory.getCategory()).isNull();
 
             repositoryService.setDeploymentKey(deploymentTwoNoKey, "newKey");
             deploymentNoCategory = repositoryService.createDeploymentQuery().deploymentId(deploymentTwoNoKey).singleResult();
-            assertEquals("newKey", deploymentNoCategory.getKey());
+            assertThat(deploymentNoCategory.getKey()).isEqualTo("newKey");
 
         } finally {
             if (noKeyDeploymentId != null)

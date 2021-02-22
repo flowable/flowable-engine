@@ -20,6 +20,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -48,15 +49,15 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
             }
 
             CommandContext commandContext = Context.getCommandContext();
-            EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService(commandContext);
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<SignalEventSubscriptionEntity> subscriptionEntities = null;
             if (processInstanceScope) {
                 subscriptionEntities = eventSubscriptionService.findSignalEventSubscriptionsByProcessInstanceAndEventName(engineEvent.getProcessInstanceId(), signalName);
             } else {
                 String tenantId = null;
                 if (engineEvent.getProcessDefinitionId() != null) {
-                    ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext)
-                            .getDeploymentManager()
+                    ProcessDefinition processDefinition = processEngineConfiguration.getDeploymentManager()
                             .findDeployedProcessDefinitionById(engineEvent.getProcessDefinitionId());
                     tenantId = processDefinition.getTenantId();
                 }

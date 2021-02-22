@@ -12,81 +12,61 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SimpleConverterTest extends AbstractConverterTest {
+class SimpleConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
+    @BpmnXmlConverterTest("simplemodel.bpmn")
+    void validateModel(BpmnModel model) {
+        assertThat(model.getDefinitionsAttributes()).hasSize(2);
+        assertThat(model.getDefinitionsAttributeValue("http://flowable.org/modeler", "version")).isEqualTo("2.2A");
+        assertThat(model.getDefinitionsAttributeValue("http://flowable.org/modeler", "exportDate")).isEqualTo("20140312T10:45:23");
 
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "simplemodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
-        assertEquals(2, model.getDefinitionsAttributes().size());
-        assertEquals("2.2A", model.getDefinitionsAttributeValue("http://flowable.org/modeler", "version"));
-        assertEquals("20140312T10:45:23", model.getDefinitionsAttributeValue("http://flowable.org/modeler", "exportDate"));
-
-        assertEquals("simpleProcess", model.getMainProcess().getId());
-        assertEquals("Simple process", model.getMainProcess().getName());
-        assertEquals("simple doc", model.getMainProcess().getDocumentation());
-        assertTrue(model.getMainProcess().isExecutable());
+        assertThat(model.getMainProcess().getId()).isEqualTo("simpleProcess");
+        assertThat(model.getMainProcess().getName()).isEqualTo("Simple process");
+        assertThat(model.getMainProcess().getDocumentation()).isEqualTo("simple doc");
+        assertThat(model.getMainProcess().isExecutable()).isTrue();
 
         FlowElement flowElement = model.getMainProcess().getFlowElement("flow1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SequenceFlow);
-        assertEquals("flow1", flowElement.getId());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SequenceFlow.class, sequenceFlow -> {
+                    assertThat(sequenceFlow.getId()).isEqualTo("flow1");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("catchEvent");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof IntermediateCatchEvent);
-        assertEquals("catchEvent", flowElement.getId());
-        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) flowElement;
-        assertEquals(1, catchEvent.getEventDefinitions().size());
-        EventDefinition eventDefinition = catchEvent.getEventDefinitions().get(0);
-        assertTrue(eventDefinition instanceof TimerEventDefinition);
-        TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
-        assertEquals("PT5M", timerDefinition.getTimeDuration());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(IntermediateCatchEvent.class, intermediateCatchEvent -> {
+                    assertThat(intermediateCatchEvent.getId()).isEqualTo("catchEvent");
+                    assertThat(intermediateCatchEvent.getEventDefinitions()).hasSize(1);
+                    assertThat(intermediateCatchEvent.getEventDefinitions().get(0))
+                            .isInstanceOfSatisfying(TimerEventDefinition.class, timerEventDefinition -> {
+                                assertThat(timerEventDefinition.getTimeDuration()).isEqualTo("PT5M");
+                            });
+                });
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        UserTask task = (UserTask) flowElement;
-        assertEquals("task doc", task.getDocumentation());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getDocumentation()).isEqualTo("task doc");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("flow1Condition");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SequenceFlow);
-        assertEquals("flow1Condition", flowElement.getId());
-        SequenceFlow flow = (SequenceFlow) flowElement;
-        assertEquals("${number <= 1}", flow.getConditionExpression());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SequenceFlow.class, sequenceFlow -> {
+                    assertThat(sequenceFlow.getId()).isEqualTo("flow1Condition");
+                    assertThat(sequenceFlow.getConditionExpression()).isEqualTo("${number <= 1}");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("gateway1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof ExclusiveGateway);
+        assertThat(flowElement).isInstanceOf(ExclusiveGateway.class);
     }
 }

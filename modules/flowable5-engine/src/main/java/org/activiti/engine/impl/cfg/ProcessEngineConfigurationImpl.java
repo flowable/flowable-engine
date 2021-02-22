@@ -209,6 +209,8 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.form.AbstractFormType;
+import org.flowable.engine.impl.bpmn.parser.factory.DefaultXMLImporterFactory;
+import org.flowable.engine.impl.bpmn.parser.factory.XMLImporterFactory;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -224,7 +226,6 @@ import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
@@ -483,6 +484,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int historicProcessInstancesQueryLimit = 20000;
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
+    protected XMLImporterFactory wsWsdlImporterFactory;
     protected ConcurrentMap<QName, URL> wsOverridenEndpointAddresses = new ConcurrentHashMap<>();
 
     protected CommandContextFactory commandContextFactory;
@@ -568,6 +570,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void init() {
         initConfigurators();
         configuratorsBeforeInit();
+        initClock();
         initProcessDiagramGenerator();
         initHistoryLevel();
         initExpressionManager();
@@ -576,13 +579,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initFormEngines();
         initFormTypes();
         initScriptingEngines();
-        initClock();
         initBusinessCalendarManager();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
         initServices();
         initIdGenerator();
+        initWsdlImporterFactory();
         initDeployers();
         initJobHandlers();
         initDataSource();
@@ -1178,6 +1181,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         defaultDeployers.add(bpmnDeployer);
         return defaultDeployers;
     }
+    
+    public void initWsdlImporterFactory() {
+        if (wsWsdlImporterFactory == null) {
+            DefaultXMLImporterFactory defaultListenerFactory = new DefaultXMLImporterFactory();
+            wsWsdlImporterFactory = defaultListenerFactory;
+        }
+    }
 
     protected List<BpmnParseHandler> getDefaultBpmnParseHandlers() {
 
@@ -1357,8 +1367,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new DateType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper));
-            variableTypes.addType(new LongJsonType(maxLengthStringVariableType + 1, objectMapper));
+            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper, false));
+            // longJsonType only needed for reading purposes
+            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, objectMapper, false));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType());
             if (customPostVariableTypes != null) {
@@ -2189,6 +2200,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void setProcessValidator(ProcessValidator processValidator) {
         this.processValidator = processValidator;
+    }
+    
+    public XMLImporterFactory getWsdlImporterFactory() {
+        return wsWsdlImporterFactory;
+    }
+
+    public ProcessEngineConfigurationImpl setWsdlImporterFactory(XMLImporterFactory wsWsdlImporterFactory) {
+        this.wsWsdlImporterFactory = wsWsdlImporterFactory;
+        return this;
     }
 
     public boolean isEnableEventDispatcher() {

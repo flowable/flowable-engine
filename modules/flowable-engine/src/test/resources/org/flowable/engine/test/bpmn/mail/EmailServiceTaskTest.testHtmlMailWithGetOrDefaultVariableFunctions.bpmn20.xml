@@ -1,0 +1,41 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="htmlMail" >
+
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
+    
+    <sendTask id="sendMail" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:string>kermit@flowable.org</flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:string>Test</flowable:string>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression>
+            <![CDATA[
+              <html>
+                <body>
+                <ul>
+                  <li><b>Currency:</b>${vars:getOrDefault(currency, 'unknown')}</li>
+                  <li><b>Gender:</b>${vars:getOrDefault(gender, 'unknown')}</li>
+                  </ul>
+                </body>
+              </html>
+            ]]>
+          </flowable:expression>
+        </flowable:field>      
+      </extensionElements>
+    </sendTask>
+    <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

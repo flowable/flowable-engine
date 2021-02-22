@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="Example">
+
+    <case id="oneHumanTaskCaseExampleCategory" name="One Human Task Case">
+        <documentation>A human task case</documentation>
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItem1" name="The Task" definitionRef="theTask"/>
+            <humanTask id="theTask" name="The Task" isBlocking="true" flowable:assignee="johnDoe" flowable:formKey="testFormKey" flowable:priority="50"
+                       flowable:dueDate="2018-01-01">
+                <documentation>This is a test documentation</documentation>
+            </humanTask>
+        </casePlanModel>
+    </case>
+
+</definitions>

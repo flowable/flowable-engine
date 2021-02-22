@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 /**
- * Extension is needed, as we need to have the we service run before we start deploying to the flowable engine.
+ * Extension is needed, as we need to have the web service run before we start deploying to the flowable engine.
  *
  * @author Filip Hrisafov
  */

@@ -1,0 +1,2873 @@
+{
+  "GENERAL": {
+    "MAIN-TITLE": "Flowable エディター",
+    "NAVIGATION": {
+      "PROCESSES": "プロセス",
+      "CASEMODELS": "ケースモデル",
+      "FORMS": "フォーム",
+      "DECISIONS": "判断",
+      "APPS": "アプリ"
+    },
+    "TITLE": {
+      "SELECT-GROUP": "グループの選択",
+      "MATCHING-GROUPS": "条件にあうグループ",
+      "FILTER": "フィルター",
+      "HISTORY": "履歴"
+    },
+    "ACTION": {
+      "LOGOUT": "サインアウト",
+      "DASHBOARD": "Dashboard",
+      "RETURN-TO-LIST": "全定義の表示",
+      "CANCEL": "キャンセル",
+      "CLOSE": "閉じる",
+      "EDIT": "編集",
+      "SAVE": "保存",
+      "OPEN": "オープン",
+      "OK": "OK",
+      "CONFIRM": "確認",
+      "CONFIRM-AND-CLOSE": "確認して閉じる",
+      "NEW-FORM": "新規フォーム",
+      "CREATE-FORM": "フォームの作成",
+      "NEW-DECISION-TABLE": "新規デシジョンテーブル",
+      "CREATE-DECISION-TABLE": "デシジョンテーブルの作成",
+      "NEW-DECISION-SERVICE": "新規デシジョンサービス",
+      "CREATE-DECISION-SERVICE": "デシジョンサービスの作成"
+    },
+    "MESSAGE": {
+      "SELECT-GROUP-HELP": "&uparrow;と&downarrow;で選択し、エンターで確認",
+      "PEOPLE-NO-MATCHING-RESULTS": "条件にあうユーザーは見つかりません。",
+      "GROUP-NO-MATCHING-RESULTS": "条件にあうグループは見つかりません。",
+      "GROUP-SOURCE-TYPE": "元グループ",
+      "GROUP-SOURCE-SEARCH-OPTION": "グループ検索",
+      "GROUP-SOURCE-FIELD-OPTION": "フォームフィールド"
+    },
+    "OTHERS": {
+      "PROCESS": "プロセス",
+      "PROCESS_NAVIGATOR": "プロセスナビゲーター",
+      "NO_STRUCTURAL_ELEMENTS_USED": "構造的要素は使われていません。"
+    }
+  },
+  "BPMN": {
+    "TITLE": "プロセスエディター",
+    "DESCRIPTION": "BPMNプロセスエディター",
+    "PROPERTYPACKAGES": {
+      "PROCESS_IDPACKAGE": {
+        "PROCESS_ID": {
+          "TITLE": "プロセスID",
+          "DESCRIPTION": "プロセス定義の識別子です。"
+        }
+      },
+      "OVERRIDEIDPACKAGE": {
+        "OVERRIDEID": {
+          "TITLE": "ID",
+          "DESCRIPTION": "要素の識別子です。"
+        }
+      },
+      "NAMEPACKAGE": {
+        "NAME": {
+          "TITLE": "名前",
+          "DESCRIPTION": "BPMN要素の名前です。"
+        }
+      },
+      "DOCUMENTATIONPACKAGE": {
+        "DOCUMENTATION": {
+          "TITLE": "ドキュメンテーション",
+          "DESCRIPTION": "BPMN要素のドキュメンテーションです。"
+        }
+      },
+      "CATEGORYPACKAGE": {
+        "CATEGORYDEFINITION": {
+          "TITLE": "カテゴリー",
+          "DESCRIPTION": "BPMN要素のカテゴリーです。"
+        }
+      },
+      "PROCESS_AUTHORPACKAGE": {
+        "PROCESS_AUTHOR": {
+          "TITLE": "プロセスオーサー",
+          "DESCRIPTION": "プロセス定義の作成者です。"
+        }
+      },
+      "PROCESS_VERSIONPACKAGE": {
+        "PROCESS_VERSION": {
+          "TITLE": "プロセスバージョン文字列（ドキュメントのみ）",
+          "DESCRIPTION": "ドキュメンテーション用のバージョンの識別子です。"
+        }
+      },
+      "PROCESS_HISTORYLEVELPACKAGE": {
+        "PROCESS_HISTORYLEVEL": {
+          "TITLE": "このプロセス定義の履歴レベルを設定",
+          "DESCRIPTION": "このプロセス定義の履歴レベルを設定"
+        }
+      },
+      "ISEXECUTABLEPACKAGE": {
+        "ISEXECUTABLE": {
+          "TITLE": "実行可能",
+          "DESCRIPTION": "このプロセスは実行可能か？"
+        }
+      },
+      "PROCESS_POTENTIALSTARTERUSERPACKAGE": {
+        "PROCESS_POTENTIALSTARTERUSER": {
+          "TITLE": "開始可能なユーザー",
+          "DESCRIPTION": "どのユーザーがこのプロセスを開始できるか？"
+        }
+      },
+      "PROCESS_POTENTIALSTARTERGROUPPACKAGE": {
+        "PROCESS_POTENTIALSTARTERGROUP": {
+          "TITLE": "開始可能なグループ",
+          "DESCRIPTION": "どのグループがこのプロセスを開始できるか？"
+        }
+      },
+      "PROCESS_NAMESPACEPACKAGE": {
+        "PROCESS_NAMESPACE": {
+          "TITLE": "ターゲット名前空間",
+          "DESCRIPTION": "プロセス定義のターゲット名前空間。"
+        }
+      },
+      "PROCESS_ISEAGEREXECUTIONFETCHPACKAGE": {
+        "ISEAGEREXECUTIONFETCH": {
+          "TITLE": "Eager Execution取得",
+          "DESCRIPTION": "このプロセス定義でEager Execution取得を有効にするか？"
+        }
+      },
+      "ASYNCHRONOUSDEFINITIONPACKAGE": {
+        "ASYNCHRONOUSDEFINITION": {
+          "TITLE": "非同期",
+          "DESCRIPTION": "アクティビティを非同期と定義。"
+        }
+      },
+      "DATAPROPERTIESPACKAGE": {
+        "DATAPROPERTIES": {
+          "TITLE": "データオブジェクト",
+          "DESCRIPTION": "データオブジェクトの属性を定義"
+        }
+      },
+      "EXCLUSIVEDEFINITIONPACKAGE": {
+        "EXCLUSIVEDEFINITION": {
+          "TITLE": "排他",
+          "DESCRIPTION": "このアクティビティを排他と定義。"
+        }
+      },
+      "EXECUTIONLISTENERSPACKAGE": {
+        "EXECUTIONLISTENERS": {
+          "TITLE": "実行リスナー",
+          "DESCRIPTION": "アクティビティ、プロセス、シーケンスフロー、開始/終了イベントなどのリスナー。"
+        }
+      },
+      "TASKLISTENERSPACKAGE": {
+        "TASKLISTENERS": {
+          "TITLE": "タスクリスナー",
+          "DESCRIPTION": "ユーザータスクのリスナー"
+        }
+      },
+      "EVENTLISTENERSPACKAGE": {
+        "EVENTLISTENERS": {
+          "TITLE": "イベントリスナー",
+          "DESCRIPTION": "Flowableエンジン内で発生するイベントのリスナー信号、メッセージ、エラーイベントとして再スローすることもできます"
+        }
+      },
+      "USERTASKASSIGNMENTPACKAGE": {
+        "USERTASKASSIGNMENT": {
+          "TITLE": "割当",
+          "DESCRIPTION": "ユーザータスクへの割当の定義"
+        }
+      },
+      "FORMPROPERTIESPACKAGE": {
+        "FORMPROPERTIES": {
+          "TITLE": "フォーム属性",
+          "DESCRIPTION": "フォーム属性の定義"
+        }
+      },
+      "FORMKEYDEFINITIONPACKAGE": {
+        "FORMKEYDEFINITION": {
+          "TITLE": "フォームキー",
+          "DESCRIPTION": "フォームへの参照のためのキー。"
+        }
+      },
+      "FORMFIELDVALIDATIONPACKAGE": {
+        "FORMFIELDVALIDATION": {
+          "TITLE": "フォーム項目の検証",
+          "DESCRIPTION": "フォーム提出時の検証。（true/falseや式を設定可能）"
+        }
+      },
+      "DUEDATEDEFINITIONPACKAGE": {
+        "DUEDATEDEFINITION": {
+          "TITLE": "期日",
+          "DESCRIPTION": "ユーザータスクの期日。"
+        }
+      },
+      "PRIORITYDEFINITIONPACKAGE": {
+        "PRIORITYDEFINITION": {
+          "TITLE": "優先度",
+          "DESCRIPTION": "ユーザータスクの優先度。"
+        }
+      },
+      "SERVICETASKCLASSPACKAGE": {
+        "SERVICETASKCLASS": {
+          "TITLE": "クラス",
+          "DESCRIPTION": "サービスタスクロジックを実装しているクラス。"
+        }
+      },
+      "SERVICETASKEXPRESSIONPACKAGE": {
+        "SERVICETASKEXPRESSION": {
+          "TITLE": "式",
+          "DESCRIPTION": "式により定義されるサービスタスクロジック。"
+        }
+      },
+      "SERVICETASKDELEGATEEXPRESSIONPACKAGE": {
+        "SERVICETASKDELEGATEEXPRESSION": {
+          "TITLE": "委譲式",
+          "DESCRIPTION": "委譲式により定義されるサービスタスクロジック。"
+        }
+      },
+      "SERVICETASKFAILEDJOBRETRYTIMECYCLEPACKAGE": {
+        "SERVICETASKFAILEDJOBRETRYTIMECYCLE": {
+          "TITLE": "失敗時のジョブ再実行サイクル",
+          "DESCRIPTION": "ジョブ再実行サイクルにより定義されるサービスタスクロジック。"
+        }
+      },
+      "SERVICETASKFIELDSPACKAGE": {
+        "SERVICETASKFIELDS": {
+          "TITLE": "クラス項目",
+          "DESCRIPTION": "項目拡張"
+        }
+      },
+      "SERVICETASKEXCEPTIONSPACKAGE": {
+        "SERVICETASKEXCEPTIONS": {
+          "TITLE": "例外",
+          "DESCRIPTION": "マッピングされた例外"
+        }
+      },
+      "SERVICETASKRESULTVARIABLEPACKAGE": {
+        "SERVICETASKRESULTVARIABLE": {
+          "TITLE": "結果変数",
+          "DESCRIPTION": "サービスタスクの結果を格納するプロセス変数の名前"
+        },
+        "SERVICETASKUSELOCALSCOPEFORRESULTVARIABLE": {
+          "TITLE": "結果変数にローカルスコープを使用",
+          "DESCRIPTION": "結果変数をローカル変数に限定するフラグ"
+        }
+      },
+      "SERVICETASKTRIGGERABLEPACKAGE": {
+        "SERVICETASKTRIGGERABLE": {
+          "TITLE": "サービスタスクをトリガー可能に設定",
+          "DESCRIPTION": "サービスタスクをトリガー可能に設定"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE": {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT": {
+          "TITLE": "結果変数を一時的に保存",
+          "DESCRIPTION": "式の結果をデータベーストランザクションの完了時に永続化させないフラグ"
+        }
+      },
+      "SCRIPTFORMATPACKAGE": {
+        "SCRIPTFORMAT": {
+          "TITLE": "スクリプトフォーマット",
+          "DESCRIPTION": "スクリプトタスクのフォーマット"
+        }
+      },
+      "SCRIPTTEXTPACKAGE": {
+        "SCRIPTTEXT": {
+          "TITLE": "スクリプト",
+          "DESCRIPTION": "スクリプトタスクのテキスト"
+        }
+      },
+      "SCRIPTAUTOSTOREVARIABLESPACKAGE": {
+        "SCRIPTAUTOSTOREVARIABLES": {
+          "TITLE": "変数の自動保存",
+          "DESCRIPTION": "すべてのスクリプト変数を自動的にプロセスに保存。"
+        }
+      },
+      "SHELLCOMMANDPACKAGE": {
+        "SHELLCOMMAND": {
+          "TITLE": "コマンド",
+          "DESCRIPTION": "シェルタスクコマンド"
+        }
+      },
+      "SHELLARG1PACKAGE": {
+        "SHELLARG1": {
+          "TITLE": "引数1",
+          "DESCRIPTION": "シェルコマンド引数1"
+        }
+      },
+      "SHELLARG2PACKAGE": {
+        "SHELLARG2": {
+          "TITLE": "引数2",
+          "DESCRIPTION": "シェルコマンド引数2"
+        }
+      },
+      "SHELLARG3PACKAGE": {
+        "SHELLARG3": {
+          "TITLE": "引数3",
+          "DESCRIPTION": "シェルコマンド引数3"
+        }
+      },
+      "SHELLARG4PACKAGE": {
+        "SHELLARG4": {
+          "TITLE": "引数4",
+          "DESCRIPTION": "シェルコマンド引数4"
+        }
+      },
+      "SHELLARG5PACKAGE": {
+        "SHELLARG5": {
+          "TITLE": "引数5",
+          "DESCRIPTION": "シェルコマンド引数5"
+        }
+      },
+      "SHELLWAITPACKAGE": {
+        "SHELLWAIT": {
+          "TITLE": "待ち",
+          "DESCRIPTION": "シェルコマンドの完了を待つフラグ"
+        }
+      },
+      "SHELLOUTPUTVARIABLEPACKAGE": {
+        "SHELLOUTPUTVARIABLE": {
+          "TITLE": "出力変数",
+          "DESCRIPTION": "シェルコマンドの出力を保存する変数"
+        }
+      },
+      "SHELLERRORCODEVARIABLEPACKAGE": {
+        "SHELLERRORCODEVARIABLE": {
+          "TITLE": "エラーコード変数",
+          "DESCRIPTION": "シェルコマンドのエラーコードを保存する変数"
+        }
+      },
+      "SHELLREDIRECTERRORPACKAGE": {
+        "SHELLREDIRECTERROR": {
+          "TITLE": "エラーをリダイレクト",
+          "DESCRIPTION": "エラー出力を標準出力にマージするフラグ"
+        }
+      },
+      "SHELLCLEANENVPACKAGE": {
+        "SHELLCLEANENV": {
+          "TITLE": "環境変数のクリア",
+          "DESCRIPTION": "シェル実行用の環境変数のクリア"
+        }
+      },
+      "SHELLDIRECTORYPACKAGE": {
+        "SHELLDIRECTORY": {
+          "TITLE": "ディレクトリー",
+          "DESCRIPTION": "シェルプロセスの作業ディレクトリー"
+        }
+      },
+      "RULETASK_RULESPACKAGE": {
+        "RULETASK_RULES": {
+          "TITLE": "ルール",
+          "DESCRIPTION": "ルールタスクのルール。"
+        }
+      },
+      "RULETASK_VARIABLES_INPUTPACKAGE": {
+        "RULETASK_VARIABLES_INPUT": {
+          "TITLE": "入力変数",
+          "DESCRIPTION": "ルールタスクの入力変数"
+        }
+      },
+      "RULETASK_EXCLUDEPACKAGE": {
+        "RULETASK_EXCLUDE": {
+          "TITLE": "除外",
+          "DESCRIPTION": "ルール属性を除外条件として使用。"
+        }
+      },
+      "RULETASK_RESULTPACKAGE": {
+        "RULETASK_RESULT": {
+          "TITLE": "結果変数",
+          "DESCRIPTION": "ルールタスクの結果変数"
+        }
+      },
+      "MAILTASKHEADERSPACKAGE": {
+        "MAILTASKHEADERS": {
+          "TITLE": "ヘッダー",
+          "DESCRIPTION": "行分割したメールヘッダー。"
+        }
+      },
+      "MAILTASKTOPACKAGE": {
+        "MAILTASKTO": {
+          "TITLE": "宛先",
+          "DESCRIPTION": "メールの受信者。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKFROMPACKAGE": {
+        "MAILTASKFROM": {
+          "TITLE": "差出人",
+          "DESCRIPTION": "メールの送信者。指定しない場合は規程のアドレスが使用されます。"
+        }
+      },
+      "MAILTASKSUBJECTPACKAGE": {
+        "MAILTASKSUBJECT": {
+          "TITLE": "件名",
+          "DESCRIPTION": "メールの表題。"
+        }
+      },
+      "MAILTASKCCPACKAGE": {
+        "MAILTASKCC": {
+          "TITLE": "同報(CC)",
+          "DESCRIPTION": "メールの同報先。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKBCCPACKAGE": {
+        "MAILTASKBCC": {
+          "TITLE": "同報(BCC)",
+          "DESCRIPTION": "メールの同報先(秘匿)。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKTEXTPACKAGE": {
+        "MAILTASKTEXT": {
+          "TITLE": "テキスト",
+          "DESCRIPTION": "リッチテキストメールに対応していない受信者のためのプレーンテキストのメールの本文。HTMLと組み合わせて利用できます。対応していない場合はテキストのみのバージョンが表示されます。"
+        },
+        "MAILTASKTEXTVAR": {
+          "TITLE": "テキスト変数",
+          "DESCRIPTION": "プレーンテキストの内容が保存されるプロセス変数。HTMLと組み合わせて利用できます。対応していない場合はテキストのみのバージョンが表示されます。"
+        }
+      },
+      "MAILTASKHTMLPACKAGE": {
+        "MAILTASKHTML": {
+          "TITLE": "HTML",
+          "DESCRIPTION": "メール本文に含まれるHTML断片。"
+        },
+        "MAILTASKHTMLVAR": {
+          "TITLE": "HTML変数",
+          "DESCRIPTION": "リッチテキストの内容が保存されるプロセス変数。"
+        }
+      },
+      "MAILTASKCHARSETPACKAGE": {
+        "MAILTASKCHARSET": {
+          "TITLE": "文字セット",
+          "DESCRIPTION": "非英語圏のユーザーのためにメールの文字セットを変更することができます。"
+        }
+      },
+      "HTTPTASKREQUESTMETHODPACKAGE": {
+        "HTTPTASKREQUESTMETHOD": {
+          "TITLE": "リクエストメソッド",
+          "DESCRIPTION": "リクエストメソッド（GET、POST、PUTなど）"
+        }
+      },
+      "HTTPTASKREQUESTURLPACKAGE": {
+        "HTTPTASKREQUESTURL": {
+          "TITLE": "リクエストURL",
+          "DESCRIPTION": "リクエストURL（http://flowable.orgなど）"
+        }
+      },
+      "HTTPTASKREQUESTHEADERSPACKAGE": {
+        "HTTPTASKREQUESTHEADERS": {
+          "TITLE": "リクエストヘッダー",
+          "DESCRIPTION": "行分割されたHTTPリクエストヘッダー（Content-Type: application/jsonなど）"
+        }
+      },
+      "HTTPTASKREQUESTBODYPACKAGE": {
+        "HTTPTASKREQUESTBODYPACKAGE": {
+          "TITLE": "リクエストボディ",
+          "DESCRIPTION": "リクエストボディ（${sampleBody}など）"
+        }
+      },
+      "HTTPTASKREQUESTBODYENCODINGPACKAGE": {
+        "HTTPTASKREQUESTBODYENCODING": {
+          "TITLE": "リクエストボディエンコーディング",
+          "DESCRIPTION": "リクエストボディのエンコーディング（UTF-8など）"
+        }
+      },
+      "HTTPTASKREQUESTTIMEOUTPACKAGE": {
+        "HTTPTASKREQUESTTIMEOUT": {
+          "TITLE": "リクエストタイムアウト",
+          "DESCRIPTION": "ミリ秒単位のリクエストのタイムアウト設定（5000など）"
+        }
+      },
+      "HTTPTASKDISALLOWREDIRECTSPACKAGE": {
+        "HTTPTASKDISALLOWREDIRECTS": {
+          "TITLE": "リダイレクト拒否",
+          "DESCRIPTION": "HTTPリダイレクトを拒否するフラグ"
+        }
+      },
+      "HTTPTASKFAILSTATUSCODESPACKAGE": {
+        "HTTPTASKFAILSTATUSCODES": {
+          "TITLE": "失敗ステータスコード",
+          "DESCRIPTION": "再実行のためのHTTPレスポンスのステータスコードのカンマ区切りリスト（400、5XXなど）"
+        }
+      },
+      "HTTPTASKHANDLESTATUSCODESPACKAGE": {
+        "HTTPTASKHANDLESTATUSCODES": {
+          "TITLE": "ステータスコードハンドル",
+          "DESCRIPTION": "無視するHTTPレスポンスのステータスコードのカンマ区切りリスト（404、3XXなど）"
+        }
+      },
+      "HTTPTASKIGNOREEXCEPTIONPACKAGE": {
+        "HTTPTASKIGNOREEXCEPTION": {
+          "TITLE": "例外無視",
+          "DESCRIPTION": "例外を無視するフラグ。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT": {
+          "TITLE": "レスポンスを一時変数に保存",
+          "DESCRIPTION": "レスポンスを一時変数に保存するフラグ"
+        }
+      },
+      "HTTPTASKSAVERESPONSEASJSONPACKAGE": {
+        "HTTPTASKSAVERESPONSEASJSON": {
+          "TITLE": "レスポンスをJSON形式で保存",
+          "DESCRIPTION": "レスポンスを文字列ではなくJSON形式で保存するフラグ"
+        }
+      },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the case is faster."
+        }
+      },
+      "SKIPEXPRESSIONPACKAGE": {
+        "SKIPEXPRESSION": {
+          "TITLE": "式のスキップ",
+          "DESCRIPTION": "タスクに関連する式の実行をスキップ。"
+        }
+      },
+      "HTTPTASKRESPONSEVARIABLENAMEPACKAGE": {
+        "HTTPTASKRESPONSEVARIABLENAME": {
+          "TITLE": "レスポンス変数",
+          "DESCRIPTION": "HTTPレスポンスを保存する変数。"
+        }
+      },
+      "HTTPTASKSAVEREQUESTVARIABLESPACKAGE": {
+        "HTTPTASKSAVEREQUESTVARIABLES": {
+          "TITLE": "リクエスト変数の保存",
+          "DESCRIPTION": "リクエスト変数の保存のフラグ。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERS": {
+          "TITLE": "レスポンスステータス、ヘッダーの保存",
+          "DESCRIPTION": "リクエストステータス、ヘッダーなどの保存のフラグ。"
+        }
+      },
+      "HTTPTASKRESULTVARIABLEPREFIXPACKAGE": {
+        "HTTPTASKRESULTVARIABLEPREFIX": {
+          "TITLE": "結果変数接頭辞",
+          "DESCRIPTION": "実行変数の接頭辞。"
+        }
+      },
+      "CALLACTIVITYCALLEDELEMENTPACKAGE": {
+        "CALLACTIVITYCALLEDELEMENT": {
+          "TITLE": "呼び出し要素",
+          "DESCRIPTION": "プロセス参照。"
+        }
+      },
+      "CALLACTIVITYCALLEDELEMENTTYPEPACKAGE": {
+        "CALLACTIVITYCALLEDELEMENTTYPE": {
+          "TITLE": "呼び出し要素タイプ",
+          "DESCRIPTION": "プロセス参照のタイプ。"
+        }
+      },
+      "CALLACTIVITYINPARAMETERSPACKAGE": {
+        "CALLACTIVITYINPARAMETERS": {
+          "TITLE": "引数",
+          "DESCRIPTION": "入力パラメータの定義"
+        }
+      },
+      "CALLACTIVITYOUTPARAMETERSPACKAGE": {
+        "CALLACTIVITYOUTPARAMETERS": {
+          "TITLE": "返値",
+          "DESCRIPTION": "出力パラメータの定義"
+        }
+      },
+      "CALLACTIVITYINHERITVARIABLESPACKAGE": {
+        "CALLACTIVITYINHERITVARIABLES": {
+          "TITLE": "変数のサブプロセス継承",
+          "DESCRIPTION": "親プロセスの変数をサブプロセスに継承。"
+        }
+      },
+      "CALLACTIVITYSAMEDEPLOYMENTPACKAGE": {
+        "CALLACTIVITYSAMEDEPLOYMENT": {
+          "TITLE": "同じデプロイから参照プロセスを開始",
+          "DESCRIPTION": "同じデプロイからの参照プロセスを使用。"
+        }
+      },
+      "CALLACTIVITYFALLBACKTODEFAULTTENANTPACKAGE": {
+        "CALLACTIVITYFALLBACKTODEFAULTTENANT": {
+          "TITLE": "規定のテナントにフォールバック",
+          "DESCRIPTION": "テナント探索に失敗した場合デフォルトのテナントを使用。"
+        }
+      },
+      "CALLACTIVITYIDVARIABLENAMEPACKAGE": {
+        "CALLACTIVITYIDVARIABLENAME": {
+          "TITLE": "ID変数",
+          "DESCRIPTION": "開始したインスタンスのIDをこの変数に保存"
+        }
+      },
+      "CALLACTIVITYPROCESSINSTANCENAMEPACKAGE": {
+        "CALLACTIVITYPROCESSINSTANCENAME": {
+          "TITLE": "プロセスインスタンス名",
+          "DESCRIPTION": "子プロセスインスタンス名を指定する式"
+        }
+      },
+      "CALLACTIVITYINHERITBUSINESSKEYPACKAGE": {
+        "CALLACTIVITYINHERITBUSINESSKEY": {
+          "TITLE": "ビジネスキー継承",
+          "DESCRIPTION": "親プロセスからビジネスキーを継承。"
+        }
+      },
+      "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERSPACKAGE": {
+        "CALLACTIVITYUSELOCALSCOPEFOROUTPARAMETERS": {
+          "TITLE": "出力パラメータにローカルスコープを使用",
+          "DESCRIPTION": "出力パラメータにローカルスコープ変数を使用"
+        }
+      },
+      "CALLACTIVITYBUSINESSKEYPACKAGE": {
+        "CALLACTIVITYBUSINESSKEY": {
+          "TITLE": "ビジネスキー式",
+          "DESCRIPTION": "子プロセスインスタンスのビジネスキーを指定する式"
+        }
+      },
+      "CALLACTIVITYCOMPLETEASYNCPACKAGE": {
+        "CALLACTIVITYCOMPLETEASYNC": {
+          "TITLE": "非同期に完了",
+          "DESCRIPTION": "子プロセスを非同期に終了し呼び出しを完了する。複数のインスタンスを平行して使用する場合に便利です。"
+        }
+      },
+      "CAMELTASKCAMELCONTEXTPACKAGE": {
+        "CAMELTASKCAMELCONTEXT": {
+          "TITLE": "Camelコンテクスト",
+          "DESCRIPTION": "追加のCamelコンテクスト定義。空の場合は規定値が使われる。"
+        }
+      },
+      "MULETASKENDPOINTURLPACKAGE": {
+        "MULETASKENDPOINTURL": {
+          "TITLE": "エンドポイントURL",
+          "DESCRIPTION": "Muleにメッセージを送る場合に必要なエンドポイントURL。"
+        }
+      },
+      "MULETASKLANGUAGEPACKAGE": {
+        "MULETASKLANGUAGE": {
+          "TITLE": "言語",
+          "DESCRIPTION": "ペイロード式を解決する言語の定義。"
+        }
+      },
+      "MULETASKPAYLOADEXPRESSIONPACKAGE": {
+        "MULETASKPAYLOADEXPRESSION": {
+          "TITLE": "ペイロード式",
+          "DESCRIPTION": "Muleに送るメッセージの定義。"
+        }
+      },
+      "MULETASKRESULTVARIABLEPACKAGE": {
+        "MULETASKRESULTVARIABLE": {
+          "TITLE": "結果変数",
+          "DESCRIPTION": "ペイロードの返値を格納する変数。"
+        }
+      },
+      "CONDITIONSEQUENCEFLOWPACKAGE": {
+        "CONDITIONSEQUENCEFLOWPACKAGE": {
+          "TITLE": "フロー条件",
+          "DESCRIPTION": "シーケンスフローの条件"
+        }
+      },
+      "DEFAULTFLOWPACKAGE": {
+        "DEFAULTFLOW": {
+          "TITLE": "既定フロー",
+          "DESCRIPTION": "既定のシーケンスフローを定義"
+        }
+      },
+      "CONDITIONALFLOWPACKAGE": {
+        "CONDITIONALFLOW": {
+          "TITLE": "条件付きフロー",
+          "DESCRIPTION": "条件付きのフローを定義"
+        }
+      },
+      "TIMERCYCLEDEFINITIONPACKAGE": {
+        "TIMERCYCLEDEFINITION": {
+          "TITLE": "タイムサイクル（R3/PT10Hなど）",
+          "DESCRIPTION": "ISO-8601 サイクルのタイマーを定義。"
+        }
+      },
+      "TIMERDATEDEFINITIONPACKAGE": {
+        "TIMERDATEDEFINITION": {
+          "TITLE": "ISO-8601日時",
+          "DESCRIPTION": "ISO-8601日付仕様のタイマーを定義。"
+        }
+      },
+      "TIMERDURATIONDEFINITIONPACKAGE": {
+        "TIMERDURATIONDEFINITION": {
+          "TITLE": "継続時間（PT5Mなど）",
+          "DESCRIPTION": " ISO-8601継続時間のタイマーを定義。"
+        }
+      },
+      "TIMERENDDATEDEFINITIONPACKAGE": {
+        "TIMERENDDATEDEFINITION": {
+          "TITLE": "ISO-8601終了時間",
+          "DESCRIPTION": " ISO-8601継続時間のタイマーを定義。"
+        }
+      },
+      "MESSAGEREFPACKAGE": {
+        "MESSAGEREF": {
+          "TITLE": "メッセージ参照",
+          "DESCRIPTION": "メッセージ名を定義。"
+        }
+      },
+      "SIGNALREFPACKAGE": {
+        "SIGNALREF": {
+          "TITLE": "信号参照",
+          "DESCRIPTION": "信号名を定義。"
+        }
+      },
+      "ERRORREFPACKAGE": {
+        "ERRORREF": {
+          "TITLE": "エラー参照",
+          "DESCRIPTION": "エラー名を定義。"
+        }
+      },
+      "ESCALATIONREFPACKAGE": {
+        "ESCALATIONREF": {
+          "TITLE": "エスカレーション参照",
+          "DESCRIPTION": "エスカレーション名を定義。"
+        }
+      },
+      "CONDITIONALEVENTPACKAGE": {
+        "CONDITION": {
+          "TITLE": "条件式",
+          "DESCRIPTION": "条件付きイベントの条件式を定義。"
+        }
+      },
+      "CANCELACTIVITYPACKAGE": {
+        "CANCELACTIVITY": {
+          "TITLE": "アクティビティのキャンセル",
+          "DESCRIPTION": "アクティビティがキャンセルされる"
+        }
+      },
+      "INITIATORPACKAGE": {
+        "INITIATOR": {
+          "TITLE": "イニシエーター",
+          "DESCRIPTION": "プロセスのイニシエーター（開始）"
+        }
+      },
+      "TEXTPACKAGE": {
+        "TEXT": {
+          "TITLE": "テキスト",
+          "DESCRIPTION": "アノテーションのテキスト。"
+        }
+      },
+      "MULTIINSTANCE_TYPEPACKAGE": {
+        "MULTIINSTANCE_TYPE": {
+          "TITLE": "マルチインスタンスタイプ",
+          "DESCRIPTION": "アクティビティの繰り返し実行（平行、連続）を異なるループタイプで表示"
+        }
+      },
+      "MULTIINSTANCE_CARDINALITYPACKAGE": {
+        "MULTIINSTANCE_CARDINALITY": {
+          "TITLE": "複合度（マルチインスタンス）",
+          "DESCRIPTION": "マルチインスタンスの複合度を定義。"
+        }
+      },
+      "MULTIINSTANCE_COLLECTIONPACKAGE": {
+        "MULTIINSTANCE_COLLECTION": {
+          "TITLE": "コレクション（マルチインスタンス）",
+          "DESCRIPTION": "マルチインスタンスのコレクションを定義。"
+        }
+      },
+      "MULTIINSTANCE_VARIABLEPACKAGE": {
+        "MULTIINSTANCE_VARIABLE": {
+          "TITLE": "要素変数（マルチインスタンス）",
+          "DESCRIPTION": "マルチインスタンスの要素変数を定義。"
+        }
+      },
+      "MULTIINSTANCE_CONDITIONPACKAGE": {
+        "MULTIINSTANCE_CONDITION": {
+          "TITLE": "完了条件（マルチインスタンス）",
+          "DESCRIPTION": "マルチインスタンスの完了条件を定義。"
+        }
+      },
+      "ISFORCOMPENSATIONPACKAGE": {
+        "ISFORCOMPENSATION": {
+          "TITLE": "補償",
+          "DESCRIPTION": "アクティビティが補償目的のものであることを示すフラグ。"
+        }
+      },
+      "SEQUENCEFLOWORDERPACKAGE": {
+        "SEQUENCEFLOWORDER": {
+          "TITLE": "フロー順",
+          "DESCRIPTION": "出力シーケンスフローの順番。"
+        }
+      },
+      "SIGNALDEFINITIONSPACKAGE": {
+        "SIGNALDEFINITIONS": {
+          "TITLE": "信号定義",
+          "DESCRIPTION": "信号定義"
+        }
+      },
+      "MESSAGEDEFINITIONSPACKAGE": {
+        "MESSAGEDEFINITIONS": {
+          "TITLE": "メッセージ定義",
+          "DESCRIPTION": "メッセージ定義"
+        }
+      },
+      "ESCALATIONDEFINITIONSPACKAGE": {
+        "ESCALATIONDEFINITIONS": {
+          "TITLE": "エスカレーション定義",
+          "DESCRIPTION": "エスカレーション定義"
+        }
+      },
+      "EVENTREGISTRYPACKAGE": {
+        "EVENTKEY": {
+          "TITLE": "イベントキー",
+          "DESCRIPTION": "イベントキーの定義"
+        },
+        "EVENTNAME": {
+          "TITLE": "イベント名",
+          "DESCRIPTION": "イベント名の定義"
+        },
+        "EVENTINPARAMETERS": {
+          "TITLE": "イベントペイロードへのマッピング",
+          "DESCRIPTION": "イベントペイロード属性にプロセス変数をマッピング"
+        },
+        "EVENTOUTPARAMETERS": {
+          "TITLE": "イベントペイロードからのマッピング",
+          "DESCRIPTION": "プロセス変数にイベントペイロード属性をマッピング"
+        },
+        "EVENTCORRELATIONPARAMETERS": {
+          "TITLE": "相関パラメーター",
+          "DESCRIPTION": "相関パラメーターの定義"
+        },
+        "CHANNELKEY": {
+          "TITLE": "チャンネルキー",
+          "DESCRIPTION": "チャンネルキーの定義"
+        },
+        "CHANNELNAME": {
+          "TITLE": "チャンネル名",
+          "DESCRIPTION": "チャンネル名の定義"
+        },
+        "CHANNELTYPE": {
+          "TITLE": "チャンネルタイプ",
+          "DESCRIPTION": "チャンネルタイプの定義"
+        },
+        "CHANNELDESTINATION": {
+          "TITLE": "チャンネルの宛先",
+          "DESCRIPTION": "チャンネルの宛先の定義"
+        },
+        "TRIGGEREVENTKEY": {
+          "TITLE": "トリガーイベントキー",
+          "DESCRIPTION": "トリガーイベントキーの定義"
+        },
+        "TRIGGEREVENTNAME": {
+          "TITLE": "トリガーイベント名",
+          "DESCRIPTION": "トリガーイベント名の定義"
+        },
+        "TRIGGERCHANNELKEY": {
+          "TITLE": "トリガーチャンネルキー",
+          "DESCRIPTION": "トリガーチャンネルキーの定義"
+        },
+        "TRIGGERCHANNELNAME": {
+          "TITLE": "トリガーチャンネル名",
+          "DESCRIPTION": "トリガーチャンネル名の定義"
+        },
+        "TRIGGERCHANNELTYPE": {
+          "TITLE": "トリガーチャンネルタイプ",
+          "DESCRIPTION": "トリガーチャンネルタイプの定義"
+        },
+        "TRIGGERCHANNELDESTINATION": {
+          "TITLE": "トリガーチャンネルの宛先",
+          "DESCRIPTION": "トリガーチャンネルの宛先の定義"
+        },
+        "KEYDETECTIONFIXEDVALUE": {
+          "TITLE": "イベントキー固定値",
+          "DESCRIPTION": "イベントキー固定値の定義"
+        },
+        "KEYDETECTIONJSONFIELD": {
+          "TITLE": "イベントキーJSONフィールド",
+          "DESCRIPTION": "JSONフィールドによるイベントキー検知の定義"
+        },
+        "KEYDETECTIONJSONPOINTER": {
+          "TITLE": "イベントキーJSONポインター",
+          "DESCRIPTION": "JSONポインター式によるイベントキー検知の定義"
+        }
+      },
+      "EXTERNALWORKERJOBPACKAGE": {
+        "TOPIC": {
+          "TITLE": "ジョブトピック",
+          "DESCRIPTION": "外部ワーカーが使用する可能性があるジョブトピック"
+        }
+      },
+      "ISTRANSACTIONPACKAGE": {
+        "ISTRANSACTION": {
+          "TITLE": "トランザクションサブプロセス",
+          "DESCRIPTION": "サブプロセスがトランザクション型であることを示すフラグ。"
+        }
+      },
+      "FORMREFERENCEPACKAGE": {
+        "FORMREFERENCE": {
+          "TITLE": "フォーム参照",
+          "DESCRIPTION": "フォームへの参照"
+        }
+      },
+      "TERMINATEALLPACKAGE": {
+        "TERMINATEALL": {
+          "TITLE": "すべて停止",
+          "DESCRIPTION": "プロセスインスタンスを停止可能"
+        }
+      },
+      "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONTABLEREFERENCE": {
+          "TITLE": "デシジョンテーブル参照",
+          "DESCRIPTION": "デシジョンテーブルへの参照を設定"
+        }
+      },
+      "DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONSERVICEREFERENCE": {
+          "TITLE": "デシジョンサービス参照",
+          "DESCRIPTION": "デシジョンサービスへの参照を設定"
+        }
+      },
+      "DECISIONTASKTHROWERRORONNOHITSPACKAGE": {
+        "DECISIONTASKTHROWERRORONNOHITS": {
+          "TITLE": "ルールがヒットしない場合はエラー",
+          "DESCRIPTION": "デシジョンテーブル上のルールにヒットせず結果が得られない場合はエラーとする。"
+        }
+      },
+      "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE": {
+        "DECISIONTASKFALLBACKTODEFAULTTENANT": {
+          "TITLE": "規定のテナントにフォールバック",
+          "DESCRIPTION": "テナント付きの条件で失敗した場合は既定の条件で判断の定義を検索。"
+        }
+      },
+      "INTERRUPTINGPACKAGE": {
+        "INTERRUPTING": {
+          "TITLE": "中断",
+          "DESCRIPTION": "親実行を停止させるフラグ。"
+        }
+      },
+      "COMPLETIONCONDITIONPACKAGE": {
+        "COMPLETIONCONDITION": {
+          "TITLE": "完了条件",
+          "DESCRIPTION": "アドホックサブプロセスの完了条件"
+        }
+      },
+      "ORDERINGPACKAGE": {
+        "ORDERING": {
+          "TITLE": "順番",
+          "DESCRIPTION": "アドホックサブプロセスの順番"
+        }
+      },
+      "CANCELREMAININGINSTANCESPACKAGE": {
+        "CANCELREMAININGINSTANCES": {
+          "TITLE": "残存インスタンスのキャンセル",
+          "DESCRIPTION": "アドホックサブプロセスのための残存インスタンスをキャンセルするフラグ。"
+        }
+      }
+    },
+    "STENCILS": {
+      "GROUPS": {
+        "STARTEVENTS": "開始イベント",
+        "ENDEVENTS": "終了イベント",
+        "DIAGRAM": "ダイヤグラム",
+        "ACTIVITIES": "アクティビティ",
+        "STRUCTURAL": "構造的",
+        "GATEWAYS": "ゲートウェイ",
+        "BOUNDARYEVENTS": "境界イベント",
+        "INTERMEDIATECATCHINGEVENTS": "中間受信イベント",
+        "INTERMEDIATETHROWINGEVENTS": "中間送信イベント",
+        "SWIMLANES": "スイムレーン",
+        "CONNECTINGOBJECTS": "接続オブジェクト",
+        "ARTIFACTS": "構造物"
+      },
+      "BPMNDIAGRAM": {
+        "TITLE": "BPMNダイアグラム",
+        "DESCRIPTION": "BPMN2.0のダイアグラム"
+      },
+      "STARTNONEEVENT": {
+        "TITLE": "開始イベント",
+        "DESCRIPTION": "トリガーなしの開始イベント"
+      },
+      "STARTTIMEREVENT": {
+        "TITLE": "タイマー開始イベント",
+        "DESCRIPTION": "タイマートリガー付きの開始イベント"
+      },
+      "STARTSIGNALEVENT": {
+        "TITLE": "信号開始イベント",
+        "DESCRIPTION": "信号トリガー付きの開始イベント"
+      },
+      "STARTMESSAGEEVENT": {
+        "TITLE": "メッセージ開始イベント",
+        "DESCRIPTION": "メッセージトリガー付きの開始イベント"
+      },
+      "STARTEVENTREGISTRYEVENT": {
+        "TITLE": "レジストリー開始イベント",
+        "DESCRIPTION": "レジストリートリガー付きの開始イベント"
+      },
+      "STARTCONDITIONALEVENT": {
+        "TITLE": "条件付き開始イベント",
+        "DESCRIPTION": "条件付きイベントによって評価される開始イベント"
+      },
+      "STARTERROREVENT": {
+        "TITLE": "エラー開始イベント",
+        "DESCRIPTION": "BPMNエラーをキャッチする開始イベント"
+      },
+      "STARTESCALATIONEVENT": {
+        "TITLE": "エスカレーション開始イベント",
+        "DESCRIPTION": "BPMNエスカレーションをキャッチする開始イベント"
+      },
+      "USERTASK": {
+        "TITLE": "ユーザータスク",
+        "DESCRIPTION": "特定の人に割当られたマニュアルタスク"
+      },
+      "SERVICETASK": {
+        "TITLE": "サービスタスク",
+        "DESCRIPTION": "サービスロジックによる自動タスク"
+      },
+      "SCRIPTTASK": {
+        "TITLE": "スクリプトタスク",
+        "DESCRIPTION": "スクリプトロジックによる自動タスク"
+      },
+      "BUSINESSRULE": {
+        "TITLE": "ビジネスルールタスク",
+        "DESCRIPTION": "ルールロジックによる自動タスク"
+      },
+      "RECEIVETASK": {
+        "TITLE": "受信タスク",
+        "DESCRIPTION": "信号を待つタスク"
+      },
+      "RECEIVEEVENTTASK": {
+        "TITLE": "イベント受信タスク",
+        "DESCRIPTION": "イベントを受信するタスク"
+      },
+      "MANUALTASK": {
+        "TITLE": "マニュアルタスク",
+        "DESCRIPTION": "ロジックがない自動タスク"
+      },
+      "MAILTASK": {
+        "TITLE": "メールタスク",
+        "DESCRIPTION": "メールタスク"
+      },
+      "CAMELTASK": {
+        "TITLE": "Camelタスク",
+        "DESCRIPTION": "Camelへメッセージを送るタスク"
+      },
+      "HTTPTASK": {
+        "TITLE": "HTTPタスク",
+        "DESCRIPTION": "HTTPタスク"
+      },
+      "MULETASK": {
+        "TITLE": "Muleタスク",
+        "DESCRIPTION": "Muleへメッセージを送るタスク"
+      },
+      "SENDTASK": {
+        "TITLE": "送信タスク",
+        "DESCRIPTION": "メッセージを送信するタスク"
+      },
+      "DECISIONTASK": {
+        "TITLE": "判断タスク",
+        "DESCRIPTION": "Flowable DMNルールエンジンを使うタスク"
+      },
+      "SENDEVENTTASK": {
+        "TITLE": "イベント送信タスク",
+        "DESCRIPTION": "イベントレジストリーにイベントを送信するタスク"
+      },
+      "EXTERNALWORKERTASK": {
+        "TITLE": "外部ワーカータスク",
+        "DESCRIPTION": "外部ワーカーによって実行されるジョブを作るタスク"
+      },
+      "SHELLTASK": {
+        "TITLE": "シェルタスクｓ",
+        "DESCRIPTION": "シェルバッチロジックによる自動タスク"
+      },
+      "SUBPROCESS": {
+        "TITLE": "サブプロセス",
+        "DESCRIPTION": "サブプロセススコープ"
+      },
+      "COLLAPSEDSUBPROCESS": {
+        "TITLE": "折りたたまれたサブプロセス",
+        "DESCRIPTION": "サブプロセススコープ"
+      },
+      "EVENTSUBPROCESS": {
+        "TITLE": "イベントサブプロセス",
+        "DESCRIPTION": "イベントサブプロセススコープ"
+      },
+      "CALLACTIVITY": {
+        "TITLE": "呼び出しアクティビティ",
+        "DESCRIPTION": "呼び出しアクティビティ"
+      },
+      "EXCLUSIVEGATEWAY": {
+        "TITLE": "排他ゲートウェイ",
+        "DESCRIPTION": "選択ゲートウェイ"
+      },
+      "PARALLELGATEWAY": {
+        "TITLE": "平行ゲートウェイ",
+        "DESCRIPTION": "平行ゲートウェイ"
+      },
+      "INCLUSIVEGATEWAY": {
+        "TITLE": "包含ゲートウェイ",
+        "DESCRIPTION": "包含ゲートウェイ"
+      },
+      "EVENTGATEWAY": {
+        "TITLE": "イベントゲートウェイ",
+        "DESCRIPTION": "イベントゲートウェイ"
+      },
+      "BOUNDARYCONDITIONALEVENT": {
+        "TITLE": "条件付き境界イベント",
+        "DESCRIPTION": "条件付きイベントを評価する境界イベント"
+      },
+      "BOUNDARYERROREVENT": {
+        "TITLE": "エラー境界イベント",
+        "DESCRIPTION": "BPMNエラーをキャッチする境界イベント"
+      },
+      "BOUNDARYESCALATIONEVENT": {
+        "TITLE": "エスカレーション境界イベント",
+        "DESCRIPTION": "BPMNエスカレーションをキャッチする境界イベント"
+      },
+      "BOUNDARYTIMEREVENT": {
+        "TITLE": "タイマー境界イベント",
+        "DESCRIPTION": "タイマートリガー付きの境界イベント"
+      },
+      "BOUNDARYSIGNALEVENT": {
+        "TITLE": "信号境界イベント",
+        "DESCRIPTION": "信号トリガー付き境界イベント"
+      },
+      "BOUNDARYMESSAGEEVENT": {
+        "TITLE": "メッセージ境界イベント",
+        "DESCRIPTION": "メッセージトリガー付きの境界イベント"
+      },
+      "BOUNDARYCANCELEVENT": {
+        "TITLE": "キャンセル境界イベント",
+        "DESCRIPTION": "キャンセル境界イベント"
+      },
+      "BOUNDARYEVENTREGISTRYEVENT": {
+        "TITLE": "レジストリー境界イベント",
+        "DESCRIPTION": "レジストリー境界イベント"
+      },
+      "BOUNDARYCOMPENSATIONEVENT": {
+        "TITLE": "補償境界イベント",
+        "DESCRIPTION": "補償境界イベント"
+      },
+      "CATCHTIMEREVENT": {
+        "TITLE": "タイマー中間受信イベント",
+        "DESCRIPTION": "タイマートリガー付きの中間受信イベント"
+      },
+      "CATCHSIGNALEVENT": {
+        "TITLE": "信号中間受信イベント",
+        "DESCRIPTION": "信号トリガー付きの中間受信イベント"
+      },
+      "CATCHMESSAGEEVENT": {
+        "TITLE": "メッセージ中間受信イベント",
+        "DESCRIPTION": "メッセージトリガー付きの中間受信イベント"
+      },
+      "CATCHCONDITIONALEVENT": {
+        "TITLE": "条件付き中間受信イベント",
+        "DESCRIPTION": "条件トリガー付き中間受信イベント"
+      },
+      "CATCHEVENTREGISTRYEVENT": {
+        "TITLE": "レジストリー中間受信イベント",
+        "DESCRIPTION": "イベントレジストリーからのイベント受信を待つ中間イベント"
+      },
+      "THROWNONEEVENT": {
+        "TITLE": "トリガーなし中間イベント",
+        "DESCRIPTION": "特定のトリガーを持たない中間イベント"
+      },
+      "THROWSIGNALEVENT": {
+        "TITLE": "信号中間送信イベント",
+        "DESCRIPTION": "信号トリガー付きの中間イベント"
+      },
+      "THROWESCALATIONEVENT": {
+        "TITLE": "エスカレーション中間送信イベント",
+        "DESCRIPTION": "エスカレーショントリガー付きの中間送信イベント"
+      },
+      "ENDNONEEVENT": {
+        "TITLE": "終了イベント",
+        "DESCRIPTION": "特定のトリガーを持たない終了イベント"
+      },
+      "ENDERROREVENT": {
+        "TITLE": "エラー終了イベント",
+        "DESCRIPTION": "エラーを送信する終了イベント"
+      },
+      "ENDESCALATIONEVENT": {
+        "TITLE": "エスカレーション終了イベント",
+        "DESCRIPTION": "エスカレーションを送信する終了イベント"
+      },
+      "ENDCANCELEVENT": {
+        "TITLE": "キャンセル終了イベント",
+        "DESCRIPTION": "キャンセル終了イベント"
+      },
+      "ENDTERMINATEEVENT": {
+        "TITLE": "停止終了イベント",
+        "DESCRIPTION": "停止終了イベント"
+      },
+      "POOL": {
+        "TITLE": "プール",
+        "DESCRIPTION": "プロセス定義を構成するプール"
+      },
+      "LANE": {
+        "TITLE": "レーン",
+        "DESCRIPTION": "プロセス定義を構成するレーン"
+      },
+      "SEQUENCEFLOW": {
+        "TITLE": "シーケンスフロー",
+        "DESCRIPTION": "アクティビティの実行順を定義するシーケンスフロー"
+      },
+      "MESSAGEFLOW": {
+        "TITLE": "メッセージフロー",
+        "DESCRIPTION": "異なるプールにある要素を繋ぐメッセージフロー"
+      },
+      "ASSOCIATION": {
+        "TITLE": "関連",
+        "DESCRIPTION": "要素とテキストアノテーションの接続"
+      },
+      "DATAASSOCIATION": {
+        "TITLE": "データ関連",
+        "DESCRIPTION": "アクティビティとデータ要素の接続"
+      },
+      "TEXTANNOTATION": {
+        "TITLE": "テキストアノテーション",
+        "DESCRIPTION": "要素の説明テキスト。"
+      },
+      "DATASTORE": {
+        "TITLE": "データストア",
+        "DESCRIPTION": "データストアの参照。"
+      },
+      "ADHOCSUBPROCESS": {
+        "TITLE": "アドホックサブプロセス",
+        "DESCRIPTION": "アドホックサブプロセス"
+      }
+    }
+  },
+  "CMMN": {
+    "TITLE": "CMMNエディター",
+    "DESCRIPTION": "CMMNケースエディター",
+    "PROPERTYPACKAGES": {
+      "CASE_IDPACKAGE": {
+        "CASE_ID": {
+          "TITLE": "ケースID",
+          "DESCRIPTION": "ケース定義のユニークID。"
+        }
+      },
+      "OVERRIDEIDPACKAGE": {
+        "OVERRIDEID": {
+          "TITLE": "ID",
+          "DESCRIPTION": "要素の識別子です。"
+        }
+      },
+      "NAMEPACKAGE": {
+        "NAME": {
+          "TITLE": "名前",
+          "DESCRIPTION": "CMMN要素の名前。"
+        }
+      },
+      "DOCUMENTATIONPACKAGE": {
+        "DOCUMENTATION": {
+          "TITLE": "ドキュメンテーション",
+          "DESCRIPTION": "CMMN要素の名前。"
+        }
+      },
+      "BLOCKINGPACKAGE": {
+        "ISBLOCKING": {
+          "TITLE": "ブロッキング",
+          "DESCRIPTION": "真偽型属性、標準ではtrue。falseの場合は関連するロジックを実行した後でタスクを自動的に完了する"
+        },
+        "ISBLOCKINGEXPRESSION": {
+          "TITLE": "ブロッキング式",
+          "DESCRIPTION": "実行時にタスクをブロックするかどうかを判定する式。設定すると、ブロッキング設定は無視されます。"
+        }
+      },
+      "CASE_INITIATORVARIABLENAMEPACKAGE": {
+        "CASE_INITIATORVARIABLENAME": {
+          "TITLE": "イニシエーター変数",
+          "DESCRIPTION": "ケースイニシエーターの値に使用する変数の名前。"
+        }
+      },
+      "CASE_AUTHORPACKAGE": {
+        "CASE_AUTHOR": {
+          "TITLE": "ケースオーサー",
+          "DESCRIPTION": "ケース定義の作成者。"
+        }
+      },
+      "CASE_VERSIONPACKAGE": {
+        "CASE_VERSION": {
+          "TITLE": "ケースバージョン文字列（ドキュメントのみ）",
+          "DESCRIPTION": "ドキュメンテーション用のバージョンの識別子です。"
+        }
+      },
+      "CASE_NAMESPACEPACKAGE": {
+        "CASE_NAMESPACE": {
+          "TITLE": "ターゲット名前空間",
+          "DESCRIPTION": "ケース定義のターゲット名前空間。"
+        }
+      },
+      "USERTASKASSIGNMENTPACKAGE": {
+        "USERTASKASSIGNMENT": {
+          "TITLE": "割当",
+          "DESCRIPTION": "ユーザータスクへの割当の定義"
+        }
+      },
+      "TASKLISTENERSPACKAGE": {
+        "TASKLISTENERS": {
+          "TITLE": "タスクリスナー",
+          "DESCRIPTION": "ヒューマンタスクのリスナー"
+        }
+      },
+      "FORMPROPERTIESPACKAGE": {
+        "FORMPROPERTIES": {
+          "TITLE": "フォーム属性",
+          "DESCRIPTION": "フォーム属性の定義"
+        }
+      },
+      "FORMKEYDEFINITIONPACKAGE": {
+        "FORMKEYDEFINITION": {
+          "TITLE": "フォームキー",
+          "DESCRIPTION": "フォームへの参照のためのキー。"
+        }
+      },
+      "FORMFIELDVALIDATIONPACKAGE": {
+        "FORMFIELDVALIDATION": {
+          "TITLE": "フォーム項目の検証",
+          "DESCRIPTION": "フォーム提出時の検証。（true/falseや式を設定可能）"
+        }
+      },
+      "DUEDATEDEFINITIONPACKAGE": {
+        "DUEDATEDEFINITION": {
+          "TITLE": "期日",
+          "DESCRIPTION": "ユーザータスクの期日。"
+        }
+      },
+      "PRIORITYDEFINITIONPACKAGE": {
+        "PRIORITYDEFINITION": {
+          "TITLE": "優先度",
+          "DESCRIPTION": "ユーザータスクの優先度。"
+        }
+      },
+      "SERVICETASKCLASSPACKAGE": {
+        "SERVICETASKCLASS": {
+          "TITLE": "クラス",
+          "DESCRIPTION": "サービスタスクロジックを実装しているクラス。"
+        }
+      },
+      "SERVICETASKEXPRESSIONPACKAGE": {
+        "SERVICETASKEXPRESSION": {
+          "TITLE": "式",
+          "DESCRIPTION": "式により定義されるサービスタスクロジック。"
+        }
+      },
+      "SERVICETASKDELEGATEEXPRESSIONPACKAGE": {
+        "SERVICETASKDELEGATEEXPRESSION": {
+          "TITLE": "委譲式",
+          "DESCRIPTION": "委譲式により定義されるサービスタスクロジック。"
+        }
+      },
+      "SERVICETASKFIELDSPACKAGE": {
+        "SERVICETASKFIELDS": {
+          "TITLE": "クラス項目",
+          "DESCRIPTION": "項目拡張"
+        }
+      },
+      "SERVICETASKRESULTVARIABLEPACKAGE": {
+        "SERVICETASKRESULTVARIABLE": {
+          "TITLE": "結果変数",
+          "DESCRIPTION": "サービスタスクの結果を格納するプロセス変数の名前"
+        }
+      },
+      "ASYNCPACKAGE": {
+        "ISASYNC": {
+          "TITLE": "非同期",
+          "DESCRIPTION": "非同期で実行されるタスク。"
+        },
+        "ISEXCLUSIVE": {
+          "TITLE": "排他",
+          "DESCRIPTION": "排他的に実行される非同期タスク"
+        }
+      },
+      "MAILTASKHEADERSPACKAGE": {
+        "MAILTASKHEADERS": {
+          "TITLE": "ヘッダー",
+          "DESCRIPTION": "行分割したメールヘッダー。"
+        }
+      },
+      "MAILTASKTOPACKAGE": {
+        "MAILTASKTO": {
+          "TITLE": "宛先",
+          "DESCRIPTION": "メールの受信者。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKFROMPACKAGE": {
+        "MAILTASKFROM": {
+          "TITLE": "差出人",
+          "DESCRIPTION": "メールの送信者。指定しない場合は規程のアドレスが使用されます。"
+        }
+      },
+      "MAILTASKSUBJECTPACKAGE": {
+        "MAILTASKSUBJECT": {
+          "TITLE": "件名",
+          "DESCRIPTION": "メールの表題。"
+        }
+      },
+      "MAILTASKCCPACKAGE": {
+        "MAILTASKCC": {
+          "TITLE": "同報(CC)",
+          "DESCRIPTION": "メールの同報先。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKBCCPACKAGE": {
+        "MAILTASKBCC": {
+          "TITLE": "同報(BCC)",
+          "DESCRIPTION": "メールの同報先(秘匿)。カンマ区切りで指定された複数の受信者。"
+        }
+      },
+      "MAILTASKTEXTPACKAGE": {
+        "MAILTASKTEXT": {
+          "TITLE": "テキスト",
+          "DESCRIPTION": "リッチテキストメールに対応していない受信者のためのプレーンテキストのメールの本文。HTMLと組み合わせて利用できます。対応していない場合はテキストのみのバージョンが表示されます。"
+        },
+        "MAILTASKTEXTVAR": {
+          "TITLE": "テキスト変数",
+          "DESCRIPTION": "プレーンテキストの内容が保存されるケース変数。HTMLと組み合わせて利用できます。対応していない場合はテキストのみのバージョンが表示されます。"
+        }
+      },
+      "MAILTASKHTMLPACKAGE": {
+        "MAILTASKHTML": {
+          "TITLE": "HTML",
+          "DESCRIPTION": "メール本文に含まれるHTML断片。"
+        },
+        "MAILTASKHTMLVAR": {
+          "TITLE": "HTML変数",
+          "DESCRIPTION": "リッチテキストの内容が保存されるケース変数。"
+        }
+      },
+      "MAILTASKCHARSETPACKAGE": {
+        "MAILTASKCHARSET": {
+          "TITLE": "文字セット",
+          "DESCRIPTION": "非英語圏のユーザーのためにメールの文字セットを変更することができます。"
+        }
+      },
+      "TEXTPACKAGE": {
+        "TEXT": {
+          "TITLE": "テキスト",
+          "DESCRIPTION": "アノテーションのテキスト。"
+        }
+      },
+      "FORMREFERENCEPACKAGE": {
+        "FORMREFERENCE": {
+          "TITLE": "フォーム参照",
+          "DESCRIPTION": "フォームへの参照"
+        }
+      },
+      "DECISIONTASKDECISIONTABLEREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONTABLEREFERENCE": {
+          "TITLE": "デシジョンテーブル参照",
+          "DESCRIPTION": "デシジョンテーブルへの参照を設定"
+        }
+      },
+      "DECISIONTASKDECISIONSERVICEREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONSERVICEREFERENCE": {
+          "TITLE": "デシジョンサービス参照",
+          "DESCRIPTION": "デシジョンサービスへの参照を設定"
+        }
+      },
+      "DECISIONTASKTHROWERRORONNOHITSPACKAGE": {
+        "DECISIONTASKTHROWERRORONNOHITS": {
+          "TITLE": "ルールがヒットしない場合はエラー",
+          "DESCRIPTION": "デシジョンテーブル上のルールにヒットせず結果が得られない場合はエラーとする。"
+        }
+      },
+      "DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE": {
+        "DECISIONTASKFALLBACKTODEFAULTTENANT": {
+          "TITLE": "規定のテナントにフォールバック",
+          "DESCRIPTION": "テナント付きの条件で失敗した場合は既定の条件で判断の定義を検索。"
+        }
+      },
+      "HTTPTASKREQUESTMETHODPACKAGE": {
+        "HTTPTASKREQUESTMETHOD": {
+          "TITLE": "リクエストメソッド",
+          "DESCRIPTION": "リクエストメソッド（GET、POST、PUTなど）"
+        }
+      },
+      "HTTPTASKREQUESTURLPACKAGE": {
+        "HTTPTASKREQUESTURL": {
+          "TITLE": "リクエストURL",
+          "DESCRIPTION": "リクエストURL（http://flowable.orgなど）"
+        }
+      },
+      "HTTPTASKREQUESTHEADERSPACKAGE": {
+        "HTTPTASKREQUESTHEADERS": {
+          "TITLE": "リクエストヘッダー",
+          "DESCRIPTION": "行分割されたHTTPリクエストヘッダー（Content-Type: application/jsonなど）"
+        }
+      },
+      "HTTPTASKREQUESTBODYPACKAGE": {
+        "HTTPTASKREQUESTBODY": {
+          "TITLE": "リクエストボディ",
+          "DESCRIPTION": "リクエストボディ（${sampleBody}など）"
+        }
+      },
+      "HTTPTASKREQUESTBODYENCODINGPACKAGE": {
+        "HTTPTASKREQUESTBODYENCODING": {
+          "TITLE": "リクエストボディエンコーディング",
+          "DESCRIPTION": "リクエストボディのエンコーディング（UTF-8など）"
+        }
+      },
+      "HTTPTASKREQUESTTIMEOUTPACKAGE": {
+        "HTTPTASKREQUESTTIMEOUT": {
+          "TITLE": "リクエストタイムアウト",
+          "DESCRIPTION": "ミリ秒単位のリクエストのタイムアウト設定（5000など）"
+        }
+      },
+      "HTTPTASKDISALLOWREDIRECTSPACKAGE": {
+        "HTTPTASKDISALLOWREDIRECTS": {
+          "TITLE": "リダイレクト拒否",
+          "DESCRIPTION": "HTTPリダイレクトを拒否するフラグ"
+        }
+      },
+      "HTTPTASKFAILSTATUSCODESPACKAGE": {
+        "HTTPTASKFAILSTATUSCODES": {
+          "TITLE": "失敗ステータスコード",
+          "DESCRIPTION": "再実行のためのHTTPレスポンスのステータスコードのカンマ区切りリスト（400、5XXなど）"
+        }
+      },
+      "HTTPTASKHANDLESTATUSCODESPACKAGE": {
+        "HTTPTASKHANDLESTATUSCODES": {
+          "TITLE": "ステータスコードハンドル",
+          "DESCRIPTION": "無視するHTTPレスポンスのステータスコードのカンマ区切りリスト（404、3XXなど）"
+        }
+      },
+      "HTTPTASKIGNOREEXCEPTIONPACKAGE": {
+        "HTTPTASKIGNOREEXCEPTION": {
+          "TITLE": "例外無視",
+          "DESCRIPTION": "例外を無視するフラグ。"
+        }
+      },
+      "HTTPTASKRESPONSEVARIABLENAMEPACKAGE": {
+        "HTTPTASKRESPONSEVARIABLENAME": {
+          "TITLE": "レスポンス変数",
+          "DESCRIPTION": "HTTPレスポンスを保存する変数。"
+        }
+      },
+      "HTTPTASKSAVEREQUESTVARIABLESPACKAGE": {
+        "HTTPTASKSAVEREQUESTVARIABLES": {
+          "TITLE": "リクエスト変数の保存",
+          "DESCRIPTION": "リクエスト変数の保存のフラグ。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERS": {
+          "TITLE": "レスポンスステータス、ヘッダーの保存",
+          "DESCRIPTION": "リクエストステータス、ヘッダーなどの保存のフラグ。"
+        }
+      },
+      "HTTPTASKRESULTVARIABLEPREFIXPACKAGE": {
+        "HTTPTASKRESULTVARIABLEPREFIX": {
+          "TITLE": "結果変数接頭辞",
+          "DESCRIPTION": "実行変数の接頭辞。"
+        }
+      },
+      "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE": {
+        "HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT": {
+          "TITLE": "レスポンスを一時変数に保存",
+          "DESCRIPTION": "レスポンスを一時変数に保存するフラグ"
+        }
+      },
+      "HTTPTASKSAVERESPONSEASJSONPACKAGE": {
+        "HTTPTASKSAVERESPONSEASJSON": {
+          "TITLE": "レスポンスをJSON形式で保存",
+          "DESCRIPTION": "レスポンスを文字列ではなくJSON形式で保存するフラグ"
+        }
+      },
+      "HTTPTASKPARALLELINSAMETRANSACTIONPACKAGE" : {
+        "HTTPTASKPARALLELINSAMETRANSACTION" : {
+          "TITLE" : "Execute parallel in same transaction",
+          "DESCRIPTION" : "Flag indicating that the Http call should be done parallel in the same transaction. This means that when using parallel gateways multiple http tasks are executed in the same time in the same transaction and thus the entire execution of the process is faster."
+        }
+      },
+      "EVENTREGISTRYPACKAGE": {
+        "EVENTKEY": {
+          "TITLE": "イベントキー",
+          "DESCRIPTION": "イベントキーの定義"
+        },
+        "EVENTNAME": {
+          "TITLE": "イベント名",
+          "DESCRIPTION": "イベント名の定義"
+        },
+        "EVENTINPARAMETERS": {
+          "TITLE": "イベントペイロードへのマッピング",
+          "DESCRIPTION": "イベントペイロード属性にプロセス変数をマッピング"
+        },
+        "EVENTOUTPARAMETERS": {
+          "TITLE": "イベントペイロードからのマッピング",
+          "DESCRIPTION": "プロセス変数にイベントペイロード属性をマッピング"
+        },
+        "EVENTCORRELATIONPARAMETERS": {
+          "TITLE": "相関パラメーター",
+          "DESCRIPTION": "相関パラメーターの定義"
+        },
+        "CHANNELKEY": {
+          "TITLE": "チャンネルキー",
+          "DESCRIPTION": "チャンネルキーの定義"
+        },
+        "CHANNELNAME": {
+          "TITLE": "チャンネル名",
+          "DESCRIPTION": "チャンネル名の定義"
+        },
+        "CHANNELTYPE": {
+          "TITLE": "チャンネルタイプ",
+          "DESCRIPTION": "チャンネルタイプの定義"
+        },
+        "CHANNELDESTINATION": {
+          "TITLE": "チャンネルの宛先",
+          "DESCRIPTION": "チャンネルの宛先の定義"
+        },
+        "KEYDETECTIONFIXEDVALUE": {
+          "TITLE": "イベントキー固定値",
+          "DESCRIPTION": "イベントキー固定値の定義"
+        },
+        "KEYDETECTIONJSONFIELD": {
+          "TITLE": "イベントキーJSONフィールド",
+          "DESCRIPTION": "JSONフィールドによるイベントキー検知の定義"
+        },
+        "KEYDETECTIONJSONPOINTER": {
+          "TITLE": "イベントキーJSONポインター",
+          "DESCRIPTION": "JSONポインター式によるイベントキー検知の定義"
+        }
+      },
+      "EXTERNALWORKERJOBPACKAGE": {
+        "TOPIC": {
+          "TITLE": "ジョブトピック",
+          "DESCRIPTION": "外部ワーカーが使用する可能性があるジョブトピック"
+        }
+      },
+      "CASETASKCASEREFERENCEPACKAGE": {
+        "CASETASKCASEREFERENCE": {
+          "TITLE": "ケース参照",
+          "DESCRIPTION": "ケース参照を設定"
+        }
+      },
+      "PROCESSTASKPROCESSREFERENCEPACKAGE": {
+        "PROCESSTASKPROCESSREFERENCE": {
+          "TITLE": "プロセス参照",
+          "DESCRIPTION": "プロセス参照を設定"
+        }
+      },
+      "FALLBACKTODEFAULTTENANTPACKAGE": {
+        "FALLBACKTODEFAULTTENANT": {
+          "TITLE": "規定のテナントにフォールバック",
+          "DESCRIPTION": "指定されたテナントにキーが見つからなかった場合は既定のテナントを使用する"
+        }
+      },
+      "PROCESSTASKINPARAMETERSPACKAGE": {
+        "PROCESSTASKINPARAMETERS": {
+          "TITLE": "引数",
+          "DESCRIPTION": "入力パラメータの定義"
+        }
+      },
+      "PROCESSTASKOUTPARAMETERSPACKAGE": {
+        "PROCESSTASKOUTPARAMETERS": {
+          "TITLE": "返値",
+          "DESCRIPTION": "出力パラメータの定義"
+        }
+      },
+      "CASETASKINPARAMETERSPACKAGE": {
+        "CASETASKINPARAMETERS": {
+          "TITLE": "引数",
+          "DESCRIPTION": "入力パラメータの定義"
+        }
+      },
+      "CASETASKOUTPARAMETERSPACKAGE": {
+        "CASETASKOUTPARAMETERS": {
+          "TITLE": "返値",
+          "DESCRIPTION": "出力パラメータの定義"
+        }
+      },
+      "IDVARIABLENAMEPACKAGE": {
+        "IDVARIABLENAME": {
+          "TITLE": "ID変数",
+          "DESCRIPTION": "開始したインスタンスのIDをこの変数に保存"
+        }
+      },
+      "TIMEREXPRESSIONPACKAGE": {
+        "TIMEREXPRESSION": {
+          "TITLE": "タイマー式",
+          "DESCRIPTION": "ISO-8601仕様の文字列もしくはjava.util.Date"
+        }
+      },
+      "TIMERSTARTTRIGGERPACKAGE": {
+        "TIMERSTARTTRIGGERSOURCEREF": {
+          "TITLE": "開始トリガー計画アイテム",
+          "DESCRIPTION": "タイマーを開始させる標準イベントを設定した計画アイテムへの参照（オプショナル）"
+        },
+        "TRANSITIONEVENT": {
+          "TITLE": "開始トリガー遷移イベント",
+          "DESCRIPTION": "遷移イベントのタイプ。開始トリガー計画アイテムが設定されている場合にのみ使用する"
+        }
+      },
+      "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONREFERENCE": {
+          "TITLE": "判断参照",
+          "DESCRIPTION": "判断参照の設定"
+        }
+      },
+      "DECISIONTASKDECISIONREFERENCEPACKAGE": {
+        "DECISIONTASKDECISIONREFERENCE": {
+          "TITLE": "判断参照",
+          "DESCRIPTION": "判断参照の設定"
+        }
+      },
+      "IFPARTCONDITIONPACKAGE": {
+        "IFPARTCONDITION": {
+          "TITLE": "条件",
+          "DESCRIPTION": ""
+        }
+      },
+      "TRIGGERMODEPACKAGE": {
+        "TRIGGERMODE": {
+          "TITLE": "トリガーモード",
+          "DESCRIPTION": "メモリー付き（標準）もしくはメモリーなし（イベント時）のどちらに見張り条件を評価するかを決定標準では見張り条件が部分的に充足した場合その結果を保持します。後続の評価は条件が同じ条件を再評価する際に保持された値を使います。イベント時、の設定の場合全部の条件を評価しすべてがtrueの場合のみ充足されます。充足されない場合は途中結果はすべて破棄されます。"
+        }
+      },
+      "AUTOCOMPLETEPACKAGE": {
+        "AUTOCOMPLETEENABLED": {
+          "TITLE": "自動完了",
+          "DESCRIPTION": "子がすべて完了した時に自動的に完了となることを示すフラグ"
+        },
+        "AUTOCOMPLETECONDITION": {
+          "TITLE": "自動完了条件",
+          "DESCRIPTION": "ステージが自動完了となる条件を決定する式"
+        }
+      },
+      "REQUIREDRULEPACKAGE": {
+        "REQUIREDENABLED": {
+          "TITLE": "必須",
+          "DESCRIPTION": "ステージ、タスク、マイルストーンなどが親ステージの完了判定時に要求されるかどうかを示すフラグ。標準ではfalseに設定。"
+        },
+        "REQUIREDRULECONDITION": {
+          "TITLE": "必須ルール",
+          "DESCRIPTION": "ステージ、タスク、マイルストーンが親ステージの完了判定時に要求されるかどうかを判定する式。"
+        }
+      },
+      "REPETITIONRULEPACKAGE": {
+        "REPETITIONENABLED": {
+          "TITLE": "反復",
+          "DESCRIPTION": "反復が有効化されているかを示すフラグ"
+        },
+        "REPETITIONRULECONDITION": {
+          "TITLE": "反復ルール",
+          "DESCRIPTION": "プランアイテムの新しいインスタンスを生成するかを判定する式"
+        },
+        "REPETITIONCOUNTERVARIABLENAME": {
+          "TITLE": "反復カウンター変数",
+          "DESCRIPTION": "反復したインスタンスの数を計測するローカル変数の名前。既定の値は\"repetitionCounter\"。"
+        }
+      },
+      "MANUALACTIVATIONRULEPACKAGE": {
+        "MANUALACTIVATIONENABLED": {
+          "TITLE": "マニュアル有効化",
+          "DESCRIPTION": "タスクやステージがマニュアルで有効化する必要があるかを示すフラグ。既定の値はfalse。"
+        },
+        "MANUALACTIVATIONRULECONDITION": {
+          "TITLE": "マニュアル有効化ルール",
+          "DESCRIPTION": "タスクやステージがマニュアルで有効化される必要があるかどうかを判定する式。"
+        }
+      },
+      "COMPLETIONNEUTRALRULEPACKAGE": {
+        "COMPLETIONNEUTRALENABLED": {
+          "TITLE": "完了中立",
+          "DESCRIPTION": "プランアイテムが完了中立(親ステージの完了に影響しない）であることを示すフラグ。既定の値はfalse。"
+        },
+        "COMPLETIONNEUTRALRULECONDITION": {
+          "TITLE": "完了中立ルール",
+          "DESCRIPTION": "プランアイテムが完了中立であるかを判定する式。"
+        }
+      },
+      "PLANITEMLIFECYCLELISTENERSPACKAGE": {
+        "PLANITEMLIFECYCLELISTENERS": {
+          "TITLE": "ライフサイクルリスナー",
+          "DESCRIPTION": "プランアイテムのライフサイクルイベントのリスナー"
+        }
+      },
+      "DISPLAYORDERPACKAGE": {
+        "DISPLAYORDER": {
+          "TITLE": "表示順",
+          "DESCRIPTION": "ステージ概要表示の際に他のステージの値と比較して表示順を決定するための値。"
+        }
+      },
+      "INCLUDEINSTAGEOVERVIEWPACKAGE": {
+        "INCLUDEINSTAGEOVERVIEW": {
+          "TITLE": "概要表示に含む",
+          "DESCRIPTION": "ステージの概要表示に出すかどうかを示す"
+        }
+      },
+      "MILESTONEVARIABLEPACKAGE": {
+        "MILESTONEVARIABLE": {
+          "TITLE": "マイルストーン変数",
+          "DESCRIPTION": "設定されている場合この名前の変数には毎留守尾トーンに到達した時点でtrueの値がセットされる"
+        }
+      },
+      "SCRIPTFORMATPACKAGE": {
+        "SCRIPTFORMAT": {
+          "TITLE": "スクリプトフォーマット",
+          "DESCRIPTION": "スクリプトタスクのフォーマット（Javascript、Groovyなど）"
+        }
+      },
+      "SCRIPTTEXTPACKAGE": {
+        "SCRIPTTEXT": {
+          "TITLE": "スクリプト",
+          "DESCRIPTION": "スクリプトタスクのテキスト"
+        }
+      },
+      "TRANSITIONEVENTPACKAGE": {
+        "TRANSITIONEVENT": {
+          "TITLE": "遷移イベントタイプ",
+          "DESCRIPTION": "遷移イベントのタイプ"
+        }
+      },
+      "AVAILABLECONDITIONPACKAGE": {
+        "AVAILABLECONDITION": {
+          "TITLE": "利用可能条件",
+          "DESCRIPTION": "イベントリスナーが利用可能になるための条件式。"
+        }
+      },
+      "SERVICETASKSTORERESULTVARIABLETRANSIENTPACKAGE": {
+        "SERVICETASKSTORERESULTVARIABLETRANSIENT": {
+          "TITLE": "結果変数を一時的に保存",
+          "DESCRIPTION": "式の結果をデータベーストランザクションの完了時に永続化させないフラグ"
+        }
+      }
+    },
+    "STENCILS": {
+      "GROUPS": {
+        "DIAGRAM": "ダイヤグラム",
+        "CONTAINERS": "コンテナー",
+        "ACTIVITIES": "アクティビティ",
+        "EVENTLISTENERS": "イベントリスナー",
+        "SENTRIES": "見張り",
+        "CONNECTORS": "コネクター"
+      },
+      "CMMNDIAGRAM": {
+        "TITLE": "CMMNダイアグラム",
+        "DESCRIPTION": "CMMN2.0のダイアグラム"
+      },
+      "CASEPLANMODEL": {
+        "TITLE": "ケースプランモデル",
+        "DESCRIPTION": "ケースプランモデル"
+      },
+      "STAGE": {
+        "TITLE": "ステージ",
+        "DESCRIPTION": "ステージ"
+      },
+      "TASK": {
+        "TITLE": "タスク",
+        "DESCRIPTION": "マニュアルタスク"
+      },
+      "HUMANTASK": {
+        "TITLE": "ヒューマンタスク",
+        "DESCRIPTION": "特定の人に割当られたマニュアルタスク"
+      },
+      "SERVICETASK": {
+        "TITLE": "サービスタスク",
+        "DESCRIPTION": "サービスロジックによる自動タスク"
+      },
+      "DECISIONTASK": {
+        "TITLE": "判断タスク",
+        "DESCRIPTION": "DMNの判断を呼び出すタスク"
+      },
+      "HTTPTASK": {
+        "TITLE": "HTTPタスク",
+        "DESCRIPTION": "HTTPタスク"
+      },
+      "MAILTASK": {
+        "TITLE": "メールタスク",
+        "DESCRIPTION": "メールタスク"
+      },
+      "SCRIPTTASK": {
+        "TITLE": "スクリプトタスク",
+        "DESCRIPTION": "スクリプトロジックによる自動タスク"
+      },
+      "SENDEVENTTASK": {
+        "TITLE": "イベント送信タスク",
+        "DESCRIPTION": "イベント送信タスク"
+      },
+      "EXTERNALWORKERTASK": {
+        "TITLE": "外部ワーカータスク",
+        "DESCRIPTION": "外部ワーカーによって実行されるジョブを作るタスク"
+      },
+      "MILESTONE": {
+        "TITLE": "マイルストーン",
+        "DESCRIPTION": "マイルストーン"
+      },
+      "CASETASK": {
+        "TITLE": "ケースタスク",
+        "DESCRIPTION": "新しいインスタンスを開始するケース定義への参照"
+      },
+      "PROCESSTASK": {
+        "TITLE": "プロセスタスク",
+        "DESCRIPTION": "新しいインスタンスを開始するプロセス定義への参照"
+      },
+      "EVENTLISTENER": {
+        "TITLE": "イベントリスナー",
+        "DESCRIPTION": "一般的なイベントリスナー"
+      },
+      "TIMEREVENTLISTENER": {
+        "TITLE": "タイマーイベントリスナー",
+        "DESCRIPTION": "タイマートリガー付きのイベントリスナー"
+      },
+      "USEREVENTLISTENER": {
+        "TITLE": "ユーザーイベントリスナー",
+        "DESCRIPTION": "ユーザーイベントのリスナー"
+      },
+      "ENTRYCRITERION": {
+        "TITLE": "入口基準",
+        "DESCRIPTION": "入口基準を定義する見張り"
+      },
+      "EXITCRITERION": {
+        "TITLE": "出口基準",
+        "DESCRIPTION": "出口基準を定義する見張り"
+      },
+      "ASSOCIATION": {
+        "TITLE": "関連",
+        "DESCRIPTION": "プランアイテムと見張りの関連"
+      }
+    }
+  },
+  "EDITOR": {
+    "POPUP": {
+      "UNSAVED-CHANGES": {
+        "TITLE": "保存していない変更があります",
+        "DESCRIPTION": "未保存の変更内容をどうしますか？",
+        "ACTION": {
+          "SAVE": "変更を保存",
+          "DISCARD": "変更を破棄",
+          "CONTINUE": "編集の続行"
+        }
+      }
+    }
+  },
+  "PROCESS-LIST": {
+    "TITLE": "ビジネスプロセスモデル",
+    "SEARCH-PLACEHOLDER": "検索",
+    "ACTION": {
+      "CREATE": "プロセスの作成",
+      "IMPORT": "プロセスのインポート"
+    },
+    "FILTER": {
+      "PROCESSES": "プロセスモデル",
+      "PROCESSES-COUNT": "プロセスモデルが{{total}}個あります",
+      "PROCESSES-ONE": "プロセスモデルが1個あります",
+      "PROCESSES-EMPTY": "プロセスモデルはまだ作成されていません。プロセスモデル、ユーザーフォームを作成しそれらをまとめてプロセスアプリを作成できます。最初のステップはプロセスモデルの作成です:",
+      "PROCESSES-BPMN-HINT": "BPMNビジュアルエディターを使ってBPMNモデルを作成。",
+      "PROCESSES-BPMN-IMPORT-HINT": "既存のBPMNモデルをインポートすることもできます。",
+      "FILTER-TEXT": "条件“{{filterText}}”",
+      "FILTER-TEXT-EMPTY": "条件“{{filterText}}”にあうプロセスモデルはありません",
+      "RECENT": "新着",
+      "RECENT-COUNT": "{{total}}個の最近使用されたモデル",
+      "RECENT-ONE": "最近利用されたモデル",
+      "RECENT-EMPTY": "最近利用されたモデルはありません。"
+    },
+    "SORT": {
+      "MODIFIED-ASC": "作成日 昇順",
+      "MODIFIED-DESC": "作成日 降順",
+      "NAME-ASC": "名前 昇順",
+      "NAME-DESC": "名前 降順"
+    }
+  },
+  "CASE-LIST": {
+    "TITLE": "ケースモデル",
+    "SEARCH-PLACEHOLDER": "検索",
+    "ACTION": {
+      "CREATE": "ケースの作成",
+      "IMPORT": "ケースのインポート"
+    },
+    "FILTER": {
+      "CASES": "ケースモデル",
+      "CASES-COUNT": "ケースモデルが{{total}}個あります",
+      "CASES-ONE": "ケースモデルが1個あります",
+      "CASES-EMPTY": "ケースモデルはまだ作成されていません。ケースモデル、ユーザーフォームを作成しそれらをまとめてアプリを作成できます。最初のステップはケースモデルの作成です:",
+      "CASES-CMMN-HINT": "CMMNビジュアルエディターを使ってCMMNモデルを作成",
+      "CASES-CMMN-IMPORT-HINT": "既存のCMMNモデルをインポートすることもできます。",
+      "FILTER-TEXT": "条件“{{filterText}}”",
+      "FILTER-TEXT-EMPTY": "条件“{{filterText}}”にあうケースモデルはありません。",
+      "RECENT": "新着",
+      "RECENT-COUNT": "{{total}}個の最近使用されたモデル",
+      "RECENT-ONE": "最近利用されたモデル",
+      "RECENT-EMPTY": "最近利用されたモデルはありません。"
+    },
+    "SORT": {
+      "MODIFIED-ASC": "作成日 昇順",
+      "MODIFIED-DESC": "作成日 降順",
+      "NAME-ASC": "名前 昇順",
+      "NAME-DESC": "名前 降順"
+    }
+  },
+  "FORMS-LIST": {
+    "TITLE": "フォーム",
+    "SEARCH-PLACEHOLDER": "検索",
+    "ACTION": {
+      "CREATE": "フォームの作成",
+      "CREATE-INLINE": "今すぐ新しいフォームを作成",
+      "SHOW-MORE": "さらに表示..."
+    },
+    "FILTER": {
+      "FORMS": "フォーム",
+      "FORMS-COUNT": "フォームが{{total}}個あります。",
+      "FORMS-ONE": "フォームが1つあります。",
+      "FORMS-EMPTY": "フォームはまだありません。フォームの作成 をクリックして追加してください。",
+      "FILTER-TEXT": "条件“{{filterText}}”",
+      "FILTER-TEXT-EMPTY": "条件“{{filterText}}”にあうフォームはありません。"
+    },
+    "SORT": {
+      "MODIFIED-ASC": "作成日 昇順",
+      "MODIFIED-DESC": "作成日 降順",
+      "NAME-ASC": "名前 昇順",
+      "NAME-DESC": "名前 降順"
+    }
+  },
+  "DECISIONS-LIST": {
+    "TITLE": "判断",
+    "SEARCH-PLACEHOLDER": "検索",
+    "ACTION": {
+      "CREATE-DECISION-SERVICE": "デシジョンサービスの作成",
+      "CREATE": "デシジョンテーブルの作成",
+      "IMPORT": "デシジョンテーブルのインポート",
+      "CREATE-INLINE": "今すぐ新しいデシジョンテーブルを作成",
+      "SHOW-MORE": "さらに表示..."
+    },
+    "FILTER": {
+      "DECISION-TABLES": "デシジョン テーブル",
+      "DECISION-TABLES-COUNT": "デシジョンテーブルが{{total}}個あります",
+      "DECISION-TABLES-ONE": "デシジョンテーブルが1個あります",
+      "DECISION-TABLES-EMPTY": "デシジョンテーブルはまだありません。デシジョンテーブルの作成 をクリックして追加してください。",
+      "FILTER-TEXT": "条件“{{filterText}}”",
+      "FILTER-TEXT-EMPTY": "条件“{{filterText}}”にあうデシジョンテーブルはありません",
+      "DECISION-SERVICES": "デシジョンサービス",
+      "DECISION-SERVICES-COUNT": "デシジョンサービスが{{total}}個あります",
+      "DECISION-SERVICES-ONE": "デシジョンサービスが1個あります",
+      "DECISION-SERVICES-EMPTY": "デシジョンサービスはまだありません。デシジョンサービスの作成 をクリックして追加してください。"
+    },
+    "SORT": {
+      "MODIFIED-ASC": "作成日 昇順",
+      "MODIFIED-DESC": "作成日 降順",
+      "NAME-ASC": "名前 昇順",
+      "NAME-DESC": "名前 降順"
+    }
+  },
+  "APPS-LIST": {
+    "TITLE": "アプリ定義",
+    "SEARCH-PLACEHOLDER": "検索",
+    "ACTION": {
+      "CREATE": "アプリの作成",
+      "IMPORT": "アプリのインポート",
+      "SHOW-MORE": "さらに表示..."
+    },
+    "FILTER": {
+      "APPS": "アプリ定義",
+      "APPS-COUNT": "アプリ定義が{{total}}個あります",
+      "APPS-ONE": "アプリ定義が1個あります",
+      "APPS-EMPTY": "アプリ定義はまだありません。アプリの作成 をクリックして追加してください。",
+      "FILTER-TEXT": "条件“{{filterText}}”",
+      "FILTER-TEXT-EMPTY": "条件“{{filterText}}”にあうアプリ定義はありません",
+      "NO-APPS": "バンドルされたプロセスモデルを公開してアプリ定義を作成できます。",
+      "NO-APPS-CALL-TO-ACTION": "今すぐアプリ定義を作成できます。",
+      "NO-APPS-NOTE": "使用する準備ができたら公開することを忘れずに"
+    },
+    "SORT": {
+      "MODIFIED-ASC": "作成日 昇順",
+      "MODIFIED-DESC": "作成日 降順",
+      "NAME-ASC": "名前 昇順",
+      "NAME-DESC": "名前 降順"
+    }
+  },
+  "PROCESS": {
+    "NAME": "モデル名",
+    "KEY": "モデルキー",
+    "DESCRIPTION": "説明",
+    "VERSION-COMMENT": "バージョンコメント",
+    "ACTION": {
+      "DETAILS": "詳細の表示",
+      "EDIT": "モデル属性の修正",
+      "DUPLICATE": "このモデルの複製",
+      "EXPORT_BPMN20": "BPMN 2.0 エクスポート",
+      "DELETE": "このモデルの削除",
+      "CREATE-CONFIRM": "新規モデルの作成",
+      "DUPLICATE-CONFIRM": "モデルの複製",
+      "OPEN-IN-EDITOR": "ビジュアルエディター",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "プロセスモデルの削除",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "FAVORITE": "モデルのブックマーク"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "履歴",
+      "LAST-UPDATED-BY": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+      "CREATED-BY": "{{createdBy}}が作成",
+      "NO-DESCRIPTION": "このモデルには説明がありません。追加するためにモデル属性を編集"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新しいビジネスプロセスモデルの作成",
+      "DUPLICATE-TITLE": "ビジネスプロセスモデルの複製",
+      "CREATE-DESCRIPTION": "新しいモデルに名前をつけてください。同時に説明を加えることもできます。",
+      "DUPLICATE-DESCRIPTION": "新しいモデルの名前を変えてください。同時に説明を加えることもできます。",
+      "EDIT-DESCRIPTION": "以下のモデルの属性を変更し、保存を押してモデルを更新。",
+      "DELETE-DESCRIPTION": "プロセスモデル“{{name}}”を削除しますか？",
+      "EDIT-TITLE": "モデル詳細の編集",
+      "DELETE-TITLE": "モデルの削除",
+      "DELETE-LOADING-RELATIONS": "モデルの使用状況をチェック中...",
+      "DELETE-RELATIONS-DESCRIPTION-SINGLE": "このモデルは削除できません。他のモデルから使用されています:",
+      "DELETE-RELATIONS-DESCRIPTION": "このモデルは削除できません。他のモデルから使用されています:",
+      "DELETE-PROCESS-RELATION": "プロセスモデル",
+      "DELETE-FORM-RELATION": "フォームモデル",
+      "DELETE-APP-RELATION": "アプリモデル",
+      "IMPORT-DESCRIPTION": ".bpmnもしくは.bpmn20.xmlの拡張子を持つBPMN XML定義ファイルをドロップするか選択してください。",
+      "IMPORT-TITLE": "プロセスモデルのインポート",
+      "USE-AS-NEW-TITLE": "新しいバージョンとして使用",
+      "USE-AS-NEW-DESCRIPTION": "新しいバージョン“{{name}}”を作成するためにバージョン{{version}}を使いますか？",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "選択したバージョンへアプリモデルを完全に復元することはできません: いくつかの参照モデルが削除されています。アプリモデルを更新してください。見つからないモデル:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "内部ID“{{id}}”のモデル“{{name}}”　作成者“{{createdBy}}”",
+      "SHARED-WITH": "共有先",
+      "PERMISSION": "権限",
+      "ACTIONS": "アクション",
+      "IMPORT": {
+        "DROPZONE": ".bpmnもしくは.bpmn20.xmlのBPMN XMLファイルをドロップ",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "BPMN XMLファイル処理中のエラー",
+        "NO-DROP": "ドラッグ＆ドロップはサポートされていません"
+      }
+    },
+    "ALERT": {
+      "EDIT-CONFIRM": "更新されたモデル"
+    },
+    "ERROR": {
+      "NOT-FOUND": "リクエストされたモデルは存在しません。"
+    }
+  },
+  "SUBPROCESS": {
+    "NAME": "サブプロセス名",
+    "DESCRIPTION": "説明",
+    "ACTION": {
+      "CREATE-CONFIRM": "新規サブプロセスの作成"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新規サブプロセスの作成",
+      "CREATE-DESCRIPTION": "新しいサブプロセスに名前をつけてください。同時に説明を加えることもできます。"
+    }
+  },
+  "CASE": {
+    "NAME": "モデル名",
+    "KEY": "モデルキー",
+    "DESCRIPTION": "説明",
+    "VERSION-COMMENT": "バージョンコメント",
+    "ACTION": {
+      "DETAILS": "詳細の表示",
+      "EDIT": "モデル属性の修正",
+      "DUPLICATE": "このモデルの複製",
+      "EXPORT_CMMN": "CMMN 1.1 エクスポート",
+      "DELETE": "このモデルの削除",
+      "CREATE-CONFIRM": "新規モデルの作成",
+      "DUPLICATE-CONFIRM": "モデルの複製",
+      "OPEN-IN-EDITOR": "ビジュアルエディター",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "ケースモデルの削除",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "FAVORITE": "モデルのブックマーク"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "履歴",
+      "LAST-UPDATED-BY": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+      "CREATED-BY": "{{createdBy}}が作成",
+      "NO-DESCRIPTION": "このモデルには説明がありません。追加するためにモデル属性を編集"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新規ケースモデルの作成",
+      "DUPLICATE-TITLE": "ケースモデルの複製",
+      "CREATE-DESCRIPTION": "新しいモデルに名前をつけてください。同時に説明を加えることもできます。",
+      "DUPLICATE-DESCRIPTION": "新しいモデルの名前を変えてください。同時に説明を加えることもできます。",
+      "EDIT-DESCRIPTION": "以下のモデルの属性を変更し、保存を押してモデルを更新。",
+      "DELETE-DESCRIPTION": "プロセスモデル“{{name}}”を削除しますか？",
+      "EDIT-TITLE": "モデル詳細の編集",
+      "DELETE-TITLE": "モデルの削除",
+      "DELETE-LOADING-RELATIONS": "モデルの使用状況をチェック中...",
+      "DELETE-RELATIONS-DESCRIPTION-SINGLE": "このモデルは削除できません。他のモデルから使用されています:",
+      "DELETE-RELATIONS-DESCRIPTION": "このモデルは削除できません。他のモデルから使用されています:",
+      "DELETE-PROCESS-RELATION": "ケースモデル",
+      "DELETE-FORM-RELATION": "フォームモデル",
+      "DELETE-APP-RELATION": "アプリモデル",
+      "IMPORT-DESCRIPTION": ".cmmnもしくは.cmmn.xmlの拡張子を持つCMMN XML定義ファイルをドロップするか選択してください",
+      "IMPORT-TITLE": "ケースモデルのインポート",
+      "USE-AS-NEW-TITLE": "新しいバージョンとして使用",
+      "USE-AS-NEW-DESCRIPTION": "新しいバージョン“{{name}}”を作成するためにバージョン{{version}}を使いますか？",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "選択したバージョンへアプリモデルを完全に復元することはできません: いくつかの参照モデルが削除されています。アプリモデルを更新してください。見つからないモデル:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "内部ID“{{id}}”のモデル“{{name}}”　作成者“{{createdBy}}”",
+      "SHARED-WITH": "共有先",
+      "PERMISSION": "権限",
+      "ACTIONS": "アクション",
+      "IMPORT": {
+        "DROPZONE": ".cmmnもしくは.cmmn.xmlのBPMN XMLファイルをドロップ",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "CMMN XMLファイル処理中のエラー",
+        "NO-DROP": "ドラッグ＆ドロップはサポートされていません"
+      }
+    },
+    "ALERT": {
+      "EDIT-CONFIRM": "更新されたモデル"
+    },
+    "ERROR": {
+      "NOT-FOUND": "リクエストされたモデルは存在しません。"
+    }
+  },
+  "FORM": {
+    "NAME": "フォーム名",
+    "KEY": "フォームキー",
+    "DESCRIPTION": "説明",
+    "ACTION": {
+      "DETAILS": "詳細の表示",
+      "EDIT": "モデル属性の修正",
+      "DELETE": "このフォームの削除",
+      "CREATE-CONFIRM": "新規フォームの作成",
+      "DUPLICATE": "このフォームの複製",
+      "DUPLICATE-CONFIRM": "フォームの複製",
+      "OPEN-IN-EDITOR": "フォームエディター",
+      "EDIT-CONFIRM": "保存",
+      "DELETE-CONFIRM": "フォームの削除",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "履歴",
+      "LAST-UPDATED-BY": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+      "CREATED-BY": "{{createdBy}}が作成"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新規フォームの作成",
+      "DUPLICATE-TITLE": "フォームの複製",
+      "CREATE-DESCRIPTION": "新しいフォームに名前をつけてください。同時に説明を加えることもできます。",
+      "DUPLICATE-DESCRIPTION": "新しいフォームに名前をつけてください。同時に説明を加えることもできます。",
+      "SAVE-FORM-TITLE": "フォームの保存",
+      "EDIT-DESCRIPTION": "以下のフォームの属性を変更し、保存を押してフォームを更新。",
+      "DELETE-DESCRIPTION": "フォーム“{{name}}”を削除しますか？",
+      "EDIT-TITLE": "フォーム詳細の編集",
+      "DELETE-TITLE": "フォームの削除",
+      "USE-AS-NEW-TITLE": "新しいバージョンとして使用",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "USE-AS-NEW-DESCRIPTION": "新しいバージョン“{{name}}”を作成するためにバージョン{{version}}を使いますか？",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "選択したバージョンへアプリモデルを完全に復元することはできません: いくつかの参照モデルが削除されています。アプリモデルを更新してください。見つからないモデル:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "内部ID“{{id}}”のモデル“{{name}}”　作成者“{{createdBy}}”"
+    }
+  },
+  "DECISION-SERVICE": {
+    "NAME": "デシジョンサービス名",
+    "KEY": "デシジョンサービスキー",
+    "DESCRIPTION": "説明",
+    "POPUP": {
+      "CREATE-TITLE": "新規デシジョンサービスの作成",
+      "CREATE-DESCRIPTION": "新しいデシジョンサービスに名前をつけてください。同時に説明を加えることもできます。"
+    }
+  },
+  "DECISION-TABLE": {
+    "NAME": "デシジョンテーブル名",
+    "KEY": "デシジョンテーブルキー",
+    "DESCRIPTION": "説明",
+    "VERSION-COMMENT": "バージョンコメント",
+    "HIT-POLICY": "ヒットポリシー:",
+    "ACTION": {
+      "DETAILS": "詳細の表示",
+      "EDIT": "モデル属性の修正",
+      "SHARE": "デシジョンテーブルの共有",
+      "DELETE": "デシジョンテーブルの削除",
+      "ADD-COMMENT": "+ コメントの追加",
+      "CREATE-CONFIRM": "新規デシジョンテーブルの作成",
+      "OPEN-IN-EDITOR": "デシジョンテーブルエディター",
+      "EXPORT": "デシジョンテーブルのエクスポート",
+      "DELETE-CONFIRM": "デシジョンテーブルの削除",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "FAVORITE": "デシジョンテーブルのブックマーク",
+      "DUPLICATE": "デシジョンテーブルの複製"
+    },
+    "DETAILS": {
+      "HISTORY-TITLE": "履歴",
+      "COMMENTS-TITLE": "コメント",
+      "LAST-UPDATED-BY": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+      "CREATED-BY": "{{createdBy}}が作成"
+    },
+    "HIT-POLICIES": {
+      "FIRST": "初回（First）",
+      "ANY": "任意（Any）",
+      "UNIQUE": "固有（Unique）",
+      "PRIORITY": "優先度",
+      "RULE ORDER": "ルール順",
+      "OUTPUT ORDER": "出力順",
+      "COLLECT": "収集（Collect）"
+    },
+    "COLLECT-OPERATORS": {
+      "SUM": "合計（Sum）",
+      "MIN": "最小（Min）",
+      "MAX": "最大（Max）",
+      "COUNT": "個数（Count）"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新規デシジョンテーブルの作成",
+      "CREATE-DESCRIPTION": "新しいデシジョンテーブルに名前をつけてください。同時に説明を加えることもできます。",
+      "SAVE-DESCRIPTION": "新しいデシジョンテーブルに名前とユニークキーをつけてください。同時に説明を加えることもできます。",
+      "DUPLICATE-TITLE": "デシジョンテーブルの複製",
+      "DUPLICATE-DESCRIPTION": "新しいデシジョンテーブルに名前をつけてください。同時に説明を加えることもできます。",
+      "DELETE-TITLE": "デシジョンテーブルの削除",
+      "DELETE-DESCRIPTION": "デシジョンテーブル“{{name}}”を削除しますか？",
+      "SAVE-DECISION-TABLE-TITLE": "デシジョンテーブルの保存",
+      "IMPORT-DESCRIPTION": ".dmnもしくは.dmn.xmlの拡張子を持つDMN XML定義ファイルをドロップするか選択してください。",
+      "IMPORT-TITLE": "DMNモデルのインポート",
+      "IMPORT": {
+        "DROPZONE": ".dmnもしくは.dmn.xmlのDMN XMLファイルをドロップ",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "ERROR": "DMN XMLファイル処理中のエラー",
+        "NO-DROP": "ドラッグ＆ドロップはサポートされていません"
+      },
+      "USE-AS-NEW-TITLE": "新しいバージョンとして使用",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "USE-AS-NEW-DESCRIPTION": "新しいバージョン“{{name}}”を作成するためにバージョン{{version}}を使いますか？",
+      "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "選択したバージョンへアプリモデルを完全に復元することはできません: いくつかの参照モデルが削除されています。アプリモデルを更新してください。見つからないモデル:",
+      "USE-AS-NEW-UNRESOLVED-MODEL": "内部ID“{{id}}”のモデル“{{name}}”　作成者“{{createdBy}}”",
+      "FORCE-DMN-11": "DMN1.1を強制"
+    },
+    "ALERT": {
+      "FAVORITE-CONFIRM": "デシジョンテーブルをブックマークしました",
+      "UN-FAVORITE-CONFIRM": "デシジョンテーブルのブックマークを解除しました"
+    }
+  },
+  "APP": {
+    "NAME": "アプリ定義名",
+    "KEY": "アプリ定義キー",
+    "DESCRIPTION": "説明",
+    "ICON": "アイコン",
+    "THEME": "テーマ",
+    "GROUPS-ACCESS": "グループアクセス カンマ区切り",
+    "USERS-ACCESS": "ユーザーアクセス カンマ区切り",
+    "ACTION": {
+      "DETAILS": "詳細の表示",
+      "EDIT": "アプリ定義属性の修正",
+      "DUPLICATE": "このアプリケーションの複製",
+      "SHARE": "アプリ定義の共有",
+      "DELETE": "アプリ定義の削除",
+      "CREATE-CONFIRM": "新規アプリ定義の作成",
+      "DUPLICATE-CONFIRM": "アプリ定義の複製",
+      "DELETE-CONFIRM": "アプリ定義の削除",
+      "USE-AS-NEW-VERSION": "新しいバージョンとして使用",
+      "OPEN-IN-EDITOR": "アプリエディター",
+      "PUBLISH": "公開",
+      "PUBLISH-CONFIRM": "アプリ定義の公開",
+      "SELECT-ICON": "アイコンの変更...",
+      "SELECT-THEME": "テーマの変更...",
+      "EDIT-MODELS": "取込モデルの編集",
+      "EXPORT-ZIP": "アプリ定義のエクスポート（zip）",
+      "EXPORT-BAR": "アプリ定義のエクスポート（bar）"
+    },
+    "DETAILS": {
+      "TITLE": "アプリ定義詳細: {{name}}",
+      "HISTORY-TITLE": "履歴",
+      "MODELS-TITLE": "アプリ定義の取込モデル",
+      "LAST-UPDATED-BY": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+      "CREATED-BY": "{{createdBy}}が作成",
+      "NO-DESCRIPTION": "アプリ定義はまだありません。追加するためにアプリ定義を編集",
+      "NO-MODELS-SELECTED": "このアプリにはモデルが選択されていません。"
+    },
+    "TITLE": {
+      "SELECT-ICON": "アプリアイコンの選択",
+      "SELECT-THEME": "アプリカラーの選択",
+      "PREVIEW": "プレビュー"
+    },
+    "POPUP": {
+      "CREATE-TITLE": "新規アプリ定義の作成",
+      "DUPLICATE-TITLE": "アプリ定義の複製",
+      "SAVE-APP-TITLE": "アプリ定義の保存",
+      "SAVE-APP-SAVE-SUCCESS": "アプリ定義の保存",
+      "CREATE-DESCRIPTION": "新しいアプリ定義に名前をつけてください。同時に説明を加えることもできます。",
+      "DUPLICATE-DESCRIPTION": "新しいアプリ定義に名前をつけてください。同時に説明を加えることもできます。",
+      "PUBLISH-TITLE": "アプリ定義の公開",
+      "PUBLISH-DESCRIPTION": "アプリ定義“{{name}}”を公開しますか？アプリ定義が新しくなると既存のワークフローアプリも更新されます。",
+      "PUBLISH-FIELD": "公開しますか？アプリ定義が新しくなると既存のワークフローアプリも更新されます。",
+      "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "プロセスモデル\"{{modelInAppName}}\"はデプロイ済みのアプリ\"{{conflictingAppName}}\"のプロセス\"{{conflictingModelName}}\"と同じID\"{{processDefinitionKey}}\"を持っています。プロセスモデルの\"ID\"属性を変更してください。",
+      "PUBLISH-ERROR-PROCESS-ALREADY-USED": "以下のプロセスモデルはすでに他のアプリで使用されています。問題はありませんか？",
+      "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "アプリ",
+      "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "不正なアプリ: 重複するプロセス識別子が見つかりました。（“ID”属性の値を変更してください）:",
+      "DELETE-TITLE": "アプリ定義の削除",
+      "DELETE-DESCRIPTION": "アプリ定義“{{name}}”を削除しますか？",
+      "DELETE-DESCRIPTION-WITH-RUNTIME": "アプリ定義“{{name}}”を削除しますか？アプリ定義がタスクのランディングページにデプロイされると、タスクアプリのランディングページからは削除されます。",
+      "DELETE-CASCADE-FALSE": "アプリ定義の現在のバージョン（v{{version}}）のみを削除",
+      "DELETE-CASCADE-TRUE": "過去のバージョンもすべて削除",
+      "HAS-CUSTOM-STENCILITEM": "モデル\"{{modelName}}\"はカスタムステンシルを使用しています。このモデルはアプリ内で使うことができません。",
+      "HAS-VALIDATIONERROR": "モデル\"{{modelName}}\"は検証エラーがありアプリ定義に追加できません。エディターでモデルを開き検証エラーの詳細を確認してください。",
+      "IMPORT-DESCRIPTION": ".zipの拡張子を持つアプリ定義ファイルをドロップするか選択してください",
+      "IMPORT-TITLE": "アプリ定義モデルのインポート",
+      "IMPORT": {
+        "DROPZONE": "アプリ定義ファイル（zip）をドロップ",
+        "CANCEL-UPLOAD": "アップロードのキャンセル",
+        "RENEWIDM-IDS": "インポートのステップでユーザーとグループのIDを更新してください。これは異なるFlowable環境にアプリ定義をインポートする際に必要になることがあります。ターゲットとなる環境では適切なユーザーとグループにヒューマンタスクとユーザータスクを結びつけます。",
+        "ERROR": "アプリ定義ファイル処理中のエラー",
+        "NO-DROP": "ドラッグ＆ドロップはサポートされていません"
+      },
+      "INCLUDE-MODELS-TITLE": "アプリ定義の取込モデル"
+    },
+    "ALERT": {
+      "DELETE-CONFIRM": "アプリ定義を削除",
+      "PUBLISH-CONFIRM": "アプリ定義が公開されました",
+      "PUBLISH-ERROR": "アプリ定義を公開できません。参照されているプロセスモデルが適正であることを確認してください。"
+    }
+  },
+  "SHARE-INFO": {
+    "ACTION": {
+      "ADD": "別の人を追加"
+    }
+  },
+  "FORM-BUILDER": {
+    "PALLETTE": {
+      "TEXT": "テキスト",
+      "MULTILINE-TEXT": "複数行テキスト",
+      "PASSWORD": "パスワード",
+      "NUMBER": "整数",
+      "CHECKBOX": "チェックボックス",
+      "DATE": "日付",
+      "DROPDOWN": "ドロップダウン",
+      "RADIO": "ラジオボタン",
+      "PEOPLE": "人",
+      "GROUP-OF-PEOPLE": "人のグループ",
+      "UPLOAD": "アップロード",
+      "EXPRESSION": "式",
+      "DECIMAL": "小数",
+      "HYPERLINK": "ハイパーリンク",
+      "SPACER": "スペーサー",
+      "HORIZONTAL-LINE": "水平線",
+      "HEADLINE": "ヘッドライン",
+      "HEADLINE-WITH-LINE": "ヘッドライン"
+    },
+    "TABS": {
+      "GENERAL": "一般",
+      "OPTIONS": "選択",
+      "UPLOAD-OPTIONS": "アップロードのオプション",
+      "ADVANCED-OPTIONS": "拡張機能"
+    },
+    "VERSION": "バージョン: {{version}}",
+    "LAST-UPDATED": "{{lastUpdatedBy}}が更新 - {{lastUpdated | dateformat}}",
+    "TITLE": {
+      "DESIGN": "設計",
+      "OUTCOME": "成果"
+    },
+    "POPUP": {
+      "EDIT-TITLE": "フィールド“{{name}}”の編集",
+      "EXPRESSION-TITLE": "式の編集"
+    },
+    "MESSAGE": {
+      "EMPTY-EXPRESSION": "（式の値がありません）",
+      "EXPRESSION-HELP": "登録済みの値を任意のフォームの中でテキストの一部としてフィールド“${myFieldId}”を参照して表示できます。",
+      "OPTIONS-EXPRESSION-HELP": "変数${optionsVariable}など式を使って動的に選択肢を設定することが可能です。式の結果はJavaオブジェクト（java.util.ListとOptionオブジェクト）かJSON表現である必要があります。"
+    },
+    "LABEL": {
+      "FUNCTIONAL-GROUP": "グループを選択...",
+      "PERSON": "人を選択..."
+    },
+    "COMPONENT": {
+      "LABEL": "ラベル:",
+      "OVERRIDEID": "IDを上書きしますか？",
+      "ID": "ID:",
+      "PLACEHOLDER": "プレースホルダー:",
+      "OPTIONS": "選択",
+      "RADIO-BUTTON-DEFAULT": "オプション1",
+      "DROPDOWN-DEFAULT-EMPTY-SELECTION": "一つ選んでください...",
+      "DROPDOWN-EMPTY-VALUE-HELP": "これは空値オプションです。\"値なし\"もしくは\"空値\"を意味します。任意のフィールドにのみ設定可能です。",
+      "OPTIONS-EXPRESSION": "選択式:",
+      "OPTIONS-EXPRESSION-ENABLED": "選択式の有効化",
+      "REQUIRED": "必須",
+      "READONLY": "読み取り専用",
+      "EXPRESSION": "式",
+      "ADD-OPTION": "+ 選択肢の追加",
+      "UPLOAD-ALLOW-MULTIPLE": "複数ファイルのアップロードを許可",
+      "SIZE": "サイズ",
+      "MAX-LENGTH": "最大長:",
+      "MIN-LENGTH": "最小長:",
+      "PASSWORD-UNMASK-OPTION": "パスワードのマスキング設定",
+      "HYPERLINK-URL": "ハイパーリンクURL",
+      "REGEX-PATTERN": "正規表現",
+      "MASK": {
+        "TITLE": "入力マスク",
+        "EXAMPLES": {
+          "TITLE": "例:",
+          "NUMBER": "任意の数",
+          "LETTER": "任意の文字",
+          "NUMBERORLETTER": "任意の数もしくは文字",
+          "OPTIONAL": "マスクを任意に設定",
+          "PHONE": "電話番号"
+        }
+      }
+    },
+    "OUTCOMES": {
+      "DESCRIPTION": "このタスクには複数の成果を定義できます。タスクの完了時に、ユーザーが成果の一つを選択できます。",
+      "NO-OUTCOMES-OPTION": "カスタムの成果を使わないでください。完了ボタンのみ表示されます。",
+      "OUTCOMES-OPTION": "このフォームにカスタムの成果を使用する。",
+      "POSSIBLE-OUTCOMES": "可能な成果",
+      "NEW-OUTCOME-PLACEHOLDER": "新しい成果を入力",
+      "ADD": "成果の追加",
+      "REMOVE": "削除"
+    }
+  },
+  "DECISION-TABLE-EDITOR": {
+    "EMPTY-MESSAGES": {
+      "NO-VARIABLE-SELECTED": "未定義"
+    },
+    "POPUP": {
+      "EXPRESSION-EDITOR": {
+        "INPUT-TITLE": "入力列の編集",
+        "INPUT-DESCRIPTION": "列の入力変数を選択",
+        "OUTPUT-TITLE": "出力列の編集",
+        "OUTPUT-DESCRIPTION": "既存の出力変数を選択するか、新しいものを作成",
+        "EXPRESSION-LABEL": "列ラベル:",
+        "EXPRESSION-PLACEHOLDER": "ラベルを入力",
+        "EXPRESSION-VARIABLE-NAME": "変数名:",
+        "EXPRESSION-VARIABLE-TYPE": "変数タイプ:",
+        "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "変数名を入力",
+        "OUTPUT-NEW-VARIABLE-ID": "変数ID:",
+        "OUTPUT-NEW-VARIABLE-TYPE": "変数タイプ:",
+        "COMPLEX-EXPRESSION-LABEL": "複雑な式:",
+        "ALLOWED-VALUES": "許可される値（任意）:",
+        "OUTPUT-VALUES": "出力値",
+        "OUTPUT-VALUES-OPTIONAL": "(オプション)",
+        "OUTPUT-VALUES-NOT-OPTIONAL": "（優先度／出力順のために行をドラッグ）"
+      }
+    },
+    "BUTTON-ACTIONS-LABEL": "アクション",
+    "BUTTON-ADD-INPUT-LABEL": "入力の追加",
+    "BUTTON-ADD-OUTPUT-LABEL": "出力の追加",
+    "BUTTON-ADD-RULE-LABEL": "ルールの追加",
+    "BUTTON-MOVE-RULE-UPWARDS-LABEL": "上へ移動",
+    "BUTTON-MOVE-RULE-DOWNWARDS-LABEL": "下へ移動",
+    "BUTTON-REMOVE-RULE-LABEL": "ルールの削除",
+    "ALERT": {
+      "EXPRESSION-VARIABLE-REQUIRED-ERROR": "入力式と出力式はフォームフィールドか変数を参照する必要があります。",
+      "SAVE-CONFIRM": "デシジョンテーブル“{{name}}”を保存"
+    }
+  },
+  "TOUR": {
+    "WELCOME-TITLE": "ようこそ、{{userName}} さん",
+    "WELCOME-CONTENT": "これはFlowableエディターのショートツアーです。次のステップは別のセクションで説明されます。ESCキーによっていつでも中断できます。",
+    "PALETTE-TITLE": "パレット",
+    "PALETTE-CONTENT": "ビジネスプロセスを作成するためのすべての構築物をここで見つけることができます。論理的なグループに整理されています。グループはクリックで開きます:",
+    "CANVAS-TITLE": "キャンバス",
+    "CANVAS-CONTENT": "ビジネスプロセスを作成するための作業場所です。パレットから要素をドラッグしキャンバスの上にドロップし、モデリングを開始してください。",
+    "DRAGDROP-TITLE": "ドラッグ&ドロップ例",
+    "DRAGDROP-CONTENT": "どのようにモデリングをするのかの例が用意されています:",
+    "PROPERTIES-TITLE": "属性",
+    "PROPERTIES-CONTENT": "ビジネスプロセスの部品の属性を設定できます。キャンバス上のアイテムを選択すると属性が表示されます。編集したい属性をクリックしてください。",
+    "TOOLBAR-TITLE": "ツールバー",
+    "TOOLBAR-CONTENT": "アクションはすべてここにあります: モデルの保存、検証、プロセス部品のコピー\r＆ペースなどボタンの上にマウスカーソルを重ねるとアクションの説明が表示されます。",
+    "END-TITLE": "終わり",
+    "END-CONTENT": "以上です。プロセスのモデリングを始めることができます。質問があれば<a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable Forum</a>に投稿してください。"
+  },
+  "FEATURE-TOUR": {
+    "BENDPOINT": {
+      "TITLE": "屈折点のチュートリアル",
+      "DESCRIPTION": "プロセスのステップをシークエンスフロー（ステップ間の矢印）で繋げる時、シークエンスフロー同士を交差させたり違う形で揃えたりしたくなるかもしれません。その様な場合、シークエンスフローに屈折点を追加したり、逆に削除したりすることができます。シーケンスフローに屈折点を追加したり、逆に削除することで経路を変えることができます。<br><br>下の図にあるように、屈折点の追加をクリックしてから対象となるシーケンスフローを選択します。屈折点が追加できるところは緑色で示されます。<br><br>削除の仕方も同様です。“屈折点の削除”をクリックし、それから対象の屈折点を選択します。"
+    }
+  },
+  "ACTION.OK": "OK",
+  "ACTION.SAVE": "保存",
+  "ACTION.SAVE-AND-CLOSE": "保存してエディターを閉じる",
+  "ACTION.SEND": "送信",
+  "ACTION.CANCEL": "キャンセル",
+  "ACTION.SELECT": "選択",
+  "ACTION.ADD": "追加",
+  "ACTION.REMOVE": "削除",
+  "ACTION.MOVE.UP": "上へ移動",
+  "ACTION.MOVE.DOWN": "下へ移動",
+  "TOOLBAR.ACTION.CLOSE": "エディターを終了し概要ページに戻る",
+  "TOOLBAR.ACTION.SAVE": "モデルの保存",
+  "TOOLBAR.ACTION.VALIDATE": "モデルの検証",
+  "TOOLBAR.ACTION.CUT": "カット（ビジネスプロセス内の一つ以上の要素を選択）",
+  "TOOLBAR.ACTION.COPY": "コピー（ビジネスプロセス内の一つ以上の要素を選択）",
+  "TOOLBAR.ACTION.PASTE": "貼り付け",
+  "TOOLBAR.ACTION.DELETE": "選択した要素を削除",
+  "TOOLBAR.ACTION.UNDO": "元に戻す",
+  "TOOLBAR.ACTION.REDO": "やり直す",
+  "TOOLBAR.ACTION.ZOOMIN": "ズームイン",
+  "TOOLBAR.ACTION.ZOOMOUT": "ズームアウト",
+  "TOOLBAR.ACTION.ZOOMACTUAL": "元のサイズ",
+  "TOOLBAR.ACTION.ZOOMFIT": "ウィンドウに合わせる",
+  "TOOLBAR.ACTION.BENDPOINT.ADD": "選択したシークエンスフローに屈折点を追加",
+  "TOOLBAR.ACTION.BENDPOINT.REMOVE": "選択したシークエンスフローから屈折点を削除",
+  "TOOLBAR.ACTION.ALIGNHORIZONTAL": "モデルの整列 水平",
+  "TOOLBAR.ACTION.ALIGNVERTICAL": "モデルの整列 垂直",
+  "TOOLBAR.ACTION.SAMESIZE": "同じサイズ",
+  "TOOLBAR.ACTION.HELP": "ガイドツアーの開始",
+  "TOOLBAR.ACTION.FEEDBACK": "フィードバックを提供",
+  "FORM_TOOLBAR.ACTION.SAVE": "モデルの保存",
+  "APP_DEFINITION_TOOLBAR.ACTION.SAVE": "アプリ定義の保存",
+  "BUTTON.ACTION.DELETE.TOOLTIP": "モデルから要素を削除",
+  "BUTTON.ACTION.MORPH.TOOLTIP": "要素タイプの変更",
+  "ELEMENT.AUTHOR": "作成者",
+  "ELEMENT.DATE_CREATED": "作成日",
+  "PROPERTY.REMOVED": "削除済",
+  "PROPERTY.EMPTY": "値なし",
+  "PROPERTY.PROPERTY.EDIT.TITLE": "値を変更",
+  "PROPERTY.FEEDBACK.TITLE": "フィードバックをご記入ください",
+  "PROPERTY.ASSIGNMENT.TITLE": "割当",
+  "PROPERTY.ASSIGNMENT.TYPE": "タイプ",
+  "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE": "IDストア",
+  "PROPERTY.ASSIGNMENT.TYPE.STATIC": "固定値",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE": "担当者",
+  "PROPERTY.ASSIGNMENT.MATCHING": "&uparrow;と&downarrow;で選択し、エンターで確認　あるいはマウスを使用",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER": "担当者を入力",
+  "PROPERTY.ASSIGNMENT.EMPTY": "担当者が選択されていません。",
+  "PROPERTY.ASSIGNMENT.NONE": "該当なし...",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "ユーザーを検索",
+  "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "グループの検索",
+  "PROPERTY.ASSIGNMENT.SEARCH": "検索:",
+  "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY": "担当者 {{assignee}}",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY": "{{length}}人の候補ユーザー",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_USERS": "候補ユーザー",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY": "{{length}}個の候補グループ",
+  "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS": "候補グループ",
+  "PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY": "ユーザー {{firstName}} {{lastName}}",
+  "PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY": "ユーザー {{email}}",
+  "PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY": "フィールド {{name}}",
+  "PROPERTY.ASSIGNMENT.IDM_EMPTY": "プロセス開始者",
+  "PROPERTY.ASSIGNMENT.IDM.TYPE": "割当",
+  "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_USERS": "候補ユーザーが選択されていません...",
+  "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_GROUPS": "候補グループが選択されていません...",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.INITIATOR": "プロセス開始者の割当",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USER": "単一のユーザーに割当",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USERS": "候補ユーザー",
+  "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.GROUPS": "候補グループ",
+  "PROPERTY.ASSIGNMENT.INITIATOR-CAN-COMPLETE": "プロセス開始者にタスクの完了を許可",
+  "PROPERTY.EXECUTIONLISTENERS.DISPLAY": "{{length}}個の実行リスナー",
+  "PROPERTY.EXECUTIONLISTENERS.EMPTY": "実行リスナーが設定されていません。",
+  "PROPERTY.EXECUTIONLISTENERS.EVENT": "イベント",
+  "PROPERTY.EXECUTIONLISTENERS.CLASS": "クラス",
+  "PROPERTY.EXECUTIONLISTENERS.CLASS.PLACEHOLDER": "クラス名を入力",
+  "PROPERTY.EXECUTIONLISTENERS.EXPRESSION": "式",
+  "PROPERTY.EXECUTIONLISTENERS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION": "委譲式",
+  "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER": "委譲式を入力",
+  "PROPERTY.EXECUTIONLISTENERS.UNSELECTED": "実行リスナーが選択されていません",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME": "名前",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION": "式",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE": "文字列値",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER": "文字列値を入力",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING": "文字列",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING.PLACEHOLDER": "文字列を入力",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.IMPLEMENTATION": "実装",
+  "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY": "フィールドが選択されていません。",
+  "PROPERTY.FIELDS": "{{length}}個のフィールド",
+  "PROPERTY.FIELDS.EMPTY": "フィールドが選択されていません。",
+  "PROPERTY.FIELDS.NAME": "名前",
+  "PROPERTY.FIELDS.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.FIELDS.EXPRESSION": "式",
+  "PROPERTY.FIELDS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.FIELDS.STRINGVALUE": "文字列値",
+  "PROPERTY.FIELDS.STRINGVALUE.PLACEHOLDER": "文字列値を入力",
+  "PROPERTY.FIELDS.STRING": "文字列",
+  "PROPERTY.FIELDS.STRING.PLACEHOLDER": "文字列を入力",
+  "PROPERTY.FIELDS.IMPLEMENTATION": "実装",
+  "PROPERTY.EXCEPTIONS": "{{length}}個の例外",
+  "PROPERTY.EXCEPTIONS.EMPTY": "例外は選択されていません",
+  "PROPERTY.EXCEPTIONS.CODE": "コード",
+  "PROPERTY.EXCEPTIONS.CODE.PLACEHOLDER": "コードを入力",
+  "PROPERTY.EXCEPTIONS.CLASS": "クラス",
+  "PROPERTY.EXCEPTIONS.CLASS.PLACEHOLDER": "クラスを入力",
+  "PROPERTY.EXCEPTIONS.CHILDREN": "子例外を含む",
+  "PROPERTY.DATAPROPERTIES.VALUES": "{{length}}個のデータオブジェクト",
+  "PROPERTY.DATAPROPERTIES.EMPTY": "データオブジェクトは設定されていません",
+  "PROPERTY.DATAPROPERTIES.ID": "ID",
+  "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER": "IDを入力",
+  "PROPERTY.DATAPROPERTIES.NAME": "名前",
+  "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.DATAPROPERTIES.TYPE": "タイプ",
+  "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER": "値の入力（任意）",
+  "PROPERTY.DATAPROPERTIES.VALUE": "デフォルト値",
+  "PROPERTY.FORMPROPERTIES.VALUE": "{{length}}個のフォーム属性",
+  "PROPERTY.FORMPROPERTIES.EMPTY": "フォーム属性が選択されていません。",
+  "PROPERTY.FORMPROPERTIES.ID": "ID",
+  "PROPERTY.FORMPROPERTIES.ID.PLACEHOLDER": "IDを入力",
+  "PROPERTY.FORMPROPERTIES.NAME": "名前",
+  "PROPERTY.FORMPROPERTIES.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.FORMPROPERTIES.TYPE": "タイプ",
+  "PROPERTY.FORMPROPERTIES.DATEPATTERN": "日付パターン",
+  "PROPERTY.FORMPROPERTIES.DATEPATTERN.PLACEHOLDER": "日付パターンを入力",
+  "PROPERTY.FORMPROPERTIES.VALUES": "値",
+  "PROPERTY.FORMPROPERTIES.ENUMVALUES.EMPTY": "Enum値が選択されていません。",
+  "PROPERTY.FORMPROPERTIES.VALUES.ID": "ID",
+  "PROPERTY.FORMPROPERTIES.VALUES.NAME": "名前",
+  "PROPERTY.FORMPROPERTIES.VALUES.ID.PLACEHOLDER": "値のIDを入力",
+  "PROPERTY.FORMPROPERTIES.VALUES.NAME.PLACEHOLDER": "値の名前を入力",
+  "PROPERTY.FORMPROPERTIES.EXPRESSION": "式",
+  "PROPERTY.FORMPROPERTIES.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.FORMPROPERTIES.VARIABLE": "変数",
+  "PROPERTY.FORMPROPERTIES.VARIABLE.PLACEHOLDER": "変数を入力",
+  "PROPERTY.FORMPROPERTIES.DEFAULT": "既定",
+  "PROPERTY.FORMPROPERTIES.DEFAULT.PLACEHOLDER": "規定値を入力",
+  "PROPERTY.FORMPROPERTIES.REQUIRED": "必須",
+  "PROPERTY.FORMPROPERTIES.READABLE": "読み取り可",
+  "PROPERTY.FORMPROPERTIES.WRITABLE": "書き込み可",
+  "PROPERTY.INPARAMETERS.VALUE": "{{length}}のinパラメーター",
+  "PROPERTY.INPARAMETERS.EMPTY": "In-パラメーターは設定されていません",
+  "PROPERTY.OUTPARAMETERS.VALUE": "{{length}}のoutパラメーター",
+  "PROPERTY.OUTPARAMETERS.EMPTY": "Out-パラメーターは設定されていません",
+  "PROPERTY.PARAMETER.SOURCE": "参照元",
+  "PROPERTY.PARAMETER.SOURCE.PLACEHOLDER": "参照元を入力",
+  "PROPERTY.PARAMETER.SOURCEEXPRESSION": "参照元式",
+  "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER": "参照元式を入力",
+  "PROPERTY.PARAMETER.TARGET": "参照先",
+  "PROPERTY.PARAMETER.TARGET.PLACEHOLDER": "参照先を入力",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION": "参照先式",
+  "PROPERTY.PARAMETER.TARGETEXPRESSION.PLACEHOLDER": "参照先式を入力",
+  "PROPERTY.PARAMETER.EMPTY": "パラメータが選択されていません。",
+  "PROPERTY.PROCESSREFERENCE.EMPTY": "参照が選択されていません",
+  "PROPERTY.PROCESSREFERENCE.TITLE": "プロセス参照",
+  "PROPERTY.PROCESSREFERENCE.ERROR.PROCESS": "プロセスのロード中にエラーがありました。しばらくしてから再度試してください",
+  "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING": "プロセスをロード中...",
+  "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY": "このフォルダにはプロセスが含まれていません。",
+  "PROPERTY.FORMREFERENCE.EMPTY": "参照が選択されていません",
+  "PROPERTY.FORMREFERENCE.TITLE": "フォーム参照",
+  "PROPERTY.FORMREFERENCE.DESCRIPTION": "フォームへの参照",
+  "PROPERTY.FORMREFERENCE.ERROR.FORM": "フォームのロード中にエラーがありました。しばらくしてから再度試してください",
+  "PROPERTY.FORMREFERENCE.FORM.LOADING": "フォームをロード中...",
+  "PROPERTY.FORMREFERENCE.FORM.EMPTY": "このフォルダにはフォームが含まれていません",
+  "PROPERTY.TASKLISTENERS.VALUE": "{{length}}個のタスクリスナー",
+  "PROPERTY.TASKLISTENERS.EMPTY": "タスクリスナーは設定されていません",
+  "PROPERTY.TASKLISTENERS.EVENT": "イベント",
+  "PROPERTY.TASKLISTENERS.CLASS": "クラス",
+  "PROPERTY.TASKLISTENERS.CLASS.PLACEHOLDER": "クラス名を入力",
+  "PROPERTY.TASKLISTENERS.EXPRESSION": "式",
+  "PROPERTY.TASKLISTENERS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION": "委譲式",
+  "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER": "委譲式を入力",
+  "PROPERTY.TASKLISTENERS.UNSELECTED": "タスクリスナーが選択されていません",
+  "PROPERTY.TASKLISTENERS.FIELDS.NAME": "名前",
+  "PROPERTY.TASKLISTENERS.FIELDS.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION": "式",
+  "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE": "文字列値",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER": "文字列値を入力",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRING": "文字列",
+  "PROPERTY.TASKLISTENERS.FIELDS.STRING.PLACEHOLDER": "文字列を入力",
+  "PROPERTY.TASKLISTENERS.FIELDS.IMPLEMENTATION": "実装",
+  "PROPERTY.TASKLISTENERS.FIELDS.EMPTY": "フィールドが選択されていません。",
+  "PROPERTY.EVENTLISTENERS.DISPLAY": "{{length}}個のイベントリスナー",
+  "PROPERTY.EVENTLISTENERS.EMPTY": "イベントリスナーは設定されていません",
+  "PROPERTY.EVENTLISTENERS.EVENTS": "イベント",
+  "PROPERTY.EVENTLISTENERS.RETHROW": "イベントを再発火させますか？",
+  "PROPERTY.EVENTLISTENERS.CLASS": "クラス",
+  "PROPERTY.EVENTLISTENERS.CLASS.PLACEHOLDER": "クラス名を入力",
+  "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION": "委譲式",
+  "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER": "委譲式を入力",
+  "PROPERTY.EVENTLISTENERS.ENTITYTYPE": "エンティティタイプ",
+  "PROPERTY.EVENTLISTENERS.ENTITYTYPE.PLACEHOLDER": "エンティティタイプを入力",
+  "PROPERTY.EVENTLISTENERS.RETHROWTYPE": "イベントタイプの再発火",
+  "PROPERTY.EVENTLISTENERS.ERRORCODE": "エラーコード",
+  "PROPERTY.EVENTLISTENERS.ERRORCODE.PLACEHOLDER": "エラーコードを入力",
+  "PROPERTY.EVENTLISTENERS.MESSAGENAME": "メッセージ名",
+  "PROPERTY.EVENTLISTENERS.MESSAGENAME.PLACEHOLDER": "メッセージ名を入力",
+  "PROPERTY.EVENTLISTENERS.SIGNALNAME": "信号名",
+  "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER": "信号名を入力",
+  "PROPERTY.EVENTLISTENERS.UNSELECTED": "イベントリスナーが選択されていません。",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.VALUE": "{{length}}個のライフサイクルリスナー",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EMPTY": "ライフサイクルリスナーは設定されていません",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EVENT": "イベント",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.SOURCE_STATE": "ソース状態",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.TARGET_STATE": "ターゲット状態",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS": "クラス",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.CLASS.PLACEHOLDER": "クラス名を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION": "式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION": "委譲式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.DELEGATEEXPRESSION.PLACEHOLDER": "委譲式を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.UNSELECTED": "タスクリスナーが選択されていません",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME": "名前",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION": "式",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EXPRESSION.PLACEHOLDER": "式を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE": "文字列値",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER": "文字列値を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING": "文字列",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.STRING.PLACEHOLDER": "文字列を入力",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.IMPLEMENTATION": "実装",
+  "PROPERTY.PLANITEMLIFECYCLELISTENERS.FIELDS.EMPTY": "フィールドが選択されていません。",
+  "PROPERTY.SIGNALDEFINITIONS.DISPLAY": "{{length}}個の信号定義",
+  "PROPERTY.SIGNALDEFINITIONS.EMPTY": "信号定義は設定されていません",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "グローバル",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "プロセスインスタンス",
+  "PROPERTY.SIGNALDEFINITIONS.ID": "ID",
+  "PROPERTY.SIGNALDEFINITIONS.NAME": "名前",
+  "PROPERTY.SIGNALDEFINITIONS.SCOPE": "スコープ",
+  "PROPERTY.MESSAGEDEFINITIONS.DISPLAY": "{{length}}個のメッセージ定義",
+  "PROPERTY.MESSAGEDEFINITIONS.EMPTY": "メッセージ定義は設定されていません",
+  "PROPERTY.MESSAGEDEFINITIONS.ID": "ID",
+  "PROPERTY.MESSAGEDEFINITIONS.NAME": "名前",
+  "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY": "{{length}}個のエスカレーション定義",
+  "PROPERTY.ESCALATIONDEFINITIONS.EMPTY": "エスカレーション定義は設定されていません",
+  "PROPERTY.ESCALATIONDEFINITIONS.ID": "ID",
+  "PROPERTY.ESCALATIONDEFINITIONS.NAME": "名前",
+  "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY": "シークエンスフローの順序が決定されていません",
+  "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY": "シークエンスフローに順序が設定されています",
+  "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND": "外向きシークエンスフローはありません",
+  "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION": "評価されるシークエンスフローの順番を設定:",
+  "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE": "{{targetType}} {{targetTitle}} へのシークエンスフロー",
+  "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE": "シークエンスフロー条件",
+  "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC": "条件式",
+  "PROPERTY.SEQUENCEFLOW.CONDITION.NO-CONDITION-DISPLAY": "条件は設定されていません",
+  "PROPERTY.DUEDATE.EMPTY": "期日はありません",
+  "PROPERTY.DUEDATE.DEFINED": "定義された期日",
+  "PROPERTY.DUEDATE.TITLE": "期日",
+  "PROPERTY.DUEDATE.EXPRESSION-LABEL": "期日式",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.NO-DUEDATE": "期日はありません",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION": "式定義",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC": "タスク作成後の固定期日",
+  "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD": "フィールドに依存",
+  "PROPERTY.EVENTINPARAMETERS.VALUE": "{{length}}個のイベントinパラメーターアイテム",
+  "PROPERTY.EVENTINPARAMETERS.EMPTY": "パラメーターアイテムは設定されていません",
+  "PROPERTY.EVENTINPARAMETERS.EVENTNAME": "イベント属性名",
+  "PROPERTY.EVENTINPARAMETERS.EVENTNAME.PLACEHOLDER": "イベント属性名を入力",
+  "PROPERTY.EVENTINPARAMETERS.EVENTTYPE": "タイプ",
+  "PROPERTY.EVENTINPARAMETERS.VARIABLENAME": "変数名",
+  "PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER": "変数名を入力",
+  "PROPERTY.EVENTINPARAMETERS.NOSELECTION": "パラメータが選択されていません。",
+  "PROPERTY.EVENTOUTPARAMETERS.VALUE": "{{length}}個のイベントoutパラメーターアイテム",
+  "PROPERTY.EVENTOUTPARAMETERS.EMPTY": "パラメーターアイテムは設定されていません",
+  "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME": "イベント属性名",
+  "PROPERTY.EVENTOUTPARAMETERS.EVENTNAME.PLACEHOLDER": "イベント属性名を入力",
+  "PROPERTY.EVENTOUTPARAMETERS.EVENTTYPE": "タイプ",
+  "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME": "変数名",
+  "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME.PLACEHOLDER": "変数名を入力",
+  "PROPERTY.EVENTOUTPARAMETERS.NOSELECTION": "パラメータが選択されていません。",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUE": "{{length}}個の相関パラメーター",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.EMPTY": "相関パラメーターは設定されていません",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME": "名前",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.NAME.PLACEHOLDER": "名前を入力",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.TYPE": "タイプ",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.NOSELECTION": "パラメータが選択されていません。",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP": "値",
+  "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUEPROP.PLACEHOLDER": "値/式を入力",
+  "MODEL.SAVE.TITLE": "モデルの保存",
+  "MODEL.VALIDATE.TITLE": "検証結果",
+  "MODEL.NAME": "名前",
+  "MODEL.KEY": "キー",
+  "MODEL.DESCRIPTION": "説明",
+  "MODEL.SAVE.NEWVERSION": "新しいバージョンとして保存しますか？いつでも以前のバージョンに戻ることができるようになります",
+  "MODEL.SAVE.COMMENT": "コメント",
+  "MODEL.SAVE.SAVING": "モデルの保存中",
+  "MODEL.LASTMODIFIEDDATE": "最終更新",
+  "MODEL.SAVE.ERROR": "予期せぬエラー: モデルが保存できません",
+  "MODEL.VALIDATIONERRORS": "モデル内に検証エラーがあります。この状態ではFlowableエンジンにモデルをデプロイできません。",
+  "MODEL.CONFLICT.WRITE": "モデルを保存できません: {{userFullName}} によってこのモデルは変更されています",
+  "MODEL.CONFLICT.WRITE.OPTIONS": "このコンフリクトを解消する方法を選択してください:",
+  "MODEL.CONFLICT.WRITE.OPTION.OVERWRITE": "他のモデルを上書き",
+  "MODEL.CONFLICT.WRITE.OPTION.DISCARDCHANGES": "変更を破棄",
+  "MODEL.CONFLICT.WRITE.OPTION.SAVEAS": "新しいモデルとして保存",
+  "MODEL.CONFLICT.WRITE.OPTION.NEWVERSION": "新しいバージョンの作成",
+  "MODEL.CONFLICT.SAVEAS": "別名で保存:",
+  "EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP": "アクティビティが他のアクティビティの代替として実行されようとしています。イベントは補償となるアクティビティを指定しています。",
+  "EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP": "アクティビティの実行が完了しました",
+  "EVENT_TYPE.ACTIVITY.ERROR.RECEIVED.TOOLTIP": "アクティビティがエラーイベントを受け取った時。実際にエラーを受け取る前に発行されます。",
+  "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "新しいメンバーシップが作成されました",
+  "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "メンバーシップが削除されました",
+  "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "グループに関連するメンバーシップをすべて削除しました。パフォーマンス負荷を回避するため個別のイベントは発行されません。",
+  "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "タスクが割当られました。ENTITY_UPDATEDイベントが発行されました。",
+  "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "タスクが完了した時。タスクエンティティの削除前に発行されます。",
+  "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "BPMNエラーが発行されプロセス内では補足されなかった時",
+  "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "変数が作成された時",
+  "EVENT_TYPE.VARIABLE.DELETED.TOOLTIP": "既存の変数が削除された時。",
+  "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "変数が更新されました",
+  "PROPERTY.DECISIONTABLEREFERENCE.EMPTY": "参照が選択されていません",
+  "PROPERTY.DECISIONTABLEREFERENCE.TITLE": "デシジョンテーブル参照",
+  "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM": "デシジョンテーブルのロード中にエラーがありました。しばらくしてから再度試してください",
+  "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING": "デシジョンテーブルをロード中...",
+  "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY": "このフォルダーにはデシジョンテーブルがありません",
+  "PROPERTY.DECISIONSERVICEREFERENCE.EMPTY": "参照が選択されていません",
+  "PROPERTY.DECISIONSERVICEREFERENCE.TITLE": "デシジョンサービス参照",
+  "PROPERTY.DECISIONSERVICEREFERENCE.ERROR.FORM": "デシジョンサービスのロード中にエラーがありました。しばらくしてから再度試してください",
+  "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.LOADING": "デシジョンサービスをロード中...",
+  "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.EMPTY": "このフォルダーにはデシジョンサービスがありません",
+  "PROPERTY.CASEREFERENCE.EMPTY": "参照が選択されていません",
+  "PROPERTY.CASEREFERENCE.TITLE": "ケースモデル参照",
+  "PROPERTY.CASEREFERENCE.ERROR.FORM": "ケースモデルのロード中にエラーがありました。しばらくしてから再度試してください",
+  "PROPERTY.CASEREFERENCE.CASE.LOADING": "ケースモデルをロード中...",
+  "PROPERTY.CASEREFERENCE.CASE.EMPTY": "このフォルダーにはケースモデルがありません"
+}

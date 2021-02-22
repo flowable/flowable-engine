@@ -68,7 +68,7 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
                 }
 
                 String variableName = null;
-                if (liquibase.util.StringUtils.isNotEmpty(outParameter.getTarget()))  {
+                if (liquibase.util.StringUtils.isNotEmpty(outParameter.getTarget())) {
                     variableName = outParameter.getTarget();
 
                 } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {

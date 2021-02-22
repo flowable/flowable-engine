@@ -12,6 +12,10 @@
  */
 package org.flowable.test.ldap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -25,85 +29,91 @@ public class LdapIntegrationTest extends LDAPTestCase {
 
     @Test
     public void testAuthenticationThroughLdap() {
-        assertTrue(identityService.checkPassword("kermit", "pass"));
-        assertTrue(identityService.checkPassword("bunsen", "pass"));
-        assertFalse(identityService.checkPassword("kermit", "blah"));
+        assertThat(identityService.checkPassword("kermit", "pass")).isTrue();
+        assertThat(identityService.checkPassword("bunsen", "pass")).isTrue();
+        assertThat(identityService.checkPassword("kermit", "blah")).isFalse();
     }
 
     @Test
     public void testAuthenticationThroughLdapEmptyPassword() {
-        try {
-            identityService.checkPassword("kermit", null);
-            fail();
-        } catch (FlowableException e) {
-        }
-        try {
-            identityService.checkPassword("kermit", "");
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> identityService.checkPassword("kermit", null))
+                .isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> identityService.checkPassword("kermit", ""))
+                .isInstanceOf(FlowableException.class);
     }
 
     @Test
     @Deployment
     public void testCandidateGroupFetchedThroughLdap() {
         runtimeService.startProcessInstanceByKey("testCandidateGroup");
-        assertEquals(1, taskService.createTaskQuery().count());
-        assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("sales").count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskCandidateGroup("sales").count()).isEqualTo(1);
 
         // Pepe is a member of the candidate group and should be able to find the task
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("pepe").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("pepe").count()).isEqualTo(1);
 
         // Dr. Bunsen is also a member of the candidate group and should be able to find the task
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("bunsen").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("bunsen").count()).isEqualTo(1);
 
         // Kermit is a candidate user and should be able to find the task
-        assertEquals(1, taskService.createTaskQuery().taskCandidateUser("kermit").count());
+        assertThat(taskService.createTaskQuery().taskCandidateUser("kermit").count()).isEqualTo(1);
     }
 
     @Test
     public void testUserQueryById() {
         List<User> users = identityService.createUserQuery().userId("kermit").list();
-        assertEquals(1, users.size());
+        assertThat(users)
+                .extracting(User::getId, User::getFirstName, User::getLastName)
+                .containsExactly(tuple("kermit", "Kermit", "The Frog"));
 
-        User user = users.get(0);
-        assertEquals("kermit", user.getId());
-        assertEquals("Kermit", user.getFirstName());
-        assertEquals("The Frog", user.getLastName());
+        User user = identityService.createUserQuery().userId("fozzie").singleResult();
+        assertThat(user.getId()).isEqualTo("fozzie");
+        assertThat(user.getFirstName()).isEqualTo("Fozzie");
+        assertThat(user.getLastName()).isEqualTo("Bear");
 
-        user = identityService.createUserQuery().userId("fozzie").singleResult();
-        assertEquals("fozzie", user.getId());
-        assertEquals("Fozzie", user.getFirstName());
-        assertEquals("Bear", user.getLastName());
+        user = identityService.createUserQuery().userId("non-existing").singleResult();
+        assertThat(user).isNull();
+    }
+
+    @Test
+    public void testUserQueryByIdIgnoreCase() {
+        List<User> users = identityService.createUserQuery().userIdIgnoreCase("KERMIT").list();
+        assertThat(users)
+                .extracting(User::getId, User::getFirstName, User::getLastName)
+                .containsExactly(tuple("kermit", "Kermit", "The Frog"));
+
+        User user = identityService.createUserQuery().userId("fozzie").singleResult();
+        assertThat(user.getId()).isEqualTo("fozzie");
+        assertThat(user.getFirstName()).isEqualTo("Fozzie");
+        assertThat(user.getLastName()).isEqualTo("Bear");
+
+        user = identityService.createUserQuery().userId("non-existing").singleResult();
+        assertThat(user).isNull();
     }
 
     @Test
     public void testUserQueryByFullNameLike() {
         List<User> users = identityService.createUserQuery().userFullNameLike("ermi").list();
-        assertEquals(1, users.size());
-        assertEquals(1, identityService.createUserQuery().userFullNameLike("ermi").count());
+        assertThat(identityService.createUserQuery().userFullNameLike("ermi").count()).isEqualTo(1);
 
-        User user = users.get(0);
-        assertEquals("kermit", user.getId());
-        assertEquals("Kermit", user.getFirstName());
-        assertEquals("The Frog", user.getLastName());
+        assertThat(users)
+                .extracting(User::getId, User::getFirstName, User::getLastName)
+                .containsExactly(tuple("kermit", "Kermit", "The Frog"));
 
         users = identityService.createUserQuery().userFullNameLike("rog").list();
-        assertEquals(1, users.size());
-        assertEquals(1, identityService.createUserQuery().userFullNameLike("rog").count());
+        assertThat(identityService.createUserQuery().userFullNameLike("rog").count()).isEqualTo(1);
 
-        user = users.get(0);
-        assertEquals("kermit", user.getId());
-        assertEquals("Kermit", user.getFirstName());
-        assertEquals("The Frog", user.getLastName());
+        assertThat(users)
+                .extracting(User::getId, User::getFirstName, User::getLastName)
+                .containsExactly(tuple("kermit", "Kermit", "The Frog"));
 
         users = identityService.createUserQuery().userFullNameLike("e").list();
-        assertEquals(5, users.size());
-        assertEquals(5, identityService.createUserQuery().userFullNameLike("e").count());
+        assertThat(users).hasSize(5);
+        assertThat(identityService.createUserQuery().userFullNameLike("e").count()).isEqualTo(5);
 
         users = identityService.createUserQuery().userFullNameLike("The").list();
-        assertEquals(3, users.size());
-        assertEquals(3, identityService.createUserQuery().userFullNameLike("The").count());
+        assertThat(users).hasSize(3);
+        assertThat(identityService.createUserQuery().userFullNameLike("The").count()).isEqualTo(3);
     }
 
 }

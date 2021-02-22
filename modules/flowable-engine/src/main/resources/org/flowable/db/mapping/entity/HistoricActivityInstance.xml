@@ -35,13 +35,13 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{processDefinitionId, jdbcType=VARCHAR},
+        1, #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
@@ -52,6 +52,7 @@
         #{assignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
+        #{transactionOrder ,jdbcType=INTEGER},
         #{durationInMillis ,jdbcType=BIGINT},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR}
@@ -73,14 +74,14 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values 
       <foreach collection="list" item="historicActivityInstance" index="index" separator=",">
          (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-          1,
-          #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+          1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
           #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
           #{historicActivityInstance.executionId, jdbcType=VARCHAR},
           #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
@@ -91,8 +92,9 @@
           #{historicActivityInstance.assignee ,jdbcType=VARCHAR},
           #{historicActivityInstance.startTime, jdbcType=TIMESTAMP},
           #{historicActivityInstance.endTime, jdbcType=TIMESTAMP},
-          #{historicActivityInstance.durationInMillis ,jdbcType=BIGINT},
-          #{historicActivityInstance.deleteReason ,jdbcType=VARCHAR},
+          #{historicActivityInstance.transactionOrder, jdbcType=INTEGER},
+          #{historicActivityInstance.durationInMillis, jdbcType=BIGINT},
+          #{historicActivityInstance.deleteReason, jdbcType=VARCHAR},
           #{historicActivityInstance.tenantId, jdbcType=VARCHAR})
       </foreach>
   </insert>
@@ -114,13 +116,13 @@
           ASSIGNEE_,
           START_TIME_,
           END_TIME_,
+          TRANSACTION_ORDER_,
           DURATION_,
           DELETE_REASON_,
           TENANT_ID_
         ) VALUES 
            (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+            1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
             #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
             #{historicActivityInstance.executionId, jdbcType=VARCHAR},
             #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
@@ -131,6 +133,7 @@
             #{historicActivityInstance.assignee ,jdbcType=VARCHAR},
             #{historicActivityInstance.startTime, jdbcType=TIMESTAMP},
             #{historicActivityInstance.endTime, jdbcType=TIMESTAMP},
+            #{historicActivityInstance.transactionOrder, jdbcType=INTEGER},
             #{historicActivityInstance.durationInMillis ,jdbcType=BIGINT},
             #{historicActivityInstance.deleteReason ,jdbcType=VARCHAR},
             #{historicActivityInstance.tenantId, jdbcType=VARCHAR})
@@ -159,6 +162,9 @@
         <if test="originalPersistentState.endTime != endTime">
             END_TIME_ = #{endTime, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.transactionOrder != transactionOrder">
+        	TRANSACTION_ORDER_ = #{transactionOrder, jdbcType=INTEGER}, 
+        </if>
         <if test="originalPersistentState.durationInMillis != durationInMillis">
             DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
         </if>
@@ -166,7 +172,7 @@
             DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
-            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.activityId != activityId">
             ACT_ID_ = #{activityId, jdbcType=VARCHAR},
@@ -183,6 +189,17 @@
   
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
+  </delete>
+
+  <delete id="deleteHistoricActivityInstance">
+    delete from ${prefix}ACT_HI_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstance" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_HI_ACTINST where
+        <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+            ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+        </foreach>
   </delete>
   
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->
@@ -201,6 +218,7 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -244,7 +262,7 @@
   </delete>
   
   <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
-    delete <if test="_databaseId != 'postgres' and _databaseId != 'db2'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
     NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
   </delete>
   

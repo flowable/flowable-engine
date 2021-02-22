@@ -30,11 +30,13 @@ public class DefaultCandidateManager implements CandidateManager {
 
     @Override
     public List<String> getGroupsForCandidateUser(String candidateUser) {
-        IdmIdentityService identityService = cmmnEngineConfiguration.getIdmIdentityService();
-        List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
         List<String> groupIds = new ArrayList<>();
-        for (Group group : groups) {
-            groupIds.add(group.getId());
+        IdmIdentityService identityService = cmmnEngineConfiguration.getIdmIdentityService();
+        if (identityService != null) {
+            List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
+            for (Group group : groups) {
+                groupIds.add(group.getId());
+            }
         }
         return groupIds;
     }

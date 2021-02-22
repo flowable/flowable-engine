@@ -28,23 +28,36 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.COMPLETED;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.COMPLETE;
     }
     
     @Override
-    protected boolean isEvaluateRepetitionRule() {
+    public boolean isEvaluateRepetitionRule() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldAggregateForSingleInstance() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldAggregateForMultipleInstances() {
         return true;
     }
 
     @Override
     protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
+            // terminate any remaining child plan items (e.g. in enabled / available state), but don't complete them as it might lead
+            // into wrong behavior resulting from it (e.g. triggering some follow-up actions on that completion event) and it will leave
+            // such implicitly completed plan items in complete state although they were never explicitly completed
             exitChildPlanItemInstances();
         }
 
@@ -52,5 +65,11 @@ public class CompletePlanItemInstanceOperation extends AbstractMovePlanItemInsta
         planItemInstanceEntity.setCompletedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntity);
     }
+
+    @Override
+    public String getOperationName() {
+        return "[Complete plan item]";
+    }
+
     
 }

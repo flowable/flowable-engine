@@ -31,12 +31,14 @@ import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
@@ -104,6 +106,26 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
             public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
                 GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
                 caseDiagramCanvas.drawUserTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+        
+        // send event task
+        activityDrawInstructions.put(SendEventServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawSendEventTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+
+        // external worker service task
+        activityDrawInstructions.put(ExternalWorkerServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawServiceTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
 
@@ -340,6 +362,9 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         ActivityDrawInstruction drawInstruction = activityDrawInstructions.get(planItem.getPlanItemDefinition().getClass());
         if (drawInstruction != null) {
             drawInstruction.draw(caseDiagramCanvas, cmmnModel, planItem);
+        
+        } else if (planItem.getPlanItemDefinition() instanceof Task) {
+            activityDrawInstructions.get(Task.class).draw(caseDiagramCanvas, cmmnModel, planItem);
         }
 
         // Nested elements
@@ -378,8 +403,8 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         List<GraphicInfo> graphicInfoList = cmmnModel.getFlowLocationGraphicInfo(association.getId());
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             graphicInfoList = connectionPerfectionizer(caseDiagramCanvas, cmmnModel, sourceElement, targetElement, graphicInfoList);
-            int xPoints[] = new int[graphicInfoList.size()];
-            int yPoints[] = new int[graphicInfoList.size()];
+            int[] xPoints = new int[graphicInfoList.size()];
+            int[] yPoints = new int[graphicInfoList.size()];
 
             for (int i = 1; i < graphicInfoList.size(); i++) {
                 GraphicInfo graphicInfo = graphicInfoList.get(i);
@@ -433,8 +458,8 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     protected static GraphicInfo getLineCenter(List<GraphicInfo> graphicInfoList) {
         GraphicInfo gi = new GraphicInfo();
 
-        int xPoints[] = new int[graphicInfoList.size()];
-        int yPoints[] = new int[graphicInfoList.size()];
+        int[] xPoints = new int[graphicInfoList.size()];
+        int[] yPoints = new int[graphicInfoList.size()];
 
         double length = 0;
         double[] lengths = new double[graphicInfoList.size()];

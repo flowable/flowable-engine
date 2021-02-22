@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -38,6 +39,14 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
                 && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))
             ){
             executeTrigger();
+
+        } else {
+            if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener){
+                throw new FlowableIllegalStateException("Can only trigger an event listener plan item that is in the AVAILABLE state");
+            } else {
+                throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
+            }
+
         }
     }
 
@@ -60,14 +69,7 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Trigger PlanItem] ");
-        if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append(" (");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
-        } else {
-            stringBuilder.append(planItem.getId());
-        }
+        stringBuilder.append(planItem);
         return stringBuilder.toString();
     }
 

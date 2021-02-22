@@ -1,0 +1,88 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flowable.template" . }}
+  labels:
+    {{ include "flowable.defaultlabels" . }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ include "flowable.template" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "flowable.template" . }}
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: {{ .Values.database.name }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.database.password }}
+        - name: POSTGRES_USER
+          value: {{ .Values.database.username }}
+        image: {{ .Values.postgres.image }}
+        name: {{ include "flowable.template" . }}
+        resources:
+{{ toYaml .Values.postgres.resources | indent 10 }}
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - postgres
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - postgres
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+        ports:
+        - containerPort: 5432
+          name: {{ include "flowable.template" . }}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: {{ include "flowable.template" . }}
+          subPath: data
+      restartPolicy: Always
+      volumes:
+      - name: {{ include "flowable.template" . }}
+        persistentVolumeClaim:
+          claimName: {{ include "flowable.template" . }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    service: {{ include "flowable.template" . }}
+  name: {{ include "flowable.template" . }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.postgres.storage.storageClassName }}
+  resources:
+    requests:
+      storage: {{ .Values.postgres.storage.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.postgres.service.name }}
+spec:
+  selector:
+    app: {{ include "flowable.template" . }}
+  ports:
+  - port: 5432
+{{- end }}

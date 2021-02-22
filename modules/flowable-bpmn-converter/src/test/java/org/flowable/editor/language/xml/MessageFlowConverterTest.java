@@ -12,64 +12,43 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DataStore;
 import org.flowable.bpmn.model.MessageFlow;
 import org.flowable.bpmn.model.Pool;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class MessageFlowConverterTest extends AbstractConverterTest {
+class MessageFlowConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "messageflow.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
-        assertEquals(1, model.getDataStores().size());
+    @BpmnXmlConverterTest("messageflow.bpmn")
+    void validateModel(BpmnModel model) {
+        assertThat(model.getDataStores()).hasSize(1);
         DataStore dataStore = model.getDataStore("DATASTORE_1");
-        assertNotNull(dataStore);
-        assertEquals("DATASTORE_1", dataStore.getId());
-        assertEquals("test", dataStore.getName());
-        assertEquals("ITEM_1", dataStore.getItemSubjectRef());
+        assertThat(dataStore).isNotNull();
+        assertThat(dataStore)
+                .extracting(DataStore::getId, DataStore::getName, DataStore::getItemSubjectRef)
+                .containsExactly("DATASTORE_1", "test", "ITEM_1");
 
         MessageFlow messageFlow = model.getMessageFlow("MESSAGEFLOW_1");
-        assertNotNull(messageFlow);
-        assertEquals("test 1", messageFlow.getName());
-        assertEquals("task1", messageFlow.getSourceRef());
-        assertEquals("task2", messageFlow.getTargetRef());
+        assertThat(messageFlow).isNotNull();
+        assertThat(messageFlow)
+                .extracting(MessageFlow::getName, MessageFlow::getSourceRef, MessageFlow::getTargetRef)
+                .containsExactly("test 1", "task1", "task2");
 
         messageFlow = model.getMessageFlow("MESSAGEFLOW_2");
-        assertNotNull(messageFlow);
-        assertEquals("test 2", messageFlow.getName());
-        assertEquals("task2", messageFlow.getSourceRef());
-        assertEquals("task3", messageFlow.getTargetRef());
+        assertThat(messageFlow).isNotNull();
+        assertThat(messageFlow)
+                .extracting(MessageFlow::getName, MessageFlow::getSourceRef, MessageFlow::getTargetRef)
+                .containsExactly("test 2", "task2", "task3");
 
-        assertEquals(2, model.getPools().size());
-        Pool pool = model.getPools().get(0);
-        assertEquals("participant1", pool.getId());
-        assertEquals("Participant 1", pool.getName());
-        assertEquals("PROCESS_1", pool.getProcessRef());
-
-        pool = model.getPools().get(1);
-        assertEquals("participant2", pool.getId());
-        assertEquals("Participant 2", pool.getName());
-        assertEquals("PROCESS_2", pool.getProcessRef());
+        assertThat(model.getPools())
+                .extracting(Pool::getId, Pool::getName, Pool::getProcessRef)
+                .containsExactly(
+                        tuple("participant1", "Participant 1", "PROCESS_1"),
+                        tuple("participant2", "Participant 2", "PROCESS_2")
+                );
     }
 }

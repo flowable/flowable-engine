@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 
@@ -26,15 +27,18 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
 
     @Override
     public Object execute(CommandContext commandContext) {
-        CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricProcessIdentityLinksForNonExistingInstances();
-        CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        HistoricEntityLinkService historicEntityLinkService = CommandContextUtil.getHistoricEntityLinkService();
-        if (historicEntityLinkService != null) {
-            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingProcessInstances();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricProcessIdentityLinksForNonExistingInstances();
+        processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
+        if (processEngineConfiguration.isEnableEntityLinks()) {
+            HistoricEntityLinkService historicEntityLinkService = processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+            if (historicEntityLinkService != null) {
+                historicEntityLinkService.deleteHistoricEntityLinksForNonExistingProcessInstances();
+            }
         }
-        CommandContextUtil.getHistoricTaskService(commandContext).deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
-        CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
-        CommandContextUtil.getHistoricDetailEntityManager(commandContext).deleteHistoricDetailForNonExistingProcessInstances();
+        processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
+        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailForNonExistingProcessInstances();
 
         return null;
     }

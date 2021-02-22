@@ -192,11 +192,11 @@ If you are using the Flowable Spring module, additional configuration is needed 
 
 ----
 <property name="flowable5CompatibilityEnabled" value="true" />
-<property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompabilityFactory" />
+<property name="flowable5CompatibilityHandlerFactory" ref="flowable5CompatibilityFactory" />
 
 ....
 
-<bean id="flowable5CompabilityFactory" class="org.flowable.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
+<bean id="flowable5CompatibilityFactory" class="org.flowable.compatibility.spring.SpringFlowable5CompatibilityHandlerFactory" />
 ----
 
 *and* add the *flowable5-spring* and *flowable5-spring-compatibility* JARs to your classpath (manually or through a dependency mechanism, such as Maven).

@@ -40,7 +40,7 @@ public abstract class BaseCmmnXmlConverter {
             baseElement.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
             Location location = xtr.getLocation();
             baseElement.setXmlRowNumber(location.getLineNumber());
-            baseElement.setXmlRowNumber(location.getColumnNumber());
+            baseElement.setXmlColumnNumber(location.getColumnNumber());
 
             if (baseElement instanceof CmmnElement) {
                 CmmnElement cmmnElement = (CmmnElement) baseElement;

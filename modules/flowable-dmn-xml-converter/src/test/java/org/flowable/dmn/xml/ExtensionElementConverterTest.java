@@ -12,9 +12,8 @@
  */
 package org.flowable.dmn.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +27,7 @@ import org.flowable.dmn.model.DmnExtensionAttribute;
 import org.flowable.dmn.model.DmnExtensionElement;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ExtensionElementConverterTest extends AbstractConverterTest {
 
@@ -65,76 +64,66 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(DmnDefinition model) {
-        assertEquals("DMN description", model.getDescription());
+        assertThat(model.getDescription()).isEqualTo("DMN description");
 
         /*
          * Verify attributes extension
          */
         Map<String, String> attributes = getAttributes(model);
-        assertEquals(2, attributes.size());
-        for (String key : attributes.keySet()) {
-            if (key.equals("Attr3")) {
-                assertEquals("3", attributes.get(key));
-            } else if (key.equals("Attr4")) {
-                assertEquals("4", attributes.get(key));
-            } else {
-                fail("Unknown key value");
-            }
-        }
+        assertThat(attributes)
+                .containsOnly(
+                        entry("Attr3", "3"),
+                        entry("Attr4", "4")
+                );
 
         /*
          * Verify localization extension
          */
         Localization localization = getLocalization(model);
-        assertEquals("rbkfn-2", localization.getResourceBundleKeyForName());
-        assertEquals("rbkfd-2", localization.getResourceBundleKeyForDescription());
-        assertEquals("leifn-2", localization.getLabeledEntityIdForName());
-        assertEquals("leifd-2", localization.getLabeledEntityIdForDescription());
+        assertThat(localization.getResourceBundleKeyForName()).isEqualTo("rbkfn-2");
+        assertThat(localization.getResourceBundleKeyForDescription()).isEqualTo("rbkfd-2");
+        assertThat(localization.getLabeledEntityIdForName()).isEqualTo("leifn-2");
+        assertThat(localization.getLabeledEntityIdForDescription()).isEqualTo("leifd-2");
 
         List<Decision> decisions = model.getDecisions();
-        assertEquals(1, decisions.size());
+        assertThat(decisions).hasSize(1);
 
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable);
+        assertThat(decisionTable).isNotNull();
 
-        assertEquals("Decision table description", decisionTable.getDescription());
+        assertThat(decisionTable.getDescription()).isEqualTo("Decision table description");
 
         /*
          * Verify decision table localization extension
          */
         localization = getLocalization(decisionTable);
-        assertEquals("rbkfn-3", localization.getResourceBundleKeyForName());
-        assertEquals("rbkfd-3", localization.getResourceBundleKeyForDescription());
-        assertEquals("leifn-3", localization.getLabeledEntityIdForName());
-        assertEquals("leifd-3", localization.getLabeledEntityIdForDescription());
+        assertThat(localization.getResourceBundleKeyForName()).isEqualTo("rbkfn-3");
+        assertThat(localization.getResourceBundleKeyForDescription()).isEqualTo("rbkfd-3");
+        assertThat(localization.getLabeledEntityIdForName()).isEqualTo("leifn-3");
+        assertThat(localization.getLabeledEntityIdForDescription()).isEqualTo("leifd-3");
 
         attributes = getAttributes(decisionTable);
-        assertEquals(2, attributes.size());
-        for (String key : attributes.keySet()) {
-            if (key.equals("Attr5")) {
-                assertEquals("5", attributes.get(key));
-            } else if (key.equals("Attr6")) {
-                assertEquals("6", attributes.get(key));
-            } else {
-                fail("Unknown key value");
-            }
-        }
+        assertThat(attributes)
+                .containsOnly(
+                        entry("Attr5", "5"),
+                        entry("Attr6", "6")
+                );
 
         List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(4, inputClauses.size());
+        assertThat(inputClauses).hasSize(4);
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(1, outputClauses.size());
+        assertThat(outputClauses).hasSize(1);
 
         /*
          * Verify input entry extension elements
          */
-        assertEquals("NONE OF", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("20, 13", decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("ANY OF", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("\"20\", \"13\"", decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
-        assertEquals("ALL OF", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText());
-        assertEquals("20", decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText());
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("NONE OF");
+        assertThat(decisionTable.getRules().get(0).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("20, 13");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("ANY OF");
+        assertThat(decisionTable.getRules().get(1).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("\"20\", \"13\"");
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("operator").get(0).getElementText()).isEqualTo("ALL OF");
+        assertThat(decisionTable.getRules().get(2).getInputEntries().get(3).getInputEntry().getExtensionElements().get("expression").get(0).getElementText()).isEqualTo("20");
     }
 
     protected Map<String, String> getAttributes(DmnElement bObj) {

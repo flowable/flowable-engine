@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -35,10 +36,13 @@ import org.flowable.common.engine.impl.identity.Authentication;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single case instance resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
@@ -49,7 +53,14 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         Authentication.setAuthenticatedUserId("getCaseUser");
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .businessKey("myBusinessKey")
+                .referenceId("testReferenceId")
+                .referenceType("testReferenceType")
+                .callbackId("testCallbackId")
+                .callbackType("testCallbackType")
+                .start();
 
         String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
         CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
@@ -57,29 +68,44 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         // Check resulting instance
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(caseInstance.getId(), responseNode.get("id").textValue());
-        assertEquals("myBusinessKey", responseNode.get("businessKey").textValue());
-        assertEquals("", responseNode.get("tenantId").textValue());
-        assertThat(responseNode.get("startTime").textValue()).as("startTime").isNotNull();
-        assertThat(responseNode.get("startUserId").textValue()).as("startUserId").isEqualTo("getCaseUser");
-
-        assertEquals(responseNode.get("url").asText(), url);
-        assertEquals(responseNode.get("caseDefinitionUrl").asText(), buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: '" + caseInstance.getId() + "',"
+                        + " businessKey: 'myBusinessKey',"
+                        + " referenceId: 'testReferenceId',"
+                        + " referenceType: 'testReferenceType',"
+                        + " callbackId: 'testCallbackId',"
+                        + " callbackType: 'testCallbackType',"
+                        + " tenantId: '',"
+                        + " startTime: " + new TextNode(getISODateStringWithTZ(caseInstance.getStartTime())) + ","
+                        + " startUserId: 'getCaseUser',"
+                        + " url: '" + url + "',"
+                        + " caseDefinitionUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
+                        .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()) + "'"
+                        + "}");
 
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = repositoryService.createDeployment().addClasspathResource(
-                        "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
-        
+                "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").tenantId("myTenant").deploy();
+
         try {
-            caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant").start();
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_OK);
-    
+            caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").tenantId("myTenant")
+                    .start();
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())),
+                    HttpStatus.SC_OK);
+
             // Check resulting instance tenant id
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("myTenant", responseNode.get("tenantId").textValue());
-            
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " tenantId: 'myTenant'"
+                            + "}");
+
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
@@ -89,7 +115,8 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
      * Test getting an unexisting case instance.
      */
     public void testGetUnexistingCaseInstance() {
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistingpi")),
+                HttpStatus.SC_NOT_FOUND));
     }
 
     /**
@@ -98,41 +125,44 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteCaseInstance() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())), HttpStatus.SC_NO_CONTENT));
+        closeResponse(
+                executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())),
+                        HttpStatus.SC_NO_CONTENT));
 
         // Check if process-instance is gone
-        assertEquals(0, runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     /**
      * Test deleting an unexisting case instance.
      */
     public void testDeleteUnexistingCaseInstance() {
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistini")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistini")),
+                HttpStatus.SC_NOT_FOUND));
     }
-    
+
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/testManualEvaluateCriteria.cmmn" })
     public void testEvaluateCriteria() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testManualEvaluateCriteria")
                 .variable("someBean", new TestBean())
                 .start();
-        
+
         // Triggering the evaluation twice will satisfy the entry criterion for B
-        assertEquals(1, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
-        
+        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
+
         String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
         HttpPut httpPut = new HttpPut(url);
-        
+
         httpPut.setEntity(new StringEntity("{\"action\": \"evaluateCriteria\"}"));
         executeRequest(httpPut, HttpStatus.SC_OK);
-        
-        assertEquals(1, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
-        
+
+        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
+
         TestBean.RETURN_VALUE = true;
         executeRequest(httpPut, HttpStatus.SC_OK);
-        
-        assertEquals(2, runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
+
+        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
     }
 
     @CmmnDeployment
@@ -146,7 +176,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
 
         ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(3, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(3);
         assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
         assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
@@ -156,7 +186,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(3, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(3);
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
         assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
@@ -165,7 +195,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(3, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(3);
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
         assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
@@ -178,26 +208,26 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
 
         ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(2, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(2);
         assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
-        assertStage(stageOverviewResponse.get(1), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(1), "Stage four", false, false);
 
         // We're doing a wrong time ordering, to test that the display order has precedence over the end time
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(2, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(2);
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
-        assertStage(stageOverviewResponse.get(1), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(1), "Stage four", false, false);
 
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(3, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(2, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(2);
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
-        assertStage(stageOverviewResponse.get(1), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(1), "Stage four", false, false);
     }
 
     @CmmnDeployment
@@ -207,18 +237,18 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
 
         ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(4);
         assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
-        assertStage(stageOverviewResponse.get(3), "Stage four", false,  false);
+        assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
 
         // We're doing a wrong time ordering, to test that the display order has precedence over the end time
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(4);
         assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
@@ -228,13 +258,13 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(4, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(4);
         assertStage(stageOverviewResponse.get(0), "Stage two", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
         assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
     }
-    
+
     @CmmnDeployment
     public void testStageAndMilestoneOverview() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -246,7 +276,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
 
         ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(6, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(6);
         assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", false, true);
         assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
@@ -259,7 +289,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(6, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(6);
         assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
@@ -271,7 +301,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
 
         stageOverviewResponse = getStageOverviewResponse(caseInstance);
-        assertEquals(6, stageOverviewResponse.size());
+        assertThat(stageOverviewResponse).hasSize(6);
         assertStage(stageOverviewResponse.get(0), "Milestone one", true, false);
         assertStage(stageOverviewResponse.get(1), "Stage one", true, false);
         assertStage(stageOverviewResponse.get(2), "Milestone two", true, false);
@@ -280,31 +310,99 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
     }
 
+    @CmmnDeployment
+    public void testStageOverviewWithRepetition() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverviewWithRepetition").start();
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(5, ChronoUnit.DAYS)));
+
+        ArrayNode stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertThat(stageOverviewResponse).hasSize(3);
+        assertStage(stageOverviewResponse.get(0), "Stage one", false, true);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        // We're doing a wrong time ordering, to test that the display order has precedence over the end time
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(7, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertThat(stageOverviewResponse).hasSize(3);
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", false, true);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, false);
+
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(Instant.now().minus(9, ChronoUnit.DAYS)));
+        taskService.complete(taskService.createTaskQuery().singleResult().getId());
+
+        stageOverviewResponse = getStageOverviewResponse(caseInstance);
+        assertThat(stageOverviewResponse).hasSize(3);
+        assertStage(stageOverviewResponse.get(0), "Stage one", true, false);
+        assertStage(stageOverviewResponse.get(1), "Stage two", true, false);
+        assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testUpdateCaseInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isNull();
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey()).isNull();
+
+        // Triggering the evaluation twice will satisfy the entry criterion for B
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name one\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isEqualTo("test name one");
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey()).isNull();
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessKey\": \"test business key\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isEqualTo("test name one");
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey())
+                .isEqualTo("test business key");
+
+        httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"test name two\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getName()).isEqualTo("test name two");
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey())
+                .isEqualTo("test business key");
+    }
+
     protected ArrayNode getStageOverviewResponse(CaseInstance caseInstance) throws IOException {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(
-            CmmnRestUrls.URL_CASE_INSTANCE_STAGE_OVERVIEW, caseInstance.getId())), HttpStatus.SC_OK);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+                CmmnRestUrls.URL_CASE_INSTANCE_STAGE_OVERVIEW, caseInstance.getId())), HttpStatus.SC_OK);
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
 
-        assertTrue(responseNode.isArray());
+        assertThat(responseNode.isArray()).isTrue();
         return (ArrayNode) responseNode;
     }
 
     protected void assertStage(JsonNode jsonNode, String name, boolean isEnded, boolean isCurrent) {
-        assertEquals(name, jsonNode.get("name").asText());
-        assertEquals("'ended' boolean is wrong", isEnded, jsonNode.get("ended").asBoolean());
-        assertEquals("current boolean is wrong", isCurrent, jsonNode.get("current").asBoolean());
+        assertThat(jsonNode.get("name").asText()).isEqualTo(name);
+        assertThat(jsonNode.get("ended").asBoolean()).as("'ended' boolean is wrong").isEqualTo(isEnded);
+        assertThat(jsonNode.get("current").asBoolean()).as("'current' boolean is wrong").isEqualTo(isCurrent);
     }
-    
+
     public static class TestBean implements Serializable {
-        
+
         public static boolean RETURN_VALUE;
-        
+
         public boolean isSatisfied() {
             return RETURN_VALUE;
         }
-        
+
     }
 
 }

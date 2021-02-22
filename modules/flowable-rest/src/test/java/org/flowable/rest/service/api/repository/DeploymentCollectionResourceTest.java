@@ -12,7 +12,7 @@
  */
 package org.flowable.rest.service.api.repository;
 
-import static org.junit.Assert.assertEquals;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import java.util.Calendar;
 import java.util.List;
@@ -27,9 +27,11 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to the Deployment collection.
- * 
+ *
  * @author Frederik Heremans
  */
 public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
@@ -89,40 +91,67 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
             // Check ordering by name
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
                     HttpStatus.SC_OK);
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(firstDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "  id: '" + firstDeployment.getId() + "'"
+                            + "}, {"
+                            + "  id: '" + secondDeployment.getId() + "'"
+                            + "} ]"
+                    );
 
             // Check ordering by deploy time
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc"), HttpStatus.SC_OK);
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc"),
+                    HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(firstDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(secondDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "  id: '" + firstDeployment.getId() + "'"
+                            + "}, {"
+                            + "  id: '" + secondDeployment.getId() + "'"
+                            + "} ]"
+                    );
 
             // Check ordering by tenantId
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=tenantId&order=desc"), HttpStatus.SC_OK);
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=tenantId&order=desc"),
+                    HttpStatus.SC_OK);
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            assertEquals(2L, dataNode.size());
-            assertEquals(secondDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(firstDeployment.getId(), dataNode.get(1).get("id").textValue());
+            assertThatJson(dataNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "  id: '" + secondDeployment.getId() + "'"
+                            + "}, {"
+                            + "  id: '" + firstDeployment.getId() + "'"
+                            + "} ]"
+                    );
 
             // Check paging
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc&start=1&size=1"), HttpStatus.SC_OK);
+            response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=deployTime&order=asc&start=1&size=1"),
+                    HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            dataNode = responseNode.get("data");
-            assertEquals(1L, dataNode.size());
-            assertEquals(secondDeployment.getId(), dataNode.get(0).get("id").textValue());
-            assertEquals(2L, responseNode.get("total").longValue());
-            assertEquals(1L, responseNode.get("start").longValue());
-            assertEquals(1L, responseNode.get("size").longValue());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "   data: [ {"
+                            + "             id: '" + secondDeployment.getId() + "'"
+                            + "         } ],"
+                            + "   total: 2,"
+                            + "   start: 1,"
+                            + "   size: 1"
+                            + "}"
+                    );
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

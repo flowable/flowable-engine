@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
@@ -26,9 +26,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
+ * @deprecated
  */
 @Deprecated
 public class PlanItemInstanceCreatedHistoryJsonTransformer extends AbstractPlanItemInstanceHistoryJsonTransformer {
+    
+    public PlanItemInstanceCreatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
     
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
@@ -42,7 +47,7 @@ public class PlanItemInstanceCreatedHistoryJsonTransformer extends AbstractPlanI
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = CommandContextUtil.getHistoricPlanItemInstanceEntityManager();
+        HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
         HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create();
         copyCommonPlanItemInstanceProperties(historicPlanItemInstanceEntity, historicalData);
         historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);

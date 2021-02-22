@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="simple" name="Simple" namespace="http://flowable.org/dmn">
+    <decision id="decision" name="Simple decision">
+        <decisionTable id="decisionTable" hitPolicy="RULE ORDER">
+            <input>
+                <inputExpression id="input1" typeRef="number">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="number"/>
+            <output id="output2" label="Output 2" name="output2" typeRef="number"/>
+            <output id="output3" label="Output 3" name="output3" typeRef="number"/>
+            <rule>
+                <inputEntry id="inputEntry1">
+                    <text><![CDATA[> 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_1">
+                    <text>11</text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_1">
+                    <text></text>
+                </outputEntry>
+                <outputEntry id="outputEntry3_1"/>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2">
+                    <text><![CDATA[> 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2">
+                    <text></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_2">
+                    <text>11</text>
+                </outputEntry>
+                <outputEntry id="outputEntry3_2"/>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry3">
+                    <text><![CDATA[> 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_3">
+                    <text></text>
+                </outputEntry>
+                <outputEntry id="outputEntry2_3"/>
+                <outputEntry id="outputEntry3_3">
+                    <text>11</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>

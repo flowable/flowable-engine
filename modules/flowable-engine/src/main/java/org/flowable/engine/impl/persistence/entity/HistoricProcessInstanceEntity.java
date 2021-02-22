@@ -56,6 +56,12 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
     void setCallbackId(String callbackId);
     
     void setCallbackType(String callbackType);
+
+    void setReferenceId(String referenceId);
+
+    void setReferenceType(String referenceType);
+
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
     
     List<HistoricVariableInstanceEntity> getQueryVariables();
 

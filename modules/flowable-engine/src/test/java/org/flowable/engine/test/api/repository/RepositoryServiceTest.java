@@ -13,8 +13,11 @@
 
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -46,96 +49,76 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceById() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
-
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("oneTaskProcess");
         ProcessDefinition processDefinition = processDefinitions.get(0);
-        assertEquals("oneTaskProcess", processDefinition.getKey());
-        assertNotNull(processDefinition.getId());
+        assertThat(processDefinition.getId()).isNotNull();
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testFindProcessDefinitionById() {
         List<ProcessDefinition> definitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, definitions.size());
+        assertThat(definitions).hasSize(1);
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitions.get(0).getId()).singleResult();
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processDefinition);
-        assertEquals("oneTaskProcess", processDefinition.getKey());
-        assertEquals("The One Task Process", processDefinition.getName());
+        assertThat(processDefinition).isNotNull();
+        assertThat(processDefinition.getKey()).isEqualTo("oneTaskProcess");
+        assertThat(processDefinition.getName()).isEqualTo("The One Task Process");
 
         processDefinition = repositoryService.getProcessDefinition(definitions.get(0).getId());
-        assertEquals("This is a process for testing purposes", processDefinition.getDescription());
+        assertThat(processDefinition.getDescription()).isEqualTo("This is a process for testing purposes");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteDeploymentWithRunningInstances() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         runtimeService.startProcessInstanceById(processDefinition.getId());
 
         // Try to delete the deployment
-        try {
-            repositoryService.deleteDeployment(processDefinition.getDeploymentId());
-            fail("Exception expected");
-        } catch (RuntimeException ae) {
-            // Exception expected when deleting deployment with running process
-        }
+        assertThatThrownBy(() -> repositoryService.deleteDeployment(processDefinition.getDeploymentId()))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     public void testDeleteDeploymentNullDeploymentId() {
-        try {
-            repositoryService.deleteDeployment(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("deploymentId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> repositoryService.deleteDeployment(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("deploymentId is null");
     }
 
     @Test
     public void testDeleteDeploymentCascadeNullDeploymentId() {
-        try {
-            repositoryService.deleteDeployment(null, true);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("deploymentId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> repositoryService.deleteDeployment(null, true))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("deploymentId is null");
     }
 
     @Test
     public void testDeleteDeploymentNonExistentDeploymentId() {
-        try {
-            repositoryService.deleteDeployment("foobar");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("Could not find a deployment with id 'foobar'.", ae.getMessage());
-        } catch (Throwable t) {
-            fail("Unexpected exception: " + t);
-        }
+        assertThatThrownBy(() -> repositoryService.deleteDeployment("foobar"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("Could not find a deployment with id 'foobar'.");
     }
 
     @Test
     public void testDeleteDeploymentCascadeNonExistentDeploymentId() {
-        try {
-            repositoryService.deleteDeployment("foobar", true);
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("Could not find a deployment with id 'foobar'.", ae.getMessage());
-        } catch (Throwable t) {
-            fail("Unexpected exception: " + t);
-        }
+        assertThatThrownBy(() -> repositoryService.deleteDeployment("foobar", true))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("Could not find a deployment with id 'foobar'.");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testDeleteDeploymentCascadeWithRunningInstances() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        assertEquals(1, processDefinitions.size());
+        assertThat(processDefinitions).hasSize(1);
         ProcessDefinition processDefinition = processDefinitions.get(0);
 
         runtimeService.startProcessInstanceById(processDefinition.getId());
@@ -146,12 +129,9 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
 
     @Test
     public void testFindDeploymentResourceNamesNullDeploymentId() {
-        try {
-            repositoryService.getDeploymentResourceNames(null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("deploymentId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> repositoryService.getDeploymentResourceNames(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("deploymentId is null");
     }
 
     @Test
@@ -165,18 +145,15 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml").activateProcessDefinitionsOn(inThreeDays).deploy();
 
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isZero();
 
         // Shouldn't be able to start a process instance
-        try {
-            runtimeService.startProcessInstanceByKey("oneTaskProcess");
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresentIgnoreCase("suspended", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneTaskProcess"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("suspended");
 
         // Move time four days forward, the timer will fire and the process
         // definitions will be active
@@ -184,14 +161,14 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(inFourDays);
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 50L);
 
-        assertEquals(1, repositoryService.createDeploymentQuery().count());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
-        assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().active().count());
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
+        assertThat(repositoryService.createProcessDefinitionQuery().suspended().count()).isZero();
+        assertThat(repositoryService.createProcessDefinitionQuery().active().count()).isEqualTo(2);
 
         // Should be able to start process instance
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
 
         // Cleanup
         repositoryService.deleteDeployment(deployment.getId(), true);
@@ -203,63 +180,48 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         // Get hold of the deployment id
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
 
-        try {
-            repositoryService.getResourceAsStream(deployment.getId(), "org/flowable/engine/test/api/unexistingProcess.bpmn.xml");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no resource found with name", ae.getMessage());
-            assertEquals(InputStream.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> repositoryService.getResourceAsStream(deployment.getId(), "org/flowable/engine/test/api/unexistingProcess.bpmn.xml"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("no resource found with name");
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetResourceAsStreamUnexistingDeployment() {
-
-        try {
-            repositoryService.getResourceAsStream("unexistingdeployment", "org/flowable/engine/test/api/unexistingProcess.bpmn.xml");
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("deployment does not exist", ae.getMessage());
-            assertEquals(org.flowable.engine.repository.Deployment.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> repositoryService.getResourceAsStream("unexistingdeployment", "org/flowable/engine/test/api/unexistingProcess.bpmn.xml"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("deployment does not exist");
     }
 
     @Test
     public void testGetResourceAsStreamNullArguments() {
-        try {
-            repositoryService.getResourceAsStream(null, "resource");
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("deploymentId is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> repositoryService.getResourceAsStream(null, "resource"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("deploymentId is null");
 
-        try {
-            repositoryService.getResourceAsStream("deployment", null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("resourceName is null", ae.getMessage());
-        }
+        assertThatThrownBy(() -> repositoryService.getResourceAsStream("deployment", null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("resourceName is null");
     }
 
     @Test
     public void testNewModelPersistence() {
         Model model = repositoryService.newModel();
-        assertNotNull(model);
+        assertThat(model).isNotNull();
 
         model.setName("Test model");
         model.setCategory("test");
         model.setMetaInfo("meta");
         repositoryService.saveModel(model);
 
-        assertNotNull(model.getId());
+        assertThat(model.getId()).isNotNull();
         model = repositoryService.getModel(model.getId());
-        assertNotNull(model);
-        assertEquals("Test model", model.getName());
-        assertEquals("test", model.getCategory());
-        assertEquals("meta", model.getMetaInfo());
-        assertNotNull(model.getCreateTime());
-        assertEquals(Integer.valueOf(1), model.getVersion());
+        assertThat(model).isNotNull();
+        assertThat(model.getName()).isEqualTo("Test model");
+        assertThat(model.getCategory()).isEqualTo("test");
+        assertThat(model.getMetaInfo()).isEqualTo("meta");
+        assertThat(model.getCreateTime()).isNotNull();
+        assertThat(model.getVersion()).isEqualTo(Integer.valueOf(1));
 
         repositoryService.deleteModel(model.getId());
     }
@@ -271,15 +233,15 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         byte[] testSource = "modelsource".getBytes(StandardCharsets.UTF_8);
         repositoryService.saveModel(model);
 
-        assertNotNull(model.getId());
+        assertThat(model.getId()).isNotNull();
         repositoryService.addModelEditorSource(model.getId(), testSource);
 
         model = repositoryService.getModel(model.getId());
-        assertNotNull(model);
-        assertEquals("Test model", model.getName());
+        assertThat(model).isNotNull();
+        assertThat(model.getName()).isEqualTo("Test model");
 
         byte[] editorSourceBytes = repositoryService.getModelEditorSource(model.getId());
-        assertEquals("modelsource", new String(editorSourceBytes, StandardCharsets.UTF_8));
+        assertThat(new String(editorSourceBytes, StandardCharsets.UTF_8)).isEqualTo("modelsource");
 
         repositoryService.deleteModel(model.getId());
     }
@@ -287,16 +249,16 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testUpdateModelPersistence() throws Exception {
         Model model = repositoryService.newModel();
-        assertNotNull(model);
+        assertThat(model).isNotNull();
 
         model.setName("Test model");
         model.setCategory("test");
         model.setMetaInfo("meta");
         repositoryService.saveModel(model);
 
-        assertNotNull(model.getId());
+        assertThat(model.getId()).isNotNull();
         model = repositoryService.getModel(model.getId());
-        assertNotNull(model);
+        assertThat(model).isNotNull();
 
         model.setName("New name");
         model.setCategory("New category");
@@ -304,19 +266,19 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         model.setVersion(2);
         repositoryService.saveModel(model);
 
-        assertNotNull(model.getId());
+        assertThat(model.getId()).isNotNull();
         repositoryService.addModelEditorSource(model.getId(), "new".getBytes(StandardCharsets.UTF_8));
         repositoryService.addModelEditorSourceExtra(model.getId(), "new".getBytes(StandardCharsets.UTF_8));
 
         model = repositoryService.getModel(model.getId());
 
-        assertEquals("New name", model.getName());
-        assertEquals("New category", model.getCategory());
-        assertEquals("test", model.getMetaInfo());
-        assertNotNull(model.getCreateTime());
-        assertEquals(Integer.valueOf(2), model.getVersion());
-        assertEquals("new", new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8));
-        assertEquals("new", new String(repositoryService.getModelEditorSourceExtra(model.getId()), StandardCharsets.UTF_8));
+        assertThat(model.getName()).isEqualTo("New name");
+        assertThat(model.getCategory()).isEqualTo("New category");
+        assertThat(model.getMetaInfo()).isEqualTo("test");
+        assertThat(model.getCreateTime()).isNotNull();
+        assertThat(model.getVersion()).isEqualTo(Integer.valueOf(2));
+        assertThat(new String(repositoryService.getModelEditorSource(model.getId()), StandardCharsets.UTF_8)).isEqualTo("new");
+        assertThat(new String(repositoryService.getModelEditorSourceExtra(model.getId()), StandardCharsets.UTF_8)).isEqualTo("new");
 
         repositoryService.deleteModel(model.getId());
     }
@@ -327,16 +289,14 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(procDefId);
 
-        try {
+        assertThatCode(() -> {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             new ObjectOutputStream(baos).writeObject(processDefinition);
 
             byte[] bytes = baos.toByteArray();
-            assertTrue(bytes.length > 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-        }
+            assertThat(bytes).isNotEmpty();
+        })
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -346,43 +306,43 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
 
         // Some basic assertions
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-        assertNotNull(bpmnModel);
-        assertEquals(1, bpmnModel.getProcesses().size());
-        assertTrue(!bpmnModel.getLocationMap().isEmpty());
-        assertTrue(!bpmnModel.getFlowLocationMap().isEmpty());
+        assertThat(bpmnModel).isNotNull();
+        assertThat(bpmnModel.getProcesses()).hasSize(1);
+        assertThat(bpmnModel.getLocationMap()).isNotEmpty();
+        assertThat(bpmnModel.getFlowLocationMap()).isNotEmpty();
 
         // Test the flow
         org.flowable.bpmn.model.Process process = bpmnModel.getProcesses().get(0);
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class);
-        assertEquals(1, startEvents.size());
+        assertThat(startEvents).hasSize(1);
         StartEvent startEvent = startEvents.get(0);
-        assertEquals(1, startEvent.getOutgoingFlows().size());
-        assertEquals(0, startEvent.getIncomingFlows().size());
+        assertThat(startEvent.getOutgoingFlows()).hasSize(1);
+        assertThat(startEvent.getIncomingFlows()).isEmpty();
 
         String nextElementId = startEvent.getOutgoingFlows().get(0).getTargetRef();
         UserTask userTask = (UserTask) process.getFlowElement(nextElementId);
-        assertEquals("First Task", userTask.getName());
+        assertThat(userTask.getName()).isEqualTo("First Task");
 
-        assertEquals(1, userTask.getOutgoingFlows().size());
-        assertEquals(1, userTask.getIncomingFlows().size());
+        assertThat(userTask.getOutgoingFlows()).hasSize(1);
+        assertThat(userTask.getIncomingFlows()).hasSize(1);
         nextElementId = userTask.getOutgoingFlows().get(0).getTargetRef();
         ParallelGateway parallelGateway = (ParallelGateway) process.getFlowElement(nextElementId);
-        assertEquals(2, parallelGateway.getOutgoingFlows().size());
+        assertThat(parallelGateway.getOutgoingFlows()).hasSize(2);
 
         nextElementId = parallelGateway.getOutgoingFlows().get(0).getTargetRef();
-        assertEquals(1, parallelGateway.getIncomingFlows().size());
+        assertThat(parallelGateway.getIncomingFlows()).hasSize(1);
         userTask = (UserTask) process.getFlowElement(nextElementId);
-        assertEquals(1, userTask.getOutgoingFlows().size());
+        assertThat(userTask.getOutgoingFlows()).hasSize(1);
 
         nextElementId = userTask.getOutgoingFlows().get(0).getTargetRef();
         parallelGateway = (ParallelGateway) process.getFlowElement(nextElementId);
-        assertEquals(1, parallelGateway.getOutgoingFlows().size());
-        assertEquals(2, parallelGateway.getIncomingFlows().size());
+        assertThat(parallelGateway.getOutgoingFlows()).hasSize(1);
+        assertThat(parallelGateway.getIncomingFlows()).hasSize(2);
 
         nextElementId = parallelGateway.getOutgoingFlows().get(0).getTargetRef();
         EndEvent endEvent = (EndEvent) process.getFlowElement(nextElementId);
-        assertEquals(0, endEvent.getOutgoingFlows().size());
-        assertEquals(1, endEvent.getIncomingFlows().size());
+        assertThat(endEvent.getOutgoingFlows()).isEmpty();
+        assertThat(endEvent.getIncomingFlows()).hasSize(1);
     }
 
     /**
@@ -396,12 +356,12 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
     @Test
     public void testDeployZipFile() {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/api/repository/test-processes.zip");
-        assertNotNull(inputStream);
+        assertThat(inputStream).isNotNull();
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-        assertNotNull(zipInputStream);
+        assertThat(zipInputStream).isNotNull();
         repositoryService.createDeployment().addZipInputStream(zipInputStream).deploy();
 
-        assertEquals(6, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(6);
 
         // Delete
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {

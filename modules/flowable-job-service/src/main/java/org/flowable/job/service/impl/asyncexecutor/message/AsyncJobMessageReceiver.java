@@ -29,11 +29,11 @@ import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
  * Helper class to be used in a setup of async jobs handling where the job is 
  * inserted in the same database transaction as the runtime data in combination with sending message to a message queue.
  * 
- * Use a sublass of {@link AbstractMessageBasedJobManager} to send the message, this
+ * Use a subclass of {@link AbstractMessageBasedJobManager} to send the message, this
  * class, with the proper handler instance set, will take care of handling it on the receiving side.
  * 
  * This class contains the boilerplate logic that is needed to fetch the job data 
- * and delete the job in case of a succesful processing.
+ * and delete the job in case of a successful processing.
  * 
  * @author Joram Barrez
  */
@@ -65,7 +65,7 @@ public class AsyncJobMessageReceiver {
             public Void execute(CommandContext commandContext) {
                 JobEntityManager jobEntityManager = jobServiceConfiguration.getJobEntityManager();
                 
-                JobQueryImpl query = new JobQueryImpl();
+                JobQueryImpl query = new JobQueryImpl(commandContext, jobServiceConfiguration);
                 query.jobId(jobId);
                 
                 List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(query);

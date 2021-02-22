@@ -63,9 +63,11 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given businessKey.", paramType = "query"),
             @ApiImplicitParam(name = "superCaseInstanceId", dataType = "string", value = "Only return case instances which have the given super case instance id (for cases that have a case tasks).", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "Indication to include case variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return case instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return case instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns case instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -92,6 +94,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
         }
 
+        if (allRequestParams.containsKey("caseDefinitionCategory")) {
+            queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
+        }
+
         if (allRequestParams.containsKey("businessKey")) {
             queryRequest.setCaseBusinessKey(allRequestParams.get("businessKey"));
         }
@@ -102,6 +108,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("includeCaseVariables")) {
             queryRequest.setIncludeCaseVariables(Boolean.valueOf(allRequestParams.get("includeCaseVariables")));
+        }
+        
+        if (allRequestParams.containsKey("activePlanItemDefinitionId")) {
+            queryRequest.setActivePlanItemDefinitionId(allRequestParams.get("activePlanItemDefinitionId"));
         }
 
         if (allRequestParams.containsKey("tenantId")) {
@@ -195,6 +205,9 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             }
             if (request.getCaseDefinitionKey() != null) {
                 caseInstanceBuilder.caseDefinitionKey(request.getCaseDefinitionKey());
+            }
+            if (request.getName() != null) {
+                caseInstanceBuilder.name(request.getName());
             }
             if (request.getBusinessKey() != null) {
                 caseInstanceBuilder.businessKey(request.getBusinessKey());

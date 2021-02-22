@@ -13,9 +13,9 @@
 
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.ChangePlanItemStateBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnDynamicStateManager;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -25,31 +25,28 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ChangePlanItemStateCmd implements Command<Void> {
 
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    
     protected ChangePlanItemStateBuilderImpl changePlanItemStateBuilder;
 
-    public ChangePlanItemStateCmd(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder) {
+    public ChangePlanItemStateCmd(ChangePlanItemStateBuilderImpl changePlanItemStateBuilder, CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.changePlanItemStateBuilder = changePlanItemStateBuilder;
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (changePlanItemStateBuilder.getMovePlanItemInstanceIdList().size() == 0 && changePlanItemStateBuilder.getMovePlanItemDefinitionIdList().size() == 0
-                        && changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList().size() == 0
-                        && changePlanItemStateBuilder.getChangePlanItemToAvailableIdList().size() == 0) {
+        if (changePlanItemStateBuilder.getActivatePlanItemDefinitions().size() == 0 &&
+                changePlanItemStateBuilder.getTerminatePlanItemDefinitions().size() == 0 &&
+                changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions().size() == 0) {
             
             throw new FlowableIllegalArgumentException("No move plan item instance or (activate) plan item definition ids provided");
 
-        } else if (changePlanItemStateBuilder.getMovePlanItemDefinitionIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
-            throw new FlowableIllegalArgumentException("Case instance id is required");
-        
-        } else if (changePlanItemStateBuilder.getActivatePlanItemDefinitionIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
-            throw new FlowableIllegalArgumentException("Case instance id is required");
-            
-        } else if (changePlanItemStateBuilder.getChangePlanItemToAvailableIdList().size() > 0 && changePlanItemStateBuilder.getCaseInstanceId() == null) {
-            throw new FlowableIllegalArgumentException("Case instance id is required");
+        } else if (changePlanItemStateBuilder.getCaseInstanceId() == null) {
+            throw new FlowableIllegalArgumentException("Case instance id is required");   
         }
 
-        CmmnDynamicStateManager dynamicStateManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDynamicStateManager();
+        CmmnDynamicStateManager dynamicStateManager = cmmnEngineConfiguration.getDynamicStateManager();
         dynamicStateManager.movePlanItemInstanceState(changePlanItemStateBuilder, commandContext);
 
         return null;

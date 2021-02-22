@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.history.task;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -27,46 +28,52 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
-    private String taskId;
-    private String caseInstanceId;
-    private String caseInstanceIdWithChildren;
-    private String caseDefinitionId;
-    private String taskName;
-    private String taskNameLike;
-    private String taskDescription;
-    private String taskDescriptionLike;
-    private String taskDefinitionKey;
-    private String taskDefinitionKeyLike;
-    private String taskCategory;
-    private String taskDeleteReason;
-    private String taskDeleteReasonLike;
-    private String taskAssignee;
-    private String taskAssigneeLike;
-    private String taskOwner;
-    private String taskOwnerLike;
-    private String taskInvolvedUser;
-    private Integer taskPriority;
-    private Integer taskMinPriority;
-    private Integer taskMaxPriority;
-    private Boolean finished;
-    private Boolean processFinished;
-    private String parentTaskId;
-    private Date dueDate;
-    private Date dueDateAfter;
-    private Date dueDateBefore;
-    private Boolean withoutDueDate;
-    private Date taskCreatedOn;
-    private Date taskCreatedBefore;
-    private Date taskCreatedAfter;
-    private Date taskCompletedOn;
-    private Date taskCompletedBefore;
-    private Date taskCompletedAfter;
-    private Boolean includeTaskLocalVariables;
-    private List<QueryVariable> taskVariables;
-    private String tenantId;
-    private String tenantIdLike;
-    private Boolean withoutTenantId;
-    private String taskCandidateGroup;
+    protected String taskId;
+    protected String caseInstanceId;
+    protected String caseInstanceIdWithChildren;
+    protected String caseDefinitionId;
+    protected String caseDefinitionKey;
+    protected String caseDefinitionKeyLike;
+    protected String caseDefinitionKeyLikeIgnoreCase;
+    protected Collection<String> caseDefinitionKeys;
+    protected String propagatedStageInstanceId;
+    protected String taskName;
+    protected String taskNameLike;
+    protected String taskDescription;
+    protected String taskDescriptionLike;
+    protected String taskDefinitionKey;
+    protected String taskDefinitionKeyLike;
+    protected String taskCategory;
+    protected String taskDeleteReason;
+    protected String taskDeleteReasonLike;
+    protected String taskAssignee;
+    protected String taskAssigneeLike;
+    protected String taskOwner;
+    protected String taskOwnerLike;
+    protected String taskInvolvedUser;
+    protected Integer taskPriority;
+    protected Integer taskMinPriority;
+    protected Integer taskMaxPriority;
+    protected Boolean finished;
+    protected Boolean processFinished;
+    protected String parentTaskId;
+    protected Date dueDate;
+    protected Date dueDateAfter;
+    protected Date dueDateBefore;
+    protected Boolean withoutDueDate;
+    protected Date taskCreatedOn;
+    protected Date taskCreatedBefore;
+    protected Date taskCreatedAfter;
+    protected Date taskCompletedOn;
+    protected Date taskCompletedBefore;
+    protected Date taskCompletedAfter;
+    protected Boolean includeTaskLocalVariables;
+    protected List<QueryVariable> taskVariables;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected Boolean withoutTenantId;
+    protected String taskCandidateGroup;
+    protected boolean ignoreTaskAssignee;
 
     public String getTaskId() {
         return taskId;
@@ -98,6 +105,46 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public void setCaseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public void setCaseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public void setCaseDefinitionKeys(Collection<String> caseDefinitionKeys) {
+        this.caseDefinitionKeys = caseDefinitionKeys;
+    }
+
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     public String getTaskName() {
@@ -387,6 +434,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskCandidateGroup(String taskCandidateGroup) {
         this.taskCandidateGroup = taskCandidateGroup;
+    }
+
+    public boolean isIgnoreTaskAssignee() {
+        return ignoreTaskAssignee;
+    }
+
+    public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
+        this.ignoreTaskAssignee = ignoreTaskAssignee;
     }
 
 }

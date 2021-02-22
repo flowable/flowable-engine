@@ -88,10 +88,10 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
 
     public void initDataManagers() {
         if (entityLinkDataManager == null) {
-            entityLinkDataManager = new MybatisEntityLinkDataManager();
+            entityLinkDataManager = new MybatisEntityLinkDataManager(this);
         }
         if (historicEntityLinkDataManager == null) {
-            historicEntityLinkDataManager = new MybatisHistoricEntityLinkDataManager();
+            historicEntityLinkDataManager = new MybatisHistoricEntityLinkDataManager(this);
         }
     }
 

@@ -13,10 +13,13 @@
 
 package org.flowable.rest.service.api.form;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -30,15 +33,12 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a Form data resource.
@@ -59,134 +59,139 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?taskId=" + task.getId()), HttpStatus.SC_OK);
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?taskId=" + task.getId()), HttpStatus.SC_OK);
 
         // Check resulting task
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(7, responseNode.get("formProperties").size());
-        Map<String, JsonNode> mappedProperties = new HashMap<>();
-        for (JsonNode propNode : responseNode.get("formProperties")) {
-            mappedProperties.put(propNode.get("id").asText(), propNode);
-        }
-        JsonNode propNode = mappedProperties.get("room");
-        assertNotNull(propNode);
-        assertEquals("room", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertTrue(propNode.get("type").isNull());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
 
-        propNode = mappedProperties.get("duration");
-        assertNotNull(propNode);
-        assertEquals("duration", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertEquals("long", propNode.get("type").asText());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "formProperties: [ {"
+                        + "  id: 'room',"
+                        + "  name: null,"
+                        + "  type: null,"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false"
+                        + "},"
+                        + "{"
+                        + "  id: 'duration',"
+                        + "  name: null,"
+                        + "  type: 'long',"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false"
+                        + "},"
+                        + "{"
+                        + "  id: 'speaker',"
+                        + "  name: null,"
+                        + "  type: null,"
+                        + "  value: 'John Doe',"
+                        + "  readable: true,"
+                        + "  writable: false,"
+                        + "  required: false"
+                        + "},"
+                        + "{"
+                        + "  id: 'street',"
+                        + "  name: null,"
+                        + "  type: null,"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: true"
+                        + "},"
+                        + "{"
+                        + "  id: 'start',"
+                        + "  name: null,"
+                        + "  type: 'date',"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false,"
+                        + "  datePattern: 'dd-MMM-yyyy'"
+                        + "},"
+                        + "{"
+                        + "  id: 'end',"
+                        + "  name: 'End',"
+                        + "  type: 'date',"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false,"
+                        + "  datePattern: 'dd/MM/yyyy'"
+                        + "},"
+                        + "{"
+                        + "id: 'direction',"
+                        + "  name: null,"
+                        + "  type: 'enum',"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false,"
+                        + "  datePattern: null,"
+                        + "  enumValues: [ {"
+                        + "    id: 'left',"
+                        + "    name: 'Go Left'"
+                        + "  },"
+                        + "  {"
+                        + "    id: 'right',"
+                        + "    name: 'Go Right'"
+                        + "  },"
+                        + "  {"
+                        + "    id: 'up',"
+                        + "    name: 'Go Up'"
+                        + "  },"
+                        + "  {"
+                        + "    id: 'down',"
+                        + "    name: 'Go Down'"
+                        + "   } ]"
+                        + "} ]"
+                        + "}"
+                );
 
-        propNode = mappedProperties.get("speaker");
-        assertNotNull(propNode);
-        assertEquals("speaker", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertTrue(propNode.get("type").isNull());
-        assertEquals("John Doe", propNode.get("value").asText());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertFalse(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
-
-        propNode = mappedProperties.get("street");
-        assertNotNull(propNode);
-        assertEquals("street", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertTrue(propNode.get("type").isNull());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertTrue(propNode.get("required").asBoolean());
-
-        propNode = mappedProperties.get("start");
-        assertNotNull(propNode);
-        assertEquals("start", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertEquals("date", propNode.get("type").asText());
-        assertTrue(propNode.get("value").isNull());
-        assertEquals("dd-MMM-yyyy", propNode.get("datePattern").asText());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
-
-        propNode = mappedProperties.get("end");
-        assertNotNull(propNode);
-        assertEquals("end", propNode.get("id").asText());
-        assertEquals("End", propNode.get("name").asText());
-        assertEquals("date", propNode.get("type").asText());
-        assertTrue(propNode.get("value").isNull());
-        assertEquals("dd/MM/yyyy", propNode.get("datePattern").asText());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
-
-        propNode = mappedProperties.get("direction");
-        assertNotNull(propNode);
-        assertEquals("direction", propNode.get("id").asText());
-        assertTrue(propNode.get("name").isNull());
-        assertEquals("enum", propNode.get("type").asText());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("datePattern").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
-        JsonNode enumValues = propNode.get("enumValues");
-        assertEquals(4, enumValues.size());
-        Map<String, String> mappedEnums = new HashMap<>();
-        for (JsonNode enumNode : enumValues) {
-            mappedEnums.put(enumNode.get("id").asText(), enumNode.get("name").asText());
-        }
-        assertEquals("Go Left", mappedEnums.get("left"));
-        assertEquals("Go Right", mappedEnums.get("right"));
-        assertEquals("Go Up", mappedEnums.get("up"));
-        assertEquals("Go Down", mappedEnums.get("down"));
-
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId=" + processInstance.getProcessDefinitionId()),
+        response = executeRequest(new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId=" + processInstance
+                                .getProcessDefinitionId()),
                 HttpStatus.SC_OK);
 
         // Check resulting task
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(2, responseNode.get("formProperties").size());
-        mappedProperties.clear();
-        for (JsonNode propertyNode : responseNode.get("formProperties")) {
-            mappedProperties.put(propertyNode.get("id").asText(), propertyNode);
-        }
 
-        propNode = mappedProperties.get("number");
-        assertNotNull(propNode);
-        assertEquals("number", propNode.get("id").asText());
-        assertEquals("Number", propNode.get("name").asText());
-        assertEquals("long", propNode.get("type").asText());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "formProperties: [ {"
+                        + "  id: 'number',"
+                        + "  name: 'Number',"
+                        + "  type: 'long',"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false"
+                        + "},"
+                        + "{"
+                        + "  id: 'description',"
+                        + "  name: 'Description',"
+                        + "  type: null,"
+                        + "  value: null,"
+                        + "  readable: true,"
+                        + "  writable: true,"
+                        + "  required: false"
+                        + "} ]"
+                        + "}"
+                );
 
-        propNode = mappedProperties.get("description");
-        assertNotNull(propNode);
-        assertEquals("description", propNode.get("id").asText());
-        assertEquals("Description", propNode.get("name").asText());
-        assertTrue(propNode.get("type").isNull());
-        assertTrue(propNode.get("value").isNull());
-        assertTrue(propNode.get("readable").asBoolean());
-        assertTrue(propNode.get("writable").asBoolean());
-        assertFalse(propNode.get("required").asBoolean());
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId=123"),
+                HttpStatus.SC_NOT_FOUND));
 
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId=123"), HttpStatus.SC_NOT_FOUND));
-
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId2=123"), HttpStatus.SC_BAD_REQUEST));
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_FORM_DATA) + "?processDefinitionId2=123"),
+                HttpStatus.SC_BAD_REQUEST));
     }
 
     @Test
@@ -223,17 +228,17 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
         task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
         Map<String, HistoricVariableInstance> historyMap = new HashMap<>();
         for (HistoricVariableInstance historicVariableInstance : variables) {
             historyMap.put(historicVariableInstance.getVariableName(), historicVariableInstance);
         }
 
-        assertEquals("123", historyMap.get("room").getValue());
-        assertEquals(processInstanceId, historyMap.get("room").getProcessInstanceId());
+        assertThat(historyMap.get("room").getValue()).isEqualTo("123");
+        assertThat(historyMap.get("room").getProcessInstanceId()).isEqualTo(processInstanceId);
 
         processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         processInstanceId = processInstance.getId();
@@ -252,18 +257,18 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         closeResponse(executeRequest(httpPost, HttpStatus.SC_NO_CONTENT));
 
         task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
-        assertNull(task);
+        assertThat(task).isNull();
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
         variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list();
         historyMap.clear();
         for (HistoricVariableInstance historicVariableInstance : variables) {
             historyMap.put(historicVariableInstance.getVariableName(), historicVariableInstance);
         }
 
-        assertEquals("123", historyMap.get("room").getValue());
-        assertEquals(processInstanceId, historyMap.get("room").getProcessInstanceId());
-        assertEquals("up", historyMap.get("direction").getValue());
+        assertThat(historyMap.get("room").getValue()).isEqualTo("123");
+        assertThat(historyMap.get("room").getProcessInstanceId()).isEqualTo(processInstanceId);
+        assertThat(historyMap.get("direction").getValue()).isEqualTo("up");
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processDefinitionId);
@@ -278,9 +283,13 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode.get("id").asText());
-        assertEquals(processDefinitionId, responseNode.get("processDefinitionId").asText());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '${json-unit.any-string}',"
+                        + "processDefinitionId: '" + processDefinitionId + "'"
+                        + "}");
         task = taskService.createTaskQuery().processInstanceId(responseNode.get("id").asText()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
     }
 }

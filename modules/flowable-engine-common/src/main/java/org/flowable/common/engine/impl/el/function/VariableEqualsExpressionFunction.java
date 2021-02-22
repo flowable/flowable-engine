@@ -42,16 +42,16 @@ public class VariableEqualsExpressionFunction extends AbstractFlowableVariableEx
                 if (variableValue instanceof Long) {
                     return ((Number) variableValue).longValue() == ((Number) comparedValue).longValue();
 
-                } else if(variableValue instanceof Integer) {
+                } else if (variableValue instanceof Integer) {
                     return ((Number) variableValue).intValue() == ((Number) comparedValue).intValue();
                     
-                } else if(variableValue instanceof Double) {
+                } else if (variableValue instanceof Double) {
                     return ((Number) variableValue).doubleValue() == ((Number) comparedValue).doubleValue();
                     
-                } else if(variableValue instanceof Float) {
+                } else if (variableValue instanceof Float) {
                     return ((Number) variableValue).floatValue() == ((Number) comparedValue).floatValue();
                     
-                } else if(variableValue instanceof Short) {
+                } else if (variableValue instanceof Short) {
                     return ((Number) variableValue).shortValue() == ((Number) comparedValue).shortValue();
                     
                 } // Other subtypes possible (e.g. BigDecimal, AtomicInteger, etc.), will fall back to default comparison

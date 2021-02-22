@@ -12,14 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDoubleFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getLongFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.variable.api.types.VariableType;
@@ -28,16 +33,15 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDoubleFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getLongFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
-
 /**
  * @author Joram Barrez
  */
 public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
+    public VariableUpdatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_VARIABLE_UPDATED);
@@ -49,7 +53,7 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
     }
     
     protected HistoricVariableInstanceEntity getHistoricVariableInstanceEntity(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricVariableService(commandContext)
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
             .getHistoricVariableInstance(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
     }
 
@@ -64,7 +68,7 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
             return;
         }
         
-        VariableTypes variableTypes = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getVariableTypes();
+        VariableTypes variableTypes = cmmnEngineConfiguration.getVariableTypes();
         VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_VARIABLE_TYPE));
         historicVariable.setVariableType(variableType);
 

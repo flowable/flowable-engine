@@ -11,7 +11,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.5.0-SNAPSHOT</version>
+		<version>6.6.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -34,7 +34,15 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -53,6 +61,16 @@
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -126,19 +144,23 @@
 
 	<profiles>
 		<profile>
-			<id>distro</id>
+			<id>cleanDb</id>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
+								<id>drop-idm-schema</id>
+								<phase>prepare-package</phase>
 								<goals>
-									<goal>jar-no-fork</goal>
+									<goal>java</goal>
 								</goals>
+								<configuration>
+									<mainClass>org.flowable.form.engine.test.DbSchemaDrop</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -146,4 +168,5 @@
 			</build>
 		</profile>
 	</profiles>
+
 </project>

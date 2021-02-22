@@ -75,7 +75,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery();
-        assertThat(jobQuery.count()).isEqualTo(0);
+        assertThat(jobQuery.count()).isZero();
     }
 
     @Test
@@ -94,8 +94,8 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
         assertThat(simpleDateFormat.format(jobs.get(0).getDuedate())).isEqualTo(simpleDateFormat.format(Date.from(yesterday.plus(100, ChronoUnit.SECONDS))));
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
 
-        waitForJobExecutorToProcessAllJobs(10000L, 25L);
-        assertThat(jobQuery.count()).isEqualTo(0);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 25L);
+        assertThat(jobQuery.count()).isZero();
 
         assertProcessEnded(pi.getId());
         processEngineConfiguration.getClock().reset();
@@ -115,7 +115,7 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday.plus(200, ChronoUnit.SECONDS)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 100L);
-        assertThat(jobQuery.count()).isEqualTo(0);
+        assertThat(jobQuery.count()).isZero();
 
         assertProcessEnded(pi.getId());
         processEngineConfiguration.getClock().reset();

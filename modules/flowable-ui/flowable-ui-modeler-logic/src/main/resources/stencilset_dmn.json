@@ -1,0 +1,441 @@
+{
+  "title": "DMN DRD editor",
+  "namespace": "http://b3mn.org/stencilset/dmn1.2#",
+  "description": "DMN DRD editor",
+  "propertyPackages": [
+    {
+      "name": "drd_idpackage",
+      "properties": [
+        {
+          "id": "drd_id",
+          "type": "String",
+          "title": "DRD identifier",
+          "value": "drdModel",
+          "description": "Unique identifier of the DRD.",
+          "readonly": true,
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "drd_namepackage",
+      "properties": [
+        {
+          "id": "name",
+          "type": "String",
+          "title": "Name",
+          "value": "",
+          "description": "The descriptive name of the DRD element.",
+          "popular": true,
+          "readonly": true,
+          "refToView": "text_name"
+        }
+      ]
+    },
+    {
+      "name": "overrideidpackage",
+      "properties": [
+        {
+          "id": "overrideid",
+          "type": "String",
+          "title": "Id",
+          "value": "",
+          "description": "Unique identifier of the element.",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "namepackage",
+      "properties": [
+        {
+          "id": "name",
+          "type": "String",
+          "title": "Name",
+          "value": "",
+          "description": "The descriptive name of the DRD element.",
+          "popular": true,
+          "refToView": "text_name"
+        }
+      ]
+    },
+    {
+      "name": "documentationpackage",
+      "properties": [
+        {
+          "id": "documentation",
+          "type": "Text",
+          "title": "Documentation",
+          "value": "",
+          "description": "Documentation of the DRD element.",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "decisiondecisiontablereferencepackage",
+      "properties": [
+        {
+          "id": "decisiondecisiontablereference",
+          "type": "Complex",
+          "title": "Decision table reference",
+          "value": "",
+          "description": "Set the decision table reference",
+          "popular": true
+        }
+      ]
+    }
+  ],
+  "stencils": [
+    {
+      "type": "node",
+      "id": "DMNDiagram",
+      "title": "DMN-Diagram",
+      "description": "A DMN DRD diagram.",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"800\"\n   height=\"600\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"fill\" >\n    <polygon stroke=\"black\" fill=\"black\" stroke-width=\"1\" points=\"0,0 0,590 9,599 799,599 799,9 790,0\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" />\n    <rect id=\"diagramcanvas\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"790\" height=\"590\" stroke=\"black\" stroke-width=\"2\" fill=\"white\" />\n    \t<text font-size=\"22\" id=\"diagramtext\" x=\"400\" y=\"25\" oryx:align=\"top center\" stroke=\"#373e48\"></text>\n  </g>\n</svg>",
+      "icon": "diagram.png",
+      "groups": [
+        "Diagram"
+      ],
+      "mayBeRoot": true,
+      "hide": true,
+      "propertyPackages": [
+        "drd_idpackage",
+        "drd_namepackage",
+        "documentationpackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": []
+    },
+    {
+      "type": "node",
+      "id": "Decision",
+      "title": "Decision",
+      "description": "A decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\">\n\t<defs>\n\t</defs>\n\t<magnets>\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n\t\t<magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n\t\t<magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n\t</magnets>\n\t<g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"61\" rx=\"10\">\n\t\t</rect>\n\t\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" stroke=\"#BBBBBB\" fill=\"#F9F9F9\" x=\"0\" y=\"0\" width=\"100\" height=\"62\">\n\t\t</rect>\n\t\t<text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"31\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\">\n\t\t</text>\n\t</g>\n</svg>\n",
+      "icon": "activity/list/type.decision.png",
+      "groups": [
+        "Elements"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "decisiondecisiontablereferencepackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "information_requirement_start",
+        "information_requirement_end",
+        "knowledge_requirement_start",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "ExpandedDecisionService",
+      "title": "Expanded Decision service",
+      "description": "A decision service",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"0\" oryx:cy=\"124\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"249\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"599\" oryx:cy=\"124\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"0\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"124\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"none\" >\n    <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"100%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t</radialGradient>\n\t</defs>\n\t  \t\n  \t<rect\n  \t\tid=\"border\"\n  \t\tclass=\"stripable-element-force\"\n  \t\toryx:resize=\"vertical horizontal\"\n  \t\tx=\"0\"\n  \t\ty=\"0\"\n  \t\twidth=\"600\"\n  \t\theight=\"250\"\n  \t\tfill=\"none\"\n  \t\tstroke-width=\"9\"\n  \t\tstroke=\"none\"\n  \t\tvisibility=\"visible\"\n  \t\tpointer-events=\"stroke\"\n        rx=\"10\"\n        ry=\"10\"\n  \t/>\n    <rect\n    \tid=\"c\"\n    \toryx:resize=\"vertical horizontal\"\n    \tx=\"0\"\n    \ty=\"0\"\n    \twidth=\"600\" \n    \theight=\"250\" \n    \tstroke=\"black\" \n    \tfill=\"url(#background) white\"\n    \tfill-opacity=\"0.3\"\n        rx=\"10\"\n        ry=\"10\" \n    />\n\t\n    <text x=\"13\" y=\"125\" font-size=\"12\" id=\"text_name\" oryx:fittoelem=\"border\" oryx:align=\"top top\" oryx:anchors=\"left\" fill=\"black\" stroke=\"black\"></text>\n    \n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "DMN.STENCILS.GROUPS.DIAGRAM"
+      ],
+      "mayBeRoot": true,
+      "hide": true,
+      "propertyPackages": [
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ],
+      "layout": [
+        {
+          "type": "layout.dmn1_2.decision_service"
+        }
+      ]
+    },
+    {
+      "type": "node",
+      "id": "OutputDecisionsDecisionServiceSection",
+      "title": "Output Decisions",
+      "description": "Output decisions ",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"none\" >\n  \n     <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n\t\t</radialGradient>\n\t</defs>\n\t\n  \t<rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" d=\"M0,0 h580 q10,0 10,10 v230 h-600 v-230 q0,-10 10,-10 z\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/>\t\t\n\t<!-- <rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\" /> -->\n\n    <path\n        id=\"border\"\n        d=\"M0,0 h580 q10,0 10,10 v230 h-600 v-230 q0,-10 10,-10 z\"\n        oryx:resize=\"vertical horizontal\"\n        stroke=\"black\" stroke-width=\"1\"\n        fill=\"url(#background) white\" \n        pointer-events=\"all\"\n    />\n\t\n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "DMN.STENCILS.GROUPS.DIAGRAM"
+      ],
+      "mayBeRoot": true,
+      "hide": true,
+      "propertyPackages": [
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ]
+    },
+    {
+      "type": "node",
+      "id": "EncapsulatedDecisionsDecisionServiceSection",
+      "title": "Encapsulated Decisions",
+      "description": "Encapsulated decisions ",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"none\" >\n  \n     <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n\t\t</radialGradient>\n\t</defs>\n\t\n  \t<rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" d=\"M0,0 h600 v230 q0,10 -10,10 h-580 q-10,0 -10,-10 z\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/>\t\t\n\t<!-- <rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\" /> -->\n\n    <path\n        id=\"border\"\n        d=\"M0,0 h600 v230 q0,10 -10,10 h-580 q-10,0 -10,-10 z\"\n        oryx:resize=\"vertical horizontal\"\n        stroke=\"black\" stroke-width=\"1\"\n        fill=\"url(#background) white\" \n        pointer-events=\"all\"\n    />\n\t\n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "DMN.STENCILS.GROUPS.DIAGRAM"
+      ],
+      "mayBeRoot": true,
+      "hide": true,
+      "propertyPackages": [
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+      ]
+    },
+    {
+      "type": "edge",
+      "id": "InformationRequirement",
+      "title": "Information requirement",
+      "description": "Input data or a decision output being used as one of the inputs of a decision",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<defs>\r\n\t  \t<marker id=\"end\" refX=\"15\" refY=\"6\" markerUnits=\"userSpaceOnUse\" markerWidth=\"15\" markerHeight=\"12\" orient=\"auto\">\r\n\t  \t\t<path id=\"arrowhead\" d=\"M 0 1 L 15 6 L 0 11z\" fill=\"#585858\" stroke=\"#585858\" stroke-linejoin=\"round\" stroke-width=\"2\" />\r\n\t  \t</marker>\r\n\t</defs>\r\n\t<g id=\"edge\">\r\n\t\t<path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" marker-start=\"url(#start)\" marker-end=\"url(#end)\" />\r\n\t\t<text id=\"text_name\" x=\"0\" y=\"0\" oryx:edgePosition=\"startTop\"/>\r\n\t</g>\r\n</svg>",
+      "icon": "connector/sequenceflow.png",
+      "groups": [
+        "Requirements"
+      ],
+      "layout": [
+        {
+          "type": "layout.bpmn2_0.sequenceflow"
+        }
+      ],
+      "propertyPackages": [],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "ConnectingObjectsMorph",
+        "all"
+      ]
+    }
+  ],
+  "rules": {
+    "cardinalityRules": [
+      {
+        "role": "Startevents_all",
+        "incomingEdges": [
+          {
+            "role": "SequenceFlow",
+            "maximum": 0
+          }
+        ]
+      },
+      {
+        "role": "Endevents_all",
+        "outgoingEdges": [
+          {
+            "role": "SequenceFlow",
+            "maximum": 0
+          }
+        ]
+      }
+    ],
+    "connectionRules": [
+      {
+        "role": "InformationRequirement",
+        "connects": [
+          {
+            "from": "information_requirement_start",
+            "to": [
+              "information_requirement_end"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "KnowledgeRequirement",
+        "connects": [
+          {
+            "from": "knowledge_requirement_start",
+            "to": [
+              "knowledge_requirement_end"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "Association",
+        "connects": [
+          {
+            "from": "sequence_start",
+            "to": [
+              "TextAnnotation"
+            ]
+          },
+          {
+            "from": "sequence_end",
+            "to": [
+              "TextAnnotation"
+            ]
+          },
+          {
+            "from": "TextAnnotation",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "BoundaryCompensationEvent",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "TextAnnotation",
+            "to": [
+              "sequence_start"
+            ]
+          },
+          {
+            "from": "BoundaryCompensationEvent",
+            "to": [
+              "sequence_start"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "DataAssociation",
+        "connects": [
+          {
+            "from": "sequence_start",
+            "to": [
+              "DataStore"
+            ]
+          },
+          {
+            "from": "sequence_end",
+            "to": [
+              "DataStore"
+            ]
+          },
+          {
+            "from": "DataStore",
+            "to": [
+              "sequence_end"
+            ]
+          },
+          {
+            "from": "DataStore",
+            "to": [
+              "sequence_start"
+            ]
+          }
+        ]
+      },
+      {
+        "role": "IntermediateEventOnActivityBoundary",
+        "connects": [
+          {
+            "from": "Activity",
+            "to": [
+              "IntermediateEventOnActivityBoundary"
+            ]
+          }
+        ]
+      }
+    ],
+    "containmentRules": [
+      {
+        "role": "DRDDiagram",
+        "contains": [
+          "all"
+        ]
+      },
+      {
+        "role": "ExpandedDecisionService",
+        "contains": [
+          "OutputDecisionsDecisionServiceSection",
+          "EncapsulatedDecisionsDecisionServiceSection"
+        ]
+      },
+      {
+        "role": "OutputDecisionsDecisionServiceSection",
+        "contains": [
+          "information_requirement_start",
+          "information_requirement_end",
+          "knowledge_requirement_start",
+          "knowledge_requirement_end",
+          "Decision"
+        ]
+      },
+      {
+        "role": "EncapsulatedDecisionsDecisionServiceSection",
+        "contains": [
+          "information_requirement_start",
+          "information_requirement_end",
+          "knowledge_requirement_start",
+          "knowledge_requirement_end",
+          "Decision"
+        ]
+      }
+    ],
+    "morphingRules": [
+      {
+        "role": "ActivitiesMorph",
+        "baseMorphs": [
+          "UserTask"
+        ],
+        "preserveBounds": true
+      },
+      {
+        "role": "GatewaysMorph",
+        "baseMorphs": [
+          "ExclusiveGateway"
+        ]
+      },
+      {
+        "role": "StartEventsMorph",
+        "baseMorphs": [
+          "StartNoneEvent"
+        ]
+      },
+      {
+        "role": "EndEventsMorph",
+        "baseMorphs": [
+          "StartNoneEvent"
+        ]
+      },
+      {
+        "role": "CatchEventsMorph",
+        "baseMorphs": [
+          "CatchTimerEvent"
+        ]
+      },
+      {
+        "role": "ThrowEventsMorph",
+        "baseMorphs": [
+          "ThrowNoneEvent"
+        ]
+      },
+      {
+        "role": "BoundaryEventsMorph",
+        "baseMorphs": [
+          "ThrowNoneEvent"
+        ]
+      },
+      {
+        "role": "BoundaryCompensationEvent",
+        "baseMorphs": [
+          "BoundaryCompensationEvent"
+        ]
+      },
+      {
+        "role": "TextAnnotation",
+        "baseMorphs": [
+          "TextAnnotation"
+        ]
+      },
+      {
+        "role": "DataStore",
+        "baseMorphs": [
+          "DataStore"
+        ]
+      }
+    ]
+  }
+}

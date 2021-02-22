@@ -12,11 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupAggregationsByTarget;
+
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.variable.CmmnAggregation;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -30,11 +38,24 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
 
     @Override
     protected void internalExecute() {
-        if (hasRepetitionRule(planItemInstanceEntity)) {
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        if (repetitionRule != null) {
             //Increase repetition counter, value is kept from the previous instance of the repetition
-            //@see CmmOpertion.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
+            //@see CmmOperation.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
             //Or if its the first instance of the repetition, this call sets the counter to 1
-            setRepetitionCounter(planItemInstanceEntity, getRepetitionCounter(planItemInstanceEntity) + 1);
+            int repetitionCounter = getRepetitionCounter(planItemInstanceEntity);
+            if (repetitionCounter == 0 && repetitionRule.getAggregations() != null) {
+                // This is the first repetition counter so we need to create the aggregated overview values
+                // If there are aggregations we need to create an overview variable for every aggregation
+                Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity,
+                        repetitionRule.getAggregations().getOverviewAggregations(), CommandContextUtil.getCmmnEngineConfiguration(commandContext));
+
+                for (String variableName : aggregationsByTarget.keySet()) {
+                    CmmnAggregation bpmnAggregation = new CmmnAggregation(planItemInstanceEntity.getId());
+                    planItemInstanceEntity.getParentVariableScope().setVariable(variableName, bpmnAggregation);
+                }
+            }
+            setRepetitionCounter(planItemInstanceEntity, repetitionCounter + 1);
         }
 
         CmmnHistoryManager cmmnHistoryManager = CommandContextUtil.getCmmnHistoryManager(commandContext);
@@ -48,7 +69,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         if (isEventListenerWithAvailableCondition(planItemInstanceEntity.getPlanItem())) {
             return PlanItemInstanceState.UNAVAILABLE;
         } else {
@@ -57,8 +78,13 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
+    }
+
+    @Override
+    public String getOperationName() {
+        return "[Create plan item]";
     }
 
 }

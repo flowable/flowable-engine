@@ -23,19 +23,6 @@ import org.flowable.cmmn.model.HumanTask;
 
 public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask> {
 
-    protected static String convertListToCommaSeparatedString(List<String> values) {
-        StringBuilder valueBuilder = new StringBuilder();
-        for (String value : values) {
-            if (valueBuilder.length() > 0) {
-                valueBuilder.append(",");
-            }
-
-            valueBuilder.append(value);
-        }
-
-        return valueBuilder.toString();
-    }
-
     @Override
     protected Class<HumanTask> getExportablePlanItemDefinitionClass() {
         return HumanTask.class;
@@ -72,6 +59,11 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, humanTask.getFormKey());
         }
+
+        if (!humanTask.isSameDeployment()) {
+            // default is true
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_SAME_DEPLOYMENT, "false");
+        }
         
         if (StringUtils.isNotEmpty(humanTask.getValidateFormFields())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION, humanTask.getValidateFormFields());
@@ -88,6 +80,10 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         if (StringUtils.isNotEmpty(humanTask.getCategory())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CATEGORY, humanTask.getCategory());
         }
+
+        if (StringUtils.isNotEmpty(humanTask.getTaskIdVariableName())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_ID_VARIABLE_NAME, humanTask.getTaskIdVariableName());
+        }
     }
 
     @Override
@@ -96,4 +92,16 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport<HumanTask>
         return FlowableListenerExport.writeFlowableListeners(xtw, CmmnXmlConstants.ELEMENT_TASK_LISTENER, humanTask.getTaskListeners(), extensionElementsWritten);
     }
 
+    protected static String convertListToCommaSeparatedString(List<String> values) {
+        StringBuilder valueBuilder = new StringBuilder();
+        for (String value : values) {
+            if (valueBuilder.length() > 0) {
+                valueBuilder.append(",");
+            }
+
+            valueBuilder.append(value);
+        }
+
+        return valueBuilder.toString();
+    }
 }

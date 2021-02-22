@@ -19,8 +19,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.engine.impl.DecisionQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
@@ -56,12 +56,12 @@ public class SetDeploymentTenantIdCmd implements Command<Void>, Serializable {
 
         // Doing process instances, executions and tasks with direct SQL updates
         // (otherwise would not be performant)
-        CommandContextUtil.getDecisionTableEntityManager(commandContext).updateDecisionTableTenantIdForDeployment(deploymentId, newTenantId);
+        CommandContextUtil.getDecisionEntityManager(commandContext).updateDecisionTenantIdForDeployment(deploymentId, newTenantId);
 
         // Doing decision tables in memory, cause we need to clear the decision table cache
-        List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
-        for (DmnDecisionTable decisionTable : decisionTables) {
-            CommandContextUtil.getDmnEngineConfiguration().getDecisionCache().remove(decisionTable.getId());
+        List<DmnDecision> decisionTables = new DecisionQueryImpl().deploymentId(deploymentId).list();
+        for (DmnDecision decisionTable : decisionTables) {
+            CommandContextUtil.getDmnEngineConfiguration().getDefinitionCache().remove(decisionTable.getId());
         }
 
         CommandContextUtil.getDeploymentEntityManager(commandContext).update(deployment);

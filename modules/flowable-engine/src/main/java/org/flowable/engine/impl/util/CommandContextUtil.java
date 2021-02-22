@@ -16,25 +16,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.batch.api.BatchService;
-import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
+import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
@@ -46,35 +47,28 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
-import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
-import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
-import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkService;
-import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.JobService;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.task.service.HistoricTaskService;
-import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskService;
-import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.VariableServiceConfiguration;
 
 public class CommandContextUtil {
 
@@ -89,245 +83,6 @@ public class CommandContextUtil {
             return (ProcessEngineConfigurationImpl) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return null;
-    }
-
-    // VARIABLE SERVICE
-    public static VariableServiceConfiguration getVariableServiceConfiguration() {
-        return getVariableServiceConfiguration(getCommandContext());
-    }
-
-    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        return (VariableServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
-    }
-
-    public static VariableService getVariableService() {
-        return getVariableService(getCommandContext());
-    }
-
-    public static VariableService getVariableService(CommandContext commandContext) {
-        VariableService variableService = null;
-        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
-        if (variableServiceConfiguration != null) {
-            variableService = variableServiceConfiguration.getVariableService();
-        }
-
-        return variableService;
-    }
-
-    public static HistoricVariableService getHistoricVariableService() {
-        HistoricVariableService historicVariableService = null;
-        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
-        if (variableServiceConfiguration != null) {
-            historicVariableService = variableServiceConfiguration.getHistoricVariableService();
-        }
-
-        return historicVariableService;
-    }
-
-    // IDENTITY LINK SERVICE
-    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
-        return getIdentityLinkServiceConfiguration(getCommandContext());
-    }
-
-    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
-        return (IdentityLinkServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
-    }
-
-    public static IdentityLinkService getIdentityLinkService() {
-        return getIdentityLinkService(getCommandContext());
-    }
-
-    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
-        IdentityLinkService identityLinkService = null;
-        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration(commandContext);
-        if (identityLinkServiceConfiguration != null) {
-            identityLinkService = identityLinkServiceConfiguration.getIdentityLinkService();
-        }
-
-        return identityLinkService;
-    }
-
-    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
-        HistoricIdentityLinkService historicIdentityLinkService = null;
-        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
-        if (identityLinkServiceConfiguration != null) {
-            historicIdentityLinkService = identityLinkServiceConfiguration.getHistoricIdentityLinkService();
-        }
-
-        return historicIdentityLinkService;
-    }
-
-    // ENTITY LINK SERVICE
-    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration() {
-        return getEntityLinkServiceConfiguration(getCommandContext());
-    }
-
-    public static EntityLinkServiceConfiguration getEntityLinkServiceConfiguration(CommandContext commandContext) {
-        return (EntityLinkServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_ENTITY_LINK_SERVICE_CONFIG);
-    }
-
-    public static EntityLinkService getEntityLinkService() {
-        return getEntityLinkService(getCommandContext());
-    }
-
-    public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
-        EntityLinkService entityLinkService = null;
-        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration(commandContext);
-        if (entityLinkServiceConfiguration != null) {
-            entityLinkService = entityLinkServiceConfiguration.getEntityLinkService();
-        }
-
-        return entityLinkService;
-    }
-
-    public static HistoricEntityLinkService getHistoricEntityLinkService() {
-        HistoricEntityLinkService historicEntityLinkService = null;
-        EntityLinkServiceConfiguration entityLinkServiceConfiguration = getEntityLinkServiceConfiguration();
-        if (entityLinkServiceConfiguration != null) {
-            historicEntityLinkService = entityLinkServiceConfiguration.getHistoricEntityLinkService();
-        }
-
-        return historicEntityLinkService;
-    }
-    
-    // EVENT SUBSCRIPTION SERVICE
-    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration() {
-        return getEventSubscriptionServiceConfiguration(getCommandContext());
-    }
-    
-    public static EventSubscriptionServiceConfiguration getEventSubscriptionServiceConfiguration(CommandContext commandContext) {
-        return (EventSubscriptionServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-                        .get(EngineConfigurationConstants.KEY_EVENT_SUBSCRIPTION_SERVICE_CONFIG);
-    }
-    
-    public static EventSubscriptionService getEventSubscriptionService() {
-        return getEventSubscriptionService(getCommandContext());
-    }
-    
-    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
-        EventSubscriptionService eventSubscriptionService = null;
-        EventSubscriptionServiceConfiguration eventSubscriptionServiceConfiguration = getEventSubscriptionServiceConfiguration(commandContext);
-        if (eventSubscriptionServiceConfiguration != null) {
-            eventSubscriptionService = eventSubscriptionServiceConfiguration.getEventSubscriptionService();
-        }
-        
-        return eventSubscriptionService;
-    }
-    
-    // TASK SERVICE
-    public static TaskServiceConfiguration getTaskServiceConfiguration() {
-        return getTaskServiceConfiguration(getCommandContext());
-    }
-
-    public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
-        return (TaskServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
-    }
-
-    public static TaskService getTaskService() {
-        return getTaskService(getCommandContext());
-    }
-
-    public static TaskService getTaskService(CommandContext commandContext) {
-        TaskService taskService = null;
-        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
-        if (taskServiceConfiguration != null) {
-            taskService = taskServiceConfiguration.getTaskService();
-        }
-        return taskService;
-    }
-
-    public static HistoricTaskService getHistoricTaskService() {
-        return getHistoricTaskService(getCommandContext());
-    }
-
-    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
-        HistoricTaskService historicTaskService = null;
-        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
-        if (taskServiceConfiguration != null) {
-            historicTaskService = taskServiceConfiguration.getHistoricTaskService();
-        }
-
-        return historicTaskService;
-    }
-
-    // JOB SERVICE
-    public static JobServiceConfiguration getJobServiceConfiguration() {
-        return getJobServiceConfiguration(getCommandContext());
-    }
-
-    public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
-        return (JobServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
-    }
-
-    public static JobService getJobService() {
-        return getJobService(getCommandContext());
-    }
-
-    public static JobService getJobService(CommandContext commandContext) {
-        JobService jobService = null;
-        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
-        if (jobServiceConfiguration != null) {
-            jobService = jobServiceConfiguration.getJobService();
-        }
-
-        return jobService;
-    }
-
-    public static TimerJobService getTimerJobService() {
-        return getTimerJobService(getCommandContext());
-    }
-
-    public static TimerJobService getTimerJobService(CommandContext commandContext) {
-        TimerJobService timerJobService = null;
-        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
-        if (jobServiceConfiguration != null) {
-            timerJobService = jobServiceConfiguration.getTimerJobService();
-        }
-
-        return timerJobService;
-    }
-
-    public static HistoryJobService getHistoryJobService() {
-        return getHistoryJobService(getCommandContext());
-    }
-
-    public static HistoryJobService getHistoryJobService(CommandContext commandContext) {
-        HistoryJobService historyJobService = null;
-        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
-        if (jobServiceConfiguration != null) {
-            historyJobService = jobServiceConfiguration.getHistoryJobService();
-        }
-
-        return historyJobService;
-    }
-    
-    // BATCH SERVICE
-    public static BatchServiceConfiguration getBatchServiceConfiguration() {
-        return getBatchServiceConfiguration(getCommandContext());
-    }
-
-    public static BatchServiceConfiguration getBatchServiceConfiguration(CommandContext commandContext) {
-        return (BatchServiceConfiguration) getProcessEngineConfiguration(commandContext).getServiceConfigurations()
-            .get(EngineConfigurationConstants.KEY_BATCH_SERVICE_CONFIG);
-    }
-
-    public static BatchService getBatchService() {
-        return getBatchService(getCommandContext());
-    }
-
-    public static BatchService getBatchService(CommandContext commandContext) {
-        BatchService batchService = null;
-        BatchServiceConfiguration batchServiceConfiguration = getBatchServiceConfiguration(commandContext);
-        if (batchServiceConfiguration != null) {
-            batchService = batchServiceConfiguration.getBatchService();
-        }
-
-        return batchService;
     }
 
     // IDM ENGINE
@@ -348,6 +103,44 @@ public class CommandContextUtil {
         }
 
         return idmIdentityService;
+    }
+    
+    // EVENT REGISTRY
+    
+    public static EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return getEventRegistryEngineConfiguration(getCommandContext());
+    }
+    
+    public static EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(CommandContext commandContext) {
+        return (EventRegistryEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+    
+    public static EventRegistry getEventRegistry() {
+        return getEventRegistry(getCommandContext());
+    }
+    
+    public static EventRegistry getEventRegistry(CommandContext commandContext) {
+        EventRegistry eventRegistry = null;
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(commandContext);
+        if (eventRegistryEngineConfiguration != null) {
+            eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
+        }
+
+        return eventRegistry;
+    }
+    
+    public static EventRepositoryService getEventRepositoryService() {
+        return getEventRepositoryService(getCommandContext());
+    }
+    
+    public static EventRepositoryService getEventRepositoryService(CommandContext commandContext) {
+        EventRepositoryService eventRepositoryService = null;
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(commandContext);
+        if (eventRegistryEngineConfiguration != null) {
+            eventRepositoryService = eventRegistryEngineConfiguration.getEventRepositoryService();
+        }
+
+        return eventRepositoryService;
     }
 
     // DMN ENGINE
@@ -370,11 +163,11 @@ public class CommandContextUtil {
         return dmnRepositoryService;
     }
 
-    public static DmnRuleService getDmnRuleService() {
-        DmnRuleService dmnRuleService = null;
+    public static DmnDecisionService getDmnRuleService() {
+        DmnDecisionService dmnRuleService = null;
         DmnEngineConfigurationApi dmnEngineConfiguration = getDmnEngineConfiguration();
         if (dmnEngineConfiguration != null) {
-            dmnRuleService = dmnEngineConfiguration.getDmnRuleService();
+            dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
         }
 
         return dmnRuleService;
@@ -464,6 +257,102 @@ public class CommandContextUtil {
         }
 
         return contentService;
+    }
+    
+    public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getVariableServiceConfiguration().getVariableService();
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        return getHistoricVariableService(getCommandContext());
+    }
+    
+    public static HistoricVariableService getHistoricVariableService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getVariableServiceConfiguration().getHistoricVariableService();
+    }
+    
+    public static IdentityLinkService getIdentityLinkService() {
+        return getIdentityLinkService(getCommandContext());
+    }
+    
+    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getIdentityLinkService();
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        return getHistoricIdentityLinkService(getCommandContext());
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
+    }
+    
+    public static EntityLinkService getEntityLinkService() {
+        return getEntityLinkService(getCommandContext());
+    }
+    
+    public static EntityLinkService getEntityLinkService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getEntityLinkService();
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService() {
+        return getHistoricEntityLinkService(getCommandContext());
+    }
+    
+    public static HistoricEntityLinkService getHistoricEntityLinkService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+    }
+    
+    public static JobService getJobService() {
+        return getJobService(getCommandContext());
+    }
+    
+    public static JobService getJobService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService();
+    }
+    
+    public static TimerJobService getTimerJobService() {
+        return getTimerJobService(getCommandContext());
+    }
+    
+    public static TimerJobService getTimerJobService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobService();
+    }
+    
+    public static TaskService getTaskService() {
+        return getTaskService(getCommandContext());
+    }
+    
+    public static TaskService getTaskService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getTaskServiceConfiguration().getTaskService();
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+    
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getTaskServiceConfiguration().getHistoricTaskService();
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService() {
+        return getEventSubscriptionService(getCommandContext());
+    }
+    
+    public static EventSubscriptionService getEventSubscriptionService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+    }
+    
+    public static BatchService getBatchService() {
+        return getBatchService(getCommandContext());
+    }
+    
+    public static BatchService getBatchService(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getBatchServiceConfiguration().getBatchService();
     }
 
     public static FlowableEngineAgenda getAgenda() {
@@ -680,13 +569,5 @@ public class CommandContextUtil {
 
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
-    }
-
-    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager(CommandContext commandContext) {
-        return getTaskServiceConfiguration(commandContext).getInternalTaskAssignmentManager();
-    }
-
-    public static InternalTaskAssignmentManager getInternalTaskAssignmentManager() {
-        return getInternalTaskAssignmentManager(getCommandContext());
     }
 }

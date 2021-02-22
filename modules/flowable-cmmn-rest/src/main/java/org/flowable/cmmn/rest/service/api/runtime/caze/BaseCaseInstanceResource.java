@@ -78,6 +78,9 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }
+        if (queryRequest.getCaseDefinitionCategory() != null) {
+            query.caseDefinitionCategory(queryRequest.getCaseDefinitionCategory());
+        }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
@@ -94,6 +97,14 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
+        }
+        
+        if (queryRequest.getActivePlanItemDefinitionId() != null) {
+            query.activePlanItemDefinitionId(queryRequest.getActivePlanItemDefinitionId());
+        }
+        
+        if (queryRequest.getActivePlanItemDefinitionIds() != null) {
+            query.activePlanItemDefinitionIds(queryRequest.getActivePlanItemDefinitionIds());
         }
 
         if (queryRequest.getTenantId() != null) {

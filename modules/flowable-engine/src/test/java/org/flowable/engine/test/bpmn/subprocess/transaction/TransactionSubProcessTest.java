@@ -13,6 +13,9 @@
 
 package org.flowable.engine.test.bpmn.subprocess.transaction;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -37,12 +40,12 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
         // after the process is started, we have compensate event subscriptions:
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isEqualTo(1);
 
         // the task is present:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // making the tx succeed:
         taskService.setVariable(task.getId(), "confirmed", true);
@@ -51,31 +54,31 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         // now the process instance execution is sitting in the 'afterSuccess' task
         // -> has left the transaction using the "normal" sequence flow
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertTrue(activeActivityIds.contains("afterSuccess"));
+        assertThat(activeActivityIds).contains("afterSuccess");
 
         // there is a compensate event subscription for the transaction under the process instance
         EventSubscription eventSubscriptionEntity = createEventSubscriptionQuery().eventType("compensate").activityId("tx").executionId(processInstance.getId()).singleResult();
 
         // there is an event-scope execution associated with the event-subscription:
-        assertNotNull(eventSubscriptionEntity.getConfiguration());
+        assertThat(eventSubscriptionEntity.getConfiguration()).isNotNull();
         Execution eventScopeExecution = runtimeService.createExecutionQuery().executionId(eventSubscriptionEntity.getConfiguration()).singleResult();
-        assertNotNull(eventScopeExecution);
+        assertThat(eventScopeExecution).isNotNull();
 
         // we still have compensate event subscriptions for the compensation handlers, only now they are part of the event scope
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").executionId(eventScopeExecution.getId()).count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").executionId(eventScopeExecution.getId()).count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("chargeCard").executionId(eventScopeExecution.getId()).count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").executionId(eventScopeExecution.getId()).count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").executionId(eventScopeExecution.getId()).count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("chargeCard").executionId(eventScopeExecution.getId()).count()).isEqualTo(1);
 
         // assert that the compensation handlers have not been invoked:
-        assertNull(runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "undoChargeCard"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookHotel")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookFlight")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoChargeCard")).isNull();
 
         // end the process instance
         Execution receiveExecution = runtimeService.createExecutionQuery().activityId("afterSuccess").singleResult();
         runtimeService.trigger(receiveExecution.getId());
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -85,13 +88,13 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
         // after the process is started, we have compensate event subscriptions:
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isEqualTo(1);
 
         // the task is present:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
-        assertEquals("askCustomer", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("askCustomer");
 
         // making the tx fail:
         taskService.setVariable(task.getId(), "confirmed", false);
@@ -100,29 +103,29 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         // now the process instance execution is sitting in the 'afterCancellation' task
         // -> has left the transaction using the cancel boundary event
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("afterCancellation").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // we have no more compensate event subscriptions
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").count()).isZero();
 
         // assert that the compensation handlers have been invoked:
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoChargeCard"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookHotel")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookFlight")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoChargeCard")).isEqualTo(1);
 
         // if we have history, we check that the invocation of the compensation
         // handlers is recorded in history.
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoChargeCard").count());
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count()).isEqualTo(1);
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count()).isEqualTo(1);
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("undoChargeCard").count()).isEqualTo(1);
         }
 
         // end the process instance
         Execution receiveExecution = runtimeService.createExecutionQuery().activityId("afterCancellation").singleResult();
         runtimeService.trigger(receiveExecution.getId());
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -132,13 +135,13 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
         // after the process is started, we have compensate event subscriptions:
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookHotel").count()).isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isEqualTo(1);
 
         // the task is present:
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
-        assertEquals("askCustomer", task.getTaskDefinitionKey());
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("askCustomer");
 
         // making the tx fail:
         taskService.setVariable(task.getId(), "confirmed", false);
@@ -147,26 +150,26 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         // now the process instance execution is sitting in the 'afterCancellation' task
         // -> has left the transaction using the cancel boundary event
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertTrue(activeActivityIds.contains("afterCancellation"));
+        assertThat(activeActivityIds).contains("afterCancellation");
 
         // we have no more compensate event subscriptions
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").count()).isZero();
 
         // assert that the compensation handlers have been invoked:
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookHotel")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookFlight")).isEqualTo(1);
 
         // if we have history, we check that the invocation of the compensation handlers is recorded in history.
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count()).isEqualTo(1);
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count()).isEqualTo(1);
         }
 
         // end the process instance
         Execution receiveExecution = runtimeService.createExecutionQuery().activityId("afterCancellation").singleResult();
         runtimeService.trigger(receiveExecution.getId());
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -176,15 +179,15 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
         // after the process is started, we have compensate event subscriptions:
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
-        assertEquals(5, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isZero();
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count()).isEqualTo(5);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count()).isEqualTo(1);
 
         // the tasks are present:
         org.flowable.task.api.Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
         org.flowable.task.api.Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
-        assertNotNull(taskInner);
-        assertNotNull(taskOuter);
+        assertThat(taskInner).isNotNull();
+        assertThat(taskOuter).isNotNull();
 
         // making the tx fail:
         taskService.setVariable(taskInner.getId(), "confirmed", false);
@@ -194,23 +197,23 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         // 'afterInnerCancellation' task
         // -> has left the transaction using the cancel boundary event
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertTrue(activeActivityIds.contains("afterInnerCancellation"));
+        assertThat(activeActivityIds).contains("afterInnerCancellation");
 
         // we have no more compensate event subscriptions for the inner tx
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count());
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count()).isZero();
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count()).isZero();
 
         // we do not have a subscription or the outer tx yet
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isZero();
 
         // assert that the compensation handlers have been invoked:
-        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "innerTxundoBookHotel"));
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookHotel")).isEqualTo(5);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight")).isEqualTo(1);
 
         // if we have history, we check that the invocation of the compensation handlers is recorded in history.
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookHotel").count());
-            assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookFlight").count());
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookHotel").count()).isEqualTo(5);
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("innerTxundoBookFlight").count()).isEqualTo(1);
         }
 
         // complete the task in the outer tx
@@ -220,7 +223,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("afterInnerCancellation").singleResult().getId());
 
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
     @Test
@@ -230,40 +233,40 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
         // after the process is started, we have compensate event subscriptions:
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
-        assertEquals(5, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count());
-        assertEquals(1, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isZero();
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count()).isEqualTo(5);
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count()).isEqualTo(1);
 
         // the tasks are present:
         org.flowable.task.api.Task taskInner = taskService.createTaskQuery().taskDefinitionKey("innerTxaskCustomer").singleResult();
         org.flowable.task.api.Task taskOuter = taskService.createTaskQuery().taskDefinitionKey("bookFlight").singleResult();
-        assertNotNull(taskInner);
-        assertNotNull(taskOuter);
+        assertThat(taskInner).isNotNull();
+        assertThat(taskOuter).isNotNull();
 
         // making the outer tx fail (invokes cancel end event)
         taskService.complete(taskOuter.getId());
 
         // now the process instance is sitting in 'afterOuterCancellation'
         List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-        assertTrue(activeActivityIds.contains("afterOuterCancellation"));
+        assertThat(activeActivityIds).contains("afterOuterCancellation");
 
         // we have no more compensate event subscriptions
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count());
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count());
-        assertEquals(0, createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count());
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookHotel").count()).isZero();
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("innerTxbookFlight").count()).isZero();
+        assertThat(createEventSubscriptionQuery().eventType("compensate").activityId("bookFlight").count()).isZero();
 
         // the compensation handlers of the inner tx have not been invoked
-        assertNull(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookHotel"));
-        assertNull(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookHotel")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight")).isNull();
 
         // the compensation handler in the outer tx has been invoked
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookFlight")).isEqualTo(1);
 
         // end the process instance (signal the execution still sitting in afterOuterCancellation)
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("afterOuterCancellation").singleResult().getId());
 
         assertProcessEnded(processInstance.getId());
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
 
     }
 
@@ -283,7 +286,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         List<EventSubscription> eventSubscriptionEntities = createEventSubscriptionQuery().eventType("compensate").list();
 
         // there are 10 compensation event subscriptions
-        assertEquals(10, eventSubscriptionEntities.size());
+        assertThat(eventSubscriptionEntities).hasSize(10);
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().listPage(0, 1).get(0);
 
@@ -291,10 +294,10 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         taskService.setVariable(task.getId(), "confirmed", false);
         taskService.complete(task.getId());
 
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
 
-        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
-        assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookHotel")).isEqualTo(5);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "undoBookFlight")).isEqualTo(5);
 
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("afterCancellation").singleResult().getId());
 
@@ -312,7 +315,7 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
         List<EventSubscription> EventSubscriptionEntitys = createEventSubscriptionQuery().eventType("compensate").list();
 
         // there are 10 compensation event subscriptions
-        assertEquals(10, EventSubscriptionEntitys.size());
+        assertThat(EventSubscriptionEntitys).hasSize(10);
 
         // first complete the inner user-tasks
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
@@ -329,46 +332,30 @@ public class TransactionSubProcessTest extends PluggableFlowableTestCase {
 
         runtimeService.trigger(runtimeService.createExecutionQuery().activityId("afterSuccess").singleResult().getId());
 
-        assertEquals(0, createEventSubscriptionQuery().count());
+        assertThat(createEventSubscriptionQuery().count()).isZero();
         assertProcessEnded(processInstance.getId());
 
     }
 
     @Test
     public void testMultipleCancelBoundaryFails() {
-        try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultipleCancelBoundaryFails.bpmn20.xml").deploy();
-            fail("exception expected");
-        } catch (Exception e) {
-            if (!e.getMessage().contains("multiple boundary events with cancelEventDefinition not supported on same transaction")) {
-                fail("different exception expected");
-            }
-        }
+        assertThatThrownBy(() -> repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testMultipleCancelBoundaryFails.bpmn20.xml").deploy())
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("multiple boundary events with cancelEventDefinition not supported on same transaction");
     }
 
     @Test
     public void testCancelBoundaryNoTransactionFails() {
-        try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelBoundaryNoTransactionFails.bpmn20.xml")
-                    .deploy();
-            fail("exception expected");
-        } catch (Exception e) {
-            if (!e.getMessage().contains("boundary event with cancelEventDefinition only supported on transaction subprocesses")) {
-                fail("different exception expected");
-            }
-        }
+        assertThatThrownBy(() -> repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelBoundaryNoTransactionFails.bpmn20.xml").deploy())
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("boundary event with cancelEventDefinition only supported on transaction subprocesses");
     }
 
     @Test
     public void testCancelEndNoTransactionFails() {
-        try {
-            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelEndNoTransactionFails.bpmn20.xml").deploy();
-            fail("exception expected");
-        } catch (Exception e) {
-            if (!e.getMessage().contains("end event with cancelEventDefinition only supported inside transaction subprocess")) {
-                fail("different exception expected");
-            }
-        }
+        assertThatThrownBy(() -> repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCancelEndNoTransactionFails.bpmn20.xml").deploy())
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("end event with cancelEventDefinition only supported inside transaction subprocess");
     }
 
     private EventSubscriptionQuery createEventSubscriptionQuery() {

@@ -23,6 +23,7 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -48,7 +49,6 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
 
     @Override
     public void execute(DelegateExecution execution) {
-
         CommandContext commandContext = Context.getCommandContext();
 
         List<SignalEventSubscriptionEntity> subscriptionEntities = null;
@@ -68,7 +68,8 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
                 signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
                 
             } else {
-                EventSubscriptionService eventSubscriptionService = CommandContextUtil.getEventSubscriptionService();
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+                EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
                 EventSubscriptionEntity flowable6EventSubscription = eventSubscriptionService.findById(signalEventSubscriptionEntity.getId());
                 EventSubscriptionUtil.eventReceived(flowable6EventSubscription, null, signalDefinition.isAsync());
             }

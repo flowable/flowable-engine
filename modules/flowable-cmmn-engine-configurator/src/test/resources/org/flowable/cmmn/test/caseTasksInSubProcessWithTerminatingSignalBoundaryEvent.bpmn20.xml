@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <signal id="myExternalSignal" name="myExternalSignal" flowable:scope="global"/>
+    <process id="terminateTwoCasesWithinSubprocessBySignalEvent"
+             name="Terminate Two Cases Within Subprocess By Signal Event" isExecutable="true"
+             flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false"/>
+        <subProcess id="expandedSubProcess1" name="Subprocess">
+            <extensionElements/>
+            <startEvent id="startNoneEvent1" flowable:initiator="initiator" flowable:formFieldValidation="false"/>
+            <serviceTask id="caseTask1" name="Case task" flowable:type="case" flowable:caseDefinitionKey="myCase"
+                         flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true"/>
+            <endEvent id="endNoneEvent2"/>
+            <parallelGateway id="parallelGateway1"/>
+            <parallelGateway id="parallelGateway2"/>
+            <serviceTask id="caseTask2" name="Case task" flowable:type="case" flowable:caseDefinitionKey="myCase"
+                         flowable:sameDeployment="true" flowable:fallbackToDefaultTenant="true"/>
+            <sequenceFlow id="sequenceFlow3" sourceRef="startNoneEvent1" targetRef="parallelGateway1"/>
+            <sequenceFlow id="sequenceFlow4" sourceRef="caseTask1" targetRef="parallelGateway2"/>
+            <sequenceFlow id="sequenceFlow8" sourceRef="parallelGateway1" targetRef="caseTask1"/>
+            <sequenceFlow id="sequenceFlow9" sourceRef="parallelGateway2" targetRef="endNoneEvent2"/>
+            <sequenceFlow id="sequenceFlow10" sourceRef="parallelGateway1" targetRef="caseTask2"/>
+            <sequenceFlow id="sequenceFlow11" sourceRef="caseTask2" targetRef="parallelGateway2"/>
+        </subProcess>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="expandedSubProcess1"/>
+        <endEvent id="endNoneEvent1"/>
+        <sequenceFlow id="sequenceFlow2" sourceRef="expandedSubProcess1" targetRef="endNoneEvent1"/>
+        <sequenceFlow id="sequenceFlow5" sourceRef="intermediateSignalEventBoundary1" targetRef="endNoneEvent3"/>
+        <endEvent id="endNoneEvent3"/>
+        <boundaryEvent id="intermediateSignalEventBoundary1" attachedToRef="expandedSubProcess1" cancelActivity="true">
+            <signalEventDefinition signalRef="myExternalSignal"/>
+        </boundaryEvent>
+    </process>
+</definitions>

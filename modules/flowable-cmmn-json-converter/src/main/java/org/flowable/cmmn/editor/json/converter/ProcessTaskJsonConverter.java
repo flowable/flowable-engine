@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.ListenerConverterUtil;
@@ -29,9 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter implements ProcessModelAwareConverter {
-    
-    protected Map<String, String> processModelMap;
+public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter {
     
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -54,12 +53,35 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter imp
 
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
-            BaseElement baseElement, CmmnModel cmmnModel) {
+            BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
         
         ProcessTask processTask = (ProcessTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         if (processTask.getFallbackToDefaultTenant() != null) {
             propertiesNode.put(PROPERTY_FALLBACK_TO_DEFAULT_TENANT, processTask.getFallbackToDefaultTenant());
+        }
+        propertiesNode.put(PROPERTY_SAME_DEPLOYMENT, processTask.isSameDeployment());
+
+        if (StringUtils.isNotEmpty(processTask.getProcessInstanceIdVariableName())) {
+            propertiesNode.put(PROPERTY_ID_VARIABLE_NAME, processTask.getProcessInstanceIdVariableName());
+        }
+
+        String processRef = processTask.getProcessRef();
+        if (StringUtils.isNotEmpty(processRef)) {
+
+            ObjectNode processReferenceNode = objectMapper.createObjectNode();
+            processReferenceNode.put("key", processRef);
+            propertiesNode.set(PROPERTY_PROCESS_REFERENCE, processReferenceNode);
+
+            Map<String, String> modelInfo = converterContext.getProcessModelInfoForProcessModelKey(processRef);
+            if (modelInfo != null) {
+                processReferenceNode.put("id", modelInfo.get("id"));
+                processReferenceNode.put("name", modelInfo.get("name"));
+
+            } else {
+                converterContext.registerUnresolvedProcessModelReferenceForCaseModel(processRef, cmmnModel);
+
+            }
         }
         
         ListenerConverterUtil.convertLifecycleListenersToJson(objectMapper, propertiesNode, processTask);
@@ -78,17 +100,20 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter imp
 
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
-            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext, CmmnModelIdHelper cmmnModelIdHelper) {
         ProcessTask task = new ProcessTask();
         
         JsonNode processModelReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_PROCESS_REFERENCE, elementNode);
         if (processModelReferenceNode != null && processModelReferenceNode.has("id") && !processModelReferenceNode.get("id").isNull()) {
 
             String processModelId = processModelReferenceNode.get("id").asText();
-            if (processModelMap != null) {
-                String processModelKey = processModelMap.get(processModelId);
-                task.setProcessRef(processModelKey);
+            String processModelKey = converterContext.getProcessModelKeyForProcessModelId(processModelId);
+
+            if (StringUtils.isEmpty(processModelKey) && processModelReferenceNode.has("key")) {
+                processModelKey = processModelReferenceNode.get("key").asText();
             }
+
+            task.setProcessRef(processModelKey);
         }
 
         JsonNode processTaskInParametersNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_PROCESS_IN_PARAMETERS, elementNode);
@@ -108,13 +133,19 @@ public class ProcessTaskJsonConverter extends BaseChildTaskCmmnJsonConverter imp
             task.setFallbackToDefaultTenant(fallbackToDefaultTenant.booleanValue());
         }
 
+        JsonNode sameDeployment = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_SAME_DEPLOYMENT, elementNode);
+        if (sameDeployment != null) {
+            task.setSameDeployment(sameDeployment.booleanValue());
+        }
+
+        JsonNode idVariableName = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_ID_VARIABLE_NAME, elementNode);
+        if (idVariableName != null && idVariableName.isTextual()) {
+            task.setProcessInstanceIdVariableName(idVariableName.asText());
+        }
+
         ListenerConverterUtil.convertJsonToLifeCycleListeners(elementNode, task);
 
         return task;
     }
 
-    @Override
-    public void setProcessModelMap(Map<String, String> processModelMap) {
-        this.processModelMap = processModelMap;
-    }
 }

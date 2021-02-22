@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -24,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -42,6 +39,8 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * @author Frederik Heremans
  */
@@ -57,19 +56,23 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Create Binary-attachment
-            Attachment binaryAttachment = taskService.createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
-                    "This is binary content".getBytes()));
+            Attachment binaryAttachment = taskService
+                    .createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
+                            "This is binary content".getBytes()));
             taskService.saveAttachment(binaryAttachment);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_COLLECTION, task.getId())), HttpStatus.SC_OK);
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_COLLECTION, task.getId())),
+                    HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertTrue(responseNode.isArray());
-            assertEquals(2, responseNode.size());
+            assertThat(responseNode.isArray()).isTrue();
+            assertThat(responseNode).hasSize(2);
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -85,7 +88,9 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
      */
     @Test
     public void testGetAttachmentsUnexistingTask() throws Exception {
-        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_COLLECTION, "unexistingtask")), HttpStatus.SC_NOT_FOUND));
+        closeResponse(
+                executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_COLLECTION, "unexistingtask")),
+                        HttpStatus.SC_NOT_FOUND));
     }
 
     /**
@@ -98,47 +103,60 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Create Binary-attachment
-            Attachment binaryAttachment = taskService.createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
-                    "This is binary content".getBytes()));
+            Attachment binaryAttachment = taskService
+                    .createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
+                            "This is binary content".getBytes()));
             taskService.saveAttachment(binaryAttachment);
 
             // Get external url attachment
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())),
                     HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(urlAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("simpleType", responseNode.get("type").textValue());
-            assertEquals("Simple attachment", responseNode.get("name").textValue());
-            assertEquals("Simple attachment description", responseNode.get("description").textValue());
-            assertEquals("http://activiti.org", responseNode.get("externalUrl").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("contentUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertFalse(responseNode.get("time").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + urlAttachment.getId() + "',"
+                            + "type: 'simpleType',"
+                            + "name: 'Simple attachment',"
+                            + "description: 'Simple attachment description',"
+                            + "externalUrl: 'http://activiti.org',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: null,"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
+                            + "}");
 
             // Get binary attachment
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())), HttpStatus.SC_OK);
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())),
+                    HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(binaryAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("binaryType", responseNode.get("type").textValue());
-            assertEquals("Binary attachment", responseNode.get("name").textValue());
-            assertEquals("Binary attachment description", responseNode.get("description").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("contentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("externalUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-
-            assertFalse(responseNode.get("time").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + binaryAttachment.getId() + "',"
+                            + "type: 'binaryType',"
+                            + "name: 'Binary attachment',"
+                            + "description: 'Binary attachment description',"
+                            + "externalUrl: null,"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId()) + "',"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -159,14 +177,19 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Get attachment for unexisting task
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, "unexistingtask", urlAttachment.getId())), HttpStatus.SC_NOT_FOUND));
+            closeResponse(executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, "unexistingtask", urlAttachment.getId())),
+                    HttpStatus.SC_NOT_FOUND));
 
             // Get attachment for task attachment
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), "unexistingattachment")), HttpStatus.SC_NOT_FOUND));
+            closeResponse(executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), "unexistingattachment")),
+                    HttpStatus.SC_NOT_FOUND));
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -187,20 +210,23 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create Binary-attachment
-            Attachment binaryAttachment = taskService.createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
-                    "This is binary content".getBytes()));
+            Attachment binaryAttachment = taskService
+                    .createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
+                            "This is binary content".getBytes()));
             taskService.saveAttachment(binaryAttachment);
 
             // Get external url attachment
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())),
+            CloseableHttpResponse response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())),
                     HttpStatus.SC_OK);
 
             // Check response body
-            String responseBodyString = IOUtils.toString(response.getEntity().getContent());
-            assertEquals("This is binary content", responseBodyString);
+            try (InputStream contentStream = response.getEntity().getContent()) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             // Check response headers
-            assertEquals("application/octet-stream", response.getEntity().getContentType().getValue());
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
             closeResponse(response);
 
         } finally {
@@ -222,16 +248,18 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create Binary-attachment
-            Attachment binaryAttachment = taskService.createAttachment("application/xml", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
-                    "<p>This is binary content</p>".getBytes()));
+            Attachment binaryAttachment = taskService
+                    .createAttachment("application/xml", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
+                            "<p>This is binary content</p>".getBytes()));
             taskService.saveAttachment(binaryAttachment);
 
             // Get external url attachment
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())),
+            CloseableHttpResponse response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())),
                     HttpStatus.SC_OK);
 
             // Check response headers
-            assertEquals("application/xml", response.getEntity().getContentType().getValue());
+            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/xml");
             closeResponse(response);
 
         } finally {
@@ -253,11 +281,14 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Get attachment content for non-binary attachment
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), urlAttachment.getId())), HttpStatus.SC_NOT_FOUND));
+            closeResponse(executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), urlAttachment.getId())),
+                    HttpStatus.SC_NOT_FOUND));
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -289,23 +320,27 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
 
             // Check if attachment is created
             List<Attachment> attachments = taskService.getTaskAttachments(task.getId());
-            assertEquals(1, attachments.size());
+            assertThat(attachments).hasSize(1);
 
             Attachment urlAttachment = attachments.get(0);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(urlAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("simpleType", responseNode.get("type").textValue());
-            assertEquals("Simple attachment", responseNode.get("name").textValue());
-            assertEquals("Simple attachment description", responseNode.get("description").textValue());
-            assertEquals("http://activiti.org", responseNode.get("externalUrl").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("contentUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertFalse(responseNode.get("time").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + urlAttachment.getId() + "',"
+                            + "type: 'simpleType',"
+                            + "name: 'Simple attachment',"
+                            + "description: 'Simple attachment description',"
+                            + "externalUrl: 'http://activiti.org',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: null,"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -340,24 +375,31 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
 
             // Check if attachment is created
             List<Attachment> attachments = taskService.getTaskAttachments(task.getId());
-            assertEquals(1, attachments.size());
+            assertThat(attachments).hasSize(1);
 
             Attachment binaryAttachment = attachments.get(0);
-            assertEquals("This is binary content", IOUtils.toString(taskService.getAttachmentContent(binaryAttachment.getId())));
+            try (InputStream contentStream = taskService.getAttachmentContent(binaryAttachment.getId())) {
+                assertThat(contentStream).hasContent("This is binary content");
+            }
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(binaryAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("myType", responseNode.get("type").textValue());
-            assertEquals("An attachment", responseNode.get("name").textValue());
-            assertEquals("An attachment description", responseNode.get("description").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("contentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("externalUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertFalse(responseNode.get("time").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + binaryAttachment.getId() + "',"
+                            + "type: 'myType',"
+                            + "name: 'An attachment',"
+                            + "description: 'An attachment description',"
+                            + "externalUrl: null,"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId()) + "',"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -407,15 +449,17 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Delete the attachment
-            HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()));
+            HttpDelete httpDelete = new HttpDelete(
+                    SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()));
             closeResponse(executeBinaryRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
             // Check if attachment is really deleted
-            assertNull(taskService.getAttachment(urlAttachment.getId()));
+            assertThat(taskService.getAttachment(urlAttachment.getId())).isNull();
 
             // Deleting again should result in 404
             closeResponse(executeBinaryRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
@@ -439,48 +483,62 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             taskService.saveTask(task);
 
             // Create URL-attachment
-            Attachment urlAttachment = taskService.createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
+            Attachment urlAttachment = taskService
+                    .createAttachment("simpleType", task.getId(), null, "Simple attachment", "Simple attachment description", "http://activiti.org");
             taskService.saveAttachment(urlAttachment);
 
             // Create Binary-attachment
-            Attachment binaryAttachment = taskService.createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
-                    "This is binary content".getBytes()));
+            Attachment binaryAttachment = taskService
+                    .createAttachment("binaryType", task.getId(), null, "Binary attachment", "Binary attachment description", new ByteArrayInputStream(
+                            "This is binary content".getBytes()));
             taskService.saveAttachment(binaryAttachment);
 
             taskService.complete(task.getId());
 
             // Get external url attachment
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())),
                     HttpStatus.SC_OK);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(urlAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("simpleType", responseNode.get("type").textValue());
-            assertEquals("Simple attachment", responseNode.get("name").textValue());
-            assertEquals("Simple attachment description", responseNode.get("description").textValue());
-            assertEquals("http://activiti.org", responseNode.get("externalUrl").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("contentUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertFalse(responseNode.get("time").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + urlAttachment.getId() + "',"
+                            + "type: 'simpleType',"
+                            + "name: 'Simple attachment',"
+                            + "description: 'Simple attachment description',"
+                            + "externalUrl: 'http://activiti.org',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), urlAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: null,"
+                            + "processInstanceUrl: null,"
+                            + "time: '${json-unit.any-string}'"
+                            + "}");
 
             // Get binary attachment
-            response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())), HttpStatus.SC_OK);
+            response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())),
+                    HttpStatus.SC_OK);
             responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals(binaryAttachment.getId(), responseNode.get("id").textValue());
-            assertEquals("binaryType", responseNode.get("type").textValue());
-            assertEquals("Binary attachment", responseNode.get("name").textValue());
-            assertEquals("Binary attachment description", responseNode.get("description").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("contentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId())));
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId())));
-
-            assertTrue(responseNode.get("externalUrl").isNull());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id : '" + binaryAttachment.getId() + "',"
+                            + "type: 'binaryType',"
+                            + "name: 'Binary attachment',"
+                            + "description: 'Binary attachment description',"
+                            + "externalUrl: null,"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT, task.getId(), binaryAttachment.getId()) + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
+                            + "contentUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_DATA, task.getId(), binaryAttachment.getId()) + "',"
+                            + "processInstanceUrl: null"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails

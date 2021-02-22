@@ -13,10 +13,8 @@
 package org.flowable.cmmn.test.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -87,7 +85,7 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
     public void testSimpleTextMail() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleTextMail").start();
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello!", "This is a test", "flowable@localhost", Collections.singletonList("test@flowable.org"), null);
@@ -99,13 +97,14 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
     public void testSimpleTextMailMultipleRecipients() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testMail").start();
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(3, messages.size());
+        assertThat(messages).hasSize(3);
 
         List<String> recipients = new ArrayList<>();
         for (WiserMessage message : messages) {
             recipients.add(message.getEnvelopeReceiver());
         }
-        assertThat(recipients).contains("one@flowable.org", "two@flowable.org", "three@flowable.org");
+        assertThat(recipients)
+                .contains("one@flowable.org", "two@flowable.org", "three@flowable.org");
     }
 
     @Test
@@ -148,15 +147,15 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             .start();
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
         WiserMessage message = messages.get(0);
 
         assertEmailSend(message, true, "Hello", "Mr. <b>Kermit</b>", "test@flowable.org", Collections.singletonList("test@flowable.org"), null);
 
         MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
-        assertEquals(2, mm.getCount());
+        assertThat(mm.getCount()).isEqualTo(2);
         String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
-        assertEquals(new TestAttachmentBean().getFile().getName(), attachmentFileName);
+        assertThat(attachmentFileName).isEqualTo(new TestAttachmentBean().getFile().getName());
     }
 
     // Helper
@@ -167,22 +166,22 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             MimeMessage mimeMessage = emailMessage.getMimeMessage();
 
             if (htmlMail) {
-                assertTrue(mimeMessage.getContentType().contains("multipart/mixed"));
+                assertThat(mimeMessage.getContentType()).contains("multipart/mixed");
             } else {
-                assertTrue(mimeMessage.getContentType().contains("text/plain"));
+                assertThat(mimeMessage.getContentType()).contains("text/plain");
             }
 
-            assertEquals(subject, mimeMessage.getHeader("Subject", null));
-            assertEquals(from, mimeMessage.getHeader("From", null));
-            assertTrue(getMessage(mimeMessage).contains(message));
+            assertThat(mimeMessage.getHeader("Subject", null)).isEqualTo(subject);
+            assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+            assertThat(getMessage(mimeMessage).contains(message));
 
             for (String t : to) {
-                assertTrue(mimeMessage.getHeader("To", null).contains(t));
+                assertThat(mimeMessage.getHeader("To", null).contains(t));
             }
 
             if (cc != null) {
                 for (String c : cc) {
-                    assertTrue(mimeMessage.getHeader("Cc", null).contains(c));
+                    assertThat(mimeMessage.getHeader("Cc", null).contains(c));
                 }
             }
 

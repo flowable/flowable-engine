@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.engine.test;
 
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class AbstractFlowableDmnTest {
     protected static DmnEngine cachedDmnEngine;
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnRepositoryService repositoryService;
-    protected DmnRuleService ruleService;
+    protected DmnDecisionService ruleService;
     protected DmnManagementService managementService;
 
     @Before
@@ -50,7 +50,7 @@ public class AbstractFlowableDmnTest {
         }
         this.dmnEngineConfiguration = cachedDmnEngine.getDmnEngineConfiguration();
         this.repositoryService = cachedDmnEngine.getDmnRepositoryService();
-        this.ruleService = cachedDmnEngine.getDmnRuleService();
+        this.ruleService = cachedDmnEngine.getDmnDecisionService();
         this.managementService = cachedDmnEngine.getDmnManagementService();
     }
 

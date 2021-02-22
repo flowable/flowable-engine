@@ -16,6 +16,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * Contains a predefined set of states for process definitions and process instances
@@ -109,7 +110,7 @@ public interface SuspensionState {
                     eventType = FlowableEngineEventType.ENTITY_SUSPENDED;
                 }
                 Context.getCommandContext().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(eventType, entity));
+                        ActivitiEventBuilder.createEntityEvent(eventType, entity), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
     }

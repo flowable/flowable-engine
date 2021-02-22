@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +45,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -64,8 +66,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(0);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(1);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -90,8 +92,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .variableName("executed")
                     .singleResult();
-            assertNotNull(historicVariableInstance);
-            assertTrue((Boolean) historicVariableInstance.getValue());
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat((Boolean) historicVariableInstance.getValue()).isTrue();
         }
 
         assertProcessEnded(processInstance.getId());
@@ -114,8 +116,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .variableName("executed")
                     .singleResult();
-            assertNotNull(historicVariableInstance);
-            assertTrue((Boolean) historicVariableInstance.getValue());
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat((Boolean) historicVariableInstance.getValue()).isTrue();
         }
 
         assertProcessEnded(processInstance.getId());
@@ -138,8 +140,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .variableName("executed")
                     .singleResult();
-            assertNotNull(historicVariableInstance);
-            assertTrue((Boolean) historicVariableInstance.getValue());
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat((Boolean) historicVariableInstance.getValue()).isTrue();
         }
 
         assertProcessEnded(processInstance.getId());
@@ -162,8 +164,8 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .variableName("executed")
                     .singleResult();
-            assertNotNull(historicVariableInstance);
-            assertTrue((Boolean) historicVariableInstance.getValue());
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat((Boolean) historicVariableInstance.getValue()).isTrue();
         }
 
         assertProcessEnded(processInstance.getId());

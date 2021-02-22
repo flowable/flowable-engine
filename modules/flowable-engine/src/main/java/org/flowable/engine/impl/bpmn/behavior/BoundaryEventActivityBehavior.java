@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.delegate.InterruptibleActivityBehaviour;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -83,6 +84,13 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
             throw new FlowableException("Programmatic error: no parent scope execution found for boundary event");
         }
 
+        if (attachedRefScopeExecution.getCurrentFlowElement() instanceof FlowNode) {
+            Object behavior = ((FlowNode) attachedRefScopeExecution.getCurrentFlowElement()).getBehavior();
+            if (behavior instanceof InterruptibleActivityBehaviour) {
+                ((InterruptibleActivityBehaviour) behavior).interrupted(attachedRefScopeExecution);
+            }
+        }
+
         deleteChildExecutions(attachedRefScopeExecution, executionEntity, commandContext);
 
         // set new parent for boundary event execution
@@ -131,6 +139,9 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         ExecutionEntity nonInterruptingExecution = executionEntityManager.createChildExecution(scopeExecution);
         nonInterruptingExecution.setActive(false);
         nonInterruptingExecution.setCurrentFlowElement(executionEntity.getCurrentFlowElement());
+        
+        // create new start activity instance for the non interrupting boundary event
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(executionEntity);
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation(nonInterruptingExecution, true);
     }

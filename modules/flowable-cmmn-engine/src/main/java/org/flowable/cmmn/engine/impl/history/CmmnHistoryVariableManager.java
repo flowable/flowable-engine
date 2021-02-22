@@ -15,6 +15,10 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.Date;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.impl.history.async.AsyncHistorySession;
+import org.flowable.job.service.impl.history.async.AsyncHistorySessionCommandContextCloseListener;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -45,4 +49,12 @@ public class CmmnHistoryVariableManager implements InternalHistoryVariableManage
         cmmnEngineConfiguration.getCmmnHistoryManager().recordVariableRemoved(variable);
     }
 
+    @Override
+    public void initAsyncHistoryCommandContextCloseListener() {
+    	if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+    		CommandContext commandContext = CommandContextUtil.getCommandContext();
+        	commandContext.addCloseListener(new AsyncHistorySessionCommandContextCloseListener(
+        			commandContext.getSession(AsyncHistorySession.class), cmmnEngineConfiguration.getAsyncHistoryListener()));
+        }
+    }
 }

@@ -14,9 +14,12 @@ package org.flowable.cmmn.engine;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
@@ -24,18 +27,19 @@ import org.flowable.common.engine.impl.FlowableVersions;
  * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
+public interface CmmnEngine extends Engine {
     
     /** the version of the flowable CMMN library */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
-    String getName();
+    /**
+     * Starts the execuctors (async and async history), if they are configured to be auto-activated.
+     */
+    void startExecutors();
 
-    void handleExecutors();
-
-    void close();
-    
     CmmnRuntimeService getCmmnRuntimeService();
+
+    DynamicCmmnService getDynamicCmmnService();
     
     CmmnTaskService getCmmnTaskService();
     
@@ -46,4 +50,6 @@ public interface CmmnEngine {
     CmmnHistoryService getCmmnHistoryService();
     
     CmmnEngineConfiguration getCmmnEngineConfiguration();
+
+    CmmnMigrationService getCmmnMigrationService();
 }

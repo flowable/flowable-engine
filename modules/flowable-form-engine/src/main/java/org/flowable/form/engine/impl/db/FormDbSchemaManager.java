@@ -15,6 +15,7 @@ package org.flowable.form.engine.impl.db;
 import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
 import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
 import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
@@ -33,6 +34,37 @@ public class FormDbSchemaManager extends LiquibaseBasedSchemaManager {
 
     public void initSchema(FormEngineConfiguration formEngineConfiguration) {
         initSchema(formEngineConfiguration.getDatabaseSchemaUpdate());
+    }
+
+    @Override
+    public void schemaCreate() {
+        getCommonSchemaManager().schemaCreate();
+        super.schemaCreate();
+    }
+
+    @Override
+    public void schemaDrop() {
+        try {
+            super.schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping form engine tables", e);
+        }
+
+        try {
+            getCommonSchemaManager().schemaDrop();
+        } catch (Exception e) {
+            logger.info("Error dropping common tables", e);
+        }
+    }
+
+    @Override
+    public String schemaUpdate() {
+        getCommonSchemaManager().schemaUpdate();
+        return super.schemaUpdate();
+    }
+
+    protected SchemaManager getCommonSchemaManager() {
+        return CommandContextUtil.getFormEngineConfiguration().getCommonSchemaManager();
     }
 
 }

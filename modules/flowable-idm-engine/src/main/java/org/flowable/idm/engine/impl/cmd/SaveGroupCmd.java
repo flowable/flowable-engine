@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.api.Group;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
@@ -28,10 +29,14 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
 public class SaveGroupCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    protected IdmEngineConfiguration idmEngineConfiguration;
+    
     protected Group group;
 
-    public SaveGroupCmd(Group group) {
+    public SaveGroupCmd(Group group, IdmEngineConfiguration idmEngineConfiguration) {
         this.group = group;
+        this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
     @Override
@@ -40,15 +45,15 @@ public class SaveGroupCmd implements Command<Void>, Serializable {
             throw new FlowableIllegalArgumentException("group is null");
         }
 
-        if (CommandContextUtil.getGroupEntityManager(commandContext).isNewGroup(group)) {
+        if (idmEngineConfiguration.getGroupEntityManager().isNewGroup(group)) {
             if (group instanceof GroupEntity) {
-                CommandContextUtil.getGroupEntityManager(commandContext).insert((GroupEntity) group);
+                idmEngineConfiguration.getGroupEntityManager().insert((GroupEntity) group);
             } else {
-                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) group);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) group, idmEngineConfiguration.getIdGenerator());
             }
         } else {
             if (group instanceof GroupEntity) {
-                CommandContextUtil.getGroupEntityManager(commandContext).update((GroupEntity) group);
+                idmEngineConfiguration.getGroupEntityManager().update((GroupEntity) group);
             } else {
                 CommandContextUtil.getDbSqlSession(commandContext).update((Entity) group);
             }

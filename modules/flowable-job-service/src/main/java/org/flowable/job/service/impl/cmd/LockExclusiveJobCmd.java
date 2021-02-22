@@ -19,7 +19,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +31,14 @@ public class LockExclusiveJobCmd implements Command<Object>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockExclusiveJobCmd.class);
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     protected Job job;
 
-    public LockExclusiveJobCmd(Job job) {
+    public LockExclusiveJobCmd(Job job, JobServiceConfiguration jobServiceConfiguration) {
         this.job = job;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class LockExclusiveJobCmd implements Command<Object>, Serializable {
 
         if (job.isExclusive()) {
             if (job.getExecutionId() != null || job.getScopeId() != null) {
-                InternalJobManager internalJobManager = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
+                InternalJobManager internalJobManager = jobServiceConfiguration.getInternalJobManager();
                 if (internalJobManager != null) {
                     internalJobManager.lockJobScope(job);
                 }

@@ -22,23 +22,17 @@ import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.persistence.entity.data.AppDeploymentDataManager;
 import org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl;
 import org.flowable.common.engine.api.repository.EngineResource;
-import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class AppDeploymentEntityManagerImpl extends AbstractAppEntityManager<AppDeploymentEntity> implements AppDeploymentEntityManager {
-
-    protected AppDeploymentDataManager deploymentDataManager;
+public class AppDeploymentEntityManagerImpl
+    extends AbstractEngineEntityManager<AppEngineConfiguration, AppDeploymentEntity, AppDeploymentDataManager>
+    implements AppDeploymentEntityManager {
 
     public AppDeploymentEntityManagerImpl(AppEngineConfiguration appEngineConfiguration, AppDeploymentDataManager deploymentDataManager) {
-        super(appEngineConfiguration);
-        this.deploymentDataManager = deploymentDataManager;
-    }
-
-    @Override
-    protected DataManager<AppDeploymentEntity> getDataManager() {
-        return deploymentDataManager;
+        super(appEngineConfiguration, deploymentDataManager);
     }
 
     @Override
@@ -68,35 +62,35 @@ public class AppDeploymentEntityManagerImpl extends AbstractAppEntityManager<App
 
     @Override
     public AppDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
+        return dataManager.findLatestDeploymentByName(deploymentName);
     }
     
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+        return dataManager.getDeploymentResourceNames(deploymentId);
     }
     
     @Override
     public AppDeploymentQuery createDeploymentQuery() {
-        return new AppDeploymentQueryImpl(appEngineConfiguration.getCommandExecutor());
+        return new AppDeploymentQueryImpl(engineConfiguration.getCommandExecutor());
     }
     
     @Override
     public List<AppDeployment> findDeploymentsByQueryCriteria(AppDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentsByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
     }
     
     @Override
     public long findDeploymentCountByQueryCriteria(AppDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentCountByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentCountByQueryCriteria((AppDeploymentQueryImpl) deploymentQuery);
     }
 
-    public AppDeploymentDataManager getDeploymentDataManager() {
-        return deploymentDataManager;
+    protected AppResourceEntityManager getAppResourceEntityManager() {
+        return engineConfiguration.getAppResourceEntityManager();
     }
 
-    public void setDeploymentDataManager(AppDeploymentDataManager deploymentDataManager) {
-        this.deploymentDataManager = deploymentDataManager;
+    protected AppDefinitionEntityManager getAppDefinitionEntityManager() {
+        return engineConfiguration.getAppDefinitionEntityManager();
     }
 
 }

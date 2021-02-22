@@ -21,6 +21,7 @@ import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.JobUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -39,42 +40,33 @@ public class StartProcessInstanceAsyncCmd extends StartProcessInstanceCmd {
     @Override
     public ProcessInstance execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration);
-        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessDefinition processDefinition = getProcessDefinition(processEngineConfiguration, commandContext);
+        processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         ExecutionEntity processInstance = (ExecutionEntity) processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName,
-            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables, callbackId, callbackType, false);
+            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
+            callbackId, callbackType, referenceId, referenceType, stageInstanceId, false);
         ExecutionEntity execution = processInstance.getExecutions().get(0);
         Process process = ProcessDefinitionUtil.getProcess(processInstance.getProcessDefinitionId());
 
         processInstanceHelper.processAvailableEventSubProcesses(processInstance, process, commandContext);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
-        executeAsynchronous(execution, process);
+        executeAsynchronous(execution, process, commandContext);
 
         return processInstance;
     }
 
-    protected void executeAsynchronous(ExecutionEntity execution, Process process) {
-        JobService jobService = CommandContextUtil.getJobService();
+    protected void executeAsynchronous(ExecutionEntity execution, Process process, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
 
-        JobEntity job = jobService.createJob();
-        job.setExecutionId(execution.getId());
-        job.setProcessInstanceId(execution.getProcessInstanceId());
-        job.setProcessDefinitionId(execution.getProcessDefinitionId());
-        job.setElementId(process.getId());
+        JobEntity job = JobUtil.createJob(execution, process, AsyncContinuationJobHandler.TYPE, processEngineConfiguration);
         job.setElementName(process.getName());
-        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-
-        // Inherit tenant id (if applicable)
-        if (execution.getTenantId() != null) {
-            job.setTenantId(execution.getTenantId());
-        }
-
-        execution.getJobs().add(job);
 
         jobService.createAsyncJob(job, false);
         jobService.scheduleAsyncJob(job);

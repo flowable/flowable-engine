@@ -25,20 +25,20 @@ import javax.inject.Qualifier;
  * <li>{@code @Inject @ProcessVariable Object accountNumber}</li>
  * <li>{@code @Inject @ProcessVariable("accountNumber") Object account}</li>
  * </ul>
+ * <p>
  * In both cases, the process variable with the name 'accountNumber' is injected. NOTE: injection points must be of type 'object'.
- * <p />
- * 
+ * <p>
  * Can also be used to declare bean-properties to hold process variables in combination with the {@link StartProcess} annotation:
  * 
  * <pre>
  * {@code @ProcessVariable }
- * String accountNumber;  // will be added as a process 
- *                        // variable to the 'billingProcess'
+ *  String accountNumber;  // will be added as a process
+ *                         // variable to the 'billingProcess'
  * 
  * {@code @StartProcess("billingProcess")}
- * public void startBillingProcess() {
+ *  public void startBillingProcess() {
  *  ...
- * }
+ *  }
  * </pre>
  * 
  * @author Daniel Meyer
@@ -52,6 +52,6 @@ public @interface ProcessVariable {
      * The name of the process variable to look up. Defaults to the name of the annotated field or parameter
      */
     @Nonbinding
-    public String value() default "";
+    String value() default "";
 
 }

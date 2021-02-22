@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="testAsyncTasks">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="inclusiveGw" />
+    
+    <inclusiveGateway id="inclusiveGw" name="Inclusive Gateway Fork" />
+    <sequenceFlow id="flow2" sourceRef="inclusiveGw" targetRef="theTask1" />
+    <sequenceFlow id="flow3" sourceRef="inclusiveGw" targetRef="theTask2"/>
+
+    <serviceTask id="theTask1" flowable:async="true" flowable:exclusive="true" flowable:expression="${true}" />
+    <sequenceFlow id="flow5" sourceRef="theTask1" targetRef="inclusiveGwJoin" />
+    
+    <serviceTask id="theTask2" flowable:async="true" flowable:exclusive="true" flowable:expression="${true}" />
+    <sequenceFlow id="flow6" sourceRef="theTask2" targetRef="inclusiveGwJoin" />
+
+    <inclusiveGateway id="inclusiveGwJoin" name="Inclusive Gateway join" flowable:async="true" flowable:exclusive="true" />
+    <sequenceFlow id="flow7" sourceRef="inclusiveGwJoin" targetRef="countingServiceTask" />
+
+    <serviceTask id="countingServiceTask" flowable:expression="${execution.setVariable('counter', execution.getVariable('counter') + 1)}" />
+    <sequenceFlow id="flow8" sourceRef="countingServiceTask" targetRef="theUserTask" />
+
+    <userTask id="theUserTask" />
+    <sequenceFlow id="flow9" sourceRef="theUserTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -20,12 +20,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -43,6 +47,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String propagatedStageInstanceId;
     protected Date createTime;
     protected Date endTime;
     protected Long durationInMillis;
@@ -68,10 +73,9 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     protected boolean isIdentityLinksInitialized;
 
     public HistoricTaskInstanceEntityImpl() {
-
     }
 
-    public HistoricTaskInstanceEntityImpl(TaskEntity task) {
+    public HistoricTaskInstanceEntityImpl(TaskEntity task) {        
         this.id = task.getId();
         this.taskDefinitionId = task.getTaskDefinitionId();
         this.processDefinitionId = task.getProcessDefinitionId();
@@ -81,6 +85,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         this.subScopeId = task.getSubScopeId();
         this.scopeType = task.getScopeType();
         this.scopeDefinitionId = task.getScopeDefinitionId();
+        this.propagatedStageInstanceId = task.getPropagatedStageInstanceId();
         this.name = task.getName();
         this.parentTaskId = task.getParentTaskId();
         this.description = task.getDescription();
@@ -123,6 +128,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
         persistentState.put("subScopeId", subScopeId);
         persistentState.put("scopeType", scopeType);
         persistentState.put("scopeDefinitionId", scopeDefinitionId);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         persistentState.put("parentTaskId", parentTaskId);
         persistentState.put("dueDate", dueDate);
         persistentState.put("claimTime", claimTime);
@@ -137,7 +143,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
             if (endTime != null) {
                 this.endTime = endTime;
             } else {
-                this.endTime = CommandContextUtil.getTaskServiceConfiguration().getClock().getCurrentTime();
+                this.endTime = getTaskServiceConfiguration().getClock().getCurrentTime();
             }
             if (endTime != null && createTime != null) {
                 this.durationInMillis = endTime.getTime() - createTime.getTime();
@@ -210,6 +216,11 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
     }
 
     @Override
@@ -476,7 +487,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     public List<HistoricIdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
             if (queryIdentityLinks == null) {
-                identityLinks = CommandContextUtil.getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(id);
+                identityLinks = getIdentityLinkServiceConfiguration().getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(id);
             } else {
                 identityLinks = queryIdentityLinks;
             }
@@ -487,7 +498,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
     }
 
     public List<HistoricIdentityLinkEntity> getQueryIdentityLinks() {
-        if(queryIdentityLinks == null) {
+        if (queryIdentityLinks == null) {
             queryIdentityLinks = new LinkedList<>();
         }
         return queryIdentityLinks;
@@ -495,6 +506,29 @@ public class HistoricTaskInstanceEntityImpl extends AbstractTaskServiceEntity im
 
     public void setQueryIdentityLinks(List<HistoricIdentityLinkEntity> identityLinks) {
         queryIdentityLinks = identityLinks;
+    }
+    
+    protected TaskServiceConfiguration getTaskServiceConfiguration() {
+        return (TaskServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+    
+    protected IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return (IdentityLinkServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    protected AbstractEngineConfiguration getTaskEngineConfiguration() {
+        Map<String, AbstractEngineConfiguration> engineConfigurations = CommandContextUtil.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = null;
+        if (ScopeTypes.CMMN.equals(scopeType)) {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        } else {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            if (engineConfiguration == null) {
+                engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
+        }
+        
+        return engineConfiguration;
     }
     
     @Override

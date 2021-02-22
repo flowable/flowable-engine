@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,8 @@
  */
 
 package org.flowable.cmmn.rest.service.api.history;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Test for REST-operation related to the historic variable instance query resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRestTestCase {
@@ -77,7 +79,8 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var2"), 0, null, null);
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
+            throws JsonProcessingException, IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -85,7 +88,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         // Check status and size
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (variableName != null) {
@@ -98,15 +101,15 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asBoolean(), (boolean) (Boolean) variableValue);
+                        assertThat((boolean) (Boolean) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asBoolean());
                     } else if (variableValue instanceof Integer) {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
+                        assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asText(), (String) variableValue);
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
                 }
             }
-            assertTrue("Variable " + variableName + " is missing", variableFound);
+            assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
     }
 }

@@ -16,7 +16,7 @@
                 <processRefExpression><![CDATA[taskAndTimer]]></processRefExpression>
             </processTask>
             <timerEventListener id="sid-A7D65572-3BD5-4816-BC7D-0F6FB80E5997">
-                <timerExpression><![CDATA[PT10S]]></timerExpression>
+                <timerExpression><![CDATA[PT100S]]></timerExpression>
             </timerEventListener>
             <humanTask id="sid-A1B94ED0-3257-4B2D-A1D3-A289D400704B" name="The task" flowable:async="true"></humanTask>
         </casePlanModel>

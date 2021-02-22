@@ -117,6 +117,9 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
         }
+        if (queryRequest.getProcessBusinessKeyLike() != null) {
+            query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }
@@ -125,6 +128,12 @@ public class BaseProcessInstanceResource {
         }
         if (queryRequest.getStartedAfter() != null) {
             query.startedAfter(queryRequest.getStartedAfter());
+        }
+        if (queryRequest.getActiveActivityId() != null) {
+            query.activeActivityId(queryRequest.getActiveActivityId());
+        }
+        if (queryRequest.getActiveActivityIds() != null) {
+            query.activeActivityIds(queryRequest.getActiveActivityIds());
         }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());

@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 
@@ -31,8 +32,8 @@ public class GenericEventListenerInstanceQueryImpl implements GenericEventListen
 
     protected PlanItemInstanceQuery innerQuery;
 
-    GenericEventListenerInstanceQueryImpl(CommandExecutor commandExecutor) {
-        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor).planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER);
+    public GenericEventListenerInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        innerQuery = new PlanItemInstanceQueryImpl(commandExecutor, cmmnEngineConfiguration).planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER);
     }
 
     @Override

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Set;
+
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
@@ -81,15 +83,20 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         callActivityEndListeners(execution);
 
+        // When leaving one of the child executions we need to aggregate the information for it
+        // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+        aggregateVariablesForChildExecution(execution, multiInstanceRootExecution);
+
         boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
-            if(completeConditionSatisfied) {
+            if (completeConditionSatisfied) {
                 sendCompletedWithConditionEvent(multiInstanceRootExecution);
             }
             else {
                 sendCompletedEvent(multiInstanceRootExecution);
             }
 
+            // Call logic to leave activity instead of continuing multi-instance
             super.leave(execution);
         } else {
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
@@ -107,6 +114,12 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 executeOriginalBehavior(executionToContinue, multiInstanceRootExecution, loopCounter);
             } else {
                 CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
+                // Delete all local variables
+                Set<String> localVariableInstances = execution.getVariableInstancesLocal().keySet();
+                localVariableInstances.remove(NUMBER_OF_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_COMPLETED_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_ACTIVE_INSTANCES);
+                execution.removeVariablesLocal(localVariableInstances);
                 executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 

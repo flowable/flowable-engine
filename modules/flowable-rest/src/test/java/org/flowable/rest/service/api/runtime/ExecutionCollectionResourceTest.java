@@ -13,8 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Map;
 
@@ -50,10 +50,10 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
         runtimeService.addUserIdentityLink(id, "kermit", "whatever");
 
         Execution childExecutionInTask = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
-        assertNotNull(childExecutionInTask);
+        assertThat(childExecutionInTask).isNotNull();
 
         Execution childExecutionInSubProcess = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
-        assertNotNull(childExecutionInSubProcess);
+        assertThat(childExecutionInSubProcess).isNotNull();
 
         // Test without any parameters
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION);
@@ -134,14 +134,14 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
     public void testSignalEventExecutions() throws Exception {
         Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-        assertNotNull(signalExecution);
+        assertThat(signalExecution).isNotNull();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "signalEventReceived");
         requestNode.put("signalName", "alert");
 
         Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertNotNull(waitingExecution);
+        assertThat(waitingExecution).isNotNull();
 
         // Sending signal event causes the execution to end (scope-execution for
         // the catching event)
@@ -151,7 +151,7 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
 
         // Check if process is moved on to the other wait-state
         waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-        assertNotNull(waitingExecution);
+        assertThat(waitingExecution).isNotNull();
     }
 
     /**
@@ -161,7 +161,7 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
     public void testSignalEventExecutionsWithvariables() throws Exception {
         Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
-        assertNotNull(signalExecution);
+        assertThat(signalExecution).isNotNull();
 
         ArrayNode variables = objectMapper.createArrayNode();
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -175,7 +175,7 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
         varNode.put("value", "Variable set when signal event is received");
 
         Execution waitingExecution = runtimeService.createExecutionQuery().activityId("waitState").singleResult();
-        assertNotNull(waitingExecution);
+        assertThat(waitingExecution).isNotNull();
 
         // Sending signal event causes the execution to end (scope-execution for
         // the catching event)
@@ -185,11 +185,11 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
 
         // Check if process is moved on to the other wait-state
         waitingExecution = runtimeService.createExecutionQuery().activityId("anotherWaitState").singleResult();
-        assertNotNull(waitingExecution);
+        assertThat(waitingExecution).isNotNull();
 
         Map<String, Object> vars = runtimeService.getVariables(waitingExecution.getId());
-        assertEquals(1, vars.size());
 
-        assertEquals("Variable set when signal event is received", vars.get("myVar"));
+        assertThat(vars)
+                .containsOnly(entry("myVar", "Variable set when signal event is received"));
     }
 }

@@ -12,7 +12,7 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.util.List;
+import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -27,11 +27,11 @@ import org.flowable.common.engine.impl.javax.el.VariableMapper;
 public class FlowableElContext extends ELContext {
 
     protected ELResolver elResolver;
-    protected List<FlowableFunctionDelegate> functionDelegates;
+    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver;
 
-    public FlowableElContext(ELResolver elResolver, List<FlowableFunctionDelegate> functionDelegates) {
+    public FlowableElContext(ELResolver elResolver, BiFunction<String, String, FlowableFunctionDelegate> functionResolver) {
         this.elResolver = elResolver;
-        this.functionDelegates = functionDelegates;
+        this.functionResolver = functionResolver;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class FlowableElContext extends ELContext {
 
     @Override
     public FunctionMapper getFunctionMapper() {
-        return new FlowableFunctionMapper(functionDelegates);
+        return new FlowableFunctionMapper(functionResolver);
     }
 
     @Override

@@ -12,10 +12,8 @@
  */
 package org.flowable.editor.form.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.SimpleFormModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,16 +46,15 @@ public class FormJsonConverterTest {
         String testJsonResource = readJsonToString(JSON_RESOURCE_1);
         SimpleFormModel formModel = new FormJsonConverter().convertToFormModel(testJsonResource);
 
-        assertNotNull(formModel);
-        assertNotNull(formModel.getFields());
-        assertEquals(1, formModel.getFields().size());
+        assertThat(formModel).isNotNull();
+        assertThat(formModel.getFields()).hasSize(1);
 
         FormField formField = formModel.getFields().get(0);
-        assertEquals("input1", formField.getId());
-        assertEquals("Input1", formField.getName());
-        assertEquals("text", formField.getType());
-        assertFalse(formField.isRequired());
-        assertEquals("empty", formField.getPlaceholder());
+        assertThat(formField.getId()).isEqualTo("input1");
+        assertThat(formField.getName()).isEqualTo("Input1");
+        assertThat(formField.getType()).isEqualTo("text");
+        assertThat(formField.isRequired()).isFalse();
+        assertThat(formField.getPlaceholder()).isEqualTo("empty");
     }
 
     /* Helper methods */

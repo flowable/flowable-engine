@@ -21,9 +21,9 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +35,14 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDeadLetterJobCmd.class);
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    protected String timerJobId;
+    protected String deadLetterJobId;
 
-    public DeleteDeadLetterJobCmd(String timerJobId) {
-        this.timerJobId = timerJobId;
+    public DeleteDeadLetterJobCmd(String deadLetterJobId, JobServiceConfiguration jobServiceConfiguration) {
+        this.deadLetterJobId = deadLetterJobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -48,29 +51,29 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getDeadLetterJobEntityManager(commandContext).delete(jobToDelete);
+        jobServiceConfiguration.getDeadLetterJobEntityManager().delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(DeadLetterJobEntity jobToDelete) {
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getJobServiceConfiguration().getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher
-                .dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    jobServiceConfiguration.getEngineName());
         }
     }
 
     protected DeadLetterJobEntity getJobToDelete(CommandContext commandContext) {
-        if (timerJobId == null) {
+        if (deadLetterJobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Deleting job {}", timerJobId);
+            LOGGER.debug("Deleting job {}", deadLetterJobId);
         }
 
-        DeadLetterJobEntity job = CommandContextUtil.getDeadLetterJobEntityManager(commandContext).findById(timerJobId);
+        DeadLetterJobEntity job = jobServiceConfiguration.getDeadLetterJobEntityManager().findById(deadLetterJobId);
         if (job == null) {
-            throw new FlowableObjectNotFoundException("No dead letter job found with id '" + timerJobId + "'", Job.class);
+            throw new FlowableObjectNotFoundException("No dead letter job found with id '" + deadLetterJobId + "'", Job.class);
         }
 
         return job;

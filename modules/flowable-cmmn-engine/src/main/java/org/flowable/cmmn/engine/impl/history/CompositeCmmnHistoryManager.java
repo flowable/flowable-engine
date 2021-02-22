@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -154,11 +155,25 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
             historyManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
         }
     }
+    
+    @Override
+    public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceUpdated(planItemInstanceEntity);
+        }
+    }
 
     @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
+        }
+    }
+
+    @Override
+    public void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceUnavailable(planItemInstanceEntity);
         }
     }
 
@@ -215,6 +230,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     public void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordPlanItemInstanceExit(planItemInstanceEntity);
+        }
+    }
+    
+    @Override
+    public void updateCaseDefinitionIdInHistory(CaseDefinition caseDefinition, CaseInstanceEntity caseInstance) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.updateCaseDefinitionIdInHistory(caseDefinition, caseInstance);
         }
     }
 

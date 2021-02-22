@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface AssignTask {
     /** the id of the task that has been assigned */
-    public String value();
+    String value();
 }

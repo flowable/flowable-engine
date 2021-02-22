@@ -12,7 +12,9 @@
  */
 package org.flowable.engine.test.api.repository;
 
-import org.flowable.common.engine.api.FlowableException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
@@ -30,12 +32,9 @@ public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableT
     @Test
     @Deployment
     public void testDeployNonExecutableProcessDefinition() {
-        try {
-            runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent("No process definition found for key 'oneTaskProcessNonExecutable'", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'oneTaskProcessNonExecutable'");
     }
 
 }

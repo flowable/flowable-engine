@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 
 /**
@@ -26,6 +27,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String name;
     protected String state;
     protected String caseDefinitionId;
+    protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected boolean isStage;
@@ -34,6 +36,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String planItemDefinitionType;
     protected Date createTime;
     protected Date lastAvailableTime;
+    protected Date lastUnavailableTime;
     protected Date lastEnabledTime;
     protected Date lastDisabledTime;
     protected Date lastStartedTime;
@@ -49,13 +52,54 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String referenceType;
     protected String entryCriterionId;
     protected String exitCriterionId;
+    protected String extraValue;
     protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+
+    public HistoricPlanItemInstanceEntityImpl() {
+    }
+
+    public HistoricPlanItemInstanceEntityImpl(PlanItemInstance planItemInstance) {
+        this.id = planItemInstance.getId();
+        this.name = planItemInstance.getName();
+        this.state = planItemInstance.getState();
+        this.caseDefinitionId = planItemInstance.getCaseDefinitionId();
+        this.derivedCaseDefinitionId = planItemInstance.getDerivedCaseDefinitionId();
+        this.caseInstanceId = planItemInstance.getCaseInstanceId();
+        this.stageInstanceId = planItemInstance.getStageInstanceId();
+        this.isStage = planItemInstance.isStage();
+        this.elementId = planItemInstance.getElementId();
+        this.planItemDefinitionId = planItemInstance.getPlanItemDefinitionId();
+        this.planItemDefinitionType = planItemInstance.getPlanItemDefinitionType();
+        this.startUserId = planItemInstance.getStartUserId();
+        this.referenceId = planItemInstance.getReferenceId();
+        this.referenceType = planItemInstance.getReferenceType();
+        this.createTime = planItemInstance.getCreateTime();
+        this.entryCriterionId = planItemInstance.getEntryCriterionId();
+        this.exitCriterionId = planItemInstance.getExitCriterionId();
+        this.extraValue = planItemInstance.getExtraValue();
+
+        this.lastAvailableTime = planItemInstance.getLastAvailableTime();
+        this.lastUnavailableTime = planItemInstance.getLastUnavailableTime();
+        this.lastEnabledTime = planItemInstance.getLastEnabledTime();
+        this.lastDisabledTime = planItemInstance.getLastDisabledTime();
+        this.lastStartedTime = planItemInstance.getLastStartedTime();
+        this.lastSuspendedTime = planItemInstance.getLastSuspendedTime();
+        this.completedTime = planItemInstance.getCompletedTime();
+        this.occurredTime = planItemInstance.getOccurredTime();
+        this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.endedTime = planItemInstance.getEndedTime();
+
+        if (planItemInstance.getTenantId() != null) {
+            this.tenantId = planItemInstance.getTenantId();
+        }
+    }
 
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
+        persistentState.put("derivedCaseDefinitionId", derivedCaseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("stageInstanceId", stageInstanceId);
         persistentState.put("isStage", isStage);
@@ -64,6 +108,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("state", state);
         persistentState.put("createTime", createTime);
         persistentState.put("lastAvailableTime", lastAvailableTime);
+        persistentState.put("lastUnavailableTime", lastUnavailableTime);
         persistentState.put("lastEnabledTime", lastEnabledTime);
         persistentState.put("lastDisabledTime", lastDisabledTime);
         persistentState.put("lastStartedTime", lastStartedTime);
@@ -81,6 +126,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("planItemDefinitionType", planItemDefinitionType);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
+        persistentState.put("extraValue", extraValue);
         persistentState.put("showInOverview", showInOverview);
         persistentState.put("tenantId", tenantId);
         return persistentState;
@@ -114,6 +160,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
+    }
+
+    @Override
+    public void setDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
+        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+    }
+
+    @Override
+    public String getDerivedCaseDefinitionId() {
+        return derivedCaseDefinitionId;
     }
 
     @Override
@@ -194,6 +250,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setLastAvailableTime(Date lastAvailableTime) {
         this.lastAvailableTime = lastAvailableTime;
+    }
+
+    @Override
+    public Date getLastUnavailableTime() {
+        return lastUnavailableTime;
+    }
+
+    @Override
+    public void setLastUnavailableTime(Date lastUnavailableTime) {
+        this.lastUnavailableTime = lastUnavailableTime;
     }
 
     @Override
@@ -346,6 +412,26 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         this.exitCriterionId = exitCriterionId;
     }
     
+    @Override
+    public String getFormKey() {
+        return extraValue;
+    }
+
+    @Override
+    public void setFormKey(String formKey) {
+        this.extraValue = formKey;
+    }
+
+    @Override
+    public String getExtraValue() {
+        return extraValue;
+    }
+
+    @Override
+    public void setExtraValue(String extraValue) {
+        this.extraValue = extraValue;
+    }
+
     @Override
     public boolean isShowInOverview() {
         return showInOverview;

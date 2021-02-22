@@ -14,6 +14,7 @@ package org.flowable.dmn.converter.child;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.InputClause;
@@ -30,7 +31,7 @@ public class InputClauseParser extends BaseChildElementParser {
     }
 
     @Override
-    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
+    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
         if (!(parentElement instanceof DecisionTable))
             return;
 
@@ -38,6 +39,6 @@ public class InputClauseParser extends BaseChildElementParser {
         input.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         input.setLabel(xtr.getAttributeValue(null, ATTRIBUTE_LABEL));
 
-        decisionTable.addInput(input);
+        ((DecisionTable) parentElement).addInput(input);
     }
 }

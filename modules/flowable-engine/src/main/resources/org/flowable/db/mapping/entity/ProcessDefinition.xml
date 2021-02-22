@@ -9,8 +9,7 @@
   <insert id="insertProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
     insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -33,8 +32,7 @@
     VALUES 
       <foreach collection="list" item="processDefinition" index="index" separator=","> 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -59,8 +57,7 @@
       INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_) VALUES 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -90,7 +87,7 @@
               SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
           </if>
           <if test="originalPersistentState.category != category">
-              CATEGORY_ = #{category, jdbcType=VARCHAR}
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
           </if>
       </set>
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -102,6 +99,13 @@
       TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
     where
       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateProcessDefinitionVersionForProcessDefinitionId" parameterType="java.util.Map">
+    update ${prefix}ACT_RE_PROCDEF set
+      VERSION_ = #{version, jdbcType=INTEGER}
+    where
+      ID_ = #{processDefinitionId, jdbcType=VARCHAR}
   </update>
 
   <!-- PROCESSDEFINITION DELETE -->
@@ -253,17 +257,21 @@
       <if test="eventSubscriptionType != null">
         and exists(select 1 from ${prefix}ACT_RU_EVENT_SUBSCR EVT where RES.ID_ = EVT.CONFIGURATION_ and EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
       </if>
-      <if test="authorizationUserId != null">
-        AND (exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
-        <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
-         OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.GROUP_ID_ IN
-            <foreach item="group" index="index" collection="authorizationGroups" 
-                     open="(" separator="," close=")">
-              #{group}
-            </foreach>
-         )
-         </if>
-        )
+      <if test="includeAuthorization">
+          AND
+          <trim prefix="(" prefixOverrides="OR" suffix=")">
+              <if test="authorizationUserId != null">
+                  exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
+              </if>
+              <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
+                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.GROUP_ID_ IN
+                  <foreach item="group" index="index" collection="authorizationGroups"
+                           open="(" separator="," close=")">
+                      #{group}
+                  </foreach>
+                  )
+              </if>
+          </trim>
       </if>
     </where>
   </sql>
@@ -280,6 +288,23 @@
     select * 
     from ${prefix}ACT_RE_PROCDEF 
     where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{processDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
+
+    <!-- TODO when deploying cmmn from the Process engine then the BPMN resources do not have a parent deployment, they are the parent deployment   -->
+    <select id="selectProcessDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+    <select id="selectProcessDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
       and KEY_ = #{processDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>

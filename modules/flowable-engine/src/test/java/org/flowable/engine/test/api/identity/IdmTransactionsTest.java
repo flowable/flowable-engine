@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
@@ -53,13 +54,13 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
     public void testCommitOnNoException() {
 
         // No users should exist prior to this test
-        assertEquals(0, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).isEmpty();
 
         runtimeService.startProcessInstanceByKey("testProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         taskService.complete(task.getId());
-        assertEquals(1, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).hasSize(1);
 
     }
 
@@ -68,7 +69,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
     public void testTransactionRolledBackOnException() {
 
         // No users should exist prior to this test
-        assertEquals(0, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).isEmpty();
 
         runtimeService.startProcessInstanceByKey("testProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -77,12 +78,12 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> taskService.complete(task.getId()));
 
         // Should have rolled back to task
-        assertNotNull(taskService.createTaskQuery().singleResult());
-        assertEquals(0L, historyService.createHistoricProcessInstanceQuery().finished().count());
+        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+        assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isZero();
 
         // The logic in the tasklistener (creating a new user) should rolled back too:
         // no new user should have been created
-        assertEquals(0, identityService.createUserQuery().list().size());
+        assertThat(identityService.createUserQuery().list()).isEmpty();
 
     }
 
@@ -93,10 +94,10 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
 
         // The service task should have created a user which is part of the admin group
         User user = identityService.createUserQuery().singleResult();
-        assertEquals("Kermit", user.getId());
+        assertThat(user.getId()).isEqualTo("Kermit");
         Group group = identityService.createGroupQuery().groupMember(user.getId()).singleResult();
-        assertNotNull(group);
-        assertEquals("admin", group.getId());
+        assertThat(group).isNotNull();
+        assertThat(group.getId()).isEqualTo("admin");
 
         identityService.deleteMembership("Kermit", "admin");
     }

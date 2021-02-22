@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.end;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -22,7 +24,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 /**
  * @author Joram Barrez
  */
-@DisabledIfSystemProperty(named = "database", matches = "cockroachdb")
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
 public class EndEventTest extends PluggableFlowableTestCase {
 
     // Test case for ACT-1259
@@ -31,7 +33,7 @@ public class EndEventTest extends PluggableFlowableTestCase {
     public void testConcurrentEndOfSameProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithDelay");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // We will now start two threads that both complete the task.
         // In the process, the task is followed by a delay of three seconds
@@ -41,8 +43,8 @@ public class EndEventTest extends PluggableFlowableTestCase {
         TaskCompleter taskCompleter1 = new TaskCompleter(task.getId());
         TaskCompleter taskCompleter2 = new TaskCompleter(task.getId());
 
-        assertFalse(taskCompleter1.isSucceeded());
-        assertFalse(taskCompleter2.isSucceeded());
+        assertThat(taskCompleter1.isSucceeded()).isFalse();
+        assertThat(taskCompleter2.isSucceeded()).isFalse();
 
         taskCompleter1.start();
         taskCompleter2.start();
@@ -57,7 +59,7 @@ public class EndEventTest extends PluggableFlowableTestCase {
             successCount++;
         }
 
-        assertEquals("(Only) one thread should have been able to successfully end the process", 1, successCount);
+        assertThat(successCount).as("(Only) one thread should have been able to successfully end the process").isEqualTo(1);
         assertProcessEnded(processInstance.getId());
     }
 

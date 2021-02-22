@@ -31,6 +31,7 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
+import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
@@ -41,6 +42,8 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
@@ -58,6 +61,7 @@ import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.bpmn.model.ScriptTask;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.ServiceTask;
@@ -117,7 +121,13 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                         processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                     }
                 } else {
-                    processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        processDiagramCanvas.drawEventRegistryStartEvent(graphicInfo, scaleFactor);
+                        
+                    } else {
+                        processDiagramCanvas.drawNoneStartEvent(graphicInfo);
+                    }
                 }
             }
         });
@@ -280,6 +290,37 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 processDiagramCanvas.drawManualTask(flowNode.getName(), graphicInfo, scaleFactor);
             }
         });
+        
+        // send event service task
+        activityDrawInstructions.put(SendEventServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                processDiagramCanvas.drawSendEventServiceTask(flowNode.getName(), graphicInfo, scaleFactor);
+            }
+        });
+
+        // external worker service task
+        activityDrawInstructions.put(ExternalWorkerServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                ServiceTask serviceTask = (ServiceTask) flowNode;
+                processDiagramCanvas.drawServiceTask(serviceTask.getName(), graphicInfo, scaleFactor);
+            }
+        });
+        
+        // case service task
+        activityDrawInstructions.put(CaseServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, FlowNode flowNode) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(flowNode.getId());
+                processDiagramCanvas.drawCaseServiceTask(flowNode.getName(), graphicInfo, scaleFactor);
+            }
+        });
 
         // businessRuleTask task
         activityDrawInstructions.put(BusinessRuleTask.class, new ActivityDrawInstruction() {
@@ -361,8 +402,13 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     } else if (eventDefinition instanceof CompensateEventDefinition) {
                         processDiagramCanvas.drawCatchingCompensateEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                     }
+                    
+                } else {
+                    List<ExtensionElement> eventTypeElements = boundaryEvent.getExtensionElements().get("eventType");
+                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                        processDiagramCanvas.drawCatchingEventRegistryEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
+                    }
                 }
-
             }
         });
 
@@ -379,6 +425,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 }
             }
         });
+        
         // transaction
         activityDrawInstructions.put(Transaction.class, new ActivityDrawInstruction() {
 
@@ -462,8 +509,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 }
                 List<GraphicInfo> graphicInfoList = bpmnModel.getFlowLocationGraphicInfo(artifact.getId());
                 graphicInfoList = connectionPerfectionizer(processDiagramCanvas, bpmnModel, sourceElement, targetElement, graphicInfoList);
-                int xPoints[] = new int[graphicInfoList.size()];
-                int yPoints[] = new int[graphicInfoList.size()];
+                int[] xPoints = new int[graphicInfoList.size()];
+                int[] yPoints = new int[graphicInfoList.size()];
                 for (int i = 1; i < graphicInfoList.size(); i++) {
                     GraphicInfo graphicInfo = graphicInfoList.get(i);
                     GraphicInfo previousGraphicInfo = graphicInfoList.get(i - 1);
@@ -503,19 +550,19 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(),drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.emptyList(),drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.<String>emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, imageType, highLightedActivities, Collections.emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
             String labelFontName, String annotationFontName, ClassLoader customClassLoader,boolean drawSequenceFlowNameWithNoLabelDI) {
 
-        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
+        return generateDiagram(bpmnModel, imageType, Collections.emptyList(), Collections.emptyList(),
                 activityFontName, labelFontName, annotationFontName, customClassLoader, 1.0,drawSequenceFlowNameWithNoLabelDI);
     }
 
@@ -523,7 +570,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName,
             String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
 
-        return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),
+        return generateDiagram(bpmnModel, imageType, Collections.emptyList(), Collections.emptyList(),
                 activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
@@ -534,7 +581,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generatePngDiagram(BpmnModel bpmnModel, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, "png", Collections.emptyList(), Collections.emptyList(), scaleFactor,drawSequenceFlowNameWithNoLabelDI);
     }
 
     @Override
@@ -544,7 +591,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public InputStream generateJpgDiagram(BpmnModel bpmnModel, double scaleFactor,boolean drawSequenceFlowNameWithNoLabelDI) {
-        return generateDiagram(bpmnModel, "jpg", Collections.<String>emptyList(), Collections.<String>emptyList(),drawSequenceFlowNameWithNoLabelDI);
+        return generateDiagram(bpmnModel, "jpg", Collections.emptyList(), Collections.emptyList(),drawSequenceFlowNameWithNoLabelDI);
     }
 
     public BufferedImage generateImage(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities, List<String> highLightedFlows,
@@ -562,7 +609,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
     @Override
     public BufferedImage generatePngImage(BpmnModel bpmnModel, double scaleFactor) {
-        return generateImage(bpmnModel, "png", Collections.<String>emptyList(), Collections.<String>emptyList(), scaleFactor,false);
+        return generateImage(bpmnModel, "png", Collections.emptyList(), Collections.emptyList(), scaleFactor,false);
     }
 
     protected DefaultProcessDiagramCanvas generateProcessDiagram(BpmnModel bpmnModel, String imageType,
@@ -727,6 +774,12 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 drawHighLight(processDiagramCanvas, bpmnModel.getGraphicInfo(flowNode.getId()));
             }
 
+        } else if (flowNode instanceof Task) {
+            activityDrawInstructions.get(Task.class).draw(processDiagramCanvas, bpmnModel, flowNode);
+            
+            if (highLightedActivities.contains(flowNode.getId())) {
+                drawHighLight(processDiagramCanvas, bpmnModel.getGraphicInfo(flowNode.getId()));
+            }
         }
 
         // Outgoing transitions of activity
@@ -752,8 +805,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             List<GraphicInfo> graphicInfoList = bpmnModel.getFlowLocationGraphicInfo(sequenceFlow.getId());
             if (graphicInfoList != null && graphicInfoList.size() > 0) {
                 graphicInfoList = connectionPerfectionizer(processDiagramCanvas, bpmnModel, sourceElement, targetElement, graphicInfoList);
-                int xPoints[] = new int[graphicInfoList.size()];
-                int yPoints[] = new int[graphicInfoList.size()];
+                int[] xPoints = new int[graphicInfoList.size()];
+                int[] yPoints = new int[graphicInfoList.size()];
 
                 for (int i = 1; i < graphicInfoList.size(); i++) {
                     GraphicInfo graphicInfo = graphicInfoList.get(i);
@@ -774,7 +827,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 GraphicInfo labelGraphicInfo = bpmnModel.getLabelGraphicInfo(sequenceFlow.getId());
                 if (labelGraphicInfo != null) {
                     processDiagramCanvas.drawLabel(sequenceFlow.getName(), labelGraphicInfo, false);
-                }else {
+                } else {
                     if (drawSequenceFlowNameWithNoLabelDI) {
                         GraphicInfo lineCenter = getLineCenter(graphicInfoList);
                         processDiagramCanvas.drawLabel(sequenceFlow.getName(), lineCenter, false); 
@@ -838,8 +891,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
     protected static GraphicInfo getLineCenter(List<GraphicInfo> graphicInfoList) {
         GraphicInfo gi = new GraphicInfo();
 
-        int xPoints[] = new int[graphicInfoList.size()];
-        int yPoints[] = new int[graphicInfoList.size()];
+        int[] xPoints = new int[graphicInfoList.size()];
+        int[] yPoints = new int[graphicInfoList.size()];
 
         double length = 0;
         double[] lengths = new double[graphicInfoList.size()];

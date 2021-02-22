@@ -12,14 +12,13 @@
  */
 package org.flowable.dmn.engine.test.cfg;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.ibatis.datasource.pooled.PoolState;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Zheng Ji
@@ -41,14 +40,14 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemDmnEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
         dmnEngine.close();
 
         // the idle connections are closed
-        assertEquals(0, state.getIdleConnectionCount());
+        assertThat(state.getIdleConnectionCount()).isZero();
 
     }
 
@@ -65,17 +64,17 @@ public class ForceCloseMybatisConnectionPoolTest {
 
         PooledDataSource pooledDataSource = (PooledDataSource) standaloneInMemDmnEngineConfiguration.getDataSource();
         PoolState state = pooledDataSource.getPoolState();
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         // then
         // if the  engine is closed
         dmnEngine.close();
 
         // the idle connections are not closed
-        assertTrue(state.getIdleConnectionCount() > 0);
+        assertThat(state.getIdleConnectionCount()).isPositive();
 
         pooledDataSource.forceCloseAll();
-        assertEquals(0, state.getIdleConnectionCount());
+        assertThat(state.getIdleConnectionCount()).isZero();
     }
 
 }

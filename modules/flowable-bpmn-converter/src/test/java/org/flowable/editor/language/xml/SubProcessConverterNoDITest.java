@@ -12,86 +12,66 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-public class SubProcessConverterNoDITest extends AbstractConverterTest {
+class SubProcessConverterNoDITest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Test
-    public void convertModelToXML() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        BpmnModel parsedModel = exportAndReadXMLFile(bpmnModel);
-        validateModel(parsedModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "subprocessmodel-noDI.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("subprocessmodel-noDI.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
-        assertEquals("start1", flowElement.getId());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof UserTask);
-        assertEquals("userTask1", flowElement.getId());
-        UserTask userTask = (UserTask) flowElement;
-        assertEquals(1, userTask.getCandidateUsers().size());
-        assertEquals(1, userTask.getCandidateGroups().size());
-        assertEquals(2, userTask.getFormProperties().size());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getId()).isEqualTo("userTask1");
+                    assertThat(userTask.getCandidateUsers()).hasSize(1);
+                    assertThat(userTask.getCandidateGroups()).hasSize(1);
+                    assertThat(userTask.getFormProperties()).hasSize(2);
+                });
 
         flowElement = model.getMainProcess().getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
-        assertEquals("subprocess1", flowElement.getId());
-        SubProcess subProcess = (SubProcess) flowElement;
-        assertTrue(subProcess.getLoopCharacteristics().isSequential());
-        assertEquals("10", subProcess.getLoopCharacteristics().getLoopCardinality());
-        assertEquals("${assignee == \"\"}", subProcess.getLoopCharacteristics().getCompletionCondition());
-        assertEquals(5, subProcess.getFlowElements().size());
-
-        assertEquals(1, subProcess.getExecutionListeners().size());
-        FlowableListener listenerSubProcess = subProcess.getExecutionListeners().get(0);
-        assertEquals("SubProcessTestClass", listenerSubProcess.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listenerSubProcess.getImplementationType());
-        assertEquals("start", listenerSubProcess.getEvent());
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getLoopCharacteristics().isSequential()).isTrue();
+                    assertThat(subProcess.getLoopCharacteristics().getLoopCardinality()).isEqualTo("10");
+                    assertThat(subProcess.getLoopCharacteristics().getCompletionCondition()).isEqualTo("${assignee == \"\"}");
+                    assertThat(subProcess.getFlowElements()).hasSize(5);
+                    assertThat(subProcess.getExecutionListeners()).hasSize(1);
+                    FlowableListener listenerSubProcess = subProcess.getExecutionListeners().get(0);
+                    assertThat(listenerSubProcess.getImplementation()).isEqualTo("SubProcessTestClass");
+                    assertThat(listenerSubProcess.getImplementationType()).isEqualTo(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+                    assertThat(listenerSubProcess.getEvent()).isEqualTo("start");
+                });
 
         flowElement = model.getMainProcess().getFlowElement("boundaryEvent1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof BoundaryEvent);
-        assertEquals("boundaryEvent1", flowElement.getId());
-        BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-        assertNotNull(boundaryEvent.getAttachedToRef());
-        assertEquals("subprocess1", boundaryEvent.getAttachedToRef().getId());
-        assertEquals(1, boundaryEvent.getEventDefinitions().size());
-        assertTrue(boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(BoundaryEvent.class, boundaryEvent -> {
+                    assertThat(boundaryEvent.getId()).isEqualTo("boundaryEvent1");
+                    assertThat(boundaryEvent.getAttachedToRef()).isNotNull();
+                    assertThat(boundaryEvent.getAttachedToRef().getId()).isEqualTo("subprocess1");
+                    assertThat(boundaryEvent.getEventDefinitions()).hasSize(1);
+                    assertThat(boundaryEvent.getEventDefinitions().get(0)).isInstanceOf(TimerEventDefinition.class);
+                });
 
-        assertEquals(1, model.getMainProcess().getExecutionListeners().size());
-        FlowableListener listenerMainProcess = model.getMainProcess().getExecutionListeners().get(0);
-        assertEquals("TestClass", listenerMainProcess.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listenerMainProcess.getImplementationType());
-        assertEquals("start", listenerMainProcess.getEvent());
+        assertThat(model.getMainProcess().getExecutionListeners())
+                .extracting(FlowableListener::getImplementation, FlowableListener::getImplementationType, FlowableListener::getEvent)
+                .containsExactly(tuple("TestClass", ImplementationType.IMPLEMENTATION_TYPE_CLASS, "start"));
     }
 }

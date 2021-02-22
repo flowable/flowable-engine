@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.test.bpmn.event.error;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -39,10 +38,10 @@ public class ErrorPropagationTest {
                     "org/flowable/engine/test/bpmn/event/error/throwError.bpmn" })
     public void test() {
         ProcessInstance processInstance = flowableRule.getRuntimeService().startProcessInstanceByKey("catchError4");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         final org.flowable.task.api.Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
 
-        assertEquals("MyErrorTaskNested", task.getName());
+        assertThat(task.getName()).isEqualTo("MyErrorTaskNested");
     }
 }

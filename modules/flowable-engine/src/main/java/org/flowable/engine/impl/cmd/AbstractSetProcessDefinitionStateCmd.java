@@ -27,6 +27,7 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.TimerChangeProcessDefinitionSuspensionStateJobHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -89,8 +90,8 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
             }
             return null;
         }
-
-        if (executionDate != null) { // Process definition state change is delayed
+        // Process definition state change is delayed
+        if (executionDate != null) {
             createTimerForDelayedExecution(commandContext, processDefinitions);
         } else { // Process definition state is changed now
             changeProcessDefinitionState(commandContext, processDefinitions);
@@ -149,8 +150,9 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     protected void createTimerForDelayedExecution(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
+            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
                 continue;
+            }
 
             TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
             TimerJobEntity timer = timerJobService.createTimerJob();
@@ -172,8 +174,9 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
-            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext))
+            if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
                 continue;
+            }
 
             SuspensionStateUtil.setSuspensionState(processDefinition, getProcessDefinitionSuspensionState());
 
@@ -201,13 +204,13 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
     }
 
     protected List<ProcessInstance> fetchProcessInstancesPage(CommandContext commandContext, ProcessDefinition processDefinition, int currentPageStartIndex) {
-
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (SuspensionState.ACTIVE.equals(getProcessDefinitionSuspensionState())) {
-            return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).suspended()
-                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
+            return new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinition.getId()).suspended()
+                    .listPage(currentPageStartIndex, processEngineConfiguration.getBatchSizeProcessInstances());
         } else {
-            return new ProcessInstanceQueryImpl(commandContext).processDefinitionId(processDefinition.getId()).active()
-                    .listPage(currentPageStartIndex, CommandContextUtil.getProcessEngineConfiguration(commandContext).getBatchSizeProcessInstances());
+            return new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinition.getId()).active()
+                    .listPage(currentPageStartIndex, processEngineConfiguration.getBatchSizeProcessInstances());
         }
     }
 

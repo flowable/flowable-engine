@@ -16,12 +16,10 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
-import org.springframework.core.task.TaskExecutor;
 
 /**
  * <p>
- * This is a spring based implementation of the {@link JobExecutor} using spring abstraction {@link TaskExecutor} for performing background task execution.
+ *     This is an {@link org.flowable.job.service.impl.asyncexecutor.AsyncExecutor} implementation which allows invoking a custom job rejected jobs handler.
  * </p>
  * <p>
  * The idea behind this implementation is to externalize the configuration of the task executor, 
@@ -34,40 +32,14 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
 
-    protected TaskExecutor taskExecutor;
     protected SpringRejectedJobsHandler rejectedJobsHandler;
-
-    public SpringAsyncExecutor() {
-    }
-    
-    public SpringAsyncExecutor(TaskExecutor taskExecutor) {
-        this(taskExecutor, null);
-    }
-
-    public SpringAsyncExecutor(TaskExecutor taskExecutor, SpringRejectedJobsHandler rejectedJobsHandler) {
-        this.taskExecutor = taskExecutor;
-        this.rejectedJobsHandler = rejectedJobsHandler;
-    }
-
-    public TaskExecutor getTaskExecutor() {
-        return taskExecutor;
-    }
-
-    /**
-     * Required spring injected {@link TaskExecutor} implementation that will be used to execute runnable jobs.
-     * 
-     * @param taskExecutor
-     */
-    public void setTaskExecutor(TaskExecutor taskExecutor) {
-        this.taskExecutor = taskExecutor;
-    }
 
     public SpringRejectedJobsHandler getRejectedJobsHandler() {
         return rejectedJobsHandler;
     }
 
     /**
-     * {@link RejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
+     * {@link SpringRejectedJobsHandler} implementation that will be used when jobs were rejected by the task executor.
      * 
      * @param rejectedJobsHandler
      */
@@ -78,9 +50,10 @@ public class SpringAsyncExecutor extends DefaultAsyncJobExecutor {
     @Override
     public boolean executeAsyncJob(JobInfo job) {
         try {
-            taskExecutor.execute(new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler));
+            taskExecutor.execute(createRunnableForJob(job));
             return true;
         } catch (RejectedExecutionException e) {
+            sendRejectedEvent(job);
             if (rejectedJobsHandler == null) {
                 unacquireJobAfterRejection(job);
             } else {

@@ -53,5 +53,4 @@ public class AsyncHistorySessionFactory implements SessionFactory {
     public void setRegisteredJobDataTypes(List<String> registeredJobDataTypes) {
         this.registeredJobDataTypes = registeredJobDataTypes;
     }
-    
 }

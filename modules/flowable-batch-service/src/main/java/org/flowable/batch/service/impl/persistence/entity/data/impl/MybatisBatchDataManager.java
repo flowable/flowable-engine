@@ -16,14 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.batch.api.Batch;
+import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchDataManager;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 
 public class MybatisBatchDataManager extends AbstractDataManager<BatchEntity> implements BatchDataManager {
 
+    protected BatchServiceConfiguration batchServiceConfiguration;
+    
+    public MybatisBatchDataManager(BatchServiceConfiguration batchServiceConfiguration) {
+        this.batchServiceConfiguration = batchServiceConfiguration;
+    }
+    
     @Override
     public Class<? extends BatchEntity> getManagedEntityClass() {
         return BatchEntityImpl.class;
@@ -60,4 +68,10 @@ public class MybatisBatchDataManager extends AbstractDataManager<BatchEntity> im
     public long findBatchCountByQueryCriteria(BatchQueryImpl batchQuery) {
         return (Long) getDbSqlSession().selectOne("selectBatchCountByQueryCriteria", batchQuery);
     }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return batchServiceConfiguration.getIdGenerator();
+    }
+    
 }

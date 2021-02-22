@@ -12,11 +12,15 @@
  */
 package org.flowable.examples.bpmn.usertask.taskassignee;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,13 +39,12 @@ public class TaskAssigneeTest extends PluggableFlowableTestCase {
 
         // Get task list
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
-        assertEquals(1, tasks.size());
-        org.flowable.task.api.Task myTask = tasks.get(0);
-        assertEquals("Schedule meeting", myTask.getName());
-        assertEquals("Schedule an engineering meeting for next week with the new hire.", myTask.getDescription());
+        assertThat(tasks)
+                .extracting(Task::getName, Task::getDescription)
+                .containsExactly(tuple("Schedule meeting", "Schedule an engineering meeting for next week with the new hire."));
 
         // Complete task. Process is now finished
-        taskService.complete(myTask.getId());
+        taskService.complete(tasks.get(0).getId());
         // assert if the process instance completed
         assertProcessEnded(processInstance.getId());
     }

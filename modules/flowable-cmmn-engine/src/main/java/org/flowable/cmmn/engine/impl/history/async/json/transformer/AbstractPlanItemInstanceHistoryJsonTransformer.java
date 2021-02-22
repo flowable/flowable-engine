@@ -12,25 +12,31 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getBooleanFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
+
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getBooleanFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
-import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 /**
  * @author Joram Barrez
  */
 public abstract class AbstractPlanItemInstanceHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
     
+    public AbstractPlanItemInstanceHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     protected void copyCommonPlanItemInstanceProperties(HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity, ObjectNode historicalData) {
         historicPlanItemInstanceEntity.setId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_ID));
         historicPlanItemInstanceEntity.setName(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_NAME));
         historicPlanItemInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));
         historicPlanItemInstanceEntity.setCaseDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID));
+        historicPlanItemInstanceEntity.setDerivedCaseDefinitionId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_DERIVED_CASE_DEFINITION_ID));
         historicPlanItemInstanceEntity.setCaseInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_CASE_INSTANCE_ID));
         historicPlanItemInstanceEntity.setStageInstanceId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STAGE_INSTANCE_ID));
         historicPlanItemInstanceEntity.setStage(getBooleanFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_IS_STAGE));

@@ -27,7 +27,7 @@ import org.flowable.app.rest.service.BaseSpringRestTestCase;
 public class AppDefinitionCollectionResourceTest extends BaseSpringRestTestCase {
 
     /**
-     * Test getting case definitions. GET app-repository/app-definitions
+     * Test getting app definitions. GET app-repository/app-definitions
      */
     public void testGetAppDefinitions() throws Exception {
 
@@ -95,7 +95,7 @@ public class AppDefinitionCollectionResourceTest extends BaseSpringRestTestCase 
             url = baseUrl + "?latest=true";
             assertResultsPresentInDataResponse(url, oneApp.getId(), secondApp.getId());
             url = baseUrl + "?latest=false";
-            assertResultsPresentInDataResponse(baseUrl, firstOneApp.getId(), oneApp.getId(), secondApp.getId());
+            assertResultsPresentInDataResponse(url, firstOneApp.getId(), oneApp.getId(), secondApp.getId());
 
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();

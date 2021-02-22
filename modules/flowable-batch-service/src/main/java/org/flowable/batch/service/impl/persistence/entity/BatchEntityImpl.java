@@ -18,6 +18,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+
 public class BatchEntityImpl extends AbstractBatchServiceEntity implements BatchEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +32,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
     protected String batchSearchKey;
     protected String batchSearchKey2;
     protected String status;
-    protected BatchByteArrayRef batchDocRefId;
+    protected ByteArrayRef batchDocRefId;
     protected String tenantId;
 
     @Override
@@ -56,6 +58,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchType;
     }
 
+    @Override
     public void setBatchType(String batchType) {
         this.batchType = batchType;
     }
@@ -83,6 +86,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchSearchKey;
     }
 
+    @Override
     public void setBatchSearchKey(String batchSearchKey) {
         this.batchSearchKey = batchSearchKey;
     }
@@ -92,6 +96,7 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return batchSearchKey2;
     }
 
+    @Override
     public void setBatchSearchKey2(String batchSearchKey2) {
         this.batchSearchKey2 = batchSearchKey2;
     }
@@ -101,22 +106,24 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public BatchByteArrayRef getBatchDocRefId() {
+    @Override
+    public ByteArrayRef getBatchDocRefId() {
         return batchDocRefId;
     }
 
-    public void setBatchDocRefId(BatchByteArrayRef batchDocRefId) {
+    public void setBatchDocRefId(ByteArrayRef batchDocRefId) {
         this.batchDocRefId = batchDocRefId;
     }
 
     @Override
-    public String getBatchDocumentJson() {
+    public String getBatchDocumentJson(String engineType) {
         if (batchDocRefId != null) {
-            byte[] bytes = batchDocRefId.getBytes();
+            byte[] bytes = batchDocRefId.getBytes(engineType);
             if (bytes != null) {
                 return new String(bytes, StandardCharsets.UTF_8);
             }
@@ -125,27 +132,29 @@ public class BatchEntityImpl extends AbstractBatchServiceEntity implements Batch
     }
 
     @Override
-    public void setBatchDocumentJson(String batchDocumentJson) {
-        this.batchDocRefId = setByteArrayRef(this.batchDocRefId, BATCH_DOCUMENT_JSON_LABEL, batchDocumentJson);
+    public void setBatchDocumentJson(String batchDocumentJson, String engineType) {
+        this.batchDocRefId = setByteArrayRef(this.batchDocRefId, BATCH_DOCUMENT_JSON_LABEL, batchDocumentJson, engineType);
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    private static BatchByteArrayRef setByteArrayRef(BatchByteArrayRef byteArrayRef, String name, String value) {
+    protected static ByteArrayRef setByteArrayRef(ByteArrayRef byteArrayRef, String name, String value, String engineType) {
         if (byteArrayRef == null) {
-            byteArrayRef = new BatchByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
         byte[] bytes = null;
         if (value != null) {
             bytes = value.getBytes(StandardCharsets.UTF_8);
         }
-        byteArrayRef.setValue(name, bytes);
+        byteArrayRef.setValue(name, bytes, engineType);
         return byteArrayRef;
     }
 

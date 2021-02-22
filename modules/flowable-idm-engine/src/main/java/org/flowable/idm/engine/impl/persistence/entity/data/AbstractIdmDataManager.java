@@ -12,6 +12,7 @@
  */
 package org.flowable.idm.engine.impl.persistence.entity.data;
 
+import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -28,4 +29,8 @@ public abstract class AbstractIdmDataManager<EntityImpl extends Entity> extends 
         this.idmEngineConfiguration = idmEngineConfiguration;
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return idmEngineConfiguration.getIdGenerator();
+    }
 }

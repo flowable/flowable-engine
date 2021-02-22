@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,15 +12,17 @@
  */
 package org.flowable.dmn.converter.child;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.dmn.model.DecisionTable;
+import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
-
-import javax.xml.stream.XMLStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Yvo Swillens
@@ -33,7 +35,7 @@ public class OutputValuesParser extends BaseChildElementParser {
     }
 
     @Override
-    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
+    public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
         if (!(parentElement instanceof OutputClause))
             return;
 
@@ -47,12 +49,7 @@ public class OutputValuesParser extends BaseChildElementParser {
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
                     String outputValuesText = xtr.getElementText();
 
-                    if (StringUtils.isNotEmpty(outputValuesText)) {
-                        String[] outputValuesSplit = outputValuesText.replaceAll("^\"", "").split("\"?(,|$)(?=(([^\"]*\"){2})*[^\"]*$) *\"?");
-                        outputValues.setTextValues(new ArrayList<>(Arrays.asList(outputValuesSplit)));
-                    }
-
-
+                    outputValues.setTextValues(splitAndFormatOutputValues(outputValuesText));
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithOutputValues = true;
                 }
@@ -62,5 +59,51 @@ public class OutputValuesParser extends BaseChildElementParser {
         }
 
         clause.setOutputValues(outputValues);
+    }
+
+    public List<Object> splitAndFormatOutputValues(String outputValuesText) {
+        if (StringUtils.isEmpty(outputValuesText)) {
+            return Collections.emptyList();
+        }
+
+        List<Object> result = new ArrayList<>();
+        int start = 0;
+        int subStart, subEnd;
+        boolean inQuotes = false;
+        for (int current = 0; current < outputValuesText.length(); current++) {
+            if (outputValuesText.charAt(current) == '\"') {
+                inQuotes = !inQuotes;
+            } else if (outputValuesText.charAt(current) == ',' && !inQuotes) {
+                subStart = getSubStringStartPos(start, outputValuesText);
+                subEnd = getSubStringEndPos(current, outputValuesText);
+
+                result.add(outputValuesText.substring(subStart, subEnd));
+
+                start = current + 1;
+                if (outputValuesText.charAt(start) == ' ') {
+                    start++;
+                }
+            }
+        }
+
+        subStart = getSubStringStartPos(start, outputValuesText);
+        subEnd = getSubStringEndPos(outputValuesText.length(), outputValuesText);
+        result.add(outputValuesText.substring(subStart, subEnd));
+
+        return result;
+    }
+
+    protected int getSubStringStartPos(int initialStart, String searchString) {
+        if (searchString.charAt(initialStart) == '\"') {
+            return initialStart + 1;
+        }
+        return initialStart;
+    }
+
+    protected int getSubStringEndPos(int initialEnd, String searchString) {
+        if (searchString.charAt(initialEnd - 1) == '\"') {
+            return initialEnd - 1;
+        }
+        return initialEnd;
     }
 }

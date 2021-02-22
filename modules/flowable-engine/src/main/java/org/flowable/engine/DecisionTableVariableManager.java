@@ -21,6 +21,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public interface DecisionTableVariableManager {
 
+    @Deprecated
     void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper);
 
+    @Deprecated
+    void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper);
+
+    default void setVariablesOnExecution(List<Map<String, Object>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+        this.setVariablesOnExecution(executionResult, decisionKey, execution, objectMapper);
+    }
+
+    default void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, DelegateExecution execution, ObjectMapper objectMapper, boolean multipleResults) {
+        this.setDecisionServiceVariablesOnExecution(executionResult, decisionKey, execution, objectMapper);
+    }
 }

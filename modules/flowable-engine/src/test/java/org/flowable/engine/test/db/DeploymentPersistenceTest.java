@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -35,24 +37,24 @@ public class DeploymentPersistenceTest extends PluggableFlowableTestCase {
                 .deploy();
 
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
-        assertEquals(1, deployments.size());
+        assertThat(deployments).hasSize(1);
         deployment = deployments.get(0);
 
-        assertEquals("strings", deployment.getName());
-        assertNotNull(deployment.getDeploymentTime());
+        assertThat(deployment.getName()).isEqualTo("strings");
+        assertThat(deployment.getDeploymentTime()).isNotNull();
 
         String deploymentId = deployment.getId();
         List<String> resourceNames = repositoryService.getDeploymentResourceNames(deploymentId);
         Set<String> expectedResourceNames = new HashSet<>();
         expectedResourceNames.add("org/flowable/test/HelloWorld.string");
         expectedResourceNames.add("org/flowable/test/TheAnswer.string");
-        assertEquals(expectedResourceNames, new HashSet<>(resourceNames));
+        assertThat(new HashSet<>(resourceNames)).isEqualTo(expectedResourceNames);
 
         InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, "org/flowable/test/HelloWorld.string");
-        assertTrue(Arrays.equals("hello world".getBytes(), IoUtil.readInputStream(resourceStream, "test")));
+        assertThat(Arrays.equals("hello world".getBytes(), IoUtil.readInputStream(resourceStream, "test"))).isTrue();
 
         resourceStream = repositoryService.getResourceAsStream(deploymentId, "org/flowable/test/TheAnswer.string");
-        assertTrue(Arrays.equals("42".getBytes(), IoUtil.readInputStream(resourceStream, "test")));
+        assertThat(Arrays.equals("42".getBytes(), IoUtil.readInputStream(resourceStream, "test"))).isTrue();
 
         repositoryService.deleteDeployment(deploymentId);
     }

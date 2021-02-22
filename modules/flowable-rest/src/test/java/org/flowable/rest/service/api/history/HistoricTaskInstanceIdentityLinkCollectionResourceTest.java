@@ -13,12 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,16 +28,15 @@ import org.flowable.task.api.Task;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic task instance identity links resource.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends BaseSpringRestTestCase {
-
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
     /**
      * Test querying historic task instance. GET history/historic-task-instances/{taskId}/identitylinks
@@ -67,27 +63,25 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
         // Check status and size
         JsonNode linksArray = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(2, linksArray.size());
-        Map<String, JsonNode> linksMap = new HashMap<>();
-        for (JsonNode linkNode : linksArray) {
-            linksMap.put(linkNode.get("type").asText(), linkNode);
-        }
-        JsonNode assigneeNode = linksMap.get("assignee");
-        assertNotNull(assigneeNode);
-        assertEquals("fozzie", assigneeNode.get("userId").asText());
-        assertTrue(assigneeNode.get("groupId").isNull());
-        assertEquals(task.getId(), assigneeNode.get("taskId").asText());
-        assertNotNull(assigneeNode.get("taskUrl").asText());
-        assertTrue(assigneeNode.get("processInstanceId").isNull());
-        assertTrue(assigneeNode.get("processInstanceUrl").isNull());
-
-        JsonNode ownerNode = linksMap.get("owner");
-        assertNotNull(ownerNode);
-        assertEquals("test", ownerNode.get("userId").asText());
-        assertTrue(ownerNode.get("groupId").isNull());
-        assertEquals(task.getId(), ownerNode.get("taskId").asText());
-        assertNotNull(ownerNode.get("taskUrl").asText());
-        assertTrue(ownerNode.get("processInstanceId").isNull());
-        assertTrue(ownerNode.get("processInstanceUrl").isNull());
+        assertThatJson(linksArray)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + "{"
+                        + "  userId: 'fozzie',"
+                        + "  groupId: null,"
+                        + "  taskId: '" + task.getId() + "',"
+                        + "  taskUrl: '${json-unit.any-string}',"
+                        + "  processInstanceId: null,"
+                        + "  processInstanceUrl: null"
+                        + "},"
+                        + "{"
+                        + "  userId: 'test',"
+                        + "  groupId: null,"
+                        + "  taskId: '" + task.getId() + "',"
+                        + "  taskUrl: '${json-unit.any-string}',"
+                        + "  processInstanceId: null,"
+                        + "  processInstanceUrl: null"
+                        + "}"
+                        + "]");
     }
 }

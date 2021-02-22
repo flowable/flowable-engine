@@ -116,6 +116,7 @@ public class DefaultProcessEngineFactory {
         flowable5Configuration.setMailServerHost(flowable6Configuration.getMailServerHost());
         flowable5Configuration.setMailServerPassword(flowable6Configuration.getMailServerPassword());
         flowable5Configuration.setMailServerPort(flowable6Configuration.getMailServerPort());
+        flowable5Configuration.setMailServerSSLPort(flowable6Configuration.getMailServerSSLPort());
         flowable5Configuration.setMailServerUsername(flowable6Configuration.getMailServerUsername());
         flowable5Configuration.setMailServerUseSSL(flowable6Configuration.getMailServerUseSSL());
         flowable5Configuration.setMailServerUseTLS(flowable6Configuration.getMailServerUseTLS());

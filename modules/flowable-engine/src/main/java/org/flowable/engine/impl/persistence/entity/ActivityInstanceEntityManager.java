@@ -31,6 +31,10 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
 
     List<ActivityInstanceEntity> findActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
 
+    List<ActivityInstanceEntity> findActivityInstancesByProcessInstanceId(String processInstanceId, boolean includeDeleted);
+    
+    ActivityInstanceEntity findActivityInstanceByTaskId(String taskId);
+
     long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
 
     List<ActivityInstance> findActivityInstancesByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery);
@@ -55,7 +59,7 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      * Record the start of an activity, if activity event logging is enabled.
      *
      * @param executionEntity
-     *     execution which is starting activityz
+     *     execution which is starting activity
      */
     void recordActivityStart(ExecutionEntity executionEntity);
 

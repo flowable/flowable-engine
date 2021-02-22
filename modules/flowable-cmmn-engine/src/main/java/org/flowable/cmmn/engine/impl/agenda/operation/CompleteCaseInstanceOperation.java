@@ -32,20 +32,20 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return CaseInstanceState.COMPLETED;
     }
     
     @Override
-    protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
     
     @Override
-    protected String getDeleteReason() {
+    public String getDeleteReason() {
         return "cmmn-state-transition-complete-case";
     }
-    
+
     @Override
     public String toString() {
         StringBuilder strb = new StringBuilder();

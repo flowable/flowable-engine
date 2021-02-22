@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.HistoricTaskService;
@@ -29,6 +29,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class TaskCreatedHistoryJsonTransformer extends AbstractTaskHistoryJsonTransformer {
 
+    public TaskCreatedHistoryJsonTransformer(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        super(cmmnEngineConfiguration);
+    }
+    
     @Override
     public List<String> getTypes() {
         return Collections.singletonList(CmmnAsyncHistoryConstants.TYPE_TASK_CREATED);
@@ -41,7 +45,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractTaskHistoryJsonTr
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService(commandContext);
+        HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
         HistoricTaskInstanceEntity historicTaskInstanceEntity = historicTaskService.createHistoricTask();
         copyCommonHistoricTaskInstanceFields(historicalData, historicTaskInstanceEntity);
         historicTaskService.insertHistoricTask(historicTaskInstanceEntity, false);

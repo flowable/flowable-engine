@@ -20,7 +20,7 @@ import java.util.List;
  * 
  * The idea is that instances of this class are put in a sequential order, and that the current version is determined from the ACT_GE_PROPERTY table.
  * 
- * Since sometimes in the past, a version is ambiguous (eg. 5.12 => 5.12, 5.12.1, 5.12T) this class act as a wrapper with a smarter matches() method.
+ * Since sometimes in the past, a version is ambiguous (eg. 5.12 : 5.12, 5.12.1, 5.12T) this class act as a wrapper with a smarter matches() method.
  * 
  * @author Joram Barrez 
  */

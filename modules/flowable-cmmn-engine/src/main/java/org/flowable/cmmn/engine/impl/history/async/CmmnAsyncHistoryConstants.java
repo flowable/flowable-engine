@@ -34,24 +34,54 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_ENTITY_LINK_DELETED = "cmmn-entity-link-deleted";
     String TYPE_MILESTONE_REACHED = "cmmn-milestone-reached";
     String TYPE_PLAN_ITEM_INSTANCE_FULL = "cmmn-plan-item-instance-full";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_AVAILABLE = "cmmn-plan-item-instance-available";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_COMPLETED = "cmmn-plan-item-instance-completed";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_CREATED = "cmmn-plan-item-instance-created";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_DISABLED = "cmmn-plan-item-instance-disabled";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_ENABLED = "cmmn-plan-item-instance-enabled";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_EXIT = "cmmn-plan-item-instance-exit";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_OCCURRED = "cmmn-plan-item-instance-occurred";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_SUSPENDED = "cmmn-plan-item-instance-suspended";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_STARTED = "cmmn-plan-item-instance-started";
+    /**
+     * @deprecated
+     */
     @Deprecated
     String TYPE_PLAN_ITEM_INSTANCE_TERMINATED = "cmmn-plan-item-instance-terminated";
     String TYPE_TASK_CREATED = "cmmn-task-created";
@@ -60,6 +90,7 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_VARIABLE_CREATED = "cmmn-variable-created";
     String TYPE_VARIABLE_REMOVED = "cmmn-variable-removed";
     String TYPE_VARIABLE_UPDATED = "cmmn-variable-updated";
+    String TYPE_UPDATE_CASE_DEFINITION_CASCADE = "cmmn-update-case-definition-cascade";
     String TYPE_HISTORIC_USER_TASK_LOG_RECORD = "cmmn-historic-user-task-log-record";
     String TYPE_HISTORIC_USER_TASK_LOG_DELETE = "cmmn-historic-user-task-log-delete";
 
@@ -88,6 +119,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
     String FIELD_CASE_DEFINITION_DESCRIPTION = "caseDefinitionDescription";
     String FIELD_CASE_DEFINITION_ID = "caseDefinitionId";
+    String FIELD_DERIVED_CASE_DEFINITION_ID = "derivedCaseDefinitionId";
     String FIELD_CASE_DEFINITION_KEY = "caseDefinitionKey";
     String FIELD_CASE_DEFINITION_NAME = "caseDefinitionName";
     String FIELD_CASE_DEFINITION_VERSION = "caseDefinitionVersion";
@@ -111,6 +143,7 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_IDENTITY_LINK_TYPE = "identityLinkType";
     String FIELD_ENTITY_LINK_TYPE = "entityLinkType";
     String FIELD_LAST_AVAILABLE_TIME = "lastAvailableTime";
+    String FIELD_LAST_UNAVAILABLE_TIME = "lastUnavailableTime";
     String FIELD_LAST_DISABLED_TIME = "lastDisabledTime";
     String FIELD_LAST_ENABLED_TIME = "lastEnabledTime";
     String FIELD_LAST_STARTED_TIME = "lastStartedTime";
@@ -129,14 +162,18 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_REFERENCE_TYPE = "referenceType";
     String FIELD_ENTRY_CRITERION_ID = "entryCriterionId";
     String FIELD_EXIT_CRITERION_ID = "exitCriterionId";
+    String FIELD_EXTRA_VALUE = "extraValue";
     String FIELD_REVISION = "revision";
     String FIELD_SCOPE_ID = "scopeId";
     String FIELD_SCOPE_DEFINITION_ID = "scopeDefinitionId";
     String FIELD_SCOPE_TYPE = "scopeType";
     String FIELD_SUB_SCOPE_ID = "subScopeId";
+    String FIELD_PARENT_ELEMENT_ID = "parentElementId";
     String FIELD_REF_SCOPE_ID = "refScopeId";
     String FIELD_REF_SCOPE_DEFINITION_ID = "refScopeDefinitionId";
     String FIELD_REF_SCOPE_TYPE = "refScopeType";
+    String FIELD_ROOT_SCOPE_ID = "rootScopeId";
+    String FIELD_ROOT_SCOPE_TYPE = "rootScopeType";
     String FIELD_HIERARCHY_TYPE = "hierarchyType";
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";

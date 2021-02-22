@@ -13,11 +13,12 @@
 package org.flowable.common.engine.impl.el;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.delegate.FlowableExpressionEnhancer;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.javax.el.ArrayELResolver;
@@ -40,12 +41,14 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
  * @author Dave Syer
  * @author Frederik Heremans
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
-    protected List<FlowableExpressionEnhancer> expressionEnhancers;
+    protected BiFunction<String, String, FlowableFunctionDelegate> functionResolver;
+    protected List<FlowableAstFunctionCreator> astFunctionCreators;
 
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
@@ -53,9 +56,11 @@ public class DefaultExpressionManager implements ExpressionManager {
     protected DeploymentCache<Expression> expressionCache;
     protected int expressionTextLengthCacheLimit = -1;
     
-    public DefaultExpressionManager() {
-        this(null);
-    }
+    protected List<ELResolver> preDefaultResolvers;
+    protected List<ELResolver> postDefaultResolvers;
+    protected List<ELResolver> preBeanResolvers;
+
+    protected ELResolver staticElResolver;
 
     public DefaultExpressionManager(Map<Object, Object> beans) {
         this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
@@ -73,17 +78,12 @@ public class DefaultExpressionManager implements ExpressionManager {
         }
         
         if (parsingElContext == null) {
-            this.parsingElContext = new ParsingElContext(functionDelegates);
+            this.parsingElContext = new ParsingElContext(functionResolver);
         } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
-            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionDelegates(functionDelegates);
+            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionResolver(functionResolver);
         }
 
         String expressionText = text.trim();
-        if (expressionEnhancers != null) {
-            for (FlowableExpressionEnhancer expressionEnhancer : expressionEnhancers) {
-                expressionText = expressionEnhancer.enhance(expressionText);
-            }
-        }
         
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
         Expression expression = createJuelExpression(text, valueExpression);
@@ -109,13 +109,25 @@ public class DefaultExpressionManager implements ExpressionManager {
     
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
-        ELResolver elResolver = createElResolver(variableContainer);
-        return new FlowableElContext(elResolver, functionDelegates);
+        ELResolver elResolver = getOrCreateStaticElResolver();
+        return new FlowableElContext(elResolver, functionResolver);
     }
     
-    protected ELResolver createElResolver(VariableContainer variableContainer) {
+    protected ELResolver getOrCreateStaticElResolver() {
+        if (staticElResolver == null) {
+            staticElResolver = new CompositeELResolver(createDefaultElResolvers());
+        }
+
+        return staticElResolver;
+    }
+
+    protected List<ELResolver> createDefaultElResolvers() {
         List<ELResolver> elResolvers = new ArrayList<>();
-        elResolvers.add(createVariableElResolver(variableContainer));
+        elResolvers.add(createVariableElResolver());
+
+        if (preDefaultResolvers != null) {
+            elResolvers.addAll(preDefaultResolvers);
+        }
         if (beans != null) {
             elResolvers.add(new ReadOnlyMapELResolver(beans));
         }
@@ -123,27 +135,26 @@ public class DefaultExpressionManager implements ExpressionManager {
         elResolvers.add(new ListELResolver());
         elResolvers.add(new MapELResolver());
         elResolvers.add(new JsonNodeELResolver());
+        if (preBeanResolvers != null) {
+            elResolvers.addAll(preBeanResolvers);
+        }
+
         ELResolver beanElResolver = createBeanElResolver();
         if (beanElResolver != null) {
             elResolvers.add(beanElResolver);
         }
         
-        configureResolvers(elResolvers);
-        
-        CompositeELResolver compositeELResolver = new CompositeELResolver();
-        for (ELResolver elResolver : elResolvers) {
-            compositeELResolver.add(elResolver);
+        if (postDefaultResolvers != null) {
+            elResolvers.addAll(postDefaultResolvers);
         }
-        compositeELResolver.add(new CouldNotResolvePropertyELResolver());
-        return compositeELResolver;
-    }
     
-    protected void configureResolvers(List<ELResolver> elResolvers) {
-        // to be extended if needed
+        elResolvers.add(new CouldNotResolvePropertyELResolver());
+
+        return elResolvers;
     }
 
-    protected ELResolver createVariableElResolver(VariableContainer variableContainer) {
-        return new VariableContainerELResolver(variableContainer);
+    protected ELResolver createVariableElResolver() {
+        return new VariableContainerELResolver();
     }
     
     protected ELResolver createBeanElResolver() {
@@ -157,6 +168,8 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     @Override
     public void setBeans(Map<Object, Object> beans) {
+        // When the beans are modified we need to reset the el resolver
+        this.staticElResolver = null;
         this.beans = beans;
     }
 
@@ -168,16 +181,42 @@ public class DefaultExpressionManager implements ExpressionManager {
     @Override
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
+
+        updateFunctionResolver();
+    }
+
+    protected void updateFunctionResolver() {
+        if (this.functionDelegates != null) {
+            Map<String, FlowableFunctionDelegate> functionDelegateMap = new LinkedHashMap<>();
+            for (FlowableFunctionDelegate functionDelegate : functionDelegates) {
+                for (String prefix : functionDelegate.prefixes()) {
+                    for (String localName : functionDelegate.localNames()) {
+                        functionDelegateMap.put(prefix + ":" + localName, functionDelegate);
+                    }
+
+                }
+
+            }
+
+            this.functionResolver = (prefix, localName) -> functionDelegateMap.get(prefix + ":" + localName);
+
+        } else {
+            this.functionResolver = null;
+
+        }
     }
     
     @Override
-    public List<FlowableExpressionEnhancer> getExpressionEnhancers() {
-        return expressionEnhancers;
+    public List<FlowableAstFunctionCreator> getAstFunctionCreators() {
+        return astFunctionCreators;
     }
     
     @Override
-    public void setExpressionEnhancers(List<FlowableExpressionEnhancer> expressionEnhancers) {
-        this.expressionEnhancers = expressionEnhancers;
+    public void setAstFunctionCreators(List<FlowableAstFunctionCreator> astFunctionCreators) {
+        this.astFunctionCreators = astFunctionCreators;
+        if (expressionFactory instanceof FlowableExpressionFactory) {
+            ((FlowableExpressionFactory) expressionFactory).setAstFunctionCreators(astFunctionCreators);
+        }
     }
 
     public DeploymentCache<Expression> getExpressionCache() {
@@ -194,6 +233,30 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     public void setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
         this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
+    }
+
+    public void addPreDefaultResolver(ELResolver elResolver) {
+        if (this.preDefaultResolvers == null) {
+            this.preDefaultResolvers = new ArrayList<>();
+        }
+
+        this.preDefaultResolvers.add(elResolver);
+    }
+
+    public void addPostDefaultResolver(ELResolver elResolver) {
+        if (this.postDefaultResolvers == null) {
+            this.postDefaultResolvers = new ArrayList<>();
+        }
+
+        this.postDefaultResolvers.add(elResolver);
+    }
+
+    public void addPreBeanResolver(ELResolver elResolver) {
+        if (this.preBeanResolvers == null) {
+            this.preBeanResolvers = new ArrayList<>();
+        }
+
+        this.preBeanResolvers.add(elResolver);
     }
     
 }

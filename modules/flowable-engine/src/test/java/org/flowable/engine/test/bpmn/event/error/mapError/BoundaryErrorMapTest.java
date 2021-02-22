@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.bpmn.event.error.mapError;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +22,8 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.standalone.testing.helpers.ServiceTaskTestMock;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * @author Saeid Mirzaei
@@ -34,7 +39,20 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
+    @ParameterizedTest(name = "JavaFutureDelegate via class throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment
+    public void testClassFutureDelegateSingleDirectMap(String throwErrorIn) {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
+        vars.put("throwErrorIn", throwErrorIn);
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -45,7 +63,18 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+    
+    @Test
+    @Deployment
+    public void testExpressionNonRuntimeException() {
+        FlagDelegate.reset();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", BoundaryErrorNonRuntimeException.class.getName());
+
+        runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -56,7 +85,22 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
+    }
+
+    @ParameterizedTest(name = "JavaFutureDelegate via delegate expression throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment
+    public void testFutureDelegateExpressionSingleDirectMap(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processWithSingleExceptionMap")
+                .variable("exceptionClass", BoundaryErrorParentException.class.getName())
+                .variable("throwErrorIn", throwErrorIn)
+                .transientVariable("throwCustomExceptionFutureDelegate", new ThrowCustomExceptionFutureDelegate())
+                .start();
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -68,7 +112,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("nestedExceptionClass", IllegalArgumentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     // exception does not match the single mapping
@@ -79,14 +123,30 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalStateException.class.getName());
-        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
-        try {
-            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exception map");
-        } catch (Exception e) {
-            assertFalse(FlagDelegate.isVisited());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
+    }
+
+
+    @ParameterizedTest(name = "JavaFutureDelegate via class throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testClassFutureDelegateSingleDirectMap.bpmn20.xml")
+    public void testClassFutureDelegateSingleDirectMapNotMatchingException(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("exceptionClass", IllegalStateException.class.getName());
+        vars.put("throwErrorIn", throwErrorIn);
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
     }
 
     @Test
@@ -96,14 +156,12 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalArgumentException.class.getName());
-        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
-        try {
-            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exception map");
-        } catch (Exception e) {
-            assertFalse(FlagDelegate.isVisited());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
     }
 
     @Test
@@ -113,14 +171,31 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalArgumentException.class.getName());
-        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
-        try {
-            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exception map");
-        } catch (Exception e) {
-            assertFalse(FlagDelegate.isVisited());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
+    }
+
+    @ParameterizedTest(name = "JavaFutureDelegate via delegate expression throws error in {0}")
+    @ValueSource(strings = { "beforeExecution", "execute", "afterExecution" })
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testFutureDelegateExpressionSingleDirectMap.bpmn20.xml")
+    public void testFutureDelegateExpressionSingleDirectMapNotMatchingException(String throwErrorIn) {
+        FlagDelegate.reset();
+
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
+
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processWithSingleExceptionMap")
+                .variable("exceptionClass", IllegalArgumentException.class.getName())
+                .variable("throwErrorIn", throwErrorIn)
+                .transientVariable("throwCustomExceptionFutureDelegate", new ThrowCustomExceptionFutureDelegate())
+                .start())
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
     }
 
     @Test
@@ -131,14 +206,12 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
         vars.put("nestedExceptionClass", IllegalStateException.class.getName());
-        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
-        try {
-            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exception map");
-        } catch (Exception e) {
-            assertFalse(FlagDelegate.isVisited());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
     }
 
     // exception matches by inheritance
@@ -150,14 +223,12 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryEventChildException.class.getName());
         vars.put("nestedExceptionClass", IllegalStateException.class.getName());
-        assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
+        assertThat(ServiceTaskTestMock.CALL_COUNT.get()).isZero();
 
-        try {
-            runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-            fail("exception expected, as there is no matching exception map");
-        } catch (Exception e) {
-            assertFalse(FlagDelegate.isVisited());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars))
+                .as("exception expected, as there is no matching exception map")
+                .isInstanceOf(Exception.class);
+        assertThat(FlagDelegate.isVisited()).isFalse();
     }
 
     // exception matches by inheritance
@@ -169,7 +240,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     // exception matches by inheritance
@@ -182,7 +253,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     // check the default map
@@ -194,7 +265,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -205,7 +276,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -216,7 +287,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         FlagDelegate.reset();
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -227,7 +298,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -238,7 +309,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("subprocssWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -251,7 +322,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -264,7 +335,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
     @Test
@@ -277,7 +348,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
-        assertTrue(FlagDelegate.isVisited());
+        assertThat(FlagDelegate.isVisited()).isTrue();
     }
 
 }

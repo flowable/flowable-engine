@@ -12,12 +12,7 @@
  */
 package org.flowable.cmmn.test.task;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,6 +22,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 
@@ -41,22 +38,21 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
-        assertNotNull(planItemInstance);
-        assertEquals("Plan Item One", planItemInstance.getName());
-        assertEquals("taskA", planItemInstance.getPlanItemDefinitionId());
+        assertThat(planItemInstance)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getPlanItemDefinitionId)
+                .containsExactly("Plan Item One", "taskA");
         assertCaseInstanceNotEnded(caseInstance);
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("blockerPlanItem").singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertCaseInstanceEnded(caseInstance);
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertNotNull(variables);
-        assertTrue(variables.isEmpty());
+        assertThat(variables).isEmpty();
     }
 
     @Test
@@ -65,25 +61,25 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         //Keep the ScriptTaskPlanItem id to check the historic scope later
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("planItemTaskA").singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
         String scriptTaskPlanInstanceId = planItemInstance.getId();
 
         //No variables set and no variables created yet by the script, because it has not run
-        assertTrue(cmmnRuntimeService.getVariables(caseInstance.getId()).isEmpty());
-        assertTrue(cmmnRuntimeService.getLocalVariables(scriptTaskPlanInstanceId).isEmpty());
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
+        assertThat(cmmnRuntimeService.getLocalVariables(scriptTaskPlanInstanceId)).isEmpty();
 
         //Initialize one of the script variables to set its scope local to the planItemInstance, otherwise it goes up in the hierarchy up to the case by default
         cmmnRuntimeService.setLocalVariable(scriptTaskPlanInstanceId, "aString", "VALUE TO OVERWRITE");
-        assertEquals(1, cmmnRuntimeService.getLocalVariables(scriptTaskPlanInstanceId).size());
-        assertTrue(cmmnRuntimeService.getVariables(caseInstance.getId()).isEmpty());
+        assertThat(cmmnRuntimeService.getLocalVariables(scriptTaskPlanInstanceId)).hasSize(1);
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId())).isEmpty();
 
         //Trigger the task entry event
         PlanItemInstance blocker = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("taskBlocker").singleResult();
-        assertNotNull(blocker);
+        assertThat(blocker).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(blocker.getId());
 
         //The case has not ended yet
@@ -91,47 +87,53 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         //Check the case variables, one will be created by the script execution
         Map<String, Object> caseVariables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertNotNull(caseVariables);
-        assertEquals(1, caseVariables.size());
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "aInt"));
+        assertThat(caseVariables).hasSize(1);
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "aInt")).isTrue();
         Object integer = cmmnRuntimeService.getVariable(caseInstance.getId(), "aInt");
-        assertThat(integer, instanceOf(Integer.class));
-        assertEquals(5, integer);
+        assertThat(integer)
+                .isInstanceOf(Integer.class)
+                .isEqualTo(5);
 
         //The planItemInstance scope variable is available on the history service
-        List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceId(scriptTaskPlanInstanceId)
-                .list();
-        assertNotNull(historicVariables);
-        assertEquals(1, historicVariables.size());
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceId(scriptTaskPlanInstanceId)
+                    .list();
+            assertThat(historicVariables).hasSize(1);
 
-        HistoricVariableInstance planItemInstanceVariable = historicVariables.get(0);
-        assertNotNull(planItemInstanceVariable);
-        assertEquals("aString", planItemInstanceVariable.getVariableName());
-        assertEquals("string", planItemInstanceVariable.getVariableTypeName());
-        assertEquals("value set in the script", planItemInstanceVariable.getValue());
-        assertEquals(scriptTaskPlanInstanceId, planItemInstanceVariable.getSubScopeId());
+            HistoricVariableInstance planItemInstanceVariable = historicVariables.get(0);
+            assertThat(planItemInstanceVariable).isNotNull();
+            assertThat(planItemInstanceVariable.getVariableName()).isEqualTo("aString");
+            assertThat(planItemInstanceVariable.getVariableTypeName()).isEqualTo("string");
+            assertThat(planItemInstanceVariable.getValue()).isEqualTo("value set in the script");
+            assertThat(planItemInstanceVariable.getSubScopeId()).isEqualTo(scriptTaskPlanInstanceId);
+        }
 
         endTestCase();
         assertCaseInstanceEnded(caseInstance);
 
         //Both variables are still in the history
-        historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .list();
-        assertNotNull(historicVariables);
-        assertEquals(2, historicVariables.size());
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricVariableInstance> historicVariables = cmmnHistoryService.createHistoricVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .list();
+            assertThat(historicVariables).hasSize(2);
 
-        HistoricVariableInstance caseScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() == null).findFirst().get();
-        assertEquals("aInt", caseScopeVariable.getVariableName());
-        assertEquals("integer", caseScopeVariable.getVariableTypeName());
-        assertEquals(5, caseScopeVariable.getValue());
+            HistoricVariableInstance caseScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() == null).findFirst().get();
+            assertThat(caseScopeVariable)
+                    .extracting(HistoricVariableInstance::getVariableName,
+                            HistoricVariableInstance::getVariableTypeName,
+                            HistoricVariableInstance::getValue)
+                    .containsExactly("aInt", "integer", 5);
 
-        HistoricVariableInstance planItemScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() != null).findFirst().get();
-        assertEquals("aString", planItemScopeVariable.getVariableName());
-        assertEquals("string", planItemScopeVariable.getVariableTypeName());
-        assertEquals("value set in the script", planItemScopeVariable.getValue());
+            HistoricVariableInstance planItemScopeVariable = historicVariables.stream().filter(v -> v.getSubScopeId() != null).findFirst().get();
+            assertThat(planItemScopeVariable)
+                    .extracting(HistoricVariableInstance::getVariableName,
+                            HistoricVariableInstance::getVariableTypeName,
+                            HistoricVariableInstance::getValue)
+                    .containsExactly("aString", "string", "value set in the script");
+        }
     }
 
     @Test
@@ -140,12 +142,12 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Number.class));
-        assertEquals(7, ((Number)result).intValue());
+        assertThat(result).isInstanceOf(Number.class);
+        assertThat(((Number) result).intValue()).isEqualTo(7);
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -160,12 +162,12 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .variable("a", 3)
                 .variable("b", 7)
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Number.class));
-        assertEquals(10, ((Number)result).intValue());
+        assertThat(result).isInstanceOf(Number.class);
+        assertThat(((Number) result).intValue()).isEqualTo(10);
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -180,17 +182,17 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .variable("a", new IntValueHolder(3))
                 .variable("b", 7)
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(Number.class));
-        assertEquals(12, ((Number)result).intValue());
+        assertThat(result).isInstanceOf(Number.class);
+        assertThat(((Number) result).intValue()).isEqualTo(12);
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "a"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "a")).isTrue();
         Object a = cmmnRuntimeService.getVariable(caseInstance.getId(), "a");
-        assertThat(a, instanceOf(IntValueHolder.class));
-        assertEquals(5, ((IntValueHolder) a).getValue());
+        assertThat(a).isInstanceOf(IntValueHolder.class);
+        assertThat(((IntValueHolder) a).getValue()).isEqualTo(5);
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -205,12 +207,12 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .variable("a", new IntValueHolder(3))
                 .variable("b", 7)
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result, instanceOf(IntValueHolder.class));
-        assertEquals(10, ((IntValueHolder) result).getValue());
+        assertThat(result).isInstanceOf(IntValueHolder.class);
+        assertThat(((IntValueHolder) result).getValue()).isEqualTo(10);
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -224,16 +226,15 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("scriptCase")
                 .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertNotNull(variables);
-        assertEquals(2,variables.size());
+        assertThat(variables).hasSize(2);
 
-        assertTrue(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum")).isTrue();
         Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "sum");
-        assertThat(result, instanceOf(Integer.class));
-        assertEquals(15, ((Number)result).intValue());
+        assertThat(result).isInstanceOf(Integer.class);
+        assertThat(((Number) result).intValue()).isEqualTo(15);
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -247,13 +248,12 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("scriptCase")
                 .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
                 .start();
-        assertNotNull(caseInstance);
+        assertThat(caseInstance).isNotNull();
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertNotNull(variables);
-        assertEquals(1,variables.size());
+        assertThat(variables).hasSize(1);
 
-        assertFalse(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum"));
+        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "sum")).isFalse();
 
         assertCaseInstanceNotEnded(caseInstance);
         endTestCase();
@@ -262,11 +262,12 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
     private void endTestCase() {
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("blockerPlanItem").singleResult();
-        assertNotNull(planItemInstance);
+        assertThat(planItemInstance).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
     }
 
     public static class IntValueHolder implements Serializable {
+
         private int value;
 
         public IntValueHolder(int value) {

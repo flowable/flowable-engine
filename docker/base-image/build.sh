@@ -1,1 +1,8 @@
-docker build -t flowable/java8_server:latest -t flowable/java8_server:8.181 .
+#!/bin/bash
+set -eou pipefail
+
+readonly IMAGE=${1:-"flowable/flowable-jre:11.0.8"}
+echo "Image name: ${IMAGE}"
+
+echo "Building image..."
+docker build -t ${IMAGE} -f Dockerfile .

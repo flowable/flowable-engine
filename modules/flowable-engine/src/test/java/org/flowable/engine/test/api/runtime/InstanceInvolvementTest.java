@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +65,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         // there are supposed to be 3 tasks
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(instanceId).list();
-        assertEquals(3, tasks.size());
+        assertThat(tasks).hasSize(3);
 
         // "user1" should now be involved as the starter of the new process
         // instance. "user2" is still not involved.
@@ -93,11 +95,11 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         // note that since "user1" already is the starter, he is not involved as
         // a participant as well
         List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(instanceId);
-        assertTrue(containsIdentityLink(identityLinks, "user1", "starter"));
-        assertTrue(containsIdentityLink(identityLinks, "user2", "participant"));
-        assertTrue(containsIdentityLink(identityLinks, "user3", "participant"));
-        assertTrue(containsIdentityLink(identityLinks, "user4", "custom"));
-        assertEquals(4, identityLinks.size());
+        assertThat(containsIdentityLink(identityLinks, "user1", "starter")).isTrue();
+        assertThat(containsIdentityLink(identityLinks, "user2", "participant")).isTrue();
+        assertThat(containsIdentityLink(identityLinks, "user3", "participant")).isTrue();
+        assertThat(containsIdentityLink(identityLinks, "user4", "custom")).isTrue();
+        assertThat(identityLinks).hasSize(4);
 
         // "user1" completes the remaining task, ending the process
         completeTaskAsUser(tasks.get(2).getId(), "user1");
@@ -134,7 +136,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "type1");
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "type2");
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedUser("kermit").count());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedUser("kermit").count()).isEqualTo(1);
     }
 
     @Test
@@ -144,8 +146,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -156,8 +158,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -168,8 +170,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -179,8 +181,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -191,7 +193,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count()).isZero();
     }
 
     @Test
@@ -203,9 +205,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-        assertEquals(processInstance.getId(),
-            runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -216,7 +217,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isZero();
     }
 
     @Test
@@ -226,9 +227,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -239,9 +240,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -252,9 +253,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -264,10 +265,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-        assertEquals(processInstance.getId(), runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -278,8 +279,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count()).isZero();
     }
 
     @Test
@@ -291,11 +292,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.CANDIDATE);
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-        assertEquals(processInstance.getId(),
-            runtimeService.createProcessInstanceQuery().
-                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().
+                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId()).isEqualTo(processInstance.getId());
     }
 
     @Test
@@ -306,8 +306,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.deleteGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().
-            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isZero();
     }
 
     @Test
@@ -318,8 +318,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
     }
 
     @Test
@@ -330,8 +330,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
     }
 
     @Test
@@ -341,8 +341,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isZero();
     }
 
     @Test
@@ -352,8 +352,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+        assertThat(runtimeService.createProcessInstanceQuery().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isZero();
     }
 
     @Test
@@ -363,11 +363,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        assertEquals(1L, runtimeService.createProcessInstanceQuery().
-            or().
-            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
-            endOr().
-            count());
+        assertThat(runtimeService.createProcessInstanceQuery().or().
+            involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
     }
 
     @Test
@@ -378,8 +375,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -392,9 +389,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-            assertEquals(processInstance.getId(),
-                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -407,9 +403,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-            assertEquals(processInstance.getId(),
-                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -421,8 +416,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         runtimeService.addGroupIdentityLink(processInstance.getId(), "testGroup", IdentityLinkType.PARTICIPANT);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -435,7 +430,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("nonInvolvedGroup")).count()).isZero();
         }
     }
 
@@ -449,9 +444,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
-            assertEquals(processInstance.getId(),
-                    historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -464,7 +458,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).count()).isZero();
         }
     }
 
@@ -476,9 +470,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -491,9 +485,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -506,9 +500,9 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -520,10 +514,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count());
-            assertEquals(processInstance.getId(), historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -536,8 +530,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("nonInvolvedGroup")).endOr().count()).isZero();
         }
     }
 
@@ -551,11 +545,10 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
-            assertEquals(processInstance.getId(),
-                    historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().list().get(0).getId()).isEqualTo(processInstance.getId());
         }
     }
 
@@ -568,8 +561,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().processInstanceId("undefinedId").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isZero();
         }
     }
 
@@ -582,8 +575,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    or().involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
         }
     }
 
@@ -596,8 +589,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
         }
     }
 
@@ -609,8 +602,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isZero();
         }
     }
 
@@ -622,8 +615,8 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(0L, historyService.createHistoricProcessInstanceQuery().
-                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count());
+            assertThat(historyService.createHistoricProcessInstanceQuery().
+                    involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).count()).isZero();
         }
     }
 
@@ -635,21 +628,21 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            assertEquals(1L, historyService.createHistoricProcessInstanceQuery().
-                    or().
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().
                     involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).
-                    endOr().
-                    count());
+                    endOr()
+                    .count()).isEqualTo(1);
         }
     }
 
     private void assertNoInvolvement(String userId) {
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().involvedUser(userId).count());
+        assertThat(runtimeService.createProcessInstanceQuery().involvedUser(userId).count()).isZero();
     }
 
     private void assertInvolvement(String userId, String instanceId) {
         ProcessInstance involvedInstance = runtimeService.createProcessInstanceQuery().involvedUser(userId).singleResult();
-        assertEquals(instanceId, involvedInstance.getId());
+        assertThat(involvedInstance.getId()).isEqualTo(instanceId);
     }
 
     private String startProcessAsUser(String processId, String userId) {

@@ -14,9 +14,9 @@ package org.flowable.engine.impl.dynamic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
@@ -41,7 +41,8 @@ public class MoveExecutionEntityContainer {
     protected ExecutionEntity superExecution;
     protected String newAssigneeId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
-    protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new HashMap<>();
+    protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new LinkedHashMap<>();
+    protected List<String> newExecutionIds = new ArrayList<>();
 
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;
@@ -144,8 +145,8 @@ public class MoveExecutionEntityContainer {
         this.newAssigneeId = newAssigneeId;
     }
 
-    public Optional<String> getNewAssigneeId() {
-        return Optional.ofNullable(newAssigneeId);
+    public String getNewAssigneeId() {
+        return newAssigneeId;
     }
 
     public void setSuperExecution(ExecutionEntity superExecution) {
@@ -178,6 +179,22 @@ public class MoveExecutionEntityContainer {
 
     public List<FlowElementMoveEntry> getMoveToFlowElements() {
         return new ArrayList<>(moveToFlowElementMap.values());
+    }
+
+    public List<String> getNewExecutionIds() {
+        return newExecutionIds;
+    }
+    
+    public boolean hasNewExecutionId(String executionId) {
+        return newExecutionIds.contains(executionId);
+    }
+
+    public void setNewExecutionIds(List<String> newExecutionIds) {
+        this.newExecutionIds = newExecutionIds;
+    }
+
+    public void addNewExecutionId(String executionId) {
+        this.newExecutionIds.add(executionId);
     }
 
     public static class FlowElementMoveEntry {

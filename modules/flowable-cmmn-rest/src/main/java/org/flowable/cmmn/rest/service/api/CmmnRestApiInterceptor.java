@@ -36,11 +36,15 @@ import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceQuery
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceCreateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceQueryRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.CaseInstanceUpdateRequest;
+import org.flowable.cmmn.rest.service.api.runtime.caze.ChangePlanItemStateRequest;
 import org.flowable.cmmn.rest.service.api.runtime.planitem.PlanItemInstanceQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskActionRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskQueryRequest;
 import org.flowable.cmmn.rest.service.api.runtime.task.TaskRequest;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.SuspendedJobQuery;
@@ -74,6 +78,8 @@ public interface CmmnRestApiInterceptor {
     void deleteCaseInstance(CaseInstance caseInstance);
     
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);
+
+    void updateCaseInstance(CaseInstance caseInstance, CaseInstanceUpdateRequest updateRequest);
     
     void accessPlanItemInstanceInfoById(PlanItemInstance planItemInstance);
 
@@ -100,12 +106,18 @@ public interface CmmnRestApiInterceptor {
     void accessJobInfoWithQuery(JobQuery jobQuery);
     
     void accessTimerJobInfoWithQuery(TimerJobQuery jobQuery);
+
+    void accessHistoryJobInfoWithQuery(HistoryJobQuery jobQuery);
     
     void accessSuspendedJobInfoWithQuery(SuspendedJobQuery jobQuery);
     
     void accessDeadLetterJobInfoWithQuery(DeadLetterJobQuery jobQuery);
+
+    void accessHistoryJobInfoById(HistoryJob historyJob);
     
     void deleteJob(Job job);
+
+    void deleteHistoryJob(HistoryJob historyJob);
     
     void accessManagementInfo();
     
@@ -136,4 +148,8 @@ public interface CmmnRestApiInterceptor {
     void accessHistoryVariableInfoById(HistoricVariableInstance historicVariableInstance);
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
+
+    void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    
+    void changePlanItemState(String caseInstanceId, ChangePlanItemStateRequest planItemStateRequest);
 }

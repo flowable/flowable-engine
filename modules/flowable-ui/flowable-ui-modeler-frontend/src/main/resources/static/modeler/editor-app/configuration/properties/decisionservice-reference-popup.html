@@ -1,0 +1,74 @@
+
+<div class="modal" ng-controller="FlowableDecisionServiceReferencePopupCtrl">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header" ng-if="popup.state == 'decisionServiceReference'">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+                <h2>
+                    {{'PROPERTY.DECISIONSERVICEREFERENCE.TITLE' | translate}}
+                    <span ng-show="selectedDecisionService != null"> - {{selectedDecisionService.name}}</span>
+                    <span ng-show="selectedDecisionService == null"> - {{'PROPERTY.DECISIONSERVICEREFERENCE.EMPTY' | translate}}</span>
+
+                </h2>
+            </div>
+            <div class="modal-header" ng-if="popup.state == 'newDecisionService'"><h2>{{'DECISION-SERVICE.POPUP.CREATE-TITLE' | translate}}</h2></div>
+            <div class="modal-body-with-overflow" ng-if="popup.state == 'decisionServiceReference'">
+                <div class="detail-group clearfix">
+                    <div class="col-xs-12">
+                        <div class="alert alert-error" ng-show="!state.loadingDecisionServices && state.decisionServiceError" translate>PROPERTY.DECISIONSERVICEREFERENCE.ERROR.FORM</div>
+                    </div>
+                </div>
+                <div class="detail-group clearfix">
+                    <div class="col-xs-12 editor-item-picker">
+                        <div ng-if="!state.loadingDecisionServices && !state.decisionServiceError" class="col-xs-4 editor-item-picker-component" ng-repeat="decisionService in decisionServices" ng-class="{'selected' : decisionService.decisionServiceId == selectedDecisionService.decisionServiceId}" ng-click="selectDecisionService(decisionService, $event)">
+                           <div class="controls">
+                               <input type="checkbox" value="option1" ng-click="selectDecisionTable(decisionService, $event)" ng-checked="decisionService.id == selectedDecisionService.id" />
+                           </div>
+                           <h4>{{decisionService.name}}</h4>
+                           <img ng-src="{{getModelThumbnailUrl(decisionService.id)}}" />
+                         </div>
+                         <div ng-show="state.loadingDecisionServices">
+                            <p class="loading" translate>PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.LOADING</p>
+                         </div>
+                         <div ng-show="!state.loadingDecisionServices && decisionServices.length == 0">
+                            <p translate>PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.EMPTY</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body" ng-if="popup.state == 'newDecisionService'">
+                <p>{{'DECISION-SERVICE.POPUP.CREATE-DESCRIPTION' | translate}}</p>
+                <div ng-if="model.errorMessage && model.errorMessage.length > 0" class="alert error" style="font-size: 14px; margin-top:20px">
+                  <div class="popup-error" style="font-size: 14px">
+                    <span class="glyphicon glyphicon-remove-circle"></span>
+                    <span>{{model.errorMessage}}</span>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <label for="newDecisionServiceName">{{'DECISION-SERVICE.NAME' | translate}}</label>
+                    <input ng-disabled="model.loading" type="text" class="form-control"
+                           id="newDecisionServiceName" ng-model="model.decisionService.name" custom-keys enter-pressed="ok()" auto-focus editor-input-check>
+                </div>
+                <div class="form-group">
+                    <label for="newDecisionServiceKey">{{'DECISION-SERVICE.KEY' | translate}}</label>
+                    <input ng-disabled="model.loading" type="text" class="form-control"
+                           id="newDecisionServiceKey" ng-model="model.decisionService.key" editor-input-check>
+                </div>
+                <div class="form-group">
+                    <label for="newDecisionServiceDescription">{{'DECISION-SERVICE.DESCRIPTION' | translate}}</label>
+                    <textarea ng-disabled="model.loading" class="form-control" id="newDecisionServiceDescription" rows="5" ng-model="model.decisionService.description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" ng-if="popup.state == 'decisionServiceReference'">
+                <button ng-click="cancel()" class="btn btn-primary" translate>GENERAL.ACTION.CANCEL</button>
+            	<button ng-disabled="state.decisionServiceError" ng-click="newDecisionService()" class="btn btn-primary" translate>GENERAL.ACTION.NEW-DECISION-SERVICE</button>
+            	<button ng-disabled="!selectedDecisionService || state.decisionServiceError" ng-click="open()" class="btn btn-primary" translate>GENERAL.ACTION.OPEN</button>
+                <button ng-disabled="state.decisionServiceError" ng-click="save()" class="btn btn-primary" translate>GENERAL.ACTION.SAVE</button>
+            </div>
+            <div class="modal-footer" ng-if="popup.state == 'newDecisionService'">
+                <button ng-click="cancel()" class="btn btn-primary" translate>GENERAL.ACTION.CANCEL</button>
+                <button ng-disabled="state.decisionServiceError || model.decisionService.name.length == 0 || model.decisionService.key.length == 0" ng-click="createDecisionService()" class="btn btn-primary" translate>GENERAL.ACTION.CREATE-DECISION-SERVICE</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,8 +19,7 @@ import javax.persistence.EntityManagerFactory;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableJpaAutoConfiguration;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -45,7 +44,6 @@ public class FlowableJpaAutoConfigurationTest {
             });
     }
 
-    @Ignore("A bug in the Boot 2.0.2 release that has been fixed in 2.0.3. Remove ignore once we go to 2.0.3")
     @Test
     public void withEntityManagerFactoryBeanAndMissingSpringProcessEngineConfigurationClass() {
         contextRunner
@@ -82,7 +80,7 @@ public class FlowableJpaAutoConfigurationTest {
                 assertThat(configuration.getJpaEntityManagerFactory())
                     .as("Process JPA Entity Manager Factory")
                     .isNull();
-                assertThat(configuration.isJpaCloseEntityManager())
+                assertThat(configuration.isJpaHandleTransaction())
                     .as("Process JPA handle transaction")
                     .isFalse();
                 assertThat(configuration.isJpaCloseEntityManager())
@@ -94,7 +92,7 @@ public class FlowableJpaAutoConfigurationTest {
                 assertThat(configuration.getJpaEntityManagerFactory())
                     .as("Process JPA Entity Manager Factory")
                     .isSameAs(entityManagerFactory);
-                assertThat(configuration.isJpaCloseEntityManager())
+                assertThat(configuration.isJpaHandleTransaction())
                     .as("Process JPA handle transaction")
                     .isFalse();
                 assertThat(configuration.isJpaCloseEntityManager())
