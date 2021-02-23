@@ -2163,7 +2163,8 @@
               "DROPZONE": "Drop a .bpmn or .bpmn20.xml BPMN XML file",
               "CANCEL-UPLOAD": "Cancel the upload",
               "ERROR": "Error while processing the BPMN XML file",
-              "NO-DROP": "Drag and drop not supported"
+              "NO-DROP": "Drag and drop not supported",
+              "NEW-VERSION": "Import into existing process model as new version if keys are matching."
           }
         },
         "ALERT": {
