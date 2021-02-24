@@ -288,14 +288,6 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         this.resetExpiredJobThread = resetExpiredJobThread;
     }
 
-    @Override
-    public int getRemainingCapacity() {
-        //TODO evaluate removing this method
-        // return plenty of remaining capacity
-        return 99;
-    }
-
-
     public boolean isUnlockOwnedJobs() {
         return unlockOwnedJobs;
     }

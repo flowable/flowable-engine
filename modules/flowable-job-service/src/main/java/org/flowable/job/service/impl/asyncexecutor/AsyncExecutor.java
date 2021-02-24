@@ -38,8 +38,6 @@ public interface AsyncExecutor {
      */
     boolean executeAsyncJob(JobInfo job);
 
-    int getRemainingCapacity();
-
     /* Getters and Setters */
 
     void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration);

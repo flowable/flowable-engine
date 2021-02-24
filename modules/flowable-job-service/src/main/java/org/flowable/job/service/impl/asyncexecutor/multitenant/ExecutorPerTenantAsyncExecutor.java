@@ -24,7 +24,6 @@ import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,16 +123,6 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     @Override
     public boolean executeAsyncJob(JobInfo job) {
         return determineAsyncExecutor().executeAsyncJob(job);
-    }
-
-    @Override
-    public int getRemainingCapacity() {
-        return determineAsyncExecutor().getRemainingCapacity();
-    }
-
-    public JobManager getJobManager() {
-        // Should never be accessed on this class, should be accessed on the actual AsyncExecutor
-        throw new UnsupportedOperationException();
     }
 
     @Override
