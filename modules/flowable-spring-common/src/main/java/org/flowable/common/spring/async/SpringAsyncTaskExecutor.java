@@ -16,17 +16,24 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author Filip Hrisafov
+ * @author Joram Barrez
  */
 public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
     protected final AsyncListenableTaskExecutor asyncTaskExecutor;
 
+    protected final boolean isAsyncTaskExecutorAopProxied;
+
     public SpringAsyncTaskExecutor(AsyncListenableTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
+        this.isAsyncTaskExecutorAopProxied = AopUtils.isAopProxy(asyncTaskExecutor); // no need to repeat this every time, done once in constructor
     }
 
     @Override
@@ -51,5 +58,18 @@ public class SpringAsyncTaskExecutor implements AsyncTaskExecutor {
 
     public AsyncListenableTaskExecutor getAsyncTaskExecutor() {
         return asyncTaskExecutor;
+    }
+
+    @Override
+    public int getRemainingCapacity() {
+        Object executor = asyncTaskExecutor;
+        if (isAsyncTaskExecutorAopProxied) {
+            executor = AopProxyUtils.getSingletonTarget(asyncTaskExecutor);
+        }
+        if (executor instanceof ThreadPoolTaskExecutor) {
+            return ((ThreadPoolTaskExecutor) executor).getThreadPoolExecutor().getQueue().remainingCapacity();
+        } else {
+            return Integer.MAX_VALUE;
+        }
     }
 }
