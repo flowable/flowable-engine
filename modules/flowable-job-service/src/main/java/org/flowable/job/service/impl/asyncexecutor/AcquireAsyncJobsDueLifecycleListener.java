@@ -19,9 +19,11 @@ public interface AcquireAsyncJobsDueLifecycleListener {
 
     void startAcquiring(String engineName);
 
-    void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition);
+    void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity);
 
-    void rejectedJobs(String engineName, int jobsRejected);
+    void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity);
+
+    void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition, int remainingCapacity);
 
     void startWaiting(String engineName, long millisToWait);
 

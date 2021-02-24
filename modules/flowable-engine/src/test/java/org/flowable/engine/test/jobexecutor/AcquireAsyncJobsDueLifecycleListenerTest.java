@@ -122,10 +122,10 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
                 .containsOnlyKeys(ScopeTypes.BPMN);
 
         assertThat(listener.statesByEngine.get(ScopeTypes.BPMN))
-                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait)
+                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait, State::getRemainingCapacity)
                 .containsExactly(
-                        tuple(0, 1, 500L),
-                        tuple(2, 1, 500L)
+                        tuple(0, 1, 500L, 100),
+                        tuple(2, 1, 500L, 100) // remaining capacity doesn't go down, cause the async executor isn't running
                 );
     }
 
@@ -144,16 +144,23 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         }
 
         @Override
-        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
             State state = statesByEngine.get(engineName).getFirst();
             state.jobsAcquired += jobsAcquired;
             state.maxTimerJobsPerAcquisition = maxAsyncJobsDuePerAcquisition;
+            state.remainingCapacity = remainingQueueCapacity;
         }
 
         @Override
-        public void rejectedJobs(String engineName, int jobsRejected) {
+        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
             State state = statesByEngine.get(engineName).getFirst();
             state.jobsRejected += jobsRejected;
+            state.remainingCapacity = remainingQueueCapacity;
+        }
+
+        @Override
+        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition, int remainingCapacity) {
+
         }
 
         @Override
@@ -170,6 +177,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         protected int jobsRejected = 0;
         protected int maxTimerJobsPerAcquisition = 0;
         protected long millisToWait = 0;
+        protected int remainingCapacity;
 
         public int getJobsAcquired() {
             return jobsAcquired;
@@ -181,6 +189,10 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
 
         public long getMillisToWait() {
             return millisToWait;
+        }
+
+        public int getRemainingCapacity() {
+            return remainingCapacity;
         }
     }
 }
