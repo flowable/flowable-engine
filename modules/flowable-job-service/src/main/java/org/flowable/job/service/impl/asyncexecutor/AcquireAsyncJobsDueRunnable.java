@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class AcquireAsyncJobsDueRunnable implements Runnable {
 
@@ -39,12 +40,17 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         }
 
         @Override
-        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
 
         }
 
         @Override
-        public void rejectedJobs(String engineName, int jobsRejected) {
+        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
+
+        }
+
+        @Override
+        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition, int remainingCapacity) {
 
         }
 
@@ -52,12 +58,13 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         public void startWaiting(String engineName, long millisToWait) {
 
         }
+
     };
 
     protected String name;
     protected final AsyncExecutor asyncExecutor;
     protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
-    protected final AcquireAsyncJobsDueLifecycleListener lifecycleListener;
+    protected AcquireAsyncJobsDueLifecycleListener lifecycleListener;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
@@ -83,7 +90,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         while (!isInterrupted) {
             final long millisToWait;
 
-            int remainingCapacity = asyncExecutor.getRemainingCapacity();
+            int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
             if (remainingCapacity > 0) {
                 millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
 
@@ -108,24 +115,27 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
             AcquiredJobEntities acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
-
-            lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
+            lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
 
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
 
-            lifecycleListener.rejectedJobs(getEngineName(), rejectedJobs.size());
-
             LOGGER.debug("Jobs acquired: {}, rejected: {}, for engine {}", acquiredJobs.size(), rejectedJobs.size(), getEngineName());
             if (rejectedJobs.size() > 0) {
+
+                lifecycleListener.rejectedJobs(getEngineName(), rejectedJobs.size(), acquiredJobs.size(),
+                    asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
+
                 // some jobs were rejected, so the queue was full; wait until attempting to acquire more.
                 return asyncExecutor.getDefaultQueueSizeFullWaitTimeInMillis();
             }
             if (acquiredJobs.size() >= asyncExecutor.getMaxAsyncJobsDuePerAcquisition()) {
-                // the maximum amount of jobs were acquired, so we can expect more.
-                return 0L;
+                return 0L; // the maximum amount of jobs were acquired, so we can expect more.
             }
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
+
+            lifecycleListener.optimistLockingException(getEngineName(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
+
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread.This is expected behavior in a clustered environment. You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. for engine {}. Exception message: {}",
                         getEngineName(), optimisticLockingException.getMessage());
@@ -160,6 +170,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     protected void sleep(long millisToWait) {
         if (millisToWait > 0) {
             try {
+
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("async job acquisition for engine {}, thread sleeping for {} millis", getEngineName(), millisToWait);
                 }
@@ -189,6 +200,14 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected String getEngineName() {
         return asyncExecutor.getJobServiceConfiguration().getEngineName();
+    }
+
+    public AcquireAsyncJobsDueLifecycleListener getLifecycleListener() {
+        return lifecycleListener;
+    }
+
+    public void setLifecycleListener(AcquireAsyncJobsDueLifecycleListener lifecycleListener) {
+        this.lifecycleListener = lifecycleListener;
     }
 
 }
