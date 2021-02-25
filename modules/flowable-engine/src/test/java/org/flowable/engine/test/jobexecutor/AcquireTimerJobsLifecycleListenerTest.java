@@ -59,7 +59,7 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
         CountDownLatch waitingLatch = new CountDownLatch(2);
         TestAcquireTimerLifecycleListener listener = new TestAcquireTimerLifecycleListener(waitingLatch);
         AcquireTimerJobsRunnable runnable = new AcquireTimerJobsRunnable(asyncExecutor, processEngineConfiguration.getJobServiceConfiguration().getJobManager(),
-                listener);
+                listener, false);
 
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 

@@ -109,7 +109,7 @@ public class LockManagerImpl implements LockManager {
     @Override
     public void releaseLock() {
         executeCommand(new ReleaseLockCmd(lockName, engineType));
-        LOGGER.info("successfully released lock {}", lockName);
+        LOGGER.debug("successfully released lock {}", lockName);
         hasAcquiredLock = false;
     }
 

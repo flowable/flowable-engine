@@ -28,12 +28,13 @@ public class TenantAwareAcquireTimerJobsRunnable extends AcquireTimerJobsRunnabl
     protected String tenantId;
 
     public TenantAwareAcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        this(asyncExecutor, tenantInfoHolder, tenantId, null);
+        this(asyncExecutor, tenantInfoHolder, tenantId, null, false);
     }
 
-    public TenantAwareAcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId, AcquireTimerLifecycleListener lifecycleListener) {
+    public TenantAwareAcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId,
+            AcquireTimerLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled) {
 
-        super(asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobManager(), lifecycleListener);
+        super(asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobManager(), lifecycleListener, globalAcquireLockEnabled);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }
