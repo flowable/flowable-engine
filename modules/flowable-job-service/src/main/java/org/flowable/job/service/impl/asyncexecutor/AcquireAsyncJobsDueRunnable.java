@@ -12,12 +12,16 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
@@ -32,6 +36,9 @@ import org.slf4j.LoggerFactory;
 public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AcquireAsyncJobsDueRunnable.class);
+
+    private static final String ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK = "acquireAsyncJobsLock";
+
     private static final AcquireAsyncJobsDueLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireAsyncJobsDueLifecycleListener() {
 
         @Override
@@ -62,20 +69,37 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     };
 
     protected String name;
+
     protected final AsyncExecutor asyncExecutor;
     protected final JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+
     protected AcquireAsyncJobsDueLifecycleListener lifecycleListener;
+
+    protected final boolean globalAcquireLockEnabled;
+    protected Duration lockWaitTime = Duration.ofMinutes(1);
+    protected Duration lockPollRate = Duration.ofMillis(500);
+    protected LockManager lockManager;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
-    public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor,
-            JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager, AcquireAsyncJobsDueLifecycleListener lifecycleListener) {
+    public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
+            AcquireAsyncJobsDueLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled) {
         this.name = name;
         this.asyncExecutor = asyncExecutor;
         this.jobEntityManager = jobEntityManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
+        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+
+        if (this.globalAcquireLockEnabled) {
+            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
+        }
+
+    }
+
+    protected LockManager createLockManager(CommandExecutor commandExecutor) {
+        return new LockManagerImpl(commandExecutor, ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     @Override
@@ -83,33 +107,63 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName(name);
 
-        CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
+        final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
 
-        lifecycleListener.startAcquiring(getEngineName());
-
+        long millisToWait = 0L;
         while (!isInterrupted) {
-            final long millisToWait;
 
-            int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
-            if (remainingCapacity > 0) {
-                millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
+            if (globalAcquireLockEnabled) {
 
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
+                try {
+                    millisToWait = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> executeAcquireCycle(commandExecutor));
+                } catch (Exception e) {
+                    // Don't do anything, lock will be tried again next time
+                    millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
+
+                    if (!(e instanceof FlowableException)) { // FlowableExeption doesn't need to be logged, could be regular lock logic
+                        LOGGER.warn("Error while waiting for global acquire lock", e);
+                    }
                 }
+
+                if (millisToWait == 0) {
+                    // Always wait when running with global acquire lock, to let other nodes have the ability to fill the queue
+                    // If 0 was returned, it means there is still work to do, but we want to give other nodes a chance.
+                    millisToWait = lockPollRate.toMillis();
+                }
+
             } else {
-                millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
+                millisToWait = executeAcquireCycle(commandExecutor);
 
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("queue is full for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
-                }
             }
 
             if (millisToWait > 0) {
                 sleep(millisToWait);
             }
+
         }
         LOGGER.info("stopped async job due acquisition for engine {}", getEngineName());
+    }
+
+    protected long executeAcquireCycle(CommandExecutor commandExecutor) {
+        lifecycleListener.startAcquiring(getEngineName());
+
+        final long millisToWait;
+        int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
+        if (remainingCapacity > 0) {
+            millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
+            }
+        } else {
+            millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("queue is full for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
+            }
+        }
+
+        return millisToWait;
     }
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
@@ -136,9 +190,18 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
             lifecycleListener.optimistLockingException(getEngineName(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, this exception means that this thread tried to acquire a due async job, which already was acquired by another async executor acquisition thread.This is expected behavior in a clustered environment. You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. for engine {}. Exception message: {}",
+            if (globalAcquireLockEnabled) {
+                LOGGER.debug("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+
+            } else {
+                LOGGER.debug(
+                    "Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, " +
+                    "this exception means that this thread tried to acquire a due async job, which already was acquired by another " +
+                    "async executor acquisition thread.This is expected behavior in a clustered environment. " +
+                    "You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. " +
+                    "For engine {}. Exception message: {}",
                         getEngineName(), optimisticLockingException.getMessage());
+
             }
         } catch (Throwable e) {
             LOGGER.error("exception for engine {} during async job acquisition: {}", getEngineName(), e.getMessage(), e);
@@ -210,4 +273,19 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         this.lifecycleListener = lifecycleListener;
     }
 
+    public Duration getLockWaitTime() {
+        return lockWaitTime;
+    }
+
+    public void setLockWaitTime(Duration lockWaitTime) {
+        this.lockWaitTime = lockWaitTime;
+    }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public void setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+    }
 }

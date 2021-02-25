@@ -12,12 +12,16 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerJobsToExecutableJobsCmd;
 import org.flowable.job.service.impl.cmd.UnlockTimerJobsCmd;
@@ -28,10 +32,13 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class AcquireTimerJobsRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AcquireTimerJobsRunnable.class);
+
+    private static final String ACQUIRE_TIMER_JOBS_GLOBAL_LOCK = "acquireTimerJobsLock";
 
     private static final AcquireTimerLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireTimerLifecycleListener() {
 
@@ -55,20 +62,33 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected final JobManager jobManager;
     protected final AcquireTimerLifecycleListener lifecycleListener;
 
+    protected final boolean globalAcquireLockEnabled;
+    protected Duration lockWaitTime = Duration.ofMinutes(1);
+    protected Duration lockPollRate = Duration.ofMillis(500);
+    protected LockManager lockManager;
+
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
-    protected long millisToWait;
-
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager) {
-        this(asyncExecutor, jobManager, null);
+        this(asyncExecutor, jobManager, null, false);
     }
 
-    public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager, AcquireTimerLifecycleListener lifecycleListener) {
+    public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager,
+            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled) {
         this.asyncExecutor = asyncExecutor;
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
+        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+
+        if (this.globalAcquireLockEnabled) {
+            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
+        }
+    }
+
+    protected LockManager createLockManager(CommandExecutor commandExecutor) {
+        return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     @Override
@@ -78,75 +98,119 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
         final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
 
-        lifecycleListener.startAcquiring(getEngineName());
-
+        long millisToWait = 0L;
         while (!isInterrupted) {
 
-            Collection<TimerJobEntity> timerJobs = Collections.emptyList();
-            try {
-                AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
+            if (globalAcquireLockEnabled) {
 
-                timerJobs = acquiredJobs.getJobs();
+                try {
+                    millisToWait = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> executeAcquireCycle(commandExecutor));
+                } catch (Exception e) {
+                    // Don't do anything, lock will be tried again next time
+                    millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
 
-                if (!timerJobs.isEmpty()) {
-                    commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
+                    if (!(e instanceof FlowableException)) { // FlowableExeption doesn't need to be logged, could be regular lock logic
+                        LOGGER.warn("Error while waiting for global acquire lock", e);
+                    }
                 }
 
-                // if all jobs were executed
-                millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
-                int jobsAcquired = acquiredJobs.size();
-                lifecycleListener.acquiredJobs(getEngineName(), jobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
-                if (jobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
-                    millisToWait = 0;
+                if (millisToWait == 0) {
+                    // Always wait when running with global acquire lock, to let other nodes have the ability to fill the queue
+                    // If 0 was returned, it means there is still work to do, but we want to give other nodes a chance.
+                    millisToWait = lockPollRate.toMillis();
                 }
 
-            } catch (FlowableOptimisticLockingException optimisticLockingException) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Optimistic locking exception during timer job acquisition. If you have multiple timer executors running against the same database, "
-                            + "this exception means that this thread tried to acquire a timer job, which already was acquired by another timer executor acquisition thread."
-                            + "This is expected behavior in a clustered environment. "
-                            + "You can ignore this message if you indeed have multiple timer executor acquisition threads running against the same database. " + "Exception message: {}",
-                            optimisticLockingException.getMessage());
-                }
+            } else {
+                millisToWait = executeAcquireCycle(commandExecutor);
 
-                unlockTimerJobs(commandExecutor, timerJobs);
-            } catch (Throwable e) {
-                LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
-                millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
-
-                unlockTimerJobs(commandExecutor, timerJobs);
             }
 
             if (millisToWait > 0) {
-                try {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("timer job acquisition thread sleeping for {} millis", millisToWait);
-                    }
-                    synchronized (MONITOR) {
-                        if (!isInterrupted) {
-                            isWaiting.set(true);
-                            lifecycleListener.startWaiting(getEngineName(), millisToWait);
-                            MONITOR.wait(millisToWait);
-                        }
-                    }
-
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("timer job acquisition thread woke up");
-                    }
-                } catch (InterruptedException e) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("timer job acquisition wait interrupted");
-                    }
-                } finally {
-                    isWaiting.set(false);
-                    if (!isInterrupted) {
-                        lifecycleListener.startAcquiring(getEngineName());
-                    }
-                }
+                sleep(millisToWait);
             }
+
         }
 
         LOGGER.info("stopped async job due acquisition");
+    }
+
+    protected long executeAcquireCycle(CommandExecutor commandExecutor) {
+        lifecycleListener.startAcquiring(getEngineName());
+
+        Collection<TimerJobEntity> timerJobs = Collections.emptyList();
+        long millisToWait = 0L;
+        try {
+            AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
+
+            timerJobs = acquiredJobs.getJobs();
+
+            if (!timerJobs.isEmpty()) {
+                commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
+            }
+
+            // if all jobs were executed
+            millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
+            int jobsAcquired = acquiredJobs.size();
+            lifecycleListener.acquiredJobs(getEngineName(), jobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
+            if (jobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
+                millisToWait = 0;
+            }
+
+        } catch (FlowableOptimisticLockingException optimisticLockingException) {
+            
+            if (globalAcquireLockEnabled) {
+                LOGGER.debug("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+
+            } else {
+                LOGGER.debug(
+                    "Optimistic locking exception during async job acquisition. If you have multiple async executors running against the same database, " +
+                        "this exception means that this thread tried to acquire a due async job, which already was acquired by another " +
+                        "async executor acquisition thread.This is expected behavior in a clustered environment. " +
+                        "You can ignore this message if you indeed have multiple async executor acquisition threads running against the same database. " +
+                        "For engine {}. Exception message: {}",
+                    getEngineName(), optimisticLockingException.getMessage());
+
+            }
+
+            unlockTimerJobs(commandExecutor, timerJobs);
+        } catch (Throwable e) {
+            LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
+            millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
+
+            unlockTimerJobs(commandExecutor, timerJobs);
+        }
+
+        return millisToWait;
+    }
+
+    protected void sleep(long millisToWait) {
+        if (millisToWait > 0) {
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("timer job acquisition thread sleeping for {} millis", millisToWait);
+                }
+                synchronized (MONITOR) {
+                    if (!isInterrupted) {
+                        isWaiting.set(true);
+                        lifecycleListener.startWaiting(getEngineName(), millisToWait);
+                        MONITOR.wait(millisToWait);
+                    }
+                }
+
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("timer job acquisition thread woke up");
+                }
+            } catch (InterruptedException e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("timer job acquisition wait interrupted");
+                }
+            } finally {
+                isWaiting.set(false);
+                if (!isInterrupted) {
+                    lifecycleListener.startAcquiring(getEngineName());
+                }
+            }
+        }
     }
 
     protected String getEngineName() {
@@ -174,11 +238,20 @@ public class AcquireTimerJobsRunnable implements Runnable {
         }
     }
 
-    public long getMillisToWait() {
-        return millisToWait;
+    public Duration getLockWaitTime() {
+        return lockWaitTime;
     }
 
-    public void setMillisToWait(long millisToWait) {
-        this.millisToWait = millisToWait;
+    public void setLockWaitTime(Duration lockWaitTime) {
+        this.lockWaitTime = lockWaitTime;
     }
+
+    public Duration getLockPollRate() {
+        return lockPollRate;
+    }
+
+    public void setLockPollRate(Duration lockPollRate) {
+        this.lockPollRate = lockPollRate;
+    }
+
 }
