@@ -47,6 +47,11 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         }
 
         @Override
+        public void stopAcquiring(String engineName) {
+
+        }
+
+        @Override
         public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
 
         }
@@ -75,7 +80,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected AcquireAsyncJobsDueLifecycleListener lifecycleListener;
 
-    protected final boolean globalAcquireLockEnabled;
+    protected boolean globalAcquireLockEnabled;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
     protected LockManager lockManager;
@@ -91,11 +96,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         this.jobEntityManager = jobEntityManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-
-        if (this.globalAcquireLockEnabled) {
-            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-        }
-
+        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
@@ -162,6 +163,8 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 LOGGER.debug("queue is full for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
             }
         }
+
+        lifecycleListener.stopAcquiring(getEngineName());
 
         return millisToWait;
     }
@@ -254,9 +257,6 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 }
             } finally {
                 isWaiting.set(false);
-                if (!isInterrupted) {
-                    lifecycleListener.startAcquiring(getEngineName());
-                }
             }
         }
     }
@@ -271,6 +271,14 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     public void setLifecycleListener(AcquireAsyncJobsDueLifecycleListener lifecycleListener) {
         this.lifecycleListener = lifecycleListener;
+    }
+
+    public boolean isGlobalAcquireLockEnabled() {
+        return globalAcquireLockEnabled;
+    }
+
+    public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
+        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
     }
 
     public Duration getLockWaitTime() {

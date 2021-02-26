@@ -19,6 +19,8 @@ public interface AcquireAsyncJobsDueLifecycleListener {
 
     void startAcquiring(String engineName);
 
+    void stopAcquiring(String engineName);
+
     void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity);
 
     void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity);

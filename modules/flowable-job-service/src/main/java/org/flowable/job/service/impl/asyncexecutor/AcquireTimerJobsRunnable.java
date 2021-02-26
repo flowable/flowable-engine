@@ -48,6 +48,11 @@ public class AcquireTimerJobsRunnable implements Runnable {
         }
 
         @Override
+        public void stopAcquiring(String engineName) {
+
+        }
+
+        @Override
         public void acquiredJobs(String engineName, int jobsAcquired, int maxTimerJobsPerAcquisition) {
 
         }
@@ -62,7 +67,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected final JobManager jobManager;
     protected final AcquireTimerLifecycleListener lifecycleListener;
 
-    protected final boolean globalAcquireLockEnabled;
+    protected boolean globalAcquireLockEnabled;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
     protected LockManager lockManager;
@@ -81,10 +86,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-
-        if (this.globalAcquireLockEnabled) {
-            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-        }
+        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
@@ -157,7 +159,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             }
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
-            
+
             if (globalAcquireLockEnabled) {
                 LOGGER.debug("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
 
@@ -179,6 +181,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             unlockTimerJobs(commandExecutor, timerJobs);
         }
+
+        lifecycleListener.stopAcquiring(getEngineName());
 
         return millisToWait;
     }
@@ -206,9 +210,6 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 }
             } finally {
                 isWaiting.set(false);
-                if (!isInterrupted) {
-                    lifecycleListener.startAcquiring(getEngineName());
-                }
             }
         }
     }
@@ -236,6 +237,14 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 MONITOR.notifyAll();
             }
         }
+    }
+
+    public boolean isGlobalAcquireLockEnabled() {
+        return globalAcquireLockEnabled;
+    }
+
+    public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
+        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
     }
 
     public Duration getLockWaitTime() {

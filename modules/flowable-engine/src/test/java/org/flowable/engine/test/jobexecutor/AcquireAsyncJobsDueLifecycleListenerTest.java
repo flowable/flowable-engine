@@ -122,10 +122,13 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
                 .containsOnlyKeys(ScopeTypes.BPMN);
 
         assertThat(listener.statesByEngine.get(ScopeTypes.BPMN))
-                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait, State::getRemainingCapacity)
+                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait, State::getRemainingCapacity, State::isAcquireCycleStopped)
                 .containsExactly(
-                        tuple(0, 1, 500L, 100),
-                        tuple(2, 1, 500L, 100) // remaining capacity doesn't go down, cause the async executor isn't running
+                        // newest entries on top
+                        tuple(0, 1, 500L, 100, true),
+                        tuple(0, 1, 500L, 100, true),
+                        tuple(1, 1, 0L, 100, true), // remaining capacity doesn't go down, cause the async executor isn't running
+                        tuple(1, 1, 0L, 100, true) // 0L for the millisToWait -> after acquiring a job, the acquire should immediately try again
                 );
     }
 
@@ -141,6 +144,12 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         @Override
         public void startAcquiring(String engineName) {
             statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State());
+        }
+
+        @Override
+        public void stopAcquiring(String engineName) {
+            State state = statesByEngine.get(engineName).getFirst();
+            state.acquireCycleStopped = true;
         }
 
         @Override
@@ -178,6 +187,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         protected int maxTimerJobsPerAcquisition = 0;
         protected long millisToWait = 0;
         protected int remainingCapacity;
+        protected boolean acquireCycleStopped;
 
         public int getJobsAcquired() {
             return jobsAcquired;
@@ -193,6 +203,10 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
 
         public int getRemainingCapacity() {
             return remainingCapacity;
+        }
+
+        public boolean isAcquireCycleStopped() {
+            return acquireCycleStopped;
         }
     }
 }
