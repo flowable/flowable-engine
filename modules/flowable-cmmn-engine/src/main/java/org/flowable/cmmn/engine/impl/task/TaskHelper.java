@@ -18,7 +18,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -54,7 +56,7 @@ public class TaskHelper {
 
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity, cmmnEngineConfiguration);
-            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+            fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
         }
 
     }
@@ -130,7 +132,7 @@ public class TaskHelper {
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskAssignee(taskEntity, assignee);
-            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+            fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
 
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity, cmmnEngineConfiguration);
@@ -237,6 +239,15 @@ public class TaskHelper {
             }
         }
         return null;
+    }
+
+    protected static void fireAssignmentEvents(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createTaskAssignedEvent(taskEntity), cmmnEngineConfiguration.getEngineCfgKey());
+        }
     }
 
 }

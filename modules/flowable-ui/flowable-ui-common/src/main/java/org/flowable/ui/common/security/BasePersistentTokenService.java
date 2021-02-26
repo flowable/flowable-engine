@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 /**
  * @author Joram Barrez
@@ -80,11 +81,12 @@ public abstract class BasePersistentTokenService implements PersistentTokenServi
     public Token getToken(String tokenId) {
         try {
             return tokenCache.get(tokenId);
-        } catch (FlowableObjectNotFoundException e) {
-            logger.warn("Token id {} does not exist in cache.", tokenId);
-            return null;
         } catch (Exception e) {
-            logger.error("Error loading token id {} from cache", tokenId, e);
+            if (e instanceof UncheckedExecutionException && e.getCause() instanceof FlowableObjectNotFoundException) {
+                logger.info("Token id {} does not exist in cache.", tokenId);
+            } else {
+                logger.error("Error loading token id {} from cache", tokenId, e);
+            }
             return null;
         }
     }

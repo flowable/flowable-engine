@@ -794,6 +794,12 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
                     propertiesNode.put(PROPERTY_CONDITIONAL_EVENT_CONDITION, conditionalDefinition.getConditionExpression());
                 }
+                
+            } else if (eventDefinition instanceof EscalationEventDefinition) {
+                EscalationEventDefinition escalationDefinition = (EscalationEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(escalationDefinition.getEscalationCode())) {
+                    propertiesNode.put(PROPERTY_ESCALATIONREF, escalationDefinition.getEscalationCode());
+                }
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
                 TimerEventDefinition timerDefinition = (TimerEventDefinition) eventDefinition;
@@ -816,6 +822,7 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+                
             } else if (eventDefinition instanceof CompensateEventDefinition) {
                 CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
                 if (StringUtils.isNotEmpty(compensateEventDefinition.getActivityRef())) {

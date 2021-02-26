@@ -33,8 +33,27 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AcquireTimerJobsRunnable.class);
 
+    private static final AcquireTimerLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireTimerLifecycleListener() {
+
+        @Override
+        public void startAcquiring(String engineName) {
+
+        }
+
+        @Override
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxTimerJobsPerAcquisition) {
+
+        }
+
+        @Override
+        public void startWaiting(String engineName, long millisToWait) {
+
+        }
+    };
+
     protected final AsyncExecutor asyncExecutor;
     protected final JobManager jobManager;
+    protected final AcquireTimerLifecycleListener lifecycleListener;
 
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
@@ -43,16 +62,23 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected long millisToWait;
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager) {
+        this(asyncExecutor, jobManager, null);
+    }
+
+    public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager, AcquireTimerLifecycleListener lifecycleListener) {
         this.asyncExecutor = asyncExecutor;
         this.jobManager = jobManager;
+        this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
     }
 
     @Override
     public synchronized void run() {
         LOGGER.info("starting to acquire async jobs due");
-        Thread.currentThread().setName("flowable-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-acquire-timer-jobs");
+        Thread.currentThread().setName("flowable-" + getEngineName() + "-acquire-timer-jobs");
 
         final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
+
+        lifecycleListener.startAcquiring(getEngineName());
 
         while (!isInterrupted) {
 
@@ -69,6 +95,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 // if all jobs were executed
                 millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
                 int jobsAcquired = acquiredJobs.size();
+                lifecycleListener.acquiredJobs(getEngineName(), jobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
                 if (jobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
                     millisToWait = 0;
                 }
@@ -98,6 +125,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
                     synchronized (MONITOR) {
                         if (!isInterrupted) {
                             isWaiting.set(true);
+                            lifecycleListener.startWaiting(getEngineName(), millisToWait);
                             MONITOR.wait(millisToWait);
                         }
                     }
@@ -111,11 +139,18 @@ public class AcquireTimerJobsRunnable implements Runnable {
                     }
                 } finally {
                     isWaiting.set(false);
+                    if (!isInterrupted) {
+                        lifecycleListener.startAcquiring(getEngineName());
+                    }
                 }
             }
         }
 
         LOGGER.info("stopped async job due acquisition");
+    }
+
+    protected String getEngineName() {
+        return asyncExecutor.getJobServiceConfiguration().getEngineName();
     }
 
     protected void unlockTimerJobs(CommandExecutor commandExecutor, Collection<TimerJobEntity> timerJobs) {

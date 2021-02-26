@@ -15,8 +15,8 @@
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.4.2</spring.boot.version>
-		<spring.framework.version>5.3.3</spring.framework.version>
-		<spring.security.version>5.4.2</spring.security.version>
+		<spring.framework.version>5.3.4</spring.framework.version>
+		<spring.security.version>5.4.4</spring.security.version>
 		<spring.amqp.version>2.3.4</spring.amqp.version>
 		<spring.kafka.version>2.6.5</spring.kafka.version>
 		<reactor-netty.version>1.0.3</reactor-netty.version>
@@ -41,7 +41,7 @@
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
         <!-- JVM params for test execution -->
-		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
+		<argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>
 
 		<!-- OSGi bundles properties -->
 		<flowable.artifact />

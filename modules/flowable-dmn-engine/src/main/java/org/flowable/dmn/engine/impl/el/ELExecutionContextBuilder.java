@@ -14,6 +14,7 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,6 +118,11 @@ public class ELExecutionContextBuilder {
             try {
                 if (inputVariable.getValue() instanceof LocalDate) {
                     Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
+                    inputVariables.put(inputVariable.getKey(), transformedDate);
+                } else if (inputVariable.getValue() instanceof java.time.LocalDate) {
+                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariable.getValue()).atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());
                     inputVariables.put(inputVariable.getKey(), transformedDate);
                 } else if (inputVariable.getValue() instanceof Long || inputVariable.getValue() instanceof Integer) {
                     BigInteger transformedNumber = new BigInteger(inputVariable.getValue().toString());
