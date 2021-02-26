@@ -19,6 +19,8 @@ public interface AcquireTimerLifecycleListener {
 
     void startAcquiring(String engineName);
 
+    void stopAcquiring(String engineName);
+
     void acquiredJobs(String engineName, int jobsAcquired, int maxTimerJobsPerAcquisition);
 
     void startWaiting(String engineName, long millisToWait);

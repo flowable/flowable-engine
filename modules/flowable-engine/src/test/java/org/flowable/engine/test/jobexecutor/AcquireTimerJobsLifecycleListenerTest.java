@@ -101,10 +101,12 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
                 .containsOnlyKeys(ScopeTypes.BPMN);
 
         assertThat(listener.statesByEngine.get(ScopeTypes.BPMN))
-                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait)
+                .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait, State::isAcquireCycleStopped)
                 .containsExactly(
-                        tuple(0, 1, 1000L),
-                        tuple(2, 1, 1000L)
+                        tuple(0, 1, 1000L, true),
+                        tuple(0, 1, 1000L, true),
+                        tuple(1, 1, 0L, true),
+                        tuple(1, 1, 0L, true)
                 );
     }
 
@@ -120,6 +122,12 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
         @Override
         public void startAcquiring(String engineName) {
             statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State());
+        }
+
+        @Override
+        public void stopAcquiring(String engineName) {
+            State state = statesByEngine.get(engineName).getFirst();
+            state.acquireCycleStopped = true;
         }
 
         @Override
@@ -142,6 +150,7 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
         protected int jobsAcquired = 0;
         protected int maxTimerJobsPerAcquisition = 0;
         protected long millisToWait = 0;
+        protected boolean acquireCycleStopped;
 
         public int getJobsAcquired() {
             return jobsAcquired;
@@ -153,6 +162,10 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
 
         public long getMillisToWait() {
             return millisToWait;
+        }
+
+        public boolean isAcquireCycleStopped() {
+            return acquireCycleStopped;
         }
     }
 }
