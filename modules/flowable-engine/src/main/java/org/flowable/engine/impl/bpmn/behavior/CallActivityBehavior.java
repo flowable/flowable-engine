@@ -107,10 +107,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             throw new FlowableException("No start element found for process definition " + processDefinition.getId());
         }
 
-        // Do not start a process instance if the process definition is suspended
-        if (ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinition.getId())) {
-            throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
-        }
+        this.verifyProcessDefinitionNotSuspended(processDefinition);
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
@@ -129,7 +126,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
 
-        dispachEvenIfNeeded(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance),
+        dispatchEvenIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance),
                 processEngineConfiguration.getEngineCfgKey());
 
         // process template-defined data objects
@@ -138,7 +135,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         // Process instance name is resolved after setting the variables on the process instance, so they can be used in the expression
         setInstanceName(instanceBeforeContext.getProcessInstanceName(), expressionManager, subProcessInstance);
 
-        dispachEvenIfNeeded(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance),
+        dispatchEvenIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance),
                 processEngineConfiguration.getEngineCfgKey());
 
         if (processEngineConfiguration.isEnableEntityLinks()) {
@@ -170,10 +167,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
-        dispachEvenIfNeeded(eventDispatcher,
+        dispatchEvenIfEnabled(eventDispatcher,
                 FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, instanceBeforeContext.getVariables(), false),
                 processEngineConfiguration.getEngineCfgKey());
 
+    }
+
+    private void verifyProcessDefinitionNotSuspended(ProcessDefinition processDefinition) {
+        // Do not start a process instance if the process definition is suspended
+        if (ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinition.getId())) {
+            throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
+        }
     }
 
     private StartSubProcessInstanceBeforeContext handleVarialbes(DelegateExecution execution, StartSubProcessInstanceBeforeContext instanceBeforeContext, ExpressionManager expressionManager,
@@ -205,7 +209,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
     }
 
-    private void dispachEvenIfNeeded(FlowableEventDispatcher eventDispatcher, FlowableEvent flowableEvent, String engineType) {
+    private void dispatchEvenIfEnabled(FlowableEventDispatcher eventDispatcher, FlowableEvent flowableEvent, String engineType) {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(flowableEvent, engineType);
         }
@@ -239,7 +243,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
             String variableName = null;
             if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                //WFS modification throw new Exception
                 Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
                 Object variableNameValue = expression.getValue(execution);
                 if (variableNameValue != null) {
@@ -253,8 +256,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
                 variableName = inParameter.getTarget();
 
             }
-
-            //Wfs modification: passport handling
             instanceBeforeContext.getVariables().put(variableName, value);
         }
 
