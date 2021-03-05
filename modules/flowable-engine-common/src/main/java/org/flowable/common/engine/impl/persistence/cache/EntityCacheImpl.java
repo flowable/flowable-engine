@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
@@ -106,6 +108,42 @@ public class EntityCacheImpl implements EntityCache {
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public <T> T findInCache(Class<T> entityClass, Predicate<T> predicate) {
+        Map<String, CachedEntity> classCache = cachedObjects.get(entityClass);
+
+        if (classCache == null) {
+            classCache = findClassCacheByCheckingSubclasses(entityClass);
+        }
+
+        if (classCache != null) {
+            List<T> entities = new ArrayList<>(classCache.size());
+            for (CachedEntity cachedObject : classCache.values()) {
+                T entity = (T) cachedObject.getEntity();
+                if (predicate.test(entity)) {
+                    return entity;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public <T> Stream<T> findInCacheStream(Class<T> entityClass) {
+        Map<String, CachedEntity> classCache = cachedObjects.get(entityClass);
+
+        if (classCache == null) {
+            classCache = findClassCacheByCheckingSubclasses(entityClass);
+        }
+
+        if (classCache != null) {
+            return classCache.values()
+                    .stream()
+                    .map(c -> (T) c.getEntity());
+        }
+        return Stream.empty();
     }
 
     @Override

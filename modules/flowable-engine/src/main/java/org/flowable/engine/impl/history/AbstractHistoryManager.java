@@ -14,6 +14,7 @@ package org.flowable.engine.impl.history;
 
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
@@ -264,18 +265,18 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
     }
 
     protected HistoricActivityInstanceEntity getHistoricActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
-        List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = getEntityCache().findInCache(HistoricActivityInstanceEntity.class);
-        for (HistoricActivityInstanceEntity cachedHistoricActivityInstance : cachedHistoricActivityInstances) {
+        Predicate<HistoricActivityInstanceEntity> predicate = cachedHistoricActivityInstance -> {
             if (activityId != null
-                            && activityId.equals(cachedHistoricActivityInstance.getActivityId())
-                            && (!endTimeMustBeNull || cachedHistoricActivityInstance.getEndTime() == null)) {
+                    && activityId.equals(cachedHistoricActivityInstance.getActivityId())
+                    && (!endTimeMustBeNull || cachedHistoricActivityInstance.getEndTime() == null)) {
                 if (executionId.equals(cachedHistoricActivityInstance.getExecutionId())) {
-                    return cachedHistoricActivityInstance;
+                    return true;
                 }
             }
-        }
 
-        return null;
+            return false;
+        };
+        return getEntityCache().findInCache(HistoricActivityInstanceEntity.class, predicate);
     }
 
     @Override

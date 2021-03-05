@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -367,35 +369,41 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     protected ActivityInstanceEntity getActivityInstanceFromCache(String executionId, String activityId, boolean endTimeMustBeNull) {
-        List<ActivityInstanceEntity> cachedActivityInstances = getEntityCache().findInCache(ActivityInstanceEntity.class);
-        for (ActivityInstanceEntity cachedActivityInstance : cachedActivityInstances) {
+        Predicate<ActivityInstanceEntity> predicate = cachedActivityInstance -> {
             if (activityId != null
-                && activityId.equals(cachedActivityInstance.getActivityId())
-                && (!endTimeMustBeNull || cachedActivityInstance.getEndTime() == null)) {
+                    && activityId.equals(cachedActivityInstance.getActivityId())
+                    && (!endTimeMustBeNull || cachedActivityInstance.getEndTime() == null)) {
                 if (executionId.equals(cachedActivityInstance.getExecutionId())) {
-                    return cachedActivityInstance;
+                    return true;
                 }
             }
-        }
 
-        return null;
+            return false;
+        };
+        return getEntityCache().findInCache(ActivityInstanceEntity.class, predicate);
     }
     
     protected int getTransactionOrderFromCache(String processInstanceId) {
-        int transactionOrder = 1;
-        List<ActivityInstanceEntity> cachedActivityInstances = getEntityCache().findInCache(ActivityInstanceEntity.class);
-        for (ActivityInstanceEntity cachedActivityInstance : cachedActivityInstances) {
-            if (processInstanceId.equals(cachedActivityInstance.getProcessInstanceId())) {
-                
-                if (cachedActivityInstance.isInserted() && cachedActivityInstance.getTransactionOrder() != null && 
-                        cachedActivityInstance.getTransactionOrder() >= transactionOrder) {
-                    
-                    transactionOrder = cachedActivityInstance.getTransactionOrder() + 1;
-                }
-            }
-        }
+        AtomicInteger transactionOrder = new AtomicInteger(1);
 
-        return transactionOrder;
+        Predicate<ActivityInstanceEntity> predicate = new Predicate<ActivityInstanceEntity>() {
+
+            @Override
+            public boolean test(ActivityInstanceEntity cachedActivityInstance) {
+                if (processInstanceId.equals(cachedActivityInstance.getProcessInstanceId())) {
+
+                    if (cachedActivityInstance.isInserted() && cachedActivityInstance.getTransactionOrder() != null &&
+                            cachedActivityInstance.getTransactionOrder() >= transactionOrder.get()) {
+
+                        transactionOrder.set(cachedActivityInstance.getTransactionOrder() + 1);;
+                    }
+                }
+
+                return false;
+            }
+        };
+        getEntityCache().findInCache(ActivityInstanceEntity.class, predicate);
+        return transactionOrder.get();
     }
 
     protected String parseActivityType(FlowElement element) {

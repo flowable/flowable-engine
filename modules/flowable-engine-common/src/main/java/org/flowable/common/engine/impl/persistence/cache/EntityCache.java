@@ -15,6 +15,8 @@ package org.flowable.common.engine.impl.persistence.cache;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.Session;
@@ -52,6 +54,10 @@ public interface EntityCache extends Session {
      * Returns all cached {@link Entity} instances of a given type. Returns an empty list if no instances of the given type exist.
      */
     <T> List<T> findInCache(Class<T> entityClass);
+
+    <T> T findInCache(Class<T> entityClass, Predicate<T> predicate);
+
+    <T> Stream<T> findInCacheStream(Class<T> entityClass);
 
     /**
      * Returns all {@link CachedEntity} instances for the given type. The difference with {@link #findInCache(Class)} is that here the whole {@link CachedEntity} is returned, which gives access to the

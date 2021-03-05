@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
@@ -36,6 +38,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
@@ -61,6 +64,8 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
@@ -2028,6 +2033,35 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             Task task = taskService.createTaskQuery().processInstanceId(calledProcessInstance.getId()).singleResult();
             taskService.complete(task.getId());
         }
+    }
+
+    @Test
+    @Deployment
+    public void testMultiInstanceSequentialSubProcessWithALargeCollection() {
+
+        List<String> records = IntStream.range(0, 1_000)
+                    .mapToObj(i -> "record" + i)
+                    .collect(Collectors.toList());
+        Logger logger = LoggerFactory.getLogger(getClass());
+        JavaDelegate dummyDelegate = new JavaDelegate() {
+
+            @Override
+            public void execute(DelegateExecution execution) {
+                Integer loopCounter = (Integer) execution.getVariable("loopCounter");
+                if (loopCounter % 100 == 0) {
+                    logger.info("Processed {} entries", loopCounter);
+                }
+            }
+        };
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("loopCounterProcess")
+                .transientVariable("employeeRecords", records)
+                .transientVariable("dummyDelegate", dummyDelegate)
+                .start();
+
+        assertProcessEnded(processInstance.getId());
+
     }
 
     protected void resetTestCounts() {
