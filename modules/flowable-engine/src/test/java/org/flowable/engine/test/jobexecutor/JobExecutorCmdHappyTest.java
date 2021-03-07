@@ -15,13 +15,13 @@ package org.flowable.engine.test.jobexecutor;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
+import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
@@ -81,7 +81,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
             }
         });
 
-        AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
+        List<TimerJobEntity> acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
         assertThat(acquiredJobs.size()).isZero();
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(SOME_TIME + (20 * SECOND)));
@@ -89,7 +89,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
         acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
         assertThat(acquiredJobs.size()).isEqualTo(1);
 
-        TimerJobEntity job = acquiredJobs.getJobs().iterator().next();
+        TimerJobEntity job = acquiredJobs.iterator().next();
 
         assertThat(job.getId()).isEqualTo(jobId);
 

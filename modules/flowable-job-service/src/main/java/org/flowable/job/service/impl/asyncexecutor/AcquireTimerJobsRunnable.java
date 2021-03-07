@@ -111,10 +111,10 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             if (globalAcquireLockEnabled) {
 
-                AcquiredTimerJobEntities acquiredTimerJobEntities = null;
+                List<TimerJobEntity> acquiredTimerJobs = null;
                 try {
 
-                    acquiredTimerJobEntities = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
+                    acquiredTimerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
                         return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
                     });
 
@@ -127,8 +127,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
                     }
                 }
 
-                if (acquiredTimerJobEntities != null) {
-                    millisToWait = executeAcquireCycle(commandExecutor, acquiredTimerJobEntities);
+                if (acquiredTimerJobs != null) {
+                    millisToWait = executeAcquireCycle(commandExecutor, acquiredTimerJobs);
                 }
 
                 if (millisToWait == 0) {
@@ -155,18 +155,17 @@ public class AcquireTimerJobsRunnable implements Runnable {
         return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
-    protected long executeAcquireCycle(CommandExecutor commandExecutor, AcquiredTimerJobEntities acquiredTimerJobEntities) {
+    protected long executeAcquireCycle(CommandExecutor commandExecutor, List<TimerJobEntity> acquiredTimerJobs) {
         lifecycleListener.startAcquiring(getEngineName());
 
         Collection<TimerJobEntity> timerJobs = Collections.emptyList();
         long millisToWait = 0L;
         try {
 
-            if (acquiredTimerJobEntities == null) {
-                AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
-                timerJobs = acquiredJobs.getJobs();
+            if (acquiredTimerJobs == null) {
+                timerJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
             } else {
-                timerJobs = acquiredTimerJobEntities.getJobs();
+                timerJobs = acquiredTimerJobs;
             }
 
             if (!timerJobs.isEmpty()) {
