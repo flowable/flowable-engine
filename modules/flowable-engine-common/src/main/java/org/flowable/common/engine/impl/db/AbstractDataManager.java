@@ -33,6 +33,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
  */
 public abstract class AbstractDataManager<EntityImpl extends Entity> implements DataManager<EntityImpl> {
 
+    public static final int MAX_ENTRIES_IN_CLAUSE = 1000; // limitation from oracle (max 1000 elements in in() clause of where)
+
     public abstract Class<? extends EntityImpl> getManagedEntityClass();
 
     public List<Class<? extends EntityImpl>> getManagedEntitySubClasses() {

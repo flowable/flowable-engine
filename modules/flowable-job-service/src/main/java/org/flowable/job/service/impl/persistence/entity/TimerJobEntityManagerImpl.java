@@ -14,6 +14,7 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -162,6 +163,22 @@ public class TimerJobEntityManagerImpl
         }
 
         super.delete(jobEntity, fireDeleteEvent);
+    }
+
+    @Override
+    public void bulkUpdateTimerLockWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
+        dataManager.bulkUpdateTimerLocksWithoutRevision(timerJobEntities, lockOwner, lockExpirationTime);
+    }
+
+    @Override
+    public void bulkDeleteTimerJobsWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities) {
+        for (TimerJobEntity timerJobEntity : timerJobEntities) {
+            if (serviceConfiguration.getInternalJobManager() != null) {
+                serviceConfiguration.getInternalJobManager().handleJobDelete(timerJobEntity);
+            }
+        }
+
+        dataManager.bulkDeleteWithoutRevision(timerJobEntities);
     }
 
     protected TimerJobEntity createTimer(JobEntity te) {

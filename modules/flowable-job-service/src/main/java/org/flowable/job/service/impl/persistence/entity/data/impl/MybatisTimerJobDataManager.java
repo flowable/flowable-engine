@@ -12,8 +12,11 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -178,7 +181,68 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
     }
-    
+
+    @Override
+    public void bulkUpdateTimerLocksWithoutRevision(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+        params.put("timerJobs", timerJobEntities);
+
+        if (timerJobEntities.size() <= MAX_ENTRIES_IN_CLAUSE) {
+            getDbSqlSession().update("updateTimerJobLocks", params);
+
+        } else {
+
+            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+
+            Iterator<TimerJobEntity> iterator = timerJobEntities.iterator();
+            List<TimerJobEntity> subList = new ArrayList<>();
+            while (iterator.hasNext()) {
+                TimerJobEntity timerJobEntity = iterator.next();
+                subList.add(timerJobEntity);
+
+                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
+                    params.put("timerJobs", subList);
+                    getDbSqlSession().update("updateTimerJobLocks", subList);
+                    subList.clear();
+                }
+            }
+
+            if (!subList.isEmpty()) {
+                params.put("timerJobs", subList);
+                getDbSqlSession().update("updateTimerJobLocks", subList);
+            }
+        }
+    }
+
+    @Override
+    public void bulkDeleteWithoutRevision(Collection<TimerJobEntity> timerJobEntities) {
+        if (timerJobEntities.size() <= MAX_ENTRIES_IN_CLAUSE) {
+            getDbSqlSession().delete("deleteTimerJobs", timerJobEntities, TimerJobEntityImpl.class);
+
+        } else {
+
+            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+
+            Iterator<TimerJobEntity> iterator = timerJobEntities.iterator();
+            List<TimerJobEntity> subList = new ArrayList<>();
+            while (iterator.hasNext()) {
+                TimerJobEntity timerJobEntity = iterator.next();
+                subList.add(timerJobEntity);
+
+                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
+                    getDbSqlSession().delete("deleteTimerJobs", subList, TimerJobEntityImpl.class);
+                    subList.clear();
+                }
+            }
+
+            if (!subList.isEmpty()) {
+                getDbSqlSession().delete("deleteTimerJobs", subList, TimerJobEntityImpl.class);
+            }
+        }
+    }
+
     @Override
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
