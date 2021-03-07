@@ -20,7 +20,6 @@ import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
@@ -28,7 +27,7 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
+public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
 
     protected AsyncExecutor asyncExecutor;
     protected boolean globalAcquireLockEnabled;
@@ -43,7 +42,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
     }
 
     @Override
-    public AcquiredTimerJobEntities execute(CommandContext commandContext) {
+    public List<TimerJobEntity> execute(CommandContext commandContext) {
         if (globalAcquireLockEnabled) {
             return acquireTimersWithGlobalAcquireLockEnabled();
         } else {
@@ -51,21 +50,18 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         }
     }
 
-    protected AcquiredTimerJobEntities defaultAcquire(CommandContext commandContext) {
-        AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
-
+    protected List<TimerJobEntity> defaultAcquire(CommandContext commandContext) {
         JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
         List<TimerJobEntity> timerJobs = fetchTimerJobs(jobServiceConfiguration);
 
         for (TimerJobEntity job : timerJobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
-            acquiredJobs.addJob(job);
         }
 
-        return new AcquiredTimerJobEntities(timerJobs);
+        return timerJobs;
     }
 
-    protected AcquiredTimerJobEntities acquireTimersWithGlobalAcquireLockEnabled() {
+    protected List<TimerJobEntity> acquireTimersWithGlobalAcquireLockEnabled() {
         JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
         List<TimerJobEntity> timerJobs = fetchTimerJobs(jobServiceConfiguration);
 
@@ -75,7 +71,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         jobServiceConfiguration.getTimerJobEntityManager()
             .bulkUpdateTimerLockWithoutRevisionCheck(timerJobs, asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
 
-        return new AcquiredTimerJobEntities(timerJobs);
+        return timerJobs;
     }
 
     protected List<TimerJobEntity> fetchTimerJobs(JobServiceConfiguration jobServiceConfiguration) {
