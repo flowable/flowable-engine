@@ -108,39 +108,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
         long millisToWait = 0L;
         while (!isInterrupted) {
-
-            if (globalAcquireLockEnabled) {
-
-                List<TimerJobEntity> acquiredTimerJobs = null;
-                try {
-
-                    acquiredTimerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
-                        return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
-                    });
-
-                } catch (Exception e) {
-                    // Don't do anything, lock will be tried again next time
-                    millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
-
-                    if (!(e instanceof FlowableException)) { // FlowableException doesn't need to be logged, could be regular lock logic
-                        LOGGER.warn("Error while waiting for global acquire lock", e);
-                    }
-                }
-
-                if (acquiredTimerJobs != null) {
-                    millisToWait = executeAcquireCycle(commandExecutor, acquiredTimerJobs);
-                }
-
-                if (millisToWait == 0) {
-                    // Always wait when running with global acquire lock, to let other nodes have the ability to fill the queue
-                    // If 0 was returned, it means there is still work to do, but we want to give other nodes a chance.
-                    millisToWait = lockPollRate.toMillis();
-                }
-
-            } else {
-                millisToWait = executeAcquireCycle(commandExecutor, null);
-
-            }
+            millisToWait = executeAcquireCycle(commandExecutor);
 
             if (millisToWait > 0) {
                 sleep(millisToWait);
@@ -155,21 +123,34 @@ public class AcquireTimerJobsRunnable implements Runnable {
         return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
-    protected long executeAcquireCycle(CommandExecutor commandExecutor, List<TimerJobEntity> acquiredTimerJobs) {
+    protected long executeAcquireCycle(CommandExecutor commandExecutor) {
         lifecycleListener.startAcquiring(getEngineName());
 
         Collection<TimerJobEntity> timerJobs = Collections.emptyList();
         long millisToWait = 0L;
         try {
 
-            if (acquiredTimerJobs == null) {
-                timerJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
+            if (globalAcquireLockEnabled) {
+
+                try {
+                    timerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
+                        return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
+                    });
+
+                } catch (Exception e) {
+                    // Don't do anything, lock will be tried again next time
+
+                    if (!(e instanceof FlowableException)) { // FlowableException doesn't need to be logged, could be regular lock logic
+                        LOGGER.warn("Error while waiting for global acquire lock", e);
+                    }
+                }
+
             } else {
-                timerJobs = acquiredTimerJobs;
+                timerJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
+
             }
 
             if (!timerJobs.isEmpty()) {
-
                 final List<TimerJobEntity> finalListCopy = new ArrayList<>(timerJobs);
                 moveJobsExecutorService.execute(() -> {
                     commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalListCopy));
@@ -179,10 +160,22 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             // if all jobs were executed
             millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
-            int jobsAcquired = timerJobs.size();
-            lifecycleListener.acquiredJobs(getEngineName(), jobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
-            if (jobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
-                millisToWait = 0;
+            int nrOfJobsAcquired = timerJobs.size();
+            lifecycleListener.acquiredJobs(getEngineName(), nrOfJobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
+
+            if (nrOfJobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
+
+                if (globalAcquireLockEnabled) {
+                    // Always wait when running with global acquire lock, to let other nodes have the ability to fill the queue
+                    // If 0 was returned, it means there is still work to do, but we want to give other nodes a chance.
+                    millisToWait = lockPollRate.toMillis();
+
+                } else {
+                    // Otherwise (no global acquire lock),the node can retry immediately
+                    millisToWait = 0;
+
+                }
+
             }
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
