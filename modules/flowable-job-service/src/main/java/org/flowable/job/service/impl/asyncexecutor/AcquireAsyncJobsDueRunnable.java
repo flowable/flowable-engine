@@ -96,15 +96,15 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         this.jobEntityManager = jobEntityManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-    }
-
-    protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     @Override
     public synchronized void run() {
+
+        if (lockManager == null) {
+            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
+        }
+
         LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName(name);
 
@@ -143,6 +143,10 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         }
         LOGGER.info("stopped async job due acquisition for engine {}", getEngineName());
+    }
+
+    protected LockManager createLockManager(CommandExecutor commandExecutor) {
+        return new LockManagerImpl(commandExecutor, ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     protected long executeAcquireCycle(CommandExecutor commandExecutor) {

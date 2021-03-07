@@ -13,8 +13,12 @@
 package org.flowable.job.service.impl.asyncexecutor;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -76,6 +80,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
+    protected ExecutorService moveJobsExecutorService = Executors.newFixedThreadPool(8);
+
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager) {
         this(asyncExecutor, jobManager, null, false);
     }
@@ -86,15 +92,15 @@ public class AcquireTimerJobsRunnable implements Runnable {
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-    }
-
-    protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     @Override
     public synchronized void run() {
+
+        if (lockManager == null) {
+            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
+        }
+
         LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName("flowable-" + getEngineName() + "-acquire-timer-jobs");
 
@@ -105,15 +111,24 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             if (globalAcquireLockEnabled) {
 
+                AcquiredTimerJobEntities acquiredTimerJobEntities = null;
                 try {
-                    millisToWait = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> executeAcquireCycle(commandExecutor));
+
+                    acquiredTimerJobEntities = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
+                        return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
+                    });
+
                 } catch (Exception e) {
                     // Don't do anything, lock will be tried again next time
                     millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
 
-                    if (!(e instanceof FlowableException)) { // FlowableExeption doesn't need to be logged, could be regular lock logic
+                    if (!(e instanceof FlowableException)) { // FlowableException doesn't need to be logged, could be regular lock logic
                         LOGGER.warn("Error while waiting for global acquire lock", e);
                     }
+                }
+
+                if (acquiredTimerJobEntities != null) {
+                    millisToWait = executeAcquireCycle(commandExecutor, acquiredTimerJobEntities);
                 }
 
                 if (millisToWait == 0) {
@@ -123,7 +138,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 }
 
             } else {
-                millisToWait = executeAcquireCycle(commandExecutor);
+                millisToWait = executeAcquireCycle(commandExecutor, null);
 
             }
 
@@ -136,23 +151,36 @@ public class AcquireTimerJobsRunnable implements Runnable {
         LOGGER.info("stopped async job due acquisition");
     }
 
-    protected long executeAcquireCycle(CommandExecutor commandExecutor) {
+    protected LockManager createLockManager(CommandExecutor commandExecutor) {
+        return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+    }
+
+    protected long executeAcquireCycle(CommandExecutor commandExecutor, AcquiredTimerJobEntities acquiredTimerJobEntities) {
         lifecycleListener.startAcquiring(getEngineName());
 
         Collection<TimerJobEntity> timerJobs = Collections.emptyList();
         long millisToWait = 0L;
         try {
-            AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor));
 
-            timerJobs = acquiredJobs.getJobs();
+            if (acquiredTimerJobEntities == null) {
+                AcquiredTimerJobEntities acquiredJobs = commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
+                timerJobs = acquiredJobs.getJobs();
+            } else {
+                timerJobs = acquiredTimerJobEntities.getJobs();
+            }
 
             if (!timerJobs.isEmpty()) {
-                commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
+
+                final List<TimerJobEntity> finalListCopy = new ArrayList<>(timerJobs);
+                moveJobsExecutorService.execute(() -> {
+                    commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalListCopy));
+                });
+
             }
 
             // if all jobs were executed
             millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
-            int jobsAcquired = acquiredJobs.size();
+            int jobsAcquired = timerJobs.size();
             lifecycleListener.acquiredJobs(getEngineName(), jobsAcquired, asyncExecutor.getMaxTimerJobsPerAcquisition());
             if (jobsAcquired >= asyncExecutor.getMaxTimerJobsPerAcquisition()) {
                 millisToWait = 0;

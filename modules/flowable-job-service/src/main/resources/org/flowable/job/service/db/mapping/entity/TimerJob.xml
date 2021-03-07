@@ -459,6 +459,13 @@
         delete from ${prefix}ACT_RU_TIMER_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
+    <delete id="deleteTimerJobs" parameterType="java.util.List">
+        delete from ${prefix}ACT_RU_TIMER_JOB where ID_ in
+        <foreach item="timerJob" index="index" collection="collection" open="(" separator="," close=")">
+            #{timerJob.id}
+        </foreach>
+    </delete>
+
     <delete id="deleteTimerJobsByExecutionId" parameterType="string">
         delete from ${prefix}ACT_RU_TIMER_JOB where PROCESS_INSTANCE_ID_ = #{id}
     </delete>
@@ -474,6 +481,14 @@
             inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
             where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
         )
+    </update>
+
+    <update id="updateTimerJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_TIMER_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="timerJob" index="index" collection="timerJobs" open="(" separator="," close=")">
+            #{timerJob.id}
+        </foreach>
     </update>
 
     <!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause Tested this on MySQL 5.6: does NOT use a temporary

@@ -12,6 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -73,6 +76,12 @@ public interface JobManager {
      * This happens for example when the due date of a timer is reached, the timer entity then becomes a 'regular' async job that can be picked up by the {@link AsyncExecutor}.
      */
     JobEntity moveTimerJobToExecutableJob(TimerJobEntity timerJob);
+
+    /**
+     * Moves a collection of {@link TimerJobEntity} instances to become async {@link JobEntity} instances
+     * (the timer is deleted and a new async job is inserted).
+     */
+    Collection<JobEntity> moveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities);
 
     /**
      * Moves an {@link ExternalWorkerJobEntity} to become an async {@link JobEntity}.

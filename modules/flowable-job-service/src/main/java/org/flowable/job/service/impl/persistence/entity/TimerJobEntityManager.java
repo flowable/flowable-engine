@@ -12,6 +12,8 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
@@ -77,5 +79,9 @@ public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEnti
      * Returns null if the timer has finished its repetitions.
      */
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
+
+    void bulkUpdateTimerLockWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime);
+
+    void bulkDeleteTimerJobsWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities);
 
 }

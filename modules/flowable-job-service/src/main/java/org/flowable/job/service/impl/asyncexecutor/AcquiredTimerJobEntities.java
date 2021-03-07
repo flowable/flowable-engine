@@ -12,9 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
@@ -23,18 +23,22 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  */
 public class AcquiredTimerJobEntities {
 
-    protected Map<String, TimerJobEntity> acquiredJobs = new HashMap<>();
+    protected List<TimerJobEntity> acquiredJobs;
+
+    public AcquiredTimerJobEntities() {
+        this.acquiredJobs = new ArrayList<>();
+    }
+
+    public AcquiredTimerJobEntities(List<TimerJobEntity> acquiredJobs) {
+        this.acquiredJobs = acquiredJobs;
+    }
 
     public void addJob(TimerJobEntity job) {
-        acquiredJobs.put(job.getId(), job);
+        acquiredJobs.add(job);
     }
 
     public Collection<TimerJobEntity> getJobs() {
-        return acquiredJobs.values();
-    }
-
-    public boolean contains(String jobId) {
-        return acquiredJobs.containsKey(jobId);
+        return acquiredJobs;
     }
 
     public int size() {
