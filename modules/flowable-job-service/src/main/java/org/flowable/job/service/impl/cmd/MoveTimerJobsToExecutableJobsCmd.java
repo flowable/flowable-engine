@@ -20,21 +20,32 @@ import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
+ * @author Filip Hrisafov
  * @author Joram Barrez
  */
 public class MoveTimerJobsToExecutableJobsCmd implements Command<Void> {
 
-    protected final JobManager jobManager;
-    protected final Collection<TimerJobEntity> timerJobs;
+    protected JobManager jobManager;
+    protected Collection<TimerJobEntity> timerJobs;
+    protected boolean bulkMove;
 
-    public MoveTimerJobsToExecutableJobsCmd(JobManager jobManager, Collection<TimerJobEntity> timerJobs) {
+    public MoveTimerJobsToExecutableJobsCmd(JobManager jobManager, Collection<TimerJobEntity> timerJobs, boolean bulkMove) {
         this.jobManager = jobManager;
         this.timerJobs = timerJobs;
+        this.bulkMove = bulkMove;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        jobManager.moveTimerJobsToExecutableJobs(timerJobs);
+        if (bulkMove) {
+            jobManager.moveTimerJobsToExecutableJobs(timerJobs);
+
+        } else {
+            for (TimerJobEntity timerJob : timerJobs) {
+                jobManager.moveTimerJobToExecutableJob(timerJob);
+            }
+
+        }
         return null;
     }
 }

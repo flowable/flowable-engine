@@ -97,7 +97,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     @Override
     public synchronized void run() {
 
-        if (lockManager == null) {
+        if (globalAcquireLockEnabled && lockManager == null) {
             this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
         }
 
@@ -108,7 +108,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
         long millisToWait = 0L;
         while (!isInterrupted) {
-            millisToWait = executeAcquireCycle(commandExecutor);
+            millisToWait = executeAcquireAndMoveCycle(commandExecutor);
 
             if (millisToWait > 0) {
                 sleep(millisToWait);
@@ -123,7 +123,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
         return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
-    protected long executeAcquireCycle(CommandExecutor commandExecutor) {
+    protected long executeAcquireAndMoveCycle(CommandExecutor commandExecutor) {
         lifecycleListener.startAcquiring(getEngineName());
 
         Collection<TimerJobEntity> timerJobs = Collections.emptyList();
@@ -151,10 +151,14 @@ public class AcquireTimerJobsRunnable implements Runnable {
             }
 
             if (!timerJobs.isEmpty()) {
-                final List<TimerJobEntity> finalListCopy = new ArrayList<>(timerJobs);
-                moveJobsExecutorService.execute(() -> {
-                    commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalListCopy));
-                });
+                if (globalAcquireLockEnabled) {
+                    final List<TimerJobEntity> finalListCopy = new ArrayList<>(timerJobs);
+                    moveJobsExecutorService.execute(() -> {
+                        commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalListCopy, true));
+                    });
+                } else {
+                    commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs, false));
+                }
 
             }
 
