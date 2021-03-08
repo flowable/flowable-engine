@@ -12,6 +12,8 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
@@ -29,6 +31,8 @@ public interface JobInfoDataManager<T extends JobInfoEntity> extends DataManager
     List<T> findExpiredJobs(List<String> enabledCategories, Page page);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void bulkUpdateJobLockWithoutRevisionCheck(Collection<T> jobEntities, String lockOwner, Date lockExpirationTime);
 
     void resetExpiredJob(String jobId);
 

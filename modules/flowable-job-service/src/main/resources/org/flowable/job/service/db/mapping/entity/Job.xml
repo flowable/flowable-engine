@@ -269,6 +269,14 @@
         )
     </update>
 
+    <update id="updateJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="jobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
+    </update>
+
     <!-- JOB INSERT -->
 
     <insert id="insertJob" parameterType="org.flowable.job.service.impl.persistence.entity.JobEntityImpl">

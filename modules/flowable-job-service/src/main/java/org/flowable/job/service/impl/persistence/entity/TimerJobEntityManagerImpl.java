@@ -166,8 +166,8 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
-    public void bulkUpdateTimerLockWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
-        dataManager.bulkUpdateTimerLocksWithoutRevision(timerJobEntities, lockOwner, lockExpirationTime);
+    public void bulkUpdateJobLockWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
+        dataManager.bulkUpdateJobLockWithoutRevisionCheck(timerJobEntities, lockOwner, lockExpirationTime);
     }
 
     @Override

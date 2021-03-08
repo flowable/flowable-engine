@@ -283,4 +283,12 @@
         where ID_ = #{id,jdbcType=VARCHAR}
     </update>
 
+    <update id="updateHistoryJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_HISTORY_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="historyJobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
+    </update>
+
 </mapper>
