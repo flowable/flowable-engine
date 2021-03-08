@@ -51,6 +51,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         super.configureConfiguration(processEngineConfiguration);
         processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(500);
         if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(1);
             processEngineConfiguration.getAsyncExecutor().setDefaultAsyncJobAcquireWaitTimeInMillis(500);
         }
     }
@@ -125,10 +126,10 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
                 .extracting(State::getJobsAcquired, State::getMaxTimerJobsPerAcquisition, State::getMillisToWait, State::getRemainingCapacity, State::isAcquireCycleStopped)
                 .containsExactly(
                         // newest entries on top
-                        tuple(0, 1, 500L, 100, true),
-                        tuple(0, 1, 500L, 100, true),
-                        tuple(1, 1, 0L, 100, true), // remaining capacity doesn't go down, cause the async executor isn't running
-                        tuple(1, 1, 0L, 100, true) // 0L for the millisToWait -> after acquiring a job, the acquire should immediately try again
+                        tuple(0, 1, 500L, 2048, true),
+                        tuple(0, 1, 500L, 2048, true),
+                        tuple(1, 1, 0L, 2048, true), // remaining capacity doesn't go down, cause the async executor isn't running
+                        tuple(1, 1, 0L, 2048, true) // 0L for the millisToWait -> after acquiring a job, the acquire should immediately try again
                 );
     }
 

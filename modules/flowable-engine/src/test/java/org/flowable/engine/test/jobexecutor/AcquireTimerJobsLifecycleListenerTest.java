@@ -50,6 +50,7 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super.configureConfiguration(processEngineConfiguration);
         processEngineConfiguration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(1000);
+        processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(1);
     }
 
     @Test
