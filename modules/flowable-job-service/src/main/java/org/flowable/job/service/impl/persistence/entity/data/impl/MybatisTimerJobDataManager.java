@@ -12,15 +12,11 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
