@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -104,6 +105,16 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateHistoryJobTenantIdForDeployment", params);
+    }
+
+    @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(Collection<HistoryJobEntity> historyJobs, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+
+        executeChangeWithInClause(historyJobs, params, "historyJobs",
+            parameters -> { getDbSqlSession().update("updateHistoryJobLocks", parameters); });
     }
 
     @Override

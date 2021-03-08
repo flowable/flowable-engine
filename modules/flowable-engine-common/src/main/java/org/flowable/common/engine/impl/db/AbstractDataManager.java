@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.context.Context;
@@ -293,6 +295,63 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
                 if (entityMatches) {
                     cachedEntity.setDeleted(true);
                 }
+            }
+        }
+    }
+
+    protected void executeChangeWithInClauseNoParameters(Collection<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
+        if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
+            consumer.accept(entities);
+
+        } else {
+
+            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+
+            Iterator<EntityImpl> iterator = entities.iterator();
+            List<EntityImpl> subList = new ArrayList<>();
+            while (iterator.hasNext()) {
+                EntityImpl entity = iterator.next();
+                subList.add(entity);
+
+                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
+                    consumer.accept(subList);
+                    subList.clear();
+                }
+            }
+
+            if (!subList.isEmpty()) {
+                consumer.accept(subList);
+            }
+        }
+    }
+
+    protected void executeChangeWithInClause(Collection<EntityImpl> entities, Map<String, Object> parameters,
+            String collectionNameInSqlStatement, Consumer<Map<String, Object>> consumer) {
+
+        if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
+            parameters.put(collectionNameInSqlStatement, entities);
+            consumer.accept(parameters);
+
+        } else {
+
+            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+
+            Iterator<EntityImpl> iterator = entities.iterator();
+            List<EntityImpl> subList = new ArrayList<>();
+            while (iterator.hasNext()) {
+                EntityImpl entity = iterator.next();
+                subList.add(entity);
+
+                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
+                    parameters.put(collectionNameInSqlStatement, subList);
+                    consumer.accept(parameters);
+                    subList.clear();
+                }
+            }
+
+            if (!subList.isEmpty()) {
+                parameters.put(collectionNameInSqlStatement, subList);
+                consumer.accept(parameters);
             }
         }
     }

@@ -67,9 +67,9 @@ public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
 
         // When running with the global acquire lock, optimistic locking exceptions can't happen during acquire,
         // as at most one node will be acquiring at any given time.
-        GregorianCalendar jobExpirationTime = calculateLockExpirationTimer(asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
+        GregorianCalendar jobExpirationTime = calculateLockExpirationTime(asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
         jobServiceConfiguration.getTimerJobEntityManager()
-            .bulkUpdateTimerLockWithoutRevisionCheck(timerJobs, asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
+            .bulkUpdateJobLockWithoutRevisionCheck(timerJobs, asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
 
         return timerJobs;
     }
@@ -86,12 +86,12 @@ public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
         // This will trigger an optimistic locking exception when two concurrent executors
         // try to lock, as the revision will not match.
 
-        GregorianCalendar jobExpirationTime = calculateLockExpirationTimer(lockTimeInMillis, jobServiceConfiguration);
+        GregorianCalendar jobExpirationTime = calculateLockExpirationTime(lockTimeInMillis, jobServiceConfiguration);
         job.setLockOwner(asyncExecutor.getLockOwner());
         job.setLockExpirationTime(jobExpirationTime.getTime());
     }
 
-    protected GregorianCalendar calculateLockExpirationTimer(int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
+    protected GregorianCalendar calculateLockExpirationTime(int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
         gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);

@@ -80,8 +80,6 @@ public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEnti
      */
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
 
-    void bulkUpdateTimerLockWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime);
-
     void bulkDeleteTimerJobsWithoutRevisionCheck(Collection<TimerJobEntity> timerJobEntities);
 
 }
