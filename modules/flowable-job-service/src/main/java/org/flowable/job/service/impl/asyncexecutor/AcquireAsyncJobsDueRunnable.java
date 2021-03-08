@@ -175,7 +175,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
-            AcquiredJobEntities acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
+            List<? extends JobInfoEntity> acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
             lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
 
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
@@ -217,9 +217,9 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         return asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
     }
 
-    protected List<JobInfoEntity> offerJobs(AcquiredJobEntities acquiredJobs) {
+    protected List<JobInfoEntity> offerJobs(List<? extends JobInfoEntity> acquiredJobs) {
         List<JobInfoEntity> rejected = new ArrayList<>();
-        for (JobInfoEntity job : acquiredJobs.getJobs()) {
+        for (JobInfoEntity job : acquiredJobs) {
             boolean jobSuccessFullyOffered = asyncExecutor.executeAsyncJob(job);
             if (!jobSuccessFullyOffered) {
                 rejected.add(job);

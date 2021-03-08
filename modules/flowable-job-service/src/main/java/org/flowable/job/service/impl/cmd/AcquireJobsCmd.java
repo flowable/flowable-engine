@@ -20,7 +20,6 @@ import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
-import org.flowable.job.service.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
@@ -29,7 +28,7 @@ import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
+public class AcquireJobsCmd implements Command<List<? extends JobInfoEntity>> {
 
     protected AsyncExecutor asyncExecutor;
     protected int remainingCapacity;
@@ -53,7 +52,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
     }
 
     @Override
-    public AcquiredJobEntities execute(CommandContext commandContext) {
+    public List<? extends JobInfoEntity> execute(CommandContext commandContext) {
         if (globalAcquireLockEnabled) {
             return acquireWithGlobalAcquireLockEnabled(commandContext);
         } else {
@@ -61,7 +60,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
         }
     }
 
-    protected AcquiredJobEntities acquireWithGlobalAcquireLockEnabled(CommandContext commandContext) {
+    protected List<? extends JobInfoEntity> acquireWithGlobalAcquireLockEnabled(CommandContext commandContext) {
         int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
         List<String> enabledCategories = asyncExecutor.getJobServiceConfiguration().getEnabledJobCategories();
 
@@ -69,30 +68,20 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
         // as at most one node will be acquiring at any given time.
         GregorianCalendar jobExpirationTime = calculateLockExpirationTime(asyncExecutor.getAsyncJobLockTimeInMillis(), asyncExecutor.getJobServiceConfiguration());
 
-        List<? extends JobInfoEntity> jobs = jobEntityManager
+        return jobEntityManager
             .findJobsToExecuteAndLockInBulk(enabledCategories, new Page(0, maxResults), asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
-
-        AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
-        for (JobInfoEntity job : jobs) {
-            acquiredJobs.addJob(job);
-        }
-
-        return acquiredJobs;
     }
 
-    protected AcquiredJobEntities defaultAcquire(CommandContext commandContext) {
+    protected List<? extends JobInfoEntity> defaultAcquire(CommandContext commandContext) {
         int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
         List<String> enabledCategories = asyncExecutor.getJobServiceConfiguration().getEnabledJobCategories();
         List<? extends JobInfoEntity> jobs = jobEntityManager.findJobsToExecute(enabledCategories, new Page(0, maxResults));
 
-        AcquiredJobEntities acquiredJobs = new AcquiredJobEntities();
-
         for (JobInfoEntity job : jobs) {
             lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis(), asyncExecutor.getJobServiceConfiguration());
-            acquiredJobs.addJob(job);
         }
 
-        return acquiredJobs;
+        return jobs;
     }
 
     protected List<? extends JobInfoEntity> fetchAsyncJobs() {
