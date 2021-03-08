@@ -101,7 +101,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     @Override
     public synchronized void run() {
 
-        if (lockManager == null) {
+        if (globalAcquireLockEnabled && lockManager == null) {
             this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
         }
 
