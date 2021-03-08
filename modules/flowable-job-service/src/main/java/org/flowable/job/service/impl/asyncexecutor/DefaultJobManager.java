@@ -14,7 +14,6 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -151,26 +150,25 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public Collection<JobEntity> moveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities) {
+    public void moveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities) {
 
         if (timerJobEntities == null || timerJobEntities.isEmpty()) {
             throw new FlowableException("Empty timer jobs collection can not be scheduled");
         }
 
-        Collection<JobEntity> jobs = new ArrayList<>(timerJobEntities.size());
+        // Only hint when there is enough capacity remaining in the job queue
+        boolean remainingCapacitySufficient = isAsyncExecutorRemainingCapacitySufficient(timerJobEntities.size());
+
         for (TimerJobEntity timerJobEntity : timerJobEntities) {
             JobEntity executableJob = createExecutableJobFromOtherJob(timerJobEntity);
 
             boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
-            if (insertSuccessful) {
-                jobs.add(executableJob);
+            if (insertSuccessful && remainingCapacitySufficient) {
                 triggerExecutorIfNeeded(executableJob);
             }
         }
 
         jobServiceConfiguration.getTimerJobEntityManager().bulkDeleteTimerJobsWithoutRevisionCheck(timerJobEntities);
-
-        return jobs;
     }
 
     @Override
@@ -873,6 +871,10 @@ public class DefaultJobManager implements JobManager {
 
     protected boolean isAsyncExecutorActive() {
         return isExecutorActive(jobServiceConfiguration.getAsyncExecutor());
+    }
+
+    protected boolean isAsyncExecutorRemainingCapacitySufficient(int neededCapacity) {
+        return jobServiceConfiguration.getAsyncExecutor().getTaskExecutor().getRemainingCapacity() >= neededCapacity;
     }
     
     protected boolean isAsyncHistoryExecutorActive() {
