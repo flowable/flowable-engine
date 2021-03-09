@@ -121,7 +121,7 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
         }
 
         @Override
-        public void startAcquiring(String engineName) {
+        public void startAcquiring(String engineName, int maxTimerJobsPerAcquisition) {
             statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State());
         }
 
