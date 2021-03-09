@@ -143,7 +143,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         }
 
         @Override
-        public void startAcquiring(String engineName, int remainingCapacity) {
+        public void startAcquiring(String engineName, int remainingCapacity, int maxAsyncJobsDuePerAcquisition) {
             statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State(remainingCapacity));
         }
 

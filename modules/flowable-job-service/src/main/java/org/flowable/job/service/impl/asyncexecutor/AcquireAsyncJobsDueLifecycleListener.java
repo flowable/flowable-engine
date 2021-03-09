@@ -17,7 +17,7 @@ package org.flowable.job.service.impl.asyncexecutor;
  */
 public interface AcquireAsyncJobsDueLifecycleListener {
 
-    void startAcquiring(String engineName, int remainingCapacity);
+    void startAcquiring(String engineName, int remainingCapacity, int maxAsyncJobsDuePerAcquisition);
 
     void stopAcquiring(String engineName);
 

@@ -44,7 +44,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     private static final AcquireAsyncJobsDueLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireAsyncJobsDueLifecycleListener() {
 
         @Override
-        public void startAcquiring(String engineName, int remainingCapacity) {
+        public void startAcquiring(String engineName, int remainingCapacity, int maxAsyncJobsDuePerAcquisition) {
 
         }
 
@@ -152,7 +152,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected long executeAcquireCycle(CommandExecutor commandExecutor) {
         int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
-        lifecycleListener.startAcquiring(getEngineName(), remainingCapacity);
+        lifecycleListener.startAcquiring(getEngineName(), remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
         final long millisToWait;
         if (remainingCapacity > 0) {

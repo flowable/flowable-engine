@@ -17,7 +17,7 @@ package org.flowable.job.service.impl.asyncexecutor;
  */
 public interface AcquireTimerLifecycleListener {
 
-    void startAcquiring(String engineName);
+    void startAcquiring(String engineName, int maxTimerJobsPerAcquisition);
 
     void stopAcquiring(String engineName);
 
