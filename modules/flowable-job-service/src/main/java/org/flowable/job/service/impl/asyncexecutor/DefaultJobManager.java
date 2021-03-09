@@ -15,9 +15,9 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -150,7 +150,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void bulkMoveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities) {
+    public void bulkMoveTimerJobsToExecutableJobs(List<TimerJobEntity> timerJobEntities) {
 
         if (timerJobEntities == null || timerJobEntities.isEmpty()) {
             throw new FlowableException("Empty timer jobs collection can not be scheduled");

@@ -143,7 +143,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected long executeAcquireAndMoveCycle(CommandExecutor commandExecutor) {
         lifecycleListener.startAcquiring(getEngineName());
 
-        Collection<TimerJobEntity> timerJobs = Collections.emptyList();
+        List<TimerJobEntity> timerJobs = Collections.emptyList();
         long millisToWait = 0L;
         try {
 
@@ -171,7 +171,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             if (!timerJobs.isEmpty()) {
                 if (globalAcquireLockEnabled) {
-                    Collection<TimerJobEntity> finalTimerJobs = timerJobs;
+                    List<TimerJobEntity> finalTimerJobs = timerJobs;
                     moveJobsExecutorService.execute(() -> {
                         commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalTimerJobs, true));
                     });
