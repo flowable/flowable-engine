@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
@@ -83,7 +83,7 @@ public interface JobManager {
      * Note that there are no revision checks happening on the {@link TimerJobEntity} instances,
      * this means this method should only be used when running with a global acquire lock.
      */
-    void bulkMoveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities);
+    void bulkMoveTimerJobsToExecutableJobs(List<TimerJobEntity> timerJobEntities);
 
     /**
      * Moves an {@link ExternalWorkerJobEntity} to become an async {@link JobEntity}.

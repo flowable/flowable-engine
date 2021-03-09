@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.flowable.job.api.Job;
@@ -39,6 +38,6 @@ public interface TimerJobDataManager extends JobInfoDataManager<TimerJobEntity> 
 
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
 
-    void bulkDeleteWithoutRevision(Collection<TimerJobEntity> timerJobEntities);
+    void bulkDeleteWithoutRevision(List<TimerJobEntity> timerJobEntities);
 
 }

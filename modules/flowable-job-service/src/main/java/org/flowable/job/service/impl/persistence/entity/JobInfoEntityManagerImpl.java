@@ -13,7 +13,6 @@
 
 package org.flowable.job.service.impl.persistence.entity;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     }
 
     @Override
-    public void bulkUpdateJobLockWithoutRevisionCheck(Collection<T> jobEntities, String lockOwner, Date lockExpirationTime) {
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime) {
         dataManager.bulkUpdateJobLockWithoutRevisionCheck(jobEntities, lockOwner, lockExpirationTime);
     }
 

@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data.impl;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +129,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     }
 
     @Override
-    public void bulkUpdateJobLockWithoutRevisionCheck(Collection<JobEntity> jobEntities, String lockOwner, Date lockExpirationTime) {
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<JobEntity> jobEntities, String lockOwner, Date lockExpirationTime) {
         Map<String, Object> params = new HashMap<>(3);
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", lockExpirationTime);

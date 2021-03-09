@@ -299,7 +299,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         }
     }
 
-    protected void executeChangeWithInClauseNoParameters(Collection<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
+    protected void executeChangeWithInClauseNoParameters(List<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
         if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
             consumer.accept(entities);
 
@@ -307,25 +307,21 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
             // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
 
-            Iterator<EntityImpl> iterator = entities.iterator();
-            List<EntityImpl> subList = new ArrayList<>();
-            while (iterator.hasNext()) {
-                EntityImpl entity = iterator.next();
-                subList.add(entity);
+            for (int startIndex = 0; startIndex < entities.size(); startIndex += MAX_ENTRIES_IN_CLAUSE) {
 
-                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
-                    consumer.accept(subList);
-                    subList.clear();
+                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
+                if (endIndex > entities.size()) {
+                    endIndex = entities.size(); // endIndex in #subList is exclusive
                 }
-            }
 
-            if (!subList.isEmpty()) {
+                List<EntityImpl> subList = entities.subList(startIndex, endIndex);
                 consumer.accept(subList);
             }
+
         }
     }
 
-    protected void executeChangeWithInClause(Collection<EntityImpl> entities, Map<String, Object> parameters,
+    protected void executeChangeWithInClause(List<EntityImpl> entities, Map<String, Object> parameters,
             String collectionNameInSqlStatement, Consumer<Map<String, Object>> consumer) {
 
         if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
@@ -336,23 +332,18 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
             // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
 
-            Iterator<EntityImpl> iterator = entities.iterator();
-            List<EntityImpl> subList = new ArrayList<>();
-            while (iterator.hasNext()) {
-                EntityImpl entity = iterator.next();
-                subList.add(entity);
+            for (int startIndex = 0; startIndex < entities.size(); startIndex += MAX_ENTRIES_IN_CLAUSE) {
 
-                if (subList.size() == MAX_ENTRIES_IN_CLAUSE) {
-                    parameters.put(collectionNameInSqlStatement, subList);
-                    consumer.accept(parameters);
-                    subList.clear();
+                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
+                if (endIndex > entities.size()) {
+                    endIndex = entities.size(); // endIndex in #subList is exclusive
                 }
-            }
 
-            if (!subList.isEmpty()) {
+                List<EntityImpl> subList = entities.subList(startIndex, endIndex);
                 parameters.put(collectionNameInSqlStatement, subList);
                 consumer.accept(parameters);
             }
+
         }
     }
     

@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -65,7 +64,7 @@ public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityMa
         return jobs;
     }
 
-    void bulkUpdateJobLockWithoutRevisionCheck(Collection<T> jobEntities, String lockOwner, Date lockExpirationTime);
+    void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime);
 
     JobServiceConfiguration getJobServiceConfiguration();
 }
