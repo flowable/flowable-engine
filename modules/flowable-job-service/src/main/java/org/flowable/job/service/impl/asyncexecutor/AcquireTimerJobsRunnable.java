@@ -139,14 +139,13 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     protected void createTimerMoveExecutorService(String threadName) {
-        int poolSize = 4;
         BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
             .namingPattern(threadName + "-move")
             .build();
         // We are using really low queue size since if we have a lot of move operations
         // we need to complete some of them before acquiring again.
         // This should leave some time to other nodes to pick up and lock the timer jobs
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(poolSize, poolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(moveExecutorPoolSize, moveExecutorPoolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
         executor.allowCoreThreadTimeOut(true);
 
         this.moveTimerJobsExecutorService = executor;

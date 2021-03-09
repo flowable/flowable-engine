@@ -12,10 +12,13 @@
  */
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
+import java.util.List;
+
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerLifecycleListener;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * Extends the default {@link AcquireTimerJobsRunnable} by setting the 'tenant' context before executing.
@@ -50,4 +53,13 @@ public class TenantAwareAcquireTimerJobsRunnable extends AcquireTimerJobsRunnabl
         tenantInfoHolder.clearCurrentTenantId();
     }
 
+    @Override
+    protected void executeMoveTimerJobsToExecutableJobs(List<TimerJobEntity> timerJobs) {
+        try {
+            tenantInfoHolder.setCurrentTenantId(tenantId);
+            super.executeMoveTimerJobsToExecutableJobs(timerJobs);
+        } finally {
+            tenantInfoHolder.clearCurrentTenantId();
+        }
+    }
 }
