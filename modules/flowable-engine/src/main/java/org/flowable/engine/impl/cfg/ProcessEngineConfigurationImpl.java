@@ -613,10 +613,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected long asyncExecutorThreadKeepAliveTime = 5000L;
 
     /**
-     * The size of the queue on which jobs to be executed are placed, before they are actually executed. Default value = 100. (This property is only applicable when using the
-     * {@link DefaultAsyncJobExecutor}).
+     * The size of the queue on which jobs to be executed are placed, before they are actually executed.
+     * Default value = 2048. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorThreadPoolQueueSize = 100;
+    protected int asyncExecutorThreadPoolQueueSize = 2048;
 
     /**
      * The queue onto which jobs will be placed before they are actually executed. Threads form the async executor threadpool will take work from this queue.
@@ -650,21 +650,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     * <p>
+     *
+     * Consider using the global acquire lock when there are too many nodes competing for the same resources (and thus too many optimistic locking exceptions).
+     *
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
+    protected int asyncExecutorMaxTimerJobsPerAcquisition = 512;
 
     /**
      * The number of async jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     * <p>
+     *
+     * Consider using the global acquire lock when there are too many nodes competing for the same resources (and thus too many optimistic locking exceptions).
+     *
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 1;
+    protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 512;
 
     /**
      * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less timer jobs have been fetched
@@ -683,10 +683,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
 
     /**
-     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards
-     * compatibility)
+     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query.
+     * By default set to 5 seconds.
      */
-    protected int asyncExecutorDefaultQueueSizeFullWaitTime;
+    protected int asyncExecutorDefaultQueueSizeFullWaitTime = 5 * 1000;
 
     /**
      * When a job is acquired, it is locked so other async executors can't lock and execute it. While doing this, the 'name' of the lock owner is written into a column of the job.
@@ -705,22 +705,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean asyncExecutorUnlockOwnedJobs = true;
 
     /**
-     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor.
+     * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
-     * Default value = 5 minutes;
+     * Default value = 60 minutes;
      * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorTimerLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncExecutorTimerLockTimeInMillis = 60 * 60 * 1000;
 
     /**
-     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor.
+     * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
-     * Default value = 5 minutes;
+     * Default value = 60 minutes;
      * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncExecutorAsyncJobLockTimeInMillis = 60 * 60 * 1000;
 
     /**
      * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the
@@ -771,17 +773,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncHistoryExecutorCorePoolSize = 8;
     protected int asyncHistoryExecutorMaxPoolSize = 8;
     protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
-    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
+    protected int asyncHistoryExecutorMaxJobsDuePerAcquisition = 512;
+    protected int asyncHistoryExecutorThreadPoolQueueSize = 2048;
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
     protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
     protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
-    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime = 5 * 1000;
     protected String asyncHistoryExecutorLockOwner;
-    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 60 * 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
     protected boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = true;
-    protected boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled = true;
     protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
 
     protected List<String> enabledJobCategories;
@@ -2255,6 +2257,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             defaultAsyncExecutor.setTimerJobAcquisitionEnabled(isAsyncExecutorTimerJobAcquisitionEnabled);
             defaultAsyncExecutor.setResetExpiredJobEnabled(isAsyncExecutorResetExpiredJobsEnabled);
 
+            // Page size
+            defaultAsyncExecutor.setMaxAsyncJobsDuePerAcquisition(asyncExecutorMaxAsyncJobsDuePerAcquisition);
+            defaultAsyncExecutor.setMaxTimerJobsPerAcquisition(asyncExecutorMaxTimerJobsPerAcquisition);
+
             // Acquisition wait time
             defaultAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(asyncExecutorDefaultTimerJobAcquireWaitTime);
             defaultAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncExecutorDefaultAsyncJobAcquireWaitTime);
@@ -2332,8 +2338,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // Thread flags
                 defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
-                defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
                 defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
+
+                // Page size
+                defaultAsyncHistoryExecutor.setMaxAsyncJobsDuePerAcquisition(asyncHistoryExecutorMaxJobsDuePerAcquisition);
 
                 // Acquisition wait time
                 defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
@@ -5075,6 +5083,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public int getAsyncHistoryExecutorMaxJobsDuePerAcquisition() {
+        return asyncHistoryExecutorMaxJobsDuePerAcquisition;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorMaxJobsDuePerAcquisition(int asyncHistoryExecutorMaxJobsDuePerAcquisition) {
+        this.asyncHistoryExecutorMaxJobsDuePerAcquisition = asyncHistoryExecutorMaxJobsDuePerAcquisition;
+        return this;
+    }
+
     public String getAsyncHistoryExecutorLockOwner() {
         return asyncHistoryExecutorLockOwner;
     }
@@ -5152,15 +5169,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncHistoryExecutorAsyncJobAcquisitionEnabled(boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled) {
         this.isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
-        return this;
-    }
-
-    public boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled() {
-        return isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
-    }
-
-    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorTimerJobAcquisitionEnabled(boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled) {
-        this.isAsyncHistoryExecutorTimerJobAcquisitionEnabled = isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
         return this;
     }
 

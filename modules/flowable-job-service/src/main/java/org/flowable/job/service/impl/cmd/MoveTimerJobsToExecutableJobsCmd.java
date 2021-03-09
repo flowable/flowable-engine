@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.cmd;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -21,14 +21,14 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Filip Hrisafov
+ * @author Joram Barrez
  */
 public class MoveTimerJobsToExecutableJobsCmd implements Command<Void> {
 
-    protected final JobManager jobManager;
-    protected final Collection<TimerJobEntity> timerJobs;
+    protected JobManager jobManager;
+    protected List<TimerJobEntity> timerJobs;
 
-    public MoveTimerJobsToExecutableJobsCmd(JobManager jobManager,
-            Collection<TimerJobEntity> timerJobs) {
+    public MoveTimerJobsToExecutableJobsCmd(JobManager jobManager, List<TimerJobEntity> timerJobs) {
         this.jobManager = jobManager;
         this.timerJobs = timerJobs;
     }
@@ -38,7 +38,6 @@ public class MoveTimerJobsToExecutableJobsCmd implements Command<Void> {
         for (TimerJobEntity timerJob : timerJobs) {
             jobManager.moveTimerJobToExecutableJob(timerJob);
         }
-
         return null;
     }
 }

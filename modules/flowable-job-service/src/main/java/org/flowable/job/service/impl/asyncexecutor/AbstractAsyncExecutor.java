@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -52,16 +53,23 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected boolean isActive;
     protected boolean isMessageQueueMode;
 
-    protected int maxTimerJobsPerAcquisition = 1;
-    protected int maxAsyncJobsDuePerAcquisition = 1;
+    protected int moveTimerExecutorPoolSize = 4;
+    protected int maxTimerJobsPerAcquisition = 512;
+    protected int maxAsyncJobsDuePerAcquisition = 512;
     protected int defaultTimerJobAcquireWaitTimeInMillis = 10 * 1000;
     protected int defaultAsyncJobAcquireWaitTimeInMillis = 10 * 1000;
-    protected int defaultQueueSizeFullWaitTime;
+    protected int defaultQueueSizeFullWaitTime = 5 * 1000;
 
     protected String lockOwner = UUID.randomUUID().toString();
-    protected int timerLockTimeInMillis = 5 * 60 * 1000;
-    protected int asyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int timerLockTimeInMillis = 60 * 60 * 1000;
+    protected int asyncJobLockTimeInMillis = 60 * 60 * 1000;
     protected int retryWaitTimeInMillis = 500;
+
+    protected boolean globalAcquireLockEnabled;
+    protected Duration asyncJobsGlobalLockWaitTime = Duration.ofMinutes(1);
+    protected Duration asyncJobsGlobalLockPollRate = Duration.ofMillis(500);
+    protected Duration timerLockWaitTime = Duration.ofMinutes(1);
+    protected Duration timerLockPollRate = Duration.ofMillis(500);
 
     protected int resetExpiredJobsInterval = 60 * 1000;
     protected int resetExpiredJobsPageSize = 3;
@@ -130,7 +138,13 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected void initializeRunnables() {
         if (timerRunnableNeeded && timerJobRunnable == null) {
-            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(), timerLifecycleListener);
+            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(),
+                timerLifecycleListener, globalAcquireLockEnabled, moveTimerExecutorPoolSize);
+
+            if (globalAcquireLockEnabled) {
+                timerJobRunnable.setLockWaitTime(timerLockWaitTime);
+                timerJobRunnable.setLockPollRate(timerLockPollRate);
+            }
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
@@ -145,7 +159,13 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
             String acquireJobsRunnableName = acquireRunnableThreadName != null ?
                     acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
-            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse, asyncJobsDueLifecycleListener);
+            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse,
+                asyncJobsDueLifecycleListener, globalAcquireLockEnabled);
+
+            if (globalAcquireLockEnabled) {
+                asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
+                asyncJobsDueRunnable.setLockPollRate(asyncJobsGlobalLockPollRate);
+            }
         }
     }
 
@@ -256,6 +276,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.asyncJobLockTimeInMillis = asyncJobLockTimeInMillis;
     }
 
+    public int getMoveTimerExecutorPoolSize() {
+        return moveTimerExecutorPoolSize;
+    }
+
+    public void setMoveTimerExecutorPoolSize(int moveTimerExecutorPoolSize) {
+        this.moveTimerExecutorPoolSize = moveTimerExecutorPoolSize;
+    }
+
     @Override
     public int getMaxTimerJobsPerAcquisition() {
         return maxTimerJobsPerAcquisition;
@@ -332,6 +360,46 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setTimerLifecycleListener(AcquireTimerLifecycleListener timerLifecycleListener) {
         this.timerLifecycleListener = timerLifecycleListener;
+    }
+
+    public boolean isGlobalAcquireLockEnabled() {
+        return globalAcquireLockEnabled;
+    }
+
+    public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
+        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+    }
+
+    public Duration getAsyncJobsGlobalLockWaitTime() {
+        return asyncJobsGlobalLockWaitTime;
+    }
+
+    public void setAsyncJobsGlobalLockWaitTime(Duration asyncJobsGlobalLockWaitTime) {
+        this.asyncJobsGlobalLockWaitTime = asyncJobsGlobalLockWaitTime;
+    }
+
+    public Duration getAsyncJobsGlobalLockPollRate() {
+        return asyncJobsGlobalLockPollRate;
+    }
+
+    public void setAsyncJobsGlobalLockPollRate(Duration asyncJobsGlobalLockPollRate) {
+        this.asyncJobsGlobalLockPollRate = asyncJobsGlobalLockPollRate;
+    }
+
+    public Duration getTimerLockWaitTime() {
+        return timerLockWaitTime;
+    }
+
+    public void setTimerLockWaitTime(Duration timerLockWaitTime) {
+        this.timerLockWaitTime = timerLockWaitTime;
+    }
+
+    public Duration getTimerLockPollRate() {
+        return timerLockPollRate;
+    }
+
+    public void setTimerLockPollRate(Duration timerLockPollRate) {
+        this.timerLockPollRate = timerLockPollRate;
     }
 
     public void setAcquireRunnableThreadName(String acquireRunnableThreadName) {

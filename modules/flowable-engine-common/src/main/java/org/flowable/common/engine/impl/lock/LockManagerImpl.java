@@ -80,15 +80,15 @@ public class LockManagerImpl implements LockManager {
         try {
             hasAcquiredLock = executeCommand(new LockCmd(lockName, engineType));
             if (hasAcquiredLock) {
-                LOGGER.info("successfully acquired lock {}", lockName);
+                LOGGER.debug("Successfully acquired lock {}", lockName);
             }
         } catch (FlowableOptimisticLockingException ex) {
-            LOGGER.info("failed to acquire lock {} due to optimistic locking", lockName, ex);
+            LOGGER.debug("Failed to acquire lock {} due to optimistic locking", lockName, ex);
             hasAcquiredLock = false;
         } catch (FlowableException ex) {
             if (ex.getClass().equals(FlowableException.class)) {
                 // If it is a FlowableException then log a warning and wait to try again
-                LOGGER.warn("failed to acquire lock {} due to unknown exception", lockName, ex);
+                LOGGER.warn("Failed to acquire lock {} due to unknown exception", lockName, ex);
                 hasAcquiredLock = false;
             } else {
                 // Re-throw any other Flowable specific exception
@@ -97,9 +97,9 @@ public class LockManagerImpl implements LockManager {
         } catch (RuntimeException ex) {
             if (ex.getCause() instanceof SQLIntegrityConstraintViolationException) {
                 // This can happen if 2 nodes try to acquire a lock in the exact same time
-                LOGGER.info("failed to acquire lock {} due to constraint violation", lockName, ex);
+                LOGGER.debug("Failed to acquire lock {} due to constraint violation", lockName, ex);
             } else {
-                LOGGER.info("failed to acquire lock {} due to unknown exception", lockName, ex);
+                LOGGER.info("Failed to acquire lock {} due to unknown exception", lockName, ex);
             }
             hasAcquiredLock = false;
         }
@@ -109,7 +109,7 @@ public class LockManagerImpl implements LockManager {
     @Override
     public void releaseLock() {
         executeCommand(new ReleaseLockCmd(lockName, engineType));
-        LOGGER.info("successfully released lock {}", lockName);
+        LOGGER.debug("successfully released lock {}", lockName);
         hasAcquiredLock = false;
     }
 

@@ -124,7 +124,7 @@ public class JobResource extends JobBaseResource {
     @ApiOperation(value = "Delete a job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the job was found and has been deleted. Response-body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found..")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found.")
     })
     @DeleteMapping("/management/jobs/{jobId}")
     public void deleteJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {
