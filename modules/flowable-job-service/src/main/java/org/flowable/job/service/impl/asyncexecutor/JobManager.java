@@ -79,8 +79,11 @@ public interface JobManager {
     /**
      * Moves a collection of {@link TimerJobEntity} instances to become async {@link JobEntity} instances
      * (the timer is deleted and a new async job is inserted).
+     *
+     * Note that there are no revision checks happening on the {@link TimerJobEntity} instances,
+     * this means this method should only be used when running with a global acquire lock.
      */
-    void moveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities);
+    void bulkMoveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities);
 
     /**
      * Moves an {@link ExternalWorkerJobEntity} to become an async {@link JobEntity}.

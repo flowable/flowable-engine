@@ -143,8 +143,8 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         }
 
         @Override
-        public void startAcquiring(String engineName) {
-            statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State());
+        public void startAcquiring(String engineName, int remainingCapacity) {
+            statesByEngine.computeIfAbsent(engineName, key -> new LinkedList<>()).addFirst(new State(remainingCapacity));
         }
 
         @Override
@@ -154,22 +154,20 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         }
 
         @Override
-        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
             State state = statesByEngine.get(engineName).getFirst();
             state.jobsAcquired += jobsAcquired;
             state.maxTimerJobsPerAcquisition = maxAsyncJobsDuePerAcquisition;
-            state.remainingCapacity = remainingQueueCapacity;
         }
 
         @Override
-        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
+        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
             State state = statesByEngine.get(engineName).getFirst();
             state.jobsRejected += jobsRejected;
-            state.remainingCapacity = remainingQueueCapacity;
         }
 
         @Override
-        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition, int remainingCapacity) {
+        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition) {
 
         }
 
@@ -189,6 +187,10 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         protected long millisToWait = 0;
         protected int remainingCapacity;
         protected boolean acquireCycleStopped;
+
+        public State(int remainingCapacity) {
+            this.remainingCapacity = remainingCapacity;
+        }
 
         public int getJobsAcquired() {
             return jobsAcquired;

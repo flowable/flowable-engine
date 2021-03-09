@@ -150,7 +150,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void moveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities) {
+    public void bulkMoveTimerJobsToExecutableJobs(Collection<TimerJobEntity> timerJobEntities) {
 
         if (timerJobEntities == null || timerJobEntities.isEmpty()) {
             throw new FlowableException("Empty timer jobs collection can not be scheduled");
@@ -160,7 +160,7 @@ public class DefaultJobManager implements JobManager {
         boolean remainingCapacitySufficient = isAsyncExecutorRemainingCapacitySufficient(timerJobEntities.size());
 
         for (TimerJobEntity timerJobEntity : timerJobEntities) {
-            JobEntity executableJob = createExecutableJobFromOtherJob(timerJobEntity);
+            JobEntity executableJob = createExecutableJobFromOtherJob(timerJobEntity, remainingCapacitySufficient);
 
             boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
             if (insertSuccessful && remainingCapacitySufficient) {
@@ -729,10 +729,14 @@ public class DefaultJobManager implements JobManager {
 
     @Override
     public JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
+       return createExecutableJobFromOtherJob(job, isAsyncExecutorActive());
+    }
+
+    protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job, boolean lockJob) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
 
-        if (isAsyncExecutorActive()) {
+        if (lockJob) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
             gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getTimerLockTimeInMillis());
@@ -874,7 +878,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected boolean isAsyncExecutorRemainingCapacitySufficient(int neededCapacity) {
-        return jobServiceConfiguration.getAsyncExecutor().getTaskExecutor().getRemainingCapacity() >= neededCapacity;
+        return getAsyncExecutor().isActive() && getAsyncExecutor().getTaskExecutor().getRemainingCapacity() >= neededCapacity;
     }
     
     protected boolean isAsyncHistoryExecutorActive() {

@@ -13,7 +13,6 @@
 package org.flowable.job.service.impl.asyncexecutor;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -150,6 +149,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             if (globalAcquireLockEnabled) {
 
+                // When running with global acquire lock, we only need to have the lock during the acquire.
+                // In the move phase, other nodes can already acquired timer jobs themselves.
                 try {
                     timerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
                         return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
@@ -170,9 +171,9 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
             if (!timerJobs.isEmpty()) {
                 if (globalAcquireLockEnabled) {
-                    final List<TimerJobEntity> finalListCopy = new ArrayList<>(timerJobs);
+                    Collection<TimerJobEntity> finalTimerJobs = timerJobs;
                     moveJobsExecutorService.execute(() -> {
-                        commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalListCopy, true));
+                        commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, finalTimerJobs, true));
                     });
                 } else {
                     commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs, false));
@@ -203,7 +204,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
 
             if (globalAcquireLockEnabled) {
-                LOGGER.debug("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+                LOGGER.warn("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
 
             } else {
                 LOGGER.debug(
