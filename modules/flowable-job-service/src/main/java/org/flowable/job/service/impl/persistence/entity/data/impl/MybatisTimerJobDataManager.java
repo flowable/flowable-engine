@@ -185,13 +185,12 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", lockExpirationTime);
 
-        executeChangeWithInClause(timerJobEntities, params, "timerJobs",
-            parameters -> { getDbSqlSession().update("updateTimerJobLocks", parameters); });
+        bulkUpdateEntities("updateTimerJobLocks", params, "timerJobs", timerJobEntities);
     }
 
     @Override
     public void bulkDeleteWithoutRevision(List<TimerJobEntity> timerJobEntities) {
-        executeChangeWithInClauseNoParameters(timerJobEntities, list -> getDbSqlSession().delete("deleteTimerJobs", list, TimerJobEntityImpl.class));
+        bulkDeleteEntities("deleteTimerJobs", timerJobEntities);
     }
 
     @Override

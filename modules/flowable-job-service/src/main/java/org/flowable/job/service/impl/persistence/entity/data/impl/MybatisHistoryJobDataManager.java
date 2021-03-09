@@ -113,8 +113,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", lockExpirationTime);
 
-        executeChangeWithInClause(historyJobs, params, "historyJobs",
-            parameters -> { getDbSqlSession().update("updateHistoryJobLocks", parameters); });
+        bulkUpdateEntities("updateHistoryJobLocks", params, "historyJobs", historyJobs);
     }
 
     @Override
