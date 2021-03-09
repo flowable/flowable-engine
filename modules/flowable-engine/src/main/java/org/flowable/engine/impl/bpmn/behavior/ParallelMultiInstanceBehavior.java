@@ -168,7 +168,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
             if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
 
-                leave(executionEntity, nrOfInstances, isCompletionConditionSatisfied);
+                leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied);
             } else if (asyncLeave) {
 
                 JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
@@ -192,11 +192,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
 
-            leave(execution, nrOfInstances, isCompletionConditionSatisfied);
+            leave(execution, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied);
         }
     }
 
-    protected void leave(ExecutionEntity execution, int nrOfInstances, boolean isCompletionConditionSatisfied) {
+    protected void leave(ExecutionEntity execution, int nrOfInstances, int nrOfCompletedInstances, boolean isCompletionConditionSatisfied) {
         DelegateExecution miRootExecution = getMultiInstanceRootExecution(execution);
         ExecutionEntity leavingExecution = null;
         if (nrOfInstances > 0) {
@@ -209,6 +209,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         Activity activity = (Activity) execution.getCurrentFlowElement();
         verifyCompensation(execution, leavingExecution, activity);
         verifyCallActivity(leavingExecution, activity);
+
+        // When we complete the Multi Instance Root execution we need to explicitly set the number of completed / active instances
+        // as the ParallelMultiInstanceLoopVariable can only handle the runtime information
+        setLoopVariable(miRootExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
+        setLoopVariable(miRootExecution, NUMBER_OF_ACTIVE_INSTANCES, 0);
 
         if (isCompletionConditionSatisfied) {
             LinkedList<DelegateExecution> toVerify = new LinkedList<>(miRootExecution.getExecutions());
