@@ -29,6 +29,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.job.service.impl.cmd.AcquireTimerJobsWithGlobalAcquireLockCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerJobsToExecutableJobsCmd;
 import org.flowable.job.service.impl.cmd.UnlockTimerJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class AcquireTimerJobsRunnable implements Runnable {
 
@@ -101,9 +103,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
     @Override
     public synchronized void run() {
 
-        if (globalAcquireLockEnabled && lockManager == null) {
-            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-        }
+        // Always initialize the lock manager, allowing to switch execution modes if needed
+        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
 
         int poolSize = 4;
         LOGGER.info("starting to acquire async jobs due");
@@ -150,10 +151,10 @@ public class AcquireTimerJobsRunnable implements Runnable {
             if (globalAcquireLockEnabled) {
 
                 // When running with global acquire lock, we only need to have the lock during the acquire.
-                // In the move phase, other nodes can already acquired timer jobs themselves.
+                // In the move phase, other nodes can already acquire timer jobs themselves (as the lock is free).
                 try {
                     timerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
-                        return commandExecutor.execute(new AcquireTimerJobsCmd(asyncExecutor, globalAcquireLockEnabled));
+                        return commandExecutor.execute(new AcquireTimerJobsWithGlobalAcquireLockCmd(asyncExecutor));
                     });
 
                 } catch (Exception e) {
