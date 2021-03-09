@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
+import org.flowable.job.service.impl.cmd.AcquireJobsWithGlobalAcquireLockCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class AcquireAsyncJobsDueRunnable implements Runnable {
 
@@ -101,9 +103,8 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     @Override
     public synchronized void run() {
 
-        if (globalAcquireLockEnabled && lockManager == null) {
-            this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
-        }
+        // Always initialize the lock manager, allowing to switch execution modes if needed
+        this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
 
         LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName(name);
@@ -175,7 +176,15 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
-            List<? extends JobInfoEntity> acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager, globalAcquireLockEnabled));
+            List<? extends JobInfoEntity> acquiredJobs;
+            if (globalAcquireLockEnabled) {
+                acquiredJobs = commandExecutor.execute(new AcquireJobsWithGlobalAcquireLockCmd(asyncExecutor, remainingCapacity, jobEntityManager));
+
+            } else {
+                acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
+
+            }
+
             lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);

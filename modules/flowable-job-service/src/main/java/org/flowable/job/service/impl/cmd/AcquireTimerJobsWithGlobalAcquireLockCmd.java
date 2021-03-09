@@ -26,12 +26,13 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
-public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
+public class AcquireTimerJobsWithGlobalAcquireLockCmd implements Command<List<TimerJobEntity>> {
 
     protected AsyncExecutor asyncExecutor;
 
-    public AcquireTimerJobsCmd(AsyncExecutor asyncExecutor) {
+    public AcquireTimerJobsWithGlobalAcquireLockCmd(AsyncExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
     }
 
@@ -42,22 +43,18 @@ public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
         List<TimerJobEntity> timerJobs = jobServiceConfiguration.getTimerJobEntityManager()
             .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxTimerJobsPerAcquisition()));
 
-        for (TimerJobEntity job : timerJobs) {
-            lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
+        if (!timerJobs.isEmpty()) {
+
+            // When running with the global acquire lock, optimistic locking exceptions can't happen during acquire,
+            // as at most one node will be acquiring at any given time.
+
+            GregorianCalendar jobExpirationTime = calculateLockExpirationTime(asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
+            jobServiceConfiguration.getTimerJobEntityManager()
+                .bulkUpdateJobLockWithoutRevisionCheck(timerJobs, asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
+
         }
 
         return timerJobs;
-    }
-
-    protected void lockJob(CommandContext commandContext, TimerJobEntity job, int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
-
-        // This will use the regular updates flush in the DbSqlSession
-        // This will trigger an optimistic locking exception when two concurrent executors
-        // try to lock, as the revision will not match.
-
-        GregorianCalendar jobExpirationTime = calculateLockExpirationTime(lockTimeInMillis, jobServiceConfiguration);
-        job.setLockOwner(asyncExecutor.getLockOwner());
-        job.setLockExpirationTime(jobExpirationTime.getTime());
     }
 
     protected GregorianCalendar calculateLockExpirationTime(int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
