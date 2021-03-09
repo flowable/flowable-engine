@@ -42,7 +42,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     private static final AcquireAsyncJobsDueLifecycleListener NOOP_LIFECYCLE_LISTENER = new AcquireAsyncJobsDueLifecycleListener() {
 
         @Override
-        public void startAcquiring(String engineName) {
+        public void startAcquiring(String engineName, int remainingCapacity) {
 
         }
 
@@ -52,17 +52,17 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         }
 
         @Override
-        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
+        public void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
 
         }
 
         @Override
-        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition, int remainingQueueCapacity) {
+        public void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition) {
 
         }
 
         @Override
-        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition, int remainingCapacity) {
+        public void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition) {
 
         }
 
@@ -150,10 +150,10 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     }
 
     protected long executeAcquireCycle(CommandExecutor commandExecutor) {
-        lifecycleListener.startAcquiring(getEngineName());
+        int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
+        lifecycleListener.startAcquiring(getEngineName(), remainingCapacity);
 
         final long millisToWait;
-        int remainingCapacity = asyncExecutor.getTaskExecutor().getRemainingCapacity();
         if (remainingCapacity > 0) {
             millisToWait = acquireAndExecuteJobs(commandExecutor, remainingCapacity);
 
@@ -161,7 +161,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                 LOGGER.debug("acquired and queued new jobs for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
             }
         } else {
-            millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
+            millisToWait = asyncExecutor.getDefaultQueueSizeFullWaitTimeInMillis();
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("queue is full for engine {}; sleeping for {} ms", getEngineName(), millisToWait);
@@ -175,16 +175,15 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     protected long acquireAndExecuteJobs(CommandExecutor commandExecutor, int remainingCapacity) {
         try {
-            List<? extends JobInfoEntity> acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager));
-            lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
+            List<? extends JobInfoEntity> acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(asyncExecutor, remainingCapacity, jobEntityManager, globalAcquireLockEnabled));
+            lifecycleListener.acquiredJobs(getEngineName(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
             List<JobInfoEntity> rejectedJobs = offerJobs(acquiredJobs);
 
             LOGGER.debug("Jobs acquired: {}, rejected: {}, for engine {}", acquiredJobs.size(), rejectedJobs.size(), getEngineName());
             if (rejectedJobs.size() > 0) {
 
-                lifecycleListener.rejectedJobs(getEngineName(), rejectedJobs.size(), acquiredJobs.size(),
-                    asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
+                lifecycleListener.rejectedJobs(getEngineName(), rejectedJobs.size(), acquiredJobs.size(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
                 // some jobs were rejected, so the queue was full; wait until attempting to acquire more.
                 return asyncExecutor.getDefaultQueueSizeFullWaitTimeInMillis();
@@ -195,10 +194,10 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
         } catch (FlowableOptimisticLockingException optimisticLockingException) {
 
-            lifecycleListener.optimistLockingException(getEngineName(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition(), remainingCapacity);
+            lifecycleListener.optimistLockingException(getEngineName(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
             if (globalAcquireLockEnabled) {
-                LOGGER.debug("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+                LOGGER.warn("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
 
             } else {
                 LOGGER.debug(

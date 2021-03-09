@@ -38,7 +38,7 @@ public class MoveTimerJobsToExecutableJobsCmd implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         if (bulkMove) {
-            jobManager.moveTimerJobsToExecutableJobs(timerJobs);
+            jobManager.bulkMoveTimerJobsToExecutableJobs(timerJobs);
 
         } else {
             for (TimerJobEntity timerJob : timerJobs) {
