@@ -61,6 +61,7 @@ public final class RestUrls {
     public static final String SEGMENT_HISTORIC_DETAIL_RESOURCE = "historic-detail";
     public static final String SEGMENT_FORM_DATA = "form-data";
     public static final String SEGMENT_TABLES = "tables";
+    public static final String SEGMENT_ENGINE_PROPERTIES = "engine-properties";
     public static final String SEGMENT_COLUMNS = "columns";
     public static final String SEGMENT_DATA = "data";
     public static final String SEGMENT_JOBS = "jobs";
@@ -469,6 +470,11 @@ public final class RestUrls {
      * URL template for the collection of tables: <i>management/tables</i>
      */
     public static final String[] URL_TABLES_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_TABLES };
+
+    /**
+     * URL template for the collection of engine properties: <i>management/engine-properties</i>
+     */
+    public static final String[] URL_ENGINE_PROPERTIES = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_ENGINE_PROPERTIES };
 
     /**
      * URL template for form data: <i>form/form-data</i>
