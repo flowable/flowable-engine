@@ -299,7 +299,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         }
     }
 
-    protected void executeChangeWithInClauseNoParameters(List<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
+    protected void executeChangeWithInClause(List<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
         if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
             consumer.accept(entities);
 
@@ -321,30 +321,18 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         }
     }
 
-    protected void executeChangeWithInClause(List<EntityImpl> entities, Map<String, Object> parameters,
-            String collectionNameInSqlStatement, Consumer<Map<String, Object>> consumer) {
+    protected void bulkDeleteEntities(String statement, List<EntityImpl> entities) {
+        executeChangeWithInClause(entities, entitiesParameter -> {
+            getDbSqlSession().delete(statement, entitiesParameter, getManagedEntityClass());
+        });
+    }
 
-        if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
-            parameters.put(collectionNameInSqlStatement, entities);
-            consumer.accept(parameters);
-
-        } else {
-
-            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
-
-            for (int startIndex = 0; startIndex < entities.size(); startIndex += MAX_ENTRIES_IN_CLAUSE) {
-
-                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
-                if (endIndex > entities.size()) {
-                    endIndex = entities.size(); // endIndex in #subList is exclusive
-                }
-
-                List<EntityImpl> subList = entities.subList(startIndex, endIndex);
-                parameters.put(collectionNameInSqlStatement, subList);
-                consumer.accept(parameters);
-            }
-
-        }
+    protected void bulkUpdateEntities(String statement, Map<String, Object> parameters, String collectionNameInSqlStatement, List<EntityImpl> entities) {
+        executeChangeWithInClause(entities, entitiesParameter -> {
+            Map<String, Object> copyParameters = new HashMap<>(parameters);
+            copyParameters.put(collectionNameInSqlStatement, entitiesParameter);
+            getDbSqlSession().update(statement, copyParameters);
+        });
     }
     
     protected boolean isEntityInserted(DbSqlSession dbSqlSession, String entityLogicalName, String entityId) {

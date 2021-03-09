@@ -128,8 +128,7 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", lockExpirationTime);
 
-        executeChangeWithInClause(externalWorkerJobs, params, "externalWorkerJobs",
-            parameters -> { getDbSqlSession().update("updateExternalWorkerJobLocks", parameters); });
+        bulkUpdateEntities("updateExternalWorkerJobLocks", params, "externalWorkerJobs", externalWorkerJobs);
     }
 
     @Override

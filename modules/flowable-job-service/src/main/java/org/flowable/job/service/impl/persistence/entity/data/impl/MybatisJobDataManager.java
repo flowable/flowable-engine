@@ -134,8 +134,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         params.put("lockOwner", lockOwner);
         params.put("lockExpirationTime", lockExpirationTime);
 
-        executeChangeWithInClause(jobEntities, params, "jobs",
-            parameters -> { getDbSqlSession().update("updateJobLocks", parameters); });
+        bulkUpdateEntities("updateJobLocks", params, "jobs", jobEntities);
     }
 
     @Override
