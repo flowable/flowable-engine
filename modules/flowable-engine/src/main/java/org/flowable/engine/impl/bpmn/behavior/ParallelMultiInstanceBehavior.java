@@ -213,7 +213,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         // When we complete the Multi Instance Root execution we need to explicitly set the number of completed / active instances
         // as the ParallelMultiInstanceLoopVariable can only handle the runtime information
         setLoopVariable(miRootExecution, NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
-        setLoopVariable(miRootExecution, NUMBER_OF_ACTIVE_INSTANCES, 0);
+        // For backwards compatibility we set the current value of the number of active instances,
+        // since the execution might be completed with a completion event.
+        // In this case the active instances is the number of active instances when the execution completed
+        setLoopVariable(miRootExecution, NUMBER_OF_ACTIVE_INSTANCES, getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES));
 
         if (isCompletionConditionSatisfied) {
             LinkedList<DelegateExecution> toVerify = new LinkedList<>(miRootExecution.getExecutions());
