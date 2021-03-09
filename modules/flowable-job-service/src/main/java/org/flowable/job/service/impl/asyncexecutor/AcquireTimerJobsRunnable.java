@@ -17,10 +17,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -79,19 +82,21 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected volatile boolean isInterrupted;
     protected final Object MONITOR = new Object();
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
+    protected final int moveExecutorPoolSize;
 
-    protected ExecutorService moveJobsExecutorService = Executors.newFixedThreadPool(8);
+    protected ExecutorService moveJobsExecutorService;
 
-    public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager) {
-        this(asyncExecutor, jobManager, null, false);
+    public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager, int moveExecutorPoolSize) {
+        this(asyncExecutor, jobManager, null, false, moveExecutorPoolSize);
     }
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager,
-            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled) {
+            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled, int moveExecutorPoolSize) {
         this.asyncExecutor = asyncExecutor;
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+        this.moveExecutorPoolSize = moveExecutorPoolSize;
     }
 
     @Override
@@ -101,8 +106,19 @@ public class AcquireTimerJobsRunnable implements Runnable {
             this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
         }
 
+        int poolSize = 4;
         LOGGER.info("starting to acquire async jobs due");
-        Thread.currentThread().setName("flowable-" + getEngineName() + "-acquire-timer-jobs");
+        String threadName = "flowable-" + getEngineName() + "-acquire-timer-jobs";
+        Thread.currentThread().setName(threadName);
+        BasicThreadFactory threadFactory = new BasicThreadFactory.Builder()
+                .namingPattern(threadName + "-move")
+                .build();
+        // We are using really low queue size since if we have a lot of move operations
+        // we need to complete some of them before acquiring again.
+        // This should leave some time to other nodes to pick up and lock the timer jobs
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(poolSize, poolSize, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1), threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.allowCoreThreadTimeOut(true);
+        this.moveJobsExecutorService = executor;
 
         final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
 
@@ -115,6 +131,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
             }
 
         }
+
+        executor.shutdown();
 
         LOGGER.info("stopped async job due acquisition");
     }

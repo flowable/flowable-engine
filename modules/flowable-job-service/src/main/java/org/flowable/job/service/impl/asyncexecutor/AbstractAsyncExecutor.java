@@ -53,6 +53,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected boolean isActive;
     protected boolean isMessageQueueMode;
 
+    protected int moveTimerExecutorPoolSize = 4;
     protected int maxTimerJobsPerAcquisition = 512;
     protected int maxAsyncJobsDuePerAcquisition = 512;
     protected int defaultTimerJobAcquireWaitTimeInMillis = 10 * 1000;
@@ -138,7 +139,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected void initializeRunnables() {
         if (timerRunnableNeeded && timerJobRunnable == null) {
             timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(),
-                timerLifecycleListener, globalAcquireLockEnabled);
+                timerLifecycleListener, globalAcquireLockEnabled, moveTimerExecutorPoolSize);
 
             if (globalAcquireLockEnabled) {
                 timerJobRunnable.setLockWaitTime(timerLockWaitTime);
@@ -273,6 +274,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     @Override
     public void setAsyncJobLockTimeInMillis(int asyncJobLockTimeInMillis) {
         this.asyncJobLockTimeInMillis = asyncJobLockTimeInMillis;
+    }
+
+    public int getMoveTimerExecutorPoolSize() {
+        return moveTimerExecutorPoolSize;
+    }
+
+    public void setMoveTimerExecutorPoolSize(int moveTimerExecutorPoolSize) {
+        this.moveTimerExecutorPoolSize = moveTimerExecutorPoolSize;
     }
 
     @Override
