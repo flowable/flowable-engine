@@ -143,101 +143,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             processEngineConfiguration.getCreateUserTaskInterceptor().beforeCreateUserTask(beforeContext);
         }
 
-        if (StringUtils.isNotEmpty(beforeContext.getName())) {
-            String name = null;
-            try {
-                Object nameValue = expressionManager.createExpression(beforeContext.getName()).getValue(execution);
-                if (nameValue != null) {
-                    name = nameValue.toString();
-                }
-            } catch (FlowableException e) {
-                name = beforeContext.getName();
-                LOGGER.warn("property not found in task name expression {}", e.getMessage());
-            }
-            task.setName(name);
-        }
-
-        if (StringUtils.isNotEmpty(beforeContext.getDescription())) {
-            String description = null;
-            try {
-                Object descriptionValue = expressionManager.createExpression(beforeContext.getDescription()).getValue(execution);
-                if (descriptionValue != null) {
-                    description = descriptionValue.toString();
-                }
-            } catch (FlowableException e) {
-                description = beforeContext.getDescription();
-                LOGGER.warn("property not found in task description expression {}", e.getMessage());
-            }
-            task.setDescription(description);
-        }
-
-        if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
-            Object dueDate = expressionManager.createExpression(beforeContext.getDueDate()).getValue(execution);
-            if (dueDate != null) {
-                if (dueDate instanceof Date) {
-                    task.setDueDate((Date) dueDate);
-                } else if (dueDate instanceof String) {
-                    String businessCalendarName = null;
-                    if (StringUtils.isNotEmpty(userTask.getBusinessCalendarName())) {
-                        businessCalendarName = expressionManager.createExpression(userTask.getBusinessCalendarName()).getValue(execution).toString();
-                    } else {
-                        businessCalendarName = DueDateBusinessCalendar.NAME;
-                    }
-
-                    BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager()
-                            .getBusinessCalendar(businessCalendarName);
-                    task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
-
-                } else {
-                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + activeTaskDueDate);
-                }
-            }
-        }
-
-        if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
-            final Object priority = expressionManager.createExpression(beforeContext.getPriority()).getValue(execution);
-            if (priority != null) {
-                if (priority instanceof String) {
-                    try {
-                        task.setPriority(Integer.valueOf((String) priority));
-                    } catch (NumberFormatException e) {
-                        throw new FlowableIllegalArgumentException("Priority does not resolve to a number: " + priority, e);
-                    }
-                } else if (priority instanceof Number) {
-                    task.setPriority(((Number) priority).intValue());
-                } else {
-                    throw new FlowableIllegalArgumentException("Priority expression does not resolve to a number: " + activeTaskPriority);
-                }
-            }
-        }
-
-        if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
-            String category = null;
-            try {
-                Object categoryValue = expressionManager.createExpression(beforeContext.getCategory()).getValue(execution);
-                if (categoryValue != null) {
-                    category = categoryValue.toString();
-                }
-            }  catch (FlowableException e) {
-                category = beforeContext.getCategory();
-                LOGGER.warn("property not found in task category expression {}", e.getMessage());
-            }
-            task.setCategory(category);
-        }
-
-        if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
-            String formKey = null;
-            try {
-                Object formKeyValue = expressionManager.createExpression(beforeContext.getFormKey()).getValue(execution);
-                if (formKeyValue != null) {
-                    formKey = formKeyValue.toString();
-                }
-            } catch (FlowableException e) {
-                formKey = beforeContext.getFormKey();
-                LOGGER.warn("property not found in task formKey expression {}", e.getMessage());
-            }
-            task.setFormKey(formKey);
-        }
+        handleName(beforeContext, expressionManager, task, execution);
+        handleDescription(beforeContext, expressionManager, task, execution);
+        handleDueDate(beforeContext, expressionManager, task, execution, processEngineConfiguration, activeTaskDueDate);
+        handlePriority(beforeContext, expressionManager, task, execution, activeTaskPriority);
+        handleCategory(beforeContext, expressionManager, task, execution);
+        handleFormKey(beforeContext, expressionManager, task, execution);
         
         boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(beforeContext.getSkipExpression(), userTask.getId(), execution, commandContext)
                     && SkipExpressionUtil.shouldSkipFlowElement(beforeContext.getSkipExpression(), userTask.getId(), execution, commandContext);
@@ -280,6 +191,118 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             leave(execution);
         }
 
+    }
+
+    protected void handleName(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task, DelegateExecution execution) {
+        if (StringUtils.isNotEmpty(beforeContext.getName())) {
+            String name = null;
+            try {
+                Object nameValue = expressionManager.createExpression(beforeContext.getName()).getValue(execution);
+                if (nameValue != null) {
+                    name = nameValue.toString();
+                }
+            } catch (FlowableException e) {
+                name = beforeContext.getName();
+                LOGGER.warn("property not found in task name expression {}", e.getMessage());
+            }
+            task.setName(name);
+        }
+    }
+
+    protected void handleDescription(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task,
+            DelegateExecution execution) {
+        if (StringUtils.isNotEmpty(beforeContext.getDescription())) {
+            String description = null;
+            try {
+                Object descriptionValue = expressionManager.createExpression(beforeContext.getDescription()).getValue(execution);
+                if (descriptionValue != null) {
+                    description = descriptionValue.toString();
+                }
+            } catch (FlowableException e) {
+                description = beforeContext.getDescription();
+                LOGGER.warn("property not found in task description expression {}", e.getMessage());
+            }
+            task.setDescription(description);
+        }
+    }
+
+    protected void handleDueDate(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration, String activeTaskDueDate) {
+        if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
+            Object dueDate = expressionManager.createExpression(beforeContext.getDueDate()).getValue(execution);
+            if (dueDate != null) {
+                if (dueDate instanceof Date) {
+                    task.setDueDate((Date) dueDate);
+                } else if (dueDate instanceof String) {
+                    String businessCalendarName = null;
+                    if (StringUtils.isNotEmpty(userTask.getBusinessCalendarName())) {
+                        businessCalendarName = expressionManager.createExpression(userTask.getBusinessCalendarName()).getValue(execution).toString();
+                    } else {
+                        businessCalendarName = DueDateBusinessCalendar.NAME;
+                    }
+
+                    BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager()
+                            .getBusinessCalendar(businessCalendarName);
+                    task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
+
+                } else {
+                    throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + activeTaskDueDate);
+                }
+            }
+        }
+    }
+
+    protected void handlePriority(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task, DelegateExecution execution,
+            String activeTaskPriority) {
+        if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
+            final Object priority = expressionManager.createExpression(beforeContext.getPriority()).getValue(execution);
+            if (priority != null) {
+                if (priority instanceof String) {
+                    try {
+                        task.setPriority(Integer.valueOf((String) priority));
+                    } catch (NumberFormatException e) {
+                        throw new FlowableIllegalArgumentException("Priority does not resolve to a number: " + priority, e);
+                    }
+                } else if (priority instanceof Number) {
+                    task.setPriority(((Number) priority).intValue());
+                } else {
+                    throw new FlowableIllegalArgumentException("Priority expression does not resolve to a number: " + activeTaskPriority);
+                }
+            }
+        }
+    }
+
+    protected void handleCategory(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task,
+            DelegateExecution execution) {
+        if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
+            String category = null;
+            try {
+                Object categoryValue = expressionManager.createExpression(beforeContext.getCategory()).getValue(execution);
+                if (categoryValue != null) {
+                    category = categoryValue.toString();
+                }
+            } catch (FlowableException e) {
+                category = beforeContext.getCategory();
+                LOGGER.warn("property not found in task category expression {}", e.getMessage());
+            }
+            task.setCategory(category);
+        }
+    }
+
+    protected void handleFormKey(CreateUserTaskBeforeContext beforeContext, ExpressionManager expressionManager, TaskEntity task, DelegateExecution execution) {
+        if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
+            String formKey = null;
+            try {
+                Object formKeyValue = expressionManager.createExpression(beforeContext.getFormKey()).getValue(execution);
+                if (formKeyValue != null) {
+                    formKey = formKeyValue.toString();
+                }
+            } catch (FlowableException e) {
+                formKey = beforeContext.getFormKey();
+                LOGGER.warn("property not found in task formKey expression {}", e.getMessage());
+            }
+            task.setFormKey(formKey);
+        }
     }
 
     @Override
