@@ -77,6 +77,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected final AcquireTimerLifecycleListener lifecycleListener;
 
     protected boolean globalAcquireLockEnabled;
+    protected String globalAcquireLockPrefix;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
     protected LockManager lockManager;
@@ -91,15 +92,16 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected CommandExecutor commandExecutor;
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager, int moveExecutorPoolSize) {
-        this(asyncExecutor, jobManager, null, false, moveExecutorPoolSize);
+        this(asyncExecutor, jobManager, null, false, "", moveExecutorPoolSize);
     }
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager,
-            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled, int moveExecutorPoolSize) {
+            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled, String globalAcquireLockPrefix, int moveExecutorPoolSize) {
         this.asyncExecutor = asyncExecutor;
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+        this.globalAcquireLockPrefix = globalAcquireLockPrefix;
         this.moveExecutorPoolSize = moveExecutorPoolSize;
     }
 
@@ -135,7 +137,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     protected void createTimerMoveExecutorService(String threadName) {

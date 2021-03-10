@@ -66,6 +66,9 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected int retryWaitTimeInMillis = 500;
 
     protected boolean globalAcquireLockEnabled;
+    // The runnable can be running for different engines/executors.
+    // Setting a different prefix allows to differentiate without them competing for the same lock
+    protected String globalAcquireLockPrefix = "";
     protected Duration asyncJobsGlobalLockWaitTime = Duration.ofMinutes(1);
     protected Duration asyncJobsGlobalLockPollRate = Duration.ofMillis(500);
     protected Duration timerLockWaitTime = Duration.ofMinutes(1);
@@ -139,7 +142,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected void initializeRunnables() {
         if (timerRunnableNeeded && timerJobRunnable == null) {
             timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(),
-                timerLifecycleListener, globalAcquireLockEnabled, moveTimerExecutorPoolSize);
+                timerLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix, moveTimerExecutorPoolSize);
 
             if (globalAcquireLockEnabled) {
                 timerJobRunnable.setLockWaitTime(timerLockWaitTime);
@@ -160,7 +163,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             String acquireJobsRunnableName = acquireRunnableThreadName != null ?
                     acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
             asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse,
-                asyncJobsDueLifecycleListener, globalAcquireLockEnabled);
+                asyncJobsDueLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix);
 
             if (globalAcquireLockEnabled) {
                 asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
@@ -368,6 +371,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+    }
+
+    public String getGlobalAcquireLockPrefix() {
+        return globalAcquireLockPrefix;
+    }
+
+    public void setGlobalAcquireLockPrefix(String globalAcquireLockPrefix) {
+        this.globalAcquireLockPrefix = globalAcquireLockPrefix;
     }
 
     public Duration getAsyncJobsGlobalLockWaitTime() {

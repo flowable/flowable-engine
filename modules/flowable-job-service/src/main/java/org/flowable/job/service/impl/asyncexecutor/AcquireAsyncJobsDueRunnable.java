@@ -83,6 +83,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     protected AcquireAsyncJobsDueLifecycleListener lifecycleListener;
 
     protected boolean globalAcquireLockEnabled;
+    protected String globalAcquireLockPrefix;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
     protected LockManager lockManager;
@@ -92,12 +93,13 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     protected final AtomicBoolean isWaiting = new AtomicBoolean(false);
 
     public AcquireAsyncJobsDueRunnable(String name, AsyncExecutor asyncExecutor, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
-            AcquireAsyncJobsDueLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled) {
+            AcquireAsyncJobsDueLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled, String globalAcquireLockPrefix) {
         this.name = name;
         this.asyncExecutor = asyncExecutor;
         this.jobEntityManager = jobEntityManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+        this.globalAcquireLockPrefix = globalAcquireLockPrefix;
     }
 
     @Override

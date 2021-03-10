@@ -78,12 +78,12 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
     public void addTenantAsyncExecutor(String tenantId, boolean startExecutor) {
 
         TenantAwareAcquireTimerJobsRunnable timerRunnable = new TenantAwareAcquireTimerJobsRunnable(this, tenantInfoHolder, tenantId,
-            timerLifecycleListener, globalAcquireLockEnabled, moveTimerExecutorPoolSize);
+            timerLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix, moveTimerExecutorPoolSize);
         timerJobAcquisitionRunnables.put(tenantId, timerRunnable);
         timerJobAcquisitionThreads.put(tenantId, new Thread(timerRunnable));
 
         TenantAwareAcquireAsyncJobsDueRunnable asyncJobsRunnable = new TenantAwareAcquireAsyncJobsDueRunnable(this, tenantInfoHolder, tenantId,
-            asyncJobsDueLifecycleListener, globalAcquireLockEnabled);
+            asyncJobsDueLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix);
         asyncJobAcquisitionRunnables.put(tenantId, asyncJobsRunnable);
         asyncJobAcquisitionThreads.put(tenantId, new Thread(asyncJobsRunnable));
 
