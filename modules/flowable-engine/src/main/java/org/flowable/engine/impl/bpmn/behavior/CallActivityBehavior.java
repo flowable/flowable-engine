@@ -126,16 +126,16 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
 
-        dispatchEvenIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance),
+        dispatchEventIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance),
                 processEngineConfiguration.getEngineCfgKey());
 
         // process template-defined data objects
-        instanceBeforeContext = handleVarialbes(execution, instanceBeforeContext, expressionManager, subProcessInstance, subProcess);
+        instanceBeforeContext = handleVariables(execution, instanceBeforeContext, expressionManager, subProcessInstance, subProcess);
 
         // Process instance name is resolved after setting the variables on the process instance, so they can be used in the expression
         setInstanceName(instanceBeforeContext.getProcessInstanceName(), expressionManager, subProcessInstance);
 
-        dispatchEvenIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance),
+        dispatchEventIfEnabled(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance),
                 processEngineConfiguration.getEngineCfgKey());
 
         if (processEngineConfiguration.isEnableEntityLinks()) {
@@ -167,20 +167,20 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
-        dispatchEvenIfEnabled(eventDispatcher,
+        dispatchEventIfEnabled(eventDispatcher,
                 FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, instanceBeforeContext.getVariables(), false),
                 processEngineConfiguration.getEngineCfgKey());
 
     }
 
-    private void verifyProcessDefinitionNotSuspended(ProcessDefinition processDefinition) {
+    protected void verifyProcessDefinitionNotSuspended(ProcessDefinition processDefinition) {
         // Do not start a process instance if the process definition is suspended
         if (ProcessDefinitionUtil.isProcessDefinitionSuspended(processDefinition.getId())) {
             throw new FlowableException("Cannot start process instance. Process definition " + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
         }
     }
 
-    private StartSubProcessInstanceBeforeContext handleVarialbes(DelegateExecution execution, StartSubProcessInstanceBeforeContext instanceBeforeContext, ExpressionManager expressionManager,
+    protected StartSubProcessInstanceBeforeContext handleVariables(DelegateExecution execution, StartSubProcessInstanceBeforeContext instanceBeforeContext, ExpressionManager expressionManager,
             ExecutionEntity subProcessInstance, Process subProcess) {
         // process template-defined data objects
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
@@ -201,7 +201,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         return instanceBeforeContext;
     }
 
-    private void setInstanceName(String processInstanceName, ExpressionManager expressionManager, ExecutionEntity subProcessInstance) {
+    protected void setInstanceName(String processInstanceName, ExpressionManager expressionManager, ExecutionEntity subProcessInstance) {
         if (StringUtils.isNotEmpty(processInstanceName)) {
             Expression processInstanceNameExpression = expressionManager.createExpression(processInstanceName);
             processInstanceName = processInstanceNameExpression.getValue(subProcessInstance).toString();
@@ -209,7 +209,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
     }
 
-    private void dispatchEvenIfEnabled(FlowableEventDispatcher eventDispatcher, FlowableEvent flowableEvent, String engineType) {
+    protected void dispatchEventIfEnabled(FlowableEventDispatcher eventDispatcher, FlowableEvent flowableEvent, String engineType) {
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(flowableEvent, engineType);
         }
