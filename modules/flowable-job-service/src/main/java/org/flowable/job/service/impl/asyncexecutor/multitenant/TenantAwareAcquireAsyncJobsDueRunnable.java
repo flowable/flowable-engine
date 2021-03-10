@@ -28,15 +28,13 @@ public class TenantAwareAcquireAsyncJobsDueRunnable extends AcquireAsyncJobsDueR
     protected String tenantId;
 
     public TenantAwareAcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        this(asyncExecutor, tenantInfoHolder, tenantId, null, false);
-        this.tenantInfoHolder = tenantInfoHolder;
-        this.tenantId = tenantId;
+        this(asyncExecutor, tenantInfoHolder, tenantId, null, false, "");
     }
 
     public TenantAwareAcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId,
-            AcquireAsyncJobsDueLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled) {
+            AcquireAsyncJobsDueLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled, String globalAcquireLockPrefix) {
         super("flowable-tenant-" + tenantId + "-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-acquire-jobs",
-                asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager(), lifecycleListener, globalAcquireLockEnabled);
+                asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager(), lifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

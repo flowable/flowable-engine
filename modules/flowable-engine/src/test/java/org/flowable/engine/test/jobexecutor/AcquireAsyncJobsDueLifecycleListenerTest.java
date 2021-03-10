@@ -63,7 +63,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         CountDownLatch waitingLatch = new CountDownLatch(2);
         TestAcquireAsyncJobsDueLifecycleListener listener = new TestAcquireAsyncJobsDueLifecycleListener(waitingLatch);
         AcquireAsyncJobsDueRunnable runnable = new AcquireAsyncJobsDueRunnable("test-acquire-jobs", asyncExecutor,
-                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager(), listener, false);
+                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager(), listener, false, "");
 
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 
