@@ -293,7 +293,7 @@ public class ErrorPropagation {
                 ErrorEventDefinition errorEventDef = (ErrorEventDefinition) boundaryEvent.getEventDefinitions().get(0);
                 String eventErrorCode = retrieveErrorCode(bpmnModel, errorEventDef.getErrorCode());
 
-                if (eventErrorCode == null || compareErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
+                if (eventErrorCode == null || eventErrorCode.equals(compareErrorCode)) {
                     List<Event> elementBoundaryEvents = null;
                     if (!eventMap.containsKey(boundaryEvent.getAttachedToRefId() + "#" + processDefinitionId)) {
                         elementBoundaryEvents = new ArrayList<>();
