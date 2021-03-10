@@ -149,7 +149,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
     }
 
     protected long executeAcquireCycle(CommandExecutor commandExecutor) {
