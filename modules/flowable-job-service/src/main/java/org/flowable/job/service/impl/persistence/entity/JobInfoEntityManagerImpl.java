@@ -70,7 +70,7 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
 
     @Override
     public JobServiceConfiguration getJobServiceConfiguration() {
-        return getJobServiceConfiguration();
+        return getServiceConfiguration();
     }
 
 }
