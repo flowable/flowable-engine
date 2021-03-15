@@ -144,10 +144,8 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(),
                 timerLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix, moveTimerExecutorPoolSize);
 
-            if (globalAcquireLockEnabled) {
-                timerJobRunnable.setLockWaitTime(timerLockWaitTime);
-                timerJobRunnable.setLockPollRate(timerLockPollRate);
-            }
+            timerJobRunnable.setLockWaitTime(timerLockWaitTime);
+            timerJobRunnable.setLockPollRate(timerLockPollRate);
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
@@ -165,10 +163,8 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
             asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse,
                 asyncJobsDueLifecycleListener, globalAcquireLockEnabled, globalAcquireLockPrefix);
 
-            if (globalAcquireLockEnabled) {
-                asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
-                asyncJobsDueRunnable.setLockPollRate(asyncJobsGlobalLockPollRate);
-            }
+            asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
+            asyncJobsDueRunnable.setLockPollRate(asyncJobsGlobalLockPollRate);
         }
     }
 
@@ -371,6 +367,13 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
         this.globalAcquireLockEnabled = globalAcquireLockEnabled;
+        if (timerJobRunnable != null) {
+            timerJobRunnable.setGlobalAcquireLockEnabled(globalAcquireLockEnabled);
+        }
+
+        if (asyncJobsDueRunnable != null) {
+            asyncJobsDueRunnable.setGlobalAcquireLockEnabled(globalAcquireLockEnabled);
+        }
     }
 
     public String getGlobalAcquireLockPrefix() {
@@ -387,6 +390,9 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setAsyncJobsGlobalLockWaitTime(Duration asyncJobsGlobalLockWaitTime) {
         this.asyncJobsGlobalLockWaitTime = asyncJobsGlobalLockWaitTime;
+        if (asyncJobsDueRunnable != null) {
+            asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
+        }
     }
 
     public Duration getAsyncJobsGlobalLockPollRate() {
@@ -395,6 +401,9 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setAsyncJobsGlobalLockPollRate(Duration asyncJobsGlobalLockPollRate) {
         this.asyncJobsGlobalLockPollRate = asyncJobsGlobalLockPollRate;
+        if (asyncJobsDueRunnable != null) {
+            asyncJobsDueRunnable.setLockPollRate(asyncJobsGlobalLockPollRate);
+        }
     }
 
     public Duration getTimerLockWaitTime() {
@@ -403,6 +412,9 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setTimerLockWaitTime(Duration timerLockWaitTime) {
         this.timerLockWaitTime = timerLockWaitTime;
+        if (timerJobRunnable != null) {
+            timerJobRunnable.setLockWaitTime(timerLockWaitTime);
+        }
     }
 
     public Duration getTimerLockPollRate() {
@@ -411,6 +423,9 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setTimerLockPollRate(Duration timerLockPollRate) {
         this.timerLockPollRate = timerLockPollRate;
+        if (timerJobRunnable != null) {
+            timerJobRunnable.setLockPollRate(timerLockPollRate);
+        }
     }
 
     public void setAcquireRunnableThreadName(String acquireRunnableThreadName) {
