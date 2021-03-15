@@ -66,5 +66,4 @@ public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityMa
 
     void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime);
 
-    JobServiceConfiguration getJobServiceConfiguration();
 }
