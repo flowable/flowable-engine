@@ -301,91 +301,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution, 
             ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-        if (StringUtils.isNotEmpty(assignee)) {
-            Object assigneeExpressionValue = expressionManager.createExpression(assignee).getValue(execution);
-            String assigneeValue = null;
-            if (assigneeExpressionValue != null) {
-                assigneeValue = assigneeExpressionValue.toString();
-            }
-
-            if (StringUtils.isNotEmpty(assigneeValue)) {
-                TaskHelper.changeTaskAssignee(task, assigneeValue);
-                if (processEngineConfiguration.isLoggingSessionEnabled()) {
-                    ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + assigneeValue, task, execution);
-                    loggingNode.put("taskAssignee", assigneeValue);
-                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_ASSIGNEE, loggingNode, ScopeTypes.BPMN);
-                }
-            }
-        }
-
-        if (StringUtils.isNotEmpty(owner)) {
-            Object ownerExpressionValue = expressionManager.createExpression(owner).getValue(execution);
-            String ownerValue = null;
-            if (ownerExpressionValue != null) {
-                ownerValue = ownerExpressionValue.toString();
-            }
-
-            if (StringUtils.isNotEmpty(ownerValue)) {
-                TaskHelper.changeTaskOwner(task, ownerValue);
-                if (processEngineConfiguration.isLoggingSessionEnabled()) {
-                    ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + ownerValue, task, execution);
-                    loggingNode.put("taskOwner", ownerValue);
-                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_OWNER, loggingNode, ScopeTypes.BPMN);
-                }
-            }
-        }
-
-        if (candidateGroups != null && !candidateGroups.isEmpty()) {
-            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
-            for (String candidateGroup : candidateGroups) {
-                Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
-                Object value = groupIdExpr.getValue(execution);
-                if (value != null) {
-                    Collection<String> candidates = extractCandidates(value);
-                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
-                            .getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
-
-                    if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
-                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        allIdentityLinkEntities.addAll(identityLinkEntities);
-                    }
-                }
-            }
-            
-            if (!allIdentityLinkEntities.isEmpty()) {
-                if (processEngineConfiguration.isLoggingSessionEnabled()) {
-                    BpmnLoggingSessionUtil.addTaskIdentityLinkData(LoggingSessionConstants.TYPE_USER_TASK_SET_GROUP_IDENTITY_LINKS, 
-                            "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", false,
-                            allIdentityLinkEntities, task, execution);
-                }
-            }
-        }
-
-        if (candidateUsers != null && !candidateUsers.isEmpty()) {
-            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
-            for (String candidateUser : candidateUsers) {
-                Expression userIdExpr = expressionManager.createExpression(candidateUser);
-                Object value = userIdExpr.getValue(execution);
-                if (value != null) {
-                    Collection<String> candidates = extractCandidates(value);
-                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
-                            .getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
-
-                    if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
-                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
-                        allIdentityLinkEntities.addAll(identityLinkEntities);
-                    }
-                }
-            }
-            
-            if (!allIdentityLinkEntities.isEmpty()) {
-                if (processEngineConfiguration.isLoggingSessionEnabled()) {
-                    BpmnLoggingSessionUtil.addTaskIdentityLinkData(LoggingSessionConstants.TYPE_USER_TASK_SET_USER_IDENTITY_LINKS, 
-                                    "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
-                                    allIdentityLinkEntities, task, execution);
-                }
-            }
-        }
+        handleAssignee(assignee, expressionManager, execution, processEngineConfiguration, task);
+        handleOwner(owner, expressionManager, execution, processEngineConfiguration, task);
+        handleCandidateGroups(candidateGroups, expressionManager, execution, processEngineConfiguration, task);
+        handleCandidateUsers(candidateUsers, expressionManager, execution, processEngineConfiguration, task);
 
         if (userTask.getCustomUserIdentityLinks() != null && !userTask.getCustomUserIdentityLinks().isEmpty()) {
 
@@ -444,6 +363,108 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
     }
 
+    protected void handleOwner(String owner, ExpressionManager expressionManager, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration, TaskEntity task) {
+
+        if (StringUtils.isNotEmpty(owner)) {
+            Object ownerExpressionValue = expressionManager.createExpression(owner).getValue(execution);
+            String ownerValue = null;
+            if (ownerExpressionValue != null) {
+                ownerValue = ownerExpressionValue.toString();
+            }
+
+            if (StringUtils.isNotEmpty(ownerValue)) {
+                TaskHelper.changeTaskOwner(task, ownerValue);
+                if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                    ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task owner value to " + ownerValue, task, execution);
+                    loggingNode.put("taskOwner", ownerValue);
+                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_OWNER, loggingNode, ScopeTypes.BPMN);
+                }
+            }
+        }
+    }
+
+    protected void handleAssignee(String assignee, ExpressionManager expressionManager, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration, TaskEntity task){
+
+        if (StringUtils.isNotEmpty(assignee)) {
+            Object assigneeExpressionValue = expressionManager.createExpression(assignee).getValue(execution);
+            String assigneeValue = null;
+            if (assigneeExpressionValue != null) {
+                assigneeValue = assigneeExpressionValue.toString();
+            }
+
+            if (StringUtils.isNotEmpty(assigneeValue)) {
+                TaskHelper.changeTaskAssignee(task, assigneeValue);
+                if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                    ObjectNode loggingNode = BpmnLoggingSessionUtil.fillBasicTaskLoggingData("Set task assignee value to " + assigneeValue, task, execution);
+                    loggingNode.put("taskAssignee", assigneeValue);
+                    LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_USER_TASK_SET_ASSIGNEE, loggingNode, ScopeTypes.BPMN);
+                }
+            }
+        }
+    }
+
+    protected void handleCandidateGroups(List<String> candidateGroups, ExpressionManager expressionManager, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration, TaskEntity task)  {
+
+        if (candidateGroups != null && !candidateGroups.isEmpty()) {
+            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
+            for (String candidateGroup : candidateGroups) {
+                Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
+                Object value = groupIdExpr.getValue(execution);
+                if (value != null) {
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                            .getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
+
+                    if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                        allIdentityLinkEntities.addAll(identityLinkEntities);
+                    }
+                }
+            }
+
+            if (!allIdentityLinkEntities.isEmpty()) {
+                if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                    BpmnLoggingSessionUtil.addTaskIdentityLinkData(LoggingSessionConstants.TYPE_USER_TASK_SET_GROUP_IDENTITY_LINKS,
+                            "Added " + allIdentityLinkEntities.size() + " candidate group identity links to task", false,
+                            allIdentityLinkEntities, task, execution);
+                }
+            }
+        }
+    }
+
+    protected void handleCandidateUsers(List<String> candidateUsers, ExpressionManager expressionManager, DelegateExecution execution,
+            ProcessEngineConfigurationImpl processEngineConfiguration, TaskEntity task) {
+
+        if (candidateUsers != null && !candidateUsers.isEmpty()) {
+            List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
+            for (String candidateUser : candidateUsers) {
+                Expression userIdExpr = expressionManager.createExpression(candidateUser);
+                Object value = userIdExpr.getValue(execution);
+                if (value != null) {
+                    Collection<String> candidates = extractCandidates(value);
+                    List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
+                            .getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
+
+                    if (identityLinkEntities != null && !identityLinkEntities.isEmpty()) {
+                        IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                        allIdentityLinkEntities.addAll(identityLinkEntities);
+                    }
+                }
+            }
+
+            if (!allIdentityLinkEntities.isEmpty()) {
+                if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                    BpmnLoggingSessionUtil.addTaskIdentityLinkData(LoggingSessionConstants.TYPE_USER_TASK_SET_USER_IDENTITY_LINKS,
+                            "Added " + allIdentityLinkEntities.size() + " candidate user identity links to task", true,
+                            allIdentityLinkEntities, task, execution);
+                }
+            }
+        }
+    }
+
     protected Collection<String> extractCandidates(Object value) {
         if (value instanceof Collection) {
             return (Collection<String>) value;
@@ -465,7 +486,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         return Collections.emptyList();
 
     }
-    
+
     protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
         if (migrationContext != null && migrationContext.getAssignee() != null) {
             return migrationContext.getAssignee();
