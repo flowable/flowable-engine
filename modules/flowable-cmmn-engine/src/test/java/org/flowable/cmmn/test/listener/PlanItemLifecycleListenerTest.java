@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
@@ -30,7 +29,6 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.task.service.delegate.TaskListener;
 import org.junit.Test;
 
 /**
