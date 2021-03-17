@@ -14,7 +14,6 @@ package org.flowable.engine.impl.bpmn.listener;
 
 import java.util.List;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;

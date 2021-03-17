@@ -30,7 +30,6 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
-import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
 
 /**
