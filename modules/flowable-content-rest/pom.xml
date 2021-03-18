@@ -17,6 +17,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jetty.version>9.4.38.v20210224</jetty.version>
 		<flowable.artifact>
 			org.flowable.content.rest
 		</flowable.artifact>
@@ -199,37 +200,37 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-http</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-webapp</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-io</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-util</artifactId>
-			<version>9.4.35.v20201120</version>
+			<version>${jetty.version}</version>
 			<scope>test</scope>
 		</dependency>
     </dependencies>
