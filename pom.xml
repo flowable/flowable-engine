@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.4.3</spring.boot.version>
-		<spring.framework.version>5.3.4</spring.framework.version>
+		<spring.boot.version>2.4.4</spring.boot.version>
+		<spring.framework.version>5.3.5</spring.framework.version>
 		<spring.security.version>5.4.5</spring.security.version>
-		<spring.amqp.version>2.3.5</spring.amqp.version>
-		<spring.kafka.version>2.6.6</spring.kafka.version>
+		<spring.amqp.version>2.3.6</spring.amqp.version>
+		<spring.kafka.version>2.6.7</spring.kafka.version>
 		<reactor-netty.version>1.0.3</reactor-netty.version>
 		<jackson.version>2.11.4</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
@@ -995,7 +995,7 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.2.6</version>
+				<version>42.2.19</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
