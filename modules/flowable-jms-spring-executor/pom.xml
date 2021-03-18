@@ -142,13 +142,13 @@
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
-            <version>5.15.8</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
-            <version>5.15.13</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
