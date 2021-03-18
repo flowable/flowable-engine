@@ -68,9 +68,4 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
         dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
-    @Override
-    public JobServiceConfiguration getJobServiceConfiguration() {
-        return getJobServiceConfiguration();
-    }
-
 }

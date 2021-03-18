@@ -739,7 +739,7 @@ public class DefaultJobManager implements JobManager {
         if (lockJob) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
-            gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getTimerLockTimeInMillis());
+            gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getAsyncJobLockTimeInMillis());
             executableJob.setLockExpirationTime(gregorianCalendar.getTime());
             executableJob.setLockOwner(getAsyncExecutor().getLockOwner());
         }

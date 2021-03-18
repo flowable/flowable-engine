@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -37,22 +36,13 @@ public class DelegateExpressionTaskListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        try {
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldExtensions);
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldExtensions);
 
-            if (delegate instanceof TaskListener) {
-                try {
-                    TaskListener taskListener = (TaskListener) delegate;
-                    taskListener.notify(delegateTask);
-                } catch (Exception e) {
-                    throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
-                }
-            } else {
-                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);
-            }
-
-        } catch (Exception e) {
-            throw new FlowableException(e.getMessage(), e);
+        if (delegate instanceof TaskListener) {
+            TaskListener taskListener = (TaskListener) delegate;
+            taskListener.notify(delegateTask);
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);
         }
     }
 

@@ -41,11 +41,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
         if (delegate instanceof TaskListener) {
-            try {
-                CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
-            } catch (Exception e) {
-                throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
-            }
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation((TaskListener) delegate, delegateTask));
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);
         }

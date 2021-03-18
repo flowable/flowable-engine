@@ -48,7 +48,7 @@ public class AcquireTimerJobsWithGlobalAcquireLockCmd implements Command<List<Ti
             // When running with the global acquire lock, optimistic locking exceptions can't happen during acquire,
             // as at most one node will be acquiring at any given time.
 
-            GregorianCalendar jobExpirationTime = calculateLockExpirationTime(asyncExecutor.getAsyncJobLockTimeInMillis(), jobServiceConfiguration);
+            GregorianCalendar jobExpirationTime = calculateLockExpirationTime(asyncExecutor.getTimerLockTimeInMillis(), jobServiceConfiguration);
             jobServiceConfiguration.getTimerJobEntityManager()
                 .bulkUpdateJobLockWithoutRevisionCheck(timerJobs, asyncExecutor.getLockOwner(), jobExpirationTime.getTime());
 

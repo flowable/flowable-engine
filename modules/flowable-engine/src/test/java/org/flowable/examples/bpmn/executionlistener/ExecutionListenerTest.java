@@ -14,18 +14,23 @@
 package org.flowable.examples.bpmn.executionlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -182,6 +187,36 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         String businessKey = (String) runtimeService.getVariable(processInstance.getId(), "businessKeyInExecution");
         assertThat(businessKey).isEqualTo("businessKey123");
 
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerDelegateExpressionThrowsException.bpmn20.xml" })
+    public void testExecutionListenerWithDelegateExpressionThrowsFlowableException() {
+        ProcessInstanceBuilder builder = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .transientVariable("bean", (ExecutionListener) delegateExecution -> {
+                    throw new FlowableIllegalArgumentException("Message from listener");
+                });
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/ExecutionListenerDelegateExpressionThrowsException.bpmn20.xml" })
+    public void testExecutionListenerWithDelegateExpressionThrowsNonFlowableException() {
+        ProcessInstanceBuilder builder = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("executionListenersProcess")
+                .transientVariable("bean", (ExecutionListener) delegateExecution -> {
+                    throw new RuntimeException("Message from listener");
+                });
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
     }
 
 }

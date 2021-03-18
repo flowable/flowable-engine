@@ -13,12 +13,16 @@
 package org.flowable.examples.bpmn.tasklistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.delegate.TaskListener;
 import org.junit.jupiter.api.Test;
@@ -269,5 +273,35 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
                 entry("variableFromClassDelegate", "From class delegate"),
                 entry("variableFromDelegateExpression", "From delegate expression")
             );
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerDelegateExpressionThrowsException.bpmn20.xml" })
+    public void testTaskListenerWithDelegateExpressionThrowsFlowableException() {
+        ProcessInstanceBuilder builder = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("taskListenerProcess")
+                .transientVariable("bean", (TaskListener) delegateTask -> {
+                    throw new FlowableIllegalArgumentException("Message from listener");
+                });
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerDelegateExpressionThrowsException.bpmn20.xml" })
+    public void testTaskListenerWithDelegateExpressionThrowsNonFlowableException() {
+        ProcessInstanceBuilder builder = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("taskListenerProcess")
+                .transientVariable("bean", (TaskListener) delegateTask -> {
+                    throw new RuntimeException("Message from listener");
+                });
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
     }
 }

@@ -13,23 +13,29 @@
 package org.flowable.cmmn.test.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.service.delegate.TaskListener;
 import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
@@ -86,6 +92,88 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
         }
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/PlanItemLifecycleListenerDelegateExpressionThrowsException.cmmn")
+    public void testListenerWithDelegateExpressionThrowsFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemLifecycleListeners")
+                .transientVariable("bean", new PlanItemInstanceLifecycleListener() {
+
+                    @Override
+                    public String getSourceState() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getTargetState() {
+                        return null;
+                    }
+
+                    @Override
+                    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+                        throw new FlowableIllegalArgumentException("Message from listener");
+                    }
+                });
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/PlanItemLifecycleListenerDelegateExpressionThrowsException.cmmn")
+    public void testListenerWithDelegateExpressionThrowsNonFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemLifecycleListeners")
+                .transientVariable("bean", new PlanItemInstanceLifecycleListener() {
+
+                    @Override
+                    public String getSourceState() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getTargetState() {
+                        return null;
+                    }
+
+                    @Override
+                    public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+                        throw new RuntimeException("Message from listener");
+                    }
+                });
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testListenerWithClassThrowsFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemLifecycleListeners");
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testListenerWithClassThrowsNonFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemLifecycleListeners");
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
     private void assertVariable(CaseInstance caseInstance, String varName, boolean value) {
         Boolean variable = (Boolean) cmmnRuntimeService.getVariable(caseInstance.getId(), varName);
         assertThat(variable).isEqualTo(value);
@@ -113,6 +201,44 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
             planItemInstance.setVariable("variableFromDelegateExpression", "Hello World from delegate expression");
         }
 
+    }
+
+    public static class ThrowingFlowableExceptionPlanItemInstanceLifecycleListener implements PlanItemInstanceLifecycleListener {
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+            throw new FlowableIllegalArgumentException("Illegal argument in listener");
+
+        }
+    }
+
+    public static class ThrowingNonFlowableExceptionPlanItemInstanceLifecycleListener implements PlanItemInstanceLifecycleListener {
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
+            throw new RuntimeException("Illegal argument in listener");
+
+        }
     }
 
 }
