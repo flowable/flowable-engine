@@ -17,6 +17,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -426,6 +427,51 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
                 repositoryService.deleteDeployment(tenantDeployment.getId(), true);
             }
         }
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" }, tenantId = "tenant1")
+    public void testStartCaseUsingDefinitionId() {
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        // Start using case definition id
+        requestNode.put("caseDefinitionId", caseDefinition.getId());
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString(), StandardCharsets.UTF_8));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+
+        // Only one case should have been started
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().singleResult();
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneHumanTaskCase");
+        assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
+        assertThat(caseInstance.getTenantId()).isEqualTo("tenant1");
+    }
+
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" }, tenantId = "tenant1")
+    public void testStartCaseUsingDefinitionIdAndOverrideDefinitionTenantId() {
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        // Start using case definition id
+        requestNode.put("caseDefinitionId", caseDefinition.getId());
+        requestNode.put("overrideDefinitionTenantId", "tenant2");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString(), StandardCharsets.UTF_8));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+
+        // Only one case should have been started
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().singleResult();
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseDefinitionKey()).isEqualTo("oneHumanTaskCase");
+        assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
+        assertThat(caseInstance.getTenantId()).isEqualTo("tenant2");
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn",
