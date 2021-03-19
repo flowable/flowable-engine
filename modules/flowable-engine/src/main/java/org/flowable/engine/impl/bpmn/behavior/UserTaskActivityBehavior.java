@@ -314,7 +314,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                     Expression idExpression = expressionManager.createExpression(userIdentityLink);
                     Object value = idExpression.getValue(execution);
 
-                    Collection<String> userIds = extractCandidates(value);
+                    Collection<String> userIds = extractCandidates(value, idExpression.getExpressionText());
                     for (String userId : userIds) {
                         IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                                 .getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
@@ -341,7 +341,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
                     Expression idExpression = expressionManager.createExpression(groupIdentityLink);
                     Object value = idExpression.getValue(execution);
-                    Collection<String> groupIds = extractCandidates(value);
+                    Collection<String> groupIds = extractCandidates(value, idExpression.getExpressionText());
                     for (String groupId : groupIds) {
                         IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                                 .getIdentityLinkService().createTaskIdentityLink(
@@ -414,7 +414,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Expression groupIdExpr = expressionManager.createExpression(candidateGroup);
                 Object value = groupIdExpr.getValue(execution);
                 if (value != null) {
-                    Collection<String> candidates = extractCandidates(value);
+                    Collection<String> candidates = extractCandidates(value, groupIdExpr.getExpressionText());
                     List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                             .getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
 
@@ -444,7 +444,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                 Expression userIdExpr = expressionManager.createExpression(candidateUser);
                 Object value = userIdExpr.getValue(execution);
                 if (value != null) {
-                    Collection<String> candidates = extractCandidates(value);
+                    Collection<String> candidates = extractCandidates(value, userIdExpr.getExpressionText());
                     List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                             .getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
 
@@ -465,7 +465,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
         }
     }
 
-    protected Collection<String> extractCandidates(Object value) {
+    public Collection<String> extractCandidates(Object value, String expressionText) {
+        handleUnsupportedType(value, expressionText);
         if (value instanceof Collection) {
             return (Collection<String>) value;
         } else if (value instanceof ArrayNode) {
@@ -485,6 +486,21 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
         return Collections.emptyList();
 
+    }
+
+    protected void handleUnsupportedType(Object value, String expressionText) {
+        if (value instanceof Boolean) {
+            throw new FlowableIllegalArgumentException("Value of type boolean is not supported for expression '" + expressionText +  "'.");
+        }
+        if (value instanceof Double) {
+            throw new FlowableIllegalArgumentException("Value of type double is not supported for expression '" + expressionText +  "'.");
+        }
+        if (value instanceof Float) {
+            throw new FlowableIllegalArgumentException("Value of type float is not supported for expression '" + expressionText +  "'.");
+        }
+        if (value instanceof ObjectNode) {
+            throw new FlowableIllegalArgumentException("Value of type objectNode is not supported for expression '" + expressionText +  "'.");
+        }
     }
 
     protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
