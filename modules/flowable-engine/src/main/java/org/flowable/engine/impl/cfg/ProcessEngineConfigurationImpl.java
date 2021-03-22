@@ -883,6 +883,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
     protected int expressionTextLengthCacheLimit = -1; // negative value to have no max length
+    protected int userTaskCandidateGroupsLimit = -1; // By default, no limit
+    protected int userTaskCandidateUsersLimit = -1; // By default, no limit
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -3423,6 +3425,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setExpressionTextLengthCacheLimit(int expressionTextLengthCacheLimit) {
         this.expressionTextLengthCacheLimit = expressionTextLengthCacheLimit;
         return this;
+    }
+
+    public int getUserTaskCandidateGroupsLimit() {
+        return userTaskCandidateGroupsLimit;
+    }
+
+    public void setUserTaskCandidateGroupsLimit(int userTaskCandidateGroupsLimit) {
+        this.userTaskCandidateGroupsLimit = userTaskCandidateGroupsLimit;
+    }
+
+    public int getUserTaskCandidateUsersLimit() {
+        return userTaskCandidateUsersLimit;
+    }
+
+    public void setUserTaskCandidateUsersLimit(int userTaskCandidateUsersLimit) {
+        this.userTaskCandidateUsersLimit = userTaskCandidateUsersLimit;
     }
 
     public BusinessCalendarManager getBusinessCalendarManager() {
