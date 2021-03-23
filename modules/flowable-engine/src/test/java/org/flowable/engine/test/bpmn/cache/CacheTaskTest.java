@@ -48,6 +48,27 @@ public class CacheTaskTest extends PluggableFlowableTestCase {
         assertThat(ServiceCacheTask.processInstanceId).isEqualTo(processInstance.getId());
         assertThat(ServiceCacheTask.executionId).isNotNull();
         assertThat(ServiceCacheTask.historicProcessInstanceId).isEqualTo(processInstance.getId());
+        assertThat(ServiceCacheTask.historicProcessInstanceDefinitionKey).isEqualTo("startToEnd");
+    }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/cache/cacheUserTask.bpmn20.xml")
+    public void testHistoricProcessInstanceDefinitionInformationWhenInCache() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
+
+        managementService.executeCommand(commandContext -> {
+            String processInstanceId = processInstance.getId();
+
+            // Make sure that it is loaded in the cache
+            HistoricProcessInstance queriedHistoricProcess = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext)
+                    .findById(processInstanceId);
+            assertThat(queriedHistoricProcess.getProcessVariables()).isEmpty();
+
+            queriedHistoricProcess = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+            assertThat(queriedHistoricProcess.getProcessDefinitionKey()).isEqualTo("oneTask");
+
+            return null;
+        });
     }
 
     @Test
