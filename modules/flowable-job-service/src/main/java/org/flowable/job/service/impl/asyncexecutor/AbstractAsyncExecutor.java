@@ -349,6 +349,10 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.asyncJobsDueLifecycleListener = asyncJobsDueLifecycleListener;
     }
 
+    public boolean isTimerRunnableNeeded() {
+        return timerRunnableNeeded;
+    }
+
     public void setTimerRunnableNeeded(boolean timerRunnableNeeded) {
         this.timerRunnableNeeded = timerRunnableNeeded;
     }
