@@ -27,11 +27,13 @@ public class ServiceCacheTask implements JavaDelegate {
     public static String processInstanceId;
     public static String executionId;
     public static String historicProcessInstanceId;
+    public static String historicProcessInstanceDefinitionKey;
 
     public static void reset() {
         processInstanceId = null;
         executionId = null;
         historicProcessInstanceId = null;
+        historicProcessInstanceDefinitionKey = null;
     }
 
     @Override
@@ -52,6 +54,7 @@ public class ServiceCacheTask implements JavaDelegate {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(execution.getProcessInstanceId()).singleResult();
         if (historicProcessInstance != null && historicProcessInstance.getId().equals(execution.getProcessInstanceId())) {
             historicProcessInstanceId = historicProcessInstance.getId();
+            historicProcessInstanceDefinitionKey = historicProcessInstance.getProcessDefinitionKey();
         }
     }
 
