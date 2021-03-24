@@ -71,7 +71,7 @@ public class AbstractModelBpmnResource {
             LOGGER.warn("Failed to encode name {}", name);
         }
 
-        String contentDispositionValue = "attachment; filename=" + name;
+        String contentDispositionValue = "attachment; filename=" + encodedName;
         if (encodedName != null) {
             contentDispositionValue += "; filename*=" + encodedName;
         }
