@@ -31,6 +31,10 @@ import org.flowable.content.engine.impl.cmd.GetTableNameCmd;
  */
 public class ContentManagementServiceImpl extends CommonEngineServiceImpl<ContentEngineConfiguration> implements ContentManagementService {
 
+    public ContentManagementServiceImpl(ContentEngineConfiguration contentEngineConfiguration) {
+        super(contentEngineConfiguration);
+    }
+
     @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));

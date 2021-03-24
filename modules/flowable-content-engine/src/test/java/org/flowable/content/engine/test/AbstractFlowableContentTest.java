@@ -12,6 +12,7 @@
  */
 package org.flowable.content.engine.test;
 
+import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngineConfiguration;
@@ -38,6 +39,7 @@ public class AbstractFlowableContentTest {
     protected static ContentEngine cachedContentEngine;
     protected ContentEngineConfiguration contentEngineConfiguration;
     protected ContentService contentService;
+    protected ContentManagementService contentManagementService;
 
     @Before
     public void initContentEngine() {
@@ -47,6 +49,7 @@ public class AbstractFlowableContentTest {
 
         this.contentEngineConfiguration = cachedContentEngine.getContentEngineConfiguration();
         this.contentService = cachedContentEngine.getContentService();
+        this.contentManagementService = cachedContentEngine.getContentManagementService();
     }
 
 }
