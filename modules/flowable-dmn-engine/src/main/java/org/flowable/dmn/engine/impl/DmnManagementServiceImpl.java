@@ -31,6 +31,10 @@ import org.flowable.dmn.engine.impl.cmd.GetTableNameCmd;
  */
 public class DmnManagementServiceImpl extends CommonEngineServiceImpl<DmnEngineConfiguration> implements DmnManagementService {
 
+    public DmnManagementServiceImpl(DmnEngineConfiguration dmnEngineConfiguration) {
+        super(dmnEngineConfiguration);
+    }
+
     @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd(configuration.getEngineCfgKey()));
