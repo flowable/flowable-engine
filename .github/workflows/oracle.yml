@@ -26,7 +26,7 @@ jobs:
             driverArtifact: ojdbc6
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
+        image: artifacts.flowable.com/artifactory/docker-local/infra/oracle:${{ matrix.oracle }}
         credentials:
           username: ${{ secrets.flowable_docker_user }}
           password: ${{ secrets.flowable_docker_user_password }}
@@ -75,7 +75,7 @@ jobs:
             driverArtifact: ojdbc6
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
+        image: artifacts.flowable.com/artifactory/docker-local/infra/oracle:${{ matrix.oracle }}
         credentials:
           username: ${{ secrets.flowable_docker_user }}
           password: ${{ secrets.flowable_docker_user_password }}
@@ -125,7 +125,7 @@ jobs:
             driverArtifact: ojdbc6
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
+        image: artifacts.flowable.com/artifactory/docker-local/infra/oracle:${{ matrix.oracle }}
         credentials:
           username: ${{ secrets.flowable_docker_user }}
           password: ${{ secrets.flowable_docker_user_password }}
