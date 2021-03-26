@@ -12,13 +12,13 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import static java.util.stream.Collectors.toList;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -419,9 +419,6 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                     Collection<String> candidates = extractCandidates(value, groupIdExpr.getExpressionText());
                     Collection<String> candidatesNormalized = normalizeCandidates(candidates);
 
-                    if(isCandidateGroupsLimit(candidatesNormalized.size(), processEngineConfiguration.getUserTaskCandidateGroupsLimit())) {
-                        throw new FlowableException("The number of groups after resolving expression exceeds the limit " + processEngineConfiguration.getUserTaskCandidateGroupsLimit() + " of allowed groups for a user task.");
-                    }
                     List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                             .getIdentityLinkService().addCandidateGroups(task.getId(), candidatesNormalized);
 
@@ -456,9 +453,6 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
                     Collection<String> candidates = extractCandidates(value, userIdExpr.getExpressionText());
                     Collection<String> candidatesNormalized = normalizeCandidates(candidates);
 
-                    if(isCandidateUsersLimit(candidatesNormalized.size(), processEngineConfiguration.getUserTaskCandidateUsersLimit())) {
-                        throw new FlowableException("The number of users after resolving expression exceeds the limit " + processEngineConfiguration.getUserTaskCandidateUsersLimit() + " of allowed users for a user task.");
-                    }
                     List<IdentityLinkEntity> identityLinkEntities = processEngineConfiguration.getIdentityLinkServiceConfiguration()
                             .getIdentityLinkService().addCandidateUsers(task.getId(), candidatesNormalized);
 

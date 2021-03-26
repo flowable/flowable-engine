@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -40,7 +39,6 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,13 +49,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class UserTaskTest extends PluggableFlowableTestCase {
-
-    @AfterEach
-    protected void tearDown() throws Exception {
-        //set back to default value
-        processEngineConfiguration.setUserTaskCandidateUsersLimit(-1);
-        processEngineConfiguration.setUserTaskCandidateGroupsLimit(-1);
-    }
 
     @Test
     @Deployment
@@ -349,38 +340,6 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         actualTaskId = secondTask.getId();
         String myExpressionTaskId = (String)runtimeService.getVariable(processInstance.getId(), "myExpressionTaskId");
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
-    }
-
-    @Test
-    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.testNonStringProperties.bpmn20.xml")
-    public void testUserTaskCandidateUsersLimit() {
-
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("taskAssignee", "testAssignee");
-        vars.put("taskOwner", "testOwner");
-        vars.put("taskCandidateGroups", "group1");
-        vars.put("taskCandidateUsers", "user1, user2, user3");
-        processEngineConfiguration.setUserTaskCandidateUsersLimit(2);
-
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("nonStringProperties", vars))
-                .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("The number of users after resolving expression exceeds the limit " + processEngineConfiguration.getUserTaskCandidateUsersLimit() +" of allowed users for a user task.");
-    }
-
-    @Test
-    @Deployment(resources="org/flowable/engine/test/bpmn/usertask/UserTaskTest.testNonStringProperties.bpmn20.xml")
-    public void testUserTaskCandidateGroupsLimit() {
-
-        Map<String, Object> vars = new HashMap<>();
-        vars.put("taskAssignee", "testAssignee");
-        vars.put("taskOwner", "testOwner");
-        vars.put("taskCandidateGroups", "group1, group2, group3");
-        vars.put("taskCandidateUsers", "user1");
-        processEngineConfiguration.setUserTaskCandidateGroupsLimit(2);
-
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("nonStringProperties", vars))
-                .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("The number of groups after resolving expression exceeds the limit " + processEngineConfiguration.getUserTaskCandidateGroupsLimit() +" of allowed groups for a user task.");
     }
 
     @Test
