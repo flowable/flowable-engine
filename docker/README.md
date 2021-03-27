@@ -16,12 +16,12 @@ login/password: `admin/test`
 ## Flowable UI with Keycloak and PostgreSQL 
 
 ```bash
-./ui-keyclock-postgres.sh start|stop|info
+./ui-keycloak-postgres.sh start|stop|info
 ```
 
 *--additional configuration required--*
 
-In order to be able to redirect both Docker containers and client browser to the same authentication provider (Keyclock) uri `keycloak.flowable.org` must be added as an alias to the Docker host hostname.
+In order to be able to redirect both Docker containers and client browser to the same authentication provider (Keycloak) uri `keycloak.flowable.org` must be added as an alias to the Docker host hostname.
 
 For local development this can be done by modifying the `/etc/hosts`;
 
