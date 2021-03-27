@@ -15,7 +15,7 @@ services:
             - SPRING.SECURITY.OAUTH2.RESOURCESERVER.JWT.ISSUER-URI=http://keycloak.flowable.org:8088/auth/realms/Flowable
             - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-ID=flowable-client
             - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-SECRET=5a63612b-c419-40fe-8d01-2f91689bb4c0
-            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-NAME=Flowable UI Keyclock
+            - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.CLIENT-NAME=Flowable UI Keycloak
             - SPRING.SECURITY.OAUTH2.CLIENT.REGISTRATION.KEYCLOAK.AUTHORIZATION-GRANT-TYPE=authorization_code
             - SPRING.SECURITY.OAUTH2.CLIENT.PROVIDER.KEYCLOAK.ISSUER-URI=http://keycloak.flowable.org:8088/auth/realms/Flowable
             - SPRING.SECURITY.OAUTH2.CLIENT.PROVIDER.KEYCLOAK.USER-NAME-ATTRIBUTE=preferred_username
@@ -54,7 +54,7 @@ services:
             DB_PASSWORD: flowable
             KEYCLOAK_USER: admin
             KEYCLOAK_PASSWORD: admin
-            KEYCLOCK_MIGRATION_ACTION: IMPORT
+            KEYCLOAK_MIGRATION_ACTION: IMPORT
             KEYCLOAK_IMPORT: /tmp/keycloak-flowable.json
         command: ["-Djboss.http.port=8088"]
         volumes: 
