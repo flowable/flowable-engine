@@ -77,7 +77,9 @@ There are 7 hit policies available;
 
     -   &gt; (max): the result of the decision table is the largest value of all the outputs.
 
-    -   \# (count): the result of the decision table is the number of distinct outputs.
+    -   \# (count): the result of the decision table is the number of outputs.
+
+(Prior to version 1.2 of the DMN spec the definition of the `count` collect hit policy stated that only distinct outputs were taken into account. You can still force this behaviour by selecting `Force DMN 1.1` when saving a decision table)
 
 ### Input and Output expressions
 
