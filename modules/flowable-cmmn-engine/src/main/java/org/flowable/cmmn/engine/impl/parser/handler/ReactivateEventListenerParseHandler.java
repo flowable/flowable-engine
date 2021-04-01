@@ -15,25 +15,18 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
-import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.UserEventListener;
+import org.flowable.cmmn.model.ReactivateEventListener;
 
 /**
- * @author Joram Barrez
+ * The parse handler for the reactivation event listener, extending the user event listener as it is based on it with a specific behavior.
+ *
+ * @author Micha Kiener
  */
-public class UserEventListenerParseHandler extends AbstractPlanItemParseHandler<UserEventListener> {
+public class ReactivateEventListenerParseHandler extends UserEventListenerParseHandler {
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Collections.singletonList(UserEventListener.class);
+        return Collections.singletonList(ReactivateEventListener.class);
     }
-
-    @Override
-    protected void executePlanItemParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, PlanItem planItem, UserEventListener userEventListener) {
-        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createUserEventListenerActivityBehavior(planItem, userEventListener));
-    }
-
 }
