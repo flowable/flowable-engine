@@ -86,4 +86,6 @@ public interface HistoricPlanItemInstance {
 
     String getTenantId();
 
+    /** Sets an optional localized name for the plan item */
+    void setLocalizedName(String localizedName);
 }

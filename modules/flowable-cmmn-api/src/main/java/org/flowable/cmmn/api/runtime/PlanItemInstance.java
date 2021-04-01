@@ -59,4 +59,7 @@ public interface PlanItemInstance {
     String getExtraValue();
     String getTenantId();
     
+
+    /** Sets an optional localized name for the plan item */
+    void setLocalizedName(String localizedName);
 }

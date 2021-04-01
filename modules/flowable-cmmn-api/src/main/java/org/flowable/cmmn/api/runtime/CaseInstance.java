@@ -44,4 +44,6 @@ public interface CaseInstance {
      */
     Map<String, Object> getCaseVariables();
 
+    /** Sets an optional localized name for the case. */
+    void setLocalizedName(String localizedName);
 }

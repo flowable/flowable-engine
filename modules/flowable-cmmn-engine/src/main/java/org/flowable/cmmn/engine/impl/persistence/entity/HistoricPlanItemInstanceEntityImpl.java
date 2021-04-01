@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 
@@ -55,6 +57,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected String extraValue;
     protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+    protected String localizedName;
 
     public HistoricPlanItemInstanceEntityImpl() {
     }
@@ -134,6 +137,9 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
 
     @Override
     public String getName() {
+        if (StringUtils.isNotBlank(localizedName)) {
+            return localizedName;
+        }
         return name;
     }
 
@@ -452,4 +458,12 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         this.tenantId = tenantId;
     }
 
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
+    }
 }

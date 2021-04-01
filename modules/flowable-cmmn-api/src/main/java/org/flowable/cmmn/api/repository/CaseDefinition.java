@@ -60,4 +60,9 @@ public interface CaseDefinition {
     /** The tenant identifier of this case definition */
     String getTenantId();
 
+    /** Sets an optional localized name for the case definition. */
+    void setLocalizedName(String localizedName);
+
+    /** Sets an optional localized description for the case definition */
+    void setLocalizedDescription(String localizedDescription);
 }

@@ -78,6 +78,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     protected Integer caseInstanceVariablesLimit;
 
+    protected String locale;
+    protected boolean withLocalizationFallback;
+
     public CaseInstanceQueryImpl() {
     }
 
@@ -662,6 +665,18 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return this;
     }
 
+    @Override
+    public CaseInstanceQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
     public Integer getCaseInstanceVariablesLimit() {
         return this.caseInstanceVariablesLimit;
     }
@@ -677,10 +692,20 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     @Override
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        List<CaseInstance> caseInstances = null;
         if (this.isIncludeCaseVariables()) {
-            return cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this);
+            caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this);
+        } else {
+            caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findByCriteria(this);
         }
-        return cmmnEngineConfiguration.getCaseInstanceEntityManager().findByCriteria(this);
+
+        if (cmmnEngineConfiguration.getCaseLocalizationManager() != null) {
+            for (CaseInstance caseInstance : caseInstances) {
+                cmmnEngineConfiguration.getCaseLocalizationManager().localize(caseInstance, locale, withLocalizationFallback);
+            }
+        }
+
+        return caseInstances;
     }
 
     @Override
