@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.StageResponse;
@@ -20,6 +21,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.CmmnDeleteHistoricTaskLogEntryCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
@@ -31,6 +33,7 @@ import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForCaseInstance
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetHistoricStageOverviewCmd;
+import org.flowable.cmmn.engine.impl.cmd.ReactivateHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
@@ -94,7 +97,12 @@ public class CmmnHistoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void deleteHistoricTaskInstance(String taskId) {
         commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
     }
-    
+
+    @Override
+    public CaseInstance reactivateHistoricCaseInstance(String caseInstanceId, Map<String, Object> reactivationPayload) {
+        return commandExecutor.execute(new ReactivateHistoricCaseInstanceCmd(caseInstanceId, reactivationPayload));
+    }
+
     @Override
     public List<HistoricIdentityLink> getHistoricIdentityLinksForCaseInstance(String caseInstanceId) {
         return commandExecutor.execute(new GetHistoricIdentityLinksForCaseInstanceCmd(caseInstanceId));

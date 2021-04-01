@@ -12,13 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.parser.handler;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.UserEventListener;
 
 /**
@@ -28,7 +29,11 @@ public class UserEventListenerParseHandler extends AbstractPlanItemParseHandler<
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Collections.singletonList(UserEventListener.class);
+        // we need to handle both listeners, the user listener itself, but also the extended one, handling the reactivation of a case
+        ArrayList<Class<? extends BaseElement>> types = new ArrayList<>(2);
+        types.add(UserEventListener.class);
+        types.add(ReactivateEventListener.class);
+        return types;
     }
 
     @Override

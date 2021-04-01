@@ -13,12 +13,15 @@
 package org.flowable.cmmn.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -62,6 +65,18 @@ public interface CmmnHistoryService {
      * historic task instance doesn't exist, no exception is thrown and the method returns normal.
      */
     void deleteHistoricTaskInstance(String taskId);
+
+    /**
+     * Reactivates a historic case instance by moving its data back to the runtime and reactivates the case depending on the reactivation event modeled in the
+     * CMMN case model.
+     *
+     * @param caseInstanceId the id of the historic case instance to be reactivated
+     * @param reactivationPayload the optional payload for the reactivation event which might contain necessary information used during the reactivation
+     * @return the reactivated case instance
+     * @throws FlowableObjectNotFoundException if the case instance could not be found
+     * @throws FlowableIllegalStateException if the case model does not explicitly support reactivation
+     */
+    CaseInstance reactivateHistoricCaseInstance(String caseInstanceId, Map<String, Object> reactivationPayload);
     
     /**
      * Retrieves the {@link HistoricIdentityLink}s associated with the given task. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is associated with a certain task

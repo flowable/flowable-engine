@@ -311,6 +311,16 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         return true;
     }
 
+    /**
+     * Internal method to directly set the list of variable instances to this entity without lazy loading or variable creation. Might be used when creating a
+     * copy from the history back to the runtime for instance where the variables are created outside the entity and should not be copied again to the history.
+     *
+     * @param variableInstances the list of variable instances to be set on this entity
+     */
+    public void setVariableInstancesToCache(Map<String, VariableInstanceEntity> variableInstances) {
+        this.variableInstances = variableInstances;
+    }
+
     @Override
     protected VariableServiceConfiguration getVariableServiceConfiguration() {
         return CommandContextUtil.getCmmnEngineConfiguration().getVariableServiceConfiguration();
