@@ -24,12 +24,11 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -73,6 +72,47 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void reactivationListenerNotAvailableAtCaseRuntime() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleReactivationTestCase")
+                .start();
+
+            assertThat(caseInstance).isNotNull();
+            List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(caseInstance.getId());
+            assertThat(planItemInstances).isNotNull().hasSize(5);
+            assertPlanItemInstanceState(caseInstance, "Reactivate case", PlanItemInstanceState.UNAVAILABLE);
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void reactivationListenerHavingNoImpactAtCaseCompletion() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleReactivationTestCase")
+                .start();
+            List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
+            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+            planItemInstances = getPlanItemInstances(caseInstance.getId());
+            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+            assertCaseInstanceEnded(caseInstance);
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
     public void simpleCaseReactivationTest() {
         String previousUserId = Authentication.getAuthenticatedUserId();
         try {
@@ -112,15 +152,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
         cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
-
-        assertCaseInstanceEnded(caseInstance);
-
-        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            return cmmnHistoryService.createHistoricCaseInstanceQuery().finished().singleResult();
-        }
-        throw new FlowableIllegalStateException("The history level needs to be at least on activity level.");
+        return cmmnHistoryService.createHistoricCaseInstanceQuery().finished().singleResult();
     }
 
     protected void assertSameVariables(HistoricCaseInstance c1, CaseInstance c2) {
