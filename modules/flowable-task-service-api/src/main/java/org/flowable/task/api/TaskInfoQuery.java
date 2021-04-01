@@ -193,7 +193,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      */
     T processInstanceIdIn(Collection<String> processInstanceIds);
 
-    /** Only select tasks foe the given business key */
+    /** Only select tasks for the given business key */
     T processInstanceBusinessKey(String processInstanceBusinessKey);
 
     /**
