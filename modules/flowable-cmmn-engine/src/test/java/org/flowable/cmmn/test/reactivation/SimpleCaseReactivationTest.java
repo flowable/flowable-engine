@@ -74,22 +74,27 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
     public void simpleCaseReactivationTest() {
-        Authentication.setAuthenticatedUserId("JohnDoe");
-        final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
 
-        CaseInstance reactivatedCaze = cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null);
-        assertThat(reactivatedCaze).isNotNull();
+            CaseInstance reactivatedCaze = cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null);
+            assertThat(reactivatedCaze).isNotNull();
 
-        List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCaze.getId());
-        assertThat(planItemInstances).isNotNull().hasSize(6);
-        assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
-        assertCaseInstanceNotEnded(reactivatedCaze);
+            List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCaze.getId());
+            assertThat(planItemInstances).isNotNull().hasSize(6);
+            assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+            assertCaseInstanceNotEnded(reactivatedCaze);
 
-        // the plan items must be equal for both the runtime as well as the history as of now
-        assertSamePlanItemState(caze, reactivatedCaze);
+            // the plan items must be equal for both the runtime as well as the history as of now
+            assertSamePlanItemState(caze, reactivatedCaze);
 
-        // make sure we have exactly the same variables as the historic case
-        assertSameVariables(caze, reactivatedCaze);
+            // make sure we have exactly the same variables as the historic case
+            assertSameVariables(caze, reactivatedCaze);
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
     }
 
     protected HistoricCaseInstance createAndFinishSimpleCase(String caseDefinitionKey) {
