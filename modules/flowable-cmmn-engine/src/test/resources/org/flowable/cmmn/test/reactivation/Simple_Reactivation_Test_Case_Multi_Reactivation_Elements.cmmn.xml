@@ -82,7 +82,7 @@
           <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
         </extensionElements>
       </humanTask>
-      <userEventListener id="reactivateEventListener1" name="Reactivate case" flowable:reactivateEventListener="true" flowable:availableCondition="${caseInstance.getState() != 'active'}">
+      <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate" flowable:availableCondition="${caseInstance.getState() != 'active'}">
         <extensionElements>
           <flowable:startformkey><![CDATA[simpleReactivationCaseActionForm]]></flowable:startformkey>
           <flowable:startFormSameDeployment><![CDATA[true]]></flowable:startFormSameDeployment>
@@ -90,13 +90,13 @@
           <design:stencilid><![CDATA[UserEventListener]]></design:stencilid>
           <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
         </extensionElements>
-      </userEventListener>
-      <userEventListener id="userEventListener2" name="Reactivate case 2" flowable:reactivateEventListener="true" flowable:availableCondition="${caseInstance.getState() != 'active'}">
+      </eventListener>
+      <eventListener id="userEventListener2" name="Reactivate case 2" flowable:eventType="reactivate" flowable:availableCondition="${caseInstance.getState() != 'active'}">
         <extensionElements>
           <design:stencilid><![CDATA[UserEventListener]]></design:stencilid>
           <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
         </extensionElements>
-      </userEventListener>
+      </eventListener>
     </casePlanModel>
   </case>
   <cmmndi:CMMNDI>

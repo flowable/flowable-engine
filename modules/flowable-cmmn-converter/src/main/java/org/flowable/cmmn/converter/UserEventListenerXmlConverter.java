@@ -16,12 +16,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.UserEventListener;
 
 /**
  * @author Dennis Federico
- * @author Micha Kiener
  */
 public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverter {
 
@@ -37,10 +35,6 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverte
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        // depending on the reactivation flag, we initialize one or the other user listener object
-        if (isReactivateListener(xtr)) {
-            return convertCommonAttributes(xtr, new ReactivateEventListener());
-        }
         return convertCommonAttributes(xtr, new UserEventListener());
     }
 
@@ -55,10 +49,5 @@ public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverte
             listener.setAuthorizedRoleRefs(roles);
         }
         return listener;
-    }
-
-    protected boolean isReactivateListener(XMLStreamReader xtr) {
-        String reactivate = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_USER_EVENT_LISTENER_REACTIVATE);
-        return (reactivate != null && Boolean.valueOf(reactivate));
     }
 }

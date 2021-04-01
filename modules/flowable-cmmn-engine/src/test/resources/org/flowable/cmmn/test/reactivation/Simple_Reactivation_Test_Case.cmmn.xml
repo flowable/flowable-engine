@@ -68,7 +68,7 @@
           </extensionElements>
         </humanTask>
       </stage>
-      <userEventListener id="reactivateEventListener1" name="Reactivate case" flowable:reactivateEventListener="true" flowable:availableCondition="${caseInstance.getState() != 'active'}">
+      <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate" flowable:availableCondition="${caseInstance.getState() != 'active'}">
         <extensionElements>
           <flowable:startformkey><![CDATA[simpleReactivationCaseActionForm]]></flowable:startformkey>
           <flowable:startFormSameDeployment><![CDATA[true]]></flowable:startFormSameDeployment>
@@ -76,7 +76,7 @@
           <design:stencilid><![CDATA[UserEventListener]]></design:stencilid>
           <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
         </extensionElements>
-      </userEventListener>
+      </eventListener>
       <humanTask id="humanTask3" name="Task C" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
         <extensionElements>
           <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
