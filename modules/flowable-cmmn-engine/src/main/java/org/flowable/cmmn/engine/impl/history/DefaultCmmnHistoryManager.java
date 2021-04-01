@@ -80,7 +80,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             }
         }
     }
-    
+
+    @Override
+    public void recordHistoricCaseInstanceReactivated(CaseInstanceEntity caseInstanceEntity) {
+        // TODO: we need to record the case being reactivated
+    }
+
     @Override
     public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {

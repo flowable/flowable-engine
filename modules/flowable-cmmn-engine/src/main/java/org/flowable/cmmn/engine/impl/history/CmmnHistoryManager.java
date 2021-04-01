@@ -32,6 +32,8 @@ public interface CmmnHistoryManager {
     void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity);
 
     void recordCaseInstanceEnd(CaseInstanceEntity caseInstanceEntity, String state, Date endTime);
+
+    void recordHistoricCaseInstanceReactivated(CaseInstanceEntity caseInstanceEntity);
     
     void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name);
 

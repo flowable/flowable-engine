@@ -30,6 +30,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
@@ -94,6 +95,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
         addOperation(new InitPlanModelInstanceOperation(commandContext, caseInstanceEntity));
+    }
+
+    @Override
+    public void planReactivateCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity) {
+        addOperation(new ReactivateCaseInstanceOperation(commandContext, caseInstanceEntity));
     }
 
     @Override
