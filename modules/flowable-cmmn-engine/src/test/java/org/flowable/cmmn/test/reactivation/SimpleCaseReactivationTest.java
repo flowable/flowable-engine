@@ -25,8 +25,10 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.converter.CmmnXMLException;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -68,6 +70,19 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
                 .isExactlyInstanceOf(FlowableIllegalStateException.class)
                 .hasMessageContaining("The historic case instance " + caze.getId() +
                     " cannot be reactivated as there is no reactivation event in its CMMN model. You need to explicitly model the reactivation event in order to support case reactivation.");
+    }
+
+    @Test
+    public void simpleCaseReactivationMultiReactivationEventFailureTest() {
+        assertThatThrownBy(() -> addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case_Multi_Reactivation_Elements.cmmn.xml")
+                .deploy()
+            ))
+                .isExactlyInstanceOf(CmmnXMLException.class)
+                .hasRootCauseInstanceOf(FlowableIllegalArgumentException.class)
+                .getRootCause()
+                .hasMessageContaining("There can only be one reactivation listener on a case model, not multiple ones. Use a start form on the listener, "
+                    + "if there are several options on how to reactivate a case and use conditions to handle the different options on reactivation.");
     }
 
     @Test
