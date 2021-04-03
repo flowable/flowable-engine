@@ -152,6 +152,26 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void simpleCaseReactivationHistoryTest() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
+
+            CaseInstance reactivatedCaze = cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null);
+            assertThat(reactivatedCaze).isNotNull();
+
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caze.getId()).singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCaze.getState());
+            assertThat(historicCaseInstance.getEndTime()).isNull();
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
     protected HistoricCaseInstance createAndFinishSimpleCase(String caseDefinitionKey) {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey(caseDefinitionKey)

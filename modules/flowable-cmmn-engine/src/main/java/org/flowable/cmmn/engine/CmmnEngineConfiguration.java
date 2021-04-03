@@ -79,6 +79,7 @@ import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.AsyncCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.async.CmmnAsyncHistoryConstants;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceEndHistoryJsonTransformer;
+import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceReactivateHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceStartHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateBusinessKeyHistoryJsonTransformer;
 import org.flowable.cmmn.engine.impl.history.async.json.transformer.CaseInstanceUpdateNameHistoryJsonTransformer;
@@ -1748,6 +1749,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         
         historyJsonTransformers.add(new CaseInstanceStartHistoryJsonTransformer(this));
         historyJsonTransformers.add(new CaseInstanceEndHistoryJsonTransformer(this));
+        historyJsonTransformers.add(new CaseInstanceReactivateHistoryJsonTransformer(this));
         historyJsonTransformers.add(new CaseInstanceUpdateNameHistoryJsonTransformer(this));
         historyJsonTransformers.add(new CaseInstanceUpdateBusinessKeyHistoryJsonTransformer(this));
         historyJsonTransformers.add(new HistoricCaseInstanceDeletedHistoryJsonTransformer(this));
