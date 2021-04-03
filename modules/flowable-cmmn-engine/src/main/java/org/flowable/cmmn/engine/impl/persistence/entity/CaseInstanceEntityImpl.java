@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -65,6 +66,33 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String caseDefinitionName;
     protected Integer caseDefinitionVersion;
     protected String caseDefinitionDeploymentId;
+
+    public CaseInstanceEntityImpl() {
+    }
+
+    public CaseInstanceEntityImpl(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables) {
+        this.id = historicCaseInstance.getId();
+        this.businessKey = historicCaseInstance.getBusinessKey();
+        this.name = historicCaseInstance.getName();
+        this.parentId = historicCaseInstance.getParentId();
+        this.caseDefinitionId = historicCaseInstance.getCaseDefinitionId();
+        this.caseDefinitionKey = historicCaseInstance.getCaseDefinitionKey();
+        this.caseDefinitionName = historicCaseInstance.getCaseDefinitionName();
+        this.caseDefinitionVersion = historicCaseInstance.getCaseDefinitionVersion();
+        this.caseDefinitionDeploymentId = historicCaseInstance.getCaseDefinitionDeploymentId();
+        this.state = historicCaseInstance.getState();
+        this.startTime = historicCaseInstance.getStartTime();
+        this.startUserId = historicCaseInstance.getStartUserId();
+        this.callbackId = historicCaseInstance.getCallbackId();
+        this.callbackType = historicCaseInstance.getCallbackType();
+        this.referenceId = historicCaseInstance.getReferenceId();
+        this.referenceType = historicCaseInstance.getReferenceType();
+
+        if (historicCaseInstance.getTenantId() != null) {
+            this.tenantId = historicCaseInstance.getTenantId();
+        }
+        this.variableInstances = variables;
+    }
 
     @Override
     public Object getPersistentState() {
