@@ -79,7 +79,14 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
 
     @Override
     public void recordHistoricCaseInstanceReactivated(CaseInstanceEntity caseInstanceEntity) {
-        // TODO: we need to record the case being reactivated
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, caseInstanceEntity.getState());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_REACTIVATE, data, caseInstanceEntity.getTenantId());
+        }
+        // TODO: we need to record the case being reactivated using a flag or specific timestamp
     }
 
     @Override

@@ -53,7 +53,6 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         HistoricCaseInstance instance = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().createHistoricCaseInstanceQuery()
             .caseInstanceId(caseInstanceId)
-            .includeCaseVariables()
             .singleResult();
 
         if (instance == null) {
@@ -66,16 +65,14 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceHelper()
             .copyHistoricCaseInstanceToRuntime(instance);
 
-        // set the reactivation payload as transient variables
+        // set the reactivation payload as new variables variables
         if (reactivationPayload != null && reactivationPayload.size() > 0) {
-            caseInstanceEntity.setTransientVariables(reactivationPayload);
+            caseInstanceEntity.setVariables(reactivationPayload);
         }
 
         // the reactivate operation will take care of triggering the reactivation event and re-initialize all necessary plan items according the model
         CommandContextUtil.getAgenda(commandContext).planReactivateCaseInstanceOperation(caseInstanceEntity);
 
-        // record the reactivation of the case in the history manager
-        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceReactivated(caseInstanceEntity);
         return caseInstanceEntity;
     }
 

@@ -25,6 +25,7 @@ public interface CmmnAsyncHistoryConstants {
     
     String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
     String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
+    String TYPE_CASE_INSTANCE_REACTIVATE = "cmmn-case-instance-reactivate";
     String TYPE_UPDATE_CASE_INSTANCE_NAME = "cmmn-update-case-instance-name";
     String TYPE_UPDATE_CASE_INSTANCE_BUSINESS_KEY = "cmmn-update-case-business-key";
     String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";

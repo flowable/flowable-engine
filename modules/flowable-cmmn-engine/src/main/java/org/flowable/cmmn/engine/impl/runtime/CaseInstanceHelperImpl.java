@@ -34,8 +34,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
@@ -76,6 +74,7 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -512,9 +511,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         // now copy the variables from the history to the runtime as well and set them on the entity to make sure further processing (e.g. evaluating expressions)
         // will actually work
-        if (caseInstanceEntity instanceof CaseInstanceEntityImpl) {
-            ((CaseInstanceEntityImpl) caseInstanceEntity)
-                .setVariableInstancesToCache(createCaseVariablesFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
+        if (caseInstanceEntity instanceof VariableScopeImpl) {
+            ((VariableScopeImpl) caseInstanceEntity).internalSetVariableInstances(createCaseVariablesFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
         } else {
             throw new FlowableIllegalArgumentException("Cannot set variables on reactivated case instance as it is not from expected implementation class.");
         }
@@ -522,12 +520,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         // create runtime plan items from the history and set them as the new child plan item list
         caseInstanceEntity.setChildPlanItemInstances(createCasePlanItemsFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
 
-        // also update the historic one to NOT be ended anymore as we reactivated it again
-        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
-        HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(historicCaseInstance.getId());
-        historicCaseInstanceEntity.setEndTime(null);
-        historicCaseInstanceEntity.setState(CaseInstanceState.ACTIVE);
-        historicCaseInstanceEntityManager.update(historicCaseInstanceEntity);
+        // record the reactivation of the case in the history manager
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceReactivated(caseInstanceEntity);
 
         return caseInstanceEntity;
     }
@@ -628,16 +622,19 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         if (variables != null) {
             Map<String, VariableInstanceEntity> newVars = new HashMap<>(variables.size());
             for (HistoricVariableInstance variable : variables) {
-                VariableInstanceEntity newVariable = variableService.createVariableInstance(
-                    variable.getVariableName(), variableTypes.getVariableType(variable.getVariableTypeName()), variable.getValue());
+                // only make a copy, if it is a case variable, we don't copy locally scoped ones (e.g. from stages), as those plan items are practically
+                // finished
+                if (variable.getSubScopeId() == null) {
+                    VariableInstanceEntity newVariable = variableService.createVariableInstance(
+                        variable.getVariableName(), variableTypes.getVariableType(variable.getVariableTypeName()), variable.getValue());
 
-                newVariable.setId(variable.getId());
-                newVariable.setScopeId(newCaseInstance.getId());
-                newVariable.setScopeType(variable.getScopeType());
-                newVariable.setSubScopeId(variable.getSubScopeId());
+                    newVariable.setId(variable.getId());
+                    newVariable.setScopeId(newCaseInstance.getId());
+                    newVariable.setScopeType(variable.getScopeType());
 
-                variableService.insertVariableInstance(newVariable);
-                newVars.put(newVariable.getName(), newVariable);
+                    variableService.insertVariableInstance(newVariable);
+                    newVars.put(newVariable.getName(), newVariable);
+                }
             }
             return newVars;
         }
