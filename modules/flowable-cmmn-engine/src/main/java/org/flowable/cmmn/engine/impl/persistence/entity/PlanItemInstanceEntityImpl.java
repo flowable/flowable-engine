@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.delegate.ReadOnlyDelegatePlanItemInstanceImpl;
@@ -88,6 +89,43 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
+
+    public PlanItemInstanceEntityImpl() {
+    }
+
+    public PlanItemInstanceEntityImpl(HistoricPlanItemInstance historicPlanItemInstance) {
+        setId(historicPlanItemInstance.getId());
+        setName(historicPlanItemInstance.getName());
+        setState(historicPlanItemInstance.getState());
+        setCaseDefinitionId(historicPlanItemInstance.getCaseDefinitionId());
+        setDerivedCaseDefinitionId(historicPlanItemInstance.getDerivedCaseDefinitionId());
+        setCaseInstanceId(historicPlanItemInstance.getCaseInstanceId());
+        setStageInstanceId(historicPlanItemInstance.getStageInstanceId());
+        setStage(historicPlanItemInstance.isStage());
+        setElementId(historicPlanItemInstance.getElementId());
+        setPlanItemDefinitionId(historicPlanItemInstance.getPlanItemDefinitionId());
+        setPlanItemDefinitionType(historicPlanItemInstance.getPlanItemDefinitionType());
+        setCreateTime(historicPlanItemInstance.getCreateTime());
+        setLastAvailableTime(historicPlanItemInstance.getLastAvailableTime());
+        setLastUnavailableTime(historicPlanItemInstance.getLastUnavailableTime());
+        setLastEnabledTime(historicPlanItemInstance.getLastEnabledTime());
+        setLastDisabledTime(historicPlanItemInstance.getLastDisabledTime());
+        setLastStartedTime(historicPlanItemInstance.getLastStartedTime());
+        setLastSuspendedTime(historicPlanItemInstance.getLastSuspendedTime());
+        setCompletedTime(historicPlanItemInstance.getCompletedTime());
+        setOccurredTime(historicPlanItemInstance.getOccurredTime());
+        setTerminatedTime(historicPlanItemInstance.getTerminatedTime());
+        setExitTime(historicPlanItemInstance.getExitTime());
+        setEndedTime(historicPlanItemInstance.getEndedTime());
+        setStartUserId(historicPlanItemInstance.getStartUserId());
+        setReferenceId(historicPlanItemInstance.getReferenceId());
+        setReferenceType(historicPlanItemInstance.getReferenceType());
+        setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
+        setExitCriterionId(historicPlanItemInstance.getExitCriterionId());
+        setFormKey(historicPlanItemInstance.getFormKey());
+        setExtraValue(historicPlanItemInstance.getExtraValue());
+        setTenantId(historicPlanItemInstance.getTenantId());
+    }
 
     @Override
     public Object getPersistentState() {

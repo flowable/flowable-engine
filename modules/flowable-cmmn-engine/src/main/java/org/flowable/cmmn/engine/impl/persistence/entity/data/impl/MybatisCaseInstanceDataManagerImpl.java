@@ -17,7 +17,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -31,6 +33,7 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -55,6 +58,11 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         caseInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<>(1));
         caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<>(1));
         return caseInstanceEntityImpl;
+    }
+
+    @Override
+    public CaseInstanceEntity create(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables) {
+        return new CaseInstanceEntityImpl(historicCaseInstance, variables);
     }
 
     @Override

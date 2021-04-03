@@ -32,7 +32,6 @@ import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CaseInstanceLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -74,7 +73,6 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -482,40 +480,13 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected CaseInstanceEntity createCaseInstanceEntityFromHistoricCaseInstance(CommandContext commandContext, HistoricCaseInstance historicCaseInstance) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
 
-        CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.create();
-
-        // we re-use the same id as in the history as we want them to still be connected, the history will be updated from the reactivated case as we move on
-        caseInstanceEntity.setId(historicCaseInstance.getId());
+        // copy the case variables first so we can directly set it on the new case instance so they don't get reloaded later
+        Map<String, VariableInstanceEntity> variables = createCaseVariablesFromHistoricCaseInstance(historicCaseInstance);
+        CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.create(historicCaseInstance, variables);
 
         // set the state back to active, not copying it from the historic one, obviously
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
-
-        caseInstanceEntity.setBusinessKey(historicCaseInstance.getBusinessKey());
-        caseInstanceEntity.setName(historicCaseInstance.getName());
-        caseInstanceEntity.setParentId(historicCaseInstance.getParentId());
-        caseInstanceEntity.setCaseDefinitionId(historicCaseInstance.getCaseDefinitionId());
-        caseInstanceEntity.setCaseDefinitionKey(historicCaseInstance.getCaseDefinitionKey());
-        caseInstanceEntity.setCaseDefinitionName(historicCaseInstance.getCaseDefinitionName());
-        caseInstanceEntity.setCaseDefinitionVersion(historicCaseInstance.getCaseDefinitionVersion());
-        caseInstanceEntity.setCaseDefinitionDeploymentId(historicCaseInstance.getCaseDefinitionDeploymentId());
-        caseInstanceEntity.setStartTime(historicCaseInstance.getStartTime());
-        caseInstanceEntity.setStartUserId(historicCaseInstance.getStartUserId());
-        caseInstanceEntity.setCallbackId(historicCaseInstance.getCallbackId());
-        caseInstanceEntity.setCallbackType(historicCaseInstance.getCallbackType());
-        caseInstanceEntity.setReferenceId(historicCaseInstance.getReferenceId());
-        caseInstanceEntity.setReferenceType(historicCaseInstance.getReferenceType());
-        caseInstanceEntity.setTenantId(historicCaseInstance.getTenantId());
-
-        // we need the case id being set before creating the plan items and variables associated with the case instance, so we need to insert it at this point
         caseInstanceEntityManager.insert(caseInstanceEntity);
-
-        // now copy the variables from the history to the runtime as well and set them on the entity to make sure further processing (e.g. evaluating expressions)
-        // will actually work
-        if (caseInstanceEntity instanceof VariableScopeImpl) {
-            ((VariableScopeImpl) caseInstanceEntity).internalSetVariableInstances(createCaseVariablesFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
-        } else {
-            throw new FlowableIllegalArgumentException("Cannot set variables on reactivated case instance as it is not from expected implementation class.");
-        }
 
         // create runtime plan items from the history and set them as the new child plan item list
         caseInstanceEntity.setChildPlanItemInstances(createCasePlanItemsFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
@@ -532,86 +503,37 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
      *
      * @param historicCaseInstance the historic case instance to copy the plan items from
      * @param newCaseInstance the newly created runtime copy of the historic case instance where the new plan items are attached to
-     * @return the list of newly copied plan items in the runtime
+     * @return the list of newly copied plan item instances in the runtime
      */
     protected List<PlanItemInstanceEntity> createCasePlanItemsFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance, CaseInstanceEntity newCaseInstance) {
         HistoricPlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+        PlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
 
         // move plan items back to runtime data, all of them as we will loop through them later to see which ones need to be reactivated according the
         // reactivation sentry modeling, but this will be done as part of the reactivation operation on the agenda
-        List<HistoricPlanItemInstance> historicPlanItems = planItemInstanceEntityManager.createHistoricPlanItemInstanceQuery()
+        List<HistoricPlanItemInstance> historicPlanItemInstances = planItemInstanceEntityManager.createHistoricPlanItemInstanceQuery()
             .planItemInstanceCaseInstanceId(historicCaseInstance.getId())
             .list();
 
-        List<PlanItemInstanceEntity> planItems = new ArrayList<>(historicPlanItems.size());
-        for (HistoricPlanItemInstance planItem : historicPlanItems) {
+        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>(historicPlanItemInstances.size());
+        for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
             // create a new plan item instance in the runtime table with exactly the same data as in the history (even the id, this way we don't even have to
             // rebuild the tree of stages and its child plan items and later on, they get updated from the runtime as well)
-            PlanItemInstanceEntity newPlanItem = createPlanItemEntityFromHistoricPlanItemInstance(newCaseInstance, planItem);
-            planItems.add(newPlanItem);
+            PlanItemInstanceEntity newPlanItemInstance = historicPlanItemInstanceEntityManager.create(historicPlanItemInstance);
+            historicPlanItemInstanceEntityManager.insert(newPlanItemInstance);
+            planItemInstances.add(newPlanItemInstance);
         }
 
-        return planItems;
-    }
-
-    /**
-     * Creates a copy of the provided historic plan item back to the runtime with exactly the same data. Nothing is changed from a data perspective, not even
-     * the state or any timestamps, this might be changed later on according the reactivation case model.
-     *
-     * @param caseInstanceEntity the copied case instance from the runtime where the plan item is attached to
-     * @param historicPlanItemInstance the historic plan item to be copied back to the runtime
-     * @return the newly created runtime plan item instance for further processing
-     */
-    protected PlanItemInstanceEntity createPlanItemEntityFromHistoricPlanItemInstance(CaseInstanceEntity caseInstanceEntity, HistoricPlanItemInstance historicPlanItemInstance) {
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
-        PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
-
-        planItemInstanceEntity.setId(historicPlanItemInstance.getId());
-
-        planItemInstanceEntity.setId(historicPlanItemInstance.getId());
-        planItemInstanceEntity.setName(historicPlanItemInstance.getName());
-        planItemInstanceEntity.setState(historicPlanItemInstance.getState());
-        planItemInstanceEntity.setCaseDefinitionId(historicPlanItemInstance.getCaseDefinitionId());
-        planItemInstanceEntity.setDerivedCaseDefinitionId(historicPlanItemInstance.getDerivedCaseDefinitionId());
-        planItemInstanceEntity.setCaseInstanceId(caseInstanceEntity.getId());
-        planItemInstanceEntity.setStageInstanceId(historicPlanItemInstance.getStageInstanceId());
-        planItemInstanceEntity.setStage(historicPlanItemInstance.isStage());
-        planItemInstanceEntity.setElementId(historicPlanItemInstance.getElementId());
-        planItemInstanceEntity.setPlanItemDefinitionId(historicPlanItemInstance.getPlanItemDefinitionId());
-        planItemInstanceEntity.setPlanItemDefinitionType(historicPlanItemInstance.getPlanItemDefinitionType());
-        planItemInstanceEntity.setCreateTime(historicPlanItemInstance.getCreateTime());
-        planItemInstanceEntity.setLastAvailableTime(historicPlanItemInstance.getLastAvailableTime());
-        planItemInstanceEntity.setLastUnavailableTime(historicPlanItemInstance.getLastUnavailableTime());
-        planItemInstanceEntity.setLastEnabledTime(historicPlanItemInstance.getLastEnabledTime());
-        planItemInstanceEntity.setLastDisabledTime(historicPlanItemInstance.getLastDisabledTime());
-        planItemInstanceEntity.setLastStartedTime(historicPlanItemInstance.getLastStartedTime());
-        planItemInstanceEntity.setLastSuspendedTime(historicPlanItemInstance.getLastSuspendedTime());
-        planItemInstanceEntity.setCompletedTime(historicPlanItemInstance.getCompletedTime());
-        planItemInstanceEntity.setOccurredTime(historicPlanItemInstance.getOccurredTime());
-        planItemInstanceEntity.setTerminatedTime(historicPlanItemInstance.getTerminatedTime());
-        planItemInstanceEntity.setExitTime(historicPlanItemInstance.getExitTime());
-        planItemInstanceEntity.setEndedTime(historicPlanItemInstance.getEndedTime());
-        planItemInstanceEntity.setStartUserId(historicPlanItemInstance.getStartUserId());
-        planItemInstanceEntity.setReferenceId(historicPlanItemInstance.getReferenceId());
-        planItemInstanceEntity.setReferenceType(historicPlanItemInstance.getReferenceType());
-        planItemInstanceEntity.setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
-        planItemInstanceEntity.setExitCriterionId(historicPlanItemInstance.getExitCriterionId());
-        planItemInstanceEntity.setFormKey(historicPlanItemInstance.getFormKey());
-        planItemInstanceEntity.setExtraValue(historicPlanItemInstance.getExtraValue());
-        planItemInstanceEntity.setTenantId(historicPlanItemInstance.getTenantId());
-
-        planItemInstanceEntityManager.insert(planItemInstanceEntity);
-        return planItemInstanceEntity;
+        return planItemInstances;
     }
 
     /**
      * Creates new variables in the runtime according the history of the provided case instance.
      *
      * @param historicCaseInstance the historic case instance to copy its variables back to the runtime
-     * @param newCaseInstance the new case instance where the variables will be attached to
      * @return the map of the created variables
      */
-    protected Map<String, VariableInstanceEntity> createCaseVariablesFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance, CaseInstanceEntity newCaseInstance) {
+    protected Map<String, VariableInstanceEntity> createCaseVariablesFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance) {
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         VariableTypes variableTypes = cmmnEngineConfiguration.getVariableTypes();
         List<HistoricVariableInstance> variables = cmmnEngineConfiguration.getCmmnHistoryService()
@@ -629,7 +551,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                         variable.getVariableName(), variableTypes.getVariableType(variable.getVariableTypeName()), variable.getValue());
 
                     newVariable.setId(variable.getId());
-                    newVariable.setScopeId(newCaseInstance.getId());
+                    newVariable.setScopeId(historicCaseInstance.getId());
                     newVariable.setScopeType(variable.getScopeType());
 
                     variableService.insertVariableInstance(newVariable);
