@@ -15,18 +15,45 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
+import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.ParentCompletionRule;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.ReactivateEventListener;
 
 /**
- * The parse handler for the reactivation event listener, extending the user event listener as it is based on it with a specific behavior.
+ * The parse handler for the reactivation event listener, similar to the user event listener, but adding specific properties to the listener like to be
+ * ignored by the parent for completion as well as an availability condition on the state of the case.
  *
  * @author Micha Kiener
  */
-public class ReactivateEventListenerParseHandler extends UserEventListenerParseHandler {
+public class ReactivateEventListenerParseHandler extends AbstractPlanItemParseHandler<ReactivateEventListener> {
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
         return Collections.singletonList(ReactivateEventListener.class);
+    }
+
+    @Override
+    protected void executePlanItemParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, PlanItem planItem, ReactivateEventListener reactivateEventListener) {
+        // the behavior is the same as with the user event listener
+        planItem.setBehavior(cmmnParser.getActivityBehaviorFactory().createUserEventListenerActivityBehavior(planItem, reactivateEventListener));
+
+        // if we are parsing a reactivation listener, we automatically set the parent completion rule to ignore as the listener does not have an impact on
+        // parent completion at all as it is used when the case is completed to only mark the case eligible for reactivation
+        ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
+        parentCompletionRule.setName("listenerIgnoredForCompletion");
+        parentCompletionRule.setType(ParentCompletionRule.IGNORE);
+        if (planItem.getItemControl() == null) {
+            PlanItemControl planItemControl = new PlanItemControl();
+            planItem.setItemControl(planItemControl);
+        }
+        planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
+
+        // additionally, we only set the listener to be available once the case is not active anymore (which in fact will make the listener unavailable at
+        // all at runtime as it is used only in history to reactivate the case again)
+        reactivateEventListener.setAvailableConditionExpression("${caseInstance.getState() != 'active'}");
     }
 }
