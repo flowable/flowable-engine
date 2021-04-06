@@ -15,9 +15,7 @@ package org.flowable.dmn.engine.test.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -76,17 +74,10 @@ public class DmnManagementServiceTest extends AbstractFlowableDmnTest {
         assertThat(instanceIdIndex).isGreaterThanOrEqualTo(0);
         assertThat(startTimeIndex).isGreaterThanOrEqualTo(0);
 
-        assertOneOf(new String[] { "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR" }, tableMetaData.getColumnTypes().get(instanceIdIndex));
-        assertOneOf(new String[] { "TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME" }, tableMetaData.getColumnTypes().get(startTimeIndex));
-    }
+        assertThat(tableMetaData.getColumnTypes().get(instanceIdIndex))
+                .isIn("VARCHAR", "VARCHAR2", "NVARCHAR2", "nvarchar", "NVARCHAR");
 
-    private void assertOneOf(String[] possibleValues, String currentValue) {
-        for (String value : possibleValues) {
-            if (currentValue.equals(value)) {
-                return;
-            }
-        }
-        fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
+        assertThat(tableMetaData.getColumnTypes().get(startTimeIndex))
+                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME");
     }
-
 }

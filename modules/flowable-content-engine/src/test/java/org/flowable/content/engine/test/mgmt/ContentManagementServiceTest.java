@@ -15,9 +15,7 @@ package org.flowable.content.engine.test.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -71,17 +69,10 @@ public class ContentManagementServiceTest extends AbstractFlowableContentTest {
         assertThat(createdByIndex).isGreaterThanOrEqualTo(0);
         assertThat(createdIndex).isGreaterThanOrEqualTo(0);
 
-        assertOneOf(new String[] { "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR" }, tableMetaData.getColumnTypes().get(createdByIndex));
-        assertOneOf(new String[] { "TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME" }, tableMetaData.getColumnTypes().get(createdIndex));
-    }
+        assertThat(tableMetaData.getColumnTypes().get(createdByIndex))
+                .isIn("VARCHAR", "VARCHAR2", "NVARCHAR2", "nvarchar", "NVARCHAR");
 
-    private void assertOneOf(String[] possibleValues, String currentValue) {
-        for (String value : possibleValues) {
-            if (currentValue.equals(value)) {
-                return;
-            }
-        }
-        fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
+        assertThat(tableMetaData.getColumnTypes().get(createdIndex))
+                .isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME");
     }
-
 }
