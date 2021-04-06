@@ -60,6 +60,11 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
     
     /** Only select jobs for the given scope type. */
     SuspendedJobQuery scopeType(String scopeType);
+
+    /**
+     * Only select jobs that do not have a scope type.
+     */
+    SuspendedJobQuery withoutScopeType();
     
     /** Only select jobs for the given scope definition identifier. */
     SuspendedJobQuery scopeDefinitionId(String scopeDefinitionId);

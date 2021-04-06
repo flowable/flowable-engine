@@ -160,6 +160,11 @@ public class JobCollectionResource {
                 query.unlocked();
             }
         }
+        if (allRequestParams.containsKey("withoutScopeType")) {
+            if (Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
+                query.withoutScopeType();
+            }
+        }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessJobInfoWithQuery(query);
