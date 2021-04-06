@@ -275,6 +275,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
+        super.initMybatisTypeHandlers(configuration);
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
