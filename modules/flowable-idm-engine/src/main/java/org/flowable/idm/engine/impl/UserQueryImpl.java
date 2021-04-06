@@ -331,4 +331,20 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return fullNameLikeIgnoreCase;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getDisplayNameLike() {
+        return displayNameLike;
+    }
+
+    public String getDisplayNameLikeIgnoreCase() {
+        return displayNameLikeIgnoreCase;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
 }

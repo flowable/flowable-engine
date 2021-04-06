@@ -547,4 +547,12 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         return noRetriesLeft;
     }
 
+    public boolean isExecutable() {
+        return executable;
+    }
+
+    public boolean isRetriesLeft() {
+        return retriesLeft;
+    }
+
 }

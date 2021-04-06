@@ -1081,4 +1081,24 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     public List<HistoricProcessInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }
+
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return involvedUserIdentityLink;
+    }
+
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return involvedGroupIdentityLink;
+    }
+
+    public boolean isWithJobException() {
+        return withJobException;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
 }

@@ -481,6 +481,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return onlyMessages;
     }
 
+    public boolean isExecutable() {
+        return executable;
+    }
+
     public boolean isOnlyExternalWorkers() {
         return onlyExternalWorkers;
     }

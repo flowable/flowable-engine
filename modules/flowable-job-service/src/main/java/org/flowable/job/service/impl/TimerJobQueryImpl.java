@@ -472,4 +472,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return duedateLowerThanOrEqual;
     }
 
+    public boolean isExecutable() {
+        return executable;
+    }
 }
