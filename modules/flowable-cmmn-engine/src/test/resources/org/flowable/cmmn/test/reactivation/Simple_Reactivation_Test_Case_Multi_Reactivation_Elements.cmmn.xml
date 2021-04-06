@@ -19,20 +19,8 @@
         </itemControl>
         <entryCriterion id="entryCriterion2" sentryRef="sentry2"></entryCriterion>
       </planItem>
-      <planItem id="planItem6" name="Reactivate case" definitionRef="reactivateEventListener1">
-        <itemControl>
-          <extensionElements>
-            <flowable:parentCompletionRule type="ignore"></flowable:parentCompletionRule>
-          </extensionElements>
-        </itemControl>
-      </planItem>
-      <planItem id="planItem7" name="Reactivate case 2" definitionRef="userEventListener2">
-        <itemControl>
-          <extensionElements>
-            <flowable:parentCompletionRule type="ignore"></flowable:parentCompletionRule>
-          </extensionElements>
-        </itemControl>
-      </planItem>
+      <planItem id="planItem6" name="Reactivate case" definitionRef="reactivateEventListener1"></planItem>
+      <planItem id="planItem7" name="Reactivate case 2" definitionRef="userEventListener2"></planItem>
       <sentry id="sentry1">
         <extensionElements>
           <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
@@ -82,7 +70,7 @@
           <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
         </extensionElements>
       </humanTask>
-      <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate" flowable:availableCondition="${caseInstance.getState() != 'active'}">
+      <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate">
         <extensionElements>
           <flowable:startformkey><![CDATA[simpleReactivationCaseActionForm]]></flowable:startformkey>
           <flowable:startFormSameDeployment><![CDATA[true]]></flowable:startFormSameDeployment>
@@ -91,7 +79,7 @@
           <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
         </extensionElements>
       </eventListener>
-      <eventListener id="userEventListener2" name="Reactivate case 2" flowable:eventType="reactivate" flowable:availableCondition="${caseInstance.getState() != 'active'}">
+      <eventListener id="userEventListener2" name="Reactivate case 2" flowable:eventType="reactivate">
         <extensionElements>
           <design:stencilid><![CDATA[UserEventListener]]></design:stencilid>
           <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
