@@ -24,8 +24,8 @@ import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.ReactivateEventListener;
 
 /**
- * The parse handler for the reactivation event listener, similar to the user event listener, but adding specific properties to the listener like to be
- * ignored by the parent for completion as well as an availability condition on the state of the case.
+ * The parse handler for the reactivation event listener, adding specific properties to the listener like to be ignored by the parent for completion as well
+ * as an availability condition on the state of the case.
  *
  * @author Micha Kiener
  */
