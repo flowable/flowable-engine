@@ -182,8 +182,8 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
 
             CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId())
-                .addVariable("varA", "varAValue")
-                .addTransientVariable("varB", "varBValue")
+                .variable("varA", "varAValue")
+                .transientVariable("varB", "varBValue")
                 .reactivate();
             assertThat(reactivatedCaze).isNotNull();
 
@@ -195,7 +195,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             Map<String, VariableInstance> reactivatedVars = cmmnEngineConfiguration.getCmmnRuntimeService().getVariableInstances(reactivatedCaze.getId());
             assertThat(reactivatedVars).isNotNull().hasSize(4);
             assertVariableValue(reactivatedVars, "varA", "varAValue");
-            assertVariableNotExisting(reactivatedVars, "varB");
+            assertThat(reactivatedVars).doesNotContainKey("varB");
 
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
@@ -211,8 +211,8 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             final HistoricCaseInstance caze = createAndFinishSimpleCase("reactivationTestCase");
 
             CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId())
-                .addTransientVariable("tempVar", "tempVarValue")
-                .addTransientVariable("tempIntVar", Integer.valueOf(100))
+                .transientVariable("tempVar", "tempVarValue")
+                .transientVariable("tempIntVar", Integer.valueOf(100))
                 .reactivate();
             assertThat(reactivatedCaze).isNotNull();
 
@@ -268,11 +268,6 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
         VariableInstance variable = variables.get(name);
         assertThat(variable).isNotNull();
         assertThat(variable.getValue()).isNotNull().isEqualTo(value);
-    }
-
-    protected void assertVariableNotExisting(Map<String, VariableInstance> variables, String name) {
-        VariableInstance variable = variables.get(name);
-        assertThat(variable).isNull();
     }
 
     protected void assertHistoricVariableValue(List<HistoricVariableInstance> variables, String name, Object value) {

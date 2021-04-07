@@ -59,7 +59,7 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
     }
 
     @Override
-    public CaseReactivationBuilder addVariable(String name, Object value) {
+    public CaseReactivationBuilder variable(String name, Object value) {
         if (variables == null) {
             variables = new HashMap<>();
         }
@@ -68,7 +68,7 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
     }
 
     @Override
-    public CaseReactivationBuilder addVariables(Map<String, Object> variables) {
+    public CaseReactivationBuilder variables(Map<String, Object> variables) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
         }
@@ -77,7 +77,7 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
     }
 
     @Override
-    public CaseReactivationBuilder addTransientVariable(String name, Object value) {
+    public CaseReactivationBuilder transientVariable(String name, Object value) {
         if (transientVariables == null) {
             transientVariables = new HashMap<>();
         }
@@ -86,7 +86,7 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
     }
 
     @Override
-    public CaseReactivationBuilder addTransientVariables(Map<String, Object> variables) {
+    public CaseReactivationBuilder transientVariables(Map<String, Object> variables) {
         if (transientVariables == null) {
             transientVariables = new HashMap<>();
         }
