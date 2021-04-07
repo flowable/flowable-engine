@@ -599,8 +599,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isScope;
     }
 
+    public boolean getIsScope() {
+        return isScope;
+    }
+
     @Override
     public void setScope(boolean isScope) {
+        this.isScope = isScope;
+    }
+
+    public void setIsScope(boolean isScope) {
         this.isScope = isScope;
     }
 
@@ -964,9 +972,17 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     public boolean isConcurrent() {
         return isConcurrent;
     }
+    
+    public boolean getIsConcurrent() {
+        return isConcurrent;
+    }
 
     @Override
     public void setConcurrent(boolean isConcurrent) {
+        this.isConcurrent = isConcurrent;
+    }
+
+    public void setIsConcurrent(boolean isConcurrent) {
         this.isConcurrent = isConcurrent;
     }
 
@@ -975,8 +991,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isActive;
     }
 
+    public boolean getIsActive() {
+        return isActive;
+    }
+
     @Override
     public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -990,8 +1014,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEnded;
     }
 
+    public boolean setIsEnded() {
+        return isEnded;
+    }
+
     @Override
     public void setEnded(boolean isEnded) {
+        this.isEnded = isEnded;
+    }
+
+    public void setIsEnded(boolean isEnded) {
         this.isEnded = isEnded;
     }
 
@@ -1035,8 +1067,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEventScope;
     }
 
+    public boolean getIsEventScope() {
+        return isEventScope;
+    }
+
     @Override
     public void setEventScope(boolean isEventScope) {
+        this.isEventScope = isEventScope;
+    }
+
+    public void setIsEventScope(boolean isEventScope) {
         this.isEventScope = isEventScope;
     }
 
@@ -1045,8 +1085,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isMultiInstanceRoot;
     }
 
+    public boolean getIsMultiInstanceRoot() {
+        return isMultiInstanceRoot;
+    }
+
     @Override
     public void setMultiInstanceRoot(boolean isMultiInstanceRoot) {
+        this.isMultiInstanceRoot = isMultiInstanceRoot;
+    }
+
+    public void setIsMultiInstanceRoot(boolean isMultiInstanceRoot) {
         this.isMultiInstanceRoot = isMultiInstanceRoot;
     }
 
@@ -1055,8 +1103,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isCountEnabled;
     }
 
+    public boolean getIsCountEnabled() {
+        return isCountEnabled;
+    }
+
     @Override
     public void setCountEnabled(boolean isCountEnabled) {
+        this.isCountEnabled = isCountEnabled;
+    }
+
+    public void setIsCountEnabled(boolean isCountEnabled) {
         this.isCountEnabled = isCountEnabled;
     }
 

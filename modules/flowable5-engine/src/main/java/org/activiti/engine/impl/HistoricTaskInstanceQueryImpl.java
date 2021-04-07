@@ -1671,7 +1671,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public String getTaskAssigneeLikeIgnoreCase() {
         return taskAssigneeLikeIgnoreCase;
     }
-
+    
+    public String getLocale() {
+        return locale;
+    }
+    
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }

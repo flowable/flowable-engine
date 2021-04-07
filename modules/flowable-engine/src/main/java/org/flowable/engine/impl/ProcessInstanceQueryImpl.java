@@ -1114,4 +1114,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
     }
+
+    public boolean isWithJobException() {
+        return withJobException;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
 }

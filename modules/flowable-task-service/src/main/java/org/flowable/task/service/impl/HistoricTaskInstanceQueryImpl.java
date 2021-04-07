@@ -2163,6 +2163,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return locale;
     }
 
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }

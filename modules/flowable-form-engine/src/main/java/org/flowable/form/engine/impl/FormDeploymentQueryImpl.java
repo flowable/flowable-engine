@@ -235,4 +235,12 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
     public String getFormDefinitionKeyLike() {
         return formDefinitionKeyLike;
     }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public String getParentDeploymentIdLike() {
+        return parentDeploymentIdLike;
+    }
 }

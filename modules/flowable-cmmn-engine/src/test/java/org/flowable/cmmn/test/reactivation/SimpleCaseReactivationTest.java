@@ -19,6 +19,7 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
@@ -44,7 +45,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             .caseDefinitionKey("simpleReactivationTestCaseNoEvent")
             .start();
 
-        assertThatThrownBy(() -> cmmnHistoryService.reactivateHistoricCaseInstance("nonexistentCaseId", null))
+        assertThatThrownBy(() -> cmmnHistoryService.createCaseReactivationBuilder("nonexistentCaseId").reactivate())
                 .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
                 .hasMessageContaining("No historic case instance to be reactivated found with id: nonexistentCaseId");
     }
@@ -56,7 +57,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             .caseDefinitionKey("simpleReactivationTestCaseNoEvent")
             .start();
 
-        assertThatThrownBy(() -> cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null))
+        assertThatThrownBy(() -> cmmnHistoryService.createCaseReactivationBuilder(caze.getId()).reactivate())
                 .isExactlyInstanceOf(FlowableIllegalStateException.class)
                 .hasMessageContaining("Case instance is still running, cannot reactivate historic case instance: " + caze.getId());
     }
@@ -66,7 +67,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
     public void simpleCaseReactivationNoReactivationEventFailureTest() {
         final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCaseNoEvent");
 
-        assertThatThrownBy(() -> cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null))
+        assertThatThrownBy(() -> cmmnHistoryService.createCaseReactivationBuilder(caze.getId()).reactivate())
                 .isExactlyInstanceOf(FlowableIllegalStateException.class)
                 .hasMessageContaining("The historic case instance " + caze.getId() +
                     " cannot be reactivated as there is no reactivation event in its CMMN model. You need to explicitly model the reactivation event in order to support case reactivation.");
@@ -134,7 +135,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             Authentication.setAuthenticatedUserId("JohnDoe");
             final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
 
-            CaseInstance reactivatedCaze = cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null);
+            CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId()).reactivate();
             assertThat(reactivatedCaze).isNotNull();
 
             List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCaze.getId());
@@ -160,13 +161,70 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             Authentication.setAuthenticatedUserId("JohnDoe");
             final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
 
-            CaseInstance reactivatedCaze = cmmnHistoryService.reactivateHistoricCaseInstance(caze.getId(), null);
+            CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId()).reactivate();
             assertThat(reactivatedCaze).isNotNull();
 
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caze.getId()).singleResult();
             assertThat(historicCaseInstance).isNotNull();
             assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCaze.getState());
             assertThat(historicCaseInstance.getEndTime()).isNull();
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void simpleCaseReactivationVariableTest() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            final HistoricCaseInstance caze = createAndFinishSimpleCase("simpleReactivationTestCase");
+
+            CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId())
+                .variable("varA", "varAValue")
+                .transientVariable("varB", "varBValue")
+                .reactivate();
+            assertThat(reactivatedCaze).isNotNull();
+
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caze.getId()).singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCaze.getState());
+            assertThat(historicCaseInstance.getEndTime()).isNull();
+
+            Map<String, VariableInstance> reactivatedVars = cmmnEngineConfiguration.getCmmnRuntimeService().getVariableInstances(reactivatedCaze.getId());
+            assertThat(reactivatedVars).isNotNull().hasSize(4);
+            assertVariableValue(reactivatedVars, "varA", "varAValue");
+            assertThat(reactivatedVars).doesNotContainKey("varB");
+
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Reactivation_Test_Case.cmmn.xml")
+    public void simpleCaseReactivationTransientVariableTest() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("JohnDoe");
+            final HistoricCaseInstance caze = createAndFinishSimpleCase("reactivationTestCase");
+
+            CaseInstance reactivatedCaze = cmmnHistoryService.createCaseReactivationBuilder(caze.getId())
+                .transientVariable("tempVar", "tempVarValue")
+                .transientVariable("tempIntVar", Integer.valueOf(100))
+                .reactivate();
+            assertThat(reactivatedCaze).isNotNull();
+
+            List<HistoricVariableInstance> vars = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricVariableInstanceQuery()
+                .caseInstanceId(reactivatedCaze.getId())
+                .list();
+            assertThat(vars).isNotNull().hasSize(5);
+            assertHistoricVariableValue(vars, "testExpression", Long.valueOf(1000));
+            assertHistoricVariableValue(vars, "testValue", "tempVarValue");
+            assertHistoricVariableNotExisting(vars, "tempVar");
+
+            assertCaseInstanceEnded(reactivatedCaze);
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -204,6 +262,24 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
         }
 
         assertThat(reactivatedVars).hasSize(0);
+    }
+
+    protected void assertVariableValue(Map<String, VariableInstance> variables, String name, Object value) {
+        VariableInstance variable = variables.get(name);
+        assertThat(variable).isNotNull();
+        assertThat(variable.getValue()).isNotNull().isEqualTo(value);
+    }
+
+    protected void assertHistoricVariableValue(List<HistoricVariableInstance> variables, String name, Object value) {
+        for (HistoricVariableInstance variable : variables) {
+            if (variable.getVariableName().equals(name)) {
+                assertThat(variable.getValue()).isEqualTo(value);
+            }
+        }
+    }
+
+    protected void assertHistoricVariableNotExisting(List<HistoricVariableInstance> variables, String name) {
+        assertThat(variables.stream().filter(v -> v.getVariableName().equals(name)).collect(Collectors.toList())).isEmpty();
     }
 
     protected void assertSamePlanItemState(HistoricCaseInstance c1, CaseInstance c2) {

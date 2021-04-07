@@ -2133,6 +2133,38 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orActive;
     }
 
+    public boolean isUnassigned() {
+        return unassigned;
+    }
+
+    public boolean isNoDelegationState() {
+        return noDelegationState;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isExcludeSubtasks() {
+        return excludeSubtasks;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
     @Override
     public List<Task> list() {
         cachedCandidateGroups = null;

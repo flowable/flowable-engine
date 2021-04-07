@@ -94,6 +94,34 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
         return this;
     }
 
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public boolean isIncludeTasks() {
+        return includeTasks;
+    }
+
+    public boolean isIncludeActivities() {
+        return includeActivities;
+    }
+
+    public boolean isIncludeVariables() {
+        return includeVariables;
+    }
+
+    public boolean isIncludeComments() {
+        return includeComments;
+    }
+
+    public boolean isIncludeVariableUpdates() {
+        return includeVariableUpdates;
+    }
+
+    public boolean isIncludeFormProperties() {
+        return includeFormProperties;
+    }
+
     @Override
     public ProcessInstanceHistoryLog singleResult() {
         return commandExecutor.execute(this);
