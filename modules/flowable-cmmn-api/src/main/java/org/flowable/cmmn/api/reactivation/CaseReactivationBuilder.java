@@ -32,7 +32,7 @@ public interface CaseReactivationBuilder {
      * @param value the value of the variable to be added
      * @return the builder for method chaining
      */
-    CaseReactivationBuilder addVariable(String name, Object value);
+    CaseReactivationBuilder variable(String name, Object value);
 
     /**
      * Adds the map of variables to the case before triggering the reactivation event.
@@ -40,7 +40,7 @@ public interface CaseReactivationBuilder {
      * @param variables the map of variables to be added to the case
      * @return the builder for method chaining
      */
-    CaseReactivationBuilder addVariables(Map<String, Object> variables);
+    CaseReactivationBuilder variables(Map<String, Object> variables);
 
     /**
      * Adds a transient variable to the case before triggering the reactivation event which is available only during that first transaction.
@@ -49,7 +49,7 @@ public interface CaseReactivationBuilder {
      * @param value the value of the variable to be added
      * @return the builder for method chaining
      */
-    CaseReactivationBuilder addTransientVariable(String name, Object value);
+    CaseReactivationBuilder transientVariable(String name, Object value);
 
     /**
      * Adds a map of transient variables to the case before triggering the reactivation event which are available only during that first transaction.
@@ -57,7 +57,7 @@ public interface CaseReactivationBuilder {
      * @param variables the map of variables to be added to the case
      * @return the builder for method chaining
      */
-    CaseReactivationBuilder addTransientVariables(Map<String, Object> variables);
+    CaseReactivationBuilder transientVariables(Map<String, Object> variables);
 
     /**
      * After having entered all necessary information for the reactivation, this method actually triggers the reactivation and returns the reactivated case
