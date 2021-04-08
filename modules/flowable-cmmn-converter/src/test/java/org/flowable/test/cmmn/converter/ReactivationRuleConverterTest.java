@@ -31,7 +31,7 @@ public class ReactivationRuleConverterTest {
         List<PlanItem> planItems = planModel.getPlanItems();
         assertThat(planItems)
                 .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
-                .extracting(planItem -> planItem.getItemControl(),
+                .extracting(PlanItem::getItemControl,
                         planItem -> planItem.getItemControl().getReactivationRule(),
                         planItem -> planItem.getItemControl().getReactivationRule().getType())
                 .doesNotContainNull();
@@ -41,8 +41,13 @@ public class ReactivationRuleConverterTest {
                 .extracting(planItem -> planItem.getItemControl().getReactivationRule().getType())
                 .containsExactly(ReactivationRule.REACTIVATE, ReactivationRule.REACTIVATE);
 
+        assertThat(planItems)
+                .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
+                .extracting(planItem -> planItem.getItemControl().getReactivationRule().getCondition())
+                .containsExactly("${reactivateStageA}", null);
+
         Stage stageA = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageA");
-        assertThat(stageA.getPlanItems()).hasSize(1).extracting(planItem -> planItem.getItemControl()).containsOnlyNulls();
+        assertThat(stageA.getPlanItems()).hasSize(1).extracting(PlanItem::getItemControl).containsOnlyNulls();
 
         Stage stageB = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageB");
         assertThat(stageB.getPlanItems())

@@ -152,6 +152,8 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_TYPE = "type";
 
+    String ATTRIBUTE_CONDITION = "condition";
+
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
