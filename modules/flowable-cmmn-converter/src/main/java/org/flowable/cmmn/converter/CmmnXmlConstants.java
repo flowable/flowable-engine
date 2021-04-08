@@ -86,6 +86,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_REPETITION_RULE = "repetitionRule";
     String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
     String ELEMENT_PARENT_COMPLETION_RULE = "parentCompletionRule";
+    String ELEMENT_REACTIVATION_RULE = "reactivationRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";

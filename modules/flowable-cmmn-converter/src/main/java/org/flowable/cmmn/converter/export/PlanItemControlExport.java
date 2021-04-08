@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.ReactivationRule;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
@@ -50,6 +51,7 @@ public class PlanItemControlExport implements CmmnXmlConstants {
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
         boolean hasWrittenExtensionElements = writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
         hasWrittenExtensionElements = writeParentCompletionRule(planItemControl.getParentCompletionRule(), hasWrittenExtensionElements, xtw);
+        hasWrittenExtensionElements = writeReactivationRule(planItemControl.getReactivationRule(), hasWrittenExtensionElements, xtw);
         if (hasWrittenExtensionElements) {
             xtw.writeEndElement();
         }
@@ -205,6 +207,24 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             hasWrittenExtensionElements = true;
         }
         
+        return hasWrittenExtensionElements;
+    }
+
+    public static boolean writeReactivationRule(ReactivationRule reactivationRule, boolean hasWrittenExtensionElements, XMLStreamWriter xtw) throws XMLStreamException {
+        if (reactivationRule != null) {
+            if (!hasWrittenExtensionElements) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(reactivationRule.getType())) {
+                xtw.writeAttribute(ATTRIBUTE_TYPE, reactivationRule.getType());
+            }
+            xtw.writeEndElement();
+
+            hasWrittenExtensionElements = true;
+        }
+
         return hasWrittenExtensionElements;
     }
     

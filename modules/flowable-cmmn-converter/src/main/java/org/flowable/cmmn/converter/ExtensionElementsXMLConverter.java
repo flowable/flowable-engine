@@ -45,6 +45,7 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.ReactivationRule;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
@@ -86,6 +87,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                         
                     } else if (CmmnXmlConstants.ELEMENT_PARENT_COMPLETION_RULE.equals(xtr.getLocalName())) {
                         readParentCompletionRule(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_REACTIVATION_RULE.equals(xtr.getLocalName())) {
+                        readReactivationRule(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_FIELD.equals(xtr.getLocalName())) {
                         readFieldExtension(xtr, conversionHelper);
@@ -191,6 +195,19 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             planItemControl.setParentCompletionRule(parentCompletionRule);
 
             readCommonXmlInfo(parentCompletionRule, xtr);
+        }
+    }
+
+    protected void readReactivationRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            ReactivationRule reactivationRule = new ReactivationRule();
+            reactivationRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            reactivationRule.setType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE));
+
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setReactivationRule(reactivationRule);
+
+            readCommonXmlInfo(reactivationRule, xtr);
         }
     }
 
