@@ -36,6 +36,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -205,6 +206,23 @@ public abstract class AbstractFlowableCmmnTestCase {
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
+        }
+    }
+
+    protected void assertHistoricPlanItemInstanceState(List<HistoricPlanItemInstance> planItemInstances, String name, String ... states) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(HistoricPlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (planItemInstanceStates.isEmpty()) {
+            fail("No historic plan item instances found with name " + name);
+        }
+
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates + "", states.length, planItemInstanceStates.size());
+        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
+        for (String state : states) {
+            assertTrue("State '" + state + "' not found in historic plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
         }
     }
 
