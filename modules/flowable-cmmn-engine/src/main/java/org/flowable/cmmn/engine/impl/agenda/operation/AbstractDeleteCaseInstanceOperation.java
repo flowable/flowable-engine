@@ -74,8 +74,8 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
         List<PlanItemInstanceEntity> childPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                if (PlanItemInstanceState.ACTIVE.equals(childPlanItemInstance.getState())
-                        || PlanItemInstanceState.AVAILABLE.equals(childPlanItemInstance.getState())) {
+                // if the child plan item is not yet in a terminal state, terminate it
+                if (!PlanItemInstanceState.isInTerminalState(childPlanItemInstance)) {
                     changeStateForChildPlanItemInstance(childPlanItemInstance);
                 }
             }

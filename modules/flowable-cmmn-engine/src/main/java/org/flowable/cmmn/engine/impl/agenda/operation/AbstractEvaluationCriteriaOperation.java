@@ -235,8 +235,17 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // check, if the plan item can be ignored for further processing and if so, immediately return
             if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
                 ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
+
+                // first check for the always ignore rule
                 if (ParentCompletionRule.IGNORE.equals(parentCompletionRule.getType())) {
                     return true;
+                }
+
+                // now check, if we can ignore it because it was completed before
+                if (ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION.equals(parentCompletionRule.getType())) {
+                    if (evaluationResult.hasCompletedPlanItemInstance(planItemInstanceEntity)) {
+                        return true;
+                    }
                 }
             }
 
@@ -268,7 +277,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
         // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
         // modification, we add them at the end of the evaluation loop to the parent container
-        PlanItemEvaluationResult evaluationResult = new PlanItemEvaluationResult();
+        PlanItemEvaluationResult evaluationResult = new PlanItemEvaluationResult(planItemInstances);
 
         // Check the existing plan item instances: this means the plan items that have been created and became available.
         // This does not include the plan items which haven't been created (for example because they're part of a stage which isn't active yet).
