@@ -250,7 +250,19 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
         }
     }
-    
+
+    @Override
+    public void recordPlanItemInstanceReactivated(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricPlanItemInstanceEntityManager historicPlanItemInstanceEntityManager = cmmnEngineConfiguration.getHistoricPlanItemInstanceEntityManager();
+            HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity = historicPlanItemInstanceEntityManager.create(planItemInstanceEntity);
+            historicPlanItemInstanceEntity.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
+
+            historicPlanItemInstanceEntityManager.insert(historicPlanItemInstanceEntity);
+            // TODO: do we need a specific flag to mark this entity being created because of a reactivation?
+        }
+    }
+
     @Override
     public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {

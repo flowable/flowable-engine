@@ -14,9 +14,10 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.List;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
@@ -44,20 +45,24 @@ public class ReactivateCaseInstanceOperation extends AbstractCaseInstanceOperati
         super.run();
 
         ReactivateEventListener reactivateEventListener = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getReactivateEventListener();
-        List<PlanItemInstanceEntity> planItems = caseInstanceEntity.getChildPlanItemInstances();
+        List<PlanItemInstanceEntity> planItemInstances = caseInstanceEntity.getChildPlanItemInstances();
 
         // we first search for the reactivation event, set it to available and then actually trigger it
-        for (PlanItemInstanceEntity planItem : planItems) {
-            if (planItem.getPlanItemDefinitionId().equals(reactivateEventListener.getId())) {
-                // reactivate the listener and direct dependencies of it so they can be triggered later
-                reactivatePlanItem(planItem, PlanItemInstanceState.AVAILABLE);
-                reactivateDependingPlanItems(planItem, planItems);
-
-                CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItem);
-            }
+        PlanItemInstanceEntity reactivationListenerPlanItemInstance = searchPlanItemInstance(reactivateEventListener.getId(), planItemInstances);
+        if (reactivationListenerPlanItemInstance == null) {
+            throw new FlowableIllegalArgumentException("Could not find reactivation listener plan item instance in case " + caseInstanceEntity.getId());
         }
 
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceEntity.getId());
+        // reactivate the listener and direct dependencies of it so they can be triggered later
+        // we don't reuse the existing plan item instance but rather create a new one so we don't lose its history and data
+        PlanItemInstanceEntity reactivationListener = reactivatePlanItem(reactivationListenerPlanItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planReactivatePlanItemInstanceOperation(reactivationListener);
+
+        // all directly depending plan items need to be reactivated as well to be in the correct state before the listener is triggered
+        reactivateDependingPlanItems(reactivationListener, planItemInstances);
+
+        // now as all depending plan items have been reactivated, trigger the reactivation event listener to start the reactivation of the case
+        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(reactivationListener);
     }
 
     /**
@@ -66,43 +71,53 @@ public class ReactivateCaseInstanceOperation extends AbstractCaseInstanceOperati
      * automatically, even though they might have been active before.
      *
      * @param reactivateEventListener the listener to activate depending plan items for
-     * @param planItems the list of plan items of the case to search for depending ones
+     * @param planItemInstances the list of plan items of the case to search for depending ones
      */
-    protected void reactivateDependingPlanItems(PlanItemInstanceEntity reactivateEventListener, List<PlanItemInstanceEntity> planItems) {
+    protected void reactivateDependingPlanItems(PlanItemInstanceEntity reactivateEventListener, List<PlanItemInstanceEntity> planItemInstances) {
         // search for all the direct dependencies the reactivation listener has as we need to (re-)activate them as well in order to be triggered
         // by the listener, which is what we call first phase of reactivation
         List<PlanItem> entryDependentPlanItems = reactivateEventListener.getPlanItem().getEntryDependentPlanItems();
         if (entryDependentPlanItems != null) {
             for (PlanItem entryDependentPlanItem : entryDependentPlanItems) {
-                reactivatePlanItem(searchPlanItemInstance(entryDependentPlanItem, planItems), PlanItemInstanceState.AVAILABLE);
+                PlanItemInstanceEntity planItemInstance = reactivatePlanItem(searchPlanItemInstance(entryDependentPlanItem.getPlanItemDefinition().getId(), planItemInstances));
+                CommandContextUtil.getAgenda(commandContext).planReactivatePlanItemInstanceOperation(planItemInstance);
             }
         }
     }
 
     /**
-     * Reactivates the given plan item into the provided new state. It will also reset all necessary data like ending times to prepare the plan item
-     * being active again once the listener is triggered.
+     * Reactivates the given plan item by creating a new instance with the same data, but of course no timestamps yet set so we keep the original one in place
+     * with all its information. After this reactivation make sure to plan its reactivation using the agenda for further processing of the reactivation.
      *
-     * @param planItem the plan item to be reactivated
-     * @param newState the new state to set
+     * @param planItemInstance the plan item to be reactivated
+     * @return the newly reactivated plan item instance
      */
-    protected void reactivatePlanItem(PlanItemInstanceEntity planItem, String newState) {
-        planItem.setState(newState);
-        planItem.setEndedTime(null);
-        planItem.setCompletedTime(null);
-        planItem.setExitTime(null);
+    protected PlanItemInstanceEntity reactivatePlanItem(PlanItemInstanceEntity planItemInstance) {
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        PlanItemInstance stagePlanItem = planItemInstance.getStagePlanItemInstanceEntity();
+        if (stagePlanItem == null && planItemInstance.getStageInstanceId() != null) {
+            stagePlanItem = planItemInstanceEntityManager.findById(planItemInstance.getStageInstanceId());
+        }
 
-        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).update(planItem);
+        return planItemInstanceEntityManager
+            .createPlanItemInstanceEntityBuilder()
+            .planItem(planItemInstance.getPlanItem())
+            .caseDefinitionId(planItemInstance.getCaseDefinitionId())
+            .caseInstanceId(planItemInstance.getCaseInstanceId())
+            .stagePlanItemInstance(stagePlanItem)
+            .tenantId(planItemInstance.getTenantId())
+            .addToParent(true)
+            .silentNameExpressionEvaluation(false)
+            .create();
     }
 
-    protected PlanItemInstanceEntity searchPlanItemInstance(PlanItem planItem, List<PlanItemInstanceEntity> planItemInstances) {
+    protected PlanItemInstanceEntity searchPlanItemInstance(String planItemDefinitionId, List<PlanItemInstanceEntity> planItemInstances) {
         for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
-            if (planItemInstance.getPlanItemDefinitionId().equals(planItem.getPlanItemDefinition().getId())) {
+            if (planItemInstance.getPlanItemDefinitionId().equals(planItemDefinitionId)) {
                 return planItemInstance;
             }
         }
-        throw new FlowableIllegalArgumentException(
-            "Could not find plan item instance for plan item with definition id " + planItem.getPlanItemDefinition().getId());
+        throw new FlowableIllegalArgumentException("Could not find plan item instance for plan item with definition id " + planItemDefinitionId);
     }
 
     @Override
