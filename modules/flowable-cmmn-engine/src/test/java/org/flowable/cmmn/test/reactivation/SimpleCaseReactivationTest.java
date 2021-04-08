@@ -15,6 +15,8 @@ package org.flowable.cmmn.test.reactivation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 
 import java.util.HashMap;
 import java.util.List;
@@ -139,8 +141,14 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             assertThat(reactivatedCaze).isNotNull();
 
             List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCaze.getId());
-            assertThat(planItemInstances).isNotNull().hasSize(6);
-            assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE);
+            assertThat(planItemInstances).isNotNull().hasSize(8);
+
+            // we need to have two reactivation listeners by now, one in terminated state (from the first case completion) and the second one needs to be
+            // in completion state as we just triggered it for case reactivation
+            assertPlanItemInstanceState(planItemInstances, "Reactivate case", TERMINATED, COMPLETED);
+
+            // the same for the task C, one instance needs to be active, the old one completed
+            assertPlanItemInstanceState(planItemInstances, "Task C", TERMINATED, ACTIVE);
             assertCaseInstanceNotEnded(reactivatedCaze);
 
             // the plan items must be equal for both the runtime as well as the history as of now

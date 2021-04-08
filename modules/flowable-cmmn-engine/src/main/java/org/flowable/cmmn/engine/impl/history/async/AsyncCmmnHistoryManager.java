@@ -265,7 +265,13 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     public void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity) {
         recordPlanItemInstanceFull(planItemInstanceEntity, null);
     }
-    
+
+    @Override
+    public void recordPlanItemInstanceReactivated(PlanItemInstanceEntity planItemInstanceEntity) {
+        recordPlanItemInstanceFull(planItemInstanceEntity, null);
+        // TODO: do we need a specific reactivation flag to mark this item being created because of a reactivation?
+    }
+
     @Override
     public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
         recordPlanItemInstanceFull(planItemInstanceEntity, null);

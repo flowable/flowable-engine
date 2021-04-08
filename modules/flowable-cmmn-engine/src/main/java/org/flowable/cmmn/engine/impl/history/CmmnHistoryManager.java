@@ -64,7 +64,9 @@ public interface CmmnHistoryManager {
     void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime);
 
     void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity);
-    
+
+    void recordPlanItemInstanceReactivated(PlanItemInstanceEntity planItemInstanceEntity);
+
     void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity);
 
     void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity);
