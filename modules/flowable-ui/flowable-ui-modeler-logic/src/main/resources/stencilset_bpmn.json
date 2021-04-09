@@ -1148,6 +1148,30 @@
         "popular" : true
       } ]
     }, {
+      "name" : "errorvariablepackage",
+      "properties" : [ {
+        "id" : "errorvariablename",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLENAME.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLENAME.DESCRIPTION",
+        "popular" : true
+      }, {
+        "id" : "errorvariabletransient",
+        "type" : "Boolean",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLETRANSIENT.TITLE",
+        "value" : "true",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLETRANSIENT.DESCRIPTION",
+        "popular" : true
+      }, {
+        "id" : "errorvariablelocalscope",
+        "type" : "Boolean",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLELOCALSCOPE.TITLE",
+        "value" : "true",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLELOCALSCOPE.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
       "name" : "eventregistryeventpackage",
       "properties" : [ {
         "id" : "eventkey",
@@ -1676,7 +1700,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z\"\n         id=\"errorPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
     "icon" : "startevent/error.png",
     "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage", "interruptingpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage", "errorvariablepackage", "interruptingpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
   }, {
@@ -2019,7 +2043,7 @@
       "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z\"\n         id=\"errorPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
       "icon" : "catching/error.png",
       "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
-      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "errorrefpackage" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "errorrefpackage", "errorvariablepackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
     }, {
