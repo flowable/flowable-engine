@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -90,8 +89,9 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(null);
-                historicCaseInstanceEntity.setState(CaseInstanceState.ACTIVE);
-                // TODO: we need to record the case being reactivated using a flag or specific timestamp
+                historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
+                historicCaseInstanceEntity.setLastReactivationTime(caseInstanceEntity.getLastReactivationTime());
+                historicCaseInstanceEntity.setLastReactivationUserId(caseInstanceEntity.getLastReactivationUserId());
             }
         }
     }

@@ -174,8 +174,17 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
 
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caze.getId()).singleResult();
             assertThat(historicCaseInstance).isNotNull();
+
+            // check the state being in sync with the runtime instance and the end time being reset as the case is not ended anymore
             assertThat(historicCaseInstance.getState()).isEqualTo(reactivatedCaze.getState());
             assertThat(historicCaseInstance.getEndTime()).isNull();
+
+            // also check, if the reactivation user and timestamp have been set on both, the runtime and the historic case instance
+            assertThat(historicCaseInstance.getLastReactivationTime()).isNotNull();
+            assertThat(historicCaseInstance.getLastReactivationUserId()).isEqualTo("JohnDoe");
+
+            assertThat(reactivatedCaze.getLastReactivationTime()).isNotNull();
+            assertThat(reactivatedCaze.getLastReactivationUserId()).isEqualTo("JohnDoe");
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }

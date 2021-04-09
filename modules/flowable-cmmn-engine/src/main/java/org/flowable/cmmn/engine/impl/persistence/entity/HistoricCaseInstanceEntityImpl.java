@@ -175,7 +175,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     }
     @Override
     public void setLastReactivationUserId(String lastReactivationUserId) {
-        this.lastReactivationUserId = this.lastReactivationUserId;
+        this.lastReactivationUserId = lastReactivationUserId;
     }
     @Override
     public String getCallbackId() {

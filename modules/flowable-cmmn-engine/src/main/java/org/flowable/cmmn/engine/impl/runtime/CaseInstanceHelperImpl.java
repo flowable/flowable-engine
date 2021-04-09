@@ -483,17 +483,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         // copy the case variables first so we can directly set it on the new case instance so they don't get reloaded later
         Map<String, VariableInstanceEntity> variables = createCaseVariablesFromHistoricCaseInstance(historicCaseInstance);
         CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.create(historicCaseInstance, variables);
-
-        // set the state back to active, not copying it from the historic one, obviously
-        caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntityManager.insert(caseInstanceEntity);
 
         // create runtime plan items from the history and set them as the new child plan item list
         caseInstanceEntity.setChildPlanItemInstances(createCasePlanItemsFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
-
-        // record the reactivation of the case in the history manager
-        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceReactivated(caseInstanceEntity);
-
         return caseInstanceEntity;
     }
 
