@@ -12,18 +12,12 @@
  */
 package org.flowable.cmmn.model;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author Joram Barrez
  */
 public class PlanItemRule extends CaseElement {
     
     protected String condition;
-
-    public boolean hasCondition() {
-        return StringUtils.isNotEmpty(condition);
-    }
 
     public String getCondition() {
         return condition;
