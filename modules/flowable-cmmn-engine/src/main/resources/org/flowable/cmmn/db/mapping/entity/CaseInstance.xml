@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
 
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
             #{id ,jdbcType=VARCHAR},
             1, #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
@@ -14,6 +14,8 @@
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
+            #{lastReactivationTime ,jdbcType=TIMESTAMP},
+            #{lastReactivationUserId ,jdbcType=VARCHAR},
             #{callbackId ,jdbcType=VARCHAR},
             #{callbackType ,jdbcType=VARCHAR},
             #{referenceId ,jdbcType=VARCHAR},
@@ -24,7 +26,7 @@
     </insert>
 
     <insert id="bulkInsertCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
         values
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
@@ -36,6 +38,8 @@
                 #{caseInstance.state ,jdbcType=VARCHAR},
                 #{caseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.lastReactivationTime ,jdbcType=TIMESTAMP},
+                #{caseInstance.lastReactivationUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
                 #{caseInstance.callbackType, jdbcType=VARCHAR},
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
@@ -49,7 +53,7 @@
     <insert id="bulkInsertCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="caseInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
                 1, #{caseInstance.parentId ,jdbcType=VARCHAR},
@@ -59,6 +63,8 @@
                 #{caseInstance.state ,jdbcType=VARCHAR},
                 #{caseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.lastReactivationTime ,jdbcType=TIMESTAMP},
+                #{caseInstance.lastReactivationUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
                 #{caseInstance.callbackType, jdbcType=VARCHAR},
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
@@ -94,6 +100,12 @@
             </if>
             <if test="originalPersistentState.startUserId != startUserId">
                 START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.lastReactivationTime != lastReactivationTime">
+                LAST_REACTIVATION_TIME_ = #{lastReactivationTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.lastReactivationUserId != lastReactivationUserId">
+                LAST_REACTIVATION_USER_ID_ = #{lastReactivationUserId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.callbackId != callbackId">
                 CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
@@ -156,6 +168,8 @@
         <result property="state" column="STATE_" jdbcType="VARCHAR" />
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+        <result property="lastReactivationTime" column="LAST_REACTIVATION_TIME_" jdbcType="TIMESTAMP" />
+        <result property="lastReactivationUserId" column="LAST_REACTIVATION_USER_ID_" jdbcType="VARCHAR" />
         <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
         <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
@@ -322,6 +336,8 @@
             TEMPRES_STATE_ as STATE_,
             TEMPRES_START_TIME_ as START_TIME_,
             TEMPRES_START_USER_ID_ as START_USER_ID_,
+            TEMPRES_LAST_REACTIVATION_TIME_ as LAST_REACTIVATION_TIME_,
+            TEMPRES_LAST_REACTIVATION_USER_ID_ as LAST_REACTIVATION_USER_ID_,
             TEMPRES_CALLBACK_ID_ as CALLBACK_ID_,
             TEMPRES_CALLBACK_TYPE_ as CALLBACK_TYPE_,
             TEMPRES_REFERENCE_ID_ as REFERENCE_ID_,
@@ -359,6 +375,8 @@
             RES.STATE_ as TEMPRES_STATE_,
             RES.START_TIME_ as TEMPRES_START_TIME_,
             RES.START_USER_ID_ as TEMPRES_START_USER_ID_,
+            RES.LAST_REACTIVATION_TIME_ as TEMPRES_LAST_REACTIVATION_TIME_,
+            RES.LAST_REACTIVATION_USER_ID_ as TEMPRES_LAST_REACTIVATION_USER_ID_,
             RES.CALLBACK_ID_ as TEMPRES_CALLBACK_ID_,
             RES.CALLBACK_TYPE_ as TEMPRES_CALLBACK_TYPE_,
             RES.REFERENCE_ID_ as TEMPRES_REFERENCE_ID_,
@@ -470,6 +488,15 @@
             </if>
             <if test="startedBy != null">
                 and RES.START_USER_ID_ = #{startedBy}
+            </if>
+            <if test="lastReactivatedBefore != null">
+                and RES.LAST_REACTIVATION_TIME_ &lt;= #{lastReactivatedBefore}
+            </if>
+            <if test="lastReactivatedAfter != null">
+                and RES.LAST_REACTIVATION_TIME_ &gt;= #{lastReactivatedAfter}
+            </if>
+            <if test="lastReactivatedBy != null">
+                and RES.LAST_REACTIVATION_USER_ID_ = #{lastReactivatedBy}
             </if>
             <if test="callbackId != null">
                 and RES.CALLBACK_ID_ = #{callbackId}
@@ -661,6 +688,15 @@
                     </if>
                     <if test="orQueryObject.startedBy != null">
                         or RES.START_USER_ID_ = #{orQueryObject.startedBy}
+                    </if>
+                    <if test="orQueryObject.lastReactivatedBefore != null">
+                        or RES.LAST_REACTIVATED_TIME_ &lt;= #{lastReactivatedBefore}
+                    </if>
+                    <if test="orQueryObject.lastReactivatedAfter != null">
+                        or RES.LAST_REACTIVATED_TIME_ &gt;= #{lastReactivatedAfter}
+                    </if>
+                    <if test="orQueryObject.lastReactivatedBy != null">
+                        or RES.LAST_REACTIVATED_USER_ID_ = #{lastReactivatedBy}
                     </if>
                     <if test="orQueryObject.callbackId != null">
                         or RES.CALLBACK_ID_ = #{orQueryObject.callbackId}
