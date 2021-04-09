@@ -39,7 +39,7 @@ public class ReactivationRuleConverterTest {
         assertThat(planItems)
                 .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
                 .extracting(planItem -> planItem.getItemControl().getReactivationRule().getType())
-                .containsExactly(ReactivationRule.REACTIVATE, ReactivationRule.REACTIVATE);
+                .containsExactly(ReactivationRule.ACTIVATE, ReactivationRule.DEFAULT);
 
         assertThat(planItems)
                 .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
@@ -52,6 +52,6 @@ public class ReactivationRuleConverterTest {
         Stage stageB = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageB");
         assertThat(stageB.getPlanItems())
                 .extracting(planItem -> planItem.getItemControl().getReactivationRule().getType())
-                .containsExactly(ReactivationRule.SKIP, ReactivationRule.REACTIVATE_IF_NOT_COMPLETED);
+                .containsExactly(ReactivationRule.IGNORE, ReactivationRule.IGNORE_IF_COMPLETED);
     }
 }

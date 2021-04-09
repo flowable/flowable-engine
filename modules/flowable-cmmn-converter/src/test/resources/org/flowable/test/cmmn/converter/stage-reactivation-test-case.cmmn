@@ -9,14 +9,14 @@
       <planItem id="planItem2" name="Stage A" definitionRef="stageA">
         <itemControl>
           <extensionElements>
-            <flowable:reactivationRule type="reactivate" condition="${reactivateStageA}"></flowable:reactivationRule>
+            <flowable:reactivationRule type="activate" reactivationRuleCondition="${reactivateStageA}"/>
           </extensionElements>
         </itemControl>
       </planItem>
       <planItem id="planItem5" name="Stage B" definitionRef="stageB">
         <itemControl>
           <extensionElements>
-            <flowable:reactivationRule type="reactivate"></flowable:reactivationRule>
+            <flowable:reactivationRule type="default"></flowable:reactivationRule>
           </extensionElements>
         </itemControl>
         <entryCriterion id="entryCriterion1" sentryRef="sentry1"></entryCriterion>
@@ -39,14 +39,14 @@
         <planItem id="planItem3" name="Task B" definitionRef="humanTask2">
           <itemControl>
           <extensionElements>
-            <flowable:reactivationRule type="skip"></flowable:reactivationRule>
+            <flowable:reactivationRule type="ignore"></flowable:reactivationRule>
           </extensionElements>
         </itemControl>
         </planItem>
         <planItem id="planItem4" name="Task C" definitionRef="humanTask3">
           <itemControl>
             <extensionElements>
-              <flowable:reactivationRule type="reactivateIfNotCompleted"></flowable:reactivationRule>
+              <flowable:reactivationRule type="ignoreIfCompleted"></flowable:reactivationRule>
             </extensionElements>
             <repetitionRule flowable:counterVariable="repetitionCounter">
               <extensionElements></extensionElements>

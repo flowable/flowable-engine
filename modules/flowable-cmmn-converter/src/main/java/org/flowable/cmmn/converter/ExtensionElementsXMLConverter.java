@@ -203,7 +203,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             ReactivationRule reactivationRule = new ReactivationRule();
             reactivationRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
             reactivationRule.setType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE));
-            reactivationRule.setCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_CONDITION));
+            reactivationRule.setCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_REACTIVATION_RULE_CONDITION));
 
             PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setReactivationRule(reactivationRule);

@@ -19,9 +19,10 @@ package org.flowable.cmmn.model;
  */
 public class ReactivationRule extends PlanItemRule {
 
-    public static final String SKIP = "skip";
-    public static final String REACTIVATE = "reactivate";
-    public static final String REACTIVATE_IF_NOT_COMPLETED = "reactivateIfNotCompleted";
+    public static final String DEFAULT = "default";
+    public static final String IGNORE = "ignore";
+    public static final String IGNORE_IF_COMPLETED = "ignoreIfCompleted";
+    public static final String ACTIVATE = "activate";
 
     protected String type;
 

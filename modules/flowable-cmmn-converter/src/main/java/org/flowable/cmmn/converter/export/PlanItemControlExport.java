@@ -220,7 +220,7 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             if (StringUtils.isNotEmpty(reactivationRule.getType())) {
                 xtw.writeAttribute(ATTRIBUTE_TYPE, reactivationRule.getType());
                 if (reactivationRule.hasCondition()) {
-                    xtw.writeAttribute(ATTRIBUTE_CONDITION, reactivationRule.getCondition());
+                    xtw.writeAttribute(ATTRIBUTE_REACTIVATION_RULE_CONDITION, reactivationRule.getCondition());
                 }
             }
             xtw.writeEndElement();
