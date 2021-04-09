@@ -20,6 +20,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class TaskDueDateTest extends PluggableFlowableTestCase {
 
@@ -155,6 +157,106 @@ public class TaskDueDateTest extends PluggableFlowableTestCase {
             assertThat(historicTasks.get(3).getName()).isEqualTo("task2");
             assertThat(historicTasks.get(4).getName()).isEqualTo("task1");
             assertThat(historicTasks.get(5).getName()).isEqualTo("task3");
+        }
+    }
+
+    @Test
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
+    public void testDueDateSortingWithNullsAndPaging() {
+        Date now = processEngineConfiguration.getClock().getCurrentTime();
+
+        // 4 tasks with a due date
+        createTask("task0", new Date(now.getTime() + (4L * 7L * 24L * 60L * 60L * 1000L))); // 4 weeks in future
+        createTask("task1", new Date(now.getTime() + (2 * 24L * 60L * 60L * 1000L))); // 2 days in future
+        createTask("task2", new Date(now.getTime() + (7L * 24L * 60L * 60L * 1000L))); // 1 week in future
+        createTask("task3", new Date(now.getTime() + (24L * 60L * 60L * 1000L))); // 1 day in future
+
+        // 2 tasks without a due date
+        createTask("task4", null);
+        createTask("task5", null);
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(6);
+
+        // Sorting on due date asc should put the nulls at the end
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByDueDateNullsLast().asc()
+                .listPage(0, 2);
+
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task3", "task1");
+
+        // The same, but now desc
+        tasks = taskService.createTaskQuery().orderByDueDateNullsLast().desc()
+                .listPage(0, 2);
+
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task2");
+
+        // The same but now nulls first
+        tasks = taskService.createTaskQuery().orderByDueDateNullsFirst().asc()
+                .listPage(0, 2);
+
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactlyInAnyOrder("task4", "task5");
+
+        // The same but now nulls first and different page
+        tasks = taskService.createTaskQuery().orderByDueDateNullsFirst().asc()
+                .listPage(2, 2);
+
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactlyInAnyOrder("task3", "task1");
+
+        // And now desc
+        tasks = taskService.createTaskQuery().orderByDueDateNullsFirst().desc()
+                .listPage(2, 2);
+
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactlyInAnyOrder("task0", "task2");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            // And now the same, but for history!
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().orderByDueDateNullsLast().asc()
+                    .listPage(0, 2);
+
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task3", "task1");
+
+            // The same, but now desc
+            historicTasks = historyService.createHistoricTaskInstanceQuery().orderByDueDateNullsLast().desc()
+                    .listPage(0, 2);
+
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task2");
+
+            // The same but now nulls first
+            historicTasks = historyService.createHistoricTaskInstanceQuery().orderByDueDateNullsFirst().asc()
+                    .listPage(0, 2);
+
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactlyInAnyOrder("task4", "task5");
+
+            // The same but now nulls first and different page
+            historicTasks = historyService.createHistoricTaskInstanceQuery().orderByDueDateNullsFirst().asc()
+                    .listPage(2, 2);
+
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactlyInAnyOrder("task3", "task1");
+
+            // And now desc
+            historicTasks = historyService.createHistoricTaskInstanceQuery().orderByDueDateNullsFirst().desc()
+                    .listPage(2, 2);
+
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactlyInAnyOrder("task0", "task2");
         }
     }
 
