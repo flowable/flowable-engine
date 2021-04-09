@@ -553,7 +553,7 @@
         </if>
       </if>
 
-      <if test="orQueryObject.processDefinitionKey != null || orQueryObject.processDefinitionKeyLike != null || orQueryObject.processDefinitionKeyLikeIgnoreCase != null || orQueryObject.processDefinitionName != null || orQueryObject.processDefinitionNameLike != null || (orQueryObject.processCategoryInList != null &amp;&amp; orQueryObject.processCategoryInList.size() &gt; 0) || (orQueryObject.processCategoryNotInList != null &amp;&amp; orQueryObject.processCategoryNotInList.size() &gt; 0) || (orQueryObject.processDefinitionKeys != null &amp;&amp; orQueryObject.processDefinitionKeys.size() &gt; 0)">
+      <if test="orQueryObject.processDefinitionKey != null || orQueryObject.processDefinitionKeyLike != null || orQueryObject.processDefinitionKeyLikeIgnoreCase != null || orQueryObject.processDefinitionName != null || orQueryObject.processDefinitionNameLike != null || (orQueryObject.processCategoryInList != null &amp;&amp; orQueryObject.processCategoryInList.size() &gt; 0) || (orQueryObject.processCategoryNotInList != null &amp;&amp; orQueryObject.processCategoryNotInList.size() &gt; 0) || (orQueryObject.processDefinitionKeys != null &amp;&amp; orQueryObject.processDefinitionKeys.size() &gt; 0) || orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_RE_PROCDEF D_OR${orIndex} on RES.PROC_DEF_ID_ = D_OR${orIndex}.ID_
       </if>
 
@@ -561,31 +561,19 @@
         inner join ${prefix}ACT_RU_EXECUTION E_OR${orIndex} on RES.PROC_INST_ID_ = E_OR${orIndex}.ID_
       </if>
 
-      <if test="orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
-        left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P_OR${orIndex} ON RES.PROC_DEF_ID_ = DEPLOY_P_OR${orIndex}.ID_
-      </if>
-      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
-        left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
-      </if>
-      <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0)">
+      <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0) || orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
             left outer join ${prefix}ACT_CMMN_CASEDEF CD_OR${orIndex} on RES.SCOPE_DEFINITION_ID_ = CD_OR${orIndex}.ID_
       </if>
     </foreach>
 
-    <if test="processDefinitionKey != null || processDefinitionKeyLike != null ||  processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; processCategoryInList.size() &gt; 0) || (processCategoryNotInList != null &amp;&amp; processCategoryNotInList.size() &gt; 0) || (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.size() &gt; 0)">
+    <if test="processDefinitionKey != null || processDefinitionKeyLike != null ||  processDefinitionKeyLikeIgnoreCase != null || processDefinitionName != null || processDefinitionNameLike != null || (processCategoryInList != null &amp;&amp; processCategoryInList.size() &gt; 0) || (processCategoryNotInList != null &amp;&amp; processCategoryNotInList.size() &gt; 0) || (processDefinitionKeys != null &amp;&amp; processDefinitionKeys.size() &gt; 0) || deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
       inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
-    <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0)">
+    <if test="caseDefinitionKey != null || caseDefinitionKeyLike != null ||  caseDefinitionKeyLikeIgnoreCase != null || (caseDefinitionKeys != null &amp;&amp; caseDefinitionKeys.size() &gt; 0) || cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0)">
           inner join ${prefix}ACT_CMMN_CASEDEF CD on RES.SCOPE_DEFINITION_ID_ = CD.ID_
     </if>
     <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null  || processInstanceBusinessKeyLikeIgnoreCase != null">
       inner join ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
-    </if>
-    <if test="deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
-      left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P ON RES.PROC_DEF_ID_ = DEPLOY_P.ID_
-    </if>
-    <if test="cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0)">
-      left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C.ID_
     </if>
     <where>
       <if test="taskId != null">
@@ -793,41 +781,25 @@
             #{item}
         </foreach>
       </if>
-      <if test="deploymentId != null &amp;&amp; cmmnDeploymentId == null">
-        and DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId}
+      <if test="deploymentId != null">
+        and D.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0 &amp;&amp; cmmnDeploymentIds == null">
-        and DEPLOY_P.DEPLOYMENT_ID_ IN
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and D.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds"
                  open="(" separator="," close=")">
           #{deployment}
         </foreach>
       </if>
-      <if test="cmmnDeploymentId != null &amp;&amp; deploymentId == null">
-        and DEPLOY_C.DEPLOYMENT_ID_ = #{cmmnDeploymentId}
+      <if test="cmmnDeploymentId != null">
+        and CD.DEPLOYMENT_ID_ = #{cmmnDeploymentId}
       </if>
-      <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0 &amp;&amp; deploymentIds == null">
-        and DEPLOY_C.DEPLOYMENT_ID_ IN
+      <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0">
+        and CD.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="cmmnDeploymentIds"
                  open="(" separator="," close=")">
           #{deployment}
         </foreach>
-      </if>
-      <if test="deploymentId != null &amp;&amp; cmmnDeploymentId != null">
-        and (DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId} or DEPLOY_C.DEPLOYMENT_ID = #{cmmnDeploymentId})
-      </if>
-      <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0 &amp;&amp; deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
-        and (
-            DEPLOY_P.DEPLOYMENT_ID_ IN
-            <foreach item="deployment" index="index" collection="deploymentIds" open="(" separator="," close=")">
-                #{deployment}
-            </foreach>
-            or
-            DEPLOY_C.DEPLOYMENT_ID_ IN
-            <foreach item="cmmnDeployment" index="index" collection="cmmnDeploymentIds" open="(" separator="," close=")">
-                #{cmmnDeployment}
-            </foreach>
-        )
       </if>
       <if test="dueDate != null">
         and RES.DUE_DATE_ = #{dueDate}
@@ -1260,20 +1232,20 @@
                 </foreach>
             </if>
             <if test="orQueryObject.deploymentId != null">
-              or DEPLOY_P_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
+              or D_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
             </if>
             <if test="orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0">
-              or DEPLOY_P_OR${orIndex}.DEPLOYMENT_ID_ IN
+              or D_OR${orIndex}.DEPLOYMENT_ID_ IN
               <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
                        open="(" separator="," close=")">
                 #{deployment}
               </foreach>
             </if>
             <if test="orQueryObject.cmmnDeploymentId != null">
-              or DEPLOY_C_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId}
+              or CD_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId}
             </if>
             <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0">
-              or DEPLOY_C_OR${orIndex}.DEPLOYMENT_ID_ IN
+              or CD_OR${orIndex}.DEPLOYMENT_ID_ IN
               <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds"
                        open="(" separator="," close=")">
                 #{deployment}
