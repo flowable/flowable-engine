@@ -152,7 +152,7 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_TYPE = "type";
 
-    String ATTRIBUTE_CONDITION = "condition";
+    String ATTRIBUTE_REACTIVATION_RULE_CONDITION = "reactivationRuleCondition";
 
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
