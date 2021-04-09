@@ -419,7 +419,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion.getId());
                         for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
                             PlanItemInstanceEntity parentPlanItemInstance = parentPlanItemInstancesToActivate.get(i);
-                            if (parentPlanItemInstance == null) { // newly created one
+                            if (parentPlanItemInstance.getState() == null) { // newly created one
                                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(parentPlanItemInstance);
                             }
                             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(parentPlanItemInstance, null); // null -> no sentry satisfied, activation is because of child activation
