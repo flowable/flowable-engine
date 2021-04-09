@@ -61,13 +61,18 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
             throw new FlowableIllegalStateException("Case instance is still running, cannot reactivate historic case instance: " + reactivationBuilder.getCaseInstanceId());
         }
 
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceHelper()
+        CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceHelper()
             .copyHistoricCaseInstanceToRuntime(instance);
 
         // reset the state to be active again and also set the last reactivation time as well as the current user triggering it
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntity.setLastReactivationTime(cmmnEngineConfiguration.getClock().getCurrentTime());
         caseInstanceEntity.setLastReactivationUserId(Authentication.getAuthenticatedUserId());
+
+        // invoke the identity link interceptor to record the reactivation user
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleReactivateCaseInstance(caseInstanceEntity);
+        }
 
         // set case variables, if the builder contains any
         if (reactivationBuilder.hasVariables()) {
