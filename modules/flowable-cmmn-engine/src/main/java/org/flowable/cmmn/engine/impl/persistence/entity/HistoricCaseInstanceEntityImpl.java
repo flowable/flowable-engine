@@ -158,16 +158,24 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
         return startUserId;
     }
     @Override
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
+    }
+    @Override
     public Date getLastReactivationTime() {
         return lastReactivationTime;
+    }
+    @Override
+    public void setLastReactivationTime(Date lastReactivationTime) {
+        this.lastReactivationTime = lastReactivationTime;
     }
     @Override
     public String getLastReactivationUserId() {
         return lastReactivationUserId;
     }
     @Override
-    public void setStartUserId(String startUserId) {
-        this.startUserId = startUserId;
+    public void setLastReactivationUserId(String lastReactivationUserId) {
+        this.lastReactivationUserId = this.lastReactivationUserId;
     }
     @Override
     public String getCallbackId() {
