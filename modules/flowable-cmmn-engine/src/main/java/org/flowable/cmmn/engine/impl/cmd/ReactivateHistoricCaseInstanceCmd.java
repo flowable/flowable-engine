@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.reactivation.CaseReactivationBuilderImpl;
@@ -23,6 +24,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -59,8 +61,18 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
             throw new FlowableIllegalStateException("Case instance is still running, cannot reactivate historic case instance: " + reactivationBuilder.getCaseInstanceId());
         }
 
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceHelper()
+        CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceHelper()
             .copyHistoricCaseInstanceToRuntime(instance);
+
+        // reset the state to be active again and also set the last reactivation time as well as the current user triggering it
+        caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
+        caseInstanceEntity.setLastReactivationTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+        caseInstanceEntity.setLastReactivationUserId(Authentication.getAuthenticatedUserId());
+
+        // invoke the identity link interceptor to record the reactivation user
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleReactivateCaseInstance(caseInstanceEntity);
+        }
 
         // set case variables, if the builder contains any
         if (reactivationBuilder.hasVariables()) {
@@ -71,6 +83,9 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
         if (reactivationBuilder.hasTransientVariables()) {
             caseInstanceEntity.setTransientVariables(reactivationBuilder.getTransientVariables());
         }
+
+        // record the reactivation of the case in the history manager to also synchronize the new state and last reactivation data to the history
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordHistoricCaseInstanceReactivated(caseInstanceEntity);
 
         // the reactivate operation will take care of triggering the reactivation event and re-initialize all necessary plan items according the model
         CommandContextUtil.getAgenda(commandContext).planReactivateCaseInstanceOperation(caseInstanceEntity);

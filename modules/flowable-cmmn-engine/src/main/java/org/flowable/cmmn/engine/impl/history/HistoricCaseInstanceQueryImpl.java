@@ -70,6 +70,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected String startedBy;
+    protected Date lastReactivatedBefore;
+    protected Date lastReactivatedAfter;
+    protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -352,7 +355,48 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
         return this;
     }
-    
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedBefore(Date beforeTime) {
+        if (beforeTime == null) {
+            throw new FlowableIllegalArgumentException("before time is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBefore = beforeTime;
+        } else {
+            this.lastReactivatedBefore = beforeTime;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedAfter(Date afterTime) {
+        if (afterTime == null) {
+            throw new FlowableIllegalArgumentException("after time is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedAfter = afterTime;
+        } else {
+            this.lastReactivatedAfter = afterTime;
+        }
+
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedBy(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("user id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBy = userId;
+        } else {
+            this.lastReactivatedBy = userId;
+        }
+
+        return this;
+    }
+
     @Override
     public HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId) {
         if (callbackId == null) {

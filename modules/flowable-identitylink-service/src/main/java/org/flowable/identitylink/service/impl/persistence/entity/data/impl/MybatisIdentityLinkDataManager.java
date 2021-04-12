@@ -201,12 +201,11 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scopeId", scopeId);
+        parameters.put("scopeType", scopeType);
 
         if (ScopeTypes.CMMN.equals(scopeType) && isEntityInserted(dbSqlSession, "caseInstance", scopeId)) {
             deleteCachedEntities(dbSqlSession, identityLinksByScopeIdAndTypeMatcher, parameters);
         } else {
-
-            parameters.put("scopeType", scopeType);
             bulkDelete("deleteIdentityLinksByScopeIdAndScopeType", identityLinksByScopeIdAndTypeMatcher, parameters);
         }
     }

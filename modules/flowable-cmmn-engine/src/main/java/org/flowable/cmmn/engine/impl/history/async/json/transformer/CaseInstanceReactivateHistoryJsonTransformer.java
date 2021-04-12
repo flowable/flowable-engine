@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history.async.json.transformer;
 
+import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getDateFromJson;
 import static org.flowable.job.service.impl.history.async.util.AsyncHistoryJsonUtil.getStringFromJson;
 
 import java.util.Collections;
@@ -49,6 +50,8 @@ public class CaseInstanceReactivateHistoryJsonTransformer extends AbstractNeedsH
 
        if (historicCaseInstanceEntity != null) {
            historicCaseInstanceEntity.setState(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_STATE));
+           historicCaseInstanceEntity.setLastReactivationTime(getDateFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_REACTIVATION_TIME));
+           historicCaseInstanceEntity.setLastReactivationUserId(getStringFromJson(historicalData, CmmnAsyncHistoryConstants.FIELD_LAST_REACTIVATION_USER_ID));
            historicCaseInstanceEntity.setEndTime(null);
            historicCaseInstanceEntityManager.update(historicCaseInstanceEntity);
        }

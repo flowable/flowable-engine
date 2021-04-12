@@ -526,4 +526,18 @@
 
     </changeSet>
 
+    <changeSet id="14" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="LAST_REACTIVATION_TIME_" type="datetime(3)" />
+            <column name="LAST_REACTIVATION_USER_ID_" type="varchar(255)" />
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="LAST_REACTIVATION_TIME_" type="datetime(3)" />
+            <column name="LAST_REACTIVATION_USER_ID_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

@@ -179,6 +179,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";
+    String FIELD_LAST_REACTIVATION_TIME = "lastReactivationTime";
+    String FIELD_LAST_REACTIVATION_USER_ID = "lastReactivationUserId";
     String FIELD_STATE = "state";
     String FIELD_TASK_ID = "taskId";
     String FIELD_TASK_DEFINITION_ID = "taskDefinitionId";

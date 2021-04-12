@@ -32,6 +32,8 @@ public interface CaseInstance {
     String getState();
     Date getStartTime();
     String getStartUserId();
+    Date getLastReactivationTime();
+    String getLastReactivationUserId();
     String getCallbackId();
     String getCallbackType();
     String getReferenceId();

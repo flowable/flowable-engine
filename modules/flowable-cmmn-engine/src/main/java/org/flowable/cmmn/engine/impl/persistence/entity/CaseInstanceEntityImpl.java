@@ -46,6 +46,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String state;
     protected Date startTime;
     protected String startUserId;
+    protected Date lastReactivationTime;
+    protected String lastReactivationUserId;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -170,6 +172,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    @Override
+    public Date getLastReactivationTime() {
+        return lastReactivationTime;
+    }
+    @Override
+    public void setLastReactivationTime(Date lastReactivationTime) {
+        this.lastReactivationTime = lastReactivationTime;
+    }
+    @Override
+    public String getLastReactivationUserId() {
+        return lastReactivationUserId;
+    }
+    @Override
+    public void setLastReactivationUserId(String lastReactivationUserId) {
+        this.lastReactivationUserId = lastReactivationUserId;
     }
     @Override
     public boolean isCompletable() {

@@ -24,7 +24,8 @@ import org.flowable.common.engine.api.query.Query;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> {
+public interface
+HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseInstance>, DeleteQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> {
 
     /**
      * Only select historic case instances with the given identifier.
@@ -130,6 +131,21 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that are started by the provided user identifier.
      */
     HistoricCaseInstanceQuery startedBy(String userId);
+
+    /**
+     * Only select historic case instance that are reactivated before the provided date time.
+     */
+    HistoricCaseInstanceQuery lastReactivatedBefore(Date beforeTime);
+
+    /**
+     * Only select historic case instance that are reactivated after the provided date time.
+     */
+    HistoricCaseInstanceQuery lastReactivatedAfter(Date afterTime);
+
+    /**
+     * Only select historic case instances that are reactivated by the provided user identifier.
+     */
+    HistoricCaseInstanceQuery lastReactivatedBy(String userId);
     
     /**
      * Only select historic case instances that have the provided callback identifier.
