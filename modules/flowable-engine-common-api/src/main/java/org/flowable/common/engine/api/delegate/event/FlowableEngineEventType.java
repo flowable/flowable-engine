@@ -347,6 +347,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * The event is dispatched after the associated {@link #ENTITY_INITIALIZED} and the variables have been set.
      */
     CASE_STARTED,
+
+    /**
+     * An uncaught BPMN error has been thrown. The process did not have any handlers for that specific error. The event’s activityId will be empty.
+     */
+    UNCAUGHT_BPMN_ERROR,
     ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};
