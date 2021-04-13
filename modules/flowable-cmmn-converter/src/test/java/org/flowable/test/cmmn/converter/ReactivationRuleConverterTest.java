@@ -28,6 +28,10 @@ public class ReactivationRuleConverterTest {
     public void validateModel(CmmnModel cmmnModel) {
         assertThat(cmmnModel).isNotNull();
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
+        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener()).isNotNull();
+        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule()).isNotNull();
+        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule().getType()).isEqualTo(ReactivationRule.IGNORE);
+
         List<PlanItem> planItems = planModel.getPlanItems();
         assertThat(planItems)
                 .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))

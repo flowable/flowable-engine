@@ -19,4 +19,17 @@ package org.flowable.cmmn.model;
  */
 public class ReactivateEventListener extends UserEventListener {
 
+    /**
+     * The optional, default reactivation rule to be considered, if a plan item does not specify an explicit one, if this one is not provided either, such
+     * a plan item will be ignored for reactivation.
+     */
+    protected ReactivationRule defaultReactivationRule;
+
+    public ReactivationRule getDefaultReactivationRule() {
+        return defaultReactivationRule;
+    }
+
+    public void setDefaultReactivationRule(ReactivationRule defaultReactivationRule) {
+        this.defaultReactivationRule = defaultReactivationRule;
+    }
 }

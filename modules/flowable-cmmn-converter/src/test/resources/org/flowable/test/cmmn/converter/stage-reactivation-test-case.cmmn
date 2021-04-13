@@ -64,7 +64,11 @@
           </extensionElements>
         </humanTask>
       </stage>
-      <eventListener id="userEventListener1" name="Reactivate case" flowable:eventType="reactivate"/>
+      <eventListener id="userEventListener1" name="Reactivate case" flowable:eventType="reactivate">
+        <extensionElements>
+          <flowable:defaultReactivationRule type="ignore"/>
+        </extensionElements>
+      </eventListener>
     </casePlanModel>
   </case>
 </definitions>
