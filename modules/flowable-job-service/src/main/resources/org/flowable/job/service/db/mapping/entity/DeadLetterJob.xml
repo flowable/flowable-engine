@@ -227,11 +227,11 @@
   	</insert>
 
     <select id="selectDeadLetterJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectDeadLetterJobByQueryCriteriaSql"/>
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectDeadLetterJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">

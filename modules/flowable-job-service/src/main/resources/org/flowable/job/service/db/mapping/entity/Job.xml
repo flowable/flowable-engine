@@ -49,9 +49,8 @@
     </select>
 
     <select id="selectJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -70,13 +69,13 @@
                 </foreach>
             </if>
         </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
     
     <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -94,8 +93,9 @@
                     #{item}
                 </foreach>
             </if>
-        </where> 
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        </where>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
     
     <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -123,11 +123,10 @@
     </select>
 
     <select id="selectJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">

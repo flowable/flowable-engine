@@ -576,11 +576,11 @@ The XML file containing the mapped statements can look as follows:
   </select>
 
   <select id="selectAttachmentByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultMap="org.flowable.engine.impl.persistence.entity.AttachmentEntity.attachmentResultMap">
-    ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectAttachmentByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <sql id="selectAttachmentByQueryCriteriaSql">

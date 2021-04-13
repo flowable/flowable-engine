@@ -202,12 +202,11 @@
 
     <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl"
         resultMap="historicProcessVariableResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.*
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectHistoricVariableInstanceByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl" resultType="long">

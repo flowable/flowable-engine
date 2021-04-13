@@ -103,11 +103,11 @@
   </select>
 
   <select id="selectFormDefinitionsByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDefinitionQueryImpl" resultMap="formDefinitionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectFormDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectFormDefinitionCountByQueryCriteria" parameterType="org.flowable.form.engine.impl.FormDefinitionQueryImpl" resultType="long">
