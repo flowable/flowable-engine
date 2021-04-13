@@ -205,7 +205,7 @@
   </select>
 
   <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">

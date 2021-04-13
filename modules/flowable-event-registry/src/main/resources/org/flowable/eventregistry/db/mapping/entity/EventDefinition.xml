@@ -250,7 +250,7 @@
   </select>
   
   <select id="selectEventDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="eventDefinitionResultMap">
-    <include refid="org.flowable.eventregistry.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectEventDefinitionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

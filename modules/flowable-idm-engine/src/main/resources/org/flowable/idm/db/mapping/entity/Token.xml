@@ -183,7 +183,7 @@
   </sql>
 
   <select id="selectTokenByNativeQuery" parameterType="java.util.Map" resultMap="tokenResultMap">
-    <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectTokenCountByNativeQuery" parameterType="java.util.Map" resultType="long">

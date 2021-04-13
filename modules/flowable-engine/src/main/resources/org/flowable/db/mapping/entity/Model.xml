@@ -197,7 +197,7 @@
   </select>
   
   <select id="selectModelByNativeQuery" parameterType="java.util.Map" resultMap="modelResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectModelCountByNativeQuery" parameterType="java.util.Map" resultType="long">

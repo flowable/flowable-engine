@@ -252,7 +252,7 @@
   </select>
   
   <select id="selectFormDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="formDefinitionResultMap">
-    <include refid="org.flowable.form.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectFormDefinitionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

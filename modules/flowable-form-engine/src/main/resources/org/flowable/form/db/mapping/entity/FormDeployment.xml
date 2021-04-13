@@ -139,7 +139,7 @@
   </select>
 
   <select id="selectFormDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="formDeploymentResultMap">
-    <include refid="org.flowable.form.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectFormDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">
