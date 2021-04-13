@@ -144,7 +144,7 @@
   </select>
 
   <select id="selectDmnDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">
-    <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectDmnDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">

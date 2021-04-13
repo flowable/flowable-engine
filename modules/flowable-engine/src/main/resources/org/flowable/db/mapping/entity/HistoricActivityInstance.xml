@@ -352,7 +352,7 @@
   </sql>
   
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
-  	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+  	<include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

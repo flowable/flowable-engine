@@ -260,7 +260,7 @@
   </sql>
 
   <select id="selectHistoricDetailByNativeQuery" parameterType="java.util.Map" resultMap="historicDetailResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricDetailCountByNativeQuery" parameterType="java.util.Map" resultType="long">

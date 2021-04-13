@@ -365,7 +365,7 @@
     </select>
 
     <select id="selectHistoricVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessVariableResultMap">
-        <include refid="org.flowable.variable.service.db.common.selectByNativeQuery" />
+        <include refid="org.flowable.common.engine.db.selectByNativeQuery" />
     </select>
 
     <select id="selectHistoricVariableInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

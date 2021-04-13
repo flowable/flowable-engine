@@ -21,9 +21,7 @@
     </typeHandlers>
 
     <mappers>
-        <mapper resource="org/flowable/db/mapping/common.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
-        <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Comment.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/DeadLetterJob.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Deployment.xml" />
@@ -46,11 +44,11 @@
         <mapper resource="org/flowable/db/mapping/entity/ProcessDefinitionInfo.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/ByteArray.xml" />
+        <mapper resource="org/flowable/common/db/mapping/common.xml" />
         <mapper resource="org/flowable/db/mapping/entity/Resource.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/ExternalWorkerJob.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
-        <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
         <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/TimerJob.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
