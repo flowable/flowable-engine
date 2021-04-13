@@ -872,15 +872,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
-    protected void checkQueryOk() {
-        super.checkQueryOk();
-
-        if (includeProcessVariables) {
-            this.orderBy(HistoricProcessInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
-        }
-    }
-
-    @Override
     public void delete() {
         if (commandExecutor != null) {
             commandExecutor.execute(new DeleteHistoricProcessInstancesCmd(this));
