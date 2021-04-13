@@ -135,6 +135,9 @@ public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseRe
         if (request.isUnlocked()) {
             query.unlocked();
         }
+        if (request.isWithoutScopeType()) {
+            query.withoutScopeType();
+        }
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessExternalWorkerJobInfoWithQuery(query, request);

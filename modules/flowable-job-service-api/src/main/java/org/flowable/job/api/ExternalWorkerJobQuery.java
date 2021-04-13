@@ -86,6 +86,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
     ExternalWorkerJobQuery scopeType(String scopeType);
 
     /**
+     * Only return jobs that do not have a scope type.
+     */
+    ExternalWorkerJobQuery withoutScopeType();
+
+    /**
      * Only select tasks for the given scope definition identifier.
      */
     ExternalWorkerJobQuery scopeDefinitionId(String scopeDefinitionId);

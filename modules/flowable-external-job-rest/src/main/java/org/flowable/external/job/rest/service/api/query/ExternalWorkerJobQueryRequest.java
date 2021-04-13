@@ -40,7 +40,7 @@ public class ExternalWorkerJobQueryRequest extends PaginateRequest {
     protected boolean withoutTenantId;
     protected boolean locked;
     protected boolean unlocked;
-
+    protected boolean withoutScopeType;
 
     public String getId() {
         return id;
@@ -194,4 +194,14 @@ public class ExternalWorkerJobQueryRequest extends PaginateRequest {
     public void setUnlocked(boolean unlocked) {
         this.unlocked = unlocked;
     }
+
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
+    }
+
+    @ApiParam("Only return jobs without a scope type")
+    public void setWithoutScopeType(boolean withoutScopeType) {
+        this.withoutScopeType = withoutScopeType;
+    }
+
 }

@@ -48,6 +48,7 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
+    protected boolean withoutScopeType;
     protected String scopeDefinitionId;
     protected String correlationId;
     protected boolean executable;
@@ -166,7 +167,13 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         this.scopeType = scopeType;
         return this;
     }
-    
+
+    @Override
+    public DeadLetterJobQueryImpl withoutScopeType() {
+        this.withoutScopeType = true;
+        return this;
+    }
+
     @Override
     public DeadLetterJobQueryImpl scopeDefinitionId(String scopeDefinitionId) {
         if (scopeDefinitionId == null) {
@@ -465,6 +472,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return scopeType;
     }
 
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
+    }
+
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }
@@ -500,5 +511,4 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public Date getDuedateLowerThanOrEqual() {
         return duedateLowerThanOrEqual;
     }
-
 }
