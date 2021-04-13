@@ -26,20 +26,32 @@
         </if>
         ${sql}
         <if test="resultType == 'LIST_PAGE'">
-            <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+            <include refid="org.flowable.common.engine.db.limitAfterNativeQuerySql"/>
         </if>
     </sql>
 
+    <sql id="limitAfterNativeQuerySql">
+        <if test="needsPaging">${limitAfter}</if>
+    </sql>
+
+    <sql id="limitAfterNativeQuerySql" databaseId="db2">
+        <if test="needsPaging">${limitAfterNativeQuery}</if>
+    </sql>
+
+    <sql id="limitAfterNativeQuerySql" databaseId="mssql">
+        <if test="needsPaging">${limitAfterNativeQuery}</if>
+    </sql>
+
     <sql id="limitBeforeNativeQuerySql">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        <if test="needsPaging">${limitBefore}</if>
     </sql>
 
     <sql id="limitBeforeNativeQuerySql" databaseId="db2">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
+        <if test="needsPaging">${limitBeforeNativeQuery}</if>
     </sql>
 
     <sql id="limitBeforeNativeQuerySql" databaseId="mssql">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
+        <if test="needsPaging">${limitBeforeNativeQuery}</if>
     </sql>
 
 
