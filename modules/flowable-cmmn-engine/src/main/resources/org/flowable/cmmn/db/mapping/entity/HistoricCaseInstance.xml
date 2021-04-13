@@ -250,6 +250,10 @@
             <if test="needsPaging">${limitAfter}</if>
         ) RES
         left outer join ${prefix}ACT_HI_VARINST VAR ON VAR.PROC_INST_ID_ is null and RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_ = 'cmmn' and VAR.SUB_SCOPE_ID_ is null
+        <if test="needsCaseDefinitionOuterJoin">
+            left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        </if>
+        ${outerJoinOrderBy}
     </select>
 
     <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql">

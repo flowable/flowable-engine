@@ -467,6 +467,7 @@
       <if test="includeIdentityLinks">
           left outer join ${prefix}ACT_RU_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
       </if>
+      ${outerJoinOrderBy}
   </select>
 
   <sql id="commonSelectTaskByQueryCriteriaSql">

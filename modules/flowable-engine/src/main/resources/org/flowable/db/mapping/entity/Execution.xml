@@ -623,6 +623,10 @@
         <if test="needsPaging">${limitAfter}</if>
     ) RES
     left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+    <if test="needsProcessDefinitionOuterJoin">
+        inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+    </if>
+    ${outerJoinOrderBy}
   </select>
 
   <sql id="selectProcessInstanceWithVariablesByQueryCriteriaSql">
