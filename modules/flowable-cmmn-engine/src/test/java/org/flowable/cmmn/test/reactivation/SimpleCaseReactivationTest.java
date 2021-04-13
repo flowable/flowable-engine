@@ -41,7 +41,6 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
@@ -212,12 +211,12 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(reactivatedCase.getId());
             assertThat(identityLinks)
                 .extracting(IdentityLinkInfo::getType)
-                .contains(IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
+                .containsExactlyInAnyOrder(IdentityLinkType.STARTER, IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
 
             List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(historicCase.getId());
             assertThat(historicIdentityLinks)
                 .extracting(IdentityLinkInfo::getType)
-                .contains(IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
+                .containsExactlyInAnyOrder(IdentityLinkType.STARTER, IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -275,6 +274,33 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             assertHistoricVariableNotExisting(vars, "tempVar");
 
             assertCaseInstanceEnded(reactivatedCase);
+        } finally {
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void simpleCaseReactivationIdentityLinkTest() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("simpleCaseReactivationVariableTest_user");
+            final HistoricCaseInstance historicCase = createAndFinishSimpleCase("simpleReactivationTestCase");
+
+            List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(historicCase.getId());
+            assertThat(historicIdentityLinks).hasSize(2);
+            assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getType)
+                .containsExactlyInAnyOrder(IdentityLinkType.STARTER, IdentityLinkType.PARTICIPANT);
+
+            CaseInstance reactivatedCase = cmmnHistoryService.createCaseReactivationBuilder(historicCase.getId()).reactivate();
+            assertThat(reactivatedCase).isNotNull();
+
+            List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForCaseInstance(reactivatedCase.getId());
+            assertThat(identityLinks).hasSize(3);
+            assertThat(identityLinks)
+                .extracting(IdentityLinkInfo::getType)
+                .containsExactlyInAnyOrder(IdentityLinkType.STARTER, IdentityLinkType.PARTICIPANT, IdentityLinkType.REACTIVATOR);
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }

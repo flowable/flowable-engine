@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
@@ -58,6 +59,11 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     @Override
     public IdentityLinkEntity create() {
         return new IdentityLinkEntityImpl();
+    }
+
+    @Override
+    public IdentityLinkEntity createIdentityLinkFromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink) {
+        return new IdentityLinkEntityImpl(historicIdentityLink);
     }
 
     @Override
