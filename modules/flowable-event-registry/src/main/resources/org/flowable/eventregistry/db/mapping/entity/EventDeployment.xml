@@ -76,11 +76,11 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectEventDeploymentsByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultMap="eventDeploymentResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectEventDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectEventDeploymentCountByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultType="long">

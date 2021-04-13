@@ -49,11 +49,11 @@
     </select>
 
     <select id="selectTimerJobByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectTimerJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectTimerJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.TimerJobQueryImpl" resultType="long">
@@ -149,9 +149,8 @@
     </sql>
 
     <select id="selectTimerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_TIMER_JOB RES
         where 
         <if test="parameter.jobExecutionScope == null">
@@ -168,13 +167,13 @@
                 #{item}
             </foreach>
         </if>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectExpiredTimerJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_TIMER_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -192,7 +191,8 @@
                 </foreach>
             </if>
         </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <!-- TIMER INSERT -->

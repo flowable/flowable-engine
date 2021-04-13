@@ -95,11 +95,11 @@
   </select>
   
   <select id="selectAppDeploymentsByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl" resultMap="appDeploymentResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectAppDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectAppDeploymentCountByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDeploymentQueryImpl" resultType="long">
