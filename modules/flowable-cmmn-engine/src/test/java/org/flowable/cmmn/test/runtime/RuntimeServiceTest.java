@@ -797,7 +797,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
 
     private void testIncludeVariablesWithPagination(CaseInstanceQuery caseInstanceQuery) {
         assertPaginationQueryIncludeVariables(20, 10, caseInstanceQuery.listPage(20, 10));
-        assertPaginationQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, 0));
+        assertPaginationQueryIncludeVariables(0, 0, caseInstanceQuery.listPage(0, 0));
         assertPaginationQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, -1));
         assertPaginationQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(-1, -1));
         assertPaginationQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(-1, -2));
@@ -805,15 +805,12 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertPaginationQueryIncludeVariables(90, 10, caseInstanceQuery.listPage(90, 10));
         assertPaginationQueryIncludeVariables(0, 20, caseInstanceQuery.listPage(-10, 20));
         assertPaginationQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, Integer.MAX_VALUE));
-
-        assertThatThrownBy(() -> caseInstanceQuery.listPage(20, -1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("fromIndex(20) > toIndex(19)");
+        assertPaginationQueryIncludeVariables(20, 80, caseInstanceQuery.listPage(20, -1));
     }
 
     private void testIncludeVariablesWithPagination(HistoricCaseInstanceQuery caseInstanceQuery) {
         assertPaginationHistoricQueryIncludeVariables(20, 10, caseInstanceQuery.listPage(20, 10));
-        assertPaginationHistoricQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, 0));
+        assertPaginationHistoricQueryIncludeVariables(0, 0, caseInstanceQuery.listPage(0, 0));
         assertPaginationHistoricQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, -1));
         assertPaginationHistoricQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(-1, -1));
         assertPaginationHistoricQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(-1, -2));
@@ -821,10 +818,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertPaginationHistoricQueryIncludeVariables(90, 10, caseInstanceQuery.listPage(90, 10));
         assertPaginationHistoricQueryIncludeVariables(0, 20, caseInstanceQuery.listPage(-10, 20));
         assertPaginationHistoricQueryIncludeVariables(0, 100, caseInstanceQuery.listPage(0, Integer.MAX_VALUE));
-
-        assertThatThrownBy(() -> caseInstanceQuery.listPage(20, -1))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("fromIndex(20) > toIndex(19)");
+        assertPaginationHistoricQueryIncludeVariables(20, 80, caseInstanceQuery.listPage(20, -1));
     }
 
     private void testIncludeVariablesOnEmptyQueryWithPagination(CaseInstanceQuery caseInstanceQuery) {

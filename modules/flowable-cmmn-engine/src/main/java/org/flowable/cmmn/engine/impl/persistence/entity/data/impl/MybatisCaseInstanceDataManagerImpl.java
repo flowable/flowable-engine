@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -175,38 +174,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     @SuppressWarnings("unchecked")
     @Override
     public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQueryImpl query) {
-        // paging doesn't work for combining case instances and variables due
-        // to an outer join, so doing it in-memory
-
-        CaseInstanceQueryImpl caseInstanceQuery = query;
-        int firstResult = caseInstanceQuery.getFirstResult();
-        int maxResults = caseInstanceQuery.getMaxResults();
-
-        // setting max results, limit to 20000 results for performance reasons
-        if (caseInstanceQuery.getCaseInstanceVariablesLimit() != null) {
-            caseInstanceQuery.setMaxResults(caseInstanceQuery.getCaseInstanceVariablesLimit());
-        } else {
-            caseInstanceQuery.setMaxResults(cmmnEngineConfiguration.getCaseQueryLimit());
-        }
-        caseInstanceQuery.setFirstResult(0);
-
-        List<CaseInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(
-                        "selectCaseInstanceWithVariablesByQueryCriteria", caseInstanceQuery, getManagedEntityClass());
-
-        if (instanceList != null && !instanceList.isEmpty()) {
-            if (firstResult > 0) {
-                if (firstResult <= instanceList.size()) {
-                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
-                    return instanceList.subList(firstResult, toIndex);
-                } else {
-                    return Collections.EMPTY_LIST;
-                }
-            } else {
-                int toIndex = maxResults > 0 ? Math.min(maxResults, instanceList.size()) : instanceList.size();
-                return instanceList.subList(0, toIndex);
-            }
-        }
-        return Collections.EMPTY_LIST;
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstanceWithVariablesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override
