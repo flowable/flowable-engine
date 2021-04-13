@@ -10265,6 +10265,11 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <td><p>If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.</p></td>
 <td><p>Boolean</p></td>
 </tr>
+<tr class="even">
+<td><p>withoutScopeType</p></td>
+<td><p>If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.</p></td>
+<td><p>Boolean</p></td>
+</tr>
 <tr class="odd">
 <td><p>sort</p></td>
 <td><p>Field to sort results on, should be one of id, dueDate, executionId, processInstanceId, retries or tenantId.</p></td>
@@ -10663,6 +10668,11 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <td><p>If true, only returns jobs which are unlocked. If false, this parameter is ignored.</p></td>
 </tr>
 <tr class="odd">
+<td><p>withoutScopeType</p></td>
+<td><p>Boolean</p></td>
+<td><p>If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.</p></td>
+</tr>
+<tr class="even">
 <td><p>sort</p></td>
 <td><p>Field to sort results on, should be one of id, dueDate, executionId, processInstanceId, retries or tenantId.</p></td>
 <td><p>String</p></td>
