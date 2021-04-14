@@ -809,16 +809,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return this;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("ProcessDefinitionKey", "TEMPP_KEY_");
-            specialOrderBy = specialOrderBy.replace("ProcessDefinitionId", "TEMPP_ID_");
-        }
-        return specialOrderBy;
-    }
-
     // results /////////////////////////////////////////////////////////////////
 
     @Override

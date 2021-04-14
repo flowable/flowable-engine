@@ -774,15 +774,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return orderBy(HistoricProcessInstanceQueryProperty.TENANT_ID);
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
-        }
-        return specialOrderBy;
-    }
-
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();

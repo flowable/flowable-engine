@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -59,7 +60,7 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
         params.setFirstResult(page.getFirstResult());
         params.setMaxResults(page.getMaxResults());
-        params.setOrderByColumns("CREATE_TIME_ ASC");
+        params.addOrder("CREATE_TIME_", Direction.ASCENDING.getName(), null);
         return getDbSqlSession().selectList("selectHistoryJobsToExecute", params);
     }
 

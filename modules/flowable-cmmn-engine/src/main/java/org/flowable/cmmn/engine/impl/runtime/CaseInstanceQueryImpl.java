@@ -868,14 +868,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return includeCaseVariables;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-        }
-        return specialOrderBy;
-    }
-
     public boolean isNeedsCaseDefinitionOuterJoin() {
         if (isNeedsPaging()) {
             if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)

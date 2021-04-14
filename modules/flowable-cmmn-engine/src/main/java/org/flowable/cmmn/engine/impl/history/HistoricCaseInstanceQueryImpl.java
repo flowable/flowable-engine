@@ -26,7 +26,6 @@ import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteTaskAndPlanItemInstanceDataOfRemovedHistoricCaseInstancesCmd;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
@@ -1016,14 +1015,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public Set<String> getCaseInstanceIds() {
         return caseInstanceIds;
-    }
-
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-        }
-        return specialOrderBy;
     }
 
     public boolean isNeedsCaseDefinitionOuterJoin() {

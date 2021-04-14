@@ -1703,14 +1703,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orderBy(TaskQueryProperty.TENANT_ID);
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-        }
-        return specialOrderBy;
-    }
-
     // results ////////////////////////////////////////////////////////////////
 
     @Override
