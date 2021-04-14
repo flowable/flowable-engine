@@ -1751,15 +1751,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return this;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
-        }
-        return specialOrderBy;
-    }
-
     public Collection<String> getCandidateGroups() {
         if (candidateGroup != null) {
             Collection<String> candidateGroupList = new ArrayList<>(1);
