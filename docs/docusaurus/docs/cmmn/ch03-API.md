@@ -308,7 +308,7 @@ To make working with case variables easier, a set of out-of-the-box functions is
 
 -   **variables:containsAny(varName, value1, value2, …​)** : similar to the *contains* function, but *true* will be returned if **any** (and not all) the passed values is contained in the variable.
 
--   \*variables:base64(varName): converts a Binary or String Variable in Base64 String
+-   **variables:base64(varName)** : converts a Binary or String variable to a Base64 String
 
 -   Comparator functions:
 
