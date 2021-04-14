@@ -230,7 +230,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
 
     /**
      * Limit case instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);
 
 

@@ -131,7 +131,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean excludeSubtasks;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
-    protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -1528,7 +1527,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     @Override
     public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
-        this.taskVariablesLimit = taskVariablesLimit;
         return this;
     }
 
@@ -1536,9 +1534,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
-    }
-    public Integer getTaskVariablesLimit() {
-        return taskVariablesLimit;
     }
 
     public Collection<String> getCandidateGroups() {

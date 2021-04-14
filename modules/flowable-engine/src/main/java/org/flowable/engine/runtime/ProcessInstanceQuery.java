@@ -351,7 +351,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /**
      * Limit process instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
 
     /**

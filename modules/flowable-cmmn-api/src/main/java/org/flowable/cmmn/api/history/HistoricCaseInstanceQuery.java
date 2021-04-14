@@ -83,7 +83,9 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
 
     /**
      * Limit historic case instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit);
 
     /**

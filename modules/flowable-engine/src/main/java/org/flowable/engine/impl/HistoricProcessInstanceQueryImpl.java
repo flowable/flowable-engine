@@ -84,7 +84,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected Set<String> involvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
-    protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
     protected String tenantId;
     protected String tenantIdLike;
@@ -450,12 +449,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit) {
-        this.processInstanceVariablesLimit = processInstanceVariablesLimit;
         return this;
-    }
-
-    public Integer getProcessInstanceVariablesLimit() {
-        return processInstanceVariablesLimit;
     }
 
     @Override

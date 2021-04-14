@@ -80,8 +80,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected CaseInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
 
-    protected Integer caseInstanceVariablesLimit;
-
     public CaseInstanceQueryImpl() {
     }
 
@@ -702,12 +700,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     @Override
     public CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit) {
-        this.caseInstanceVariablesLimit = caseInstanceVariablesLimit;
         return this;
-    }
-
-    public Integer getCaseInstanceVariablesLimit() {
-        return this.caseInstanceVariablesLimit;
     }
 
     // results ////////////////////////////////////////////////////
