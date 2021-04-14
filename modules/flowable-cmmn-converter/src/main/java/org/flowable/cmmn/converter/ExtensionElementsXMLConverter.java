@@ -219,8 +219,9 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     protected ReactivationRule readReactivationRule(XMLStreamReader xtr) {
         ReactivationRule reactivationRule = new ReactivationRule();
         reactivationRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
-        reactivationRule.setType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE));
-        reactivationRule.setCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_REACTIVATION_RULE_CONDITION));
+        reactivationRule.setActivateCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ACTIVATE_CONDITION));
+        reactivationRule.setIgnoreCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IGNORE_CONDITION));
+        reactivationRule.setDefaultCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DEFAULT_CONDITION));
         readCommonXmlInfo(reactivationRule, xtr);
         return reactivationRule;
     }

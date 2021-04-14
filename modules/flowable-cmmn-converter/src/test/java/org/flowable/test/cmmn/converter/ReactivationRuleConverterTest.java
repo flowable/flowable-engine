@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ReactivationRule;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Task;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
 public class ReactivationRuleConverterTest {
@@ -30,32 +31,30 @@ public class ReactivationRuleConverterTest {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
         assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener()).isNotNull();
         assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule()).isNotNull();
-        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule().getType()).isEqualTo(ReactivationRule.IGNORE);
+        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule().hasIgnoreRule()).isTrue();
+        assertThat(cmmnModel.getPrimaryCase().getReactivateEventListener().getDefaultReactivationRule().hasIgnoreCondition()).isFalse();
 
         List<PlanItem> planItems = planModel.getPlanItems();
-        assertThat(planItems)
-                .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
-                .extracting(PlanItem::getItemControl,
-                        planItem -> planItem.getItemControl().getReactivationRule(),
-                        planItem -> planItem.getItemControl().getReactivationRule().getType())
-                .doesNotContainNull();
 
         assertThat(planItems)
                 .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
-                .extracting(planItem -> planItem.getItemControl().getReactivationRule().getType())
-                .containsExactly(ReactivationRule.ACTIVATE, ReactivationRule.DEFAULT);
-
-        assertThat(planItems)
-                .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Stage))
-                .extracting(planItem -> planItem.getItemControl().getReactivationRule().getCondition())
-                .containsExactly("${reactivateStageA}", null);
+                .extracting(planItem -> planItem.getItemControl().getReactivationRule())
+                .containsExactly(
+                    new ReactivationRule(null, null, "${vars:getOrDefault(reactivateStageA, false)}"),
+                    new ReactivationRule("${vars:getOrDefault(reactivateStageB, false)}", null, "${vars:getOrDefault(reactivateStageA, false)}"));
 
         Stage stageA = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageA");
-        assertThat(stageA.getPlanItems()).hasSize(1).extracting(PlanItem::getItemControl).containsOnlyNulls();
+        assertThat(stageA).isNotNull();
+        assertThat(stageA.getPlanItems()).hasSize(1).first().isNotNull().extracting(PlanItem::getItemControl).isNull();
 
         Stage stageB = (Stage) cmmnModel.getPrimaryCase().getPlanModel().findPlanItemDefinitionInStageOrDownwards("stageB");
+        assertThat(stageB).isNotNull();
         assertThat(stageB.getPlanItems())
-                .extracting(planItem -> planItem.getItemControl().getReactivationRule().getType())
-                .containsExactly(ReactivationRule.IGNORE, ReactivationRule.IGNORE_IF_COMPLETED);
+                .filteredOn(planItem -> (planItem.getPlanItemDefinition() instanceof Task))
+                .extracting(planItem -> planItem.getItemControl().getReactivationRule())
+                .containsExactly(
+                    new ReactivationRule(null, "true", null),
+                    new ReactivationRule(null, null, "true")
+                );
     }
 }

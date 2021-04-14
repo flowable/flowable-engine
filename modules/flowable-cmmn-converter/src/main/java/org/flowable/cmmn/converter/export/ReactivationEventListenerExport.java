@@ -46,12 +46,7 @@ public class ReactivationEventListenerExport extends AbstractPlanItemDefinitionE
         if (reactivationRule != null) {
             xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DEFAULT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
-            if (StringUtils.isNotEmpty(reactivationRule.getType())) {
-                xtw.writeAttribute(ATTRIBUTE_TYPE, reactivationRule.getType());
-                if (StringUtils.isNotEmpty(reactivationRule.getCondition())) {
-                    xtw.writeAttribute(ATTRIBUTE_REACTIVATION_RULE_CONDITION, reactivationRule.getCondition());
-                }
-            }
+            PlanItemControlExport.writeReactivationRuleAttributes(reactivationRule, xtw);
             xtw.writeEndElement();
             xtw.writeEndElement();
         }
