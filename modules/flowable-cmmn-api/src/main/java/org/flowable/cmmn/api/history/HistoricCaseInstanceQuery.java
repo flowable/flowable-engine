@@ -84,7 +84,9 @@ HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQuery, HistoricCaseI
 
     /**
      * Limit historic case instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit);
 
     /**

@@ -81,7 +81,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String tenantId;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
-    protected Integer caseVariablesLimit;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -609,7 +608,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit) {
-        this.caseVariablesLimit = historicCaseVariablesLimit;
         return this;
     }
     
@@ -995,10 +993,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isIncludeCaseVariables() {
         return includeCaseVariables;
-    }
-
-    public Integer getCaseVariablesLimit() {
-        return caseVariablesLimit;
     }
 
     public List<HistoricCaseInstanceQueryImpl> getOrQueryObjects() {
