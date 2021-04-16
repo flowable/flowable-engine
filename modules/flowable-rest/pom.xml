@@ -16,7 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.38.v20210224</jetty.version>
+        <jetty.version>${jetty.version}</jetty.version>
         <flowable.artifact>
             org.flowable.rest
         </flowable.artifact>
@@ -164,7 +164,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>1.11.22.RELEASE</version>
+            <version>2.4.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
