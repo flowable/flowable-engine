@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -507,7 +506,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     }
 
     protected void processPlanItems(CmmnModel cmmnModel, PlanFragment planFragment) {
-        List<PlanItem> planItemsToRemove = new ArrayList<>();
         for (PlanItem planItem : planFragment.getPlanItems()) {
             // Plan items are defined on the same level or in a higher parent stage, never in a child stage.
             Stage parentStage = planItem.getParentStage();
@@ -517,36 +515,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     + planItem.getDefinitionRef() + " of plan item " + planItem.getId());
             }
 
-//            /*
-//             * Plan fragments are special: they have a plan item and plan definition, but no runtime behavior.
-//             *
-//             * From the CMMN spec: " Unlike other PlanItemDefinitions, a PlanFragment (that is not a Stage) does not have a representation in run-time,
-//             * i.e., there is no notion of lifecycle tracking of a PlanFragment (not being a Stage) in the context of a Case instance.
-//             * Just the PlanItems that are contained in it are instantiated and have their lifecyles that are tracked."
-//             *
-//             * As such, the plan item needs to be removed (it can't have sentries or a plan item instance at runtime).
-//             * It is stored as a 'meta' plan item on the parent, as the plan item does need to be exported to XML.
-//             */
-//            if (planItemDefinition instanceof PlanFragment && !(planItemDefinition instanceof Stage)) {
-//                PlanFragment parentPlanFragment = planItem
-//                    .getParent(); // Note: the parent plan fragment (not the parent stage), as plan fragments can be nested
-//                parentPlanFragment.getMetaPlanItems().add(planItem);
-//
-//                planItemsToRemove.add(planItem);
-//
-//            } else {
-//                planItem.setPlanItemDefinition(planItemDefinition);
-//                procesPlanItem(cmmnModel, planItem, planItemDefinition);
-//
-//            }
-
             planItem.setPlanItemDefinition(planItemDefinition);
             procesPlanItem(cmmnModel, planItem, planItemDefinition);
 
-        }
-
-        for (PlanItem planItem : planItemsToRemove) {
-            planFragment.removePlanItem(planItem);
         }
 
     }
