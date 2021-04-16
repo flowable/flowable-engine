@@ -42,6 +42,8 @@ public class CmmnModel {
 
     protected List<Association> associations = new ArrayList<>();
 
+    protected List<TextAnnotation> textAnnotations = new ArrayList<>();
+
     protected Map<String, Criterion> criterionMap = new LinkedHashMap<>();
     protected Map<String, String> criterionTechnicalIdMap = new HashMap<>();
 
@@ -180,6 +182,19 @@ public class CmmnModel {
         associations.add(association);
     }
 
+    public TextAnnotation findTextAnnotation(String id) {
+        for (TextAnnotation textAnnotation : textAnnotations) {
+            if (id.equals(textAnnotation.getId())) {
+                return textAnnotation;
+            }
+        }
+        return null;
+    }
+
+    public void addTextAnnotation(TextAnnotation textAnnotation) {
+        textAnnotations.add(textAnnotation);
+    }
+
     public void addCriterion(String key, Criterion criterion) {
         criterionMap.put(key, criterion);
     }
@@ -309,6 +324,12 @@ public class CmmnModel {
     }
     public void setAssociations(List<Association> associations) {
         this.associations = associations;
+    }
+    public List<TextAnnotation> getTextAnnotations() {
+        return textAnnotations;
+    }
+    public void setTextAnnotations(List<TextAnnotation> textAnnotations) {
+        this.textAnnotations = textAnnotations;
     }
     public void addNamespace(String prefix, String uri) {
         namespaceMap.put(prefix, uri);

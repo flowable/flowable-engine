@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.model.EventListener;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -74,40 +75,61 @@ public abstract class CmmnOperation implements Runnable {
     protected List<PlanItemInstanceEntity> createPlanItemInstancesForNewStage(CommandContext commandContext, List<PlanItem> planItems, String caseDefinitionId,
             CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
 
-        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
+        List<PlanItemInstanceEntity> newPlanItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
 
             // In some cases (e.g. cross-border triggering of a sentry, the child plan item instance has been activated already
             // As such, it doesn't need to be created again (this is the if check here, which goes against the cache)
 
-            if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceForPlanItemExists(stagePlanItemInstanceEntity, planItem)) {
+            if (planItem.isInstanceLifecycleEnabled()) {
+                createPlanItemInstanceIfNeeded(commandContext, planItem, caseDefinitionId, caseInstanceEntity,
+                    stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
 
-                String caseInstanceId = null;
-                if (caseInstanceEntity != null) {
-                    caseInstanceId = caseInstanceEntity.getId();
-                } else if (stagePlanItemInstanceEntity != null) {
-                    caseInstanceId = stagePlanItemInstanceEntity.getCaseInstanceId();
+            } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment){
+                // Some plan items (plan fragments) exist as plan item, but not as plan item instance
+                PlanFragment planFragment = (PlanFragment) planItem.getPlanItemDefinition();
+                List<PlanItem> planFragmentPlanItems = planFragment.getDirectChildPlanItemsWithLifecycleEnabled();
+                for (PlanItem planFragmentPlanItem : planFragmentPlanItems) {
+                    createPlanItemInstanceIfNeeded(commandContext, planFragmentPlanItem, caseDefinitionId, caseInstanceEntity,
+                        stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
                 }
-
-                PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-                    .createPlanItemInstanceEntityBuilder()
-                    .planItem(planItem)
-                    .caseDefinitionId(caseDefinitionId)
-                    .caseInstanceId(caseInstanceId)
-                    .stagePlanItemInstance(stagePlanItemInstanceEntity)
-                    .tenantId(tenantId)
-                    .addToParent(true)
-                    // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
-                    // local variables might not yet be available
-                    .silentNameExpressionEvaluation(ExpressionUtil.hasRepetitionOnCollection(planItem))
-                    .create();
-
-                planItemInstances.add(childPlanItemInstance);
-                CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
 
             }
         }
-        return planItemInstances;
+        return newPlanItemInstances;
+    }
+
+    protected void createPlanItemInstanceIfNeeded(CommandContext commandContext, PlanItem planItem, String caseDefinitionId,
+            CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId, List<PlanItemInstanceEntity> newPlanItemInstances) {
+
+        if (stagePlanItemInstanceEntity == null || !childPlanItemInstanceForPlanItemExists(stagePlanItemInstanceEntity, planItem)) {
+
+            String caseInstanceId = null;
+            if (caseInstanceEntity != null) {
+                caseInstanceId = caseInstanceEntity.getId();
+            } else if (stagePlanItemInstanceEntity != null) {
+                caseInstanceId = stagePlanItemInstanceEntity.getCaseInstanceId();
+            }
+
+            PlanItemInstanceEntity childPlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                .createPlanItemInstanceEntityBuilder()
+                .planItem(planItem)
+                .caseDefinitionId(caseDefinitionId)
+                .caseInstanceId(caseInstanceId)
+                .stagePlanItemInstance(stagePlanItemInstanceEntity)
+                .tenantId(tenantId)
+                .addToParent(true)
+                // we silently ignore any exceptions evaluating the name for the new plan item, if it has repetition on a collection, as the item / itemIndex
+                // local variables might not yet be available
+                .silentNameExpressionEvaluation(ExpressionUtil.hasRepetitionOnCollection(planItem))
+                .create();
+
+            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(childPlanItemInstance);
+
+            newPlanItemInstances.add(childPlanItemInstance);
+            
+        }
+        
     }
 
     protected boolean childPlanItemInstanceForPlanItemExists(PlanItemInstanceContainer planItemInstanceContainer, PlanItem planItem) {
