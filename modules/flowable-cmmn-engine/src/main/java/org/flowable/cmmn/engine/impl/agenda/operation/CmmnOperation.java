@@ -163,6 +163,8 @@ public abstract class CmmnOperation implements Runnable {
             .silentNameExpressionEvaluation(silentNameExpressionEvaluation)
             .create();
 
+        CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(planItemInstanceEntity);
+
         return planItemInstanceEntity;
     }
     
