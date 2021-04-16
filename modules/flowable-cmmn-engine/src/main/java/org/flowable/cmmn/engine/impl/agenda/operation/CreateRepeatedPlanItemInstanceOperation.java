@@ -49,7 +49,7 @@ public class CreateRepeatedPlanItemInstanceOperation extends AbstractChangePlanI
 
     @Override
     public String getOperationName() {
-        return "[Create reeated plan item]";
+        return "[Create repeated plan item]";
     }
 
 }
