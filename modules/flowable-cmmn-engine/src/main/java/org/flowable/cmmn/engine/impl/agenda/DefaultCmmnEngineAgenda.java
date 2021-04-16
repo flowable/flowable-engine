@@ -20,6 +20,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperat
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceForRepetitionOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CreateRepeatedPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.DisablePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.DismissPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EnablePlanItemInstanceOperation;
@@ -132,6 +133,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planCreatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new CreatePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
+
+    @Override
+    public void planCreateRepeatedPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new CreateRepeatedPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override

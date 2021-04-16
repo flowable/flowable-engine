@@ -805,6 +805,10 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         }
 
         PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+
+        // record the plan item being created based on the collection, so it gets synchronized to the history as well
+        CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(childPlanItemInstanceEntity);
+
         // The repetition counter is 1 based
         setRepetitionCounter(childPlanItemInstanceEntity, index + 1);
 

@@ -18,13 +18,11 @@ import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -156,7 +154,7 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
             assertCaseInstanceNotEnded(reactivatedCase);
 
             // the plan items must be equal for both the runtime as well as the history as of now
-            assertSamePlanItemState(historicCase, reactivatedCase);
+            assertSamePlanItemState(reactivatedCase);
 
             // make sure we have exactly the same variables as the historic case
             assertSameVariables(historicCase, reactivatedCase);
@@ -356,27 +354,5 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
 
     protected void assertHistoricVariableNotExisting(List<HistoricVariableInstance> variables, String name) {
         assertThat(variables.stream().filter(v -> v.getVariableName().equals(name)).collect(Collectors.toList())).isEmpty();
-    }
-
-    protected void assertSamePlanItemState(HistoricCaseInstance c1, CaseInstance c2) {
-        List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c2.getId());
-        List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
-
-        assertThat(runtimePlanItems).isNotNull();
-        assertThat(historicPlanItems).isNotNull();
-        assertThat(runtimePlanItems).hasSize(historicPlanItems.size());
-
-        Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
-        for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
-            historyMap.put(historicPlanItem.getId(), historicPlanItem);
-        }
-
-        for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
-            HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
-            assertThat(historicPlanItemInstance).isNotNull();
-            assertThat(runtimePlanItem.getState()).isEqualTo(historicPlanItemInstance.getState());
-        }
-
-        assertThat(historyMap).hasSize(0);
     }
 }

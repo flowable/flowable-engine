@@ -57,6 +57,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, ACTIVE, ACTIVE, AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
         // now let's complete all Tasks B -> nothing must happen additionally
@@ -77,6 +80,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -106,6 +112,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // complete all active tasks
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -126,6 +135,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // now let's complete all Tasks B -> nothing must happen additionally
         completeAllPlanItems(caseInstance.getId(), "Task B", 2);
 
@@ -134,6 +146,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -163,6 +178,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // only complete two active Task B
         completePlanItemsWithItemValues(caseInstance.getId(), "Task B", 4, "A", "B");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -183,6 +201,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", Arrays.asList("C", "D", "E", "F"), Arrays.asList(2, 3, 0, 1));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // now let's complete all Tasks B -> nothing must happen additionally
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
 
@@ -191,6 +212,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -218,6 +242,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task C", myCollection, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // if we change the collection variable, nothing else must happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -242,6 +269,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
                 .orderByCreateTime().asc()
                 .list();
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         assertThat(tasks).hasSize(4);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
@@ -252,5 +282,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 }
