@@ -16,14 +16,11 @@ package org.flowable.common.engine.impl.db;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.query.Query.NullHandlingOnOrder;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.Direction;
 
 /**
  * @author Tijs Rademakers
@@ -35,7 +32,9 @@ public class ListQueryParameterObject {
         LIST, LIST_PAGE, SINGLE_RESULT, COUNT
     }
 
-    protected static class OrderBy {
+    protected static final OrderBy DEFAULT_ORDER_BY = new OrderBy("RES.ID_", "asc", null);
+
+    public static class OrderBy {
 
         protected final String columnName;
         protected final String direction;
@@ -46,6 +45,18 @@ public class ListQueryParameterObject {
             this.direction = direction;
             this.nullHandlingOnOrder = nullHandlingOnOrder;
         }
+
+        public String getColumnName() {
+            return columnName;
+        }
+
+        public String getDirection() {
+            return direction;
+        }
+
+        public NullHandlingOnOrder getNullHandlingOnOrder() {
+            return nullHandlingOnOrder;
+        }
     }
     
     public static final String SORTORDER_ASC = "asc";
@@ -54,9 +65,8 @@ public class ListQueryParameterObject {
     protected int firstResult = -1;
     protected int maxResults = -1;
     protected Object parameter;
-    protected Map<String, Boolean> orderByColumnMap = new TreeMap<>();
-    protected Collection<OrderBy> orderByCollection = new ArrayList<>();
-    protected OrderBy defaultOrderBy = new OrderBy("RES.ID_", "asc", null);
+    protected Collection<OrderBy> orderByCollection;
+    protected OrderBy defaultOrderBy = DEFAULT_ORDER_BY;
     protected QueryProperty orderProperty;
     protected String nullHandlingColumn;
     protected NullHandlingOnOrder nullHandlingOnOrder;
@@ -75,10 +85,8 @@ public class ListQueryParameterObject {
     
     public void addOrder(String column, String sortOrder, NullHandlingOnOrder nullHandlingOnOrder) {
         
-        if (Direction.ASCENDING.getName().equals(sortOrder)) {
-            orderByColumnMap.put(column, true);
-        } else {
-            orderByColumnMap.put(column, false);
+        if (orderByCollection == null) {
+            orderByCollection = new ArrayList<>(2);
         }
 
         orderByCollection.add(new OrderBy(column, sortOrder, nullHandlingOnOrder));
@@ -124,30 +132,35 @@ public class ListQueryParameterObject {
     }
 
     public boolean hasOrderBy() {
-        if (!orderByCollection.isEmpty()) {
+        if (orderByCollection != null && !orderByCollection.isEmpty()) {
             return true;
         }
 
         return defaultOrderBy != null;
     }
 
+    // This is used for the SQL Server and DB2 order by in a window function / over
+    @SuppressWarnings("unused")
     public String getOrderByForWindow() {
         return buildOrderBy();
     }
 
     protected String buildOrderBy() {
-        Collection<OrderBy> orderBy;
-        if (!orderByCollection.isEmpty()) {
-            orderBy = orderByCollection;
-        } else if (defaultOrderBy != null) {
-            orderBy = Collections.singleton(defaultOrderBy);
-        } else {
-            orderBy = Collections.emptyList();
-        }
+        Collection<OrderBy> orderBy = getOrderByCollectionSafe();
 
         return orderBy.stream()
                 .map(this::mapOrderByToSql)
                 .collect(Collectors.joining(",", "order by ", ""));
+    }
+
+    protected Collection<OrderBy> getOrderByCollectionSafe() {
+        if (orderByCollection != null && !orderByCollection.isEmpty()) {
+            return orderByCollection;
+        } else if (defaultOrderBy != null) {
+            return Collections.singleton(defaultOrderBy);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @SuppressWarnings("unused")
@@ -174,26 +187,27 @@ public class ListQueryParameterObject {
     }
 
     protected String mapOrderByToSql(OrderBy by) {
-        NullHandlingOnOrder nullHandlingOnOrder = by.nullHandlingOnOrder;
+        NullHandlingOnOrder nullHandlingOnOrder = by.getNullHandlingOnOrder();
+        String columnAndDirection = by.getColumnName() + " " + by.getDirection();
         if (nullHandlingOnOrder == null) {
-            return by.columnName + " " + by.direction;
+            return columnAndDirection;
         } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
             if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                return by.columnName + " " + by.direction + " NULLS FIRST";
+                return columnAndDirection + " NULLS FIRST";
             } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)
             ) {
                 // CASE WHEN <COLUMN_NAME> IS NULL
                 // THEN 0 ELSE 1 END ASC,
-                return "CASE WHEN " + by.columnName + " IS NULL THEN 0 ELSE 1 END, " + by.columnName + " " + by.direction;
+                return "CASE WHEN " + by.getColumnName() + " IS NULL THEN 0 ELSE 1 END, " + columnAndDirection;
 
             } else {
-                return by.columnName + " " + by.direction + " NULLS FIRST";
+                return columnAndDirection + " NULLS FIRST";
             }
         } else {
             if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType)
@@ -201,17 +215,17 @@ public class ListQueryParameterObject {
                     || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                return by.columnName + " " + by.direction + " NULLS LAST";
+                return columnAndDirection + " NULLS LAST";
             } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)
             ) {
                 // CASE WHEN <COLUMN_NAME> IS NULL
                 // THEN 1 ELSE 0 END ASC,
-                return "CASE WHEN " + by.columnName + " IS NULL THEN 1 ELSE 0 END ASC, " + by.columnName + " " + by.direction;
+                return "CASE WHEN " + by.getColumnName() + " IS NULL THEN 1 ELSE 0 END ASC, " + columnAndDirection;
 
             } else {
-                return by.columnName + " " + by.direction + " NULLS LAST";
+                return columnAndDirection + " NULLS LAST";
             }
         }
     }
@@ -230,8 +244,14 @@ public class ListQueryParameterObject {
         }
     }
     
-    public Map<String, Boolean> getOrderByColumnMap() {
-        return orderByColumnMap;
+    protected boolean hasOrderByForColumn(String name) {
+        for (OrderBy orderBy : getOrderByCollectionSafe()) {
+            if (name.equals(orderBy.getColumnName())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void setDatabaseType(String databaseType) {

@@ -1119,6 +1119,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             }
         }
 
-        return orderByColumnMap.containsKey(ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
+        return hasOrderByForColumn(ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
     }
 }

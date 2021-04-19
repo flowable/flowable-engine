@@ -1022,7 +1022,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             }
         }
 
-        return orderByColumnMap.containsKey(HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
+        return hasOrderByForColumn(HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
     }
 
 }

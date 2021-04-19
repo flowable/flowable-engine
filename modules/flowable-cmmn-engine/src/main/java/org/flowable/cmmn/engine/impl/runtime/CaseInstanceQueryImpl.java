@@ -872,6 +872,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             }
         }
 
-        return orderByColumnMap.containsKey(CaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
+        return hasOrderByForColumn(CaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
     }
 }
