@@ -1090,6 +1090,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             }
         }
 
-        return orderByColumnMap.containsKey(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
+        return hasOrderByForColumn(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
     }
 }
