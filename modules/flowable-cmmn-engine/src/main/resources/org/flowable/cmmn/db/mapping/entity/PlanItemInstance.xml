@@ -333,11 +333,11 @@
   </select>
 
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
@@ -347,19 +347,6 @@
 
   <sql id="selectPlanItemInstancesByQueryCriteriaSql">
     from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
-        <choose>
-            <when test="queryVariableValue.local">
-                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SUB_SCOPE_ID_ and A${index}.SCOPE_TYPE_ = 'cmmn'
-            </when>
-            <otherwise>
-                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.CASE_INST_ID_ = A${index}.SCOPE_ID_ and
-                A${index}.SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn'
-            </otherwise>
-        </choose>
-      </if>
-    </foreach>
     <where>
         <if test="caseDefinitionId != null">
             RES.CASE_DEF_ID_ = #{caseDefinitionId}
@@ -553,75 +540,90 @@
               )
             </when>
             <otherwise>
-                <if test="queryVariableValue.name != null">
-                  <!-- Match-all variable-names when name is null -->
-                  and A${index}.NAME_= #{queryVariableValue.name}
-                </if>
-                <if test="queryVariableValue.needsTypeCheck()">
-                  and A${index}.TYPE_ = #{queryVariableValue.type}
-                </if>
-                <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                      and (lower(A${index}.TEXT_)
-                    </when>
-                    <otherwise>
-                      and (A${index}.TEXT_
-                    </otherwise>
-                  </choose>
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
-                    <otherwise><include refid="variableOperator" /></otherwise>
-                  </choose>
-                  #{queryVariableValue.textValue}
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-                  </choose>
-                  <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                      or A${index}.TEXT_ is null
-                  </if>
-                  )
-                </if>
-                <if test="queryVariableValue.textValue2 != null">
-                  and A${index}.TEXT2_
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-                    <otherwise><include refid="variableOperator" /></otherwise>
-                  </choose>
-                    #{queryVariableValue.textValue2}
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-                  </choose>
-                </if>
-                <if test="queryVariableValue.longValue != null">
-                  and (A${index}.LONG_
-                  <include refid="variableOperator" />
-                  #{queryVariableValue.longValue}
-                  <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                      or A${index}.LONG_ is null
-                  </if>
-                  )
-                </if>
-                <if test="queryVariableValue.doubleValue != null">
-                  and (A${index}.DOUBLE_
-                  <include refid="variableOperator" />
-                  #{queryVariableValue.doubleValue}
-                  <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
-                      or A${index}.DOUBLE_ is null
-                  </if>
-                  )
-                </if>
-                <!-- Null variable type -->
-                <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                  <choose>
-                    <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-                      and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-                    </when>
-                    <otherwise>
-                      and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-                    </otherwise>
-                  </choose>
-                </if>
+                and exists (
+                    select 1
+                    from ${prefix}ACT_RU_VARIABLE V
+                    <where>
+                        <if test="queryVariableValue.local">
+                            and RES.ID_ = V.SUB_SCOPE_ID_
+                            and V.SCOPE_TYPE_ = 'cmmn'
+                        </if>
+                        <if test="!queryVariableValue.local">
+                            and RES.CASE_INST_ID_ = V.SCOPE_ID_
+                            and V.SUB_SCOPE_ID_ is null 
+                            and V.SCOPE_TYPE_ = 'cmmn'
+                        </if>
+                        <if test="queryVariableValue.name != null">
+                            <!-- Match-all variable-names when name is null -->
+                            and V.NAME_= #{queryVariableValue.name}
+                        </if>
+                        <if test="queryVariableValue.needsTypeCheck()">
+                            and V.TYPE_ = #{queryVariableValue.type}
+                        </if>
+                        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                    and (lower(V.TEXT_)
+                                </when>
+                                <otherwise>
+                                    and (V.TEXT_
+                                </otherwise>
+                            </choose>
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                                <otherwise><include refid="variableOperator" /></otherwise>
+                            </choose>
+                            #{queryVariableValue.textValue}
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                            </choose>
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or V.TEXT_ is null
+                            </if>
+                            )
+                        </if>
+                        <if test="queryVariableValue.textValue2 != null">
+                            and V.TEXT2_
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                                <otherwise><include refid="variableOperator" /></otherwise>
+                            </choose>
+                            #{queryVariableValue.textValue2}
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                            </choose>
+                        </if>
+                        <if test="queryVariableValue.longValue != null">
+                            and (V.LONG_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.longValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or V.LONG_ is null
+                            </if>
+                            )
+                        </if>
+                        <if test="queryVariableValue.doubleValue != null">
+                            and (V.DOUBLE_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.doubleValue}
+                            <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                or V.DOUBLE_ is null
+                            </if>
+                            )
+                        </if>
+                        <!-- Null variable type -->
+                        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                            <choose>
+                                <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                    and (V.TEXT_ is not null or V.TEXT2_ is not null or V.LONG_ is not null or V.DOUBLE_ is not null or V.BYTEARRAY_ID_ is not null)
+                                </when>
+                                <otherwise>
+                                    and V.TEXT_ is null and V.TEXT2_ is null and V.LONG_ is null and V.DOUBLE_ is null and V.BYTEARRAY_ID_ is null
+                                </otherwise>
+                            </choose>
+                        </if>
+                    </where>
+                )
             </otherwise>
         </choose>
       </foreach>

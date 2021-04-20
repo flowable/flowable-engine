@@ -34,8 +34,7 @@ class RepetitionRuleConverterTest {
 
         PlanItem planItem2 = cmmnModel.getPrimaryCase()
                 .getPlanModel()
-                .getPlanItemMap()
-                .get("planItem2");
+                .getPlanItem("planItem2");
 
         assertThat(planItem2).isNotNull();
         assertThat(planItem2.getPlanItemDefinition().getId()).isEqualTo("humanTask2");

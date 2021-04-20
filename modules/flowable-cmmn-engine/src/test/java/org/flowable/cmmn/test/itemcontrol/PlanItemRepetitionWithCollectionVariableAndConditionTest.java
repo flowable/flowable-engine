@@ -69,6 +69,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // now let's complete all Tasks B -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -87,6 +90,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -124,6 +130,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // now let's complete all Tasks B -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -142,6 +151,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -174,6 +186,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // complete all active tasks
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -202,6 +217,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -234,6 +252,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // only complete two active Task B
         completePlanItemsWithItemValues(caseInstance.getId(), "Task B", 4, "A", "B");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -262,6 +283,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -297,6 +321,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task C", myCollection, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // if we change the collection variable, nothing else must happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -331,6 +358,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 
     @Test
@@ -367,6 +397,9 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task C", myCollection, Arrays.asList(0, 1, 2, 3));
 
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
+
         // if we change the collection variable, nothing else must happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -401,5 +434,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertNoPlanItemInstance(planItemInstances, "Task C");
+
+        // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
+        assertSamePlanItemState(caseInstance);
     }
 }

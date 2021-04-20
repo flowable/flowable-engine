@@ -42,6 +42,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_CASE = "case";
     String ELEMENT_PLAN_MODEL = "casePlanModel";
     String ELEMENT_STAGE = "stage";
+    String ELEMENT_PLAN_FRAGMENT = "planFragment";
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
     String ELEMENT_HUMAN_TASK = "humanTask";
@@ -77,6 +78,9 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     String ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 
+    String ELEMENT_TEXT_ANNOTATION = "textAnnotation";
+    String ELEMENT_ASSOCIATION = "association";
+
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
     String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
     String ATTRIBUTE_EXIT_TYPE = "exitType";
@@ -98,9 +102,11 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
     String ATTRIBUTE_CASE_CANDIDATE_USERS = "candidateStarterUsers";
     String ATTRIBUTE_CASE_CANDIDATE_GROUPS = "candidateStarterGroups";
+    String ELEMENT_TEXT = "text";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
+    String ATTRIBUTE_TARGET_REF = "targetRef";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";

@@ -670,7 +670,9 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
 
     /**
      * Limit task variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     T limitTaskVariables(Integer taskVariablesLimit);
 
     /**

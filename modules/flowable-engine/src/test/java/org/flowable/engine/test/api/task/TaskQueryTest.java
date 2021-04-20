@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
@@ -52,6 +53,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  * @author Frederik Heremans
  * @author Falko Menge
+ * @author Filip Hrisafov
  */
 public class TaskQueryTest extends PluggableFlowableTestCase {
 
@@ -3119,6 +3121,408 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(task.getTaskLocalVariables()).isNotNull();
         bytes = (byte[]) task.getTaskLocalVariables().get("binaryTaskVariable");
         assertThat(new String(bytes)).isEqualTo("It is I, le binary");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testIncludeIdentityLinksWithPaging() {
+        // We don't need the existing tasks for this test
+        taskService.deleteTasks(taskIds, true);
+        taskIds.clear();
+
+        for (int i = 0; i < 10; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            task.setName("task" + i);
+            taskService.saveTask(task);
+            taskService.setPriority(task.getId(), i);
+            taskService.addCandidateGroup(task.getId(), "group" + i);
+            taskService.addCandidateGroup(task.getId(), "otherGroup" + i);
+            taskService.addCandidateUser(task.getId(), "user" + i);
+        }
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(10);
+        assertThat(taskService.createTaskQuery().list()).hasSize(10);
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        tasks = taskService.createTaskQuery()
+                .includeIdentityLinks()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        Task task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getIdentityLinks())
+                .extracting(IdentityLinkInfo::getGroupId, IdentityLinkInfo::getUserId)
+                .containsExactlyInAnyOrder(
+                        tuple("group1", null),
+                        tuple("otherGroup1", null),
+                        tuple(null, "user1")
+                );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(10);
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeIdentityLinks()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            HistoricTaskInstance historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getIdentityLinks())
+                    .extracting(IdentityLinkInfo::getGroupId, IdentityLinkInfo::getUserId)
+                    .containsExactlyInAnyOrder(
+                            tuple("group1", null),
+                            tuple("otherGroup1", null),
+                            tuple(null, "user1")
+                    );
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testIncludeProcessVariablesWithPaging() {
+        // We don't need the existing tasks for this test
+        taskService.deleteTasks(taskIds, true);
+        taskIds.clear();
+
+        for (int i = 0; i < 10; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("processVar", "value" + i));
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            task.setName("task" + i);
+            taskService.saveTask(task);
+            taskService.setPriority(task.getId(), i);
+        }
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(10);
+        assertThat(taskService.createTaskQuery().list()).hasSize(10);
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        Task task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(10);
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            HistoricTaskInstance historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testIncludeProcessVariablesAndTaskLocalVariablesWithPaging() {
+        // We don't need the existing tasks for this test
+        taskService.deleteTasks(taskIds, true);
+        taskIds.clear();
+
+        for (int i = 0; i < 10; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("processVar", "value" + i));
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            task.setName("task" + i);
+            taskService.saveTask(task);
+            taskService.setPriority(task.getId(), i);
+            taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + i);
+        }
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(10);
+        assertThat(taskService.createTaskQuery().list()).hasSize(10);
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        Task task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+        assertThat(task.getTaskLocalVariables()).isEmpty();
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+        assertThat(task.getTaskLocalVariables())
+                .containsOnly(entry("taskVar", "taskValue1"));
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(10);
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            HistoricTaskInstance historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+            assertThat(historicTask.getTaskLocalVariables()).isEmpty();
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .includeTaskLocalVariables()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+            assertThat(historicTask.getTaskLocalVariables())
+                    .containsOnly(entry("taskVar", "taskValue1"));
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testIncludeProcessVariablesAndTaskLocalVariablesAndIncludeIdentityLinksWithPaging() {
+        // We don't need the existing tasks for this test
+        taskService.deleteTasks(taskIds, true);
+        taskIds.clear();
+
+        for (int i = 0; i < 10; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("processVar", "value" + i));
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            task.setName("task" + i);
+            taskService.saveTask(task);
+            taskService.setPriority(task.getId(), i);
+            taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + i);
+            taskService.addCandidateGroup(task.getId(), "group" + i);
+            taskService.addCandidateGroup(task.getId(), "otherGroup" + i);
+            taskService.addCandidateUser(task.getId(), "user" + i);
+        }
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(10);
+        assertThat(taskService.createTaskQuery().list()).hasSize(10);
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        Task task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+        assertThat(task.getTaskLocalVariables()).isEmpty();
+        assertThat(task.getIdentityLinks()).isEmpty();
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+        assertThat(task.getTaskLocalVariables())
+                .containsOnly(entry("taskVar", "taskValue1"));
+        assertThat(task.getIdentityLinks()).isEmpty();
+
+        tasks = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .includeTaskLocalVariables()
+                .includeIdentityLinks()
+                .orderByTaskPriority().asc()
+                .listPage(0, 4);
+        assertThat(tasks)
+                .extracting(TaskInfo::getName)
+                .containsExactly("task0", "task1", "task2", "task3");
+
+        task = tasks.get(1);
+        assertThat(task).isNotNull();
+        assertThat(task.getProcessVariables())
+                .containsOnly(entry("processVar", "value1"));
+        assertThat(task.getTaskLocalVariables())
+                .containsOnly(entry("taskVar", "taskValue1"));
+        assertThat(task.getIdentityLinks())
+                .extracting(IdentityLinkInfo::getGroupId, IdentityLinkInfo::getUserId)
+                .containsExactlyInAnyOrder(
+                        tuple("group1", null),
+                        tuple("otherGroup1", null),
+                        tuple(null, "user1")
+                );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(10);
+            assertThat(historyService.createHistoricTaskInstanceQuery().list()).hasSize(10);
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            HistoricTaskInstance historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+            assertThat(historicTask.getTaskLocalVariables()).isEmpty();
+            assertThat(historicTask.getIdentityLinks()).isEmpty();
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .includeTaskLocalVariables()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+            assertThat(historicTask.getTaskLocalVariables())
+                    .containsOnly(entry("taskVar", "taskValue1"));
+            assertThat(historicTask.getIdentityLinks()).isEmpty();
+
+            historicTasks = historyService.createHistoricTaskInstanceQuery()
+                    .includeProcessVariables()
+                    .includeTaskLocalVariables()
+                    .includeIdentityLinks()
+                    .orderByTaskPriority().asc()
+                    .listPage(0, 4);
+            assertThat(historicTasks)
+                    .extracting(TaskInfo::getName)
+                    .containsExactly("task0", "task1", "task2", "task3");
+
+            historicTask = historicTasks.get(1);
+            assertThat(historicTask).isNotNull();
+            assertThat(historicTask.getProcessVariables())
+                    .containsOnly(entry("processVar", "value1"));
+            assertThat(historicTask.getTaskLocalVariables())
+                    .containsOnly(entry("taskVar", "taskValue1"));
+            assertThat(historicTask.getIdentityLinks())
+                    .extracting(IdentityLinkInfo::getGroupId, IdentityLinkInfo::getUserId)
+                    .containsExactlyInAnyOrder(
+                            tuple("group1", null),
+                            tuple("otherGroup1", null),
+                            tuple(null, "user1")
+                    );
+        }
     }
 
     /**

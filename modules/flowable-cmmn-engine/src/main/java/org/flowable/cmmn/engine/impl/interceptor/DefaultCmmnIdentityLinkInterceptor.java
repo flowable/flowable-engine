@@ -69,6 +69,14 @@ public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInter
     public void handleReactivateCaseInstance(CaseInstanceEntity caseInstance) {
         String authenticatedUserId = Authentication.getAuthenticatedUserId();
         if (authenticatedUserId != null) {
+            List<IdentityLinkEntity> identityLinks = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .findIdentityLinksByScopeIdAndType(caseInstance.getId(), ScopeTypes.CMMN);
+            for (IdentityLinkEntity identityLink : identityLinks) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(authenticatedUserId) && IdentityLinkType.REACTIVATOR.equals(identityLink.getType())) {
+                    return;
+                }
+            }
+
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.REACTIVATOR, cmmnEngineConfiguration);
         }
     }

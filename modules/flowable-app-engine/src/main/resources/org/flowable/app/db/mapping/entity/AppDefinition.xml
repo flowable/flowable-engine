@@ -137,11 +137,11 @@
   </select>
   
   <select id="selectAppDefinitionsByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl" resultMap="appDefinitionResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectAppDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectAppDefinitionCountByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl" resultType="long">

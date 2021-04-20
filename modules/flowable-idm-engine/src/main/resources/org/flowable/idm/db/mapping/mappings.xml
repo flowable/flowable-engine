@@ -18,9 +18,9 @@
     <!-- Common mappers -->
     <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
     <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
     <!-- Engine mappers -->
-    <mapper resource="org/flowable/idm/db/mapping/common.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/IdmByteArray.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/Group.xml" />
     <mapper resource="org/flowable/idm/db/mapping/entity/IdentityInfo.xml" />

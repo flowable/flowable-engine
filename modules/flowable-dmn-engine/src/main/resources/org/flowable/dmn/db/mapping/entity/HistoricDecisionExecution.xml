@@ -107,11 +107,11 @@
   </select>
 
   <select id="selectHistoricDecisionExecutionsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultMap="historicDecisionExecutionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetweenNoDistinct}</if>, DEF.KEY_ as DEC_DEF_KEY_, DEF.NAME_ as DEC_DEF_NAME_, DEF.VERSION_ as DEC_DEF_VERSION_
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as DEC_DEF_KEY_, DEF.NAME_ as DEC_DEF_NAME_, DEF.VERSION_ as DEC_DEF_VERSION_
     <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectHistoricDecisionExecutionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultType="long">
@@ -121,6 +121,7 @@
   
   <sql id="selectHistoricDecisionExecutionsByQueryCriteriaSql">  
     from ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
+        <!-- The definition relationship is 1:1. Therefore it is OK to use an inner join here -->
         inner join ${prefix}ACT_DMN_DECISION DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
     <where>
       <if test="id != null">
@@ -179,7 +180,7 @@
   </sql>
 
   <select id="selectHistoricDecisionExecutionByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
-    <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricDecisionExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

@@ -25,6 +25,7 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.TextAnnotation;
 
 public class CmmnDIExport implements CmmnXmlConstants {
     
@@ -45,6 +46,13 @@ public class CmmnDIExport implements CmmnXmlConstants {
                 PlanItem planItem = model.findPlanItem(elementId);
                 if (planItem != null) {
                     writePlanItem(planItem, model, xtw);
+
+                } else {
+                    TextAnnotation textAnnotation = model.findTextAnnotation(elementId);
+                    if (textAnnotation != null) {
+                        writeTextAnnotation(textAnnotation, model, xtw);
+                    }
+
                 }
             }
         }
@@ -86,6 +94,10 @@ public class CmmnDIExport implements CmmnXmlConstants {
         for (Criterion criterion : planItem.getExitCriteria()) {
             createCmmnShape(model, criterion.getId(), xtw);
         }
+    }
+
+    protected static void writeTextAnnotation(TextAnnotation textAnnotation, CmmnModel model, XMLStreamWriter xtw) throws Exception {
+        createCmmnShape(model, textAnnotation.getId(), xtw);
     }
     
     protected static void createCmmnShape(CmmnModel model, String elementId, XMLStreamWriter xtw) throws Exception {

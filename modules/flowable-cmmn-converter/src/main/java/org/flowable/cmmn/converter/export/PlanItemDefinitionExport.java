@@ -27,6 +27,7 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
 
     static {
         addPlanItemDefinitionExport(StageExport.getInstance());
+        addPlanItemDefinitionExport(PlanFragmentExport.getInstance());
         addPlanItemDefinitionExport(new TaskExport());
         addPlanItemDefinitionExport(new HumanTaskExport());
         addPlanItemDefinitionExport(new CaseTaskExport());

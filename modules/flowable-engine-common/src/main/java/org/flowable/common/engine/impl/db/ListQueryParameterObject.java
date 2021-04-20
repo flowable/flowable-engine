@@ -13,13 +13,14 @@
 
 package org.flowable.common.engine.impl.db;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.query.Query.NullHandlingOnOrder;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.Direction;
 
 /**
  * @author Tijs Rademakers
@@ -30,6 +31,33 @@ public class ListQueryParameterObject {
     public enum ResultType {
         LIST, LIST_PAGE, SINGLE_RESULT, COUNT
     }
+
+    protected static final OrderBy DEFAULT_ORDER_BY = new OrderBy("RES.ID_", "asc", null);
+
+    public static class OrderBy {
+
+        protected final String columnName;
+        protected final String direction;
+        protected final NullHandlingOnOrder nullHandlingOnOrder;
+
+        public OrderBy(String columnName, String direction, NullHandlingOnOrder nullHandlingOnOrder) {
+            this.columnName = columnName;
+            this.direction = direction;
+            this.nullHandlingOnOrder = nullHandlingOnOrder;
+        }
+
+        public String getColumnName() {
+            return columnName;
+        }
+
+        public String getDirection() {
+            return direction;
+        }
+
+        public NullHandlingOnOrder getNullHandlingOnOrder() {
+            return nullHandlingOnOrder;
+        }
+    }
     
     public static final String SORTORDER_ASC = "asc";
     public static final String SORTORDER_DESC = "desc";
@@ -37,8 +65,8 @@ public class ListQueryParameterObject {
     protected int firstResult = -1;
     protected int maxResults = -1;
     protected Object parameter;
-    protected String orderByColumns;
-    protected Map<String, Boolean> orderByColumnMap = new TreeMap<>();
+    protected Collection<OrderBy> orderByCollection;
+    protected OrderBy defaultOrderBy = DEFAULT_ORDER_BY;
     protected QueryProperty orderProperty;
     protected String nullHandlingColumn;
     protected NullHandlingOnOrder nullHandlingOnOrder;
@@ -55,74 +83,17 @@ public class ListQueryParameterObject {
         this.maxResults = maxResults;
     }
     
-    protected void addOrder(String column, String sortOrder, NullHandlingOnOrder nullHandlingOnOrder) {
-
-        if (orderByColumns == null) {
-            orderByColumns = "";
-        } else {
-            orderByColumns = orderByColumns + ", ";
-        }
+    public void addOrder(String column, String sortOrder, NullHandlingOnOrder nullHandlingOnOrder) {
         
-        if (Direction.ASCENDING.getName().equals(sortOrder)) {
-            orderByColumnMap.put(column, true);
-        } else {
-            orderByColumnMap.put(column, false);
+        if (orderByCollection == null) {
+            orderByCollection = new ArrayList<>(2);
         }
 
-        String defaultOrderByClause = column + " " + sortOrder;
+        orderByCollection.add(new OrderBy(column, sortOrder, nullHandlingOnOrder));
+    }
 
-        if (nullHandlingOnOrder != null) {
-
-            if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
-
-                if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType) 
-                        || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
-                        || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) 
-                        || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderByColumns = orderByColumns + defaultOrderByClause + " NULLS FIRST";
-                } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderByColumns = orderByColumns + "isnull(" + column + ") desc," + defaultOrderByClause;
-                } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    if (nullHandlingColumn == null) {
-                        nullHandlingColumn = "";
-                    } else {
-                        nullHandlingColumn = nullHandlingColumn + ", ";
-                    }
-                    String columnName = column.replace("RES.", "") + "_order_null";
-                    nullHandlingColumn = nullHandlingColumn + "case when " + column + " is null then 0 else 1 end " + columnName;
-                    orderByColumns = orderByColumns + columnName + "," + defaultOrderByClause;
-                } else {
-                    orderByColumns = orderByColumns + defaultOrderByClause;
-                }
-
-            } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_LAST) {
-
-                if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType) 
-                        || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
-                        || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType) 
-                        || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
-                    orderByColumns = orderByColumns + column + " " + sortOrder + " NULLS LAST";
-                } else if (AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)) {
-                    orderByColumns = orderByColumns + "isnull(" + column + ") asc," + defaultOrderByClause;
-                } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
-                    if (nullHandlingColumn == null) {
-                        nullHandlingColumn = "";
-                    } else {
-                        nullHandlingColumn = nullHandlingColumn + ", ";
-                    }
-                    String columnName = column.replace("RES.", "") + "_order_null";
-                    nullHandlingColumn = nullHandlingColumn + "case when " + column + " is null then 1 else 0 end " + columnName;
-                    orderByColumns = orderByColumns + columnName + "," + defaultOrderByClause;
-                } else {
-                    orderByColumns = orderByColumns + defaultOrderByClause;
-                }
-
-            }
-
-        } else {
-            orderByColumns = orderByColumns + defaultOrderByClause;
-        }
-
+    public boolean isNeedsPaging() {
+        return firstResult >= 0;
     }
     
     public int getFirstResult() {
@@ -159,33 +130,128 @@ public class ListQueryParameterObject {
     public void setParameter(Object parameter) {
         this.parameter = parameter;
     }
+
+    public boolean hasOrderBy() {
+        if (orderByCollection != null && !orderByCollection.isEmpty()) {
+            return true;
+        }
+
+        return defaultOrderBy != null;
+    }
+
+    // This is used for the SQL Server and DB2 order by in a window function / over
+    @SuppressWarnings("unused")
+    public String getOrderByForWindow() {
+        return buildOrderBy();
+    }
+
+    protected String buildOrderBy() {
+        Collection<OrderBy> orderBy = getOrderByCollectionSafe();
+
+        return orderBy.stream()
+                .map(this::mapOrderByToSql)
+                .collect(Collectors.joining(",", "order by ", ""));
+    }
+
+    protected Collection<OrderBy> getOrderByCollectionSafe() {
+        if (orderByCollection != null && !orderByCollection.isEmpty()) {
+            return orderByCollection;
+        } else if (defaultOrderBy != null) {
+            return Collections.singleton(defaultOrderBy);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public String getOuterJoinOrderBy() {
+        if (isNeedsPaging()) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                // SQL Server does not optimize the order by in the outer join.
+                // Therefore we use the row number (if paging is enabled)
+                return "order by RES.rn asc";
+            } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)) {
+                // Sometimes we are ordering by columns which are not in the join, e.g. the definition.
+                // Therefore we use the row number (if paging is enabled)
+                return "order by RES.rnk asc";
+            } else if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
+                // Sometimes we are ordering by columns which are not in the join, e.g. the definition.
+                // Therefore we use the row number (if paging is enabled)
+                return "order by RES.rownum asc";
+            }
+        }
+        // We need to do another order by in order to make sure that the final result entries are correctly sorted.
+        // Some DBs will correctly remove this orderBy due to being identical to the on in the sub select.
+        // Postgres, Oracle are such DBs.
+        return buildOrderBy();
+    }
+
+    protected String mapOrderByToSql(OrderBy by) {
+        NullHandlingOnOrder nullHandlingOnOrder = by.getNullHandlingOnOrder();
+        String columnAndDirection = by.getColumnName() + " " + by.getDirection();
+        if (nullHandlingOnOrder == null) {
+            return columnAndDirection;
+        } else if (nullHandlingOnOrder == NullHandlingOnOrder.NULLS_FIRST) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
+                return columnAndDirection + " NULLS FIRST";
+            } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)
+            ) {
+                // CASE WHEN <COLUMN_NAME> IS NULL
+                // THEN 0 ELSE 1 END ASC,
+                return "CASE WHEN " + by.getColumnName() + " IS NULL THEN 0 ELSE 1 END, " + columnAndDirection;
+
+            } else {
+                return columnAndDirection + " NULLS FIRST";
+            }
+        } else {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_H2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
+                return columnAndDirection + " NULLS LAST";
+            } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MYSQL.equals(databaseType)
+            ) {
+                // CASE WHEN <COLUMN_NAME> IS NULL
+                // THEN 1 ELSE 0 END ASC,
+                return "CASE WHEN " + by.getColumnName() + " IS NULL THEN 1 ELSE 0 END ASC, " + columnAndDirection;
+
+            } else {
+                return columnAndDirection + " NULLS LAST";
+            }
+        }
+    }
+
+
     
     public String getOrderBy() {
         // For db2 and sqlserver, when there is paging needed, the limitBefore and limitBetween is used.
         // For those databases, the regular orderBy needs to be empty, 
-        // the order will be added in the 'limitBetween' (see mssql/db2.properties). 
-        if (firstResult >= 0 
+        // the order will be added in the 'limitBetween' (see mssql/db2.properties).
+        if (isNeedsPaging()
                 && (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType) || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) ) {
             return "";
         } else {
-            return "order by " + getOrderByColumns();
+            return buildOrderBy();
         }
     }
     
-    public void setOrderByColumns(String orderByColumns) {
-        this.orderByColumns = orderByColumns;
-    }
+    protected boolean hasOrderByForColumn(String name) {
+        for (OrderBy orderBy : getOrderByCollectionSafe()) {
+            if (name.equals(orderBy.getColumnName())) {
+                return true;
+            }
+        }
 
-    public String getOrderByColumns() {
-        if (orderByColumns != null) {
-            return orderByColumns;
-        } else {
-            return "RES.ID_ asc";
-        }
-    }
-    
-    public Map<String, Boolean> getOrderByColumnMap() {
-        return orderByColumnMap;
+        return false;
     }
 
     public void setDatabaseType(String databaseType) {
@@ -203,5 +269,5 @@ public class ListQueryParameterObject {
     public void setNullHandlingColumn(String nullHandlingColumn) {
         this.nullHandlingColumn = nullHandlingColumn;
     }
-    
+
 }

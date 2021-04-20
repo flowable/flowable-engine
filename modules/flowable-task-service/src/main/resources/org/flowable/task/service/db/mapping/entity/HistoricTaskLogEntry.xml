@@ -117,11 +117,11 @@
   
   <!-- SELECTS -->
   <select id="selectHistoricTaskLogEntriesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultMap="HistoricTaskLogEntryResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectHistoricTaskLogEntriesByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectHistoricTaskLogEntriesCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl" resultType="long">
@@ -130,7 +130,7 @@
   </select>
 
   <select id="selectHistoricTaskLogEntriesByNativeQueryCriteria" parameterType="java.util.Map" resultMap="HistoricTaskLogEntryResultMap">
-    <include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricTaskLogEntriesCountByNativeQueryCriteria" parameterType="java.util.Map" resultType="long">

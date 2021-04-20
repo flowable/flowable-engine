@@ -840,9 +840,8 @@ public abstract class AbstractEngineConfiguration {
                 properties.put("limitBefore", "");
                 properties.put("limitAfter", "");
                 properties.put("limitBetween", "");
-                properties.put("limitBetweenNoDistinct", "");
-                properties.put("limitOuterJoinBetween", "");
                 properties.put("limitBeforeNativeQuery", "");
+                properties.put("limitAfterNativeQuery", "");
                 properties.put("blobType", "BLOB");
                 properties.put("boolValue", "TRUE");
 
