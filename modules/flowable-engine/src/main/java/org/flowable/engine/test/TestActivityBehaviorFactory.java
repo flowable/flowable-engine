@@ -55,6 +55,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
@@ -67,6 +68,7 @@ import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivity
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundarySignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CaseTaskActivityBehavior;
@@ -81,6 +83,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEventRegistryStartE
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessVariableListenerlStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
@@ -90,6 +93,7 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEven
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
@@ -376,6 +380,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
+    public EventSubProcessVariableListenerlStartEventActivityBehavior createEventSubProcessVariableListenerlStartEventActivityBehavior(
+            StartEvent startEvent, VariableListenerEventDefinition variableListenerEventDefinition) {
+        
+        return wrappedActivityBehaviorFactory.createEventSubProcessVariableListenerlStartEventActivityBehavior(startEvent, variableListenerEventDefinition);
+    }
+
+    @Override
     public AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess) {
         return wrappedActivityBehaviorFactory.createAdhocSubprocessActivityBehavior(subProcess);
     }
@@ -402,7 +413,7 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     
     @Override
     public IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
-                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
         
         return wrappedActivityBehaviorFactory.createIntermediateCatchConditionalEventActivityBehavior(intermediateCatchEvent, 
                         conditionalEventDefinition, conditionExpression);
@@ -410,7 +421,6 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     @Override
     public IntermediateCatchMessageEventActivityBehavior createIntermediateCatchMessageEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, MessageEventDefinition messageEventDefinition) {
-
         return wrappedActivityBehaviorFactory.createIntermediateCatchMessageEventActivityBehavior(intermediateCatchEvent, messageEventDefinition);
     }
 
@@ -426,11 +436,18 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     @Override
     public IntermediateCatchSignalEventActivityBehavior createIntermediateCatchSignalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
-                    SignalEventDefinition signalEventDefinition, Signal signal) {
+            SignalEventDefinition signalEventDefinition, Signal signal) {
 
         return wrappedActivityBehaviorFactory.createIntermediateCatchSignalEventActivityBehavior(intermediateCatchEvent, signalEventDefinition, signal);
     }
     
+    @Override
+    public IntermediateCatchVariableListenerEventActivityBehavior createIntermediateCatchVariableListenerEventActivityBehavior(
+            IntermediateCatchEvent intermediateCatchEvent, VariableListenerEventDefinition variableListenerEventDefinition) {
+        
+        return wrappedActivityBehaviorFactory.createIntermediateCatchVariableListenerEventActivityBehavior(intermediateCatchEvent, variableListenerEventDefinition);
+    }
+
     @Override
     public IntermediateThrowNoneEventActivityBehavior createIntermediateThrowNoneEventActivityBehavior(ThrowEvent throwEvent) {
         return wrappedActivityBehaviorFactory.createIntermediateThrowNoneEventActivityBehavior(throwEvent);
@@ -438,14 +455,14 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     @Override
     public IntermediateThrowSignalEventActivityBehavior createIntermediateThrowSignalEventActivityBehavior(ThrowEvent throwEvent, 
-                    SignalEventDefinition signalEventDefinition, Signal signal) {
+            SignalEventDefinition signalEventDefinition, Signal signal) {
 
         return wrappedActivityBehaviorFactory.createIntermediateThrowSignalEventActivityBehavior(throwEvent, signalEventDefinition, signal);
     }
     
     @Override
     public IntermediateThrowEscalationEventActivityBehavior createIntermediateThrowEscalationEventActivityBehavior(ThrowEvent throwEvent, 
-                    EscalationEventDefinition escalationEventDefinition, Escalation escalation) {
+            EscalationEventDefinition escalationEventDefinition, Escalation escalation) {
 
         return wrappedActivityBehaviorFactory.createIntermediateThrowEscalationEventActivityBehavior(throwEvent, escalationEventDefinition, escalation);
     }
@@ -526,6 +543,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting) {
         return wrappedActivityBehaviorFactory.createBoundaryEventRegistryEventActivityBehavior(boundaryEvent, eventDefinitionKey, interrupting);
+    }
+    
+    @Override
+    public BoundaryVariableListenerEventActivityBehavior createBoundaryVariableListenerEventActivityBehavior(BoundaryEvent boundaryEvent, VariableListenerEventDefinition variableListenerEventDefinition, boolean interrupting) {
+        return wrappedActivityBehaviorFactory.createBoundaryVariableListenerEventActivityBehavior(boundaryEvent, variableListenerEventDefinition, interrupting);
     }
 
     // Mock support //////////////////////////////////////////////////////

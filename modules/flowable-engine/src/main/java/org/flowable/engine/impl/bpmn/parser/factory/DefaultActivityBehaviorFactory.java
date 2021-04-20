@@ -56,6 +56,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
@@ -71,6 +72,7 @@ import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivity
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundarySignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BusinessRuleTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
@@ -87,6 +89,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEventRegistryStartE
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessVariableListenerlStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
@@ -96,6 +99,7 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEven
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
@@ -520,6 +524,11 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey) {
         return new EventSubProcessEventRegistryStartEventActivityBehavior(eventDefinitionKey);
     }
+    
+    @Override
+    public EventSubProcessVariableListenerlStartEventActivityBehavior createEventSubProcessVariableListenerlStartEventActivityBehavior(StartEvent startEvent, VariableListenerEventDefinition variableListenerEventDefinition) {
+        return new EventSubProcessVariableListenerlStartEventActivityBehavior(variableListenerEventDefinition);
+    }
 
     @Override
     public AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess) {
@@ -579,6 +588,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
                     SignalEventDefinition signalEventDefinition, Signal signal) {
 
         return new IntermediateCatchSignalEventActivityBehavior(signalEventDefinition, signal);
+    }
+    
+    @Override
+    public IntermediateCatchVariableListenerEventActivityBehavior createIntermediateCatchVariableListenerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
+            VariableListenerEventDefinition variableListenerEventDefinition) {
+        
+        return new IntermediateCatchVariableListenerEventActivityBehavior(variableListenerEventDefinition);
     }
     
     @Override
@@ -694,5 +710,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     @Override
     public BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting) {
         return new BoundaryEventRegistryEventActivityBehavior(eventDefinitionKey, interrupting);
+    }
+
+    @Override
+    public BoundaryVariableListenerEventActivityBehavior createBoundaryVariableListenerEventActivityBehavior(BoundaryEvent boundaryEvent, VariableListenerEventDefinition variableListenerEventDefinition, boolean interrupting) {
+        return new BoundaryVariableListenerEventActivityBehavior(variableListenerEventDefinition, interrupting);
     }
 }

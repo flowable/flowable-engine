@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.test.runtime;
+package org.flowable.cmmn.test.eventlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -453,7 +453,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/TimerEventListenerTest.testTimerWithVariableExpression.cmmn")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventlistener/TimerEventListenerTest.testTimerWithVariableExpression.cmmn")
     public void testTimerWithInstantVariableExpression() {
         setClockTo(Date.from(Instant.parse("2020-10-21T08:31:45.585Z")));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

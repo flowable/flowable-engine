@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class BpmnModel {
     protected List<Signal> signals = new ArrayList<>();
     protected Map<String, MessageFlow> messageFlowMap = new LinkedHashMap<>();
     protected Map<String, Message> messageMap = new LinkedHashMap<>();
+    protected Map<String, List<String>> variableListenerToActivityMap = new HashMap<>();
     protected Map<String, String> errorMap = new LinkedHashMap<>();
     protected Map<String, Escalation> escalationMap = new LinkedHashMap<>();
     protected Map<String, ItemDefinition> itemDefinitionMap = new LinkedHashMap<>();
@@ -424,9 +426,35 @@ public class BpmnModel {
         }
         return result;
     }
-
+    
     public boolean containsMessageId(String messageId) {
         return messageMap.containsKey(messageId);
+    }
+    
+    public List<String> getActivityIdsForVariableListenerName(String variableName) {
+        return variableListenerToActivityMap.get(variableName);
+    }
+
+    public void addActivityIdForVariableListenerName(String variableName, String activityId) {
+        List<String> activityIds = null;
+        if (variableListenerToActivityMap.containsKey(variableName)) {
+            activityIds = variableListenerToActivityMap.get(variableName);
+        }
+        
+        if (activityIds == null) {
+            activityIds = new ArrayList<>();
+        }
+        
+        activityIds.add(activityId);
+        variableListenerToActivityMap.put(variableName, activityIds);
+    }
+
+    public boolean containsVariableListenerForVariableName(String variableName) {
+        return variableListenerToActivityMap.containsKey(variableName);
+    }
+    
+    public boolean hasVariableListeners() {
+        return !variableListenerToActivityMap.isEmpty();
     }
 
     public Map<String, String> getErrors() {

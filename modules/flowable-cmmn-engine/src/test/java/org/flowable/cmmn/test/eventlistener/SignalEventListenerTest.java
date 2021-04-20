@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.test.runtime;
+package org.flowable.cmmn.test.eventlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -198,7 +198,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
     @Test
     public void testRedeployDefinitionWithRuntimeEventSubscriptions() {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/runtime/SignalEventListenerTest.testRedeploy.cmmn")
+            .addClasspathResource("org/flowable/cmmn/test/eventlistener/SignalEventListenerTest.testRedeploy.cmmn")
             .deploy();
         addDeploymentForAutoCleanup(deployment);
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(deployment.getId()).singleResult();
@@ -215,7 +215,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         // Event subscription to start should reflect new definition id
         // Existing subscription for event listener should remain
         org.flowable.cmmn.api.repository.CmmnDeployment redeployment = cmmnRepositoryService.createDeployment()
-            .addClasspathResource("org/flowable/cmmn/test/runtime/SignalEventListenerTest.testRedeploy.cmmn")
+            .addClasspathResource("org/flowable/cmmn/test/eventlistener/SignalEventListenerTest.testRedeploy.cmmn")
             .deploy();
         addDeploymentForAutoCleanup(redeployment);
         CaseDefinition caseDefinitionAfterRedeploy = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(redeployment.getId()).singleResult();

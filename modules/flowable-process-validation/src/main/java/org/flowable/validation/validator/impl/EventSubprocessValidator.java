@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
@@ -49,7 +50,8 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
                             !(eventDefinition instanceof EscalationEventDefinition) &&
                             !(eventDefinition instanceof MessageEventDefinition) &&
                             !(eventDefinition instanceof SignalEventDefinition) &&
-                            !(eventDefinition instanceof TimerEventDefinition)) {
+                            !(eventDefinition instanceof TimerEventDefinition) &&
+                            !(eventDefinition instanceof VariableListenerEventDefinition)) {
 
                         addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess,
                                 "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");

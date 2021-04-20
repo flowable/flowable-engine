@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +59,15 @@ public class BoundaryEventParseHandler extends AbstractFlowNodeBpmnParseHandler<
             eventDefinition = boundaryEvent.getEventDefinitions().get(0);
         }
 
-        if (eventDefinition instanceof TimerEventDefinition || eventDefinition instanceof ErrorEventDefinition || eventDefinition instanceof SignalEventDefinition
-                || eventDefinition instanceof CancelEventDefinition || eventDefinition instanceof ConditionalEventDefinition || eventDefinition instanceof MessageEventDefinition 
-                || eventDefinition instanceof EscalationEventDefinition || eventDefinition instanceof CompensateEventDefinition) {
+        if (eventDefinition instanceof TimerEventDefinition || 
+                eventDefinition instanceof ErrorEventDefinition || 
+                eventDefinition instanceof SignalEventDefinition || 
+                eventDefinition instanceof CancelEventDefinition || 
+                eventDefinition instanceof ConditionalEventDefinition || 
+                eventDefinition instanceof MessageEventDefinition || 
+                eventDefinition instanceof EscalationEventDefinition || 
+                eventDefinition instanceof CompensateEventDefinition ||
+                eventDefinition instanceof VariableListenerEventDefinition) {
 
             bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
             return;

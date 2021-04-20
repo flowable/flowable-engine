@@ -34,6 +34,7 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -338,80 +339,16 @@ public class ProcessInstanceHelper {
 
             EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
             if (eventDefinition instanceof MessageEventDefinition) {
-                MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
-                BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-                if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
-                    messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
-                }
-
-                ExecutionEntity messageExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
-                messageExecution.setCurrentFlowElement(startEvent);
-                messageExecution.setEventScope(true);
-                messageExecution.setActive(false);
-
-                String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, parentExecution);
-                EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
-                        .getEventSubscriptionService().createEventSubscriptionBuilder()
-                                .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
-                                .eventName(messageName)
-                                .executionId(messageExecution.getId())
-                                .processInstanceId(messageExecution.getProcessInstanceId())
-                                .activityId(messageExecution.getCurrentActivityId())
-                                .processDefinitionId(messageExecution.getProcessDefinitionId())
-                                .tenantId(messageExecution.getTenantId())
-                                .create();
-                
-                CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-                messageEventSubscriptions.add(eventSubscription);
-                messageExecution.getEventSubscriptions().add(eventSubscription);
+                handleMessageEventSubscription(eventDefinition, startEvent, parentExecution, messageEventSubscriptions, processEngineConfiguration, commandContext);
 
             } else if (eventDefinition instanceof SignalEventDefinition) {
-                SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
-                BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-                Signal signal = null;
-                if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-                    signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-                    signalEventDefinition.setSignalRef(signal.getName());
-                }
-
-                ExecutionEntity signalExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
-                signalExecution.setCurrentFlowElement(startEvent);
-                signalExecution.setEventScope(true);
-                signalExecution.setActive(false);
-
-                String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
-
-                EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
-                        .getEventSubscriptionService().createEventSubscriptionBuilder()
-                                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
-                                .eventName(eventName)
-                                .signal(signal)
-                                .executionId(signalExecution.getId())
-                                .processInstanceId(signalExecution.getProcessInstanceId())
-                                .activityId(signalExecution.getCurrentActivityId())
-                                .processDefinitionId(signalExecution.getProcessDefinitionId())
-                                .tenantId(signalExecution.getTenantId())
-                                .create();
-                
-                CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-                signalEventSubscriptions.add(eventSubscription);
-                signalExecution.getEventSubscriptions().add(eventSubscription);
+                handleSignalEventSubscription(eventDefinition, startEvent, parentExecution, signalEventSubscriptions, processEngineConfiguration, commandContext);
 
             } else if (eventDefinition instanceof TimerEventDefinition) {
-                TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-
-                ExecutionEntity timerExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
-                timerExecution.setCurrentFlowElement(startEvent);
-                timerExecution.setEventScope(true);
-                timerExecution.setActive(false);
-
-                TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                        false, timerExecution, TriggerTimerEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
-                                timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
-                if (timerJob != null) {
-                    processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
-                }
+                handleTimerEvent(eventDefinition, startEvent, parentExecution, processEngineConfiguration);
+            
+            } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+                handleVariableListenerEventSubscription(eventDefinition, startEvent, parentExecution, processEngineConfiguration, commandContext);
             }
         }
 
@@ -431,6 +368,117 @@ public class ProcessInstanceHelper {
                         processEngineConfiguration.getEngineCfgKey());
             }
         }
+    }
+    
+    protected void handleMessageEventSubscription(EventDefinition eventDefinition, StartEvent startEvent, ExecutionEntity parentExecution, 
+            List<EventSubscriptionEntity> messageEventSubscriptions, ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        
+        MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+        if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+            messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
+        }
+
+        ExecutionEntity messageExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+        messageExecution.setCurrentFlowElement(startEvent);
+        messageExecution.setEventScope(true);
+        messageExecution.setActive(false);
+
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, parentExecution);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                        .eventName(messageName)
+                        .executionId(messageExecution.getId())
+                        .processInstanceId(messageExecution.getProcessInstanceId())
+                        .activityId(messageExecution.getCurrentActivityId())
+                        .processDefinitionId(messageExecution.getProcessDefinitionId())
+                        .tenantId(messageExecution.getTenantId())
+                        .create();
+        
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        messageEventSubscriptions.add(eventSubscription);
+        messageExecution.getEventSubscriptions().add(eventSubscription);
+    }
+    
+    protected void handleSignalEventSubscription(EventDefinition eventDefinition, StartEvent startEvent, ExecutionEntity parentExecution, 
+            List<EventSubscriptionEntity> signalEventSubscriptions, ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        
+        SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+        Signal signal = null;
+        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
+            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+            signalEventDefinition.setSignalRef(signal.getName());
+        }
+
+        ExecutionEntity signalExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+        signalExecution.setCurrentFlowElement(startEvent);
+        signalExecution.setEventScope(true);
+        signalExecution.setActive(false);
+
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                        .eventName(eventName)
+                        .signal(signal)
+                        .executionId(signalExecution.getId())
+                        .processInstanceId(signalExecution.getProcessInstanceId())
+                        .activityId(signalExecution.getCurrentActivityId())
+                        .processDefinitionId(signalExecution.getProcessDefinitionId())
+                        .tenantId(signalExecution.getTenantId())
+                        .create();
+        
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        signalEventSubscriptions.add(eventSubscription);
+        signalExecution.getEventSubscriptions().add(eventSubscription);
+    }
+    
+    protected void handleTimerEvent(EventDefinition eventDefinition, StartEvent startEvent, ExecutionEntity parentExecution, 
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        
+        TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+
+        ExecutionEntity timerExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+        timerExecution.setCurrentFlowElement(startEvent);
+        timerExecution.setEventScope(true);
+        timerExecution.setActive(false);
+
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                false, timerExecution, TriggerTimerEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
+                        timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+
+        if (timerJob != null) {
+            processEngineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
+        }
+    }
+    
+    protected void handleVariableListenerEventSubscription(EventDefinition eventDefinition, StartEvent startEvent, ExecutionEntity parentExecution, 
+            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        
+        VariableListenerEventDefinition variableListenerEventDefinition = (VariableListenerEventDefinition) eventDefinition;
+
+        ExecutionEntity variableListenerExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+        variableListenerExecution.setCurrentFlowElement(startEvent);
+        variableListenerExecution.setEventScope(true);
+        variableListenerExecution.setActive(false);
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType("variable")
+                        .eventName(variableListenerEventDefinition.getVariableName())
+                        .configuration(variableListenerEventDefinition.getVariableChangeType())
+                        .executionId(variableListenerExecution.getId())
+                        .processInstanceId(variableListenerExecution.getProcessInstanceId())
+                        .activityId(variableListenerExecution.getCurrentActivityId())
+                        .processDefinitionId(variableListenerExecution.getProcessDefinitionId())
+                        .tenantId(variableListenerExecution.getTenantId())
+                        .create();
+        
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        variableListenerExecution.getEventSubscriptions().add(eventSubscription);
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

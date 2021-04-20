@@ -79,5 +79,7 @@ public interface CmmnEngineAgenda extends Agenda {
     void planEvaluateCriteriaOperation(String caseInstanceEntityId, boolean evaluateCaseInstanceComplete);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
+    
+    void planEvaluateVariableEventListenersOperation(String caseInstanceEntityId);
 
 }

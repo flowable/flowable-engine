@@ -27,6 +27,8 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -350,6 +352,26 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
                 .scopeType(ScopeTypes.CMMN)
                 .names(variableNames)
                 .list();
+    }
+    
+    @Override
+    protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
+        VariableInstanceEntity variableInstance = super.createVariableInstance(variableName, value);
+        
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_CREATE, 
+                variableInstance.getScopeId(), ScopeTypes.CMMN, caseDefinitionId);
+
+        return variableInstance;
+    }
+    
+    @Override
+    protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value) {
+        super.updateVariableInstance(variableInstance, value);
+
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_UPDATE, 
+                variableInstance.getScopeId(), ScopeTypes.CMMN, caseDefinitionId);
     }
 
     @Override
