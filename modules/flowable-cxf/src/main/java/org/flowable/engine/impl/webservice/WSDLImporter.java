@@ -211,14 +211,8 @@ public class WSDLImporter implements XMLImporter {
                             isFieldParameterTypeNeestedClass = true;
                         }
                     } while (!isFieldParameterTypeNeestedClass);
-                    if (isFieldParameterTypeNeestedClass) {
-                        // The parameter type is a nested class
-                        fieldParameterClass = ReflectUtil
-                                .loadClass(theClass.erasure().fullName() + "$" + fieldParameterType.name());
-                    } else {
-                        // The parameter type is not a nested class
-                        fieldParameterClass = ReflectUtil.loadClass(fieldParameterType.erasure().fullName());
-                    }
+                    // The parameter type is a nested class
+                    fieldParameterClass = ReflectUtil.loadClass(theClass.erasure().fullName() + "$" + fieldParameterType.name());
                 }
             } else {
                 fieldParameterClass = null;
