@@ -119,7 +119,9 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
                     for (String variableName : variableSessionData.keySet()) {
                         List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
                         for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
-                            if (!variableListenerCaseInstanceIds.contains(variableListenerData.getScopeId())) {
+                            if (!variableListenerCaseInstanceIds.contains(variableListenerData.getScopeId()) && 
+                                    caseInstanceId.equals(variableListenerData.getScopeId())) {
+                                
                                 variableListenerCaseInstanceIds.add(variableListenerData.getScopeId());
                                 agenda.planEvaluateVariableEventListenersOperation(variableListenerData.getScopeId());
                             }
