@@ -89,10 +89,10 @@ public class BpmnEventModelUtil {
                 
                 if (flowElement instanceof SendEventServiceTask) {
                     SendEventServiceTask task = (SendEventServiceTask) flowElement;
+                    eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
 
                     if (task.isTriggerable() && StringUtils.isNotEmpty(task.getTriggerEventType())) {
-                        eventModel.setPayload(getInIOParameterEventPayload(task.getEventInParameters()));
-
+                        
                         EventModel triggerEventModel = new EventModel();
                         String triggerEventName = getElementValue("triggerEventName", flowElement);
                         triggerEventModel.setKey(task.getTriggerEventType());
