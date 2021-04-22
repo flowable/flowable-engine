@@ -393,11 +393,17 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         BaseElement sourceElement = cmmnModel.getCriterion(sourceRef);
         if (sourceElement == null) {
             sourceElement = cmmnModel.findPlanItem(sourceRef);
+            if (sourceElement == null) {
+                sourceElement = cmmnModel.findTextAnnotation(sourceRef);
+            }
         }
 
         BaseElement targetElement = cmmnModel.getCriterion(targetRef);
         if (targetElement == null) {
             targetElement = cmmnModel.findPlanItem(targetRef);
+            if (targetElement == null) {
+                targetElement = cmmnModel.findTextAnnotation(targetRef);
+            }
         }
 
         List<GraphicInfo> graphicInfoList = cmmnModel.getFlowLocationGraphicInfo(association.getId());
