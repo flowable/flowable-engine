@@ -75,8 +75,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertThat(pagePlanItemInstance).isNotNull();
 
-        // page tasks go into terminated state, if their parent stage gets completed, regardless its previous state
-        assertThat(pagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+        // page tasks go into terminated or completed state, depending on the parent ending type like complete or exit
+        assertThat(pagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
         assertThat(pagePlanItemInstance.getFormKey()).isEqualTo("myFormKeyValue");
         assertThat(pagePlanItemInstance.getExtraValue()).isEqualTo("myFormKeyValue");
 
