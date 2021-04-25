@@ -37,6 +37,8 @@
 		<mockito.version>3.7.7</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
+		<jetty.version>9.4.39.v20210325</jetty.version>
+
 		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
