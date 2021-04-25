@@ -16,7 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>${jetty.version}</jetty.version>
+        <jetty.version>9.4.38.v20210224</jetty.version>
         <flowable.artifact>
             org.flowable.eventregistry.rest
         </flowable.artifact>
