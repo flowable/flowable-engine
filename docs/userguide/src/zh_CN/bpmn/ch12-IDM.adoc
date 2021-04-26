@@ -1,11 +1,9 @@
 [[IDM]]
 
 == Identity management
-
-Starting from Flowable V6, the identity management (IDM) component has been extracted from the flowable-engine module and the logic moved to several separate modules: flowable-idm-api, flowable-idm-engine, flowable-idm-spring and flowable-idm-engine-configurator. The main reason for separating the IDM logic was that it's not core to the Flowable engine and in a lot of cases when the Flowable engine is embedded in an application, the identity logic is not used or needed. 
-
-By default, the IDM engine is initialized and started when the Flowable engine is started. This results in the same identity logic being executed and available in Flowable v5. The idm-engine manages its own database schema and the following entities:
-
+（开源版与商业版逻辑不一样 盘古BPM）
+从Flowable V6开始，身份管理（IDM）组件已经从Flowable engine模块中提取出来，逻辑转移到几个单独的模块：Flowable IDM api、Flowable IDM engine、Flowable IDM spring和Flowable IDM engine configurator。分离IDM逻辑的主要原因是它不是Flowable引擎的核心，在很多情况下，当Flowable引擎嵌入到应用程序中时，标识逻辑不被使用或不需要。
+默认情况下，IDM引擎在可流动引擎启动时初始化并启动。这将导致在FlowableV5中执行和可用相同的标识逻辑。idm引擎管理自己的数据库架构和以下实体：
 * User and UserEntity, the user information.
 * Group and GroupEntity, the group information.
 * MembershipEntity, the memberships of users in groups
@@ -13,17 +11,16 @@ By default, the IDM engine is initialized and started when the Flowable engine i
 * PrivilegeMappingEntity, linking a user and/or group to a privilege
 * Token and TokenEntity, an authentication token used by the UI apps  
 
-Since the DB contains historic entities for past as well as ongoing instances, you might want to consider querying these tables in order to minimize access to the runtime process instance data, and that way keep the runtime execution performant.
-
+由于数据库包含过去和正在进行的实例的历史实体，因此您可能需要考虑查询这些表，以尽量减少对运行时流程实例数据的访问，从而保持运行时执行的性能。
 
 [[IDM engine configuration]]
 
 
 === IDM engine configuration
 
-By default the Flowable engine is started with the +org.flowable.idm.engine.configurator.IdmEngineConfigurator+. This configurator uses the same datasource configuration as the Flowable process engine configuration. No additional configuration is needed to use the identity component as it was configured in Flowable v5.
+默认情况下，可流动发动机以+org.flowable.idm.engine.configurator.IdmEngineConfigurator+. 此配置程序使用与可流动流程引擎配置相同的数据源配置。使用标识组件不需要额外的配置，因为它是在Flowable v5中配置的。
 
-When no identity logic is needed in the Flowable engine the IDM engine can be disabled in the process engine configuration.
+当流程引擎中不需要标识逻辑时，可以在流程引擎配置中禁用IDM引擎。
 
 [source,xml,linenums]
 ----
@@ -33,10 +30,10 @@ When no identity logic is needed in the Flowable engine the IDM engine can be di
 </bean>
 ----
 
-This means that no user and group queries can be used, and candidate groups in a task query can not be retrieved for a user.
+这意味着不能使用任何用户和组查询，并且不能为用户检索任务查询中的候选组。
 
-By default, the user passwords will be saved in plain text in the IDM database tables. To make sure that the passwords are encoded you can define a password encoder in the process engine configuration.
 
+默认情况下，用户密码将以纯文本形式保存在IDM数据库表中。为了确保密码已编码，您可以在流程引擎配置中定义密码编码器。
 [source,xml,linenums]
 ----
 <bean id="bCryptEncoder"
@@ -52,10 +49,10 @@ By default, the user passwords will be saved in plain text in the IDM database t
 </bean>
 ----
 
-In this example the ShaPasswordEncoder is used, but you can also use the org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder for example. When not using Spring you can also use the org.flowable.idm.engine.impl.authentication.ApacheDigester to encode the passwords.
+在本例中，使用了ShaPasswordEncoder，但也可以使用org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder 例如。不使用弹簧时，也可以使用org.flowable.idm.engine.impl.authentication.ApacheDigester 对密码进行编码。
+默认的IDM引擎配置器也可以被重写，以自定义方式初始化IDM引擎。LDAPConfigurator就是一个很好的例子
 
-The default IDM engine configurator can also be overridden to initialize the IDM Engine in a custom way. A good example is the LDAPConfigurator
-implementation which overrides the default IDM engine to use a LDAP server instead of the default IDM database tables. The +idmProcessEngineConfigurator+ property of the process engine configuration can be used to set a custom configurator like the LDAPConfigurator
+重写默认IDM引擎以使用LDAP服务器而不是默认IDM数据库表的实现。process engine配置的+idmProcessEngineConfigurator+属性可用于设置自定义配置程序，如LDAPConfigurator
 
 [source,xml,linenums]
 ----
