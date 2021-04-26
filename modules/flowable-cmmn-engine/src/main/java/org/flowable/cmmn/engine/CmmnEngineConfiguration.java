@@ -70,6 +70,8 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
+import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
+import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -1037,6 +1039,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             flowableFunctionDelegates.add(new VariableBase64ExpressionFunction());
 
             flowableFunctionDelegates.add(new IsStageCompletableExpressionFunction());
+            flowableFunctionDelegates.add(new IsPlanItemCompletedExpressionFunction());
             flowableFunctionDelegates.add(new TaskGetFunctionDelegate());
         }
         
@@ -1109,7 +1112,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         if (isAsyncHistoryEnabled) {
             initAsyncHistorySessionFactory();
         }
-        
+
         if (!sessionFactories.containsKey(VariableListenerSession.class)) {
             VariableListenerSessionFactory variableListenerSessionFactory = new VariableListenerSessionFactory();
             sessionFactories.put(VariableListenerSession.class, variableListenerSessionFactory);

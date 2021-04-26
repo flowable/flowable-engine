@@ -217,18 +217,25 @@ public class PlanItemControlExport implements CmmnXmlConstants {
             }
 
             xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
-            if (StringUtils.isNotEmpty(reactivationRule.getType())) {
-                xtw.writeAttribute(ATTRIBUTE_TYPE, reactivationRule.getType());
-                if (StringUtils.isNotEmpty(reactivationRule.getCondition())) {
-                    xtw.writeAttribute(ATTRIBUTE_REACTIVATION_RULE_CONDITION, reactivationRule.getCondition());
-                }
-            }
+            writeReactivationRuleAttributes(reactivationRule, xtw);
             xtw.writeEndElement();
 
             hasWrittenExtensionElements = true;
         }
 
         return hasWrittenExtensionElements;
+    }
+
+    public static void writeReactivationRuleAttributes(ReactivationRule reactivationRule, XMLStreamWriter xtw) throws XMLStreamException {
+        if (StringUtils.isNotEmpty(reactivationRule.getActivateCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_ACTIVATE_CONDITION, reactivationRule.getActivateCondition());
+        }
+        if (StringUtils.isNotEmpty(reactivationRule.getIgnoreCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_IGNORE_CONDITION, reactivationRule.getIgnoreCondition());
+        }
+        if (StringUtils.isNotEmpty(reactivationRule.getDefaultCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_DEFAULT_CONDITION, reactivationRule.getDefaultCondition());
+        }
     }
     
 }

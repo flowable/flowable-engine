@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
   <case id="reactivationTestCase" name="Reactivation Test Case" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
     <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
       <extensionElements>
@@ -64,6 +66,7 @@
       </stage>
       <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate">
         <extensionElements>
+          <flowable:defaultReactivationRule ignoreCondition="true"/>
           <flowable:startformkey><![CDATA[simpleReactivationCaseActionForm]]></flowable:startformkey>
           <flowable:startFormSameDeployment><![CDATA[true]]></flowable:startFormSameDeployment>
           <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>

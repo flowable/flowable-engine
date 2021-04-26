@@ -19,31 +19,34 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
- * @author Joram Barrez
+ * This operation is initializing phase two of a case reactivation by reactivating the root plan item model for the case according the case model which means
+ * that only plan items marked as eligible for reactivation will be recreated and evaluated for activation.
+ *
+ * @author Micha Kiener
  */
-public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperation {
-    
-    public InitPlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
+public class ReactivatePlanModelInstanceOperation extends AbstractCaseInstanceOperation {
+
+    public ReactivatePlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
         super(commandContext, null, caseInstanceEntity);
     }
-    
+
     @Override
     public void run() {
         super.run();
-        
+
         Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
         createPlanItemInstancesForNewOrReactivatedStage(commandContext, caseModel,
                 caseModel.getPlanModel().getPlanItems(),
                 caseInstanceEntity,
                 null,
                 caseInstanceEntity.getTenantId());
-        
+
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceEntity.getId());
     }
-    
+
     @Override
     public String toString() {
-        return "[Init Plan Model] initializing plan model for case instance " + caseInstanceEntity.getId();
+        return "[Reactivate Plan Model] reactivating plan model for case instance " + caseInstanceEntity.getId();
     }
 
 }
