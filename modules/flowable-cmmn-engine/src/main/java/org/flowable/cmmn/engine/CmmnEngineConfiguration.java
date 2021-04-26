@@ -71,7 +71,6 @@ import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
-import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.cmmn.engine.impl.function.IsStageCompletableExpressionFunction;
 import org.flowable.cmmn.engine.impl.function.TaskGetFunctionDelegate;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;

@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.InstanceOfAssertFactories;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
