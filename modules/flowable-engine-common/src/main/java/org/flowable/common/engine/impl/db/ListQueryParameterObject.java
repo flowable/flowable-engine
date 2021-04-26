@@ -177,7 +177,7 @@ public class ListQueryParameterObject {
             } else if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
                 // Sometimes we are ordering by columns which are not in the join, e.g. the definition.
                 // Therefore we use the row number (if paging is enabled)
-                return "order by RES.rownum asc";
+                return "order by RES.rnum asc";
             }
         }
         // We need to do another order by in order to make sure that the final result entries are correctly sorted.

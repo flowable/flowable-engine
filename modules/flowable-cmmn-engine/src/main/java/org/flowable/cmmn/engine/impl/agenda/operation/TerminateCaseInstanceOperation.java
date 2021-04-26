@@ -14,10 +14,13 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
 import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
+import static org.flowable.cmmn.model.PlanItemTransition.EXIT;
+import static org.flowable.cmmn.model.PlanItemTransition.TERMINATE;
 
 import java.util.HashMap;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -91,12 +94,22 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     
     @Override
     public void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
-        // we don't propagate the exit and exit event type to the children, they will always be terminated / exited the same way, regardless of its case being
-        // completed or terminated
-        if (manualTermination) {
-            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+        // if the plan item implements the specific behavior interface for ending, invoke it, otherwise use the default one which is terminate, regardless,
+        // if the case got completed or terminated
+        Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
+        if (behavior instanceof OnParentEndDependantActivityBehavior) {
+            // if the specific behavior is implemented, invoke it
+            ((OnParentEndDependantActivityBehavior) behavior).onParentEnd(commandContext, planItemInstanceEntity, manualTermination ? TERMINATE : EXIT, exitEventType);
         } else {
-            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId, null, null);
+            // use default behavior, if the interface is not implemented
+
+            // we don't propagate the exit and exit event type to the children, they will always be terminated / exited the same way, regardless of its case being
+            // completed or terminated
+            if (manualTermination) {
+                CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+            } else {
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId, null, null);
+            }
         }
     }
     

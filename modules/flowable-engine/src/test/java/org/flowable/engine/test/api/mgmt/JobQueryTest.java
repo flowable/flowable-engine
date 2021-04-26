@@ -151,6 +151,15 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByNoCriteriaWithPaging() {
+        List<Job> jobs = managementService.createJobQuery().listPage(1, 2);
+        assertThat(jobs).isEmpty();
+
+        List<Job> timerJobs = managementService.createTimerJobQuery().listPage(1, 2);
+        assertThat(timerJobs).hasSize(2);
+    }
+
+    @Test
     public void testQueryByProcessInstanceId() {
         TimerJobQuery query = managementService.createTimerJobQuery().processInstanceId(processInstanceIdOne);
         verifyQueryResults(query, 1);
@@ -447,6 +456,20 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
+    public void testJobQueryByTenantId() {
+        createJobWithTenantId("muppets");
+        JobQuery query = managementService.createJobQuery().jobTenantId("muppets");
+        verifyQueryResults(query, 1);
+        deleteJobInDatabase();
+    }
+
+    @Test
+    public void testTimerJobQueryByTenantId() {
+        TimerJobQuery query = managementService.createTimerJobQuery().jobTenantId("muppets");
+        verifyQueryResults(query, 0);
+    }
+
     // sorting //////////////////////////////////////////
 
     @Test
@@ -740,6 +763,35 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 jobEntity.setRetries(0);
 
                 jobEntity.setExceptionMessage("I'm supposed to fail");
+
+                jobService.insertJob(jobEntity);
+
+                assertThat(jobEntity.getId()).isNotNull();
+
+                return null;
+
+            }
+        });
+
+    }
+
+    private void createJobWithTenantId(String tenantId) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        commandExecutor.execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                jobEntity = jobService.createJob();
+                jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
+                jobEntity.setLockOwner(UUID.randomUUID().toString());
+                jobEntity.setRetries(0);
+                jobEntity.setTenantId(tenantId);
+
+                StringWriter stringWriter = new StringWriter();
+                NullPointerException exception = new NullPointerException();
+                exception.printStackTrace(new PrintWriter(stringWriter));
+                jobEntity.setExceptionStacktrace(stringWriter.toString());
 
                 jobService.insertJob(jobEntity);
 

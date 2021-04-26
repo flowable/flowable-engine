@@ -127,6 +127,7 @@
         SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectJobByQueryCriteriaSql" />
         ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">

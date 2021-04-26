@@ -53,10 +53,10 @@ public class GenericEventListenerXmlConverter extends PlanItemDefinitionXmlConve
         } else if ("reactivate".equals(listenerType)) {
             ReactivateEventListener reactivateEventListener = new ReactivateEventListener();
             return convertCommonAttributes(xtr, reactivateEventListener);
+
         } else {
             GenericEventListener genericEventListener = new GenericEventListener();
             return convertCommonAttributes(xtr, genericEventListener);
-
         }
     }
 
