@@ -223,6 +223,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_DI_LABEL = "CMMNLabel";
     String ELEMENT_DI_BOUNDS = "Bounds";
     String ELEMENT_DI_WAYPOINT = "waypoint";
+    String ELEMENT_DI_EXTENSION = "extension";
+    String ELEMENT_DI_DOCKER = "docker";
     String ATTRIBUTE_DI_CMMN_ELEMENT_REF = "cmmnElementRef";
     String ATTRIBUTE_DI_TARGET_CMMN_ELEMENT_REF = "targetCMMNElementRef";
     String ATTRIBUTE_DI_WIDTH = "width";

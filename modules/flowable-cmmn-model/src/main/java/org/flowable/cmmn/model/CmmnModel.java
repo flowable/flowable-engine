@@ -50,6 +50,7 @@ public class CmmnModel {
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, CmmnDiEdge> edgeMap = new LinkedHashMap<>();
 
     protected Map<String, String> namespaceMap = new LinkedHashMap<>();
 
@@ -237,6 +238,18 @@ public class CmmnModel {
 
     public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
+    }
+    
+    public CmmnDiEdge getEdgeInfo(String key) {
+        return edgeMap.get(key);
+    }
+    
+    public void addEdgeInfo(String key, CmmnDiEdge edgeInfo) {
+        edgeMap.put(key, edgeInfo);
+    }
+
+    public Map<String, CmmnDiEdge> getEdgeMap() {
+        return edgeMap;
     }
 
     public GraphicInfo getLabelGraphicInfo(String key) {

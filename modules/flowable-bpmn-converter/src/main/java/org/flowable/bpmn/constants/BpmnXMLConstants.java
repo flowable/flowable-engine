@@ -360,6 +360,10 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DI_HEIGHT = "height";
     public static final String ATTRIBUTE_DI_X = "x";
     public static final String ATTRIBUTE_DI_Y = "y";
+    public static final String ATTRIBUTE_DI_SOURCE_DOCKER_X = "sourceDockerX";
+    public static final String ATTRIBUTE_DI_SOURCE_DOCKER_Y = "sourceDockerY";
+    public static final String ATTRIBUTE_DI_TARGET_DOCKER_X = "targetDockerX";
+    public static final String ATTRIBUTE_DI_TARGET_DOCKER_Y = "targetDockerY";
 
     public static final String ELEMENT_DATA_OBJECT = "dataObject";
     public static final String ATTRIBUTE_DATA_ID = "id";

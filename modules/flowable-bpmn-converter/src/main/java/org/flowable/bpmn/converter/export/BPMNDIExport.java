@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
+import org.flowable.bpmn.model.BpmnDiEdge;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
@@ -196,6 +197,15 @@ public class BPMNDIExport implements BpmnXMLConstants {
         xtw.writeStartElement(BPMNDI_PREFIX, ELEMENT_DI_EDGE, BPMNDI_NAMESPACE);
         xtw.writeAttribute(ATTRIBUTE_DI_BPMNELEMENT, elementId);
         xtw.writeAttribute(ATTRIBUTE_ID, "BPMNEdge_" + elementId);
+        
+        BpmnDiEdge edgeInfo = model.getEdgeInfo(elementId);
+        if (edgeInfo != null && edgeInfo.getSourceDockerInfo() != null && edgeInfo.getTargetDockerInfo() != null) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_SOURCE_DOCKER_X, String.valueOf(edgeInfo.getSourceDockerInfo().getX()));
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_SOURCE_DOCKER_Y, String.valueOf(edgeInfo.getSourceDockerInfo().getY()));
+            
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_TARGET_DOCKER_X, String.valueOf(edgeInfo.getTargetDockerInfo().getX()));
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_TARGET_DOCKER_Y, String.valueOf(edgeInfo.getTargetDockerInfo().getY()));
+        }
 
         List<GraphicInfo> graphicInfoList = model.getFlowLocationGraphicInfo(elementId);
         for (GraphicInfo graphicInfo : graphicInfoList) {
