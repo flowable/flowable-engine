@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
@@ -78,6 +79,12 @@ public class SimpleDiCmmnXmlConverterTest {
         assertThat(waypoints.get(2).getY()).isEqualTo(130.0);
         assertThat(waypoints.get(3).getX()).isEqualTo(250.0);
         assertThat(waypoints.get(3).getY()).isEqualTo(130.0);
+        
+        CmmnDiEdge edgeInfo = cmmnModel.getEdgeInfo("CMMNEdge_onPart1");
+        assertThat(edgeInfo.getSourceDockerInfo().getX()).isEqualTo(50.0);
+        assertThat(edgeInfo.getSourceDockerInfo().getY()).isEqualTo(10.0);
+        assertThat(edgeInfo.getTargetDockerInfo().getX()).isEqualTo(50.0);
+        assertThat(edgeInfo.getTargetDockerInfo().getY()).isEqualTo(40.0);
     }
 
 }

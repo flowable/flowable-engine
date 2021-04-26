@@ -130,6 +130,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
+        addElementConverter(new CmmnDiExtensionXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
@@ -447,6 +448,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 associationIterator.remove();
             }
 
+            cmmnModel.addEdgeInfo(diEdge.getId(), diEdge);
             cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
         }
     }

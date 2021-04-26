@@ -5,6 +5,7 @@
     xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" 
     xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
     targetNamespace="http://flowable.org/cmmn">
     
   <case id="CaseWithDi" name="Case with DI">
@@ -37,6 +38,10 @@
         <cmmndi:CMMNLabel />
       </cmmndi:CMMNShape>
       <cmmndi:CMMNEdge id="CMMNEdge_onPart1" cmmnElementRef="planItem1" targetCMMNElementRef="criterion1">
+      	<di:extension>
+      		<flowable:docker type="source" x="50" y="10" />
+      		<flowable:docker type="target" x="50" y="40" />
+      	</di:extension>
         <di:waypoint x="170" y="95" />
         <di:waypoint x="220" y="95" />
         <di:waypoint x="220" y="130" />

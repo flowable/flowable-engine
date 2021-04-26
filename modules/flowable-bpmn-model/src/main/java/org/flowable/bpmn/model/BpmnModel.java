@@ -34,6 +34,7 @@ public class BpmnModel {
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, BpmnDiEdge> edgeMap = new LinkedHashMap<>();
     protected List<Signal> signals = new ArrayList<>();
     protected Map<String, MessageFlow> messageFlowMap = new LinkedHashMap<>();
     protected Map<String, Message> messageMap = new LinkedHashMap<>();
@@ -278,6 +279,14 @@ public class BpmnModel {
     public void removeFlowGraphicInfoList(String key) {
         flowLocationMap.remove(key);
     }
+    
+    public BpmnDiEdge getEdgeInfo(String key) {
+        return edgeMap.get(key);
+    }
+    
+    public void addEdgeInfo(String key, BpmnDiEdge edgeInfo) {
+        edgeMap.put(key, edgeInfo);
+    }
 
     public Map<String, GraphicInfo> getLocationMap() {
         return locationMap;
@@ -285,6 +294,10 @@ public class BpmnModel {
 
     public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
+    }
+
+    public Map<String, BpmnDiEdge> getEdgeMap() {
+        return edgeMap;
     }
 
     public GraphicInfo getLabelGraphicInfo(String key) {

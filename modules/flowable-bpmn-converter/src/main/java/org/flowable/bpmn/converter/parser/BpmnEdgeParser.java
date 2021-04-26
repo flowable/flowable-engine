@@ -17,9 +17,11 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.BpmnDiEdge;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
 
@@ -32,6 +34,29 @@ public class BpmnEdgeParser implements BpmnXMLConstants {
 
         String id = xtr.getAttributeValue(null, ATTRIBUTE_DI_BPMNELEMENT);
         List<GraphicInfo> wayPointList = new ArrayList<>();
+        
+        String sourceDockerX = xtr.getAttributeValue(null, ATTRIBUTE_DI_SOURCE_DOCKER_X);
+        String sourceDockerY = xtr.getAttributeValue(null, ATTRIBUTE_DI_SOURCE_DOCKER_Y);
+        String targetDockerX = xtr.getAttributeValue(null, ATTRIBUTE_DI_TARGET_DOCKER_X);
+        String targetDockerY = xtr.getAttributeValue(null, ATTRIBUTE_DI_TARGET_DOCKER_Y);
+        if (StringUtils.isNotEmpty(sourceDockerX) && StringUtils.isNotEmpty(sourceDockerY) && 
+                StringUtils.isNotEmpty(targetDockerX) && StringUtils.isNotEmpty(targetDockerY)) {
+            
+            BpmnDiEdge edgeInfo = new BpmnDiEdge();
+            edgeInfo.setWaypoints(wayPointList);
+            GraphicInfo sourceDockerInfo = new GraphicInfo();
+            sourceDockerInfo.setX(Double.valueOf(sourceDockerX).intValue());
+            sourceDockerInfo.setY(Double.valueOf(sourceDockerY).intValue());
+            edgeInfo.setSourceDockerInfo(sourceDockerInfo);
+            
+            GraphicInfo targetDockerInfo = new GraphicInfo();
+            targetDockerInfo.setX(Double.valueOf(targetDockerX).intValue());
+            targetDockerInfo.setY(Double.valueOf(targetDockerY).intValue());
+            edgeInfo.setTargetDockerInfo(targetDockerInfo);
+            
+            model.addEdgeInfo(id, edgeInfo);
+        }
+        
         while (xtr.hasNext()) {
             xtr.next();
             if (xtr.isStartElement() && ELEMENT_DI_LABEL.equalsIgnoreCase(xtr.getLocalName())) {
