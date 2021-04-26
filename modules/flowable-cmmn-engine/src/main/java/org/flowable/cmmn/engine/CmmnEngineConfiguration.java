@@ -317,6 +317,7 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
@@ -1536,6 +1537,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new CmmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new EmptyCollectionType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
 
         } else {
@@ -1550,6 +1552,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
             if (variableTypes.getVariableType(CmmnAggregatedVariableType.TYPE_NAME) == null) {
                 variableTypes.addTypeBefore(new CmmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
+            }
+
+            if (variableTypes.getVariableType(EmptyCollectionType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new EmptyCollectionType(), SerializableType.TYPE_NAME);
             }
         }
 

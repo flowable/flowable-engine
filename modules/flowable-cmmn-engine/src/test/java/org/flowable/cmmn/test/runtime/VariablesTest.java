@@ -16,10 +16,13 @@ import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
@@ -686,6 +689,48 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertThat(customVar.getScopeType())
                 .as("custom var scope type")
                 .isEqualTo(ScopeTypes.CMMN);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testImmutableEmptyCollectionVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("listVar", Collections.emptyList())
+                .variable("setVar", Collections.emptySet())
+                .start();
+
+        VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
+        assertThat(variableInstance.getValue()).asList().isEmpty();
+
+        variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
+        assertThat(variableInstance.getValue())
+                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testEmptyCollectionVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("listVar", new ArrayList<>())
+                .variable("setVar", new HashSet<>())
+                .start();
+
+        VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
+        assertThat(variableInstance.getValue()).asList().isEmpty();
+
+        variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
+        assertThat(variableInstance.getValue())
+                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {
