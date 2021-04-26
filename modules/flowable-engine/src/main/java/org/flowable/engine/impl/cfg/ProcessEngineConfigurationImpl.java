@@ -420,6 +420,7 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 import org.flowable.variable.service.impl.types.InstantType;
@@ -2488,6 +2489,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new ParallelMultiInstanceLoopVariableType(this));
             variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new EmptyCollectionType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
 
         } else {
@@ -2506,6 +2508,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (variableTypes.getVariableType(ParallelMultiInstanceLoopVariableType.TYPE_NAME) == null) {
                 variableTypes.addTypeBefore(new ParallelMultiInstanceLoopVariableType(this), SerializableType.TYPE_NAME);
+            }
+
+            if (variableTypes.getVariableType(EmptyCollectionType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new EmptyCollectionType(), SerializableType.TYPE_NAME);
             }
         }
 
