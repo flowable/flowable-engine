@@ -31,10 +31,12 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
@@ -114,6 +116,18 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("task outside subprocess");
     }
 
+    @Test
+    @Deployment
+    public void testTimerOnAsyncMultiInstanceActivity() {
+        runtimeService.startProcessInstanceByKey("testTimerOnAsyncMultiInstanceActivity");
+        // async-continuation into the async multi-instance activity
+        for (Job job : managementService.createJobQuery().list()) {
+            managementService.executeJob(job.getId());
+        }
+
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+    }
+    
     @Test
     @Deployment
     public void testExpressionOnTimer() {
