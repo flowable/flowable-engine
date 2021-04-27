@@ -70,7 +70,6 @@ public class TaskHelper {
             deleteTask(task, deleteReason, cascade, true, cmmnEngineConfiguration);
             
         } else if (cascade) {
-            deleteHistoricTaskLogEntries(taskId, cmmnEngineConfiguration);
             deleteHistoricTask(taskId, cmmnEngineConfiguration);
         }
     }
@@ -114,7 +113,6 @@ public class TaskHelper {
             
             if (cascade) {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
-                deleteHistoricTaskLogEntries(task.getId(), cmmnEngineConfiguration);
             } else {
                 cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason, 
                         cmmnEngineConfiguration.getClock().getCurrentTime());
@@ -162,6 +160,19 @@ public class TaskHelper {
         }
     }
 
+    public static void deleteHistoricTaskInstancesByCaseInstanceId(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            List<HistoricTaskInstance> taskInstances = cmmnEngineConfiguration.getCmmnHistoryService()
+                    .createHistoricTaskInstanceQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .list();
+
+            for (HistoricTaskInstance taskInstance : taskInstances) {
+                deleteHistoricTask(taskInstance.getId(), cmmnEngineConfiguration);
+            }
+        }
+    }
+
     public static void deleteHistoricTask(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
@@ -171,7 +182,6 @@ public class TaskHelper {
                 List<HistoricTaskInstanceEntity> subTasks = historicTaskService.findHistoricTasksByParentTaskId(historicTaskInstance.getId());
                 for (HistoricTaskInstance subTask : subTasks) {
                     deleteHistoricTask(subTask.getId(), cmmnEngineConfiguration);
-                    deleteHistoricTaskLogEntries(subTask.getId(), cmmnEngineConfiguration);
                 }
     
                 cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
@@ -180,6 +190,7 @@ public class TaskHelper {
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
+        deleteHistoricTaskLogEntries(taskId, cmmnEngineConfiguration);
     }
 
     public static void deleteHistoricTaskLogEntries(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {

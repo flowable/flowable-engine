@@ -294,4 +294,35 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processEngineConfiguration.resetClock();
         }
     }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeleteSingleHistoricInstanceWithSingleMethodOnHistoryService() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        runtimeService.setVariable(processInstance.getId(), "testVar", "testValue");
+        runtimeService.setVariable(processInstance.getId(), "numVar", 43);
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(2);
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+
+            runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "for test");
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+            assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId())).isEmpty();
+            assertThat(historyService.getHistoricEntityLinkChildrenForProcessInstance(processInstance.getId())).isEmpty();
+            assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+            assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+            assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).list()).isEmpty();
+        }
+    }
+
 }

@@ -403,7 +403,6 @@ public class TaskHelper {
     protected static void handleTaskHistory(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade) {
         if (cascade) {
             deleteHistoricTask(task.getId());
-            deleteHistoricTaskEventLogEntries(task.getId());
         } else {
             ExecutionEntity execution = null;
             if (task.getExecutionId() != null) {
@@ -458,7 +457,6 @@ public class TaskHelper {
             
         } else if (cascade) {
             deleteHistoricTask(taskId);
-            deleteHistoricTaskEventLogEntries(taskId);
         }
     }
 
@@ -524,6 +522,7 @@ public class TaskHelper {
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
+        deleteHistoricTaskEventLogEntries(taskId);
     }
 
     public static void deleteHistoricTaskEventLogEntries(String taskId) {
