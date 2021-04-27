@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
+import org.flowable.editor.language.xml.util.ConversionDirection;
 
 /**
  * @author Joram Barrez
@@ -31,5 +32,22 @@ class ExtensionsConverterTest {
         FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("theTask");
         List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get("test");
         assertThat(extensionElements).hasSize(1);
+    }
+
+    // We are only converting one direction since the XML location changes when we do it both ways
+    @BpmnXmlConverterTest(value = "extensionsXmlLocation.bpmn20.xml", directions = ConversionDirection.xmlToModel)
+    void validateXmlLocations(BpmnModel bpmnModel) {
+        FlowElement flowElement = bpmnModel.getMainProcess().getFlowElement("theTask");
+        List<ExtensionElement> extensionElements = flowElement.getExtensionElements().get("test");
+        assertThat(extensionElements).hasSize(1);
+        ExtensionElement element = extensionElements.get(0);
+        assertThat(element.getXmlRowNumber()).isEqualTo(9);
+        assertThat(element.getXmlColumnNumber()).isEqualTo(43);
+
+        extensionElements = flowElement.getExtensionElements().get("testValue");
+        assertThat(extensionElements).hasSize(1);
+        element = extensionElements.get(0);
+        assertThat(element.getXmlRowNumber()).isEqualTo(10);
+        assertThat(element.getXmlColumnNumber()).isEqualTo(50);
     }
 }
