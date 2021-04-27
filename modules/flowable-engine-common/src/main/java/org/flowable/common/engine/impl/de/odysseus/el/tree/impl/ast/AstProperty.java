@@ -66,10 +66,13 @@ public abstract class AstProperty extends AstNode {
 	@Override
 	public Object eval(Bindings bindings, ELContext context) {
 		Object base = prefix.eval(bindings, context);
+		Object property = getProperty(bindings, context);
 		if (base == null) {
+			if (property != null) {
+				throw new PropertyNotFoundException(LocalMessages.get("error.property.base.null", prefix));
+			}
 			return null;
 		}
-		Object property = getProperty(bindings, context);
 		if (property == null && strict) {
 			return null;
 		}
