@@ -62,7 +62,7 @@ public class IntermediateCatchEventValidator extends ProcessLevelValidator {
                         !(eventDefinition instanceof ConditionalEventDefinition) && 
                         !(eventDefinition instanceof VariableListenerEventDefinition)) {
                     
-                    addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, "Unsupported intermediate catch event type");
+                    addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, eventDefinition, "Unsupported intermediate catch event type");
                 }
             }
         }

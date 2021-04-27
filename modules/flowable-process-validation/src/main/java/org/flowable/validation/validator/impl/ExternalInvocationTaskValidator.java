@@ -69,7 +69,7 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             }
 
             if (("wait".equals(fieldName) || "redirectError".equals(fieldName) || "cleanEnv".equals(fieldName)) && !"true".equals(fieldValue.toLowerCase()) && !"false".equals(fieldValue.toLowerCase())) {
-                addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, "Undefined parameter value for shell field");
+                addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, fieldExtension, "Undefined parameter value for shell field");
             }
 
         }
