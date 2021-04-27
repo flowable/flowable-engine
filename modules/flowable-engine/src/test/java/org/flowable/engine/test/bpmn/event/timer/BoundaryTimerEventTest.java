@@ -119,18 +119,14 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testTimerOnAsyncMultiInstanceActivity() {
-    	runtimeService.startProcessInstanceByKey("testTimerOnAsyncMultiInstanceActivity");
+        runtimeService.startProcessInstanceByKey("testTimerOnAsyncMultiInstanceActivity");
+        // async-continuation into the async multi-instance activity
+        for (Job job : managementService.createJobQuery().list()) {
+            managementService.executeJob(job.getId());
+        }
 
-    	// async-continuation into the async multi-instance activity
-		for(Job job: managementService.createJobQuery().list()) {
-			managementService.executeJob(job.getId());
-		}
-		
-		long timerJobCount = managementService.createTimerJobQuery().count();
-		
-		assertThat(timerJobCount).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
     }
-    
     
     @Test
     @Deployment
