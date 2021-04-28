@@ -29,6 +29,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
     protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
     protected List<FlowElement> flowElementList = new ArrayList<>();
+    protected Map<String, Artifact> artifactMap = new LinkedHashMap<>();
     protected List<Artifact> artifactList = new ArrayList<>();
     protected List<ValuedDataObject> dataObjects = new ArrayList<>();
 
@@ -125,10 +126,26 @@ public class SubProcess extends Activity implements FlowElementsContainer {
     public Collection<Artifact> getArtifacts() {
         return artifactList;
     }
+    
+    @Override
+    public Map<String, Artifact> getArtifactMap() {
+        return artifactMap;
+    }
 
     @Override
     public void addArtifact(Artifact artifact) {
         artifactList.add(artifact);
+        addArtifactToMap(artifact);
+    }
+    
+    @Override
+    public void addArtifactToMap(Artifact artifact) {
+        if (artifact != null && StringUtils.isNotEmpty(artifact.getId())) {
+            artifactMap.put(artifact.getId(), artifact);
+            if (getParentContainer() != null) {
+                getParentContainer().addArtifactToMap(artifact);
+            }
+        }
     }
 
     @Override
