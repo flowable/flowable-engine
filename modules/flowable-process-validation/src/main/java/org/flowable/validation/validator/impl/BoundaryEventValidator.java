@@ -70,7 +70,7 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
                         !(eventDefinition instanceof EscalationEventDefinition) &&
                         !(eventDefinition instanceof VariableListenerEventDefinition)) {
                     
-                    addError(errors, Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, process, boundaryEvent, "Invalid or unsupported event definition");
+                    addError(errors, Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, process, boundaryEvent, eventDefinition, "Invalid or unsupported event definition");
                 }
 
                 if (eventDefinition instanceof CancelEventDefinition) {

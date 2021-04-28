@@ -342,6 +342,54 @@ public class DefaultProcessValidatorTest {
     }
 
     @Test
+    void testEventSubProcessWithCancelStart() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/eventSubProcessWithCancelStartEvent.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+        assertThat(errors).hasSize(1);
+        ValidationError error = errors.get(0);
+        assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION);
+        assertThat(error.getDefaultDescription()).isEqualTo("start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
+        assertThat(error.getActivityId()).isEqualTo("cancelStartEventSubProcess");
+        assertThat(error.getActivityName()).isEqualTo("Cancel Event Sub Process");
+        assertThat(error.isWarning()).isFalse();
+        assertThat(error.getXmlLineNumber()).isEqualTo(12);
+        assertThat(error.getXmlColumnNumber()).isEqualTo(41);
+    }
+
+    @Test
+    void testInvalidMultiInstanceActivity() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/invalidMultiInstanceActivity.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+        assertThat(errors).hasSize(1);
+        ValidationError error = errors.get(0);
+        assertThat(error.getProblem()).isEqualTo(Problems.MULTI_INSTANCE_MISSING_COLLECTION);
+        assertThat(error.getDefaultDescription()).isEqualTo("Either loopCardinality or loopDataInputRef/flowable:collection must been set");
+        assertThat(error.getActivityId()).isEqualTo("multiInstanceServiceTask");
+        assertThat(error.getActivityName()).isEqualTo("Multi Instance Service Task");
+        assertThat(error.isWarning()).isFalse();
+        assertThat(error.getXmlLineNumber()).isEqualTo(9);
+        assertThat(error.getXmlColumnNumber()).isEqualTo(47);
+    }
+
+    @Test
+    void testIntermediateTimerThrowEvent() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/intermediateTimerThrowEvent.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+        assertThat(errors).hasSize(1);
+        ValidationError error = errors.get(0);
+        assertThat(error.getProblem()).isEqualTo(Problems.THROW_EVENT_INVALID_EVENTDEFINITION);
+        assertThat(error.getDefaultDescription()).isEqualTo("Unsupported intermediate throw event type");
+        assertThat(error.getActivityId()).isEqualTo("timerThrow");
+        assertThat(error.getActivityName()).isEqualTo("Timer Throw");
+        assertThat(error.isWarning()).isFalse();
+        assertThat(error.getXmlLineNumber()).isEqualTo(8);
+        assertThat(error.getXmlColumnNumber()).isEqualTo(35);
+    }
+
+    @Test
     void testExternalWorkerTaskWithoutTopic() {
         BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/processWithInvalidExternalWorkerTask.bpmn20.xml");
 

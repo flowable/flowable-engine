@@ -53,7 +53,7 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
                             !(eventDefinition instanceof TimerEventDefinition) &&
                             !(eventDefinition instanceof VariableListenerEventDefinition)) {
 
-                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess,
+                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, eventDefinition,
                                 "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
                     }
                 }

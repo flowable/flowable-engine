@@ -64,7 +64,7 @@ public class FlowElementValidator extends ProcessLevelValidator {
             if (StringUtils.isEmpty(multiInstanceLoopCharacteristics.getLoopCardinality())
                     && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getInputDataItem()) && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getCollectionString())) {
 
-                addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION, process, activity,
+                addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION, process, activity, multiInstanceLoopCharacteristics,
                         "Either loopCardinality or loopDataInputRef/flowable:collection must been set");
             }
             
@@ -84,7 +84,7 @@ public class FlowElementValidator extends ProcessLevelValidator {
         if (activity.getDataInputAssociations() != null) {
             for (DataAssociation dataAssociation : activity.getDataInputAssociations()) {
                 if (StringUtils.isEmpty(dataAssociation.getTargetRef())) {
-                    addError(errors, Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity,
+                    addError(errors, Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity, dataAssociation,
                             "Targetref is required on a data association");
                 }
             }
