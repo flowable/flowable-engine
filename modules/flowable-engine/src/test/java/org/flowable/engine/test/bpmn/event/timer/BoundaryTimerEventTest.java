@@ -31,12 +31,10 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.flowable.job.api.JobQuery;
 import org.flowable.job.api.TimerJobQuery;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
@@ -118,14 +116,53 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testTimerOnSyncMultiInstanceActivity() {
+
+        // Timer doesn't fire
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess");
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+
+        taskService.complete(tasks.get(0).getId());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+
+        taskService.complete(tasks.get(1).getId());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+
+        taskService.complete(tasks.get(2).getId());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
+
+
+        // Timer does fire
+        processInstance = runtimeService.startProcessInstanceByKey("myProcess");
+        Job job = managementService.moveTimerToExecutableJob(managementService.createTimerJobQuery().singleResult().getId());
+        managementService.executeJob(job.getId());
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
+    }
+
+    @Test
+    @Deployment
     public void testTimerOnAsyncMultiInstanceActivity() {
-        runtimeService.startProcessInstanceByKey("testTimerOnAsyncMultiInstanceActivity");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTimerOnAsyncMultiInstanceActivity");
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+
         // async-continuation into the async multi-instance activity
         for (Job job : managementService.createJobQuery().list()) {
             managementService.executeJob(job.getId());
         }
 
         assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
+
+        Job job = managementService.moveTimerToExecutableJob(managementService.createTimerJobQuery().singleResult().getId());
+        managementService.executeJob(job.getId());
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(0);
     }
     
     @Test

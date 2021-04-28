@@ -206,7 +206,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (activityBehavior != null) {
             executeActivityBehavior(activityBehavior, flowNode);
             
-            if (!execution.isDeleted() && !execution.isEnded() && execution.isMultiInstanceRoot()) {
+            if (execution.isMultiInstanceRoot() && !execution.isDeleted() && !execution.isEnded()) {
                 // Create any boundary events, sub process boundary events will be created from the activity behavior
                 List<ExecutionEntity> boundaryEventExecutions = null;
                 List<BoundaryEvent> boundaryEvents = null;
