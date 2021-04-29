@@ -64,6 +64,8 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
@@ -464,12 +466,19 @@ public class ProcessInstanceHelper {
         variableListenerExecution.setCurrentFlowElement(startEvent);
         variableListenerExecution.setEventScope(true);
         variableListenerExecution.setActive(false);
+        
+        String configuration = null;
+        if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableChangeType())) {
+            ObjectNode configurationNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+            configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableListenerEventDefinition.getVariableChangeType());
+            configuration = configurationNode.toString();
+        }
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
                 .getEventSubscriptionService().createEventSubscriptionBuilder()
                         .eventType("variable")
                         .eventName(variableListenerEventDefinition.getVariableName())
-                        .configuration(variableListenerEventDefinition.getVariableChangeType())
+                        .configuration(configuration)
                         .executionId(variableListenerExecution.getId())
                         .processInstanceId(variableListenerExecution.getProcessInstanceId())
                         .activityId(variableListenerExecution.getCurrentActivityId())

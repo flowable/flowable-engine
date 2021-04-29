@@ -14,6 +14,8 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
@@ -27,6 +29,8 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN extension Variable Event Listener.
@@ -54,10 +58,17 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
             }
 
         } else if (PlanItemTransition.CREATE.equals(transition)) {
+            String configuration = null;
+            if (StringUtils.isNotEmpty(variableChangeType)) {
+                ObjectNode configurationNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+                configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableChangeType);
+                configuration = configurationNode.toString();
+            }
+            
             cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
                 .eventType("variable")
                 .eventName(variableName)
-                .configuration(variableChangeType)
+                .configuration(configuration)
                 .subScopeId(planItemInstance.getId())
                 .scopeId(planItemInstance.getCaseInstanceId())
                 .scopeDefinitionId(planItemInstance.getCaseDefinitionId())

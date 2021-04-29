@@ -16,11 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -28,6 +31,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
@@ -223,6 +227,139 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+        }
+    }
+    
+    @Test
+    public void testProcessWithCaseTaskAndVariableListener() throws Exception {
+        ProcessEngineConfiguration processEngineConfiguration = (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+        TaskService taskService = processEngineConfiguration.getTaskService();
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithVariableListener.cmmn")
+                .deploy();
+        
+        processEngineConfiguration.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/caseTaskProcess.bpmn20.xml")
+                .deploy();
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("caseTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+            
+            List<PlanItemInstance> planItemInstances = cmmnEngineConfiguration.getCmmnRuntimeService()
+                    .createPlanItemInstanceQuery()
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances).hasSize(1);
+            String caseInstanceId = planItemInstances.iterator().next().getCaseInstanceId();
+            
+            cmmnEngineConfiguration.getCmmnRuntimeService().setVariable(caseInstanceId, "var1", "test");
+            
+            planItemInstances = cmmnEngineConfiguration.getCmmnRuntimeService()
+                    .createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances).hasSize(2);
+            
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
+            }
+            
+            assertThat(cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceQuery().caseInstanceId(caseInstanceId).count()).isZero();
+            
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
+            taskService.complete(task.getId());
+            
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        } finally {
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+            
+            cmmnEngineConfiguration.getCmmnRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
+        }
+    }
+    
+    @Test
+    public void testProcessWithCaseTaskAndMultipleVariableListeners() throws Exception {
+        ProcessEngineConfiguration processEngineConfiguration = (ProcessEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+        TaskService taskService = processEngineConfiguration.getTaskService();
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithVariableListener.cmmn")
+                .deploy();
+        
+        processEngineConfiguration.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/processWithVariableListener.bpmn20.xml")
+                .deploy();
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableListenerProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
+            
+            List<PlanItemInstance> planItemInstances = cmmnEngineConfiguration.getCmmnRuntimeService()
+                    .createPlanItemInstanceQuery()
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances).hasSize(1);
+            String caseInstanceId = planItemInstances.iterator().next().getCaseInstanceId();
+            
+            cmmnEngineConfiguration.getCmmnRuntimeService().setVariable(caseInstanceId, "var1", "test");
+            
+            planItemInstances = cmmnEngineConfiguration.getCmmnRuntimeService()
+                    .createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .list();
+            assertThat(planItemInstances).hasSize(2);
+            
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
+            }
+            
+            assertThat(cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceQuery().caseInstanceId(caseInstanceId).count()).isZero();
+            
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+            
+            runtimeService.setVariable(processInstance.getId(), "var1", "test");
+            
+            List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+            for (Execution execution : executions) {
+                System.out.println("execution " + execution.getId() + " " + execution.getActivityId());
+            }
+            
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        } finally {
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+            
+            cmmnEngineConfiguration.getCmmnRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
         }
     }
 }

@@ -114,7 +114,7 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     
     @Override
     public void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId) {
-        planOperation(new EvaluateVariableListenerEventsOperation(commandContext, processDefinitionId, processInstanceId));
+        planOperation(new EvaluateVariableListenerEventDefinitionsOperation(commandContext, processDefinitionId, processInstanceId));
     }
 
     @Override

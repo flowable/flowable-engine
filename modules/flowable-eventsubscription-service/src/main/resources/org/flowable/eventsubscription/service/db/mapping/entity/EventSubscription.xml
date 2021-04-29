@@ -308,6 +308,13 @@
     </where>   
   </select>
   
+  <select id="selectEventSubscriptionsByScopeIdAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select * 
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = #{parameter.eventType})
+    	and (SCOPE_ID_ = #{parameter.scopeId})
+  </select>
+  
   <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR

@@ -42,6 +42,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessInstanceAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeIdAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsBySubScopeIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.MessageEventSubscriptionsByProcInstAndEventNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByEventNameMatcher;
@@ -79,6 +80,8 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher();
+    
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeIdAndTypeMatcher = new EventSubscriptionsByScopeIdAndTypeMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> signalEventSubscriptionByNameAndExecutionMatcher = new SignalEventSubscriptionByNameAndExecutionMatcher();
 
@@ -257,6 +260,14 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
             params.put("tenantId", tenantId);
         }
         return getDbSqlSession().selectList(query, params);
+    }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type) {
+        Map<String, String> params = new HashMap<>();
+        params.put("scopeId", scopeId);
+        params.put("eventType", type);
+        return getList("selectEventSubscriptionsByScopeIdAndType", params, eventSubscriptionsByScopeIdAndTypeMatcher, true);
     }
 
     @Override
