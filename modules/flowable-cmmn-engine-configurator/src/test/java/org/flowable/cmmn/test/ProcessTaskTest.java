@@ -109,6 +109,10 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertThat(processTaskPlanItemInstance.getReferenceId()).isEqualTo(childProcessInstance.getId());
         assertThat(processTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
 
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            assertThat(cmmnRuntimeService.getEntityLinkChildrenForCaseInstance(caseInstance.getId())).isEmpty();
+        }
+
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isEqualTo(1);
             HistoricPlanItemInstance historicProcessTaskPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
@@ -117,6 +121,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(historicProcessTaskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
             assertThat(historicProcessTaskPlanItemInstance.getReferenceId()).isEqualTo(childProcessInstance.getId());
             assertThat(historicProcessTaskPlanItemInstance.getReferenceType()).isEqualTo(ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId())).isEmpty();
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())) {

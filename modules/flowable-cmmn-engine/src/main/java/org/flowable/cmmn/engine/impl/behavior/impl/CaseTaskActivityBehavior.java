@@ -121,12 +121,16 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
-        caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
-        caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
 
         if (sameDeployment) {
             caseInstanceBuilder.caseDefinitionParentDeploymentId(
                     CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration));
+        }
+
+        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
+        if (blocking) {
+            caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
+            caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
         }
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
@@ -150,7 +154,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                             variablesFromFormSubmission, caseInstanceEntity.getTenantId());
         }
 
-        if (!evaluateIsBlocking(planItemInstanceEntity)) {
+        if (!blocking) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
