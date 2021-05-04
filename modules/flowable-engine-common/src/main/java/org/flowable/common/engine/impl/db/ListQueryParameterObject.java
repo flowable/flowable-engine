@@ -148,6 +148,10 @@ public class ListQueryParameterObject {
     protected String buildOrderBy() {
         Collection<OrderBy> orderBy = getOrderByCollectionSafe();
 
+        if (orderBy.isEmpty()) {
+            return "";
+        }
+
         return orderBy.stream()
                 .map(this::mapOrderByToSql)
                 .collect(Collectors.joining(",", "order by ", ""));
