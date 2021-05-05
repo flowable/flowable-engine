@@ -41,6 +41,11 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
     HistoryJobQuery scopeType(String scopeType);
 
     /**
+     * Only return jobs that do not have a scope type.
+     */
+    HistoryJobQuery withoutScopeType();
+
+    /**
      * Only select jobs that have the given tenant id.
      */
     HistoryJobQuery jobTenantId(String tenantId);

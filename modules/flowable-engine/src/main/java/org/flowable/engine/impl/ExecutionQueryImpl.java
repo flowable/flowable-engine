@@ -1154,4 +1154,20 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         this.startedBy = startedBy;
     }
 
+    public String getLocale() {
+        return locale;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
+
 }

@@ -9,9 +9,9 @@
   <mappers>
     <!-- Common mappers -->
     <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+    <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
     <!-- Engine mappers -->
-    <mapper resource="org/flowable/dmn/db/mapping/common.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/Decision.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/DmnDeployment.xml" />
     <mapper resource="org/flowable/dmn/db/mapping/entity/HistoricDecisionExecution.xml" />

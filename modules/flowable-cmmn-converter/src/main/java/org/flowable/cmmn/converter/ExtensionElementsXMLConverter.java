@@ -45,6 +45,8 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.ReactivateEventListener;
+import org.flowable.cmmn.model.ReactivationRule;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
@@ -86,6 +88,12 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                         
                     } else if (CmmnXmlConstants.ELEMENT_PARENT_COMPLETION_RULE.equals(xtr.getLocalName())) {
                         readParentCompletionRule(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_REACTIVATION_RULE.equals(xtr.getLocalName())) {
+                        readReactivationRule(xtr, conversionHelper);
+
+                    } else if (CmmnXmlConstants.ELEMENT_DEFAULT_REACTIVATION_RULE.equals(xtr.getLocalName())) {
+                        readDefaultReactivationRule(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_FIELD.equals(xtr.getLocalName())) {
                         readFieldExtension(xtr, conversionHelper);
@@ -192,6 +200,30 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
             readCommonXmlInfo(parentCompletionRule, xtr);
         }
+    }
+
+    protected void readReactivationRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setReactivationRule(readReactivationRule(xtr));
+        }
+    }
+
+    protected void readDefaultReactivationRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof ReactivateEventListener) {
+            ReactivateEventListener reactivateEventListener = (ReactivateEventListener) conversionHelper.getCurrentCmmnElement();
+            reactivateEventListener.setDefaultReactivationRule(readReactivationRule(xtr));
+        }
+    }
+
+    protected ReactivationRule readReactivationRule(XMLStreamReader xtr) {
+        ReactivationRule reactivationRule = new ReactivationRule();
+        reactivationRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        reactivationRule.setActivateCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ACTIVATE_CONDITION));
+        reactivationRule.setIgnoreCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IGNORE_CONDITION));
+        reactivationRule.setDefaultCondition(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DEFAULT_CONDITION));
+        readCommonXmlInfo(reactivationRule, xtr);
+        return reactivationRule;
     }
 
     protected void readFieldExtension(XMLStreamReader xtr, ConversionHelper conversionHelper) {

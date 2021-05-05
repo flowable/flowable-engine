@@ -27,6 +27,7 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
 
     static {
         addPlanItemDefinitionExport(StageExport.getInstance());
+        addPlanItemDefinitionExport(PlanFragmentExport.getInstance());
         addPlanItemDefinitionExport(new TaskExport());
         addPlanItemDefinitionExport(new HumanTaskExport());
         addPlanItemDefinitionExport(new CaseTaskExport());
@@ -40,8 +41,10 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         addPlanItemDefinitionExport(new MilestoneExport());
         addPlanItemDefinitionExport(new GenericEventListenerExport());
         addPlanItemDefinitionExport(new SignalEventListenerExport());
+        addPlanItemDefinitionExport(new ReactivationEventListenerExport());
         addPlanItemDefinitionExport(new TimerEventListenerExport());
         addPlanItemDefinitionExport(new UserEventListenerExport());
+        addPlanItemDefinitionExport(new VariableEventListenerExport());
     }
 
     public static void addPlanItemDefinitionExport(AbstractPlanItemDefinitionExport exporter) {

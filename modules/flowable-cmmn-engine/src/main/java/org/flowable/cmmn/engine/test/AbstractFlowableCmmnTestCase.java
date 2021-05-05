@@ -22,8 +22,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -36,6 +38,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.DynamicCmmnService;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -181,6 +184,28 @@ public abstract class AbstractFlowableCmmnTestCase {
         assertEquals(1, taskIds.size());
     }
 
+    protected void assertSamePlanItemState(CaseInstance c1) {
+        List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
+        List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
+
+        assertNotNull(runtimePlanItems);
+        assertNotNull(historicPlanItems);
+        assertEquals(runtimePlanItems.size(), historicPlanItems.size());
+
+        Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
+        for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
+            historyMap.put(historicPlanItem.getId(), historicPlanItem);
+        }
+
+        for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
+            HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
+            assertNotNull(historicPlanItemInstance);
+            assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
+        }
+
+        assertEquals(historyMap.size(), 0);
+    }
+
     protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
             .caseInstanceId(caseInstance.getId())
@@ -205,6 +230,23 @@ public abstract class AbstractFlowableCmmnTestCase {
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
+        }
+    }
+
+    protected void assertHistoricPlanItemInstanceState(List<HistoricPlanItemInstance> planItemInstances, String name, String ... states) {
+        List<String> planItemInstanceStates = planItemInstances.stream()
+            .filter(planItemInstance -> Objects.equals(name, planItemInstance.getName()))
+            .map(HistoricPlanItemInstance::getState)
+            .collect(Collectors.toList());
+
+        if (planItemInstanceStates.isEmpty()) {
+            fail("No historic plan item instances found with name " + name);
+        }
+
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates + "", states.length, planItemInstanceStates.size());
+        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
+        for (String state : states) {
+            assertTrue("State '" + state + "' not found in historic plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
         }
     }
 

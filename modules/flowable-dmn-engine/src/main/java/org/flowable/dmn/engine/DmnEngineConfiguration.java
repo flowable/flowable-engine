@@ -125,7 +125,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
+    protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl(this);
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
     protected DmnDecisionService ruleService = new DmnDecisionServiceImpl(this);
     protected DmnHistoryService dmnHistoryService = new DmnHistoryServiceImpl();

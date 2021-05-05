@@ -27,6 +27,7 @@ import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.model.UserEventListener;
+import org.flowable.cmmn.model.VariableEventListener;
 
 /**
  * @author Joram Barrez
@@ -44,6 +45,8 @@ public interface PlanItemDefinitionType {
     String USER_EVENT_LISTENER = UserEventListener.class.getSimpleName().toLowerCase();
     
     String SIGNAL_EVENT_LISTENER = SignalEventListener.class.getSimpleName().toLowerCase();
+    
+    String VARIABLE_EVENT_LISTENER = VariableEventListener.class.getSimpleName().toLowerCase();
     
     String GENERIC_EVENT_LISTENER = GenericEventListener.class.getSimpleName().toLowerCase();
     

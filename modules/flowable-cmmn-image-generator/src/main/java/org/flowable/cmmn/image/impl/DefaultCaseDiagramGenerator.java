@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
@@ -393,11 +394,29 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         BaseElement sourceElement = cmmnModel.getCriterion(sourceRef);
         if (sourceElement == null) {
             sourceElement = cmmnModel.findPlanItem(sourceRef);
+            if (sourceElement == null) {
+                PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition(sourceRef);
+                if (planItemDefinition != null) {
+                    sourceElement = cmmnModel.findPlanItem(planItemDefinition.getPlanItemRef());
+                }
+                if (sourceElement == null) {
+                    sourceElement = cmmnModel.findTextAnnotation(sourceRef);
+                }
+            }
         }
 
         BaseElement targetElement = cmmnModel.getCriterion(targetRef);
         if (targetElement == null) {
             targetElement = cmmnModel.findPlanItem(targetRef);
+            if (targetElement == null) {
+                PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition(targetRef);
+                if (planItemDefinition != null) {
+                    targetElement = cmmnModel.findPlanItem(planItemDefinition.getPlanItemRef());
+                }
+                if (targetElement == null) {
+                    targetElement = cmmnModel.findTextAnnotation(targetRef);
+                }
+            }
         }
 
         List<GraphicInfo> graphicInfoList = cmmnModel.getFlowLocationGraphicInfo(association.getId());
@@ -423,7 +442,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         }
     }
 
-    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas processDiagramCanvas, CmmnModel cmmnModel,
+    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel,
                     BaseElement sourceElement, BaseElement targetElement, List<GraphicInfo> graphicInfoList) {
 
         GraphicInfo sourceGraphicInfo = cmmnModel.getGraphicInfo(sourceElement.getId());
@@ -432,7 +451,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         DefaultCaseDiagramCanvas.SHAPE_TYPE sourceShapeType = getShapeType(sourceElement);
         DefaultCaseDiagramCanvas.SHAPE_TYPE targetShapeType = getShapeType(targetElement);
 
-        return processDiagramCanvas.connectionPerfectionizer(sourceShapeType, targetShapeType, sourceGraphicInfo, targetGraphicInfo, graphicInfoList);
+        return caseDiagramCanvas.connectionPerfectionizer(sourceShapeType, targetShapeType, sourceGraphicInfo, targetGraphicInfo, graphicInfoList);
     }
 
     /**
@@ -440,7 +459,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
      * Each element can be presented as rectangle, rhombus, or ellipse.
      *
      * @param baseElement
-     * @return DefaultProcessDiagramCanvas.SHAPE_TYPE
+     * @return DefaultCaseDiagramCanvas.SHAPE_TYPE
      */
     protected static DefaultCaseDiagramCanvas.SHAPE_TYPE getShapeType(BaseElement baseElement) {
         if (baseElement instanceof Task || baseElement instanceof Stage) {

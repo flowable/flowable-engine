@@ -15,8 +15,10 @@ package org.flowable.engine.impl.variable;
 import java.util.List;
 
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -62,8 +64,20 @@ public class ParallelMultiInstanceLoopVariableType implements VariableType {
 
     @Override
     public Object getValue(ValueFields valueFields) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        if (commandContext != null) {
+            return getValue(valueFields, commandContext);
+        } else {
+            return processEngineConfiguration.getCommandExecutor()
+                    .execute(context -> getValue(valueFields, context));
+        }
+    }
+
+    protected Object getValue(ValueFields valueFields, CommandContext commandContext) {
         String multiInstanceRootId = valueFields.getTextValue();
         String type = valueFields.getTextValue2();
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntity multiInstanceRootExecution = processEngineConfiguration.getExecutionEntityManager().findById(multiInstanceRootId);
         List<? extends ExecutionEntity> childExecutions = multiInstanceRootExecution.getExecutions();
         int nrOfActiveInstances = (int) childExecutions.stream().filter(execution -> execution.isActive() && !(execution.getCurrentFlowElement() instanceof BoundaryEvent))

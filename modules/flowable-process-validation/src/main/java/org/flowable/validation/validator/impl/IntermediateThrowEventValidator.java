@@ -42,7 +42,7 @@ public class IntermediateThrowEventValidator extends ProcessLevelValidator {
             if (eventDefinition != null && !(eventDefinition instanceof SignalEventDefinition) && 
                             !(eventDefinition instanceof EscalationEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition)) {
                 
-                addError(errors, Problems.THROW_EVENT_INVALID_EVENTDEFINITION, process, throwEvent, "Unsupported intermediate throw event type");
+                addError(errors, Problems.THROW_EVENT_INVALID_EVENTDEFINITION, process, throwEvent, eventDefinition, "Unsupported intermediate throw event type");
             }
         }
     }

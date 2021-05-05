@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" targetNamespace="http://www.flowable.org/casedef">
+    <case id="testCaseLifecycleListeners" name="testCaseLifecycleListeners" flowable:initiatorVariableName="initiator">
+        <extensionElements>
+            <!-- null -> active -->
+            <flowable:caseLifecycleListener sourceState="" targetState="active" delegateExpression="${bean}"></flowable:caseLifecycleListener>
+        </extensionElements>
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="class delegate" definitionRef="humanTask"></planItem>
+            <humanTask id="humanTask" name="class delegate">
+            </humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

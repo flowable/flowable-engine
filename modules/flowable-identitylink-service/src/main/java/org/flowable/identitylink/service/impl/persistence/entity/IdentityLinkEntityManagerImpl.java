@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
@@ -35,6 +36,11 @@ public class IdentityLinkEntityManagerImpl
 
     public IdentityLinkEntityManagerImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration, IdentityLinkDataManager identityLinkDataManager) {
         super(identityLinkServiceConfiguration, identityLinkServiceConfiguration.getEngineName(), identityLinkDataManager);
+    }
+
+    @Override
+    public IdentityLinkEntity createIdentityLinkFromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink) {
+        return dataManager.createIdentityLinkFromHistoricIdentityLink(historicIdentityLink);
     }
 
     @Override

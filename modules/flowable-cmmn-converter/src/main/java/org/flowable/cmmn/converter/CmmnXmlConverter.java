@@ -43,10 +43,12 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
+import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
 import org.flowable.cmmn.converter.export.StageExport;
+import org.flowable.cmmn.converter.export.TextAnnotationExport;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
@@ -70,6 +72,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TextAnnotation;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.io.InputStreamProvider;
@@ -96,6 +99,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new DocumentationXmlConverter());
         addElementConverter(new CaseXmlConverter());
         addElementConverter(new PlanModelXmlConverter());
+        addElementConverter(new PlanFragmentXmlConverter());
         addElementConverter(new StageXmlConverter());
         addElementConverter(new MilestoneXmlConverter());
         addElementConverter(new TaskXmlConverter());
@@ -120,10 +124,13 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new TimerEventListenerXmlConverter());
         addElementConverter(new UserEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
+        addElementConverter(new TextAnnotationXmlConverter());
+        addElementConverter(new AssociationXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
+        addElementConverter(new CmmnDiExtensionXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
@@ -131,7 +138,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addTextConverter(new DecisionRefExpressionXmlConverter());
         addTextConverter(new ConditionXmlConverter());
         addTextConverter(new TimerExpressionXmlConverter());
-        
+        addTextConverter(new TextXmlConverter());
+
         addElementConverter(new ExtensionElementsXMLConverter());
     }
 
@@ -304,6 +312,24 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 xtw.writeEndElement();
             }
 
+            // We're currently only writing out associations for text annotations
+            List<Association> associations = model.getAssociations();
+
+            List<TextAnnotation> textAnnotations = model.getTextAnnotations();
+            for (TextAnnotation textAnnotation : textAnnotations) {
+                TextAnnotationExport.writeTextAnnotations(textAnnotation, xtw);
+
+                String textAnnotationId = textAnnotation.getId();
+                if (textAnnotationId != null) {
+                    for (Association association : associations) {
+                        if (textAnnotationId.equals(association.getSourceRef()) || textAnnotationId.equals(association.getTargetRef())) {
+                            AssociationExport.writeAssociation(association, xtw);
+                        }
+                    }
+                }
+
+            }
+
             CmmnDIExport.writeCmmnDI(model, xtw);
 
             // end definitions root element
@@ -385,6 +411,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         // In case there are some associations that didn't have a DI then create an ID for them
         ensureIds(cmmnModel.getAssociations(), "association_");
+
+        // There could still be associations without source/target set, do a last pass
+        processAssociations(cmmnModel);
     }
 
     protected void processDiEdges(CmmnModel cmmnModel, List<CmmnDiEdge> diEdges) {
@@ -419,6 +448,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 associationIterator.remove();
             }
 
+            cmmnModel.addEdgeInfo(diEdge.getId(), diEdge);
             cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
         }
     }
@@ -479,101 +509,105 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void processPlanItems(CmmnModel cmmnModel, PlanFragment planFragment) {
         for (PlanItem planItem : planFragment.getPlanItems()) {
-
             // Plan items are defined on the same level or in a higher parent stage, never in a child stage.
             Stage parentStage = planItem.getParentStage();
             PlanItemDefinition planItemDefinition = parentStage.findPlanItemDefinitionInStageOrUpwards(planItem.getDefinitionRef());
             if (planItemDefinition == null) {
                 throw new FlowableException("No matching plan item definition found for reference "
-                        + planItem.getDefinitionRef() + " of plan item " + planItem.getId());
+                    + planItem.getDefinitionRef() + " of plan item " + planItem.getId());
             }
+
             planItem.setPlanItemDefinition(planItemDefinition);
+            procesPlanItem(cmmnModel, planItem, planItemDefinition);
 
-            if (!planItem.getEntryCriteria().isEmpty()) {
-                resolveEntryCriteria(planItem);
-            }
+        }
 
-            if (!planItem.getExitCriteria().isEmpty()) {
-                boolean exitCriteriaAllowed = true;
-                if (planItemDefinition instanceof Task) {
-                    Task task = (Task) planItemDefinition;
-                    if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
-                        exitCriteriaAllowed = false;
-                    }
-                }
+    }
 
-                if (exitCriteriaAllowed) {
-                    resolveExitCriteriaSentry(planItem);
-                } else {
-                    LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
-                    planItem.getExitCriteria().clear();
+    protected void procesPlanItem(CmmnModel cmmnModel, PlanItem planItem, PlanItemDefinition planItemDefinition) {
+        if (!planItem.getEntryCriteria().isEmpty()) {
+            resolveEntryCriteria(planItem);
+        }
+
+        if (!planItem.getExitCriteria().isEmpty()) {
+            boolean exitCriteriaAllowed = true;
+            if (planItemDefinition instanceof Task) {
+                Task task = (Task) planItemDefinition;
+                if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
+                    exitCriteriaAllowed = false;
                 }
             }
 
-            if (planItemDefinition instanceof PlanFragment) {
-                PlanFragment planItemPlanFragment = (PlanFragment) planItemDefinition;
-                planItemPlanFragment.setPlanItem(planItem);
-                processPlanFragment(cmmnModel, planItemPlanFragment);
-
-            } else if (planItemDefinition instanceof ProcessTask) {
-                ProcessTask processTask = (ProcessTask) planItemDefinition;
-                if (processTask.getProcessRef() != null) {
-                    org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
-                    if (process != null) {
-                        processTask.setProcess(process);
-                    }
-                }
-
-            } else if (planItemDefinition instanceof DecisionTask) {
-                DecisionTask decisionTask = (DecisionTask) planItemDefinition;
-                if (decisionTask.getDecisionRef() != null) {
-                    org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
-                    if (decision != null) {
-                        decisionTask.setDecision(decision);
-                    }
-                }
-
-            } else if (planItemDefinition instanceof TimerEventListener) {
-                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
-                String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
-                PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
-                if (startTriggerPlanItem != null) {
-                    timerEventListener.setTimerStartTriggerPlanItem(startTriggerPlanItem);
-                    
-                    // Although the CMMN spec does not categorize the timer start trigger as an entry criterion,
-                    // it is exposed as such to the engine as there is no difference in handling it vs a real criterion
-                    // which means no special care will need to be taken in the core engine operations
-                    
-                    Criterion criterion = new Criterion();
-                    criterion.setId(generateEntryCriterionId(planItem));
-                    criterion.setEntryCriterion(true);
-                    
-                    SentryOnPart sentryOnPart = new SentryOnPart();
-                    sentryOnPart.setSourceRef(startTriggerPlanItem.getId());
-                    sentryOnPart.setSource(startTriggerPlanItem);
-                    sentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
-                    
-                    Sentry sentry = new Sentry();
-                    sentry.addSentryOnPart(sentryOnPart);
-                    
-                    criterion.setSentry(sentry);
-                    planItem.addEntryCriterion(criterion);
-                }
-            } else if (planItemDefinition instanceof CasePageTask) {
-                // check, if the parent completion rule is set and if not, set it to the default value for a case page which is always ignore
-                if (planItem.getItemControl() == null) {
-                    PlanItemControl planItemControl = new PlanItemControl();
-                    planItem.setItemControl(planItemControl);
-                }
-                if (planItem.getItemControl().getParentCompletionRule() == null) {
-                    ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
-                    parentCompletionRule.setType(ParentCompletionRule.IGNORE);
-
-                    planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
-                }
+            if (exitCriteriaAllowed) {
+                resolveExitCriteriaSentry(planItem);
+            } else {
+                LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
+                planItem.getExitCriteria().clear();
             }
         }
 
+        if (planItemDefinition instanceof Stage) {
+            Stage planItemStage = (Stage) planItemDefinition;
+            planItemStage.setPlanItem(planItem);
+            processPlanFragment(cmmnModel, planItemStage);
+
+        } else if (planItemDefinition instanceof ProcessTask) {
+            ProcessTask processTask = (ProcessTask) planItemDefinition;
+            if (processTask.getProcessRef() != null) {
+                org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
+                if (process != null) {
+                    processTask.setProcess(process);
+                }
+            }
+
+        } else if (planItemDefinition instanceof DecisionTask) {
+            DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+            if (decisionTask.getDecisionRef() != null) {
+                org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
+                if (decision != null) {
+                    decisionTask.setDecision(decision);
+                }
+            }
+
+        } else if (planItemDefinition instanceof TimerEventListener) {
+            TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+            String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
+            PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
+            if (startTriggerPlanItem != null) {
+                timerEventListener.setTimerStartTriggerPlanItem(startTriggerPlanItem);
+
+                // Although the CMMN spec does not categorize the timer start trigger as an entry criterion,
+                // it is exposed as such to the engine as there is no difference in handling it vs a real criterion
+                // which means no special care will need to be taken in the core engine operations
+
+                Criterion criterion = new Criterion();
+                criterion.setId(generateEntryCriterionId(planItem));
+                criterion.setEntryCriterion(true);
+
+                SentryOnPart sentryOnPart = new SentryOnPart();
+                sentryOnPart.setSourceRef(startTriggerPlanItem.getId());
+                sentryOnPart.setSource(startTriggerPlanItem);
+                sentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
+
+                Sentry sentry = new Sentry();
+                sentry.addSentryOnPart(sentryOnPart);
+
+                criterion.setSentry(sentry);
+                planItem.addEntryCriterion(criterion);
+            }
+        } else if (planItemDefinition instanceof CasePageTask) {
+            // check, if the parent completion rule is set and if not, set it to the default value for a case page which is always ignore
+            if (planItem.getItemControl() == null) {
+                PlanItemControl planItemControl = new PlanItemControl();
+                planItem.setItemControl(planItemControl);
+            }
+            if (planItem.getItemControl().getParentCompletionRule() == null) {
+                ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
+                parentCompletionRule.setType(ParentCompletionRule.IGNORE);
+
+                planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
+            }
+        }
     }
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {
@@ -646,6 +680,39 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 baseElement.setId(id);
                 elementsWithId.put(id, baseElement);
             }
+        }
+    }
+
+    protected void processAssociations(CmmnModel cmmnModel) {
+        List<Association> associations = cmmnModel.getAssociations();
+        for (Association association : associations) {
+
+            String sourceRef = association.getSourceRef();
+            if (sourceRef != null && association.getSourceElement() == null) {
+                PlanItem planItem = cmmnModel.findPlanItem(sourceRef);
+                if (planItem != null) {
+                    association.setSourceElement(planItem);
+                } else {
+                    TextAnnotation textAnnotation = cmmnModel.findTextAnnotation(sourceRef);
+                    if (textAnnotation != null) {
+                        association.setSourceElement(textAnnotation);
+                    }
+                }
+            }
+
+            String targetRef = association.getTargetRef();
+            if (targetRef != null && association.getTargetElement() == null) {
+                PlanItem planItem = cmmnModel.findPlanItem(targetRef);
+                if (planItem != null) {
+                    association.setTargetElement(planItem);
+                } else {
+                    TextAnnotation textAnnotation = cmmnModel.findTextAnnotation(targetRef);
+                    if (textAnnotation != null) {
+                        association.setTargetElement(textAnnotation);
+                    }
+                }
+            }
+
         }
     }
 

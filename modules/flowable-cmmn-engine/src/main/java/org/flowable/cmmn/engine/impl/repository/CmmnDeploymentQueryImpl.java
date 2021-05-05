@@ -245,6 +245,22 @@ public class CmmnDeploymentQueryImpl extends AbstractQuery<CmmnDeploymentQuery, 
         return key;
     }
 
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    public String getParentDeploymentIdLike() {
+        return parentDeploymentIdLike;
+    }
+
+    public List<String> getParentDeploymentIds() {
+        return parentDeploymentIds;
+    }
+
+    public boolean isLatest() {
+        return latest;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

@@ -123,11 +123,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     public void notify(DelegateTask delegateTask) {
         TaskListener taskListenerInstance = getTaskListenerInstance();
 
-        try {
-            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
-        } catch (Exception e) {
-            throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
-        }
+        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new TaskListenerInvocation(taskListenerInstance, delegateTask));
     }
 
     @Override

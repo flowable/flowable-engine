@@ -14,7 +14,11 @@ package org.flowable.standalone.cfg;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +29,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author jbarrez
+ * @author Filip Hrisafov
  */
 public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
@@ -36,7 +41,9 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
     public void testSelectTaskColumns() {
 
         // Create test data
+        Instant start = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         for (int i = 0; i < 5; i++) {
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(start.plus(i, ChronoUnit.MINUTES)));
             org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf(i));
             taskService.saveTask(task);
@@ -54,13 +61,19 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Verify
         List<Map<String, Object>> tasks = managementService.executeCustomSql(customSqlExecution);
-        assertThat(tasks).hasSize(5);
-        for (int i = 0; i < 5; i++) {
-            Map<String, Object> task = tasks.get(i);
-            assertThat(getValue(task, "id")).isNotNull();
-            assertThat(getValue(task, "name")).isNotNull();
-            assertThat(getValue(task, "createTime")).isNotNull();
-        }
+        assertThat(tasks)
+                .extracting(task -> getValue(task, "name"), task -> getValue(task, "createTime"))
+                .containsExactlyInAnyOrder(
+                        tuple("0", Date.from(start)),
+                        tuple("1", Date.from(start.plus(1, ChronoUnit.MINUTES))),
+                        tuple("2", Date.from(start.plus(2, ChronoUnit.MINUTES))),
+                        tuple("3", Date.from(start.plus(3, ChronoUnit.MINUTES))),
+                        tuple("4", Date.from(start.plus(4, ChronoUnit.MINUTES)))
+                );
+
+        assertThat(tasks)
+                .extracting(task -> getValue(task, "id"))
+                .doesNotContainNull();
 
         // Cleanup
         for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {

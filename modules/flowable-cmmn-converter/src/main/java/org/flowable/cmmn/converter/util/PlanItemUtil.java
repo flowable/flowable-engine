@@ -15,7 +15,9 @@ package org.flowable.cmmn.converter.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 
 /**
@@ -39,6 +41,22 @@ public class PlanItemUtil {
             if (parentPlanItem != null) {
                 parentPlanItems.add(parentPlanItem);
                 internalGetParentPlanItems(parentPlanItem, parentPlanItems);
+            }
+        }
+    }
+
+    public static List<PlanItem> getAllChildPlanItems(PlanFragment planFragment) {
+        List<PlanItem> planItems = new ArrayList<>();
+        internalGetAllChildPlanItems(planFragment, planItems);
+        return planItems;
+    }
+
+    protected static void internalGetAllChildPlanItems(PlanFragment planFragment, List<PlanItem> planItems) {
+        for (PlanItem planItem : planFragment.getPlanItems()) {
+            planItems.add(planItem);
+            PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            if (planItemDefinition instanceof PlanFragment) {
+                internalGetAllChildPlanItems((PlanFragment) planItemDefinition, planItems);
             }
         }
     }

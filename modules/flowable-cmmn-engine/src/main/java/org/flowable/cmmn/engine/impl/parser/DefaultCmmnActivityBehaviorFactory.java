@@ -34,6 +34,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
+import org.flowable.cmmn.engine.impl.behavior.impl.VariableEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.http.DefaultCmmnHttpActivityDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
@@ -55,6 +56,7 @@ import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.model.UserEventListener;
+import org.flowable.cmmn.model.VariableEventListener;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -143,6 +145,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public EventRegistryEventListenerActivityBehaviour createEventRegistryEventListenerActivityBehaviour(PlanItem planItem, GenericEventListener genericEventListener) {
         return new EventRegistryEventListenerActivityBehaviour(createExpression(genericEventListener.getEventType()));
+    }
+    
+    @Override
+    public VariableEventListenerActivityBehaviour createVariableEventListenerActivityBehaviour(PlanItem planItem, VariableEventListener variableEventListener) {
+        return new VariableEventListenerActivityBehaviour(variableEventListener);
     }
 
     @Override

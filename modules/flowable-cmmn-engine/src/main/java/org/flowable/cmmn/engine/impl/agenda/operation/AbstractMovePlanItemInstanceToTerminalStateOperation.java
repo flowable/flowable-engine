@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -55,6 +56,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  *
  * @author Joram Barrez
  * @author Filip Hrisafov
+ * @author Micha Kiener
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
 
@@ -206,27 +208,29 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         return false;
     }
 
-    protected void completeChildPlanItemInstances() {
-        completeChildPlanItemInstances(null);
-    }
-
-    protected void completeChildPlanItemInstances(String exitCriterionId) {
+    /**
+     * Exits (terminates) all child plan items of the current one (e.g. if the current one is a stage or plan model) on a terminate or complete transition of
+     * the parent as in this case, child plan items not being in an ending state must also be terminated.
+     * Depending on the plan item behavior, it might be delegated to the behavior or the default one is to simply exit the child plan item as well.
+     *
+     * @param parentTransition the transition of the parent plan item to an ending state as it might have an impact on how to end the child plan item
+     * @param exitCriterionId the optional exit criterion being triggered on the parent to end it, might be null
+     * @param exitEventType the optional exit event type, if an exit sentry was triggered, as it might have an impact on the child ending as well
+     */
+    protected void exitChildPlanItemInstances(String parentTransition, String exitCriterionId, String exitEventType) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
-            if (StateTransition.isPossible(child, PlanItemTransition.COMPLETE)) {
-                CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(child);
-            }
-        }
-    }
-    
-    protected void exitChildPlanItemInstances() {
-        exitChildPlanItemInstances(null);
-    }
-
-    protected void exitChildPlanItemInstances(String exitCriterionId) {
-        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
-            if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
+            // if the plan item implements the specific behavior interface for ending, invoke it, otherwise use the default one which is terminate, regardless,
+            // if the case got completed or terminated
+            Object behavior = child.getPlanItem().getBehavior();
+            if (behavior instanceof OnParentEndDependantActivityBehavior) {
+                // if the specific behavior is implemented, invoke it
+                ((OnParentEndDependantActivityBehavior) behavior).onParentEnd(commandContext, child, parentTransition, exitEventType);
+            } else {
+                // use default behavior, if the interface is not implemented
+                if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
+                    // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
+                }
             }
         }
     }

@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -70,6 +71,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected String startedBy;
+    protected Date lastReactivatedBefore;
+    protected Date lastReactivatedAfter;
+    protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -77,7 +81,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String tenantId;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
-    protected Integer caseVariablesLimit;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -352,7 +355,48 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
         return this;
     }
-    
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedBefore(Date beforeTime) {
+        if (beforeTime == null) {
+            throw new FlowableIllegalArgumentException("before time is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBefore = beforeTime;
+        } else {
+            this.lastReactivatedBefore = beforeTime;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedAfter(Date afterTime) {
+        if (afterTime == null) {
+            throw new FlowableIllegalArgumentException("after time is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedAfter = afterTime;
+        } else {
+            this.lastReactivatedAfter = afterTime;
+        }
+
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery lastReactivatedBy(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("user id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBy = userId;
+        } else {
+            this.lastReactivatedBy = userId;
+        }
+
+        return this;
+    }
+
     @Override
     public HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId) {
         if (callbackId == null) {
@@ -564,7 +608,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricCaseInstanceQuery limitCaseVariables(Integer historicCaseVariablesLimit) {
-        this.caseVariablesLimit = historicCaseVariablesLimit;
         return this;
     }
     
@@ -952,10 +995,6 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return includeCaseVariables;
     }
 
-    public Integer getCaseVariablesLimit() {
-        return caseVariablesLimit;
-    }
-
     public List<HistoricCaseInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }
@@ -972,12 +1011,18 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return caseInstanceIds;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
+    public boolean isNeedsCaseDefinitionOuterJoin() {
+        if (isNeedsPaging()) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                // When using oracle, db2 or mssql we don't need outer join for the process definition join.
+                // It is not needed because the outer join order by is done by the row number instead
+                return false;
+            }
         }
-        return specialOrderBy;
+
+        return hasOrderByForColumn(HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
     }
 
 }

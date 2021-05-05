@@ -528,6 +528,57 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
     }
 
     @Test
+    public void logCaseTaskEventsInSameTransaction() {
+        deployOneHumanTaskCaseModel();
+        CaseInstance oneTaskCase = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+        assertThat(oneTaskCase).isNotNull();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase.getId()).singleResult();
+        assertThat(task).isNotNull();
+        try {
+            cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+                cmmnTaskService.setAssignee(task.getId(), "newAssignee");
+                cmmnTaskService.setOwner(task.getId(), "newOwner");
+                cmmnTaskService.complete(task.getId());
+
+                return null;
+            });
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                List<HistoricTaskLogEntry> logEntries = cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+
+                assertThat(logEntries.get(0))
+                    .extracting(
+                        HistoricTaskLogEntry::getType,
+                        HistoricTaskLogEntry::getScopeType,
+                        HistoricTaskLogEntry::getScopeId,
+                        HistoricTaskLogEntry::getSubScopeId,
+                        HistoricTaskLogEntry::getScopeDefinitionId
+                    )
+                    .containsExactly(
+                        "USER_TASK_CREATED",
+                        ScopeTypes.CMMN,
+                        oneTaskCase.getId(),
+                        task.getSubScopeId(),
+                        oneTaskCase.getCaseDefinitionId()
+                    );
+
+                assertThat(logEntries)
+                    .extracting(HistoricTaskLogEntry::getType)
+                    .containsExactly(
+                            "USER_TASK_CREATED",
+                            "USER_TASK_ASSIGNEE_CHANGED",
+                            "USER_TASK_ASSIGNEE_CHANGED",
+                            "USER_TASK_OWNER_CHANGED",
+                            "USER_TASK_COMPLETED"
+                    );
+            }
+        } finally {
+            deleteTaskWithLogEntries(task.getId());
+        }
+    }
+
+    @Test
     public void logAddCandidateUser() {
         deployOneHumanTaskCaseModel();
         CaseInstance oneTaskCase = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();

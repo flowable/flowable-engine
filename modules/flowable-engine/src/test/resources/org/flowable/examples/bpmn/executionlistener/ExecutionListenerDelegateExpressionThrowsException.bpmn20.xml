@@ -1,0 +1,23 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="executionListenersProcess">
+    
+    <startEvent id="theStart" name="Start Event">
+      <extensionElements>
+        <flowable:executionListener delegateExpression="${bean}" event="end" />
+      </extensionElements>
+    </startEvent>
+
+    <sequenceFlow sourceRef="theStart" targetRef="noneEvent" />
+
+    <intermediateThrowEvent id="noneEvent" name="None Event"/>
+    
+    <sequenceFlow sourceRef="noneEvent" targetRef="theEnd" />
+
+    <endEvent id="theEnd" name="End Event"/>
+    
+  </process>
+</definitions>

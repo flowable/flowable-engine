@@ -298,6 +298,30 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return variableNameLike;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Set<String> getTaskIds() {
+        return taskIds;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public Set<String> getExecutionIds() {
+        return executionIds;
+    }
+
+    public boolean isExcludeTaskRelated() {
+        return excludeTaskRelated;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
+    }
+
     public QueryVariableValue getQueryVariableValue() {
         return queryVariableValue;
     }

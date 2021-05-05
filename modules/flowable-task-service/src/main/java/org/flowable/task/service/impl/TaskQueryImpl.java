@@ -131,7 +131,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean excludeSubtasks;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
-    protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -1528,7 +1527,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     @Override
     public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
-        this.taskVariablesLimit = taskVariablesLimit;
         return this;
     }
 
@@ -1536,9 +1534,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
-    }
-    public Integer getTaskVariablesLimit() {
-        return taskVariablesLimit;
     }
 
     public Collection<String> getCandidateGroups() {
@@ -1701,14 +1696,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery orderByTenantId() {
         return orderBy(TaskQueryProperty.TENANT_ID);
-    }
-
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-        }
-        return specialOrderBy;
     }
 
     // results ////////////////////////////////////////////////////////////////
@@ -2131,6 +2118,38 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isOrActive() {
         return orActive;
+    }
+
+    public boolean isUnassigned() {
+        return unassigned;
+    }
+
+    public boolean isNoDelegationState() {
+        return noDelegationState;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isExcludeSubtasks() {
+        return excludeSubtasks;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
     }
 
     @Override

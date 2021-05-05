@@ -21,7 +21,6 @@ import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.cfg.TransactionState;
@@ -127,8 +126,6 @@ public class ListenerNotificationHelper {
                     try {
                         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                                 .handleInvocation(new TaskListenerInvocation((TaskListener) taskListener, taskEntity));
-                    } catch (Exception e) {
-                        throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
                     } finally {
                         taskEntity.setEventName(null);
                     }

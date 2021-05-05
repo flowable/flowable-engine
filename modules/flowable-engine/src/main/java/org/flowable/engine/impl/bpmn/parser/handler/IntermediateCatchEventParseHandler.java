@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,11 @@ public class IntermediateCatchEventParseHandler extends AbstractFlowNodeBpmnPars
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchEventActivityBehavior(intermediateCatchEvent));
 
         } else {
-            if (eventDefinition instanceof TimerEventDefinition || eventDefinition instanceof SignalEventDefinition || 
-                            eventDefinition instanceof MessageEventDefinition || eventDefinition instanceof ConditionalEventDefinition) {
+            if (eventDefinition instanceof TimerEventDefinition || 
+                    eventDefinition instanceof SignalEventDefinition || 
+                    eventDefinition instanceof MessageEventDefinition || 
+                    eventDefinition instanceof ConditionalEventDefinition ||
+                    eventDefinition instanceof VariableListenerEventDefinition) {
 
                 bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
 

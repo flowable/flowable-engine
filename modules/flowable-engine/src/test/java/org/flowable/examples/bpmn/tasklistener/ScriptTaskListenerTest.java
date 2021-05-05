@@ -13,7 +13,10 @@
 package org.flowable.examples.bpmn.tasklistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Rich Kroll, Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
@@ -49,6 +53,26 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
         Object foo = runtimeService.getVariable(processInstance.getId(), "foo");
         assertThat(foo).as("Could not find the 'foo' variable in variable scope").isEqualTo("FOO");
+    }
+
+    @Test
+    @Deployment
+    public void testThrowFlowableIllegalArgumentException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
+    @Test
+    @Deployment
+    public void testThrowNonFlowableException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("problem evaluating script: java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 7")
+                .getRootCause()
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Illegal argument in listener");
     }
 
 }

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -83,7 +84,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected Set<String> involvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
-    protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
     protected String tenantId;
     protected String tenantIdLike;
@@ -449,12 +449,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit) {
-        this.processInstanceVariablesLimit = processInstanceVariablesLimit;
         return this;
-    }
-
-    public Integer getProcessInstanceVariablesLimit() {
-        return processInstanceVariablesLimit;
     }
 
     @Override
@@ -773,15 +768,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return orderBy(HistoricProcessInstanceQueryProperty.TENANT_ID);
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
-        }
-        return specialOrderBy;
-    }
-
     @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
@@ -868,15 +854,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
         for (HistoricProcessInstanceQueryImpl orQueryObject : orQueryObjects) {
             orQueryObject.ensureVariablesInitialized();
-        }
-    }
-
-    @Override
-    protected void checkQueryOk() {
-        super.checkQueryOk();
-
-        if (includeProcessVariables) {
-            this.orderBy(HistoricProcessInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
         }
     }
 
@@ -1080,5 +1057,39 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public List<HistoricProcessInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return involvedUserIdentityLink;
+    }
+
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return involvedGroupIdentityLink;
+    }
+
+    public boolean isWithJobException() {
+        return withJobException;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
+    public boolean isNeedsProcessDefinitionOuterJoin() {
+        if (isNeedsPaging()) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                // When using oracle, db2 or mssql we don't need outer join for the process definition join.
+                // It is not needed because the outer join order by is done by the row number instead
+                return false;
+            }
+        }
+
+        return hasOrderByForColumn(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
     }
 }

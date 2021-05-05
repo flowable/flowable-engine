@@ -18,10 +18,13 @@ import javax.xml.stream.XMLStreamReader;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.ReactivateEventListener;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
+ * @author Micha Kiener
  */
 public abstract class BaseCmmnXmlConverter {
 
@@ -52,6 +55,15 @@ public abstract class BaseCmmnXmlConverter {
                 conversionHelper.getCmmnModel().addCriterion(criterion.getId(), criterion);
             }
 
+            // the reactivate event listener is a very specific user event listener in need to be registered in the case model
+            if (baseElement instanceof ReactivateEventListener) {
+                if (conversionHelper.getCurrentCase().getReactivateEventListener() != null) {
+                    throw new FlowableIllegalArgumentException(
+                        "There can only be one reactivation listener on a case model, not multiple ones. Use a start form on the listener, "
+                        + "if there are several options on how to reactivate a case and use conditions to handle the different options on reactivation.");
+                }
+                conversionHelper.getCurrentCase().setReactivateEventListener((ReactivateEventListener) baseElement);
+            }
         }
         return baseElement;
     }

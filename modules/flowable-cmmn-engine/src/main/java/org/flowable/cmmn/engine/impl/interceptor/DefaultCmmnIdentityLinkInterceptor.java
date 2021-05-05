@@ -64,7 +64,23 @@ public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInter
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.STARTER, cmmnEngineConfiguration);
         }
     }
-    
+
+    @Override
+    public void handleReactivateCaseInstance(CaseInstanceEntity caseInstance) {
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        if (authenticatedUserId != null) {
+            List<IdentityLinkEntity> identityLinks = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .findIdentityLinksByScopeIdAndType(caseInstance.getId(), ScopeTypes.CMMN);
+            for (IdentityLinkEntity identityLink : identityLinks) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(authenticatedUserId) && IdentityLinkType.REACTIVATOR.equals(identityLink.getType())) {
+                    return;
+                }
+            }
+
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.REACTIVATOR, cmmnEngineConfiguration);
+        }
+    }
+
     protected void addUserIdentityLinkToParent(Task task, String userId) {
         if (userId != null && ScopeTypes.CMMN.equals(task.getScopeType()) && StringUtils.isNotEmpty(task.getScopeId())) {
             CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(task.getScopeId());

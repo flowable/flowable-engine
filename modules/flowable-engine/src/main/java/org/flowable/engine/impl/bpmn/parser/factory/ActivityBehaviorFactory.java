@@ -48,6 +48,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -59,6 +60,7 @@ import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivity
 import org.flowable.engine.impl.bpmn.behavior.BoundaryMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundarySignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.BoundaryVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CaseTaskActivityBehavior;
@@ -73,6 +75,7 @@ import org.flowable.engine.impl.bpmn.behavior.EventSubProcessEventRegistryStartE
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessMessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessSignalStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessTimerStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessVariableListenerlStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
@@ -82,6 +85,7 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchEventRegistryEven
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchMessageEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchTimerEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.IntermediateCatchVariableListenerEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
@@ -200,7 +204,7 @@ public interface ActivityBehaviorFactory {
     EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess);
     
     EventSubProcessConditionalStartEventActivityBehavior createEventSubProcessConditionalStartEventActivityBehavior(StartEvent startEvent,
-                                                                                                                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
 
     EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent);
     
@@ -213,7 +217,9 @@ public interface ActivityBehaviorFactory {
     EventSubProcessTimerStartEventActivityBehavior createEventSubProcessTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition);
     
     EventSubProcessEventRegistryStartEventActivityBehavior createEventSubProcessEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey);
-
+    
+    EventSubProcessVariableListenerlStartEventActivityBehavior createEventSubProcessVariableListenerlStartEventActivityBehavior(StartEvent startEvent, VariableListenerEventDefinition variableListenerEventDefinition);
+    
     AdhocSubProcessActivityBehavior createAdhocSubprocessActivityBehavior(SubProcess subProcess);
 
     CallActivityBehavior createCallActivityBehavior(CallActivity callActivity);
@@ -225,17 +231,20 @@ public interface ActivityBehaviorFactory {
     IntermediateCatchEventActivityBehavior createIntermediateCatchEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent);
 
     IntermediateCatchMessageEventActivityBehavior createIntermediateCatchMessageEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-                                                                                                      MessageEventDefinition messageEventDefinition);
+            MessageEventDefinition messageEventDefinition);
     
     IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-                                                                                                              ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
 
     IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition);
 
     IntermediateCatchEventRegistryEventActivityBehavior createIntermediateCatchEventRegistryEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, String eventDefinitionKey);
 
     IntermediateCatchSignalEventActivityBehavior createIntermediateCatchSignalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-                                                                                                    SignalEventDefinition signalEventDefinition, Signal signal);
+            SignalEventDefinition signalEventDefinition, Signal signal);
+    
+    IntermediateCatchVariableListenerEventActivityBehavior createIntermediateCatchVariableListenerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
+            VariableListenerEventDefinition variableListenerEventDefinition);
     
     IntermediateThrowNoneEventActivityBehavior createIntermediateThrowNoneEventActivityBehavior(ThrowEvent throwEvent);
 
@@ -266,11 +275,13 @@ public interface ActivityBehaviorFactory {
     BoundaryMessageEventActivityBehavior createBoundaryMessageEventActivityBehavior(BoundaryEvent boundaryEvent, MessageEventDefinition messageEventDefinition, boolean interrupting);
     
     BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent, ConditionalEventDefinition conditionalEventDefinition,
-                                                                                            String conditionExpression, boolean interrupting);
+            String conditionExpression, boolean interrupting);
     
     BoundaryEscalationEventActivityBehavior createBoundaryEscalationEventActivityBehavior(BoundaryEvent boundaryEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation, boolean interrupting);
 
     BoundaryCompensateEventActivityBehavior createBoundaryCompensateEventActivityBehavior(BoundaryEvent boundaryEvent, CompensateEventDefinition compensateEventDefinition, boolean interrupting);
     
     BoundaryEventRegistryEventActivityBehavior createBoundaryEventRegistryEventActivityBehavior(BoundaryEvent boundaryEvent, String eventDefinitionKey, boolean interrupting);
+    
+    BoundaryVariableListenerEventActivityBehavior createBoundaryVariableListenerEventActivityBehavior(BoundaryEvent boundaryEvent, VariableListenerEventDefinition variableListenerEventDefinition, boolean interrupting);
 }

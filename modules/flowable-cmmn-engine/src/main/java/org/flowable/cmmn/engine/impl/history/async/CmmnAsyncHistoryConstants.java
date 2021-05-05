@@ -25,6 +25,7 @@ public interface CmmnAsyncHistoryConstants {
     
     String TYPE_CASE_INSTANCE_END = "cmmn-case-instance-end";
     String TYPE_CASE_INSTANCE_START = "cmmn-case-instance-start";
+    String TYPE_CASE_INSTANCE_REACTIVATE = "cmmn-case-instance-reactivate";
     String TYPE_UPDATE_CASE_INSTANCE_NAME = "cmmn-update-case-instance-name";
     String TYPE_UPDATE_CASE_INSTANCE_BUSINESS_KEY = "cmmn-update-case-business-key";
     String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";
@@ -178,6 +179,8 @@ public interface CmmnAsyncHistoryConstants {
     String FIELD_STAGE_INSTANCE_ID = "stageInstanceId";
     String FIELD_START_TIME = "startTime";
     String FIELD_START_USER_ID = "startUserId";
+    String FIELD_LAST_REACTIVATION_TIME = "lastReactivationTime";
+    String FIELD_LAST_REACTIVATION_USER_ID = "lastReactivationUserId";
     String FIELD_STATE = "state";
     String FIELD_TASK_ID = "taskId";
     String FIELD_TASK_DEFINITION_ID = "taskDefinitionId";

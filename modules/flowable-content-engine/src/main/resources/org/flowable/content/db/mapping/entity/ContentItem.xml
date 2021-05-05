@@ -181,11 +181,11 @@
     </select>
 
 	<select id="selectContentItemsByQueryCriteria" parameterType="org.flowable.content.engine.impl.ContentItemQueryImpl" resultMap="contentItemResultMap">
-	  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-	    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
-	    ${orderBy}
-	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
 	<select id="selectContentItemCountByQueryCriteria" parameterType="org.flowable.content.engine.impl.ContentItemQueryImpl" resultType="long">

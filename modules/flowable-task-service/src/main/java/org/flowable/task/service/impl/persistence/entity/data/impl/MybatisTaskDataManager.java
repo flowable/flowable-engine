@@ -12,7 +12,6 @@
  */
 package org.flowable.task.service.impl.persistence.entity.data.impl;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,36 +112,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @SuppressWarnings("unchecked")
     public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
         final String query = "selectTasksWithRelatedEntitiesByQueryCriteria";
-        // paging doesn't work for combining task instances and variables due to
-        // an outer join, so doing it in-memory
-
-        int firstResult = taskQuery.getFirstResult();
-        int maxResults = taskQuery.getMaxResults();
-
-        // setting max results, limit to 20000 results for performance reasons
-        if (taskQuery.getTaskVariablesLimit() != null) {
-            taskQuery.setMaxResults(taskQuery.getTaskVariablesLimit());
-        } else {
-            taskQuery.setMaxResults(taskServiceConfiguration.getTaskQueryLimit());
-        }
-        taskQuery.setFirstResult(0);
-
-        List<Task> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheLoadAndStore(query, taskQuery, getManagedEntityClass());
-
-        if (instanceList != null && !instanceList.isEmpty()) {
-            if (firstResult > 0) {
-                if (firstResult <= instanceList.size()) {
-                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
-                    return instanceList.subList(firstResult, toIndex);
-                } else {
-                    return Collections.EMPTY_LIST;
-                }
-            } else {
-                int toIndex = maxResults > 0 ?  Math.min(maxResults, instanceList.size()) : instanceList.size();
-                return instanceList.subList(0, toIndex);
-            }
-        }
-        return Collections.EMPTY_LIST;
+        return getDbSqlSession().selectList(query, taskQuery, getManagedEntityClass());
     }
 
     @Override

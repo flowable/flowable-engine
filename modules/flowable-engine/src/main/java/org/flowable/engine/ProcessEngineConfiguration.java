@@ -121,11 +121,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected AsyncExecutor asyncHistoryExecutor;
     protected AsyncTaskExecutor asyncHistoryTaskExecutor;
     protected boolean shutdownAsyncHistoryTaskExecutor;
-    /**
-     * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
-     * retried again.
-     */
-    protected int lockTimeAsyncJobWaitTime = 60;
+
     /** define the default wait time for a failed job in seconds */
     protected int defaultFailedJobWaitTime = 10;
     /** define the default wait time for a failed async job in seconds */
@@ -752,15 +748,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
         this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
-        return this;
-    }
-
-    public int getLockTimeAsyncJobWaitTime() {
-        return lockTimeAsyncJobWaitTime;
-    }
-
-    public ProcessEngineConfiguration setLockTimeAsyncJobWaitTime(int lockTimeAsyncJobWaitTime) {
-        this.lockTimeAsyncJobWaitTime = lockTimeAsyncJobWaitTime;
         return this;
     }
 

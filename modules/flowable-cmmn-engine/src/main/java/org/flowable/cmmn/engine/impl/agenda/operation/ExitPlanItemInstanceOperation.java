@@ -117,7 +117,7 @@ public class ExitPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
 
             // regardless of the exit event type, we need to exit the child plan items as well (we don't propagate the exit event type though, children are
             // always exited, not completed)
-            exitChildPlanItemInstances(exitCriterionId);
+            exitChildPlanItemInstances(PlanItemTransition.EXIT, exitCriterionId, exitEventType);
         }
 
         planItemInstanceEntity.setExitCriterionId(exitCriterionId);

@@ -507,7 +507,7 @@ List<CustomTask> tasks = managementService.executeCommand(new Command<List<Custo
       @SuppressWarnings("unchecked")
       @Override
       public List<CustomTask> execute(CommandContext commandContext) {
-        return (List<CustomTask>) commandContext.getDbSqlSession().selectList("selectCustomTaskList");
+        return (List<CustomTask>) CommandContextUtil.getDbSqlSession().selectList("selectCustomTaskList");
       }
     });
 ----
@@ -551,13 +551,13 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    return (Long) commandContext.getDbSqlSession()
+    return (Long) CommandContextUtil.getDbSqlSession()
                    .selectOne("selectAttachmentCountByQueryCriteria", this);
   }
 
   @Override
   public List<Attachment> executeList(CommandContext commandContext, Page page) {
-    return commandContext.getDbSqlSession()
+    return CommandContextUtil.getDbSqlSession()
             .selectList("selectAttachmentByQueryCriteria", this);
   }
 ----

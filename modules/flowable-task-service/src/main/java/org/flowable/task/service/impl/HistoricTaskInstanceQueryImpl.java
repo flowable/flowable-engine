@@ -138,7 +138,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean withLocalizationFallback;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
-    protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
@@ -1579,7 +1578,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery limitTaskVariables(Integer taskVariablesLimit) {
-        this.taskVariablesLimit = taskVariablesLimit;
         return this;
     }
 
@@ -1587,10 +1585,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
-    }
-
-    public Integer getTaskVariablesLimit() {
-        return taskVariablesLimit;
     }
 
     @Override
@@ -1749,26 +1743,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQuery orderByTenantId() {
         orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID_);
         return this;
-    }
-
-    @Override
-    protected void checkQueryOk() {
-        super.checkQueryOk();
-        // In case historic query variables are included, an additional order-by
-        // clause should be added
-        // to ensure the last value of a variable is used
-        if (includeProcessVariables || includeTaskLocalVariables) {
-            this.orderBy(HistoricTaskInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
-        }
-    }
-
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
-        }
-        return specialOrderBy;
     }
 
     public Collection<String> getCandidateGroups() {
@@ -2161,6 +2135,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getLocale() {
         return locale;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
     }
 
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {

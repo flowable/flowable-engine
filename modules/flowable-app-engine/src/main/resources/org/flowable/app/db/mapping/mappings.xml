@@ -21,6 +21,7 @@
         <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/ByteArray.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+        <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
         <!-- Engine mappers -->
         <mapper resource="org/flowable/app/db/mapping/entity/AppDeployment.xml" />
@@ -28,7 +29,6 @@
         <mapper resource="org/flowable/app/db/mapping/entity/AppDefinition.xml" />
 
         <!-- Variable support -->
-        <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
         <mapper resource="org/flowable/variable/service/db/mapping/entity/HistoricVariableInstance.xml" />
 

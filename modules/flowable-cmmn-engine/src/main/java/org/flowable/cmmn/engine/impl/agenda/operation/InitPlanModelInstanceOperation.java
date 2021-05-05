@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Case;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -23,23 +23,19 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperation {
     
-    protected CaseInstanceEntity caseInstanceEntity;
-    
     public InitPlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
         super(commandContext, null, caseInstanceEntity);
-        this.caseInstanceEntity = caseInstanceEntity;
     }
     
     @Override
     public void run() {
         super.run();
         
-        Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
-        createPlanItemInstancesForNewStage(commandContext,
-                stage.getPlanItems(), 
-                caseInstanceEntity.getCaseDefinitionId(), 
+        Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
+        createPlanItemInstancesForNewOrReactivatedStage(commandContext, caseModel,
+                caseModel.getPlanModel().getPlanItems(),
                 caseInstanceEntity,
-                null, 
+                null,
                 caseInstanceEntity.getTenantId());
         
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceEntity.getId());

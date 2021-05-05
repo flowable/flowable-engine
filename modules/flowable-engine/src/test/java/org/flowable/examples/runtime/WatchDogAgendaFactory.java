@@ -120,6 +120,11 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
+        public void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId) {
+            agenda.planEvaluateVariableListenerEventsOperation(processDefinitionId, processInstanceId);
+        }
+
+        @Override
         public void planExecuteInactiveBehaviorsOperation() {
             agenda.planExecuteInactiveBehaviorsOperation();
         }

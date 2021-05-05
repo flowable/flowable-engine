@@ -13,18 +13,21 @@
 package org.flowable.cmmn.test.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -33,6 +36,7 @@ import org.junit.Test;
 /**
  * @author martin.grofcik
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
@@ -143,6 +147,88 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
         assertHistoricVariable(caseInstance.getId(), "globalTerminatedVariable", "ok");
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/CaseInstanceLifecycleListenerDelegateExpressionThrowsException.cmmn")
+    public void testListenerWithDelegateExpressionThrowsFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testCaseLifecycleListeners")
+                .transientVariable("bean", new CaseInstanceLifecycleListener() {
+
+                    @Override
+                    public String getSourceState() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getTargetState() {
+                        return null;
+                    }
+
+                    @Override
+                    public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+                        throw new FlowableIllegalArgumentException("Message from listener");
+                    }
+                });
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/listener/CaseInstanceLifecycleListenerDelegateExpressionThrowsException.cmmn")
+    public void testListenerWithDelegateExpressionThrowsNonFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testCaseLifecycleListeners")
+                .transientVariable("bean", new CaseInstanceLifecycleListener() {
+
+                    @Override
+                    public String getSourceState() {
+                        return null;
+                    }
+
+                    @Override
+                    public String getTargetState() {
+                        return null;
+                    }
+
+                    @Override
+                    public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+                        throw new RuntimeException("Message from listener");
+                    }
+                });
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Message from listener");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testListenerWithClassThrowsFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testCaseLifecycleListeners");
+        assertThatThrownBy(builder::start)
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testListenerWithClassThrowsNonFlowableException() {
+        CaseInstanceBuilder builder = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("testCaseLifecycleListeners");
+        assertThatThrownBy(builder::start)
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {
         String variable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), varName);
         assertThat(variable).isEqualTo(value);
@@ -176,6 +262,44 @@ public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFl
             ((CaseInstanceEntity)caseInstance).setVariable("variableFromDelegateExpression", "Hello World from delegate expression");
         }
 
+    }
+
+    public static class ThrowingFlowableExceptionCaseInstanceLifecycleListener implements CaseInstanceLifecycleListener {
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+            throw new FlowableIllegalArgumentException("Illegal argument in listener");
+
+        }
+    }
+
+    public static class ThrowingNonFlowableExceptionCaseInstanceLifecycleListener implements CaseInstanceLifecycleListener {
+
+        @Override
+        public String getSourceState() {
+            return null;
+        }
+
+        @Override
+        public String getTargetState() {
+            return null;
+        }
+
+        @Override
+        public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
+            throw new RuntimeException("Illegal argument in listener");
+
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -83,9 +84,17 @@ public class ScriptingEngines {
 
     protected Object evaluate(String script, String language, Bindings bindings) {
         ScriptEngine scriptEngine = getEngineByName(language);
+        return evaluate(scriptEngine, script, bindings);
+    }
+
+    protected Object evaluate(ScriptEngine scriptEngine, String script, Bindings bindings) {
         try {
             return scriptEngine.eval(script, bindings);
         } catch (ScriptException e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof FlowableException) {
+                throw (FlowableException) rootCause;
+            }
             throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
         }
     }

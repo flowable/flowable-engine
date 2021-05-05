@@ -17,11 +17,15 @@ package org.flowable.job.service.impl.asyncexecutor;
  */
 public interface AcquireAsyncJobsDueLifecycleListener {
 
-    void startAcquiring(String engineName);
+    void startAcquiring(String engineName, int remainingCapacity, int maxAsyncJobsDuePerAcquisition);
+
+    void stopAcquiring(String engineName);
 
     void acquiredJobs(String engineName, int jobsAcquired, int maxAsyncJobsDuePerAcquisition);
 
-    void rejectedJobs(String engineName, int jobsRejected);
+    void rejectedJobs(String engineName, int jobsRejected, int jobsAcquired, int maxAsyncJobsDuePerAcquisition);
+
+    void optimistLockingException(String engineName, int maxAsyncJobsDuePerAcquisition);
 
     void startWaiting(String engineName, long millisToWait);
 

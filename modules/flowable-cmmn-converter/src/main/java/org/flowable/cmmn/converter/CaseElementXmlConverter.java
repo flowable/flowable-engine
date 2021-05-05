@@ -16,7 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
-import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.common.engine.api.FlowableException;
 
 /**
@@ -36,7 +36,7 @@ public abstract class CaseElementXmlConverter extends BaseCmmnXmlConverter {
         CaseElement caseElement = (CaseElement) baseElement;
         if (caseElement != null) {
             conversionHelper.addCaseElement(caseElement);
-            if (!(caseElement instanceof Stage)) {
+            if (!(caseElement instanceof PlanFragment)) {
                 caseElement.setParent(conversionHelper.getCurrentPlanFragment());
             } 
         }

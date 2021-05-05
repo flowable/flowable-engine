@@ -77,6 +77,8 @@ import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
 public interface BpmnRestApiInterceptor {
 
+    void accessEngineProperties();
+
     void accessTaskInfoById(Task task);
     
     void accessTaskInfoWithQuery(TaskQuery taskQuery, TaskQueryRequest request);

@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
@@ -25,6 +28,8 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,10 +106,30 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
     protected void evaluateUntilStable(CommandContext commandContext) {
         Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
-        if (involvedCaseInstanceIds != null) {
+        if (involvedCaseInstanceIds != null && !involvedCaseInstanceIds.isEmpty()) {
+            
+            CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
 
             for (String caseInstanceId : involvedCaseInstanceIds) {
-                CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceId, true);
+                VariableListenerSession variableListenerSession = commandContext.getSession(VariableListenerSession.class);
+                Map<String, List<VariableListenerSessionData>> variableSessionData = variableListenerSession.getVariableData();
+                
+                if (variableSessionData != null) {
+                    List<String> variableListenerCaseInstanceIds = new ArrayList<>();
+                    for (String variableName : variableSessionData.keySet()) {
+                        List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
+                        for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
+                            if (!variableListenerCaseInstanceIds.contains(variableListenerData.getScopeId()) && 
+                                    caseInstanceId.equals(variableListenerData.getScopeId())) {
+                                
+                                variableListenerCaseInstanceIds.add(variableListenerData.getScopeId());
+                                agenda.planEvaluateVariableEventListenersOperation(variableListenerData.getScopeId());
+                            }
+                        }
+                    }
+                }
+                
+                agenda.planEvaluateCriteriaOperation(caseInstanceId, true);
             }
 
             involvedCaseInstanceIds.clear(); // Clearing after scheduling the evaluation. If anything changes, new operations will add ids again.

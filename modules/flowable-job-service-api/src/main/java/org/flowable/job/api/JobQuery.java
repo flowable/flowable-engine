@@ -60,6 +60,11 @@ public interface JobQuery extends Query<JobQuery, Job> {
     
     /** Only select tasks for the given scope type. */
     JobQuery scopeType(String scopeType);
+
+    /**
+     * Only return jobs that do not have a scope type.
+     */
+    JobQuery withoutScopeType();
     
     /** Only select tasks for the given scope definition identifier. */
     JobQuery scopeDefinitionId(String scopeDefinitionId);
@@ -164,5 +169,4 @@ public interface JobQuery extends Query<JobQuery, Job> {
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     JobQuery orderByTenantId();
-
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <process id="intermediateTimerThrowEventProcess" name="test intermediate timer throw" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="timerThrow"/>
+        <intermediateThrowEvent id="timerThrow" name="Timer Throw">
+            <timerEventDefinition>
+                <timeDuration>PT10M</timeDuration>
+            </timerEventDefinition>
+        </intermediateThrowEvent>
+        <sequenceFlow id="flow2" sourceRef="timerThrow" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

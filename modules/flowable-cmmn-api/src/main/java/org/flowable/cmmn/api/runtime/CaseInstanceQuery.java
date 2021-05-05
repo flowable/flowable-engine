@@ -37,6 +37,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceStartedBefore(Date beforeTime);
     CaseInstanceQuery caseInstanceStartedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceStartedBy(String userId);
+    CaseInstanceQuery caseInstanceLastReactivatedBefore(Date beforeTime);
+    CaseInstanceQuery caseInstanceLastReactivatedAfter(Date afterTime);
+    CaseInstanceQuery caseInstanceLastReactivatedBy(String userId);
     CaseInstanceQuery caseInstanceCallbackId(String callbackId);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
     CaseInstanceQuery caseInstanceReferenceId(String referenceId);
@@ -227,7 +230,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
 
     /**
      * Limit case instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);
 
 

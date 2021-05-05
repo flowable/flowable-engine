@@ -49,9 +49,8 @@
     </select>
 
     <select id="selectExternalWorkerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
             and HANDLER_CFG_ = #{parameter.topic, jdbcType=VARCHAR}
@@ -90,13 +89,13 @@
             </trim>
             and LOCK_EXP_TIME_ is null
         </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectExpiredExternalWorkerJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -114,7 +113,8 @@
                 </foreach>
             </if>
         </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
     
     <select id="selectExternalWorkerJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
@@ -148,11 +148,11 @@
     </select>
 
     <select id="selectExternalWorkerJobByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultMap="externalWorkerJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectExternalWorkerJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectExternalWorkerJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultType="long">
@@ -241,6 +241,9 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <if test="withoutScopeType">
+                and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
+            </if>
             <trim prefix="AND (" prefixOverrides="OR" suffix=")">
                 <if test="authorizedUser != null">
                     exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser})
@@ -299,6 +302,14 @@
         ) AS tempTask
 
         )
+    </update>
+
+    <update id="updateExternalWorkerJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_EXTERNAL_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="externalWorkerJobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
     </update>
 
     <!-- JOB INSERT -->

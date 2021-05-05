@@ -23,6 +23,7 @@
     <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
     <mapper resource="org/flowable/common/db/mapping/entity/ByteArray.xml" />
     <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
     <!-- Engine mappers -->
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnDeployment.xml" />
@@ -37,7 +38,6 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricPlanItemInstance.xml" />
     
     <!-- Variable support -->
-    <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
     <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
     <mapper resource="org/flowable/variable/service/db/mapping/entity/HistoricVariableInstance.xml" />
     
@@ -53,7 +53,6 @@
     <mapper resource="org/flowable/eventsubscription/service/db/mapping/entity/EventSubscription.xml" />
     
     <!-- Task support -->
-    <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskLogEntry.xml" />
     <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskInstance.xml" />

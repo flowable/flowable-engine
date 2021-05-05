@@ -500,7 +500,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
         assertThat(decisionServices2).hasSize(2);
 
         List<DmnDecision> decisionTables = repositoryService.createDecisionQuery().decisionType(DecisionTypes.DECISION_TABLE).list();
-        assertThat(decisionServices2).hasSize(2);
+        assertThat(decisionTables).isEmpty();
     }
 
     @Test

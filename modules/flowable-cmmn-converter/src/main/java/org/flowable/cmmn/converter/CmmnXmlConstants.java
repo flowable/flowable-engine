@@ -42,6 +42,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_CASE = "case";
     String ELEMENT_PLAN_MODEL = "casePlanModel";
     String ELEMENT_STAGE = "stage";
+    String ELEMENT_PLAN_FRAGMENT = "planFragment";
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
     String ELEMENT_HUMAN_TASK = "humanTask";
@@ -77,6 +78,9 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     String ATTRIBUTE_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 
+    String ELEMENT_TEXT_ANNOTATION = "textAnnotation";
+    String ELEMENT_ASSOCIATION = "association";
+
     String ATTRIBUTE_TRIGGER_MODE = "triggerMode";
     String ATTRIBUTE_EXIT_EVENT_TYPE = "exitEventType";
     String ATTRIBUTE_EXIT_TYPE = "exitType";
@@ -86,6 +90,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_REPETITION_RULE = "repetitionRule";
     String ELEMENT_COMPLETION_NEUTRAL_RULE = "completionNeutralRule";
     String ELEMENT_PARENT_COMPLETION_RULE = "parentCompletionRule";
+    String ELEMENT_REACTIVATION_RULE = "reactivationRule";
+    String ELEMENT_DEFAULT_REACTIVATION_RULE = "defaultReactivationRule";
 
     String ELEMENT_PROCESS = "process";
     String ELEMENT_DECISION = "decision";
@@ -97,9 +103,11 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
     String ATTRIBUTE_CASE_CANDIDATE_USERS = "candidateStarterUsers";
     String ATTRIBUTE_CASE_CANDIDATE_GROUPS = "candidateStarterGroups";
+    String ELEMENT_TEXT = "text";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
+    String ATTRIBUTE_TARGET_REF = "targetRef";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
@@ -151,6 +159,10 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_TYPE = "type";
 
+    String ATTRIBUTE_ACTIVATE_CONDITION = "activateCondition";
+    String ATTRIBUTE_IGNORE_CONDITION = "ignoreCondition";
+    String ATTRIBUTE_DEFAULT_CONDITION = "defaultCondition";
+
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
@@ -190,6 +202,10 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType"; // Note that this is the same as ELEMENT_EVENT_TYPE. We can't change this (backwards compatibility)
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";
     String ATTRIBUTE_EVENT_LISTENER_SIGNAL_REF = "signalRef";
+    String ATTRIBUTE_EVENT_LISTENER_VARIABLE_NAME = "variableName";
+    String ATTRIBUTE_EVENT_LISTENER_VARIABLE_CHANGE_TYPE = "variableChangeType";
+
+    String ATTRIBUTE_USER_EVENT_LISTENER_REACTIVATE = "reactivateEventListener";
 
     String ELEMENT_EVENT_TYPE = "eventType";
     String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
@@ -210,6 +226,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_DI_LABEL = "CMMNLabel";
     String ELEMENT_DI_BOUNDS = "Bounds";
     String ELEMENT_DI_WAYPOINT = "waypoint";
+    String ELEMENT_DI_EXTENSION = "extension";
+    String ELEMENT_DI_DOCKER = "docker";
     String ATTRIBUTE_DI_CMMN_ELEMENT_REF = "cmmnElementRef";
     String ATTRIBUTE_DI_TARGET_CMMN_ELEMENT_REF = "targetCMMNElementRef";
     String ATTRIBUTE_DI_WIDTH = "width";

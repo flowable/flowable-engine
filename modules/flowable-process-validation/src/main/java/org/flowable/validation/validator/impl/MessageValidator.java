@@ -34,7 +34,7 @@ public class MessageValidator extends ValidatorImpl {
                 // Item ref
                 if (StringUtils.isNotEmpty(message.getItemRef())) {
                     if (!bpmnModel.getItemDefinitions().containsKey(message.getItemRef())) {
-                        addError(errors, Problems.MESSAGE_INVALID_ITEM_REF, null, message, "Item reference is invalid: not found");
+                        addError(errors, Problems.MESSAGE_INVALID_ITEM_REF, message, "Item reference is invalid: not found");
                     }
                 }
 

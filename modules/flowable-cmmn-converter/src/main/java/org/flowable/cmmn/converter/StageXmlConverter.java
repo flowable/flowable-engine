@@ -55,7 +55,7 @@ public class StageXmlConverter extends PlanItemDefinitionXmlConverter {
         }
 
         stage.setCase(conversionHelper.getCurrentCase());
-        stage.setParent(conversionHelper.getCurrentStage());
+        stage.setParent(conversionHelper.getCurrentPlanFragment());
         
         conversionHelper.setCurrentStage(stage);
         conversionHelper.addStage(stage);

@@ -8,25 +8,25 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>6.6.1-SNAPSHOT</version>
+	<version>6.7.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.4.2</spring.boot.version>
-		<spring.framework.version>5.3.4</spring.framework.version>
-		<spring.security.version>5.4.4</spring.security.version>
-		<spring.amqp.version>2.3.4</spring.amqp.version>
-		<spring.kafka.version>2.6.5</spring.kafka.version>
-		<reactor-netty.version>1.0.3</reactor-netty.version>
+		<spring.boot.version>2.4.4</spring.boot.version>
+		<spring.framework.version>5.3.6</spring.framework.version>
+		<spring.security.version>5.4.6</spring.security.version>
+		<spring.amqp.version>2.3.6</spring.amqp.version>
+		<spring.kafka.version>2.6.7</spring.kafka.version>
+		<reactor-netty.version>1.0.6</reactor-netty.version>
 		<jackson.version>2.11.4</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<groovy.version>3.0.7</groovy.version>
+		<groovy.version>3.0.8</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
@@ -775,7 +775,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.25.Final</version>
+				<version>5.4.28.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -995,7 +995,7 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.2.6</version>
+				<version>42.2.19</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>

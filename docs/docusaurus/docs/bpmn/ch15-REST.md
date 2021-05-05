@@ -2894,9 +2894,9 @@ Only one of processDefinitionId, processDefinitionKey or message can be used in 
     }
 
 The request body can contain all possible filters that can be used in the [List process instances](bpmn/ch15-REST.md#list-of-process-instances) URL query. On top of these, it’s possible to provide an array of variables
-to include in the query, with their format [described here](restQueryVariable).
+to include in the query, with their format [described here](#json-query-variable-format).
 
-The general [paging and sorting query-parameters](restPagingAndSort) can be used for this URL.
+The general [paging and sorting query-parameters](paging-and-sorting) can be used for this URL.
 
 <table>
 <caption>Query process instances - Response codes</caption>
@@ -4154,9 +4154,9 @@ Returns all activities which are active in the execution and in all child-execut
     }
 
 The request body can contain all possible filters that can be used in the [List executions](bpmn/ch15-REST.md#list-of-executions) URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables
-to include in the query, with their format [described here](restQueryVariable).
+to include in the query, with their format [described here](#json-query-variable-format).
 
-The general [paging and sorting query-parameters](restPagingAndSort) can be used for this URL.
+The general [paging and sorting query-parameters](paging-and-sorting) can be used for this URL.
 
 <table>
 <caption>Query executions - Response codes</caption>
@@ -10265,6 +10265,11 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <td><p>If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.</p></td>
 <td><p>Boolean</p></td>
 </tr>
+<tr class="even">
+<td><p>withoutScopeType</p></td>
+<td><p>If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.</p></td>
+<td><p>Boolean</p></td>
+</tr>
 <tr class="odd">
 <td><p>sort</p></td>
 <td><p>Field to sort results on, should be one of id, dueDate, executionId, processInstanceId, retries or tenantId.</p></td>
@@ -10663,6 +10668,11 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <td><p>If true, only returns jobs which are unlocked. If false, this parameter is ignored.</p></td>
 </tr>
 <tr class="odd">
+<td><p>withoutScopeType</p></td>
+<td><p>Boolean</p></td>
+<td><p>If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.</p></td>
+</tr>
+<tr class="even">
 <td><p>sort</p></td>
 <td><p>Field to sort results on, should be one of id, dueDate, executionId, processInstanceId, retries or tenantId.</p></td>
 <td><p>String</p></td>

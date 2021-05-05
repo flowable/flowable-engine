@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="variableListener" name="Variable listener">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItemA" name="A" definitionRef="taskA"/>
+            
+            <planItem id="serviceTaskPlanItem" definitionRef="serviceTask">
+            	<entryCriterion id="entryServiceTask" sentryRef="sentryOnServiceTask"/>
+            </planItem>
+            
+            <planItem id="stagePlanItem" name="Stage 1" definitionRef="stage1">
+            	<exitCriterion id="exitcriterion1" sentryRef="sentryOnVariableEventListener" />
+          	</planItem>
+            
+            <sentry id="sentryOnVariableEventListener">
+                <planItemOnPart id="sentryOnVariableEvent" sourceRef="variableEventListenerPlanItem">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            
+            <sentry id="sentryOnServiceTask">
+                <planItemOnPart id="sentryOnTaskCompleteEvent" sourceRef="planItemA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            
+            <humanTask id="taskA" name="A" />
+            <task id="serviceTask" flowable:type="java" flowable:expression="${caseInstance.setVariable('var1', 'test')}" />
+            
+            <stage id="stage1" name="Stage 1">
+            	<planItem id="variableEventListenerPlanItem" definitionRef="variableEventListener"/>
+				<planItem id="planItemB" name="B" definitionRef="taskB" />
+				
+	            <eventListener id="variableEventListener" flowable:eventType="variable" flowable:variableName="var1" />
+	            <humanTask id="taskB" name="B"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
+import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -41,6 +42,8 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
     public BoundaryEventXMLConverter() {
         InParameterParser inParameterParser = new InParameterParser();
         childParserMap.put(inParameterParser.getElementName(), inParameterParser);
+        VariableListenerEventDefinitionParser variableListenerEventDefinitionParser = new VariableListenerEventDefinitionParser();
+        childParserMap.put(variableListenerEventDefinitionParser.getElementName(), variableListenerEventDefinitionParser);
     }
 
     @Override
@@ -57,6 +60,9 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         BoundaryEvent boundaryEvent = new BoundaryEvent();
         BpmnXMLUtil.addXMLLocation(boundaryEvent, xtr);
+        String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
+        boundaryEvent.setId(elementId);
+        
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_BOUNDARY_CANCELACTIVITY))) {
             String cancelActivity = xtr.getAttributeValue(null, ATTRIBUTE_BOUNDARY_CANCELACTIVITY);
             if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(cancelActivity)) {
@@ -101,6 +107,13 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
                 }
             }
         }
+    }
+    
+    @Override
+    protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        BoundaryEvent boundaryEvent = (BoundaryEvent) element;
+        didWriteExtensionStartElement = writeVariableListenerDefinition(boundaryEvent, didWriteExtensionStartElement, xtw);        
+        return didWriteExtensionStartElement;
     }
 
     @Override

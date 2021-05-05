@@ -416,6 +416,14 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return categoryNotEquals;
     }
 
+    public String getAuthorizationUserId() {
+        return authorizationUserId;
+    }
+
+    public boolean isAuthorizationGroupsSet() {
+        return authorizationGroupsSet;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

@@ -24,6 +24,7 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
@@ -55,10 +56,13 @@ public class IntermediateCatchEventValidator extends ProcessLevelValidator {
                 addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_NO_EVENTDEFINITION, process, intermediateCatchEvent, "No event definition for intermediate catch event ");
                 
             } else {
-                if (!(eventDefinition instanceof TimerEventDefinition) && !(eventDefinition instanceof SignalEventDefinition) && 
-                                !(eventDefinition instanceof MessageEventDefinition) && !(eventDefinition instanceof ConditionalEventDefinition)) {
+                if (!(eventDefinition instanceof TimerEventDefinition) && 
+                        !(eventDefinition instanceof SignalEventDefinition) && 
+                        !(eventDefinition instanceof MessageEventDefinition) && 
+                        !(eventDefinition instanceof ConditionalEventDefinition) && 
+                        !(eventDefinition instanceof VariableListenerEventDefinition)) {
                     
-                    addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, "Unsupported intermediate catch event type");
+                    addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, eventDefinition, "Unsupported intermediate catch event type");
                 }
             }
         }

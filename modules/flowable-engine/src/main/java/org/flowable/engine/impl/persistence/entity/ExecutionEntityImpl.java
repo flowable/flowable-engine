@@ -27,11 +27,14 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -599,8 +602,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isScope;
     }
 
+    public boolean getIsScope() {
+        return isScope;
+    }
+
     @Override
     public void setScope(boolean isScope) {
+        this.isScope = isScope;
+    }
+
+    public void setIsScope(boolean isScope) {
         this.isScope = isScope;
     }
 
@@ -808,6 +819,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         
         CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
         
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_CREATE, 
+                variableInstance.getProcessInstanceId(), ScopeTypes.BPMN, variableInstance.getProcessDefinitionId());
+        
         Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
         // Record historic variable
         CommandContextUtil.getHistoryManager().recordVariableCreate(variableInstance, clock.getCurrentTime());
@@ -837,7 +852,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceExecution) {
         super.updateVariableInstance(variableInstance, value);
 
-        Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_UPDATE, 
+                variableInstance.getProcessInstanceId(), ScopeTypes.BPMN, variableInstance.getProcessDefinitionId());
+        
+        Clock clock = processEngineConfiguration.getClock();
         CommandContextUtil.getHistoryManager().recordHistoricDetailVariableCreate(variableInstance, sourceExecution, true,
             getRelatedActivityInstanceId(sourceExecution), clock.getCurrentTime());
 
@@ -964,9 +984,17 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     public boolean isConcurrent() {
         return isConcurrent;
     }
+    
+    public boolean getIsConcurrent() {
+        return isConcurrent;
+    }
 
     @Override
     public void setConcurrent(boolean isConcurrent) {
+        this.isConcurrent = isConcurrent;
+    }
+
+    public void setIsConcurrent(boolean isConcurrent) {
         this.isConcurrent = isConcurrent;
     }
 
@@ -975,8 +1003,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isActive;
     }
 
+    public boolean getIsActive() {
+        return isActive;
+    }
+
     @Override
     public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -990,8 +1026,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEnded;
     }
 
+    public boolean setIsEnded() {
+        return isEnded;
+    }
+
     @Override
     public void setEnded(boolean isEnded) {
+        this.isEnded = isEnded;
+    }
+
+    public void setIsEnded(boolean isEnded) {
         this.isEnded = isEnded;
     }
 
@@ -1035,8 +1079,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEventScope;
     }
 
+    public boolean getIsEventScope() {
+        return isEventScope;
+    }
+
     @Override
     public void setEventScope(boolean isEventScope) {
+        this.isEventScope = isEventScope;
+    }
+
+    public void setIsEventScope(boolean isEventScope) {
         this.isEventScope = isEventScope;
     }
 
@@ -1045,8 +1097,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isMultiInstanceRoot;
     }
 
+    public boolean getIsMultiInstanceRoot() {
+        return isMultiInstanceRoot;
+    }
+
     @Override
     public void setMultiInstanceRoot(boolean isMultiInstanceRoot) {
+        this.isMultiInstanceRoot = isMultiInstanceRoot;
+    }
+
+    public void setIsMultiInstanceRoot(boolean isMultiInstanceRoot) {
         this.isMultiInstanceRoot = isMultiInstanceRoot;
     }
 
@@ -1055,8 +1115,16 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isCountEnabled;
     }
 
+    public boolean getIsCountEnabled() {
+        return isCountEnabled;
+    }
+
     @Override
     public void setCountEnabled(boolean isCountEnabled) {
+        this.isCountEnabled = isCountEnabled;
+    }
+
+    public void setIsCountEnabled(boolean isCountEnabled) {
         this.isCountEnabled = isCountEnabled;
     }
 
