@@ -54,7 +54,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/XE
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver
@@ -103,7 +103,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -Pdmn,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/XE
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver
@@ -153,7 +153,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -Pcontent,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/XE
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver
