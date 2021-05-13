@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.util.List;
 
@@ -34,29 +35,28 @@ public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testAddCommentToProcessInstance() {
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcessInstanceComment");
+        assumeThat(HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcessInstanceComment");
 
-            taskService.addComment(null, processInstance.getId(), "Hello World");
+        taskService.addComment(null, processInstance.getId(), "Hello World");
 
-            List<Comment> comments = taskService.getProcessInstanceComments(processInstance.getId());
-            assertThat(comments).hasSize(1);
+        List<Comment> comments = taskService.getProcessInstanceComments(processInstance.getId());
+        assertThat(comments).hasSize(1);
 
-            List<Comment> commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "comment");
-            assertThat(commentsByType).hasSize(1);
+        List<Comment> commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "comment");
+        assertThat(commentsByType).hasSize(1);
 
-            commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "noThisType");
-            assertThat(commentsByType).isEmpty();
+        commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "noThisType");
+        assertThat(commentsByType).isEmpty();
 
-            // Suspend process instance
-            runtimeService.suspendProcessInstanceById(processInstance.getId());
-            assertThatThrownBy(() -> taskService.addComment(null, processInstance.getId(), "Hello World 2"))
-                    .isInstanceOf(FlowableException.class)
-                    .hasMessageContaining("Cannot add a comment to a suspended execution");
+        // Suspend process instance
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+        assertThatThrownBy(() -> taskService.addComment(null, processInstance.getId(), "Hello World 2"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Cannot add a comment to a suspended execution");
 
-            // Delete comments again
-            taskService.deleteComments(null, processInstance.getId());
-        }
+        // Delete comments again
+        taskService.deleteComments(null, processInstance.getId());
     }
 
 }
