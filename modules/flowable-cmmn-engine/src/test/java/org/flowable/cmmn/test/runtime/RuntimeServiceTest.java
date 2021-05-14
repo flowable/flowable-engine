@@ -872,6 +872,96 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
         }
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testDeleteCaseInstance() {
+
+        // Task A active
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance, 0);
+
+        // Task B active
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance, 1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testDeleteCaseInstanceWithListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+        
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        }).isInstanceOf(FlowableException.class);
+        
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance, 1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testDeleteCaseInstanceWithListenerAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/RuntimeServiceTest.testDeleteCaseInstanceWithListener.cmmn"
+    })
+    public void testDeleteCaseInstanceWithListenerAndCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCaseWithCaseTask").start();
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+        
+        CaseInstance subCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("myCase").singleResult();
+        assertThat(subCaseInstance).isNotNull();
+        
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        }).isInstanceOf(FlowableException.class);
+        
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance, 0);
+        assertCaseInstanceEnded(subCaseInstance, 0);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+            
+            HistoricCaseInstance historicSubCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(subCaseInstance.getId())
+                    .singleResult();
+            assertThat(historicSubCaseInstance).isNotNull();
+            assertThat(historicSubCaseInstance.getStartTime()).isNotNull();
+            assertThat(historicSubCaseInstance.getEndTime()).isNotNull();
+            assertThat(historicSubCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+        }
+    }
 
     @Test
     @CmmnDeployment

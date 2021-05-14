@@ -36,5 +36,7 @@ public interface CaseInstanceService {
     void deleteCaseInstance(String caseInstanceId);
 
     void deleteCaseInstancesForExecutionId(String executionId);
+    
+    void deleteCaseInstanceWithoutAgenda(String caseInstanceId);
 
 }

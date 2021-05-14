@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -219,6 +220,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
             CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(delegatePlanItemInstance.getReferenceId());
             if (caseInstance != null && !caseInstance.isDeleted()) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
+                        caseInstance, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
                 caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
             }
             

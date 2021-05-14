@@ -153,7 +153,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         executionEntityManager.deleteChildExecutions(parentExecution, Collections.singletonList(outgoingExecutionEntity.getId()), null,
                 deleteReason, true, outgoingExecutionEntity.getCurrentFlowElement());
 
-        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false, true, outgoingExecutionEntity.getCurrentFlowElement());
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false, false, true, outgoingExecutionEntity.getCurrentFlowElement());
     }
 
     public boolean isInterrupting() {

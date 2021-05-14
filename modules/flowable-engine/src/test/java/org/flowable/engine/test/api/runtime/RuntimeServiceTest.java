@@ -451,6 +451,66 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             assertThat(historicInstance.getEndTime()).isNotNull();
         }
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessWithListener.bpmn20.xml" })
+    public void testDeleteProcessInstanceWithListener() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+
+        String deleteReason = "testing instance deletion";
+        runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isZero();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicInstance).isNotNull();
+            assertThat(historicInstance.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(historicInstance.getEndTime()).isNotNull();
+        }
+    }
+    
+    @Test
+    @Deployment(resources = { 
+            "org/flowable/engine/test/api/taskProcessWithCallActivityListener.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcessWithListener.bpmn20.xml" 
+    })
+    public void testDeleteProcessInstanceWithCallActivityListener() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAndCallActivityProcess");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("taskAndCallActivityProcess").count()).isEqualTo(1);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").singleResult();
+        assertThat(subProcessInstance).isNotNull();
+        
+        String deleteReason = "testing instance deletion";
+        runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("taskAndCallActivityProcess").count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(historicInstance).isNotNull();
+            assertThat(historicInstance.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(historicInstance.getEndTime()).isNotNull();
+            
+            HistoricProcessInstance historicSubInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(subProcessInstance.getId())
+                    .singleResult();
+
+            assertThat(historicSubInstance).isNotNull();
+            assertThat(historicSubInstance.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(historicSubInstance.getEndTime()).isNotNull();
+        }
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })

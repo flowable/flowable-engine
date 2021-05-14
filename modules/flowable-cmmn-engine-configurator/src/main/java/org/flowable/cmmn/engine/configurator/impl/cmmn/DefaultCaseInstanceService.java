@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -140,4 +141,20 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         }
     }
 
+    @Override
+    public void deleteCaseInstanceWithoutAgenda(String caseInstanceId) {
+        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
+            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted()) {
+                return null;
+            }
+
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
+                    caseInstanceEntity, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
+            
+            cmmnEngineConfiguration.getCaseInstanceEntityManager().delete(caseInstanceEntity.getId(), false, "cmmn-state-transition-delete-case");
+            
+            return null;
+        });
+    }
 }

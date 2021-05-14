@@ -138,7 +138,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         subProcessExecution.setCurrentFlowElement(subProcess);
         subProcessExecution.setScope(true);
 
-        CommandContextUtil.getExecutionEntityManager(commandContext).deleteRelatedDataForExecution(execution, null);
+        CommandContextUtil.getExecutionEntityManager(commandContext).deleteRelatedDataForExecution(execution, null, false);
         CommandContextUtil.getExecutionEntityManager(commandContext).delete(execution);
         execution = subProcessExecution;
     }
@@ -241,7 +241,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         FlowElement flowElement = execution.getCurrentFlowElement();
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        executionEntityManager.deleteRelatedDataForExecution(execution, null);
+        executionEntityManager.deleteRelatedDataForExecution(execution, null, false);
         executionEntityManager.delete(execution);
         
         ExecutionEntity multiInstanceRootExecution = executionEntityManager.createChildExecution(parentExecution);

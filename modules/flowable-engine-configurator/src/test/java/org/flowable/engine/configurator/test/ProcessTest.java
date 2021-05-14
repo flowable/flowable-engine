@@ -22,15 +22,23 @@ import java.util.Map;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.test.FlowableAppTestCase;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormDefinition;
@@ -349,6 +357,69 @@ public class ProcessTest extends FlowableAppTestCase {
             }
             
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+
+        } finally {
+            processEngineConfiguration.getRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
+            
+            cmmnEngineConfiguration.getCmmnRepositoryService()
+                    .createDeploymentQuery()
+                    .list()
+                    .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
+        }
+    }
+    
+    @Test
+    public void testProcessWithCaseTaskAndListener() throws Exception {
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) appEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+        TaskService taskService = processEngineConfiguration.getTaskService();
+        HistoryService historyService = processEngineConfiguration.getHistoryService();
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        
+        cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithListener.cmmn")
+                .deploy();
+        
+        processEngineConfiguration.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/caseTaskProcessWithListener.bpmn20.xml")
+                .deploy();
+        
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("caseTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+            
+            CaseInstance subCaseInstance = cmmnEngineConfiguration.getCmmnRuntimeService()
+                    .createCaseInstanceQuery()
+                    .caseDefinitionKey("caseWithListener")
+                    .singleResult();
+            assertThat(subCaseInstance).isNotNull();
+            
+            runtimeService.deleteProcessInstance(processInstance.getId(), "some reason");
+            
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list().size()).isZero();
+            assertThat(cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceQuery().caseInstanceId(subCaseInstance.getId()).list().size()).isZero();
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery().caseInstanceId(subCaseInstance.getId()).count()).isEqualTo(1);
+                HistoricCaseInstance historicCaseInstance = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
+                        .caseInstanceId(subCaseInstance.getId())
+                        .singleResult();
+                assertThat(historicCaseInstance.getEndTime()).isNotNull();
+                assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+                
+                assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+                HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .singleResult();
+                assertThat(historicProcessInstance.getEndTime()).isNotNull();
+            }
 
         } finally {
             processEngineConfiguration.getRepositoryService()
