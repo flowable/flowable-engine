@@ -4,7 +4,7 @@
   xmlns:flowable="http://flowable.org/bpmn"
   targetNamespace="Examples">
   
-  <process id="process">
+  <process id="correlation">
   
     <startEvent id="theStart">
         <extensionElements>

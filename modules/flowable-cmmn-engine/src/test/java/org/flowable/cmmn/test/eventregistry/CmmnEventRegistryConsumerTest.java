@@ -384,6 +384,33 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(2);
         }
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseStartOnlyOneInstance.cmmn")
+    public void testCaseStartOneInstanceWithMultipleCaseDefinitionVersions() {
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(1);
+        
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
+        try {
+            deployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseStartOnlyOneInstance.cmmn")
+                .deploy();
+            
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("testCaseStartEvent").latestVersion().singleResult().getVersion()).isEqualTo(2);
+            
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(1);
+    
+            inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(2);
+            inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("testCaseStartEvent").count()).isEqualTo(2);
+            
+        } finally {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
