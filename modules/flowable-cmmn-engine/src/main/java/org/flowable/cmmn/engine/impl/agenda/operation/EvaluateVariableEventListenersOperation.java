@@ -12,27 +12,23 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.VariableEventListener;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class EvaluateVariableEventListenersOperation extends AbstractEvaluationCriteriaOperation {
 
@@ -58,63 +54,55 @@ public class EvaluateVariableEventListenersOperation extends AbstractEvaluationC
             return;
         }
         
-        Map<String, List<PlanItemInstanceEntity>> variableListenerMap = new HashMap<>();
-        collectVariableListenerPlanItemInstances(caseInstanceEntity, variableListenerMap);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        List<EventSubscriptionEntity> eventSubscriptionEntities = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionEntityManager()
+                .findEventSubscriptionsByScopeIdAndType(caseInstanceEntity.getId(), "variable");
         
         boolean triggeredPlanItemInstance = false;
-        for (String variableName : variableSessionData.keySet()) {
+        for (EventSubscriptionEntity eventSubscription : eventSubscriptionEntities) {
             
-            if (!variableListenerMap.containsKey(variableName)) {
+            if (eventSubscription.isDeleted() || !variableSessionData.containsKey(eventSubscription.getEventName())) {
                 continue;
             }
             
-            List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
+            List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(eventSubscription.getEventName());
             Iterator<VariableListenerSessionData> itVariableListener = variableListenerDataList.iterator();
             while (itVariableListener.hasNext()) {
                 VariableListenerSessionData variableListenerData = itVariableListener.next();
                
-                for (PlanItemInstanceEntity planItemInstanceEntity : variableListenerMap.get(variableName)) {
-                    if (!planItemInstanceEntity.getCaseInstanceId().equals(variableListenerData.getScopeId())) {
-                        continue;
-                    }
-                    
-                    PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
-                    VariableEventListener variableEventListener = (VariableEventListener) planItemDefinition;
-                    if (StringUtils.isEmpty(variableEventListener.getVariableChangeType()) || variableEventListener.getVariableChangeType().equals(variableListenerData.getChangeType()) ||
-                            VariableListenerEventDefinition.CHANGE_TYPE_ALL.equals(variableEventListener.getVariableChangeType()) ||
-                            (VariableListenerEventDefinition.CHANGE_TYPE_UPDATE_CREATE.equals(variableEventListener.getVariableChangeType()) &&
-                                    (VariableListenerEventDefinition.CHANGE_TYPE_CREATE.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_UPDATE.equals(variableListenerData.getChangeType())))) {
-                        
-                        itVariableListener.remove();
-                        CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
-                        triggeredPlanItemInstance = true;
+                if (!caseInstanceEntity.getId().equals(variableListenerData.getScopeId())) {
+                    continue;
+                }
+                
+                String subScopeId = eventSubscription.getSubScopeId();
+                PlanItemInstanceEntity planItemInstance = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(subScopeId);
+                
+                String configuration = eventSubscription.getConfiguration();
+                String changeTypeValue = VariableListenerEventDefinition.CHANGE_TYPE_ALL;
+                if (StringUtils.isNotEmpty(configuration)) {
+                    try {
+                        JsonNode configNode = cmmnEngineConfiguration.getObjectMapper().readTree(configuration);
+                        if (configNode.has(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY) && !configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).isNull()) {
+                            changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asText();
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error reading variable listener configuration value for " + eventSubscription.getActivityId(), e);
                     }
                 }
-            }               
+            
+                if (changeTypeValue.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_ALL.equals(changeTypeValue) ||
+                            (VariableListenerEventDefinition.CHANGE_TYPE_UPDATE_CREATE.equals(changeTypeValue) &&
+                                    (VariableListenerEventDefinition.CHANGE_TYPE_CREATE.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_UPDATE.equals(variableListenerData.getChangeType())))) {
+                        
+                    itVariableListener.remove();
+                    CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstance);
+                    triggeredPlanItemInstance = true;
+                }         
+            }
         }
         
         if (!triggeredPlanItemInstance) { 
             markAsNoop();
-        }
-    }
-    
-    protected void collectVariableListenerPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer,
-            Map<String, List<PlanItemInstanceEntity>> variableListenerMap) {
-        
-        for (PlanItemInstance planItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
-            if (planItemDefinition instanceof VariableEventListener && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
-                VariableEventListener variableEventListener = (VariableEventListener) planItemDefinition;
-                if (!variableListenerMap.containsKey(variableEventListener.getVariableName())) {
-                    variableListenerMap.put(variableEventListener.getVariableName(), new ArrayList<>());
-                }
-                
-                variableListenerMap.get(variableEventListener.getVariableName()).add(planItemInstanceEntity);
-            
-            } else if (planItemDefinition instanceof Stage) {
-                collectVariableListenerPlanItemInstances(planItemInstanceEntity, variableListenerMap);
-            }
         }
     }
 

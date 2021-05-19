@@ -14,6 +14,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.impl.context.Context;
@@ -25,6 +26,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -47,11 +50,19 @@ public class BoundaryVariableListenerEventActivityBehavior extends BoundaryEvent
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        
+        String configuration = null;
+        if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableChangeType())) {
+            ObjectNode configurationNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+            configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableListenerEventDefinition.getVariableChangeType());
+            configuration = configurationNode.toString();
+        }
+        
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
                 .getEventSubscriptionService().createEventSubscriptionBuilder()
                     .eventType("variable")
                     .eventName(variableListenerEventDefinition.getVariableName())
-                    .configuration(variableListenerEventDefinition.getVariableChangeType())
+                    .configuration(configuration)
                     .executionId(executionEntity.getId())
                     .processInstanceId(executionEntity.getProcessInstanceId())
                     .activityId(executionEntity.getCurrentActivityId())

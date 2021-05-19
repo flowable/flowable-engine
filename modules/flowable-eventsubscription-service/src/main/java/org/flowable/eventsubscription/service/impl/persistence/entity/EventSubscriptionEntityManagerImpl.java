@@ -168,6 +168,11 @@ public class EventSubscriptionEntityManagerImpl
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
         return dataManager.findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
     }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type) {
+        return dataManager.findEventSubscriptionsByScopeIdAndType(scopeId, type);
+    }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByName(String type, String eventName, String tenantId) {

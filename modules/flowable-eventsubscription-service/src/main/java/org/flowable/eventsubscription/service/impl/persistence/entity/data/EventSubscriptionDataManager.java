@@ -61,6 +61,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    
+    List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByName(final String type, final String eventName, final String tenantId);
 

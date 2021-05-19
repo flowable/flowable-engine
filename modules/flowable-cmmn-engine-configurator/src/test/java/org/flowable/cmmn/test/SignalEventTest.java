@@ -13,11 +13,19 @@
 package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -263,6 +271,34 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
         }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testPassVariablesThroughCaseInstanceService() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSignalEventListener").start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list())
+            .extracting(Task::getName)
+            .containsOnly("A");
+
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery()
+            .scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
+        assertThat(eventSubscription.getEventType()).isEqualTo("signal");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("hello", "world");
+        variables.put("someNumber", 12345);
+
+        CaseInstanceService caseInstanceService = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getCaseInstanceService();
+        caseInstanceService.handleSignalEvent((EventSubscriptionEntity) eventSubscription, variables);
+
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list())
+            .extracting(Task::getName)
+            .containsOnly("A", "B");
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+            .containsOnly(entry("hello", "world"), entry("someNumber", 12345));
+
     }
 
 }

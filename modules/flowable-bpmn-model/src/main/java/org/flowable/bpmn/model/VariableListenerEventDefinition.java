@@ -22,6 +22,8 @@ public class VariableListenerEventDefinition extends EventDefinition {
     public static final String CHANGE_TYPE_CREATE = "create";
     public static final String CHANGE_TYPE_UPDATE_CREATE = "update-create";
     public static final String CHANGE_TYPE_DELETE = "delete";
+    
+    public static final String CHANGE_TYPE_PROPERTY = "changeType";
 
     protected String variableName;
     protected String variableChangeType;

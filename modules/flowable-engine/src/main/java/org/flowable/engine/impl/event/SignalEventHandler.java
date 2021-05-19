@@ -55,25 +55,29 @@ public class SignalEventHandler extends AbstractEventHandler {
                 throw new FlowableException("Could not handle signal: process definition with id: " + processDefinitionId + " is suspended");
             }
 
+            // Start process instance via the flow element linked to the event
             FlowElement flowElement = process.getFlowElement(eventSubscription.getActivityId(), true);
             if (flowElement == null) {
                 throw new FlowableException("Could not find matching FlowElement for activityId " + eventSubscription.getActivityId());
             }
 
-            // Start process instance via that flow element
-            Map<String, Object> variables = null;
-            if (payload instanceof Map) {
-                variables = (Map<String, Object>) payload;
-            }
             ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-            processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinition, null, null, flowElement, process, variables, null, true);
+            processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinition, null, null, flowElement, process, getPayloadAsMap(payload), null, true);
 
         } else if (eventSubscription.getScopeId() != null && ScopeTypes.CMMN.equals(eventSubscription.getScopeType())) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getCaseInstanceService().handleSignalEvent(eventSubscription);
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getCaseInstanceService().handleSignalEvent(eventSubscription, getPayloadAsMap(payload));
         
         } else {
             throw new FlowableException("Invalid signal handling: no execution nor process definition set");
         }
+    }
+
+    protected Map<String, Object> getPayloadAsMap(Object payload) {
+        Map<String, Object> variables = null;
+        if (payload instanceof Map) {
+            variables = (Map<String, Object>) payload;
+        }
+        return variables;
     }
 
 }

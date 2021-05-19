@@ -56,7 +56,7 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
             compatibilityHandler.deleteProcessInstance(processInstanceId, deleteReason);
         } else {
-            CommandContextUtil.getExecutionEntityManager(commandContext).deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), deleteReason, false);
+            CommandContextUtil.getExecutionEntityManager(commandContext).deleteProcessInstance(processInstanceEntity.getProcessInstanceId(), deleteReason, false, true);
         }
 
         return null;
