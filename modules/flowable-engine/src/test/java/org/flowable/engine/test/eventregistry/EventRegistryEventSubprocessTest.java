@@ -14,6 +14,7 @@
 package org.flowable.engine.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashMap;
@@ -226,6 +227,28 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
     @Test
     @Deployment
+    public void testNonInterruptingSubProcessWithVariables() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "kermit");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("customerIdVar", "kermit")
+                );
+
+        inboundEventChannelAdapter.triggerTestEvent("kermit", "order1");
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("customerIdVar", "kermit"),
+                        entry("orderIdVar", "order1")
+                );
+    }
+
+    @Test
+    @Deployment
     public void testInterruptingSubProcess() {
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("customerIdVar", "gonzo");
@@ -309,6 +332,29 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         assertProcessEnded(processInstance.getId());
     }
+
+    @Test
+    @Deployment
+    public void testInterruptingSubProcessWithVariables() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("customerIdVar", "gonzo");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("customerIdVar", "gonzo")
+                );
+
+        inboundEventChannelAdapter.triggerTestEvent("gonzo", "order1");
+
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+                .containsOnly(
+                        entry("customerIdVar", "gonzo"),
+                        entry("orderIdVar", "order1")
+                );
+    }
+
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
