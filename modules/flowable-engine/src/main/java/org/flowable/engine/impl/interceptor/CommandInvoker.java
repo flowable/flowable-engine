@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
@@ -74,23 +75,31 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             if (!commandContext.isReused() && CommandContextUtil.hasInvolvedExecutions(commandContext)) {
                 agenda.planExecuteInactiveBehaviorsOperation();
                 
-                VariableListenerSession variableListenerSession = commandContext.getSession(VariableListenerSession.class);
-                Map<String, List<VariableListenerSessionData>> variableSessionData = variableListenerSession.getVariableData();
-                
-                if (variableSessionData != null) {
-                    List<String> processInstanceIds = new ArrayList<>();
-                    for (String variableName : variableSessionData.keySet()) {
-                        List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
-                        for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
-                            if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
-                                processInstanceIds.add(variableListenerData.getScopeId());
-                                agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
-                            }
+                executeOperations(commandContext);
+            }
+            
+            VariableListenerSession variableListenerSession = commandContext.getSession(VariableListenerSession.class);
+            Map<String, List<VariableListenerSessionData>> variableSessionData = variableListenerSession.getVariableData();
+            
+            List<String> processInstanceIds = new ArrayList<>();
+            if (variableSessionData != null) {
+                for (String variableName : variableSessionData.keySet()) {
+                    List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
+                    for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
+                        if (!ScopeTypes.BPMN.equals(variableListenerData.getScopeType())) {
+                            continue;
+                        }
+                        
+                        if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
+                            processInstanceIds.add(variableListenerData.getScopeId());
+                            agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
                         }
                     }
                 }
                 
-                executeOperations(commandContext);
+                if (!processInstanceIds.isEmpty()) {
+                    executeOperations(commandContext);
+                }
             }
     
             return (T) commandContext.getResult();
