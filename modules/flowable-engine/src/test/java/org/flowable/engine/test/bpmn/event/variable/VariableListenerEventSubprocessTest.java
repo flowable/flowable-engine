@@ -19,6 +19,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 public class VariableListenerEventSubprocessTest extends PluggableFlowableTestCase {
@@ -134,6 +135,35 @@ public class VariableListenerEventSubprocessTest extends PluggableFlowableTestCa
         
         // complete root process task
         task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        taskService.complete(task.getId());
+
+        // done!
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+    
+    @Test
+    @Deployment
+    public void testSubProcessAndEventSubProcess() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("variableListenerProcess")
+                .variable("var2", "initial")
+                .start();
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list()).hasSize(2);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list()).hasSize(4);
+        
+        runtimeService.signalEventReceived("signalTest");
+        
+        assertThat(runtimeService.getVariable(processInstance.getId(), "var2")).isEqualTo("test");
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("formTask3");
+        
         taskService.complete(task.getId());
 
         // done!
