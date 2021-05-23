@@ -190,6 +190,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SCRIPT_TEXT = "script";
     public static final String ATTRIBUTE_TASK_SCRIPT_FORMAT = "scriptFormat";
     public static final String ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE = "resultVariable";
+    public static final String ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
 
     public static final String ATTRIBUTE_TASK_SERVICE_CLASS = "class";

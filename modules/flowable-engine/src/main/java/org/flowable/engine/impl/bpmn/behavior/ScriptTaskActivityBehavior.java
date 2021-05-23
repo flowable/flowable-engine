@@ -15,11 +15,13 @@ package org.flowable.engine.impl.bpmn.behavior;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     protected String script;
     protected String language;
     protected String resultVariable;
+    protected String skipExpression;
     protected boolean storeScriptVariables; // see https://activiti.atlassian.net/browse/ACT-1626
 
     public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
@@ -52,14 +55,23 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         this.resultVariable = resultVariable;
     }
 
-    public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, boolean storeScriptVariables) {
+    public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, String skipExpression,
+            boolean storeScriptVariables) {
         this(script, language, resultVariable);
         this.scriptTaskId = scriptTaskId;
+        this.skipExpression = skipExpression;
         this.storeScriptVariables = storeScriptVariables;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpression, scriptTaskId, execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(skipExpression, scriptTaskId, execution, commandContext)) {
+            leave(execution);
+            return;
+        }
 
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
 

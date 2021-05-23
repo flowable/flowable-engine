@@ -57,6 +57,10 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isEmpty(scriptTask.getResultVariable())) {
             scriptTask.setResultVariable(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SERVICE_RESULTVARIABLE, xtr));
         }
+        String skipExpression = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, xtr);
+        if (StringUtils.isNotEmpty(skipExpression)) {
+            scriptTask.setSkipExpression(skipExpression);
+        }
         String autoStoreVariables = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, xtr);
         if (StringUtils.isNotEmpty(autoStoreVariables)) {
             scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
@@ -70,6 +74,7 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         ScriptTask scriptTask = (ScriptTask) element;
         writeDefaultAttribute(ATTRIBUTE_TASK_SCRIPT_FORMAT, scriptTask.getScriptFormat(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE, scriptTask.getResultVariable(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, scriptTask.getSkipExpression(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, String.valueOf(scriptTask.isAutoStoreVariables()), xtw);
     }
 

@@ -30,8 +30,9 @@ import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
 public class SecureJavascriptTaskActivityBehavior extends ScriptTaskActivityBehavior {
 
     public SecureJavascriptTaskActivityBehavior(String scriptTaskId, String script,
-            String language, String resultVariable, boolean storeScriptVariables) {
-        super(scriptTaskId, script, language, resultVariable, storeScriptVariables);
+        String language, String resultVariable, String skipExpression,
+        boolean storeScriptVariables) {
+        super(scriptTaskId, script, language, resultVariable, skipExpression, storeScriptVariables);
     }
 
     @Override

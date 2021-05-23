@@ -15,6 +15,7 @@ package org.flowable.examples.bpmn.scripttask;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,7 @@ import groovy.lang.MissingPropertyException;
 /**
  * @author Joram Barrez
  * @author Christian Stettler
+ * @author Calin Cerchez
  */
 public class ScriptTaskTest extends PluggableFlowableTestCase {
 
@@ -143,6 +145,47 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertThat(((Number) runtimeService.getVariable(processInstance.getId(), "test2")).intValue()).isEqualTo(22);
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testSkipExpression() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("scriptTaskProcess")
+                .transientVariable("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true)
+                .transientVariable("skipExpression", true)
+                .start();
+
+        assertThat(processInstance.getProcessVariables()).isEmpty();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/examples/bpmn/scripttask/ScriptTaskTest.testSkipExpression.bpmn20.xml")
+    public void testSkipExpressionFalse() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("scriptTaskProcess")
+                .transientVariable("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true)
+                .transientVariable("skipExpression", false)
+                .start();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(entry("persistentResult", "success"));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/examples/bpmn/scripttask/ScriptTaskTest.testSkipExpression.bpmn20.xml")
+    public void testSkipExpressionDisabled() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("scriptTaskProcess")
+                .transientVariable("_FLOWABLE_SKIP_EXPRESSION_ENABLED", false)
+                .transientVariable("skipExpression", true)
+                .start();
+
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(entry("persistentResult", "success"));
     }
 
 }
