@@ -15,11 +15,13 @@ package org.flowable.engine.impl.bpmn.behavior;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     protected String script;
     protected String language;
     protected String resultVariable;
+    protected String skipExpression;
     protected boolean storeScriptVariables; // see https://activiti.atlassian.net/browse/ACT-1626
 
     public ScriptTaskActivityBehavior(String script, String language, String resultVariable) {
@@ -52,46 +55,58 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         this.resultVariable = resultVariable;
     }
 
-    public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, boolean storeScriptVariables) {
+    public ScriptTaskActivityBehavior(String scriptTaskId, String script, String language, String resultVariable, String skipExpression,
+            boolean storeScriptVariables) {
         this(script, language, resultVariable);
         this.scriptTaskId = scriptTaskId;
+        this.skipExpression = skipExpression;
         this.storeScriptVariables = storeScriptVariables;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-
-        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-            ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
-            if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
-                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
-                if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
-                    script = overrideScript;
-                }
-            }
-        }
-
-        boolean noErrors = true;
         try {
-            Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            boolean isSkipExpressionEnabled = SkipExpressionUtil
+                    .isSkipExpressionEnabled(skipExpression, scriptTaskId, execution, commandContext);
+            if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpression, scriptTaskId, execution, commandContext)) {
+                ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration()
+                        .getScriptingEngines();
 
-            if (null != result) {
-                if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
-                    throw new FlowableException("Error in Script");
+                if (CommandContextUtil.getProcessEngineConfiguration()
+                        .isEnableProcessDefinitionInfoCache()) {
+                    ObjectNode taskElementProperties = BpmnOverrideContext
+                            .getBpmnOverrideElementProperties(scriptTaskId,
+                                    execution.getProcessDefinitionId());
+                    if (taskElementProperties != null && taskElementProperties
+                            .has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
+                        String overrideScript = taskElementProperties
+                                .get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
+                        if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
+                            script = overrideScript;
+                        }
+                    }
+                }
+
+                Object result = scriptingEngines
+                        .evaluate(script, language, execution, storeScriptVariables);
+
+                if (null != result) {
+                    if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script
+                            .equals(result.toString())) {
+                        throw new FlowableException("Error in Script");
+                    }
+                }
+
+                if (resultVariable != null) {
+                    execution.setVariable(resultVariable, result);
                 }
             }
 
-            if (resultVariable != null) {
-                execution.setVariable(resultVariable, result);
-            }
-
+            leave(execution);
         } catch (FlowableException e) {
-
             LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
 
-            noErrors = false;
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof BpmnError) {
                 ErrorPropagation.propagateError((BpmnError) rootCause, execution);
@@ -101,9 +116,5 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
                 throw e;
             }
         }
-        if (noErrors) {
-            leave(execution);
-        }
     }
-
 }
