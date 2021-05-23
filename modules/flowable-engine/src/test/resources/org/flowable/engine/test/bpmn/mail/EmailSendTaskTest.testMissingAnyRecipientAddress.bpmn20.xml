@@ -3,7 +3,7 @@
         xmlns:flowable="http://flowable.org/bpmn"
         targetNamespace="Examples">
 
-    <process id="missingToAddress">
+    <process id="missingAnyRecipientAddress">
         <startEvent id="theStart"/>
         <sequenceFlow sourceRef="theStart" targetRef="sendMail"/>
         <sendTask id="sendMail" flowable:type="mail">
