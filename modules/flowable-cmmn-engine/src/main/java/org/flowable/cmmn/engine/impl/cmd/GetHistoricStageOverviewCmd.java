@@ -105,7 +105,8 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
                     showInOverview = true;
                 }
             
-            } else {
+            } else if (caseInstance.getEndTime() == null) {
+                // It can be a future one only if the case instance is not completed
                 if (!"false".equalsIgnoreCase(overviewElement.getIncludeInStageOverview())) {
                     showInOverview = true;
                 }
