@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -105,11 +104,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 List<File> files = new LinkedList<>();
                 List<DataSource> dataSources = new LinkedList<>();
                 getFilesFromFields(attachments, execution, files, dataSources);
-
-                if (StringUtils.isAllEmpty(toStr, ccStr, bccStr)) {
-                    throw new FlowableException("No recipient could be found for sending email");
-                }
-
+    
                 email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
                 addHeader(email, headersStr);
                 addTo(email, toStr, execution.getTenantId());
@@ -201,7 +196,8 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     protected void addTo(Email email, String to, String tenantId) {
         if (to == null) {
-            return;
+            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
+            throw new FlowableException("No recipient could be found for sending email");
         }
         String newTo = getForceTo(tenantId);
         if (newTo == null) {
