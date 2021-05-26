@@ -65,48 +65,45 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
     @Override
     public void execute(DelegateExecution execution) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpression, scriptTaskId, execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(skipExpression, scriptTaskId, execution, commandContext)) {
+            leave(execution);
+            return;
+        }
+
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+
+        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+            ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
+            if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
+                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
+                if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
+                    script = overrideScript;
+                }
+            }
+        }
+
+        boolean noErrors = true;
         try {
-            CommandContext commandContext = CommandContextUtil.getCommandContext();
-            boolean isSkipExpressionEnabled = SkipExpressionUtil
-                    .isSkipExpressionEnabled(skipExpression, scriptTaskId, execution, commandContext);
-            if (!isSkipExpressionEnabled || !SkipExpressionUtil.shouldSkipFlowElement(skipExpression, scriptTaskId, execution, commandContext)) {
-                ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration()
-                        .getScriptingEngines();
+            Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
 
-                if (CommandContextUtil.getProcessEngineConfiguration()
-                        .isEnableProcessDefinitionInfoCache()) {
-                    ObjectNode taskElementProperties = BpmnOverrideContext
-                            .getBpmnOverrideElementProperties(scriptTaskId,
-                                    execution.getProcessDefinitionId());
-                    if (taskElementProperties != null && taskElementProperties
-                            .has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
-                        String overrideScript = taskElementProperties
-                                .get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
-                        if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
-                            script = overrideScript;
-                        }
-                    }
-                }
-
-                Object result = scriptingEngines
-                        .evaluate(script, language, execution, storeScriptVariables);
-
-                if (null != result) {
-                    if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script
-                            .equals(result.toString())) {
-                        throw new FlowableException("Error in Script");
-                    }
-                }
-
-                if (resultVariable != null) {
-                    execution.setVariable(resultVariable, result);
+            if (null != result) {
+                if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
+                    throw new FlowableException("Error in Script");
                 }
             }
 
-            leave(execution);
+            if (resultVariable != null) {
+                execution.setVariable(resultVariable, result);
+            }
+
         } catch (FlowableException e) {
+
             LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
 
+            noErrors = false;
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof BpmnError) {
                 ErrorPropagation.propagateError((BpmnError) rootCause, execution);
@@ -115,6 +112,9 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             } else {
                 throw e;
             }
+        }
+        if (noErrors) {
+            leave(execution);
         }
     }
 }
