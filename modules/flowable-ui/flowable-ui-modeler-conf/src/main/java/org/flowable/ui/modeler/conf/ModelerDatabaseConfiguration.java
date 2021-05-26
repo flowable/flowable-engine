@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
+import org.flowable.ui.common.util.LiquibaseUtil;
 import org.flowable.ui.modeler.properties.FlowableModelerAppProperties;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -138,6 +139,14 @@ public class ModelerDatabaseConfiguration {
     public Liquibase modelerLiquibase(DataSource dataSource) {
         LOGGER.info("Configuring Liquibase");
 
+        try {
+            return LiquibaseUtil.runInFlowableScope(() -> createAndUpdateLiquibase(dataSource));
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error creating liquibase database", e);
+        }
+    }
+
+    protected Liquibase createAndUpdateLiquibase(DataSource dataSource) {
         Liquibase liquibase = null;
         try {
             DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());

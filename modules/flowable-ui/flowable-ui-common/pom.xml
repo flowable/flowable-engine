@@ -134,6 +134,13 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- Liquibase -->
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+
     <!-- Guava -->
     <dependency>
       <groupId>com.google.guava</groupId>

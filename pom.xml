@@ -978,11 +978,11 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.8.0</version>
+				<version>4.3.5</version>
 				<exclusions>
 					<exclusion>
-						<groupId>ch.qos.logback</groupId>
-						<artifactId>logback-classic</artifactId>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
