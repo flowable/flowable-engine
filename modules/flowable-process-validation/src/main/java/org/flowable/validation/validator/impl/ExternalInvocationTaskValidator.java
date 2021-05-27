@@ -28,12 +28,18 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public abstract class ExternalInvocationTaskValidator extends ProcessLevelValidator {
 
     protected void validateFieldDeclarationsForEmail(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
-        boolean toDefined = false;
+        boolean recipientDefined = false;
         boolean textOrHtmlDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
             if ("to".equals(fieldExtension.getFieldName())) {
-                toDefined = true;
+                recipientDefined = true;
+            }
+            if ("cc".equals(fieldExtension.getFieldName())) {
+                recipientDefined = true;
+            }
+            if ("bcc".equals(fieldExtension.getFieldName())) {
+                recipientDefined = true;
             }
             if ("html".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
@@ -49,7 +55,7 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             }
         }
 
-        if (!toDefined) {
+        if (!recipientDefined) {
             addError(errors, Problems.MAIL_TASK_NO_RECIPIENT, process, task, "No recipient is defined on the mail activity");
         }
         if (!textOrHtmlDefined) {

@@ -148,6 +148,22 @@ public class EmailSendTaskTest extends EmailTestCase {
 
     @Test
     @Deployment
+    public void testAnyRecipientAddressPresent() throws Exception {
+        runtimeService.startProcessInstanceByKey("anyRecipientAddressPresent");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
+            Collections.emptyList());
+
+        assertThat(messages)
+            .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+            .containsExactlyInAnyOrder(
+                tuple("flowable@localhost", "mispiggy@activiti.org")
+            );
+    }
+
+    @Test
+    @Deployment
     public void testHtmlMail() throws Exception {
         runtimeService.startProcessInstanceByKey("htmlMail", CollectionUtil.singletonMap("gender", "male"));
 
@@ -270,17 +286,17 @@ public class EmailSendTaskTest extends EmailTestCase {
 
     @Test
     @Deployment
-    public void testMissingToAddress() {
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+    public void testMissingAnyRecipientAddress() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
             .hasMessage("No recipient could be found for sending email");
     }
 
     @Test
-    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testMissingToAddress.bpmn20.xml")
-    public void testMissingToAddressWithForceTo() {
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testMissingAnyRecipientAddress.bpmn20.xml")
+    public void testMissingAnyRecipientAddressWithForceTo() {
         processEngineConfiguration.setMailServerForceTo("no-reply@flowable.org");
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingToAddress"))
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("missingAnyRecipientAddress"))
             .isInstanceOf(FlowableException.class)
             .hasMessage("No recipient could be found for sending email");
     }
