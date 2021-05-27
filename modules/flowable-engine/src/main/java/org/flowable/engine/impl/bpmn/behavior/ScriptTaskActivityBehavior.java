@@ -73,8 +73,6 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             return;
         }
 
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
@@ -85,20 +83,14 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             }
         }
 
+        safelyExecuteScript(execution);
+    }
+
+    protected void safelyExecuteScript(DelegateExecution execution) {
         boolean noErrors = true;
+
         try {
-            Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
-
-            if (null != result) {
-                if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
-                    throw new FlowableException("Error in Script");
-                }
-            }
-
-            if (resultVariable != null) {
-                execution.setVariable(resultVariable, result);
-            }
-
+            executeScript(execution);
         } catch (FlowableException e) {
 
             LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
@@ -116,6 +108,23 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         if (noErrors) {
             leave(execution);
         }
+    }
+
+    protected void executeScript(DelegateExecution execution) {
+
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+        Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+
+        if (null != result) {
+            if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
+                throw new FlowableException("Error in Script");
+            }
+        }
+
+        if (resultVariable != null) {
+            execution.setVariable(resultVariable, result);
+        }
+
     }
 
 }
