@@ -118,6 +118,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     protected void init() {
         initEngineConfigurations();
         initClock();
+        initObjectMapper();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();

@@ -199,6 +199,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();

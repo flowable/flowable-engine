@@ -864,6 +864,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initCaseDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();

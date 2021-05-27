@@ -1032,6 +1032,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initProcessDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
