@@ -1140,6 +1140,7 @@
         <module>modules/flowable-cmmn-image-generator</module>
         <module>modules/flowable-cmmn-engine</module>
 		<module>modules/flowable-cmmn-engine-configurator</module>
+		<module>modules/flowable-cmmn-validation</module>
 		<module>modules/flowable-engine</module>
 		<module>modules/flowable-app-engine-api</module>
 		<module>modules/flowable-app-engine</module>
