@@ -25,8 +25,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Flowable - CMMN Validation</name>
-    <artifactId>flowable-cmmn-validation</artifactId>
+    <name>Flowable - Case Validation</name>
+    <artifactId>flowable-case-validation</artifactId>
 
     <dependencies>
         <dependency>

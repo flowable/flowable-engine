@@ -15,32 +15,30 @@
 
 package org.flowable.cmmn.validation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
-import org.flowable.cmmn.validation.validator.Validator;
-import org.flowable.cmmn.validation.validator.impl.HumanTaskValidator;
+import org.flowable.cmmn.validation.validator.ValidatorSet;
 
 /**
  * @author Calin Cerchez
  */
-public class CaseValidator {
+public class CaseValidatorImpl implements CaseValidator {
 
-    private List<Validator> validators;
+    private List<ValidatorSet> validatorSets = new ArrayList<>();
 
-    private CaseValidator() {
-
-    }
-
+    @Override
     public List<ValidationEntry> validate(CmmnModel model) {
-        return validators.stream().flatMap(validator -> validator.validate(model).stream()).collect(Collectors.toList());
+        return validatorSets.stream()
+                .flatMap(validatorSet -> validatorSet.getValidators().stream())
+                .flatMap(validator -> validator.validate(model).stream())
+                .collect(Collectors.toList());
     }
 
-    public CaseValidator defaultCmmnValidator() {
-        CaseValidator caseValidator = new CaseValidator();
-        caseValidator.validators.add(new HumanTaskValidator());
-        return caseValidator;
+    public void addValidatorSet(ValidatorSet validatorSet) {
+        this.validatorSets.add(validatorSet);
     }
 }
