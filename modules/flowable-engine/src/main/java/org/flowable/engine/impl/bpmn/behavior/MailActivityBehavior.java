@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -118,7 +119,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 addBcc(email, bccStr, execution.getTenantId());
                 setSubject(email, subjectStr);
                 setMailServerProperties(email, execution.getTenantId());
-                setCharset(email, charSetStr);
+                setCharset(email, charSetStr, execution.getTenantId());
                 attach(email, files, dataSources);
     
                 email.send();
@@ -376,9 +377,14 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void setCharset(Email email, String charSetStr) {
+    protected void setCharset(Email email, String charSetStr, String tenantId) {
         if (charset != null) {
             email.setCharset(charSetStr);
+        } else {
+            Charset mailServerDefaultCharset = getDefaultCharSet(tenantId);
+            if (mailServerDefaultCharset != null) {
+                email.setCharset(mailServerDefaultCharset.name());
+            }
         }
     }
 
@@ -508,6 +514,23 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         return forceTo;
+    }
+
+    protected Charset getDefaultCharSet(String tenantId) {
+        Charset defaultCharset = null;
+        if (StringUtils.isNotBlank(tenantId)) {
+            MailServerInfo mailServerInfo = CommandContextUtil.getProcessEngineConfiguration().getMailServer(tenantId);
+            if (mailServerInfo != null) {
+                defaultCharset = mailServerInfo.getMailServerDefaultCharset();
+            }
+
+        }
+
+        if (defaultCharset == null) {
+            defaultCharset = CommandContextUtil.getProcessEngineConfiguration().getMailServerDefaultCharset();
+        }
+
+        return defaultCharset;
     }
 
     public static class ContentItemDataSourceWrapper implements DataSource {

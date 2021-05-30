@@ -18,6 +18,7 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -550,6 +551,59 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(configuration.getAsyncHistoryTaskExecutor()).isEqualTo(asyncTaskExecutor);
                     assertThat(((SpringAsyncTaskExecutor) asyncTaskExecutor).getAsyncTaskExecutor())
                             .isEqualTo(context.getBean(TaskExecutor.class));
+                });
+    }
+
+    @Test
+    void processEngineDefaultMailProperties(){
+        contextRunner
+                .run(context -> {
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+                    ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+
+                    assertThat(engineConfiguration).isNotNull();
+                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isNull();
+                    assertThat(engineConfiguration.getMailServerDefaultFrom()).isEqualTo("flowable@localhost");
+                    assertThat(engineConfiguration.getMailServerHost()).isEqualTo("localhost");
+                    assertThat(engineConfiguration.getMailServerUsername()).isNull();
+                    assertThat(engineConfiguration.getMailServerPassword()).isNull();
+                    assertThat(engineConfiguration.getMailServerPort()).isEqualTo(1025);
+                    assertThat(engineConfiguration.getMailServerSSLPort()).isEqualTo(1465);
+                    assertThat(engineConfiguration.getMailServerUseSSL()).isFalse();
+                    assertThat(engineConfiguration.getMailServerUseTLS()).isFalse();
+                });
+    }
+
+    @Test
+    void processEngineMailProperties(){
+        contextRunner
+                .withPropertyValues(
+                        "flowable.mail.server.host=my-server",
+                        "flowable.mail.server.port=4040",
+                        "flowable.mail.server.sslPort=5050",
+                        "flowable.mail.server.username=username",
+                        "flowable.mail.server.password=password",
+                        "flowable.mail.server.defaultFrom=customfrom@localhost",
+                        "flowable.mail.server.forceTo=internal@localhost",
+                        "flowable.mail.server.defaultCharset=utf-16",
+                        "flowable.mail.server.useSsl=true",
+                        "flowable.mail.server.useTls=true"
+                )
+                .run(context -> {
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+                    ProcessEngineConfiguration engineConfiguration = processEngine.getProcessEngineConfiguration();
+
+                    assertThat(engineConfiguration).isNotNull();
+                    assertThat(engineConfiguration.getMailServerHost()).isEqualTo("my-server");
+                    assertThat(engineConfiguration.getMailServerPort()).isEqualTo(4040);
+                    assertThat(engineConfiguration.getMailServerSSLPort()).isEqualTo(5050);
+                    assertThat(engineConfiguration.getMailServerUsername()).isEqualTo("username");
+                    assertThat(engineConfiguration.getMailServerPassword()).isEqualTo("password");
+                    assertThat(engineConfiguration.getMailServerDefaultFrom()).isEqualTo("customfrom@localhost");
+                    assertThat(engineConfiguration.getMailServerForceTo()).isEqualTo("internal@localhost");
+                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isEqualTo(StandardCharsets.UTF_16);
+                    assertThat(engineConfiguration.getMailServerUseSSL()).isTrue();
+                    assertThat(engineConfiguration.getMailServerUseTLS()).isTrue();
                 });
     }
 

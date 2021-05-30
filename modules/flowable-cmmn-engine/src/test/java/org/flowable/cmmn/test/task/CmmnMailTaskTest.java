@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,15 +84,38 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testSimpleTextMail() {
+    public void testSimpleTextMail() throws Exception {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleTextMail").start();
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         assertEmailSend(message, false, "Hello!", "This is a test", "flowable@localhost", Collections.singletonList("test@flowable.org"), null);
+        assertThat(message.getMimeMessage().getContentType()).isEqualTo("text/plain; charset=us-ascii");
 
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testSimpleTextMail.cmmn")
+    public void testSimpleTextMailCharset() throws Exception {
+        Charset originalCharset = cmmnEngineConfiguration.getMailServerDefaultCharset();
+
+        try {
+            cmmnEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.UTF_8);
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testSimpleTextMail")
+                    .start();
+
+            List<WiserMessage> messages = wiser.getMessages();
+            assertThat(messages).hasSize(1);
+
+            WiserMessage message = messages.get(0);
+            assertThat(message.getMimeMessage().getContentType()).isEqualTo("text/plain; charset=UTF-8");
+        } finally {
+            cmmnEngineConfiguration.setMailServerDefaultCharset(originalCharset);
+        }
+    }
+
 
     @Test
     @CmmnDeployment
