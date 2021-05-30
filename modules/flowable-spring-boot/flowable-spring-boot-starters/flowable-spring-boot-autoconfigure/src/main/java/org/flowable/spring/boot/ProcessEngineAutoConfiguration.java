@@ -220,6 +220,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setMailServerForceTo(mailProperties.getForceTo());
         conf.setMailServerUseSSL(mailProperties.isUseSsl());
         conf.setMailServerUseTLS(mailProperties.isUseTls());
+        conf.setMailServerDefaultCharset(mailProperties.getDefaultCharset());
 
         conf.getHttpClientConfig().setUseSystemProperties(httpProperties.isUseSystemProperties());
         conf.getHttpClientConfig().setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout());
