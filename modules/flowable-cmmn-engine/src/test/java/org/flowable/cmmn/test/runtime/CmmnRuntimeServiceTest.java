@@ -20,9 +20,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -31,6 +33,10 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -296,6 +302,56 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseDefinitionVersion()).isEqualTo(1);
         assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
         assertThat(caseInstance.getCaseDefinitionDeploymentId()).isEqualTo(caseDefinition.getDeploymentId());
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void testNestedRuntimeServiceInvocation() {
+
+        // The 'nested' here means that the runtime service will be called in a nested service call (with command context reuse)
+
+        Boolean originalIsEnableEventDispatcher = null;
+        FlowableEventListener eventListener = null;
+
+        CaseInstance caseInstance = null;
+        try {
+
+            eventListener = new AbstractFlowableEventListener() {
+
+                @Override
+                public void onEvent(FlowableEvent event) {
+                    Object entity = ((FlowableEntityEvent) event).getEntity();
+                    if (event instanceof FlowableCaseStartedEvent) {
+                        CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) entity;
+                        cmmnRuntimeService.setVariable(caseInstanceEntity.getId(), "testVariable", 123);
+                    }
+                }
+
+                @Override
+                public boolean isFailOnException() {
+                    return false;
+                }
+
+            };
+
+            originalIsEnableEventDispatcher = cmmnEngineConfiguration.isEnableEventDispatcher();
+
+            cmmnEngineConfiguration.setEnableEventDispatcher(true);
+            cmmnEngineConfiguration.getEventDispatcher().addEventListener(eventListener);
+
+            caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+
+        } finally {
+            if (originalIsEnableEventDispatcher != null) {
+                cmmnEngineConfiguration.setEnableEventDispatcher(originalIsEnableEventDispatcher);
+            }
+            if (eventListener != null) {
+                cmmnEngineConfiguration.getEventDispatcher().removeEventListener(eventListener);
+            }
+        }
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "testVariable")).isEqualTo(123);
+
     }
 
 }

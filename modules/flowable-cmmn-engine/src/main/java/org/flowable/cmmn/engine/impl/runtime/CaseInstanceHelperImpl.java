@@ -185,6 +185,18 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
         CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
 
+        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        }
+
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " +
+                caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+        }
+
         return caseInstanceEntity;
     }
 
@@ -282,22 +294,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             cmmnEngineConfiguration.getStartCaseInstanceInterceptor().afterStartCaseInstance(instanceAfterContext);
         }
 
-        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
-
         CallbackData callbackData = new CallbackData(caseInstanceEntity.getCallbackId(), caseInstanceEntity.getCallbackType(),
             caseInstanceEntity.getId(), null, CaseInstanceState.ACTIVE);
         callCaseInstanceStateChangeCallbacks(callbackData);
         cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
-        
-        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-        }
-
-        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " + 
-                    caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
-        }
 
         return caseInstanceEntity;
     }
