@@ -243,8 +243,8 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Test
     @Deployment
-    public void testAnyRecipientAddressPresent() throws Exception {
-        runtimeService.startProcessInstanceByKey("anyRecipientAddressPresent");
+    public void testOnlyBccAddress() throws Exception {
+        runtimeService.startProcessInstanceByKey("onlyBccAddress");
 
         List<WiserMessage> messages = wiser.getMessages();
         assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
@@ -255,6 +255,38 @@ public class EmailServiceTaskTest extends EmailTestCase {
             .containsExactlyInAnyOrder(
                 tuple("flowable@localhost", "mispiggy@activiti.org")
             );
+    }
+
+    @Test
+    @Deployment
+    public void testOnlyCcAddress() throws Exception {
+        runtimeService.startProcessInstanceByKey("onlyCcAddress");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
+                Collections.emptyList());
+
+        assertThat(messages)
+                .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+                .containsExactlyInAnyOrder(
+                        tuple("flowable@localhost", "mispiggy@activiti.org")
+                );
+    }
+
+    @Test
+    @Deployment
+    public void testOnlyToAddress() throws Exception {
+        runtimeService.startProcessInstanceByKey("onlyToAddress");
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
+                Collections.emptyList());
+
+        assertThat(messages)
+                .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
+                .containsExactlyInAnyOrder(
+                        tuple("flowable@localhost", "mispiggy@activiti.org")
+                );
     }
 
     @Test

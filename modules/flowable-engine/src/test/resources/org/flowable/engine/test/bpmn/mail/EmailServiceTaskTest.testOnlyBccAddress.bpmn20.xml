@@ -3,12 +3,12 @@
         xmlns:flowable="http://flowable.org/bpmn"
         targetNamespace="Examples">
 
-    <process id="anyRecipientAddressPresent" >
+    <process id="onlyBccAddress" >
 
         <startEvent id="theStart" />
         <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
 
-        <sendTask id="sendMail" flowable:type="mail">
+        <serviceTask id="sendMail" flowable:type="mail">
             <extensionElements>
                 <flowable:field name="subject">
                     <flowable:string>Hello world</flowable:string>
@@ -20,7 +20,7 @@
                     <flowable:string>mispiggy@activiti.org</flowable:string>
                 </flowable:field>
             </extensionElements>
-        </sendTask>
+        </serviceTask>
         <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />
 
         <endEvent id="theEnd" />
