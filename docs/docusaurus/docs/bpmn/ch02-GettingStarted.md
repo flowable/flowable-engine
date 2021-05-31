@@ -452,6 +452,8 @@ To get a full, detailed overview of the Flowable REST API, check out the [REST A
 
 When you download the .zip file from the flowable.org website, the REST application can be found in the *wars* folder. You’ll need a servlet container, such as [Tomcat](http://tomcat.apache.org//), [Jetty](http://www.eclipse.org/jetty//), and so on, to run the WAR file.
 
+>Note: The flowable-rest.war is based on Spring Boot, which means that it supports the Tomcat / Jetty servlet containers supported by Spring Boot.
+
 When using Tomcat the steps are as follows:
 
 -   Download and unzip the latest and greatest Tomcat zip file (choose the 'Core' distribution from the Tomcat website).
