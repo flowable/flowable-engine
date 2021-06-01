@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+    <case id="testCcBccWithoutToMail" name="testCcBccWithoutToMail" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+            </extensionElements>
+            <planItem id="planItem1" name="Email task" definitionRef="emailTask1"></planItem>
+            <planItem id="planItem2" name="Email task2" definitionRef="emailTask2"></planItem>
+            <task id="emailTask1" name="Email task" flowable:type="mail">
+                <extensionElements>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                    <design:stencilid><![CDATA[EmailTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    <flowable:field name="from">
+                        <flowable:string><![CDATA[flowable@localhost]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="subject">
+                        <flowable:string><![CDATA[Hello!]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="text">
+                        <flowable:string><![CDATA[This is a test]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="cc">
+                        <flowable:string><![CDATA[cc@flowable.org]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+            <task id="emailTask2" name="Email task2" flowable:type="mail">
+                <extensionElements>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                    <design:stencilid><![CDATA[EmailTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    <flowable:field name="from">
+                        <flowable:string><![CDATA[flowable@localhost]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="subject">
+                        <flowable:string><![CDATA[Hello!]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="text">
+                        <flowable:string><![CDATA[This is a test]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="bcc">
+                        <flowable:string><![CDATA[bcc@flowable.org]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+        </casePlanModel>
+    </case>
+</definitions>

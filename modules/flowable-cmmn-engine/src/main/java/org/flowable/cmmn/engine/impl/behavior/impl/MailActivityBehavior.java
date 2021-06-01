@@ -97,6 +97,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
             addHeader(email, headersStr);
+            validateToCcBcc(toStr, ccStr, bccStr);
             addTo(commandContext, email, toStr, planItemInstanceEntity.getTenantId());
             setFrom(commandContext, email, fromStr, planItemInstanceEntity.getTenantId());
             addCc(commandContext, email, ccStr, planItemInstanceEntity.getTenantId());
@@ -183,15 +184,18 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             throw new FlowableException("Could not create text-only email", e);
         }
     }
-
-    protected void addTo(CommandContext commandContext, Email email, String to, String tenantId) {
-        if (to == null) {
-            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
+    
+    protected void validateToCcBcc(String to, String cc, String bcc) {
+        if (to == null && cc == null && bcc == null) {
             throw new FlowableException("No recipient could be found for sending email");
         }
-        String newTo = getForceTo(commandContext, tenantId);
+    }
+
+    protected void addTo(CommandContext commandContext, Email email, String to, String tenantId) {
+        String forceTo = getForceTo(commandContext, tenantId);
+        String newTo = forceTo == null ? to : forceTo;
         if (newTo == null) {
-            newTo = to;
+            return;
         }
         String[] tos = splitAndTrim(newTo);
         if (tos != null) {
@@ -202,8 +206,6 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
                     throw new FlowableException("Could not add " + t + " as recipient", e);
                 }
             }
-        } else {
-            throw new FlowableException("No recipient could be found for sending email");
         }
     }
 

@@ -107,6 +107,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     
                 email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
                 addHeader(email, headersStr);
+                validateToCcBcc(toStr, ccStr, bccStr);
                 addTo(email, toStr, execution.getTenantId());
                 setFrom(email, fromStr, execution.getTenantId());
                 addCc(email, ccStr, execution.getTenantId());
@@ -193,16 +194,21 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             throw new FlowableException("Could not create text-only email", e);
         }
     }
-
-    protected void addTo(Email email, String to, String tenantId) {
-        if (to == null) {
-            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
+    
+    protected void validateToCcBcc(String to, String cc, String bcc) {
+        if (to == null && cc == null && bcc == null) {
             throw new FlowableException("No recipient could be found for sending email");
         }
-        String newTo = getForceTo(tenantId);
+    }
+    
+    protected void addTo(Email email, String to, String tenantId) {
+        String forceTo = getForceTo(tenantId);
+        String newTo = forceTo == null ? to : forceTo;
+
         if (newTo == null) {
-            newTo = to;
+            return;
         }
+        
         String[] tos = splitAndTrim(newTo);
         if (tos != null) {
             for (String t : tos) {
@@ -212,8 +218,6 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                     throw new FlowableException("Could not add " + t + " as recipient", e);
                 }
             }
-        } else {
-            throw new FlowableException("No recipient could be found for sending email");
         }
     }
 
