@@ -30,7 +30,7 @@
                 <flowable:field name="text">
                     <flowable:string>This is the content</flowable:string>
                 </flowable:field>
-                <flowable:field name="bcc">
+                <flowable:field name="to">
                     <flowable:string>mispiggy@activiti.org</flowable:string>
                 </flowable:field>
             </extensionElements>

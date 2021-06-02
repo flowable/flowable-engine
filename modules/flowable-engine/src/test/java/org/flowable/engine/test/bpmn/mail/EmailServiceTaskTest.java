@@ -264,7 +264,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
         List<WiserMessage> messages = wiser.getMessages();
         assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
-                Collections.emptyList());
+                Collections.singletonList("mispiggy@activiti.org"));
 
         assertThat(messages)
                 .extracting(WiserMessage::getEnvelopeSender, WiserMessage::getEnvelopeReceiver)
@@ -279,7 +279,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         runtimeService.startProcessInstanceByKey("onlyToAddress");
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.emptyList(),
+        assertEmailSend(messages.get(0), false, "Hello world", "This is the content", "flowable@localhost", Collections.singletonList("mispiggy@activiti.org"),
                 Collections.emptyList());
 
         assertThat(messages)
