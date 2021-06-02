@@ -173,7 +173,7 @@
                             <permissions>
                                 <permission>
                                     <file>/flowable-entrypoint.sh</file>
-                                    <mode>544</mode> <!-- Read/execute for owner, read for group/other -->
+                                    <mode>554</mode> <!-- Read/execute for owner/group, read for other -->
                                 </permission>
                             </permissions>
                         </extraDirectories>
