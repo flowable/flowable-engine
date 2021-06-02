@@ -375,14 +375,14 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    //TODO: check if this is desired we change a protected method.
     protected void setCharset(Email email, String charSetStr, String tenantId) {
         if (charset != null) {
             email.setCharset(charSetStr);
         }else{
-            //TODO: check if the charset is actually used the javadoc hint you should set it BEFORE adding text / info:
-            //Set the charset of the message. Please note that you should set the charset before adding the message content.
-            getDefaultCharSet(tenantId).ifPresent(charset -> email.setCharset(charset.name()));
+            Charset mailServerDefaultCharset = getDefaultCharSet(tenantId);
+            if(mailServerDefaultCharset != null){
+                email.setCharset(mailServerDefaultCharset.name());
+            }
         }
     }
 
@@ -514,7 +514,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         return forceTo;
     }
 
-    protected Optional<Charset> getDefaultCharSet(String tenantId){
+    protected Charset getDefaultCharSet(String tenantId){
         Charset defaultCharset = null;
         if(StringUtils.isNotBlank(tenantId)){
             MailServerInfo mailServerInfo = CommandContextUtil.getProcessEngineConfiguration().getMailServer(tenantId);
@@ -525,7 +525,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             defaultCharset = CommandContextUtil.getProcessEngineConfiguration().getMailServerDefaultCharset();
         }
 
-        return Optional.ofNullable(defaultCharset);
+        return defaultCharset;
     }
 
     public static class ContentItemDataSourceWrapper implements DataSource {
