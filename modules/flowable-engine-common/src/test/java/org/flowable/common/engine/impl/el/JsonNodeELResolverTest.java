@@ -1,20 +1,29 @@
 package org.flowable.common.engine.impl.el;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.flowable.common.engine.impl.javax.el.ELContext;
-import org.flowable.common.engine.impl.javax.el.ELResolver;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.DecimalNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.LongNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * @author Prathamesh Mane
  */
 class JsonNodeELResolverTest {
+
     private final ELResolver resolver = new JsonNodeELResolver();
     private final ELContext context = new FlowableElContext(resolver, null);
     private final ObjectMapper mapper = new ObjectMapper();
@@ -23,49 +32,49 @@ class JsonNodeELResolverTest {
     void integerValueShouldBeIntNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "age", 11);
-        assertTrue(node.get("age").isInt());
+        assertThat(node.get("age")).isExactlyInstanceOf(IntNode.class);
     }
 
     @Test
     void longValueShouldBeLongNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "age", 11L);
-        assertTrue(node.get("age").isLong());
+        assertThat(node.get("age")).isExactlyInstanceOf(LongNode.class);
     }
 
     @Test
     void doubleValueShouldBeDoubleNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "net", 11.1);
-        assertTrue(node.get("net").isDouble());
+        assertThat(node.get("net")).isExactlyInstanceOf(DoubleNode.class);
     }
 
     @Test
     void stringValueShouldBeTextNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "name", "flowable");
-        assertTrue(node.get("name").isTextual());
+        assertThat(node.get("name")).isExactlyInstanceOf(TextNode.class);
     }
 
     @Test
     void bigDecimalValueShouldBeBigDecimalNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "net", BigDecimal.ZERO);
-        assertTrue(node.get("net").isBigDecimal());
+        assertThat(node.get("net")).isExactlyInstanceOf(DecimalNode.class);
     }
 
     @Test
     void booleanValueShouldBeBooleanNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "isAlive", true);
-        assertTrue(node.get("isAlive").isBoolean());
+        assertThat(node.get("isAlive")).isExactlyInstanceOf(BooleanNode.class);
     }
 
     @Test
     void dateValueShouldBeTextNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "dob", new Date());
-        assertTrue(node.get("dob").isTextual());
+        assertThat(node.get("dob")).isExactlyInstanceOf(TextNode.class);
     }
 
     @Test
@@ -73,13 +82,13 @@ class JsonNodeELResolverTest {
         ObjectNode node = mapper.createObjectNode();
         ObjectNode value = mapper.createObjectNode();
         resolver.setValue(context, node, "address", value);
-        assertTrue(node.get("address").isObject());
+        assertThat(node.get("address")).isExactlyInstanceOf(ObjectNode.class);
     }
 
     @Test
     void nullValueShouldBeNullNode() {
         ObjectNode node = mapper.createObjectNode();
         resolver.setValue(context, node, "age", null);
-        assertTrue(node.get("age").isNull());
+        assertThat(node.get("age")).isExactlyInstanceOf(NullNode.class);
     }
 }
