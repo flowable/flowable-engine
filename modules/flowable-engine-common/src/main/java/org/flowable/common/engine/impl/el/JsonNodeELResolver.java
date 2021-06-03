@@ -320,16 +320,14 @@ public class JsonNodeELResolver extends ELResolver {
         JsonNode jsonNode;
         if (value instanceof BigDecimal) {
             jsonNode = nodeCreator.numberNode((BigDecimal) value);
-
         } else if (value instanceof Boolean) {
             jsonNode = nodeCreator.booleanNode((Boolean) value);
-
+        } else if (value instanceof Integer) {
+            jsonNode = nodeCreator.numberNode((Integer) value);
         } else if (value instanceof Long) {
             jsonNode = nodeCreator.numberNode((Long) value);
-
         } else if (value instanceof Double) {
             jsonNode = nodeCreator.numberNode((Double) value);
-
         } else if (value instanceof JsonNode) {
             jsonNode = (JsonNode) value;
         } else if (value instanceof CharSequence) {
