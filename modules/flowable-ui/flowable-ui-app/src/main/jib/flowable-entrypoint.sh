@@ -8,10 +8,4 @@ cmd="java ${JAVA_OPTS} \
           org.flowable.ui.application.FlowableUiApplication \
           ${@}"
 
-## if user is part of root group, then 
-if [ $(id -g) -eq 0 -a $(id -u) -ne 0 ]
-then
-        exec $cmd
-else
-        exec su-exec flowable:flowable $cmd
-fi
+exec $cmd
