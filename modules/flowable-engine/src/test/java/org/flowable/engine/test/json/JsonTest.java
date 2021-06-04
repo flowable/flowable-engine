@@ -830,6 +830,35 @@ public class JsonTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testSetNumberInJsonNode() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode())
+                .start();
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{}");
+        managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("${customer.pin}");
+            expression.setValue(10, CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstance.getId()));
+            return null;
+        });
+
+        assertThatJson(runtimeService.getVariable(processInstance.getId(), "customer"))
+                .isEqualTo("{"
+                        + "  pin: 10"
+                        + "}");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatJson(historyService.createHistoricVariableInstanceQuery().variableName("customer").singleResult().getValue())
+                    .isEqualTo("{"
+                            + "  pin: 10"
+                            + "}");
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void testSetDateInJsonNode() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("oneTaskProcess")
