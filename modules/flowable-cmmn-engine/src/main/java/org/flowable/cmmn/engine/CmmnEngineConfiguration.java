@@ -2573,6 +2573,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CaseValidator getCaseValidator() {
+        return caseValidator;
+    }
+
     public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {
         return caseDefinitionDiagramHelper;
     }

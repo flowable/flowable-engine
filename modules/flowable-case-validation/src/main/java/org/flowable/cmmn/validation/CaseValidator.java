@@ -23,6 +23,6 @@ import org.flowable.cmmn.validation.validator.ValidationEntry;
  * @author Calin Cerchez
  */
 public interface CaseValidator {
-
+    
     List<ValidationEntry> validate(CmmnModel model);
 }
