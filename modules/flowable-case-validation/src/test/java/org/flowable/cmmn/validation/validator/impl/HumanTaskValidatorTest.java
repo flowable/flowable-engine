@@ -17,10 +17,10 @@ package org.flowable.cmmn.validation.validator.impl;
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -36,16 +36,16 @@ public class HumanTaskValidatorTest {
     public void testValidateNoErrors() {
         CmmnModel cmmnModel = readXMLFile("humanTaskNoErrors.cmmn");
         List<ValidationEntry> validationEntries = new HumanTaskValidator().validate(cmmnModel);
-        Assert.assertTrue(validationEntries.isEmpty());
+        Assertions.assertThat(validationEntries.isEmpty()).isTrue();
     }
 
     @Test
     public void testValidateMissingListenerImplementationType() {
         CmmnModel cmmnModel = readXMLFile("humanTaskMissingListenerImplementationType.cmmn");
         List<ValidationEntry> validationEntries = new HumanTaskValidator().validate(cmmnModel);
-        Assert.assertFalse(validationEntries.isEmpty());
-        Assert.assertEquals(1, validationEntries.size());
-        Assert.assertEquals("Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener",
-                validationEntries.get(0).getDefaultDescription());
+        Assertions.assertThat(validationEntries.isEmpty()).isFalse();
+        Assertions.assertThat(validationEntries.size()).isEqualTo(1);
+        Assertions.assertThat(validationEntries.get(0).getDefaultDescription())
+                .isEqualTo("Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener");
     }
 }
