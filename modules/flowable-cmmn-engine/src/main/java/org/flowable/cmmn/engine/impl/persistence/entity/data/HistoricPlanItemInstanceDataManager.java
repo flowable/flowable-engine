@@ -36,4 +36,9 @@ public interface HistoricPlanItemInstanceDataManager extends DataManager<Histori
     void deleteByCaseDefinitionId(String caseDefinitionId);
 
     void deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
+
+    long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

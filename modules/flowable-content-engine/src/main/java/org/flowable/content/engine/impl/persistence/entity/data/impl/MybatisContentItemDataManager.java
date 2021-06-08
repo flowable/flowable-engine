@@ -71,4 +71,19 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
         params.put("scopeType", scopeType);
         getDbSqlSession().delete("deleteContentItemsByScopeIdAndScopeType", params, getManagedEntityClass());
     }
+
+    @Override
+    public long countChangeTenantIdContentItemInstances(String sourceTenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdContentItemInstances", parameters);
+    }
+
+    @Override
+    public long changeTenantIdContentItemInstances(String sourceTenantId, String targetTenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        return (long) getDbSqlSession().update("changeTenantIdContentItemInstances", parameters);
+    }
 }

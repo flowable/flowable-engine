@@ -73,4 +73,8 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     void clearAllProcessInstanceLockTimes(String lockOwner);
 
+    long countChangeTenantIdExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

@@ -128,4 +128,21 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         return jobServiceConfiguration.getIdGenerator();
     }
     
+    @Override
+    public long countChangeTenantIdHistoryJobs(String sourceTenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", false); //because History Jobs don't have references to definitions (at this moment)
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoryJobs", parameters);
+    }
+
+    @Override
+    public long changeTenantIdHistoryJobs(String sourceTenantId, String targetTenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", false); //because History Jobs don't have references to definitions (at this moment)
+        return (long) getDbSqlSession().update("changeTenantIdHistoryJobs", parameters);
+    }
+
 }

@@ -54,4 +54,9 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
     List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs);
+        
+    long countChangeTenantIdExternalWorkerJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdExternalWorkerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

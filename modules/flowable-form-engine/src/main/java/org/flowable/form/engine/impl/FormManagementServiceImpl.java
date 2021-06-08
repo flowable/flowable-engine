@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.cmd.GetTableMetaDataCmd;
@@ -25,6 +26,7 @@ import org.flowable.form.api.FormManagementService;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.form.engine.impl.cmd.GetTableNameCmd;
+import org.flowable.form.engine.impl.tenant.ChangeTenantIdBuilderFormInstanceImpl;
 
 /**
  * @author Tijs Rademakers
@@ -58,6 +60,11 @@ public class FormManagementServiceImpl extends CommonEngineServiceImpl<FormEngin
     public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
         Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
         return commandExecutor.execute(new ExecuteCustomSqlCmd<>(mapperClass, customSqlExecution));
+    }
+
+    @Override
+    public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
+        return new ChangeTenantIdBuilderFormInstanceImpl(commandExecutor, fromTenantId, toTenantId);
     }
 
 }

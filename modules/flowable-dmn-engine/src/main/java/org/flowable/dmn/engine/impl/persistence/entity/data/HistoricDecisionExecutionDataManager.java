@@ -34,4 +34,9 @@ public interface HistoricDecisionExecutionDataManager extends DataManager<Histor
     List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap);
+
+    long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

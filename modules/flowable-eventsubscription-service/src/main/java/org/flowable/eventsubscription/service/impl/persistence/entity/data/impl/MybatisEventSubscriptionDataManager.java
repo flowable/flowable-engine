@@ -374,4 +374,27 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         return eventSubscriptionServiceConfiguration.getIdGenerator();
     }
     
+    @Override
+    public long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdEventSubscriptions", parameters);
+    }
+
+    @Override
+    public long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdEventSubscriptions", parameters);
+    }
+
 }

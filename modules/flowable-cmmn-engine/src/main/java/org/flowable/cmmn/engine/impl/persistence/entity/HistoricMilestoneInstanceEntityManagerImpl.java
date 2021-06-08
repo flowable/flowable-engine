@@ -53,4 +53,16 @@ public class HistoricMilestoneInstanceEntityManagerImpl
         dataManager.deleteHistoricMilestoneInstancesForNonExistingCaseInstances();
     }
     
+    @Override
+    public long countChangeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdCmmnHistoricMilestoneInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdCmmnHistoricMilestoneInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

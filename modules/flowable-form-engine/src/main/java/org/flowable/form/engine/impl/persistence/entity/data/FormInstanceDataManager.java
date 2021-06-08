@@ -33,4 +33,9 @@ public interface FormInstanceDataManager extends DataManager<FormInstanceEntity>
     void deleteFormInstancesByProcessDefinitionId(String processDefinitionId);
     
     void deleteFormInstancesByScopeDefinitionId(String scopeDefinitionId);
+
+    long countChangeTenantIdFormInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
+    long changeTenantIdFormInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
 }

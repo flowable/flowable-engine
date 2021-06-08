@@ -70,4 +70,14 @@ public class HistoryJobEntityManagerImpl
         super.delete(historyJobEntity);
     }
 
+    @Override
+    public long countChangeTenantIdHistoryJobs(String sourceTenantId) {
+        return dataManager.countChangeTenantIdHistoryJobs(sourceTenantId);
+    }
+
+    @Override
+    public long changeTenantIdHistoryJobs(String sourceTenantId, String targetTenantId) {
+        return dataManager.changeTenantIdHistoryJobs(sourceTenantId, targetTenantId);
+    }
+
 }

@@ -61,4 +61,16 @@ public class HistoricDecisionExecutionEntityManagerImpl
         return dataManager.findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
     }
 
+    @Override
+    public long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdHistoricDecisionExecutions(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdHistoricDecisionExecutions(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

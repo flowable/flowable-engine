@@ -79,5 +79,9 @@ public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEnti
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
 
     void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities);
-
+    
+    long countChangeTenantIdTimerJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdTimerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

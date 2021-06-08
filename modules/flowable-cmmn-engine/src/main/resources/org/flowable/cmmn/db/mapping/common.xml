@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.db.mapping">
+
+    <!-- <sql id="changeTenantIdSetSql">
+        <set>
+            RES.TENANT_ID_ = #{targetTenantId, jdbcType=VARCHAR}
+        </set>
+    </sql> -->
+    
+    <sql id="changeTenantIdCaseCriteriaSql">
+        <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
+        <if test="onlyInstancesFromDefaultTenantDefinitions">
+            and RES.CASE_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+        </if>
+    </sql>
+
+</mapper>

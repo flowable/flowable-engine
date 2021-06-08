@@ -939,4 +939,16 @@
   <select id="selectHistoricProcessInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <select id="countChangeTenantIdHistoricProcessInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_PROCINST RES
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdHistoricProcessInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_HI_PROCINST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+  </update>
+
 </mapper>

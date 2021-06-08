@@ -373,5 +373,16 @@
     select * from ${prefix}ACT_HI_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>
-  
+
+  <select id="countChangeTenantIdHistoricActivityInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_ACTINST RES
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql" />
+  </select>
+
+  <update id="changeTenantIdHistoricActivityInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_HI_ACTINST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+  </update>
+
 </mapper>

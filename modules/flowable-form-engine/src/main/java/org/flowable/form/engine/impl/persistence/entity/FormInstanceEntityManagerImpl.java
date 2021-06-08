@@ -64,4 +64,17 @@ public class FormInstanceEntityManagerImpl
     protected FormResourceEntityManager getResourceEntityManager() {
         return engineConfiguration.getResourceEntityManager();
     }
+
+    @Override
+    public long countChangeTenantIdFormInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdFormInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdFormInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdFormInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+    
 }

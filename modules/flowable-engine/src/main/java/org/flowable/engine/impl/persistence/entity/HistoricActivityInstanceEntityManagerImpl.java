@@ -97,4 +97,16 @@ public class HistoricActivityInstanceEntityManagerImpl
         return engineConfiguration.getHistoryManager();
     }
 
+    @Override
+    public long countChangeTenantIdHistoricActivityInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdHistoricActivityInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdHistoricActivityInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdHistoricActivityInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

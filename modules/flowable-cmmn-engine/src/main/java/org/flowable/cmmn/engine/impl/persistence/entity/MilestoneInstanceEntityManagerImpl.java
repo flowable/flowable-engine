@@ -57,5 +57,17 @@ public class MilestoneInstanceEntityManagerImpl
     public void deleteByCaseInstanceId(String caseInstanceId) {
         dataManager.deleteByCaseInstanceId(caseInstanceId);
     }
+
+    @Override
+    public long countChangeTenantIdCmmnMilestoneInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdCmmnMilestoneInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdCmmnMilestoneInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdCmmnMilestoneInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
     
 }

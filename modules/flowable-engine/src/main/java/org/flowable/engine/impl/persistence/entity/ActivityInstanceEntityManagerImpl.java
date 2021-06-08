@@ -451,4 +451,16 @@ public class ActivityInstanceEntityManagerImpl
         return engineConfiguration.getExecutionEntityManager();
     }
 
+    @Override
+    public long countChangeTenantIdActivityInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdActivityInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdActivityInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

@@ -58,4 +58,14 @@ public class ContentItemEntityManagerImpl
         dataManager.deleteContentItemsByScopeIdAndScopeType(scopeId, scopeType);
     }
 
+    @Override
+    public long countChangeTenantIdContentItemInstances(String sourceTenantId) {
+        return dataManager.countChangeTenantIdContentItemInstances(sourceTenantId);
+    }
+
+    @Override
+    public long changeTenantIdContentItemInstances(String sourceTenantId, String targetTenantId) {
+        return dataManager.changeTenantIdContentItemInstances(sourceTenantId, targetTenantId);
+    }
+
 }

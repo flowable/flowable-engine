@@ -130,4 +130,18 @@ public class DeadLetterJobEntityManagerImpl
         return newJobEntity;
     }
 
+    @Override
+    public long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdDeadLetterJobs(sourceTenantId, defaultTenantId,
+                onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdDeadLetterJobs(sourceTenantId, targetTenantId, defaultTenantId,
+                onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
 }

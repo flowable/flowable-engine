@@ -69,4 +69,17 @@ public class HistoricCaseInstanceEntityManagerImpl
     public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
         dataManager.deleteHistoricCaseInstances(historicCaseInstanceQuery);
     }
+
+    @Override
+    public long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdCmmnHistoricCaseInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdCmmnHistoricCaseInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

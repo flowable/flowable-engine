@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -21,6 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 
 /**
  * @author Joram Barrez
@@ -55,6 +58,27 @@ public class MybatisHistoricMilestoneInstanceDataManager extends AbstractCmmnDat
     @Override
     public void deleteHistoricMilestoneInstancesForNonExistingCaseInstances() {
         getDbSqlSession().delete("bulkDeleteHistoricMilestoneInstancesForNonExistingCaseInstances", null, getManagedEntityClass());
+    }
+
+    @Override
+    public long countChangeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricMilestoneInstances", parameters);
+    }
+
+    @Override
+    public long changeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricMilestoneInstances", parameters);
     }
     
 }

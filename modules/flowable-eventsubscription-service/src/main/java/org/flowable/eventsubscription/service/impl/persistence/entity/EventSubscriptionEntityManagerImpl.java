@@ -335,4 +335,16 @@ public class EventSubscriptionEntityManagerImpl
         return messageEventSubscriptionEntities;
     }
 
+    @Override
+    public long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdEventSubscriptions(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdEventSubscriptions(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
 }

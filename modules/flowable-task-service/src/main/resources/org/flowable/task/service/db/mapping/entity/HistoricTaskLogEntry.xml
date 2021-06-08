@@ -236,4 +236,15 @@
     SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_RU_CASE_INST CASEINST)
   </delete>
 
+  <select id="countChangeTenantIdHistoricTaskLogEntries" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_TSK_LOG RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdHistoricTaskLogEntries" parameterType="java.util.Map">
+    update ${prefix}ACT_HI_TSK_LOG RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+  </update>
+
 </mapper>

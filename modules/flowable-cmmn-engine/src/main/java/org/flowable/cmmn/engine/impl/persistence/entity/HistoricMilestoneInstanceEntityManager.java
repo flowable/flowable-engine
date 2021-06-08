@@ -30,4 +30,9 @@ public interface HistoricMilestoneInstanceEntityManager extends EntityManager<Hi
     long findHistoricMilestoneInstanceCountByQueryCriteria(HistoricMilestoneInstanceQuery query);
     
     void deleteHistoricMilestoneInstancesForNonExistingCaseInstances();
+
+    long countChangeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

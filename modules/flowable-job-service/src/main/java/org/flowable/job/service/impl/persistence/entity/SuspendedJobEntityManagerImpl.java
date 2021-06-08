@@ -127,4 +127,16 @@ public class SuspendedJobEntityManagerImpl
         return newSuspendedJobEntity;
     }
 
+    @Override
+    public long countChangeTenantIdSuspendedJobs(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdSuspendedJobs(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdSuspendedJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdSuspendedJobs(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
 }

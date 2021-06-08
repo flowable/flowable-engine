@@ -133,19 +133,27 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
-        long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
-        assertEquals(createCaseInstanceEndedErrorMessage(caseInstance, count), 0, count);
-        assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertCaseInstanceEnded(caseInstance.getId());
+    }
+
+    protected void assertCaseInstanceEnded(String caseInstanceId) {
+        long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).count();
+        assertEquals(createCaseInstanceEndedErrorMessage(caseInstanceId, count), 0, count);
+        assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).count());
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+            assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).finished().count());
         }
     }
 
     protected String createCaseInstanceEndedErrorMessage(CaseInstance caseInstance, long count) {
+        return createCaseInstanceEndedErrorMessage(caseInstance.getId(), count);
+    }
+
+    protected String createCaseInstanceEndedErrorMessage(String caseInstanceId, long count) {
         String errorMessage = "Plan item instances found for case instance: ";
         if (count != 0) {
-            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).list();
             String names = planItemInstances.stream()
                 .map(planItemInstance -> planItemInstance.getName() + "(" + planItemInstance.getPlanItemDefinitionType() + ")")
                 .collect(Collectors.joining(", "));

@@ -45,6 +45,7 @@
         <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
         <mapper resource="org/flowable/common/db/mapping/entity/ByteArray.xml" />
         <mapper resource="org/flowable/common/db/mapping/common.xml" />
+        <mapper resource="org/flowable/common/db/mapping/changeTenantId.xml"/>
         <mapper resource="org/flowable/db/mapping/entity/Resource.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/SuspendedJob.xml" />
         <mapper resource="org/flowable/job/service/db/mapping/entity/ExternalWorkerJob.xml" />
@@ -55,7 +56,7 @@
         <mapper resource="org/flowable/eventsubscription/service/db/mapping/entity/EventSubscription.xml" />
         <mapper resource="org/flowable/db/mapping/entity/EventLogEntry.xml" />
         <mapper resource="org/flowable/batch/service/db/mapping/entity/Batch.xml" />
-        <mapper resource="org/flowable/batch/service/db/mapping/entity/BatchPart.xml" />
+        <mapper resource="org/flowable/batch/service/db/mapping/entity/BatchPart.xml" />  
     </mappers>
 
 </configuration>

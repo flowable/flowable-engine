@@ -332,4 +332,15 @@
     where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
   </select>
   
+  <select id="countChangeTenantIdActivityInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_RU_ACTINST RES
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdActivityInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_ACTINST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+  </update>
+
 </mapper>

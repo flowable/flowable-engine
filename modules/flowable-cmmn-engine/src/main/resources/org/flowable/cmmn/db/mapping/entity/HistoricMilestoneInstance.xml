@@ -143,5 +143,16 @@
         </if>
     </where>
   </sql>
+
+  <select id="countChangeTenantIdCmmnHistoricMilestoneInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_CMMN_HI_MIL_INST RES
+    <include refid="org.flowable.cmmn.db.mapping.changeTenantIdCaseCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdCmmnHistoricMilestoneInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_CMMN_HI_MIL_INST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.cmmn.db.mapping.changeTenantIdCaseCriteriaSql"/>
+  </update>
   
 </mapper>

@@ -44,4 +44,8 @@ public interface HistoricProcessInstanceDataManager extends DataManager<Historic
     
     void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
+    long countChangeTenantIdHistoricProcessInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

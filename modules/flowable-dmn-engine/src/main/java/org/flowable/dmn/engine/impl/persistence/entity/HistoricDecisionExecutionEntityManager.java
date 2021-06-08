@@ -34,4 +34,8 @@ public interface HistoricDecisionExecutionEntityManager extends EntityManager<Hi
 
     long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
+    long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }

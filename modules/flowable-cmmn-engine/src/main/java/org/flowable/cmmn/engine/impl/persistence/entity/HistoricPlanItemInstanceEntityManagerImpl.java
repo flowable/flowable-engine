@@ -63,4 +63,17 @@ public class HistoricPlanItemInstanceEntityManagerImpl
     public void deleteHistoricPlanItemInstancesForNonExistingCaseInstances() {
         dataManager.deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
     }
+
+    @Override
+    public long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdCmmnHistoricPlanItemInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdCmmnHistoricPlanItemInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

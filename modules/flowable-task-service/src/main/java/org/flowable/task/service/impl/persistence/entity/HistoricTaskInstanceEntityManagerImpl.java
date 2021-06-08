@@ -108,4 +108,15 @@ public class HistoricTaskInstanceEntityManagerImpl
         this.dataManager = historicTaskInstanceDataManager;
     }
 
+    @Override
+    public long countChangeTenantIdHistoricTaskInstances(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdHistoricTaskInstances(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdHistoricTaskInstances(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdHistoricTaskInstances(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
 }
