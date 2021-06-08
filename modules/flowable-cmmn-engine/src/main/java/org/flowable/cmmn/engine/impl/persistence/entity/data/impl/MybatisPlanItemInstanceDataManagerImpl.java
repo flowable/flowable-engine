@@ -109,12 +109,14 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
 
     @Override
     public long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        setSafeInValueLists(planItemInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectPlanItemInstanceCountByQueryCriteria", planItemInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        setSafeInValueLists(planItemInstanceQuery);
         return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
     }
     
@@ -183,4 +185,9 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
 
     }
     
+    protected void setSafeInValueLists(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        if (planItemInstanceQuery.getInvolvedGroups() != null) {
+            planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
+        }
+    }
 }

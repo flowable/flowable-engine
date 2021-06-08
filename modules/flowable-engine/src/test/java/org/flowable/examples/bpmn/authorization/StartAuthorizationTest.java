@@ -18,11 +18,14 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
@@ -349,6 +352,21 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             assertThat(repositoryService.createProcessDefinitionQuery().startableByUserOrGroups("user1", Collections.singletonList("group3")).list())
                 .extracting(ProcessDefinition::getKey)
                 .containsExactlyInAnyOrder("process2", "process3", "process4");
+            
+            Set<String> testGroups = new HashSet<>(2100);
+            for (int i = 0; i < 2100; i++) {
+                testGroups.add("groupa" + i);
+            }
+            
+            ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().startableByUserOrGroups(null, testGroups);
+            assertThat(processDefinitionQuery.count()).isEqualTo(0);
+            assertThat(processDefinitionQuery.list()).hasSize(0);
+            
+            testGroups.add("group1");
+            
+            processDefinitionQuery = repositoryService.createProcessDefinitionQuery().startableByUserOrGroups(null, testGroups);
+            assertThat(processDefinitionQuery.count()).isEqualTo(1);
+            assertThat(processDefinitionQuery.list()).hasSize(1);
 
         } finally {
             tearDownUsersAndGroups();

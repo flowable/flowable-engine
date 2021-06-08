@@ -508,6 +508,106 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("theTask").or().deploymentIdIn(deploymentIds).endOr();
         assertThat(taskInstanceQuery.count()).isZero();
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessCandidateGroups.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryByCandidateGroups() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        List<String> testCandidateGroups = new ArrayList<>();
+        testCandidateGroups.add("groupA");
+        testCandidateGroups.add("groupC");
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+        
+        testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").taskCandidateGroupIn(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(5);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(5);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("undefined").taskCandidateGroupIn(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        testCandidateGroups.add("groupB");
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessCandidateGroups.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryByInvolvedGroups() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        List<String> testCandidateGroups = new ArrayList<>();
+        testCandidateGroups.add("groupA");
+        testCandidateGroups.add("groupC");
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+        
+        testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").taskInvolvedGroups(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(5);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(5);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("undefined").taskInvolvedGroups(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        testCandidateGroups.add("groupB");
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })

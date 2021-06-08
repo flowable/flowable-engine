@@ -43,6 +43,7 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricPlanItemInstance> findByCriteria(HistoricPlanItemInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return getDbSqlSession().selectList("selectHistoricPlanItemInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
@@ -55,6 +56,7 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
 
     @Override
     public long countByCriteria(HistoricPlanItemInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return (Long) getDbSqlSession().selectOne("selectHistoricPlanItemInstancesCountByQueryCriteria", query);
     }
 
@@ -81,5 +83,11 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     @Override
     public HistoricPlanItemInstanceEntity create(PlanItemInstance planItemInstance) {
         return new HistoricPlanItemInstanceEntityImpl(planItemInstance);
+    }
+    
+    protected void setSafeInValueLists(HistoricPlanItemInstanceQueryImpl planItemInstanceQuery) {
+        if (planItemInstanceQuery.getInvolvedGroups() != null) {
+            planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
+        }
     }
 }

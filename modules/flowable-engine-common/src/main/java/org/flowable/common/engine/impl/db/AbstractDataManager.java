@@ -298,6 +298,35 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
             }
         }
     }
+    
+    protected List<List<String>> createSafeInValuesList(Collection<String> values) {
+        if (values == null) {
+            return null;
+        }
+        
+        List<String> valuesList = new ArrayList<>(values);
+        List<List<String>> safeValuesList = new ArrayList<>();
+        int valuesSize = values.size();
+        if (valuesSize <= MAX_ENTRIES_IN_CLAUSE) {
+            safeValuesList.add(valuesList);
+
+        } else {
+
+            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+
+            for (int startIndex = 0; startIndex < valuesSize; startIndex += MAX_ENTRIES_IN_CLAUSE) {
+
+                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
+                if (endIndex > valuesSize) {
+                    endIndex = valuesSize; // endIndex in #subList is exclusive
+                }
+
+                safeValuesList.add(valuesList.subList(startIndex, endIndex));
+            }
+        }
+        
+        return safeValuesList;
+    }
 
     protected void executeChangeWithInClause(List<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
         if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {

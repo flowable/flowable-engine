@@ -106,9 +106,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Collection<String> taskDefinitionKeys;
     protected String candidateUser;
     protected String candidateGroup;
-    private Collection<String> candidateGroups;
+    protected Collection<String> candidateGroups;
+    private List<List<String>> safeCandidateGroups;
     protected String involvedUser;
     protected Collection<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected boolean ignoreAssigneeValue;
     protected Integer taskPriority;
     protected Integer taskMinPriority;
@@ -2159,5 +2161,21 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCandidateGroups() {
+        return safeCandidateGroups;
+    }
+
+    public void setSafeCandidateGroups(List<List<String>> safeCandidateGroups) {
+        this.safeCandidateGroups = safeCandidateGroups;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
     }
 }

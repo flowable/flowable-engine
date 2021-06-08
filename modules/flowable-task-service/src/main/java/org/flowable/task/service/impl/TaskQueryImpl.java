@@ -69,6 +69,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Collection<String> assigneeIds;
     protected String involvedUser;
     protected Collection<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected String owner;
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
@@ -79,6 +80,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String candidateUser;
     protected String candidateGroup;
     protected Collection<String> candidateGroups;
+    private List<List<String>> safeCandidateGroups;
     protected boolean ignoreAssigneeValue;
     protected String tenantId;
     protected String tenantIdLike;
@@ -2170,4 +2172,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return super.count();
     }
 
+    public List<List<String>> getSafeCandidateGroups() {
+        return safeCandidateGroups;
+    }
+
+    public void setSafeCandidateGroups(List<List<String>> safeCandidateGroups) {
+        this.safeCandidateGroups = safeCandidateGroups;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
+    }
 }

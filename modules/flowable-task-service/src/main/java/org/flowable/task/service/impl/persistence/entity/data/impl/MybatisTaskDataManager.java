@@ -105,6 +105,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @SuppressWarnings("unchecked")
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {
         final String query = "selectTaskByQueryCriteria";
+        setSafeInValueLists(taskQuery);
         return getDbSqlSession().selectList(query, taskQuery, getManagedEntityClass());
     }
 
@@ -112,11 +113,13 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @SuppressWarnings("unchecked")
     public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
         final String query = "selectTasksWithRelatedEntitiesByQueryCriteria";
+        setSafeInValueLists(taskQuery);
         return getDbSqlSession().selectList(query, taskQuery, getManagedEntityClass());
     }
 
     @Override
     public long findTaskCountByQueryCriteria(TaskQueryImpl taskQuery) {
+        setSafeInValueLists(taskQuery);
         return (Long) getDbSqlSession().selectOne("selectTaskCountByQueryCriteria", taskQuery);
     }
 
@@ -165,4 +168,19 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         return taskServiceConfiguration.getIdGenerator();
     }
     
+    protected void setSafeInValueLists(TaskQueryImpl taskQuery) {
+        if (taskQuery.getCandidateGroups() != null) {
+            taskQuery.setSafeCandidateGroups(createSafeInValuesList(taskQuery.getCandidateGroups()));
+        }
+        
+        if (taskQuery.getInvolvedGroups() != null) {
+            taskQuery.setSafeInvolvedGroups(createSafeInValuesList(taskQuery.getInvolvedGroups()));
+        }
+        
+        if (taskQuery.getOrQueryObjects() != null && !taskQuery.getOrQueryObjects().isEmpty()) {
+            for (TaskQueryImpl orTaskQuery : taskQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orTaskQuery);
+            }
+        }
+    }
 }

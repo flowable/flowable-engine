@@ -1187,11 +1187,18 @@
                 or
               </if>
               <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-                LINK.GROUP_ID_ IN
-                <foreach item="group" index="index" collection="candidateGroups"
+                (
+                <foreach item="candidateGroupListItem" index="groupIndex" collection="safeCandidateGroups">
+                	<if test="groupIndex &gt; 0">
+                	or
+                	</if>
+                	LINK.GROUP_ID_ IN
+                	<foreach item="group" index="index" collection="candidateGroupListItem"
                          open="(" separator="," close=")">
-                  #{group}
+                  	  #{group}
+                	</foreach>
                 </foreach>
+                )
               </if>
             )
         )
@@ -1204,10 +1211,19 @@
           )
       </if>
       <if test="involvedGroups != null">
-        and EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
-        <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
-          #{involvedGroup}
-        </foreach>
+        and EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = ${queryTablePrefix}ID_ and
+            (
+    		<foreach item="involvedGroupListItem" index="groupIndex" collection="safeInvolvedGroups">
+    			<if test="groupIndex &gt; 0">
+    			or
+    			</if>
+                LINK.GROUP_ID_ IN
+                <foreach item="group" index="index" collection="involvedGroupListItem"
+                      open="(" separator="," close=")">
+                  #{group}
+                </foreach>
+            </foreach>
+            )
         )
       </if>
   </sql>
@@ -1421,11 +1437,18 @@
                 or
               </if>
               <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
-                LINK.GROUP_ID_ IN
-                <foreach item="group" index="index" collection="orQueryObject.candidateGroups"
+                (
+                <foreach item="candidateGroupListItem" index="groupIndex" collection="orQueryObject.safeCandidateGroups">
+                    <if test="groupIndex &gt; 0">
+                    or
+                    </if>
+                    LINK.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="candidateGroupListItem"
                          open="(" separator="," close=")">
-                  #{group}
+                      #{group}
+                    </foreach>
                 </foreach>
+                )
               </if>
             )
           )
@@ -1443,10 +1466,19 @@
       </if>
       <if test="orQueryObject.involvedGroups != null">
         or
-          EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
-          <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
-            #{involvedGroup}
-          </foreach>
+          EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.TASK_ID_ = ${queryTablePrefix}ID_ and
+            (
+    		<foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+    			<if test="groupIndex &gt; 0">
+    			or
+    			</if>
+                LINK.GROUP_ID_ IN
+                <foreach item="group" index="index" collection="involvedGroupListItem"
+                      open="(" separator="," close=")">
+                  #{group}
+                </foreach>
+            </foreach>
+            )
           )
       </if>
   </sql>

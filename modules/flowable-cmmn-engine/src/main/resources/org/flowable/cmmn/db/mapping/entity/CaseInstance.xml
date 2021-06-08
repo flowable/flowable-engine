@@ -441,10 +441,19 @@
         	</if>
             <if test="involvedGroups != null">
                 and EXISTS(
-                select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
-                <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
-                    #{involvedGroup}
-                </foreach>
+                  select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and
+                    (
+                    <foreach item="involvedGroupListItem" index="groupIndex" collection="safeInvolvedGroups">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        I.GROUP_ID_ IN
+                        <foreach item="group" index="index" collection="involvedGroupListItem"
+                              open="(" separator="," close=")">
+                          #{group}
+                        </foreach>
+                    </foreach>
+                    )
                 )
             </if>
             <if test="involvedGroupIdentityLink != null">
@@ -651,10 +660,19 @@
 			        </if>
                     <if test="orQueryObject.involvedGroups != null">
                         or EXISTS(
-                        select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.GROUP_ID_ in
-                        <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
-                            #{involvedGroup}
-                        </foreach>
+                          select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and
+                            (
+                            <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                                <if test="groupIndex &gt; 0">
+                                or
+                                </if>
+                                I.GROUP_ID_ IN
+                                <foreach item="group" index="index" collection="involvedGroupListItem"
+                                      open="(" separator="," close=")">
+                                  #{group}
+                                </foreach>
+                            </foreach>
+                            )
                         )
                     </if>
 					<if test="orQueryObject.involvedGroupIdentityLink != null">

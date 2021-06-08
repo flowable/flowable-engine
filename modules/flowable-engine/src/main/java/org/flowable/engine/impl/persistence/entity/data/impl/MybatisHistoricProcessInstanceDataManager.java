@@ -62,18 +62,21 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
 
     @Override
     public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        setSafeInValueLists(historicProcessInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        setSafeInValueLists(historicProcessInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        setSafeInValueLists(historicProcessInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
     }
 
@@ -93,4 +96,15 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
         getDbSqlSession().delete("bulkDeleteHistoricProcessInstances", historicProcessInstanceQuery, HistoricProcessInstanceEntityImpl.class);
     }
 
+    protected void setSafeInValueLists(HistoricProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getInvolvedGroups() != null) {
+            processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
+        }
+        
+        if (processInstanceQuery.getOrQueryObjects() != null && !processInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (HistoricProcessInstanceQueryImpl orProcessInstanceQuery : processInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orProcessInstanceQuery);
+            }
+        }
+    }
 }
