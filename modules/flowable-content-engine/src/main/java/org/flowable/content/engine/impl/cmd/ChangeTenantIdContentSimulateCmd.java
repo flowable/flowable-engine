@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTenantIdContentSimulateCmd implements Command<ChangeTenantIdResult> {
 
-        private final static Logger logger = LoggerFactory.getLogger(ChangeTenantIdContentSimulateCmd.class);
+        private final static Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdContentSimulateCmd.class);
 
         private final String sourceTenantId;
         private final String targetTenantId;
@@ -38,7 +38,7 @@ public class ChangeTenantIdContentSimulateCmd implements Command<ChangeTenantIdR
 
         @Override
         public ChangeTenantIdResult execute(CommandContext commandContext) {
-                logger.debug("Simulating Content Instance migration from '{}' to '{}'.", sourceTenantId, targetTenantId);
+                LOGGER.debug("Simulating Content Instance migration from '{}' to '{}'.", sourceTenantId, targetTenantId);
                 ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration(commandContext);
                 long changeTenantIdContentItemInstances = contentEngineConfiguration.getContentItemEntityManager()
                                                 .countChangeTenantIdContentItemInstances(sourceTenantId);

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTenantIdBpmnSimulateCmd  implements Command<ChangeTenantIdResult>{
 
-    private final static Logger logger = LoggerFactory.getLogger(ChangeTenantIdBpmnSimulateCmd.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdBpmnSimulateCmd.class);
 
     private final String sourceTenantId;
     private final String targetTenantId;
@@ -43,7 +43,7 @@ public class ChangeTenantIdBpmnSimulateCmd  implements Command<ChangeTenantIdRes
 
     @Override
     public ChangeTenantIdResult execute(CommandContext commandContext) {
-        logger.debug("Simulating case instance migration from '{}' to '{}'{}.", sourceTenantId, targetTenantId,
+        LOGGER.debug("Simulating case instance migration from '{}' to '{}'{}.", sourceTenantId, targetTenantId,
         onlyInstancesFromDefaultTenantDefinitions
                         ? " but only for instances from the default tenant definitions"
                         : "");
