@@ -56,7 +56,6 @@ import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
-import org.flowable.spring.boot.cmmn.Cmmn;
 import org.flowable.spring.boot.cmmn.CmmnEngineAutoConfiguration;
 import org.flowable.spring.boot.cmmn.CmmnEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;

@@ -17,7 +17,6 @@ import java.util.List;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
-import org.flowable.bpmn.model.Process;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;

@@ -108,9 +108,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoric
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
 import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 public class DmnEngineConfiguration extends AbstractEngineConfiguration
         implements DmnEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
