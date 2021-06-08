@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +34,6 @@ import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
-import liquibase.hub.core.MockHubService;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.ui.LoggerUIService;
 

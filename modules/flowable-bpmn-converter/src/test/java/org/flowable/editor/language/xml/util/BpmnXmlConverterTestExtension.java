@@ -12,9 +12,6 @@
  */
 package org.flowable.editor.language.xml.util;
 
-import static org.flowable.editor.language.xml.util.XmlTestUtils.readXMLFile;
-import static org.flowable.editor.language.xml.util.XmlTestUtils.readXmlExportAndReadAgain;
-
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
