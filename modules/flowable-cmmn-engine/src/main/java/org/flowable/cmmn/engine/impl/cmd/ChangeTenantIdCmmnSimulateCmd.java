@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTenantIdCmmnSimulateCmd implements Command<ChangeTenantIdResult> {
 
-        private final static Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdCmmnSimulateCmd.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdCmmnSimulateCmd.class);
 
         private final String sourceTenantId;
         private final String targetTenantId;
