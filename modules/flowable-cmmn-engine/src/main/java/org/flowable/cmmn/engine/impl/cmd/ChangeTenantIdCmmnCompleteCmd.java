@@ -13,12 +13,11 @@
 
 package org.flowable.cmmn.engine.impl.cmd;
 
-import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.*;
-
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -54,71 +53,71 @@ public class ChangeTenantIdCmmnCompleteCmd implements Command<ChangeTenantIdResu
                 TaskServiceConfiguration taskServiceConfiguration = cmmnEngineConfiguration
                                 .getTaskServiceConfiguration();
                 return ChangeTenantIdResult.builder()
-                                .addResult(CaseInstances, cmmnEngineConfiguration.getCaseInstanceEntityManager()
+                                .addResult(Key.CaseInstances, cmmnEngineConfiguration.getCaseInstanceEntityManager()
                                                 .changeTenantIdCmmnCaseInstances(sourceTenantId, targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(MilestoneInstances, cmmnEngineConfiguration
+                                .addResult(Key.MilestoneInstances, cmmnEngineConfiguration
                                                 .getMilestoneInstanceEntityManager()
                                                 .changeTenantIdCmmnMilestoneInstances(sourceTenantId, targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(PlanItemInstances, cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                                .addResult(Key.PlanItemInstances, cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
                                                 .changeTenantIdCmmnPlanItemInstances(sourceTenantId, targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(HistoricCaseInstances, cmmnEngineConfiguration
+                                .addResult(Key.HistoricCaseInstances, cmmnEngineConfiguration
                                                 .getHistoricCaseInstanceEntityManager()
                                                 .changeTenantIdCmmnHistoricCaseInstances(sourceTenantId, targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(HistoricMilestoneInstances, cmmnEngineConfiguration
+                                .addResult(Key.HistoricMilestoneInstances, cmmnEngineConfiguration
                                                 .getHistoricMilestoneInstanceEntityManager()
                                                 .changeTenantIdCmmnHistoricMilestoneInstances(sourceTenantId,
                                                                 targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(HistoricPlanItemInstances, cmmnEngineConfiguration
+                                .addResult(Key.HistoricPlanItemInstances, cmmnEngineConfiguration
                                                 .getHistoricPlanItemInstanceEntityManager()
                                                 .changeTenantIdCmmnHistoricPlanItemInstances(sourceTenantId,
                                                                 targetTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions))
-                                .addResult(Jobs, jobServiceConfiguration.getJobEntityManager().changeTenantIdJobs(
+                                .addResult(Key.Jobs, jobServiceConfiguration.getJobEntityManager().changeTenantIdJobs(
                                                 sourceTenantId, targetTenantId, defaultTenantId,
                                                 onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.CMMN))
-                                .addResult(TimerJobs, jobServiceConfiguration.getTimerJobEntityManager()
+                                .addResult(Key.TimerJobs, jobServiceConfiguration.getTimerJobEntityManager()
                                                 .changeTenantIdTimerJobs(sourceTenantId, targetTenantId,
                                                                 defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(SuspendedJobs, jobServiceConfiguration.getSuspendedJobEntityManager()
+                                .addResult(Key.SuspendedJobs, jobServiceConfiguration.getSuspendedJobEntityManager()
                                                 .changeTenantIdSuspendedJobs(sourceTenantId, targetTenantId,
                                                                 defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(DeadLetterJobs, jobServiceConfiguration.getDeadLetterJobEntityManager()
+                                .addResult(Key.DeadLetterJobs, jobServiceConfiguration.getDeadLetterJobEntityManager()
                                                 .changeTenantIdDeadLetterJobs(sourceTenantId, targetTenantId,
                                                                 defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(HistoryJobs, jobServiceConfiguration.getHistoryJobEntityManager()
+                                .addResult(Key.HistoryJobs, jobServiceConfiguration.getHistoryJobEntityManager()
                                                 .changeTenantIdHistoryJobs(sourceTenantId, targetTenantId))
-                                .addResult(ExternalWorkerJobs, jobServiceConfiguration
+                                .addResult(Key.ExternalWorkerJobs, jobServiceConfiguration
                                                 .getExternalWorkerJobEntityManager().changeTenantIdExternalWorkerJobs(
                                                                 sourceTenantId, targetTenantId, defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(EventSubscriptions, cmmnEngineConfiguration
+                                .addResult(Key.EventSubscriptions, cmmnEngineConfiguration
                                                 .getEventSubscriptionServiceConfiguration()
                                                 .getEventSubscriptionEntityManager().changeTenantIdEventSubscriptions(
                                                                 sourceTenantId, targetTenantId, defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(Tasks, taskServiceConfiguration.getTaskEntityManager().changeTenantIdTasks(
+                                .addResult(Key.Tasks, taskServiceConfiguration.getTaskEntityManager().changeTenantIdTasks(
                                                 sourceTenantId, targetTenantId, defaultTenantId,
                                                 onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.CMMN))
-                                .addResult(HistoricTaskInstances, taskServiceConfiguration
+                                .addResult(Key.HistoricTaskInstances, taskServiceConfiguration
                                                 .getHistoricTaskInstanceEntityManager()
                                                 .changeTenantIdHistoricTaskInstances(sourceTenantId, targetTenantId,
                                                                 defaultTenantId,
                                                                 onlyInstancesFromDefaultTenantDefinitions,
                                                                 ScopeTypes.CMMN))
-                                .addResult(HistoricTaskLogEntries, taskServiceConfiguration
+                                .addResult(Key.HistoricTaskLogEntries, taskServiceConfiguration
                                                 .getHistoricTaskLogEntryEntityManager()
                                                 .changeTenantIdHistoricTaskLogEntries(sourceTenantId, targetTenantId,
                                                                 defaultTenantId,

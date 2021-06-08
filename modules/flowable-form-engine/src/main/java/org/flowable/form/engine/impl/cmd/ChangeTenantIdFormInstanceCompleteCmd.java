@@ -14,7 +14,7 @@
 package org.flowable.form.engine.impl.cmd;
 
 
-import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.*;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.FormInstances;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.form.engine.FormEngineConfiguration;

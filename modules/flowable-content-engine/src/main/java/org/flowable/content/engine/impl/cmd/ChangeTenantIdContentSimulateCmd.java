@@ -14,7 +14,7 @@
 package org.flowable.content.engine.impl.cmd;
 
 
-import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.*;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.ContentItemInstances;
 
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.interceptor.Command;
