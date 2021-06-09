@@ -347,7 +347,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
             }
         }
     }
-}
+
     @Override
     public long countChangeTenantIdExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
         String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
