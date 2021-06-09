@@ -205,12 +205,12 @@ public class WSDLImporter implements XMLImporter {
                     // loaded from classloader. It should be contain "$" instead of "." as separator
                     boolean isFieldParameterTypeNeestedClass = false;
                     final Iterator<JDefinedClass> theClassNeestedClassIt = theClass.classes();
-                    do {
+                    while (theClassNeestedClassIt.hasNext() && !isFieldParameterTypeNeestedClass) {
                         final JDefinedClass neestedType = theClassNeestedClassIt.next();
                         if (neestedType.name().equals(fieldParameterType.name())) {
                             isFieldParameterTypeNeestedClass = true;
                         }
-                    } while (!isFieldParameterTypeNeestedClass);
+                    }
                     if (isFieldParameterTypeNeestedClass) {
                         // The parameter type is a nested class
                         fieldParameterClass = ReflectUtil
