@@ -19,8 +19,6 @@
     <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
     <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
     <mapper resource="org/flowable/common/db/mapping/common.xml" />
-    <!-- <mapper resource="org/flowable/common/db/mapping/changeTenantId.xml"/> -->
-    <!-- <mapper resource="org/flowable/db/mapping/common.xml"/> -->
 
     <!-- Engine mappers -->
     <mapper resource="org/flowable/eventregistry/db/mapping/entity/EventDeployment.xml" />
