@@ -73,7 +73,8 @@ public class FlowableUiApplicationSecurityTest {
             "mappings",
             "caches",
             "caches-cache",
-                "health-path"
+            "health-path",
+            "configprops-prefix"
         )
     );
 
