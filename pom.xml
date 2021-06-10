@@ -14,11 +14,11 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.5.0</spring.boot.version>
-		<spring.framework.version>5.3.7</spring.framework.version>
+		<spring.boot.version>2.5.1</spring.boot.version>
+		<spring.framework.version>5.3.8</spring.framework.version>
 		<spring.security.version>5.5.0</spring.security.version>
-		<spring.amqp.version>2.3.7</spring.amqp.version>
-		<spring.kafka.version>2.7.1</spring.kafka.version>
+		<spring.amqp.version>2.3.8</spring.amqp.version>
+		<spring.kafka.version>2.7.2</spring.kafka.version>
 		<reactor-netty.version>1.0.6</reactor-netty.version>
 		<jackson.version>2.12.3</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
@@ -30,7 +30,7 @@
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.7.1</junit.jupiter.version>
+		<junit.jupiter.version>5.7.2</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
@@ -775,7 +775,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.30.Final</version>
+				<version>5.4.32.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
