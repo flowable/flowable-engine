@@ -65,12 +65,14 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
 
     @Override
     public long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        setSafeInValueLists(historicTaskInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectHistoricTaskInstanceCountByQueryCriteria", historicTaskInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        setSafeInValueLists(historicTaskInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
     }
 
@@ -109,5 +111,21 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     protected IdGenerator getIdGenerator() {
         return taskServiceConfiguration.getIdGenerator();
+    }
+    
+    protected void setSafeInValueLists(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        if (historicTaskInstanceQuery.getCandidateGroups() != null) {
+            historicTaskInstanceQuery.setSafeCandidateGroups(createSafeInValuesList(historicTaskInstanceQuery.getCandidateGroups()));
+        }
+        
+        if (historicTaskInstanceQuery.getInvolvedGroups() != null) {
+            historicTaskInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(historicTaskInstanceQuery.getInvolvedGroups()));
+        }
+        
+        if (historicTaskInstanceQuery.getOrQueryObjects() != null && !historicTaskInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (HistoricTaskInstanceQueryImpl orHistoricTaskInstanceQuery : historicTaskInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orHistoricTaskInstanceQuery);
+            }
+        }
     }
 }

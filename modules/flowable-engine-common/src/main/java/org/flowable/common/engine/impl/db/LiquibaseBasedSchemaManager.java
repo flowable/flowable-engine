@@ -14,6 +14,9 @@ package org.flowable.common.engine.impl.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -22,19 +25,34 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ClassUtils;
 
 import liquibase.Liquibase;
+import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.ui.LoggerUIService;
 
 /**
  * @author Filip Hrisafov
  */
 public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
+
+    private static final String LIQUIBASE_HUB_SERVICE_CLASS_NAME = "liquibase.hub.HubService";
+    protected static final Map<String, Object> LIQUIBASE_SCOPE_VALUES = new HashMap<>();
+
+    static {
+        if (ClassUtils.isPresent(LIQUIBASE_HUB_SERVICE_CLASS_NAME, null)) {
+            LIQUIBASE_SCOPE_VALUES.put("liquibase.plugin." + LIQUIBASE_HUB_SERVICE_CLASS_NAME, FlowableLiquibaseHubService.class);
+            LoggerUIService uiService = new LoggerUIService();
+            uiService.setStandardLogLevel(Level.FINE);
+            LIQUIBASE_SCOPE_VALUES.put(Scope.Attr.ui.name(), uiService);
+        }
+    }
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -51,22 +69,28 @@ public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
     public void initSchema(String databaseSchemaUpdate) {
         try {
             if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-                schemaCreate();
+                runForLiquibase(this::schemaCreate);
 
             } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                schemaDrop();
-                schemaCreate();
+                runForLiquibase(() -> {
+                    schemaDrop();
+                    schemaCreate();
+                });
 
             } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                schemaUpdate();
+                runForLiquibase(this::schemaUpdate);
 
             } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                schemaCheckVersion();
+                runForLiquibase(this::schemaCheckVersion);
 
             }
         } catch (Exception e) {
             throw new FlowableException("Error initialising " + context + " data model", e);
         }
+    }
+
+    protected void runForLiquibase(Runnable runnable) throws Exception {
+        Scope.child(LIQUIBASE_SCOPE_VALUES, runnable::run);
     }
 
     @Override

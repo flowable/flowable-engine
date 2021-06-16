@@ -51,6 +51,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration} for the Dmn engine
  *
@@ -86,6 +88,7 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @Bean
     @ConditionalOnMissingBean
     public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ObjectMapper> objectMapperProvider,
         ObjectProvider<List<AutoDeploymentStrategy<DmnEngine>>> dmnAutoDeploymentStrategies) throws IOException {
         SpringDmnEngineConfiguration configuration = new SpringDmnEngineConfiguration();
 
@@ -102,6 +105,10 @@ public class DmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            configuration.setObjectMapper(objectMapper);
+        }
 
         configuration.setHistoryEnabled(dmnProperties.isHistoryEnabled());
         configuration.setEnableSafeDmnXml(dmnProperties.isEnableSafeXml());

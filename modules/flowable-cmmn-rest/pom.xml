@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Flowable - CMNMN Rest - Classes</name>
+  <name>Flowable - CMMN Rest - Classes</name>
   <artifactId>flowable-cmmn-rest</artifactId>
   <packaging>jar</packaging>
 
@@ -15,7 +15,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jetty.version>9.4.38.v20210224</jetty.version>
+    <jetty.version>9.4.42.v20210604</jetty.version>
     <flowable.artifact>
       org.flowable.cmmn.rest
     </flowable.artifact>

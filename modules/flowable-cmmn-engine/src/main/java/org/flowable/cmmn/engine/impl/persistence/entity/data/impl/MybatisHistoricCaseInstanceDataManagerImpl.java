@@ -58,17 +58,20 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return getDbSqlSession().selectList("selectHistoricCaseInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override
     public long countByCriteria(HistoricCaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return (Long) getDbSqlSession().selectOne("selectHistoricCaseInstanceCountByQueryCriteria", query);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        setSafeInValueLists(historicCaseInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery, getManagedEntityClass());
     }
 
@@ -81,5 +84,17 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     @Override
     public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
         getDbSqlSession().delete("bulkDeleteHistoricCaseInstances", historicCaseInstanceQuery, getManagedEntityClass());
+    }
+    
+    protected void setSafeInValueLists(HistoricCaseInstanceQueryImpl caseInstanceQuery) {
+        if (caseInstanceQuery.getInvolvedGroups() != null) {
+            caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
+        }
+        
+        if (caseInstanceQuery.getOrQueryObjects() != null && !caseInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (HistoricCaseInstanceQueryImpl orCaseInstanceQuery : caseInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orCaseInstanceQuery);
+            }
+        }
     }
 }

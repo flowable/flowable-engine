@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;

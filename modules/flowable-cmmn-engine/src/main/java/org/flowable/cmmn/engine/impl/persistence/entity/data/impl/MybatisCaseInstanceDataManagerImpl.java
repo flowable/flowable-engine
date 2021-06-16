@@ -168,17 +168,20 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     public List<CaseInstance> findByCriteria(CaseInstanceQueryImpl query) {
         // Not going through cache as the case instance should always be loaded with all related plan item instances
         // when not doing a query call
+        setSafeInValueLists(query);
         return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstancesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstanceWithVariablesByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override
     public long countByCriteria(CaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
         return (Long) getDbSqlSession().selectOne("selectCaseInstanceCountByQueryCriteria", query);
     }
 
@@ -210,4 +213,15 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         getDbSqlSession().update("clearAllCaseInstanceLockTimes", params);
     }
 
+    protected void setSafeInValueLists(CaseInstanceQueryImpl caseInstanceQuery) {
+        if (caseInstanceQuery.getInvolvedGroups() != null) {
+            caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
+        }
+        
+        if (caseInstanceQuery.getOrQueryObjects() != null && !caseInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (CaseInstanceQueryImpl orCaseInstanceQuery : caseInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orCaseInstanceQuery);
+            }
+        }
+    }
 }

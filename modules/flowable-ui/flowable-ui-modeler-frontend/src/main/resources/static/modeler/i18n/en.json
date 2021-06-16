@@ -730,6 +730,20 @@
             "DESCRIPTION" : "Define the error name."
           }
         },
+        "ERRORVARIABLEPACKAGE" : {
+          "ERRORVARIABLENAME" : {
+            "TITLE" : "Error variable name",
+            "DESCRIPTION" : "Define the error variable name."
+          },          
+          "ERRORVARIABLETRANSIENT" : {
+            "TITLE" : "Store as transient variable",
+            "DESCRIPTION" : "Flag defines whether a variable will be stored transiently."
+          },
+          "ERRORVARIABLELOCALSCOPE" : {
+            "TITLE" : "Store to a local scope",
+            "DESCRIPTION" : "Flag defines whether variable will be stored to a local scope."
+          }          
+        },
         "ESCALATIONREFPACKAGE" : {
           "ESCALATIONREF" : {
             "TITLE" : "Escalation reference",

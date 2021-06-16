@@ -53,13 +53,29 @@ public class WSOperation implements OperationImplementation {
 
     @Override
     public MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {
-        Object[] arguments = this.getArguments(message);
+        Object[] inArguments = this.getInArguments(message);
+        Object[] outArguments = this.getOutArguments(operation);
+
+        // For each out parameters, a value 'null' must be set in arguments passed to the Apache CXF API to invoke
+        // web-service operation
+        Object[] arguments = new Object[inArguments.length + outArguments.length];
+        System.arraycopy(inArguments, 0, arguments, 0, inArguments.length);
         Object[] results = this.safeSend(arguments, overridenEndpointAddresses);
         return this.createResponseMessage(results, operation);
     }
 
-    private Object[] getArguments(MessageInstance message) {
+    private Object[] getInArguments(MessageInstance message) {
         return message.getStructureInstance().toArray();
+    }
+
+    private Object[] getOutArguments(Operation operation) {
+
+        MessageDefinition outMessage = operation.getOutMessage();
+        if (outMessage != null) {
+            return outMessage.createInstance().getStructureInstance().toArray();
+        } else {
+            return new Object[] {};
+        }
     }
 
     private Object[] safeSend(Object[] arguments, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {

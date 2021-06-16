@@ -14,13 +14,13 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.4.4</spring.boot.version>
-		<spring.framework.version>5.3.6</spring.framework.version>
-		<spring.security.version>5.4.6</spring.security.version>
-		<spring.amqp.version>2.3.6</spring.amqp.version>
-		<spring.kafka.version>2.6.7</spring.kafka.version>
+		<spring.boot.version>2.5.1</spring.boot.version>
+		<spring.framework.version>5.3.8</spring.framework.version>
+		<spring.security.version>5.5.0</spring.security.version>
+		<spring.amqp.version>2.3.8</spring.amqp.version>
+		<spring.kafka.version>2.7.2</spring.kafka.version>
 		<reactor-netty.version>1.0.6</reactor-netty.version>
-		<jackson.version>2.11.4</jackson.version>
+		<jackson.version>2.12.3</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
@@ -30,7 +30,7 @@
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.7.1</junit.jupiter.version>
+		<junit.jupiter.version>5.7.2</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
@@ -775,7 +775,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.28.Final</version>
+				<version>5.4.32.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -978,11 +978,11 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.8.0</version>
+				<version>4.3.5</version>
 				<exclusions>
 					<exclusion>
-						<groupId>ch.qos.logback</groupId>
-						<artifactId>logback-classic</artifactId>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -1013,24 +1013,11 @@
 				<version>30.1-jre</version>
 			</dependency>
 			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
 				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-joda</artifactId>
-				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>

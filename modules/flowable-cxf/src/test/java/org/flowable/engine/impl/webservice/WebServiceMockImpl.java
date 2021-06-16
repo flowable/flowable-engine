@@ -15,6 +15,7 @@ package org.flowable.engine.impl.webservice;
 import java.util.Date;
 
 import javax.jws.WebService;
+import javax.xml.ws.Holder;
 
 /**
  * An implementation of a Counter WS
@@ -107,5 +108,13 @@ public class WebServiceMockImpl implements WebServiceMock {
     @Override
     public String reservedWordAsName(String prefix, String suffix) {
         return prefix + this.getCount() + suffix;
+    }
+
+    @Override
+    public void returnsSeveralParams(String inParam, Holder<String> outParam1, Holder<Integer> outParam2,
+            Holder<String> outParam3) {
+        outParam1.value = inParam;
+        outParam2.value = Integer.valueOf(inParam);
+        outParam3.value = inParam + "-" + inParam;
     }
 }

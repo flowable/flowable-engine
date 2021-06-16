@@ -737,10 +737,19 @@
       </if>
       <if test="involvedGroups != null">
           and EXISTS(
-          select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
-          <foreach item="involvedGroup" index="index" collection="involvedGroups" open="(" separator="," close=")">
-              #{involvedGroup}
-          </foreach>
+          select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and 
+            (
+            <foreach item="involvedGroupListItem" index="groupIndex" collection="safeInvolvedGroups">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                LINK.GROUP_ID_ IN
+                <foreach item="group" index="index" collection="involvedGroupListItem"
+                      open="(" separator="," close=")">
+                  #{group}
+                </foreach>
+            </foreach>
+            )
           )
       </if>
       <if test="involvedGroupIdentityLink != null">
@@ -850,10 +859,19 @@
       </if>
       <if test="orQueryObject.involvedGroups != null">
         or EXISTS(
-              select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and LINK.GROUP_ID_ in
-              <foreach item="involvedGroup" index="index" collection="orQueryObject.involvedGroups" open="(" separator="," close=")">
-                  #{involvedGroup}
-              </foreach>
+              select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and 
+                (
+                <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                    <if test="groupIndex &gt; 0">
+                    or
+                    </if>
+                    LINK.GROUP_ID_ IN
+                    <foreach item="group" index="index" collection="involvedGroupListItem"
+                          open="(" separator="," close=")">
+                      #{group}
+                    </foreach>
+                </foreach>
+                )
         )
       </if>
       <if test="orQueryObject.involvedGroupIdentityLink != null">

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -67,7 +67,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
     protected String getStencilId(BaseElement baseElement) {
         BoundaryEvent boundaryEvent = (BoundaryEvent) baseElement;
         List<EventDefinition> eventDefinitions = boundaryEvent.getEventDefinitions();
-        
+
         if (eventDefinitions.isEmpty()) {
             if (boundaryEvent.getExtensionElements().get("eventType") != null && boundaryEvent.getExtensionElements().get("eventType").size() > 0) {
                 String eventType = boundaryEvent.getExtensionElements().get("eventType").get(0).getElementText();
@@ -76,7 +76,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
                 }
             }
         }
-        
+
         if (eventDefinitions.size() != 1) {
             // return timer event as default;
             return STENCIL_EVENT_BOUNDARY_TIMER;
@@ -103,8 +103,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement,
-        BpmnJsonConverterContext converterContext) {
+    protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement, BpmnJsonConverterContext converterContext) {
         BoundaryEvent boundaryEvent = (BoundaryEvent) baseElement;
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
@@ -144,13 +143,13 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
         if (STENCIL_EVENT_BOUNDARY_TIMER.equals(stencilId)) {
             convertJsonToTimerDefinition(elementNode, boundaryEvent);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
-            
+
         } else if (STENCIL_EVENT_BOUNDARY_CONDITIONAL.equals(stencilId)) {
             convertJsonToConditionalDefinition(elementNode, boundaryEvent);
 
         } else if (STENCIL_EVENT_BOUNDARY_ERROR.equals(stencilId)) {
             convertJsonToErrorDefinition(elementNode, boundaryEvent);
-            
+
         } else if (STENCIL_EVENT_BOUNDARY_ESCALATION.equals(stencilId)) {
             convertJsonToEscalationDefinition(elementNode, boundaryEvent);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
@@ -172,7 +171,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
             CompensateEventDefinition compensateEventDefinition = new CompensateEventDefinition();
             boundaryEvent.getEventDefinitions().add(compensateEventDefinition);
             boundaryEvent.setCancelActivity(getPropertyValueAsBoolean(PROPERTY_CANCEL_ACTIVITY, elementNode));
-        
+
         } else if (STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY.equals(stencilId)) {
             addReceiveEventExtensionElements(elementNode, boundaryEvent);
 
@@ -212,7 +211,7 @@ public class BoundaryEventJsonConverter extends BaseBpmnJsonConverter {
 
         return attachedRefId;
     }
-    
+
     @Override
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
         if (StringUtils.isNotEmpty(value)) {

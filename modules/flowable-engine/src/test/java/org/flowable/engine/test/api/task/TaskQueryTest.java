@@ -698,6 +698,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.getIdentityLinksForTask(adhocTask.getId())).hasSize(1);
 
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
+            
+            List<String> testCandidateGroups = new ArrayList<>(2100);
+            for (int i = 0; i < 2100; i++) {
+                testCandidateGroups.add("group" + i);
+            }
+            
+            TaskQuery query = taskService.createTaskQuery().taskInvolvedGroups(testCandidateGroups);
+            assertThat(query.count()).isEqualTo(0);
+            assertThat(query.list()).hasSize(0);
+            
+            testCandidateGroups.add("testGroup");
+            query = taskService.createTaskQuery().taskInvolvedGroups(testCandidateGroups);
+            assertThat(query.count()).isEqualTo(1);
+            assertThat(query.list()).hasSize(1);
 
         } finally {
             deleteAllTasks();
@@ -708,6 +722,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     public void testQueryByInvolvedGroupOr() {
         try {
             org.flowable.task.api.Task adhocTask = taskService.newTask();
+            adhocTask.setName("testtask");
             taskService.saveTask(adhocTask);
             taskService.addGroupIdentityLink(adhocTask.getId(), "testGroup", "customType");
 
@@ -715,6 +730,19 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup"))
                     .count()).isEqualTo(1);
+            
+            List<String> testCandidateGroups = new ArrayList<>(2100);
+            for (int i = 0; i < 2100; i++) {
+                testCandidateGroups.add("group" + i);
+            }
+            
+            TaskQuery query = taskService.createTaskQuery().or().taskName("testtask").taskInvolvedGroups(testCandidateGroups).endOr();
+            assertThat(query.count()).isEqualTo(1);
+            assertThat(query.list()).hasSize(1);
+            
+            query = taskService.createTaskQuery().or().taskName("undefined").taskInvolvedGroups(testCandidateGroups).endOr();
+            assertThat(query.count()).isEqualTo(0);
+            assertThat(query.list()).hasSize(0);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
                 assertThat(historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid")
@@ -1393,6 +1421,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(12);
         tasks = query.list();
         assertThat(tasks).hasSize(12);
+        
+        List<String> testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        query = taskService.createTaskQuery().taskCandidateGroupIn(testCandidateGroups).taskCandidateOrAssigned("kermit");
+        assertThat(query.count()).isEqualTo(7);
+        assertThat(query.list()).hasSize(7);
+        
+        testCandidateGroups.add("management");
+        query = taskService.createTaskQuery().taskCandidateGroupIn(testCandidateGroups).taskCandidateOrAssigned("kermit");
+        assertThat(query.count()).isEqualTo(10);
+        assertThat(query.list()).hasSize(10);
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().taskName("assigneeToKermit").singleResult();
         taskService.deleteTask(assigneeToKermit.getId(), true);
@@ -1432,6 +1474,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(12);
         tasks = query.list();
         assertThat(tasks).hasSize(12);
+        
+        List<String> testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        query = taskService.createTaskQuery().or().taskName("testTask").taskCandidateGroupIn(testCandidateGroups).taskCandidateOrAssigned("kermit").endOr();
+        assertThat(query.count()).isEqualTo(7);
+        assertThat(query.list()).hasSize(7);
+        
+        testCandidateGroups.add("management");
+        query = taskService.createTaskQuery().or().taskName("unexisting").taskCandidateGroupIn(testCandidateGroups).taskCandidateOrAssigned("kermit").endOr();
+        assertThat(query.count()).isEqualTo(10);
+        assertThat(query.list()).hasSize(10);
 
         org.flowable.task.api.Task assigneeToKermit = taskService.createTaskQuery().or().taskId("invalid").taskName("assigneeToKermit").singleResult();
         taskService.deleteTask(assigneeToKermit.getId(), true);
@@ -1614,12 +1670,25 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
 
-        // Unexisting groups or groups that don't have candidate tasks shouldn't
-        // influence other results
+        // Unexisting groups or groups that don't have candidate tasks shouldn't influence other results
         groups = Arrays.asList("management", "accountancy", "sales", "unexising");
         query = taskService.createTaskQuery().taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
+        
+        List<String> testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        query = taskService.createTaskQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.list()).hasSize(0);
+        
+        testCandidateGroups.add("management");
+        query = taskService.createTaskQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(query.count()).isEqualTo(3);
+        assertThat(query.list()).hasSize(3);
     }
 
     @Test
@@ -1655,6 +1724,20 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         query = taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
+        
+        List<String> testCandidateGroups = new ArrayList<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        query = taskService.createTaskQuery().or().taskName("testTask").taskCandidateGroupIn(testCandidateGroups).endOr();
+        assertThat(query.count()).isEqualTo(6);
+        assertThat(query.list()).hasSize(6);
+        
+        testCandidateGroups.add("management");
+        query = taskService.createTaskQuery().or().taskName("undefined").taskCandidateGroupIn(testCandidateGroups);
+        assertThat(query.count()).isEqualTo(3);
+        assertThat(query.list()).hasSize(3);
     }
 
     @Test

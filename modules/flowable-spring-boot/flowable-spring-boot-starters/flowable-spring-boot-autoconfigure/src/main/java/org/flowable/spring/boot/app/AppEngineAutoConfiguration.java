@@ -39,6 +39,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
@@ -72,6 +74,7 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @Bean
     @ConditionalOnMissingBean
     public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ObjectMapper> objectMapperProvider,
         ObjectProvider<List<AutoDeploymentStrategy<AppEngine>>> appAutoDeploymentStrategies) throws IOException {
 
         SpringAppEngineConfiguration conf = new SpringAppEngineConfiguration();
@@ -88,6 +91,10 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
 
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            conf.setObjectMapper(objectMapper);
+        }
 
         conf.setIdGenerator(new StrongUuidGenerator());
 

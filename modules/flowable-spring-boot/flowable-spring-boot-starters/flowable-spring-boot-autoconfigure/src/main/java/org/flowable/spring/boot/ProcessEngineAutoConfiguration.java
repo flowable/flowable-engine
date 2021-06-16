@@ -63,6 +63,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
@@ -154,6 +156,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+            ObjectProvider<ObjectMapper> objectMapperProvider,
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
@@ -200,6 +203,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
         }
 
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            conf.setObjectMapper(objectMapper);
+        }
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 

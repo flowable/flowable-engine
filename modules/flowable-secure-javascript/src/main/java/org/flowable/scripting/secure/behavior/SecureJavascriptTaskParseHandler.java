@@ -38,13 +38,15 @@ public class SecureJavascriptTaskParseHandler extends ScriptTaskParseHandler {
         }
     }
 
-    protected void createSecureJavascriptTaskBehavior(BpmnParse bpmnParse, ScriptTask scriptTask, String language) {
+    protected void createSecureJavascriptTaskBehavior(BpmnParse bpmnParse, ScriptTask scriptTask,
+        String language) {
         if (StringUtils.isEmpty(scriptTask.getScript())) {
             LOGGER.warn("No script provided for scriptTask {}", scriptTask.getId());
         }
 
         scriptTask.setBehavior(new SecureJavascriptTaskActivityBehavior(scriptTask.getId(),
-                scriptTask.getScript(), language, scriptTask.getResultVariable(), scriptTask.isAutoStoreVariables()));
+            scriptTask.getScript(), language, scriptTask.getResultVariable(),
+            scriptTask.getSkipExpression(), scriptTask.isAutoStoreVariables()));
     }
 
 }
