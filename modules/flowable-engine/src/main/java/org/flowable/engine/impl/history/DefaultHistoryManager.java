@@ -183,15 +183,19 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordActivityEnd(ActivityInstance activityInstance) {
         if (activityInstance != null && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, activityInstance.getProcessDefinitionId())) {
             HistoricActivityInstanceEntity historicActivityInstance = getHistoricActivityInstanceEntityManager().findById(activityInstance.getId());
-            historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
-            historicActivityInstance.setEndTime(activityInstance.getEndTime());
-            historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());
+            if (historicActivityInstance != null) {
+                historicActivityInstance.setDeleteReason(activityInstance.getDeleteReason());
+                historicActivityInstance.setEndTime(activityInstance.getEndTime());
+                historicActivityInstance.setDurationInMillis(activityInstance.getDurationInMillis());
 
-            // Fire event
-            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance),
-                        processEngineConfiguration.getEngineCfgKey());
+                // Fire event
+                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance),
+                            processEngineConfiguration.getEngineCfgKey());
+                }
+            } else {
+                LOGGER.debug("Historic activity instance was not found.");
             }
         }
     }
