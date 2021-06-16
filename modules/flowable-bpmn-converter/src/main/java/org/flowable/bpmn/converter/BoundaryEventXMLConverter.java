@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ import org.flowable.bpmn.model.ExtensionElement;
  * @author Tijs Rademakers
  */
 public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
-    
+
     protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     public BoundaryEventXMLConverter() {
@@ -97,7 +97,7 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
             if (!(eventDef instanceof ErrorEventDefinition)) {
                 writeDefaultAttribute(ATTRIBUTE_BOUNDARY_CANCELACTIVITY, String.valueOf(boundaryEvent.isCancelActivity()).toLowerCase(), xtw);
             }
-            
+
         } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
             List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
             if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {

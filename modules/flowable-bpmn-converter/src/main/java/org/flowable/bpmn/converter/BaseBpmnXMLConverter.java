@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -539,39 +539,43 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         }
         xtw.writeEndElement();
     }
-    
+
     protected void writeConditionalDefinition(Event parentEvent, ConditionalEventDefinition conditionalDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_CONDITIONALDEFINITION);
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(conditionalDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
-        
+
         if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
             xtw.writeStartElement(ELEMENT_CONDITION);
             xtw.writeCharacters(conditionalDefinition.getConditionExpression());
             xtw.writeEndElement();
         }
-        
+
         xtw.writeEndElement();
     }
 
     protected void writeErrorDefinition(Event parentEvent, ErrorEventDefinition errorDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_ERRORDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ERROR_REF, errorDefinition.getErrorCode(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_NAME, errorDefinition.getErrorVariableName(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope().toString(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient().toString(), xtw);
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(errorDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
-    
+
     protected void writeEscalationDefinition(Event parentEvent, EscalationEventDefinition escalationDefinition, BpmnModel model,
                     XMLStreamWriter xtw) throws Exception {
-        
+
         xtw.writeStartElement(ELEMENT_EVENT_ESCALATIONDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ESCALATION_REF, escalationDefinition.getEscalationCode(), xtw);
-        
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(escalationDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();

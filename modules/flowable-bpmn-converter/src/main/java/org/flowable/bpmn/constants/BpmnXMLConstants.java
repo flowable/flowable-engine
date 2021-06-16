@@ -222,7 +222,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_RULE_RULES = "rules";
     public static final String ATTRIBUTE_TASK_RULE_EXCLUDE = "exclude";
     public static final String ATTRIBUTE_TASK_RULE_CLASS = "class";
-    
+
     public static final String ATTRIBUTE_BUSINESS_KEY = "businessKey";
     public static final String ATTRIBUTE_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_SAME_DEPLOYMENT = "sameDeployment";
@@ -242,7 +242,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     public static final String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
     public static final String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
-    
+
     public static final String ATTRIBUTE_CASE_TASK_CASE_DEFINITION_KEY = "caseDefinitionKey";
     public static final String ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME = "caseInstanceName";
 
@@ -281,44 +281,47 @@ public interface BpmnXMLConstants {
 
     public static final String ATTRIBUTE_BOUNDARY_ATTACHEDTOREF = "attachedToRef";
     public static final String ATTRIBUTE_BOUNDARY_CANCELACTIVITY = "cancelActivity";
-    
+
     public static final String ELEMENT_EVENT_CONDITIONALDEFINITION = "conditionalEventDefinition";
     public static final String ELEMENT_CONDITION = "condition";
 
     public static final String ELEMENT_EVENT_ERRORDEFINITION = "errorEventDefinition";
     public static final String ATTRIBUTE_ERROR_REF = "errorRef";
     public static final String ATTRIBUTE_ERROR_CODE = "errorCode";
-    
+    public static final String ATTRIBUTE_ERROR_VARIABLE_NAME = "errorVariableName";
+    public static final String ATTRIBUTE_ERROR_VARIABLE_TRANSIENT = "errorVariableTransient";
+    public static final String ATTRIBUTE_ERROR_VARIABLE_LOCAL_SCOPE = "errorVariableLocalScope";
+
     public static final String ELEMENT_EVENT_MESSAGEDEFINITION = "messageEventDefinition";
     public static final String ATTRIBUTE_MESSAGE_REF = "messageRef";
     public static final String ATTRIBUTE_MESSAGE_EXPRESSION = "messageExpression";
-    
+
     public static final String ELEMENT_EVENT_SIGNALDEFINITION = "signalEventDefinition";
     public static final String ATTRIBUTE_SIGNAL_REF = "signalRef";
     public static final String ATTRIBUTE_SIGNAL_EXPRESSION = "signalExpression";
     public static final String ATTRIBUTE_SCOPE = "scope";
-    
+
     public static final String ELEMENT_EVENT_TIMERDEFINITION = "timerEventDefinition";
     public static final String ATTRIBUTE_CALENDAR_NAME = "businessCalendarName";
     public static final String ATTRIBUTE_TIMER_DATE = "timeDate";
     public static final String ATTRIBUTE_TIMER_CYCLE = "timeCycle";
     public static final String ATTRIBUTE_END_DATE = "endDate";
     public static final String ATTRIBUTE_TIMER_DURATION = "timeDuration";
-    
+
     public static final String ELEMENT_EVENT_ESCALATIONDEFINITION = "escalationEventDefinition";
     public static final String ATTRIBUTE_ESCALATION_REF = "escalationRef";
     public static final String ATTRIBUTE_ESCALATION_CODE = "escalationCode";
-    
+
     public static final String ELEMENT_EVENT_TERMINATEDEFINITION = "terminateEventDefinition";
     public static final String ATTRIBUTE_TERMINATE_ALL = "terminateAll";
     public static final String ATTRIBUTE_TERMINATE_MULTI_INSTANCE = "terminateMultiInstance";
-    
+
     public static final String ELEMENT_EVENT_CANCELDEFINITION = "cancelEventDefinition";
-    
+
     public static final String ELEMENT_EVENT_COMPENSATEDEFINITION = "compensateEventDefinition";
     public static final String ATTRIBUTE_COMPENSATE_ACTIVITYREF = "activityRef";
     public static final String ATTRIBUTE_COMPENSATE_WAITFORCOMPLETION = "waitForCompletion";
-    
+
     public static final String ELEMENT_EVENT_CORRELATION_PARAMETER = "eventCorrelationParameter";
     public static final String ELEMENT_EVENT_IN_PARAMETER = "eventInParameter";
     public static final String ELEMENT_EVENT_OUT_PARAMETER = "eventOutParameter";
@@ -370,7 +373,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_DATA_ID = "id";
     public static final String ATTRIBUTE_DATA_NAME = "name";
     public static final String ATTRIBUTE_DATA_ITEM_REF = "itemSubjectRef";
-    
+
     // only used by valued data objects
     public static final String ELEMENT_DATA_VALUE = "value";
 
