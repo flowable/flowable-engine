@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.ReactivationRule;
 
@@ -42,19 +43,29 @@ public class ReactivationEventListenerExport extends AbstractPlanItemDefinitionE
 
         xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_TYPE, "reactivate");
 
-        ReactivationRule reactivationRule = reactivationEventListener.getDefaultReactivationRule();
-        if (reactivationRule != null) {
-            xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
-            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DEFAULT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
-            PlanItemControlExport.writeReactivationRuleAttributes(reactivationRule, xtw);
-            xtw.writeEndElement();
-            xtw.writeEndElement();
-        }
-
         if (StringUtils.isNotEmpty(reactivationEventListener.getAvailableConditionExpression())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE,
                 CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION,
                 reactivationEventListener.getAvailableConditionExpression());
         }
+    }
+    
+    @Override
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ReactivateEventListener reactivationEventListener, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        boolean extensionElementsWritten = super.writePlanItemDefinitionExtensionElements(model, reactivationEventListener, didWriteExtensionElement, xtw);
+        
+        ReactivationRule reactivationRule = reactivationEventListener.getDefaultReactivationRule();
+        if (reactivationRule != null) {
+            if (!extensionElementsWritten) {
+                xtw.writeStartElement(CmmnXmlConstants.ELEMENT_EXTENSION_ELEMENTS);
+                extensionElementsWritten = true;
+            }
+            
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DEFAULT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            PlanItemControlExport.writeReactivationRuleAttributes(reactivationRule, xtw);
+            xtw.writeEndElement();
+        }
+        
+        return extensionElementsWritten;
     }
 }
