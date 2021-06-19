@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -21,8 +23,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Joram Barrez
@@ -47,5 +47,4 @@ public class RepeatingServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance.isEnded()).isTrue();
     }
-
 }
