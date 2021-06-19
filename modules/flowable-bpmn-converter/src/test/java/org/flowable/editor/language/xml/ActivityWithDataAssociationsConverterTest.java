@@ -14,9 +14,10 @@
 
 package org.flowable.editor.language.xml;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
@@ -38,10 +39,10 @@ class ActivityWithDataAssociationsConverterTest {
         List<DataAssociation> dataInputAssociations = activity.getDataInputAssociations();
         List<DataAssociation> dataOutputAssociations = activity.getDataOutputAssociations();
 
-        Assertions.assertThat(dataInputAssociations.isEmpty()).isFalse();
-        Assertions.assertThat(dataOutputAssociations.isEmpty()).isFalse();
-        Assertions.assertThat(dataInputAssociations.get(0).getTransformation()).isEqualTo("${dataOutputOfServiceTask.prettyPrint}");
-        Assertions.assertThat(dataOutputAssociations.get(0).getAssignments().isEmpty()).isFalse();
-        Assertions.assertThat(dataOutputAssociations.get(0).getAssignments().get(0).getFrom()).isEqualTo("${dataInputOfProcess.prefix}");
+        assertThat(dataInputAssociations.isEmpty()).isFalse();
+        assertThat(dataOutputAssociations.isEmpty()).isFalse();
+        assertThat(dataInputAssociations.get(0).getTransformation()).isEqualTo("${dataOutputOfServiceTask.prettyPrint}");
+        assertThat(dataOutputAssociations.get(0).getAssignments().isEmpty()).isFalse();
+        assertThat(dataOutputAssociations.get(0).getAssignments().get(0).getFrom()).isEqualTo("${dataInputOfProcess.prefix}");
     }
 }
