@@ -1145,6 +1145,10 @@
           "TITLE" : "Evento intermedio de lanzamiento de escalamiento",
           "DESCRIPTION" : "Un evento intermedio con un disparador de escalamiento"
         },
+        "THROWCOMPENSATIONEVENT": {
+          "TITLE" : "Evento de lanzamiento de compensación intermedia",
+          "DESCRIPTION" : "Un evento intermedio con un disparador de compensación"
+        },
         "ENDNONEEVENT" : {
           "TITLE" : "Evento de fin",
           "DESCRIPTION" : "Un evento de fin sin un disparador específico"

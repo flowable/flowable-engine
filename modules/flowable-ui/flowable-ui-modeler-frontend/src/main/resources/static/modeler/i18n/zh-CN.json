@@ -1118,6 +1118,10 @@
         "TITLE" : "中间升级抛出事件",
         "DESCRIPTION" : "具有升级触发器的中间事件"
       },
+      "THROWCOMPENSATIONEVENT": {
+        "TITLE" : "中间补偿投掷事件",
+        "DESCRIPTION" : "带有补偿触发器的中间事件"
+      },
       "ENDNONEEVENT" : {
         "TITLE" : "结束事件",
         "DESCRIPTION" : "没有特定触发器的结束事件"

@@ -1163,6 +1163,10 @@
         "TITLE": "エスカレーション中間送信イベント",
         "DESCRIPTION": "エスカレーショントリガー付きの中間送信イベント"
       },
+      "THROWCOMPENSATIONEVENT": {
+        "TITLE" : "中間補償スローイベント",
+        "DESCRIPTION" : "補償トリガーを伴う中間イベント"
+      },
       "ENDNONEEVENT": {
         "TITLE": "終了イベント",
         "DESCRIPTION": "特定のトリガーを持たない終了イベント"
