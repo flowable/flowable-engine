@@ -16,7 +16,7 @@
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
 		<spring.boot.version>2.5.1</spring.boot.version>
 		<spring.framework.version>5.3.8</spring.framework.version>
-		<spring.security.version>5.5.0</spring.security.version>
+		<spring.security.version>5.5.1</spring.security.version>
 		<spring.amqp.version>2.3.8</spring.amqp.version>
 		<spring.kafka.version>2.7.2</spring.kafka.version>
 		<reactor-netty.version>1.0.6</reactor-netty.version>
@@ -25,7 +25,7 @@
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
-		<slf4j.version>1.7.30</slf4j.version>
+		<slf4j.version>1.7.31</slf4j.version>
 		<groovy.version>3.0.8</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
