@@ -185,25 +185,27 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected void assertSamePlanItemState(CaseInstance c1) {
-        List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
-        List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
+            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
 
-        assertNotNull(runtimePlanItems);
-        assertNotNull(historicPlanItems);
-        assertEquals(runtimePlanItems.size(), historicPlanItems.size());
+            assertNotNull(runtimePlanItems);
+            assertNotNull(historicPlanItems);
+            assertEquals(runtimePlanItems.size(), historicPlanItems.size());
 
-        Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
-        for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
-            historyMap.put(historicPlanItem.getId(), historicPlanItem);
+            Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
+            for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
+                historyMap.put(historicPlanItem.getId(), historicPlanItem);
+            }
+
+            for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
+                HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
+                assertNotNull(historicPlanItemInstance);
+                assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
+            }
+
+            assertEquals(historyMap.size(), 0);
         }
-
-        for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
-            HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
-            assertNotNull(historicPlanItemInstance);
-            assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
-        }
-
-        assertEquals(historyMap.size(), 0);
     }
 
     protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {

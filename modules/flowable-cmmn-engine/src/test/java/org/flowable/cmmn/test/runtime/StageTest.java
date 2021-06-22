@@ -380,6 +380,7 @@ public class StageTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("testCase")
                 .variable("showInStage", true)
                 .start();
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
         assertThat(stages).hasSize(3);
@@ -440,6 +441,8 @@ public class StageTest extends FlowableCmmnTestCase {
                 .variable("showInStage", true)
                 .variable("showMilestoneInOverview", true)
                 .start();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
         assertThat(stages).hasSize(5);
@@ -525,6 +528,8 @@ public class StageTest extends FlowableCmmnTestCase {
                 .variable("showMilestoneInOverview", true)
                 .start();
 
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
         List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
         assertThat(stages).hasSize(5);
 
@@ -597,6 +602,8 @@ public class StageTest extends FlowableCmmnTestCase {
                 .variable("showInStage", false)
                 .variable("showMilestoneInOverview", false)
                 .start();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
         assertThat(stages).hasSize(3);
