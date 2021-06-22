@@ -664,6 +664,8 @@
                                 <exclude>**/CacheTaskTest.java</exclude>
                                 <exclude>**/PlanItemInjectionTest.java</exclude>
                                 <exclude>**/CmmnStandaloneTaskBuilderTest.java</exclude>
+                                <exclude>**/SimpleCaseReactivationTest.java</exclude>
+                                <exclude>**/StageReactivationTest.java</exclude>
 
                                 <!-- Needs investigation -->
                                 <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>

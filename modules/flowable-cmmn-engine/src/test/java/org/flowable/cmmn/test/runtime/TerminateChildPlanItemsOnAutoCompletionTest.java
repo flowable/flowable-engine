@@ -24,6 +24,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.junit.Test;
 
@@ -56,16 +58,18 @@ public class TerminateChildPlanItemsOnAutoCompletionTest extends FlowableCmmnTes
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
             assertCaseInstanceEnded(caseInstance);
 
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-                .planItemInstanceCaseInstanceId(caseInstance.getId())
-                .list();
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .list();
 
-            assertThat(historicPlanItems).hasSize(6);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+                assertThat(historicPlanItems).hasSize(6);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+            }
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -93,16 +97,18 @@ public class TerminateChildPlanItemsOnAutoCompletionTest extends FlowableCmmnTes
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
             assertCaseInstanceEnded(caseInstance);
 
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-                .planItemInstanceCaseInstanceId(caseInstance.getId())
-                .list();
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .list();
 
-            assertThat(historicPlanItems).hasSize(6);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+                assertThat(historicPlanItems).hasSize(6);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+            }
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
@@ -134,19 +140,21 @@ public class TerminateChildPlanItemsOnAutoCompletionTest extends FlowableCmmnTes
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
             assertCaseInstanceEnded(caseInstance);
 
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
-                .planItemInstanceCaseInstanceId(caseInstance.getId())
-                .list();
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                        .planItemInstanceCaseInstanceId(caseInstance.getId())
+                        .list();
 
-            assertThat(historicPlanItems).hasSize(10);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Manual stage task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored stage task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion stage task", COMPLETED, TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+                assertThat(historicPlanItems).hasSize(10);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Manual stage task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored stage task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion stage task", COMPLETED, TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Manual task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignored task", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Ignore after first completion task", COMPLETED, TERMINATED);
+            }
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }

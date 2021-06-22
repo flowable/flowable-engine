@@ -43,6 +43,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
+        assertSamePlanItemState(caseInstance);
+
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
         // complete Task A by providing the collection used for repetition
@@ -95,6 +97,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
+
+        assertSamePlanItemState(caseInstance);
 
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
@@ -162,6 +166,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
+        assertSamePlanItemState(caseInstance);
+
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
         // complete Task A by providing the collection used for repetition
@@ -228,6 +234,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
+        assertSamePlanItemState(caseInstance);
+
         List<String> myCollection = Arrays.asList("A", "B", "C", "D");
 
         // set the collection variable to kick-off the creation of the Task C repetition
@@ -239,6 +247,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
+
+        assertSamePlanItemState(caseInstance);
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task C", myCollection, Arrays.asList(0, 1, 2, 3));
 
@@ -253,6 +263,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
 
+        assertSamePlanItemState(caseInstance);
+
         // even if we remove the variable completely, nothing else must happen
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "myCollection");
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -260,6 +272,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", ACTIVE, ACTIVE, ACTIVE, ACTIVE);
+
+        assertSamePlanItemState(caseInstance);
 
         // now let's complete all Tasks C -> nothing must happen additionally
         List<PlanItemInstance> tasks = cmmnRuntimeService.createPlanItemInstanceQuery()
