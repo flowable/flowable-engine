@@ -49,8 +49,8 @@ public class DefaultTenantProvider implements TenantProvider {
         }
 
         SecurityScope currentSecurityScope = SecurityUtils.getCurrentSecurityScope();
-        if (currentSecurityScope != null) {
-            String tenantId = currentSecurityScope.getTenantId();
+        if (currentSecurityScope != null && currentSecurityScope.getTenantId().isPresent()) {
+            String tenantId = currentSecurityScope.getTenantId().get();
             // quotes can help solve whitespace issues, trimming here would not 
             // help solve the problem at source which is in user database
             LOGGER.debug("Using user tenantId: '{}'", tenantId);

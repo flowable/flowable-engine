@@ -13,10 +13,12 @@
 package org.flowable.ui.common.security;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -42,8 +44,8 @@ public class FlowableAuthenticationSecurityScope implements SecurityScope {
     }
 
     @Override
-    public String getTenantId() {
-        return extractAuthoritiesStartingWith(SecurityUtils.TENANT_PREFIX).findFirst().orElse("");
+    public Optional<String> getTenantId() {
+        return extractAuthoritiesStartingWith(SecurityUtils.TENANT_PREFIX).findFirst();
     }
 
     @Override

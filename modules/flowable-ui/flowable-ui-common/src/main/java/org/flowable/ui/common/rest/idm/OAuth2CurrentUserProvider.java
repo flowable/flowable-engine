@@ -46,7 +46,7 @@ public class OAuth2CurrentUserProvider implements CurrentUserProvider {
         }
 
         SecurityScope securityScope = SecurityUtils.getSecurityScope(authentication);
-        userRepresentation.setTenantId(securityScope.getTenantId());
+        userRepresentation.setTenantId(securityScope.getTenantId().orElse(null));
 
         for (String groupId : securityScope.getGroupIds()) {
             GroupRepresentation group = new GroupRepresentation();
