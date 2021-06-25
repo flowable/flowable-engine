@@ -191,7 +191,7 @@
           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
-          PROPAGATED_STAGE_INST_ID_ = ${propagatedStageInstanceId, jdbcType=VARCHAR},
+          PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.description != description">
           DESCRIPTION_ = #{description, jdbcType=VARCHAR},
