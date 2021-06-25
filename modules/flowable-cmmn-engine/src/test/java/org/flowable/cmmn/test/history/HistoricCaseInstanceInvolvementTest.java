@@ -17,9 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -194,6 +197,53 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).list().get(0).getId()).isEqualTo(caseInstance.getId());
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())).singleResult().getId()).isEqualTo(caseInstance.getId());
+            
+            Set<String> testGroups = new HashSet<>(2100);
+            for (int i = 0; i < 2100; i++) {
+                testGroups.add("group" + i);
+            }
+            
+            HistoricCaseInstanceQuery caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(testGroups);
+            assertThat(caseInstanceQuery.count()).isEqualTo(0);
+            assertThat(caseInstanceQuery.list()).hasSize(0);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(testGroups).includeCaseVariables();
+            assertThat(caseInstanceQuery.count()).isEqualTo(0);
+            assertThat(caseInstanceQuery.list()).hasSize(0);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").involvedGroups(testGroups).endOr();
+            assertThat(caseInstanceQuery.count()).isEqualTo(2);
+            assertThat(caseInstanceQuery.list()).hasSize(2);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").involvedGroups(testGroups).endOr().includeCaseVariables();
+            assertThat(caseInstanceQuery.count()).isEqualTo(2);
+            assertThat(caseInstanceQuery.list()).hasSize(2);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+            assertThat(caseInstanceQuery.count()).isEqualTo(0);
+            assertThat(caseInstanceQuery.list()).hasSize(0);
+            
+            testGroups.add("testGroup");
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(testGroups);
+            assertThat(caseInstanceQuery.count()).isEqualTo(1);
+            assertThat(caseInstanceQuery.list()).hasSize(1);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(testGroups).includeCaseVariables();
+            assertThat(caseInstanceQuery.count()).isEqualTo(1);
+            assertThat(caseInstanceQuery.list()).hasSize(1);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+            assertThat(caseInstanceQuery.count()).isEqualTo(1);
+            assertThat(caseInstanceQuery.list()).hasSize(1);
+            
+            testGroups.add("testGroup2");
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().involvedGroups(testGroups);
+            assertThat(caseInstanceQuery.count()).isEqualTo(1);
+            assertThat(caseInstanceQuery.list()).hasSize(1);
+            
+            caseInstanceQuery = cmmnHistoryService.createHistoricCaseInstanceQuery().or().caseDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+            assertThat(caseInstanceQuery.count()).isEqualTo(1);
+            assertThat(caseInstanceQuery.list()).hasSize(1);
         }
     }
 

@@ -76,10 +76,10 @@ class AcquireTimerJobsMultiNodeTest extends JobExecutorTestCase {
 
         JobServiceConfiguration jobServiceConfiguration = processEngineConfiguration.getJobServiceConfiguration();
 
-        AcquireTimerJobsRunnable runnable1 = new AcquireTimerJobsRunnable(asyncExecutor, jobServiceConfiguration.getJobManager());
+        AcquireTimerJobsRunnable runnable1 = new AcquireTimerJobsRunnable(asyncExecutor, jobServiceConfiguration.getJobManager(), 1);
         CompletableFuture.runAsync(runnable1, executorService);
 
-        AcquireTimerJobsRunnable runnable2 = new AcquireTimerJobsRunnable(asyncExecutor, jobServiceConfiguration.getJobManager());
+        AcquireTimerJobsRunnable runnable2 = new AcquireTimerJobsRunnable(asyncExecutor, jobServiceConfiguration.getJobManager(), 1);
         CompletableFuture.runAsync(runnable2, executorService);
 
         try {

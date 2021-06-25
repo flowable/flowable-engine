@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="ExamplesCategory">
+
+  <process id="taskAndCallActivityProcess">
+  	<extensionElements>
+		<flowable:executionListener event="end" expression="${nonExistingVar != 2}" />
+	</extensionElements>
+    
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+    <userTask id="theTask" name="my task" />    
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="callActivity" />
+    <callActivity id="callActivity" calledElement="oneTaskProcess" />    
+    <sequenceFlow id="flow3" sourceRef="callActivity" targetRef="theTask2" />
+    <userTask id="theTask2" name="my task2" />    
+    <sequenceFlow id="flow4" sourceRef="theTask2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

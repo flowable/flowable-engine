@@ -214,6 +214,7 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initBeans();
         initExpressionManager();
         initCommandContextFactory();

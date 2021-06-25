@@ -75,6 +75,8 @@ public interface CmmnRestApiInterceptor {
     
     void createCaseInstance(CaseInstanceBuilder caseInstanceBuilder, CaseInstanceCreateRequest request);
     
+    void terminateCaseInstance(CaseInstance caseInstance);
+    
     void deleteCaseInstance(CaseInstance caseInstance);
     
     void doCaseInstanceAction(CaseInstance caseInstance, RestActionRequest actionRequest);

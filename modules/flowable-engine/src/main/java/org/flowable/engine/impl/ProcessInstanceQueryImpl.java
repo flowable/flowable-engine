@@ -22,6 +22,7 @@ import java.util.Set;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -68,10 +69,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String involvedUser;
     protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected SuspensionState suspensionState;
     protected boolean includeProcessVariables;
-    protected Integer processInstanceVariablesLimit;
     protected boolean withJobException;
     protected String name;
     protected String nameLike;
@@ -476,12 +477,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     @Override
     public ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit) {
-        this.processInstanceVariablesLimit = processInstanceVariablesLimit;
         return this;
-    }
-
-    public Integer getProcessInstanceVariablesLimit() {
-        return processInstanceVariablesLimit;
     }
 
     @Override
@@ -808,16 +804,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return this;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("ProcessDefinitionKey", "TEMPP_KEY_");
-            specialOrderBy = specialOrderBy.replace("ProcessDefinitionId", "TEMPP_ID_");
-        }
-        return specialOrderBy;
-    }
-
     // results /////////////////////////////////////////////////////////////////
 
     @Override
@@ -1113,5 +1099,35 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
+    }
+
+    public boolean isWithJobException() {
+        return withJobException;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public boolean isNeedsProcessDefinitionOuterJoin() {
+        if (isNeedsPaging()) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                // When using oracle, db2 or mssql we don't need outer join for the process definition join.
+                // It is not needed because the outer join order by is done by the row number instead
+                return false;
+            }
+        }
+
+        return hasOrderByForColumn(ProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
     }
 }

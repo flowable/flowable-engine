@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -132,20 +131,37 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
     }
 
+    @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Indicates the case instance was found and terminate. Response body is left empty intentionally."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
+    })
+    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
+    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.terminateCaseInstance(caseInstance);
+        }
+
+        runtimeService.terminateCaseInstance(caseInstance.getId());
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+    
     @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
-    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
-    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/delete")
+    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstance(caseInstance);
         }
 
-        runtimeService.terminateCaseInstance(caseInstance.getId());
+        runtimeService.deleteCaseInstance(caseInstance.getId());
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 

@@ -301,12 +301,11 @@
     </select>
 
     <select id="selectHistoricPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl" resultMap="historicPlanItemInstanceResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.*
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectHistoricPlanItemInstancesByQueryCriteriaSql"/>
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectHistoricPlanItemInstancesCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl" resultType="long">
@@ -467,11 +466,18 @@
                         or
                       </if>
                       <if test="involvedGroups != null &amp;&amp; involvedGroups.size() &gt; 0">
-                        I.GROUP_ID_ IN
-                        <foreach item="involvedGroup" index="index" collection="involvedGroups"
-                                 open="(" separator="," close=")">
-                          #{involvedGroup}
+                        (
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="safeInvolvedGroups">
+                            <if test="groupIndex &gt; 0">
+                            or
+                            </if>
+                            I.GROUP_ID_ IN
+                            <foreach item="group" index="index" collection="involvedGroupListItem"
+                                  open="(" separator="," close=")">
+                              #{group}
+                            </foreach>
                         </foreach>
+                        )
                       </if>
                     )
                 )

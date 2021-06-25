@@ -69,6 +69,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Collection<String> assigneeIds;
     protected String involvedUser;
     protected Collection<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected String owner;
     protected String ownerLike;
     protected String ownerLikeIgnoreCase;
@@ -79,6 +80,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String candidateUser;
     protected String candidateGroup;
     protected Collection<String> candidateGroups;
+    private List<List<String>> safeCandidateGroups;
     protected boolean ignoreAssigneeValue;
     protected String tenantId;
     protected String tenantIdLike;
@@ -131,7 +133,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean excludeSubtasks;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
-    protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -1528,7 +1529,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     @Override
     public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
-        this.taskVariablesLimit = taskVariablesLimit;
         return this;
     }
 
@@ -1536,9 +1536,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
-    }
-    public Integer getTaskVariablesLimit() {
-        return taskVariablesLimit;
     }
 
     public Collection<String> getCandidateGroups() {
@@ -1701,14 +1698,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     public TaskQuery orderByTenantId() {
         return orderBy(TaskQueryProperty.TENANT_ID);
-    }
-
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-        }
-        return specialOrderBy;
     }
 
     // results ////////////////////////////////////////////////////////////////
@@ -2133,6 +2122,38 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return orActive;
     }
 
+    public boolean isUnassigned() {
+        return unassigned;
+    }
+
+    public boolean isNoDelegationState() {
+        return noDelegationState;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isExcludeSubtasks() {
+        return excludeSubtasks;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
     @Override
     public List<Task> list() {
         cachedCandidateGroups = null;
@@ -2151,4 +2172,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return super.count();
     }
 
+    public List<List<String>> getSafeCandidateGroups() {
+        return safeCandidateGroups;
+    }
+
+    public void setSafeCandidateGroups(List<List<String>> safeCandidateGroups) {
+        this.safeCandidateGroups = safeCandidateGroups;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
+    }
 }

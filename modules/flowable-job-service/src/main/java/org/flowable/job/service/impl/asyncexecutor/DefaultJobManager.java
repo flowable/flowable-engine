@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -146,6 +147,28 @@ public class DefaultJobManager implements JobManager {
             return executableJob;
         }
         return null;
+    }
+
+    @Override
+    public void bulkMoveTimerJobsToExecutableJobs(List<TimerJobEntity> timerJobEntities) {
+
+        if (timerJobEntities == null || timerJobEntities.isEmpty()) {
+            throw new FlowableException("Empty timer jobs collection can not be scheduled");
+        }
+
+        // Only hint when there is enough capacity remaining in the job queue
+        boolean remainingCapacitySufficient = isAsyncExecutorRemainingCapacitySufficient(timerJobEntities.size());
+
+        for (TimerJobEntity timerJobEntity : timerJobEntities) {
+            JobEntity executableJob = createExecutableJobFromOtherJob(timerJobEntity, remainingCapacitySufficient);
+
+            boolean insertSuccessful = jobServiceConfiguration.getJobEntityManager().insertJobEntity(executableJob);
+            if (insertSuccessful && remainingCapacitySufficient) {
+                triggerExecutorIfNeeded(executableJob);
+            }
+        }
+
+        jobServiceConfiguration.getTimerJobEntityManager().bulkDeleteTimerJobsWithoutRevisionCheck(timerJobEntities);
     }
 
     @Override
@@ -706,13 +729,17 @@ public class DefaultJobManager implements JobManager {
 
     @Override
     public JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {
+       return createExecutableJobFromOtherJob(job, isAsyncExecutorActive());
+    }
+
+    protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job, boolean lockJob) {
         JobEntity executableJob = jobServiceConfiguration.getJobEntityManager().create();
         copyJobInfo(executableJob, job);
 
-        if (isAsyncExecutorActive()) {
+        if (lockJob) {
             GregorianCalendar gregorianCalendar = new GregorianCalendar();
             gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
-            gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getTimerLockTimeInMillis());
+            gregorianCalendar.add(Calendar.MILLISECOND, getAsyncExecutor().getAsyncJobLockTimeInMillis());
             executableJob.setLockExpirationTime(gregorianCalendar.getTime());
             executableJob.setLockOwner(getAsyncExecutor().getLockOwner());
         }
@@ -848,6 +875,10 @@ public class DefaultJobManager implements JobManager {
 
     protected boolean isAsyncExecutorActive() {
         return isExecutorActive(jobServiceConfiguration.getAsyncExecutor());
+    }
+
+    protected boolean isAsyncExecutorRemainingCapacitySufficient(int neededCapacity) {
+        return getAsyncExecutor().isActive() && getAsyncExecutor().getTaskExecutor().getRemainingCapacity() >= neededCapacity;
     }
     
     protected boolean isAsyncHistoryExecutorActive() {

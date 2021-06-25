@@ -372,6 +372,33 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             assertThat(runtimeService.createProcessInstanceQuery().list()).hasSize(2);
         }
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testStartOnlyOneInstance.bpmn20.xml")
+    public void testStartOneInstanceWithMultipleProcessDefinitionVersions() {
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+        
+        org.flowable.engine.repository.Deployment deployment = null;
+        try {
+            deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testStartOnlyOneInstance.bpmn20.xml")
+                .deploy();
+            
+            assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionKey("correlation").latestVersion().singleResult().getVersion()).isEqualTo(2);
+            
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+    
+            inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+            inboundEventChannelAdapter.triggerTestEvent("anotherTestCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(2);
+            
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
 
     @Test
     public void testRedeployDefinitionWithRuntimeEventSubscriptions() {

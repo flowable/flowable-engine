@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.6.1-SNAPSHOT</version>
+        <version>6.7.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -664,6 +664,8 @@
                                 <exclude>**/CacheTaskTest.java</exclude>
                                 <exclude>**/PlanItemInjectionTest.java</exclude>
                                 <exclude>**/CmmnStandaloneTaskBuilderTest.java</exclude>
+                                <exclude>**/SimpleCaseReactivationTest.java</exclude>
+                                <exclude>**/StageReactivationTest.java</exclude>
 
                                 <!-- Needs investigation -->
                                 <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>

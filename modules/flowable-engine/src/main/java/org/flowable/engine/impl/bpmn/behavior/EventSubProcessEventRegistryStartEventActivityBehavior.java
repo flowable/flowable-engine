@@ -32,6 +32,9 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
+import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
@@ -72,6 +75,12 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
+
+        Object eventInstance = execution.getTransientVariable(EventConstants.EVENT_INSTANCE);
+        if (eventInstance instanceof EventInstance) {
+            EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, startEvent, (EventInstance) eventInstance);
+        }
+
         if (startEvent.isInterrupting()) {
             List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionEntity.getParent());
             for (int i = childExecutions.size() - 1; i >= 0; i--) {

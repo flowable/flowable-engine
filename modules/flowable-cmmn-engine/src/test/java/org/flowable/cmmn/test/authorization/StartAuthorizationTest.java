@@ -18,9 +18,12 @@ import static org.assertj.core.api.Assertions.extractProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -286,6 +289,21 @@ public class StartAuthorizationTest extends FlowableCmmnTestCase {
             assertThat(cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups("user1", Collections.singletonList("group3")).list())
                     .extracting(CaseDefinition::getKey)
                     .containsExactlyInAnyOrder("case2", "case3");
+            
+            Set<String> testGroups = new HashSet<>(2100);
+            for (int i = 0; i < 2100; i++) {
+                testGroups.add("groupa" + i);
+            }
+            
+            CaseDefinitionQuery caseDefinitionQuery = cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups(null, testGroups);
+            assertThat(caseDefinitionQuery.count()).isEqualTo(0);
+            assertThat(caseDefinitionQuery.list()).hasSize(0);
+            
+            testGroups.add("group1");
+            
+            caseDefinitionQuery = cmmnRepositoryService.createCaseDefinitionQuery().startableByUserOrGroups(null, testGroups);
+            assertThat(caseDefinitionQuery.count()).isEqualTo(1);
+            assertThat(caseDefinitionQuery.list()).hasSize(1);
 
         } finally {
             tearDownUsersAndGroups();

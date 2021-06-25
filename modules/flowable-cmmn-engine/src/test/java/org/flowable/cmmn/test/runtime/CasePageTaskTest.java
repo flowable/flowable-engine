@@ -15,12 +15,16 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -75,8 +79,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertThat(pagePlanItemInstance).isNotNull();
 
-        // page tasks go into terminated state, if their parent stage gets completed, regardless its previous state
-        assertThat(pagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+        // page tasks go into terminated or completed state, depending on the parent ending type like complete or exit
+        assertThat(pagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
         assertThat(pagePlanItemInstance.getFormKey()).isEqualTo("myFormKeyValue");
         assertThat(pagePlanItemInstance.getExtraValue()).isEqualTo("myFormKeyValue");
 
@@ -218,7 +222,21 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .orderByName().asc()
                 .list();
         assertThat(planItemInstances).hasSize(4);
-
+        
+        Set<String> testGroups = new HashSet<>(2100);
+        for (int i = 0; i < 2100; i++) {
+            testGroups.add("group" + i);
+        }
+        
+        PlanItemInstanceQuery planItemInstanceQuery = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(testGroups);
+        assertThat(planItemInstanceQuery.count()).isEqualTo(0);
+        assertThat(planItemInstanceQuery.list()).hasSize(0);
+        
+        testGroups.add("sales");
+        planItemInstanceQuery = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(testGroups);
+        assertThat(planItemInstanceQuery.count()).isEqualTo(1);
+        assertThat(planItemInstanceQuery.list()).hasSize(1);
+        
         // Finishing task 2 should complete the stage
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
 
@@ -264,6 +282,16 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
             assertThat(historicGroupLink)
                 .extracting(HistoricIdentityLink::getGroupId)
                 .containsExactly("sales");
+            
+            testGroups.remove("sales");
+            HistoricPlanItemInstanceQuery historicPlanItemInstanceQuery = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(testGroups);
+            assertThat(historicPlanItemInstanceQuery.count()).isEqualTo(0);
+            assertThat(historicPlanItemInstanceQuery.list()).hasSize(0);
+            
+            testGroups.add("sales");
+            historicPlanItemInstanceQuery = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(testGroups);
+            assertThat(historicPlanItemInstanceQuery.count()).isEqualTo(1);
+            assertThat(historicPlanItemInstanceQuery.list()).hasSize(1);
         }
     }
 }

@@ -320,4 +320,28 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     public String getProcessDefinitionKeyLike() {
         return processDefinitionKeyLike;
     }
+
+    public String getCategoryLike() {
+        return categoryLike;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getKeyLike() {
+        return keyLike;
+    }
+
+    public String getParentDeploymentIdLike() {
+        return parentDeploymentIdLike;
+    }
+
+    public List<String> getParentDeploymentIds() {
+        return parentDeploymentIds;
+    }
+
+    public boolean isLatest() {
+        return latest;
+    }
 }

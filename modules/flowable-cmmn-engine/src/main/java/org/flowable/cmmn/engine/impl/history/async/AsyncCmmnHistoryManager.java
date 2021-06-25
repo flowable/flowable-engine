@@ -72,11 +72,26 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             if (caseInstanceEntity.getStartTime() != null) {
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DURATION, endTime.getTime() - caseInstanceEntity.getStartTime().getTime());
             }
+
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, state);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END, data, caseInstanceEntity.getTenantId());
         }
     }
-    
+
+    @Override
+    public void recordHistoricCaseInstanceReactivated(CaseInstanceEntity caseInstanceEntity) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            ObjectNode data = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_ID, caseInstanceEntity.getId());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, caseInstanceEntity.getState());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_REACTIVATION_TIME, caseInstanceEntity.getLastReactivationTime());
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_LAST_REACTIVATION_USER_ID, caseInstanceEntity.getLastReactivationUserId());
+
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_REACTIVATE, data, caseInstanceEntity.getTenantId());
+        }
+    }
+
     @Override
     public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
@@ -253,7 +268,13 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
     public void recordPlanItemInstanceCreated(PlanItemInstanceEntity planItemInstanceEntity) {
         recordPlanItemInstanceFull(planItemInstanceEntity, null);
     }
-    
+
+    @Override
+    public void recordPlanItemInstanceReactivated(PlanItemInstanceEntity planItemInstanceEntity) {
+        recordPlanItemInstanceFull(planItemInstanceEntity, null);
+        // TODO: do we need a specific reactivation flag to mark this item being created because of a reactivation?
+    }
+
     @Override
     public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
         recordPlanItemInstanceFull(planItemInstanceEntity, null);

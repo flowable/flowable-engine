@@ -337,6 +337,10 @@ public class DecisionQueryImpl extends AbstractQuery<DmnDecisionQuery, DmnDecisi
         return ids;
     }
 
+    public String getDecisionId() {
+        return decisionId;
+    }
+
     public String getName() {
         return name;
     }

@@ -126,6 +126,15 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
+        if (this.maxResults >= 0) {
+            if (this.firstResult < 0) {
+                this.firstResult = 0;
+            }
+        } else {
+            if (this.firstResult >= 0) {
+                this.maxResults = Integer.MAX_VALUE;
+            }
+        }
         this.resultType = ResultType.LIST_PAGE;
         if (commandExecutor != null) {
             return (List<U>) commandExecutor.execute(this);

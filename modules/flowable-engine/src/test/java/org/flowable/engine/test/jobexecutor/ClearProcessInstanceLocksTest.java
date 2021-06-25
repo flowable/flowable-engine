@@ -24,7 +24,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.asyncexecutor.AcquiredJobEntities;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -84,9 +83,9 @@ public class ClearProcessInstanceLocksTest extends PluggableFlowableTestCase {
         // Acquire jobs (mimic the async executor behavior)
         List<JobInfoEntity> acquiredJobs = new ArrayList<>();
         while (acquiredJobs.size() < 5) {
-            AcquiredJobEntities acquiredJobEntities = processEngineConfiguration.getCommandExecutor()
+            List<? extends JobInfoEntity> jobs = processEngineConfiguration.getCommandExecutor()
                 .execute(new AcquireJobsCmd(processEngineConfiguration.getAsyncExecutor()));
-            acquiredJobs.addAll(acquiredJobEntities.getJobs());
+            acquiredJobs.addAll(jobs);
         }
 
         // Validate lock owner and time set after acquiring

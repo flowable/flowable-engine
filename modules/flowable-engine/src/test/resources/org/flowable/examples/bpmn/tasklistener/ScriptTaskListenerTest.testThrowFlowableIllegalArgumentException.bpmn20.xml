@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+
+    <process id="scriptTaskListenerProcess" name="Script Task Example">
+        <startEvent id="startevent1" name="Start"></startEvent>
+
+        <userTask id="usertask1" name="All your base are belong to us">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.engine.impl.bpmn.listener.ScriptTaskListener">
+                    <flowable:field name="script">
+                        <flowable:string>
+							var MyError = Packages.org.flowable.common.engine.api.FlowableIllegalArgumentException;
+							throw new MyError("Illegal argument in listener");
+                        </flowable:string>
+                    </flowable:field>
+                    <flowable:field name="language" stringValue="JavaScript"/>
+                    <flowable:field name="resultVariable" stringValue="myVar"/>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+
+        <endEvent id="endevent1" name="End"></endEvent>
+
+        <userTask id="usertask2" name="${myVar}"></userTask>
+
+        <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+        <sequenceFlow id="flow12" name="" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+        <sequenceFlow id="flow13" name="" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
+    </process>
+</definitions>

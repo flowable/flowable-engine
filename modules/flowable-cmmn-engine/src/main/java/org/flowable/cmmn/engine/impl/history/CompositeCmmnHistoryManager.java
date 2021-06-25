@@ -53,6 +53,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordHistoricCaseInstanceReactivated(CaseInstanceEntity caseInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordHistoricCaseInstanceReactivated(caseInstanceEntity);
+        }
+    }
+
+    @Override
     public void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordUpdateCaseInstanceName(caseInstanceEntity, name);
@@ -155,7 +162,14 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
             historyManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
         }
     }
-    
+
+    @Override
+    public void recordPlanItemInstanceReactivated(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceReactivated(planItemInstanceEntity);
+        }
+    }
+
     @Override
     public void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {

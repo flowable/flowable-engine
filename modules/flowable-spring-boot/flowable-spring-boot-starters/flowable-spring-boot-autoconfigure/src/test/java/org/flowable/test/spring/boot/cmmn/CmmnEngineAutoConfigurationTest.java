@@ -64,6 +64,7 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -74,6 +75,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -170,6 +173,23 @@ public class CmmnEngineAutoConfigurationTest {
 
             deleteDeployments(cmmnEngine);
         });
+    }
+
+    @Test
+    public void standaloneCmmnEngineWithJackson() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).as("Cmmn engine")
+                            .hasSingleBean(CmmnEngine.class)
+                            .hasSingleBean(ObjectMapper.class);
+
+                    CmmnEngine processEngine = context.getBean(CmmnEngine.class);
+
+                    assertThat(processEngine.getCmmnEngineConfiguration().getObjectMapper()).isEqualTo(context.getBean(ObjectMapper.class));
+
+                    deleteDeployments(processEngine);
+                });
     }
 
     @Test
@@ -326,6 +346,30 @@ public class CmmnEngineAutoConfigurationTest {
             deleteDeployments(processEngine);
             deleteDeployments(cmmnEngine);
         });
+    }
+
+    @Test
+    public void cmmnEngineWithProcessEngineAndJackson() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(
+                        ProcessEngineServicesAutoConfiguration.class,
+                        ProcessEngineAutoConfiguration.class,
+                        JacksonAutoConfiguration.class
+                ))
+                .run(context -> {
+                    assertThat(context)
+                            .doesNotHaveBean(AppEngine.class)
+                            .hasSingleBean(ProcessEngine.class)
+                            .hasSingleBean(ObjectMapper.class);
+                    CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                    assertThat(cmmnEngine.getCmmnEngineConfiguration().getObjectMapper()).isEqualTo(context.getBean(ObjectMapper.class));
+                    assertThat(cmmnEngine.getCmmnEngineConfiguration().getObjectMapper()).isEqualTo(processEngine.getProcessEngineConfiguration().getObjectMapper());
+
+                    deleteDeployments(cmmnEngine);
+                    deleteDeployments(processEngine);
+                });
     }
 
     @Test

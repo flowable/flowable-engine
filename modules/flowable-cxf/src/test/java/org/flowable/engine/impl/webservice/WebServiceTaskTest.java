@@ -14,6 +14,7 @@ package org.flowable.engine.impl.webservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -341,6 +342,28 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         final String myDateJson = currentStructureJson.findValue("eltDate").asText();
         assertThat(sdf.parse(myDateJson)).isEqualTo(myDate);
+    }
+
+    /**
+     * Unit test relative to issue <a href="https://github.com/flowable/flowable-engine/issues/2871">2871</a>.
+     */
+    @Test
+    @Deployment
+    public void testWebServiceInvocationReturningSeveralParams() throws Exception {
+
+        final String inParam = "23";
+        final Map<String, Object> variables = new HashMap<>(1);
+        variables.put("inParam", inParam);
+        final ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("webServiceInvocationReturningSeveralParams", variables);
+        waitForJobExecutorToProcessAllJobs(10000L, 250L);
+
+        final HistoricProcessInstance histProcInst = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstance.getId()).includeProcessVariables().singleResult();
+        final Map<String, Object> procVariables = histProcInst.getProcessVariables();
+        assertEquals("23", procVariables.get("outParam1"));
+        assertEquals(23, procVariables.get("outParam2"));
+        assertEquals("23-23", procVariables.get("outParam3"));
     }
 
 }

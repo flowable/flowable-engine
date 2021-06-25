@@ -215,6 +215,9 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             if (request.isTenantSet()) {
                 caseInstanceBuilder.tenantId(request.getTenantId());
             }
+            if (request.getOverrideDefinitionTenantId() != null && request.getOverrideDefinitionTenantId().length() > 0) {
+                caseInstanceBuilder.overrideCaseDefinitionTenantId(request.getOverrideDefinitionTenantId());
+            }
             if (startVariables != null) {
                 caseInstanceBuilder.variables(startVariables);
             }

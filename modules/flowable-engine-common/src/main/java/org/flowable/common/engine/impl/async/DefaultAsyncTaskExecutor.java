@@ -255,4 +255,9 @@ public class DefaultAsyncTaskExecutor implements AsyncTaskExecutor {
     public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
         this.rejectedExecutionHandler = rejectedExecutionHandler;
     }
+
+    @Override
+    public int getRemainingCapacity() {
+        return threadPoolQueue.remainingCapacity();
+    }
 }

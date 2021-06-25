@@ -108,9 +108,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoric
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
 import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 public class DmnEngineConfiguration extends AbstractEngineConfiguration
         implements DmnEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
@@ -125,7 +122,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl();
+    protected DmnManagementService dmnManagementService = new DmnManagementServiceImpl(this);
     protected DmnRepositoryService dmnRepositoryService = new DmnRepositoryServiceImpl();
     protected DmnDecisionService ruleService = new DmnDecisionServiceImpl(this);
     protected DmnHistoryService dmnHistoryService = new DmnHistoryServiceImpl();
@@ -181,8 +178,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     protected int decisionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<DecisionCacheEntry> definitionCache;
-
-    protected ObjectMapper dmnEngineObjectMapper = new ObjectMapper();
 
     // HIT POLICIES
     protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
@@ -247,6 +242,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     protected void init() {
         initEngineConfigurations();
         initClock();
+        initObjectMapper();
         initFunctionDelegates();
         initBeans();
         initExpressionManager();
@@ -264,8 +260,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
             initSchemaManager();
             initSchemaManagementCommand();
         }
-
-        dmnEngineObjectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         initTransactionFactory();
 
@@ -601,7 +595,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     /////////////////////////////////////////////////////////////
     public void initRuleEngineExecutor() {
     	if (ruleEngineExecutor == null) {
-	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, dmnEngineObjectMapper);
+	        ruleEngineExecutor = new RuleEngineExecutorImpl(hitPolicyBehaviors, expressionManager, objectMapper);
 	        
     	} else {
     	    if (ruleEngineExecutor.getExpressionManager() == null) {
@@ -613,7 +607,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     	    }
     	    
     	    if (ruleEngineExecutor.getObjectMapper() == null) {
-    	        ruleEngineExecutor.setObjectMapper(dmnEngineObjectMapper);
+    	        ruleEngineExecutor.setObjectMapper(objectMapper);
     	    }
     	}
     }
@@ -1121,11 +1115,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     public Map<String, AbstractHitPolicy> getCustomHitPolicyBehaviors() {
         return customHitPolicyBehaviors;
-    }
-
-    @Override
-    public ObjectMapper getObjectMapper() {
-        return dmnEngineObjectMapper;
     }
 
     public DecisionRequirementsDiagramGenerator getDecisionRequirementsDiagramGenerator() {

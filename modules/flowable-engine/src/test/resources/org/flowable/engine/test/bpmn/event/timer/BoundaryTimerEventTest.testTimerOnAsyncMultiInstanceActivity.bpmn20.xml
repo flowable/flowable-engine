@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="testTimerOnAsyncMultiInstanceActivity" isExecutable="true">
+    <startEvent id="startevent1" name="Start"/>
+    <userTask id="multiInstanceTask" name="Multi-Instance Task" flowable:async="true">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="multiInstanceTask"/>
+    <endEvent id="endevent1" name="End"/>
+    <sequenceFlow id="flow2" sourceRef="multiInstanceTask" targetRef="endevent1"/>
+    <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="multiInstanceTask" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT2H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <endEvent id="endevent2" name="End"/>
+    <sequenceFlow id="flow3" sourceRef="boundarytimer1" targetRef="endevent2"/>
+  </process>
+</definitions>

@@ -60,7 +60,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected ContentManagementService contentManagementService = new ContentManagementServiceImpl();
+    protected ContentManagementService contentManagementService = new ContentManagementServiceImpl(this);
     protected ContentService contentService = new ContentServiceImpl();
 
     // DATA MANAGERS ///////////////////////////////////////////////////
@@ -118,6 +118,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     protected void init() {
         initEngineConfigurations();
         initClock();
+        initObjectMapper();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();

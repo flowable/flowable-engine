@@ -89,4 +89,8 @@ public class DefaultVariableTypes implements VariableTypes, Serializable {
         typesMap.remove(type.getTypeName());
         return this;
     }
+
+    public int size() {
+        return typesList.size();
+    }
 }

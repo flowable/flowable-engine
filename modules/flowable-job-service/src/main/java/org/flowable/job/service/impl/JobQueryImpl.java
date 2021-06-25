@@ -34,9 +34,9 @@ import org.flowable.job.service.JobServiceConfiguration;
 public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     protected JobServiceConfiguration jobServiceConfiguration;
-    
+
     protected String id;
     protected String processInstanceId;
     protected String executionId;
@@ -62,7 +62,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    
+    protected boolean withoutScopeType;
+
     protected String lockOwner;
     protected boolean onlyLocked;
     protected boolean onlyUnlocked;
@@ -106,7 +107,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.processDefinitionId = processDefinitionId;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl category(String category) {
         if (category == null) {
@@ -115,7 +116,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.category = category;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl categoryLike(String categoryLike) {
         if (categoryLike == null) {
@@ -124,7 +125,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.categoryLike = categoryLike;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl elementId(String elementId) {
         if (elementId == null) {
@@ -133,7 +134,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.elementId = elementId;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl elementName(String elementName) {
         if (elementName == null) {
@@ -142,7 +143,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.elementName = elementName;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl scopeId(String scopeId) {
         if (scopeId == null) {
@@ -151,7 +152,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.scopeId = scopeId;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl subScopeId(String subScopeId) {
         if (subScopeId == null) {
@@ -160,7 +161,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.subScopeId = subScopeId;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl scopeType(String scopeType) {
         if (scopeType == null) {
@@ -169,7 +170,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.scopeType = scopeType;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl scopeDefinitionId(String scopeDefinitionId) {
         if (scopeDefinitionId == null) {
@@ -178,7 +179,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
-    
+
     @Override
     public JobQueryImpl caseInstanceId(String caseInstanceId) {
         if (caseInstanceId == null) {
@@ -188,7 +189,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         scopeType(ScopeTypes.CMMN);
         return this;
     }
-    
+
     @Override
     public JobQueryImpl caseDefinitionId(String caseDefinitionId) {
         if (caseDefinitionId == null) {
@@ -198,7 +199,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         scopeType(ScopeTypes.CMMN);
         return this;
     }
-    
+
     @Override
     public JobQueryImpl planItemInstanceId(String planItemInstanceId) {
         if (planItemInstanceId == null) {
@@ -329,6 +330,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
+    public JobQuery withoutScopeType() {
+        this.withoutScopeType = true;
+        return this;
+    }
+
     // sorting //////////////////////////////////////////
 
     @Override
@@ -423,7 +430,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
-    
+
     public String getCategory() {
         return category;
     }
@@ -496,4 +503,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return onlyUnlocked;
     }
 
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
+    }
 }

@@ -235,11 +235,11 @@
   </select>
 
   <select id="selectActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="ActivityInstanceResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <select id="selectActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
@@ -299,7 +299,7 @@
   </sql>
   
   <select id="selectActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="ActivityInstanceResultMap">
-  	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+  	<include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
   
   <select id="selectActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

@@ -129,11 +129,11 @@
   <!-- MODEL SELECT -->
 
   <select id="selectModelsByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultMap="modelResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectModelsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectModelCountByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="long">
@@ -197,7 +197,7 @@
   </select>
   
   <select id="selectModelByNativeQuery" parameterType="java.util.Map" resultMap="modelResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectModelCountByNativeQuery" parameterType="java.util.Map" resultType="long">

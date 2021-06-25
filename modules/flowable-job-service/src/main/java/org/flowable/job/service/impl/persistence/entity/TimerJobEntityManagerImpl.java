@@ -164,6 +164,22 @@ public class TimerJobEntityManagerImpl
         super.delete(jobEntity, fireDeleteEvent);
     }
 
+    @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
+        dataManager.bulkUpdateJobLockWithoutRevisionCheck(timerJobEntities, lockOwner, lockExpirationTime);
+    }
+
+    @Override
+    public void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities) {
+        for (TimerJobEntity timerJobEntity : timerJobEntities) {
+            if (serviceConfiguration.getInternalJobManager() != null) {
+                serviceConfiguration.getInternalJobManager().handleJobDelete(timerJobEntity);
+            }
+        }
+
+        dataManager.bulkDeleteWithoutRevision(timerJobEntities);
+    }
+
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();
         newTimerEntity.setJobHandlerConfiguration(te.getJobHandlerConfiguration());

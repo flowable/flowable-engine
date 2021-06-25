@@ -461,6 +461,22 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return categoryNotEquals;
     }
 
+    public String getAuthorizationUserId() {
+        return authorizationUserId;
+    }
+
+    public String getProcDefId() {
+        return procDefId;
+    }
+
+    public String getEventSubscriptionName() {
+        return eventSubscriptionName;
+    }
+
+    public String getEventSubscriptionType() {
+        return eventSubscriptionType;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

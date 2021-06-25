@@ -47,6 +47,27 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+import org.apache.ibatis.type.ArrayTypeHandler;
+import org.apache.ibatis.type.BigDecimalTypeHandler;
+import org.apache.ibatis.type.BlobByteObjectArrayTypeHandler;
+import org.apache.ibatis.type.BlobInputStreamTypeHandler;
+import org.apache.ibatis.type.BooleanTypeHandler;
+import org.apache.ibatis.type.ByteTypeHandler;
+import org.apache.ibatis.type.ClobTypeHandler;
+import org.apache.ibatis.type.DateOnlyTypeHandler;
+import org.apache.ibatis.type.DateTypeHandler;
+import org.apache.ibatis.type.DoubleTypeHandler;
+import org.apache.ibatis.type.FloatTypeHandler;
+import org.apache.ibatis.type.IntegerTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.LongTypeHandler;
+import org.apache.ibatis.type.NClobTypeHandler;
+import org.apache.ibatis.type.NStringTypeHandler;
+import org.apache.ibatis.type.ShortTypeHandler;
+import org.apache.ibatis.type.SqlxmlTypeHandler;
+import org.apache.ibatis.type.StringTypeHandler;
+import org.apache.ibatis.type.TimeOnlyTypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -106,6 +127,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public abstract class AbstractEngineConfiguration {
 
@@ -394,7 +416,7 @@ public abstract class AbstractEngineConfiguration {
     protected boolean usePrefixId;
 
     protected Clock clock;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
     // Variables
 
@@ -663,6 +685,13 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    public void initObjectMapper() {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        }
+    }
+
     public void initClock() {
         if (clock == null) {
             clock = new DefaultClockImpl();
@@ -819,9 +848,8 @@ public abstract class AbstractEngineConfiguration {
                 properties.put("limitBefore", "");
                 properties.put("limitAfter", "");
                 properties.put("limitBetween", "");
-                properties.put("limitBetweenNoDistinct", "");
-                properties.put("limitOuterJoinBetween", "");
                 properties.put("limitBeforeNativeQuery", "");
+                properties.put("limitAfterNativeQuery", "");
                 properties.put("blobType", "BLOB");
                 properties.put("boolValue", "TRUE");
 
@@ -874,7 +902,49 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public void initMybatisTypeHandlers(Configuration configuration) {
-        // To be extended
+        // When mapping into Map<String, Object> there is currently a problem with MyBatis.
+        // It will return objects which are driver specific.
+        // Therefore we are registering the mappings between Object.class and the specific jdbc type here.
+        // see https://github.com/mybatis/mybatis-3/issues/2216 for more info
+        TypeHandlerRegistry handlerRegistry = configuration.getTypeHandlerRegistry();
+
+        handlerRegistry.register(Object.class, JdbcType.BOOLEAN, new BooleanTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.BIT, new BooleanTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.TINYINT, new ByteTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.SMALLINT, new ShortTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.INTEGER, new IntegerTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.FLOAT, new FloatTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.DOUBLE, new DoubleTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.CHAR, new StringTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.CLOB, new ClobTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.NCHAR, new NStringTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.NCLOB, new NClobTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.ARRAY, new ArrayTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.BIGINT, new LongTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.REAL, new BigDecimalTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.DECIMAL, new BigDecimalTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.NUMERIC, new BigDecimalTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.BLOB, new BlobInputStreamTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new BlobByteObjectArrayTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.DATE, new DateOnlyTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.TIME, new TimeOnlyTypeHandler());
+        handlerRegistry.register(Object.class, JdbcType.TIMESTAMP, new DateTypeHandler());
+
+        handlerRegistry.register(Object.class, JdbcType.SQLXML, new SqlxmlTypeHandler());
     }
 
     public void initCustomMybatisInterceptors(Configuration configuration) {

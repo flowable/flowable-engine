@@ -15,9 +15,19 @@ package org.flowable.cmmn.model;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 /**
+ * Even though plan fragments don't have a runtime behavior, they still need to be stored in the {@link CmmnModel},
+ * as they are needed when exporting the XML.
+ *
+ * From the CMMN spec:
+ *
+ * "Unlike other PlanItemDefinitions, a PlanFragment does not have a representation in run-time,
+ * i.e., there is no notion of lifecycle tracking of a PlanFragment (not being a Stage) in the context of a Case instance.
+ * Just the PlanItems that are contained in it are instantiated and have their lifecyles that are tracked.
+ *
  * @author Joram Barrez
  */
 public class PlanFragment extends PlanItemDefinition {
@@ -27,7 +37,7 @@ public class PlanFragment extends PlanItemDefinition {
     protected Map<String, PlanItem> planItemMap = new LinkedHashMap<>();
     protected Map<String, PlanItem> planItemDefinitionToItemMap = new LinkedHashMap<>();
     protected List<Sentry> sentries = new ArrayList<>();
-    
+
     public PlanItem findPlanItemInPlanFragmentOrDownwards(String planItemId) {
         for (PlanItem planItem : planItemMap.values()) {
             if (planItem.getId().equals(planItemId)) {
@@ -112,6 +122,32 @@ public class PlanFragment extends PlanItemDefinition {
         planItemDefinitionToItemMap.put(planItem.getDefinitionRef(), planItem);
     }
 
+    public void removePlanItem(PlanItem planItem) {
+        planItemMap.remove(planItem.getId());
+        planItemDefinitionToItemMap.get(planItem.getId());
+    }
+
+    public List<PlanItem> getDirectChildPlanItemsWithLifecycleEnabled() {
+        List<PlanItem> childPlanItems = new ArrayList<>(planItemMap.values());
+        ListIterator<PlanItem> planItemIterator = childPlanItems.listIterator(childPlanItems.size());
+        while (planItemIterator.hasPrevious()) { // ListIterator#add will add it before the cursor, hence the reverse traversal
+            PlanItem planItem = planItemIterator.previous();
+            if (!planItem.isInstanceLifecycleEnabled()) {
+                planItemIterator.remove();
+
+                PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+                if (planItemDefinition instanceof PlanFragment) {
+                    PlanFragment planFragment = (PlanFragment) planItemDefinition;
+
+                    for (PlanItem planFragmentPlanItem : planFragment.getPlanItems()) {
+                        planItemIterator.add(planFragmentPlanItem);
+                    }
+                }
+            }
+        }
+        return childPlanItems;
+    }
+
     public void addSentry(Sentry sentry) {
         sentries.add(sentry);
     }
@@ -136,12 +172,12 @@ public class PlanFragment extends PlanItemDefinition {
         return new ArrayList<>(planItemMap.values());
     }
 
-    public Map<String, PlanItem> getPlanItemMap() {
-        return planItemMap;
-    }
-
     public void setPlanItemMap(Map<String, PlanItem> planItemMap) {
         this.planItemMap = planItemMap;
+    }
+
+    public PlanItem getPlanItem(String planItemId) {
+        return planItemMap.get(planItemId);
     }
 
     public List<Sentry> getSentries() {

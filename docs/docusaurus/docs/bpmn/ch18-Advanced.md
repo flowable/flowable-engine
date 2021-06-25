@@ -504,7 +504,7 @@ The statement can be executed as follows:
           @SuppressWarnings("unchecked")
           @Override
           public List<CustomTask> execute(CommandContext commandContext) {
-            return (List<CustomTask>) commandContext.getDbSqlSession().selectList("selectCustomTaskList");
+            return (List<CustomTask>) CommandContextUtil.getDbSqlSession().selectList("selectCustomTaskList");
           }
         });
 
@@ -545,13 +545,13 @@ Suppose that for some use case the ability to query attachments data is required
 
       @Override
       public long executeCount(CommandContext commandContext) {
-        return (Long) commandContext.getDbSqlSession()
+        return (Long) CommandContextUtil.getDbSqlSession()
                        .selectOne("selectAttachmentCountByQueryCriteria", this);
       }
 
       @Override
       public List<Attachment> executeList(CommandContext commandContext, Page page) {
-        return commandContext.getDbSqlSession()
+        return CommandContextUtil.getDbSqlSession()
                 .selectList("selectAttachmentByQueryCriteria", this);
       }
 

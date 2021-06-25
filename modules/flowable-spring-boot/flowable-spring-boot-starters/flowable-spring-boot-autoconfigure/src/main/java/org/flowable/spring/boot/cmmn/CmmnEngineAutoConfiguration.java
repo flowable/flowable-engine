@@ -65,6 +65,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration} for the CMMN engine
  *
@@ -133,6 +135,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @Bean
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ObjectMapper> objectMapperProvider,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
         ObjectProvider<AsyncListenableTaskExecutor> taskExecutor,
         @Cmmn ObjectProvider<AsyncListenableTaskExecutor> cmmnTaskExecutor,
@@ -174,6 +177,10 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            configuration.setObjectMapper(objectMapper);
+        }
 
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 

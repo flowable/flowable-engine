@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.CmmnModel;
@@ -104,11 +106,18 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
 
-                    long caseInstanceCount = cmmnRuntimeService.createCaseInstanceQuery()
-                        .caseDefinitionId(eventSubscription.getScopeDefinitionId())
-                        .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
-                        .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE)
-                        .count();
+                    CaseDefinition caseDefinition = cmmnEngineConfiguration.getCmmnRepositoryService().getCaseDefinition(eventSubscription.getScopeDefinitionId());
+                    
+                    CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
+                            .caseDefinitionKey(caseDefinition.getKey())
+                            .caseInstanceReferenceId(correlationKeyWithAllParameters.getValue())
+                            .caseInstanceReferenceType(ReferenceTypes.EVENT_CASE);
+                    
+                    if (eventInstance.getTenantId() != null && !Objects.equals(CmmnEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+                        caseInstanceQuery.caseInstanceTenantId(eventInstance.getTenantId());
+                    }
+                    
+                    long caseInstanceCount = caseInstanceQuery.count();
 
                     if (caseInstanceCount > 0) {
                         // Returning, no new instance should be started

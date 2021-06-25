@@ -344,6 +344,14 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
         return ids;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getNameLike() {
+        return nameLike;
+    }
+
     public String getTaskId() {
         return taskId;
     }

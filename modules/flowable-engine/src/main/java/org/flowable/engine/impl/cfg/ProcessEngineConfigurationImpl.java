@@ -102,6 +102,8 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DecisionTableVariableManager;
 import org.flowable.engine.DefaultCandidateManager;
@@ -199,6 +201,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.TaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.VariableListenerEventDefinitionParseHandler;
 import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
 import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
@@ -403,6 +406,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.DefaultTaskPostProcessor;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.api.types.VariableType;
@@ -416,6 +420,7 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 import org.flowable.variable.service.impl.types.InstantType;
@@ -612,10 +617,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected long asyncExecutorThreadKeepAliveTime = 5000L;
 
     /**
-     * The size of the queue on which jobs to be executed are placed, before they are actually executed. Default value = 100. (This property is only applicable when using the
-     * {@link DefaultAsyncJobExecutor}).
+     * The size of the queue on which jobs to be executed are placed, before they are actually executed.
+     * Default value = 2048. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorThreadPoolQueueSize = 100;
+    protected int asyncExecutorThreadPoolQueueSize = 2048;
 
     /**
      * The queue onto which jobs will be placed before they are actually executed. Threads form the async executor threadpool will take work from this queue.
@@ -649,21 +654,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     * <p>
+     *
+     * Consider using the global acquire lock when there are too many nodes competing for the same resources (and thus too many optimistic locking exceptions).
+     *
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
+    protected int asyncExecutorMaxTimerJobsPerAcquisition = 512;
 
     /**
      * The number of async jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     * <p>
-     * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     * <p>
+     *
+     * Consider using the global acquire lock when there are too many nodes competing for the same resources (and thus too many optimistic locking exceptions).
+     *
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 1;
+    protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 512;
 
     /**
      * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less timer jobs have been fetched
@@ -682,10 +687,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
 
     /**
-     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards
-     * compatibility)
+     * The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query.
+     * By default set to 5 seconds.
      */
-    protected int asyncExecutorDefaultQueueSizeFullWaitTime;
+    protected int asyncExecutorDefaultQueueSizeFullWaitTime = 5 * 1000;
 
     /**
      * When a job is acquired, it is locked so other async executors can't lock and execute it. While doing this, the 'name' of the lock owner is written into a column of the job.
@@ -704,22 +709,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean asyncExecutorUnlockOwnedJobs = true;
 
     /**
-     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor.
+     * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
-     * Default value = 5 minutes;
+     * Default value = 60 minutes;
      * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorTimerLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncExecutorTimerLockTimeInMillis = 60 * 60 * 1000;
 
     /**
-     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+     * The amount of time (in milliseconds) an async job is locked when acquired by the async executor.
+     * During this period of time, no other async executor will try to acquire and lock this job.
      * <p>
-     * Default value = 5 minutes;
+     * Default value = 60 minutes;
      * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
-    protected int asyncExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncExecutorAsyncJobLockTimeInMillis = 60 * 60 * 1000;
 
     /**
      * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the
@@ -770,17 +777,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected int asyncHistoryExecutorCorePoolSize = 8;
     protected int asyncHistoryExecutorMaxPoolSize = 8;
     protected long asyncHistoryExecutorThreadKeepAliveTime = 5000L;
-    protected int asyncHistoryExecutorThreadPoolQueueSize = 100;
+    protected int asyncHistoryExecutorMaxJobsDuePerAcquisition = 512;
+    protected int asyncHistoryExecutorThreadPoolQueueSize = 2048;
     protected BlockingQueue<Runnable> asyncHistoryExecutorThreadPoolQueue;
     protected long asyncHistoryExecutorSecondsToWaitOnShutdown = 60L;
     protected int asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
-    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime;
+    protected int asyncHistoryExecutorDefaultQueueSizeFullWaitTime = 5 * 1000;
     protected String asyncHistoryExecutorLockOwner;
-    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
+    protected int asyncHistoryExecutorAsyncJobLockTimeInMillis = 60 * 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsInterval = 60 * 1000;
     protected int asyncHistoryExecutorResetExpiredJobsPageSize = 3;
     protected boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = true;
-    protected boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled = true;
     protected boolean isAsyncHistoryExecutorResetExpiredJobsEnabled = true;
 
     protected List<String> enabledJobCategories;
@@ -894,10 +901,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoricProcessInstanceQueryInterceptor historicProcessInstanceQueryInterceptor;
     protected TaskQueryInterceptor taskQueryInterceptor;
     protected HistoricTaskQueryInterceptor historicTaskQueryInterceptor;
-    protected int executionQueryLimit = 20000;
-    protected int taskQueryLimit = 20000;
-    protected int historicTaskQueryLimit = 20000;
-    protected int historicProcessInstancesQueryLimit = 20000;
 
     protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
     protected XMLImporterFactory wsWsdlImporterFactory;
@@ -1029,6 +1032,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initProcessDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -1254,6 +1258,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
+        super.initMybatisTypeHandlers(configuration);
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
@@ -1468,6 +1473,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 sessionFactories.put(LoggingSession.class, loggingSessionFactory);
             }
         }
+        
+        if (!sessionFactories.containsKey(VariableListenerSession.class)) {
+            VariableListenerSessionFactory variableListenerSessionFactory = new VariableListenerSessionFactory();
+            sessionFactories.put(VariableListenerSession.class, variableListenerSessionFactory);
+        }
 
         if (customSessionFactories != null) {
             for (SessionFactory sessionFactory : customSessionFactories) {
@@ -1481,9 +1491,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initDbSqlSessionFactoryEntitySettings() {
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
 
-        // Oracle doesn't support bulk inserting for event log entries
+        // Oracle doesn't support bulk inserting for event log entries and historic task log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
             dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(EventLogEntryEntityImpl.class);
+            dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(HistoricTaskLogEntryEntityImpl.class);
         }
     }
 
@@ -1632,8 +1643,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setEnableLocalization(this.performanceSettings.isEnableLocalization());
         this.taskServiceConfiguration.setTaskQueryInterceptor(this.taskQueryInterceptor);
         this.taskServiceConfiguration.setHistoricTaskQueryInterceptor(this.historicTaskQueryInterceptor);
-        this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
-        this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
 
         this.taskServiceConfiguration.init();
 
@@ -2039,6 +2048,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new TimerEventDefinitionParseHandler());
         bpmnParserHandlers.add(new TransactionParseHandler());
         bpmnParserHandlers.add(new UserTaskParseHandler());
+        bpmnParserHandlers.add(new VariableListenerEventDefinitionParseHandler());
 
         // Replace any default handler if the user wants to replace them
         if (customDefaultBpmnParseHandlers != null) {
@@ -2253,6 +2263,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             defaultAsyncExecutor.setTimerJobAcquisitionEnabled(isAsyncExecutorTimerJobAcquisitionEnabled);
             defaultAsyncExecutor.setResetExpiredJobEnabled(isAsyncExecutorResetExpiredJobsEnabled);
 
+            // Page size
+            defaultAsyncExecutor.setMaxAsyncJobsDuePerAcquisition(asyncExecutorMaxAsyncJobsDuePerAcquisition);
+            defaultAsyncExecutor.setMaxTimerJobsPerAcquisition(asyncExecutorMaxTimerJobsPerAcquisition);
+
             // Acquisition wait time
             defaultAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(asyncExecutorDefaultTimerJobAcquireWaitTime);
             defaultAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncExecutorDefaultAsyncJobAcquireWaitTime);
@@ -2330,8 +2344,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // Thread flags
                 defaultAsyncHistoryExecutor.setAsyncJobAcquisitionEnabled(isAsyncHistoryExecutorAsyncJobAcquisitionEnabled);
-                defaultAsyncHistoryExecutor.setTimerJobAcquisitionEnabled(isAsyncHistoryExecutorTimerJobAcquisitionEnabled);
                 defaultAsyncHistoryExecutor.setResetExpiredJobEnabled(isAsyncHistoryExecutorResetExpiredJobsEnabled);
+
+                // Page size
+                defaultAsyncHistoryExecutor.setMaxAsyncJobsDuePerAcquisition(asyncHistoryExecutorMaxJobsDuePerAcquisition);
 
                 // Acquisition wait time
                 defaultAsyncHistoryExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime);
@@ -2474,19 +2490,37 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new ParallelMultiInstanceLoopVariableType(this));
             variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new EmptyCollectionType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
-            if (customPostVariableTypes != null) {
-                for (VariableType customVariableType : customPostVariableTypes) {
-                    variableTypes.addType(customVariableType);
+
+        } else {
+            if (customPreVariableTypes != null) {
+                for (int i = customPreVariableTypes.size() - 1; i >= 0; i--) {
+                    VariableType customVariableType = customPreVariableTypes.get(i);
+                    if (variableTypes.getVariableType(customVariableType.getTypeName()) == null) {
+                        variableTypes.addType(customVariableType, 0);
+                    }
                 }
             }
-        } else {
+
             if (variableTypes.getVariableType(BpmnAggregatedVariableType.TYPE_NAME) == null) {
                 variableTypes.addTypeBefore(new BpmnAggregatedVariableType(this), SerializableType.TYPE_NAME);
             }
 
             if (variableTypes.getVariableType(ParallelMultiInstanceLoopVariableType.TYPE_NAME) == null) {
                 variableTypes.addTypeBefore(new ParallelMultiInstanceLoopVariableType(this), SerializableType.TYPE_NAME);
+            }
+
+            if (variableTypes.getVariableType(EmptyCollectionType.TYPE_NAME) == null) {
+                variableTypes.addTypeBefore(new EmptyCollectionType(), SerializableType.TYPE_NAME);
+            }
+        }
+
+        if (customPostVariableTypes != null) {
+            for (VariableType customVariableType : customPostVariableTypes) {
+                if (variableTypes.getVariableType(customVariableType.getTypeName()) == null) {
+                    variableTypes.addType(customVariableType);
+                }
             }
         }
     }
@@ -3504,39 +3538,35 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public int getExecutionQueryLimit() {
-        return executionQueryLimit;
-    }
-
+    /**
+     * @deprecated no longer needed, this is a noop
+     */
+    @Deprecated
     public ProcessEngineConfigurationImpl setExecutionQueryLimit(int executionQueryLimit) {
-        this.executionQueryLimit = executionQueryLimit;
         return this;
     }
 
-    public int getTaskQueryLimit() {
-        return taskQueryLimit;
-    }
-
+    /**
+     * @deprecated no longer needed, this is a noop
+     */
+    @Deprecated
     public ProcessEngineConfigurationImpl setTaskQueryLimit(int taskQueryLimit) {
-        this.taskQueryLimit = taskQueryLimit;
         return this;
     }
 
-    public int getHistoricTaskQueryLimit() {
-        return historicTaskQueryLimit;
-    }
-
+    /**
+     * @deprecated no longer needed, this is a noop
+     */
+    @Deprecated
     public ProcessEngineConfigurationImpl setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
-        this.historicTaskQueryLimit = historicTaskQueryLimit;
         return this;
     }
 
-    public int getHistoricProcessInstancesQueryLimit() {
-        return historicProcessInstancesQueryLimit;
-    }
-
+    /**
+     * @deprecated no longer needed, this is a noop
+     */
+    @Deprecated
     public ProcessEngineConfigurationImpl setHistoricProcessInstancesQueryLimit(int historicProcessInstancesQueryLimit) {
-        this.historicProcessInstancesQueryLimit = historicProcessInstancesQueryLimit;
         return this;
     }
 
@@ -5073,6 +5103,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public int getAsyncHistoryExecutorMaxJobsDuePerAcquisition() {
+        return asyncHistoryExecutorMaxJobsDuePerAcquisition;
+    }
+
+    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorMaxJobsDuePerAcquisition(int asyncHistoryExecutorMaxJobsDuePerAcquisition) {
+        this.asyncHistoryExecutorMaxJobsDuePerAcquisition = asyncHistoryExecutorMaxJobsDuePerAcquisition;
+        return this;
+    }
+
     public String getAsyncHistoryExecutorLockOwner() {
         return asyncHistoryExecutorLockOwner;
     }
@@ -5150,15 +5189,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAsyncHistoryExecutorAsyncJobAcquisitionEnabled(boolean isAsyncHistoryExecutorAsyncJobAcquisitionEnabled) {
         this.isAsyncHistoryExecutorAsyncJobAcquisitionEnabled = isAsyncHistoryExecutorAsyncJobAcquisitionEnabled;
-        return this;
-    }
-
-    public boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled() {
-        return isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
-    }
-
-    public ProcessEngineConfigurationImpl setAsyncHistoryExecutorTimerJobAcquisitionEnabled(boolean isAsyncHistoryExecutorTimerJobAcquisitionEnabled) {
-        this.isAsyncHistoryExecutorTimerJobAcquisitionEnabled = isAsyncHistoryExecutorTimerJobAcquisitionEnabled;
         return this;
     }
 

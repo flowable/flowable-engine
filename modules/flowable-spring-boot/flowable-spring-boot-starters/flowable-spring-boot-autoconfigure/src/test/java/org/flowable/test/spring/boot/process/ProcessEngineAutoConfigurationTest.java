@@ -67,6 +67,7 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
@@ -79,6 +80,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -178,6 +181,23 @@ public class ProcessEngineAutoConfigurationTest {
 
             deleteDeployments(processEngine);
         });
+    }
+
+    @Test
+    public void standaloneProcessEngineWithJackson() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context).as("Process engine")
+                            .hasSingleBean(ProcessEngine.class)
+                            .hasSingleBean(ObjectMapper.class);
+
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+
+                    assertThat(processEngine.getProcessEngineConfiguration().getObjectMapper()).isEqualTo(context.getBean(ObjectMapper.class));
+
+                    deleteDeployments(processEngine);
+                });
     }
     
     @Test
@@ -336,6 +356,34 @@ public class ProcessEngineAutoConfigurationTest {
             deleteDeployments(appEngine);
             deleteDeployments(processEngine);
         });
+    }
+
+    @Test
+    public void processEngineWithBasicDataSourceAndAppEngineWithJackson() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(
+                        AppEngineServicesAutoConfiguration.class,
+                        AppEngineAutoConfiguration.class,
+                        IdmEngineAutoConfiguration.class,
+                        IdmEngineServicesAutoConfiguration.class,
+
+                        JacksonAutoConfiguration.class
+                ))
+                .run(context -> {
+                    assertThat(context).as("Process engine")
+                            .hasSingleBean(ProcessEngine.class)
+                            .hasSingleBean(AppEngine.class)
+                            .hasSingleBean(ObjectMapper.class);
+
+                    ProcessEngine processEngine = context.getBean(ProcessEngine.class);
+                    AppEngine appEngine = context.getBean(AppEngine.class);
+
+                    assertThat(processEngine.getProcessEngineConfiguration().getObjectMapper()).isEqualTo(context.getBean(ObjectMapper.class));
+                    assertThat(processEngine.getProcessEngineConfiguration().getObjectMapper()).isEqualTo(appEngine.getAppEngineConfiguration().getObjectMapper());
+
+                    deleteDeployments(appEngine);
+                    deleteDeployments(processEngine);
+                });
     }
 
     @Test

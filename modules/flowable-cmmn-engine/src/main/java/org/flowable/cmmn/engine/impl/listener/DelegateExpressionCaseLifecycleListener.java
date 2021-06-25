@@ -19,7 +19,6 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 
@@ -53,23 +52,14 @@ public class DelegateExpressionCaseLifecycleListener implements CaseInstanceLife
 
     @Override
     public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
-        try {
-            CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) caseInstance;
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, caseInstanceEntity, fieldExtensions);
+        CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) caseInstance;
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, caseInstanceEntity, fieldExtensions);
 
-            if (delegate instanceof CaseInstanceLifecycleListener) {
-                try {
-                    CaseInstanceLifecycleListener listener = (CaseInstanceLifecycleListener) delegate;
-                    listener.stateChanged(caseInstanceEntity, oldState, newState);
-                } catch (Exception e) {
-                    throw new FlowableException("Exception while invoking CaseInstanceLifeCycleListener: " + e.getMessage(), e);
-                }
-            } else {
-                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + CaseInstanceLifecycleListener.class);
-            }
-
-        } catch (Exception e) {
-            throw new FlowableException(e.getMessage(), e);
+        if (delegate instanceof CaseInstanceLifecycleListener) {
+            CaseInstanceLifecycleListener listener = (CaseInstanceLifecycleListener) delegate;
+            listener.stateChanged(caseInstanceEntity, oldState, newState);
+        } else {
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + CaseInstanceLifecycleListener.class);
         }
     }
 

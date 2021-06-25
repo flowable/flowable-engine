@@ -26,9 +26,17 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity);
 
+    void planReactivateCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
+
+    void planReactivatePlanModelOperation(CaseInstanceEntity caseInstanceEntity);
+
     void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planCreatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planCreateRepeatedPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planReactivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planCreatePlanItemInstanceForRepetitionOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
@@ -75,5 +83,7 @@ public interface CmmnEngineAgenda extends Agenda {
     void planEvaluateCriteriaOperation(String caseInstanceEntityId, boolean evaluateCaseInstanceComplete);
 
     void planEvaluateCriteriaOperation(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
+    
+    void planEvaluateVariableEventListenersOperation(String caseInstanceEntityId);
 
 }

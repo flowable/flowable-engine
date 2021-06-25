@@ -244,6 +244,14 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
         return isGraphicalNotationDefined;
     }
 
+    public boolean getIsGraphicalNotationDefined() {
+        return isGraphicalNotationDefined;
+    }
+
+    public void setIsGraphicalNotationDefined(boolean isGraphicalNotationDefined) {
+        this.isGraphicalNotationDefined = isGraphicalNotationDefined;
+    }
+
     @Override
     public void setGraphicalNotationDefined(boolean isGraphicalNotationDefined) {
         this.isGraphicalNotationDefined = isGraphicalNotationDefined;

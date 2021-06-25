@@ -39,8 +39,10 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcInstTypeAndActivityMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessInstanceAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeIdAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsBySubScopeIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.MessageEventSubscriptionsByProcInstAndEventNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByEventNameMatcher;
@@ -60,6 +62,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         ENTITY_SUBCLASSES.add(MessageEventSubscriptionEntityImpl.class);
         ENTITY_SUBCLASSES.add(SignalEventSubscriptionEntityImpl.class);
         ENTITY_SUBCLASSES.add(CompensateEventSubscriptionEntityImpl.class);
+        ENTITY_SUBCLASSES.add(GenericEventSubscriptionEntityImpl.class);
     }
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByNameMatcher = new EventSubscriptionsByNameMatcher();
@@ -71,10 +74,14 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcInstTypeAndActivityMatcher = new EventSubscriptionsByProcInstTypeAndActivityMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByExecutionAndTypeMatcher = new EventSubscriptionsByExecutionAndTypeMatcher();
+    
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcessInstanceAndTypeMatcher = new EventSubscriptionsByProcessInstanceAndTypeMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher();
+    
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeIdAndTypeMatcher = new EventSubscriptionsByScopeIdAndTypeMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> signalEventSubscriptionByNameAndExecutionMatcher = new SignalEventSubscriptionByNameAndExecutionMatcher();
 
@@ -198,7 +205,15 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         params.put("eventType", type);
         return getList("selectEventSubscriptionsByExecutionAndType", params, eventSubscriptionsByExecutionAndTypeMatcher, true);
     }
-
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndType(final String processInstanceId, final String type) {
+        Map<String, String> params = new HashMap<>();
+        params.put("processInstanceId", processInstanceId);
+        params.put("eventType", type);
+        return getList("selectEventSubscriptionsByProcessInstanceAndType", params, eventSubscriptionsByProcessInstanceAndTypeMatcher, true);
+    }
+    
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(final String processInstanceId, final String activityId, final String type) {
         Map<String, String> params = new HashMap<>();
@@ -245,6 +260,14 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
             params.put("tenantId", tenantId);
         }
         return getDbSqlSession().selectList(query, params);
+    }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type) {
+        Map<String, String> params = new HashMap<>();
+        params.put("scopeId", scopeId);
+        params.put("eventType", type);
+        return getList("selectEventSubscriptionsByScopeIdAndType", params, eventSubscriptionsByScopeIdAndTypeMatcher, true);
     }
 
     @Override

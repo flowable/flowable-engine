@@ -14,16 +14,21 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
  */
 public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity> {
+
+    CaseInstanceEntity create(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables);
 
     List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId);
 

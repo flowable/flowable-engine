@@ -220,6 +220,10 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
         return createTimeLowerThan;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

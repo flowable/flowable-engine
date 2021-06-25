@@ -48,6 +48,7 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
+    protected boolean withoutScopeType;
     protected String scopeDefinitionId;
     protected String correlationId;
     protected Date duedateHigherThan;
@@ -166,6 +167,12 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
             throw new FlowableIllegalArgumentException("Provided scope type is null");
         }
         this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
+    public ExternalWorkerJobQueryImpl withoutScopeType() {
+        this.withoutScopeType = true;
         return this;
     }
 
@@ -451,6 +458,10 @@ public class ExternalWorkerJobQueryImpl extends AbstractQuery<ExternalWorkerJobQ
 
     public String getScopeType() {
         return scopeType;
+    }
+
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
     }
 
     public String getScopeDefinitionId() {

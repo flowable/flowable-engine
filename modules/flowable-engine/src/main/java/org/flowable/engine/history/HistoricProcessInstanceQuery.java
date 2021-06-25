@@ -337,7 +337,9 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
 
     /**
      * Limit process instance variables
+     * @deprecated no longer needed, this is a noop
      */
+    @Deprecated
     HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
 
     /**

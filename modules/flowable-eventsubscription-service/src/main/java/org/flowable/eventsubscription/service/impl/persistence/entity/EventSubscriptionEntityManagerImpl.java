@@ -143,6 +143,11 @@ public class EventSubscriptionEntityManagerImpl
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(final String executionId, final String type) {
         return dataManager.findEventSubscriptionsByExecutionAndType(executionId, type);
     }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndType(final String processInstanceId, final String type) {
+        return dataManager.findEventSubscriptionsByProcessInstanceAndType(processInstanceId, type);
+    }
 
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type) {
@@ -162,6 +167,11 @@ public class EventSubscriptionEntityManagerImpl
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
         return dataManager.findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
+    }
+    
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type) {
+        return dataManager.findEventSubscriptionsByScopeIdAndType(scopeId, type);
     }
 
     @Override
@@ -288,6 +298,7 @@ public class EventSubscriptionEntityManagerImpl
     protected GenericEventSubscriptionEntity insertGenericEvent(EventSubscriptionBuilder eventSubscriptionBuilder) {
         GenericEventSubscriptionEntity eventSubscription = createGenericEventSubscription();
         eventSubscription.setEventType(eventSubscriptionBuilder.getEventType());
+        eventSubscription.setEventName(eventSubscriptionBuilder.getEventName());
         eventSubscription.setExecutionId(eventSubscriptionBuilder.getExecutionId());
         eventSubscription.setProcessInstanceId(eventSubscriptionBuilder.getProcessInstanceId());
         eventSubscription.setActivityId(eventSubscriptionBuilder.getActivityId());

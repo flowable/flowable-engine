@@ -169,6 +169,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initBeans();
         initExpressionManager();
         initCommandContextFactory();

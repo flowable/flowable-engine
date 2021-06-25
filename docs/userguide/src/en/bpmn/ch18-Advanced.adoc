@@ -507,7 +507,7 @@ List<CustomTask> tasks = managementService.executeCommand(new Command<List<Custo
       @SuppressWarnings("unchecked")
       @Override
       public List<CustomTask> execute(CommandContext commandContext) {
-        return (List<CustomTask>) commandContext.getDbSqlSession().selectList("selectCustomTaskList");
+        return (List<CustomTask>) CommandContextUtil.getDbSqlSession().selectList("selectCustomTaskList");
       }
     });
 ----
@@ -551,13 +551,13 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
 
   @Override
   public long executeCount(CommandContext commandContext) {
-    return (Long) commandContext.getDbSqlSession()
+    return (Long) CommandContextUtil.getDbSqlSession()
                    .selectOne("selectAttachmentCountByQueryCriteria", this);
   }
 
   @Override
   public List<Attachment> executeList(CommandContext commandContext, Page page) {
-    return commandContext.getDbSqlSession()
+    return CommandContextUtil.getDbSqlSession()
             .selectList("selectAttachmentByQueryCriteria", this);
   }
 ----
@@ -576,11 +576,11 @@ The XML file containing the mapped statements can look as follows:
   </select>
 
   <select id="selectAttachmentByQueryCriteria" parameterType="org.flowable.standalone.cfg.AttachmentQuery" resultMap="org.flowable.engine.impl.persistence.entity.AttachmentEntity.attachmentResultMap">
-    ${limitBefore}
-    select distinct RES.* ${limitBetween}
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectAttachmentByQueryCriteriaSql"/>
     ${orderBy}
-    ${limitAfter}
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <sql id="selectAttachmentByQueryCriteriaSql">

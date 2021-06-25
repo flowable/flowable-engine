@@ -88,6 +88,11 @@ public class PlanItemInstanceContainerUtil {
 
                     // if the plan item is active and not to be ignored, we can directly stop to look any further as it prevents the parent from being completed
                     if (ACTIVE_STATES.contains(planItemInstance.getState())) {
+                        // if the plan item is active, but was already completed and should be ignored after first completion, we can skip it for further investigation
+                        alreadyCompleted = isPlanItemAlreadyCompleted(commandContext, planItemInstance);
+                        if (shouldIgnorePlanItemForCompletion(commandContext, planItemInstance, alreadyCompleted)) {
+                            continue;
+                        }
                         return new CompletionEvaluationResult(false, false, planItemInstance);
                     }
 

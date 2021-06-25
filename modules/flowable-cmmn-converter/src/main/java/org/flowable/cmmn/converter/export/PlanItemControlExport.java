@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.ReactivationRule;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.RequiredRule;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
@@ -50,6 +51,7 @@ public class PlanItemControlExport implements CmmnXmlConstants {
     protected static void writeItemControlContent(PlanItemControl planItemControl, XMLStreamWriter xtw) throws Exception {
         boolean hasWrittenExtensionElements = writeCompletionNeutralRule(planItemControl.getCompletionNeutralRule(), xtw);
         hasWrittenExtensionElements = writeParentCompletionRule(planItemControl.getParentCompletionRule(), hasWrittenExtensionElements, xtw);
+        hasWrittenExtensionElements = writeReactivationRule(planItemControl.getReactivationRule(), hasWrittenExtensionElements, xtw);
         if (hasWrittenExtensionElements) {
             xtw.writeEndElement();
         }
@@ -206,6 +208,34 @@ public class PlanItemControlExport implements CmmnXmlConstants {
         }
         
         return hasWrittenExtensionElements;
+    }
+
+    public static boolean writeReactivationRule(ReactivationRule reactivationRule, boolean hasWrittenExtensionElements, XMLStreamWriter xtw) throws XMLStreamException {
+        if (reactivationRule != null) {
+            if (!hasWrittenExtensionElements) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_REACTIVATION_RULE, FLOWABLE_EXTENSIONS_NAMESPACE);
+            writeReactivationRuleAttributes(reactivationRule, xtw);
+            xtw.writeEndElement();
+
+            hasWrittenExtensionElements = true;
+        }
+
+        return hasWrittenExtensionElements;
+    }
+
+    public static void writeReactivationRuleAttributes(ReactivationRule reactivationRule, XMLStreamWriter xtw) throws XMLStreamException {
+        if (StringUtils.isNotEmpty(reactivationRule.getActivateCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_ACTIVATE_CONDITION, reactivationRule.getActivateCondition());
+        }
+        if (StringUtils.isNotEmpty(reactivationRule.getIgnoreCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_IGNORE_CONDITION, reactivationRule.getIgnoreCondition());
+        }
+        if (StringUtils.isNotEmpty(reactivationRule.getDefaultCondition())) {
+            xtw.writeAttribute(ATTRIBUTE_DEFAULT_CONDITION, reactivationRule.getDefaultCondition());
+        }
     }
     
 }

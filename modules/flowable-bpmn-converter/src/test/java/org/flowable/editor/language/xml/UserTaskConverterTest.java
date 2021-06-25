@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
 
+import org.flowable.bpmn.model.BpmnDiEdge;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
@@ -85,5 +86,15 @@ class UserTaskConverterTest {
                                     FlowableListener::getCustomPropertiesResolverImplementation)
                             .containsExactly(tuple("end", "before-commit", "org.test.TestResolverClass"));
                 });
+        
+        assertThat(model.getEdgeInfo("flow2")).isNotNull();
+        BpmnDiEdge edgeInfo = model.getEdgeInfo("flow2");
+        assertThat(edgeInfo.getSourceDockerInfo().getX()).isEqualTo(50.0);
+        assertThat(edgeInfo.getSourceDockerInfo().getY()).isEqualTo(10.0);
+        assertThat(edgeInfo.getTargetDockerInfo().getX()).isEqualTo(40.0);
+        assertThat(edgeInfo.getTargetDockerInfo().getY()).isEqualTo(30.0);
+        assertThat(edgeInfo.getWaypoints()).hasSize(2);
+        
+        assertThat(model.getEdgeInfo("flow1")).isNull();
     }
 }

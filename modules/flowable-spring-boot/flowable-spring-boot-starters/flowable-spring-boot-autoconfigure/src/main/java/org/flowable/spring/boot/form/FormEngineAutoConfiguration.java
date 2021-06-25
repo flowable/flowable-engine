@@ -51,6 +51,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Auto configuration for the form engine.
  *
@@ -89,6 +91,7 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     public SpringFormEngineConfiguration formEngineConfiguration(
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ObjectMapper> objectMapperProvider,
         ObjectProvider<List<AutoDeploymentStrategy<FormEngine>>> formAutoDeploymentStrategies
     ) throws IOException {
         
@@ -107,6 +110,10 @@ public class FormEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            configuration.setObjectMapper(objectMapper);
+        }
 
         // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
         List<AutoDeploymentStrategy<FormEngine>> deploymentStrategies = formAutoDeploymentStrategies.getIfAvailable();

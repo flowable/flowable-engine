@@ -12,11 +12,11 @@
  */
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 
 public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityManager<T> {
@@ -53,5 +53,16 @@ public interface JobInfoEntityManager <T extends JobInfoEntity> extends EntityMa
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
 
-    JobServiceConfiguration getJobServiceConfiguration();
+    // Done with a default method, as otherwise the generics make the code hard to follow in the AcquireJobsCmd
+    default List<T> findJobsToExecuteAndLockInBulk(List<String> enabledCategories, Page page, String lockOwner, Date lockExpirationTime) {
+        List<T> jobs = findJobsToExecute(enabledCategories, page);
+
+        if (!jobs.isEmpty()) {
+            bulkUpdateJobLockWithoutRevisionCheck(jobs, lockOwner, lockExpirationTime);
+        }
+        return jobs;
+    }
+
+    void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime);
+
 }

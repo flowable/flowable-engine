@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="variableListenerProcess">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+        
+        <parallelGateway id="fork" />
+        
+        <sequenceFlow id="flow2" sourceRef="fork" targetRef="caseTask" />
+        
+        <serviceTask flowable:type="case" id="caseTask" flowable:caseDefinitionKey="caseWithVariableListener" />
+        
+        <sequenceFlow id="flow3" sourceRef="fork" targetRef="theTask" />
+        
+        <userTask id="theTask" name="my task" />
+        
+        <boundaryEvent id="variableListenerEvent" name="Variable listener" cancelActivity="true" attachedToRef="theTask">
+			<extensionElements>
+				<flowable:variableListenerEventDefinition variableName="var1" />
+			</extensionElements>
+		</boundaryEvent>
+		
+		<sequenceFlow id="flow4" sourceRef="caseTask" targetRef="join" />
+		
+		<manualTask id="manualTask" />
+		
+		<sequenceFlow id="flow5" sourceRef="theTask" targetRef="manualTask" />
+		
+		<sequenceFlow id="flow6" sourceRef="variableListenerEvent" targetRef="manualTask" />
+		
+		<sequenceFlow id="flow7" sourceRef="manualTask" targetRef="join" />
+		
+		<parallelGateway id="join" />
+		
+        <sequenceFlow id="flow8" sourceRef="join" targetRef="theEnd" />
+        
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

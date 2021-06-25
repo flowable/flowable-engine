@@ -162,7 +162,7 @@
         "DECISION-TABLES-SIZE": "这个流程实例有{{total}}个决策表.",
         "DECISION-TABLES-EMPTY": "这个流程实例没有决策表.",
         "FORM-INSTANCES-SIZE": "这个流程实例有{{total}}个表单实例.",
-        "FORM-INSTANCES-EMPTY": "这个流程实例没有子流程.",
+        "FORM-INSTANCES-EMPTY": "这个流程实例没有表单实例.",
         "TITLE": {
             "TASKS": "任务",
             "VARIABLES": "变量",
