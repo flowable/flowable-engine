@@ -12,7 +12,6 @@
  */
 package org.flowable.ui.common.security;
 
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -37,11 +36,11 @@ public interface SecurityScope {
     Set<String> getGroupIds();
 
     /**
-     * The optional tenant id for which the security scope is meant for
+     * The tenant id for which the security scope is meant for
      *
-     * @return the optional tenant id
+     * @return the tenant id
      */
-    Optional<String> getTenantId();
+    String getTenantId();
 
     /**
      * Check if the security scope has the given authority.
