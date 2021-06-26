@@ -680,6 +680,12 @@
           "DESCRIPTION" : "定义信号的名称"
         }
       },
+      "COMPENSATIONACTIVITYREFPACKAGE" : {
+        "COMPENSATIONACTIVITYREF" : {
+          "TITLE" : "補償活動參考",
+          "DESCRIPTION" : "定義活動參考。"
+        }
+      },
       "ERRORREFPACKAGE" : {
         "ERRORREF" : {
           "TITLE" : "错误引用",

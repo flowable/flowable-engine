@@ -705,6 +705,12 @@
           "DESCRIPTION": "信号名を定義。"
         }
       },
+      "COMPENSATIONACTIVITYREFPACKAGE" : {
+        "COMPENSATIONACTIVITYREF" : {
+          "TITLE" : "報酬活動リファレンス",
+          "DESCRIPTION" : "アクティビティ参照を定義します。"
+        }
+      },
       "ERRORREFPACKAGE": {
         "ERRORREF": {
           "TITLE": "エラー参照",

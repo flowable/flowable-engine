@@ -718,6 +718,12 @@
             "DESCRIPTION" : "Define the signal name."
           }
         },
+        "COMPENSATIONACTIVITYREFPACKAGE" : {
+          "COMPENSATIONACTIVITYREF" : {
+            "TITLE" : "Compensation activity reference",
+            "DESCRIPTION" : "Define the activity reference."
+          }
+        },
         "SIGNALEXPRESSIONPACKAGE" : {
           "SIGNALEXPRESSION" : {
             "TITLE" : "Signal expression",
