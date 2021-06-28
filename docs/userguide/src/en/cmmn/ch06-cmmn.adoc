@@ -889,6 +889,75 @@ User event listeners can be queried using the _org.flowable.cmmn.api.runtime.Use
 
 A user event listener can be completed by calling the _cmmnRuntimeService.completeUserEventListenerInstance(id)_ method.
 
+===== Reactivate Event Listener
+
+Adding a reactivation listener to a case model allows a finished (archived) case instance to be reactivated (reopened). What reactivation actually means is fully up to the modeler as there might be different possibilities what should happen when a case instance is reactivated.
+
+Looking at a sample case with three stages; data collection, review for approval and execution. Reactivating a finished case instance might be done in several ways: maybe you only want to redo the execution part of the case, maybe you want to go back further and even redo the review and approval phase or even restart the case from the data collection stage.
+
+As you can see, there are a lot of options and that's why reactivation needs further information in the case model to actually work.
+
+It all starts with the reactivate listener, without it, you can't reopen a case instance. Adding a reactivate listener kind of marks the case model to support case reactivation.
+
+Here is how you specify a reactivate listener in the case model:
+
+[source,XML,linenums]
+----
+<eventListener id="reactivationListener1" name="Reactivate case" flowable:eventType="reactivate">
+  <extensionElements>
+    <flowable:defaultReactivationRule activateCondition="true | expression" ignoreCondition="true | expression" defaultCondition="true | expression"/>
+  </extensionElements>
+</eventListener>
+----
+
+Case reactivation happens in two phases, once you trigger the reactivate listener on an archived case:
+
+* triggering and executing all directly associated plan items of the reactivate listener (e.g. some initializing stuff like resetting data, preparing the case instance for reactivation)
+* once those primary plan items have been executed, the case engine reactivates all plan items in the case according their reactivation rules
+
+Every plan item, including stages of course, support reactivation rules where you can specify on how the case engine should treat them once the case gets reopened.
+
+Here is how you can specify the reactivation conditions on any plan item:
+
+[source,XML,linenums]
+----
+<planItem id="planItem1" name="Task" definitionRef="humanTask1">
+  <itemControl>
+    <extensionElements>
+      <flowable:reactivationRule activateCondition="true | expression" ignoreCondition="true | expression" defaultCondition="true | expression"/>
+    </extensionElements>
+</itemControl>
+</planItem>
+----
+
+There are three different reactivation conditions:
+
+* *Direct activation condition* - if set to true or evaluating to true, if it is an expression, that plan item immediately gets activated, regardless of any entry sentry or condition which might be necessary to restart at a certain state of the case (e.g. a stage)
+* *Ignore condition* - if set to true or evaluating to true, if it is an expression, that plan item is ignored when the case is reactivated and hence cannot be part of the execution again
+* *Default condition* - if set to true or evaluating to true, if it is an expression, that plan item behaves like a regular one as if the case was started from scratch, necessary entry sentry are considered and everything else
+
+Evaluation of those rules take place in the following order:
+
+* First, the direct activation condition is evaluated and if true, the plan item immediately gets activated and the other rules are ignored
+* If the direct activation is not set at all or was evaluating to false, the ignore condition is evaluated and if true, the plan item is ignored and will not be taken into account again
+* If either both rules (direct activation and ignore) are not set or evaluated to false, the default condition gets evaluated and if true, the plan item gets initialized the very same way as it was when the case was originally started. If evaluating to false, it has the same effect as ignore, however, if it is not set at all, the default rules as being specified on the reactivate listener apply.
+
+You can specify default reactivation rule conditions on the reactivate listener. Those are taken into account if you don't specify any rules on a plan item. This might come in handy when you want most of the plan items to behave the same way as if the case was freshly started and only have a couple of exceptions or the opposite, when you only want to selectively reactivate a few plan items on case reactivation.
+
+While triggering a case reactivation, you can optionally pass in an arbitrary set of variables, allowing you to control precisely, how the case instance needs to behave during reactivation.
+
+The case reactivation builder is used to create all the necessary and optional information for an archived / finished case to be reactivated.
+
+Here is a sample on how you can reactivate a case instance:
+
+[source,java,linenums]
+----
+CaseInstance reactivatedCase = cmmnHistoryService.createCaseReactivationBuilder("historicCaseId")
+    .transientVariable("fullReactivation", true)
+    .variable("foo", "bar")
+    .reactivate();
+----
+
 ===== Generic Event Listener
 
 A generic event listener is used to typically model a programmatic interaction (e.g. a external system that calls out to change something in a case instance).
