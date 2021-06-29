@@ -565,36 +565,15 @@ public class ModelServiceImpl implements ModelService {
             throw new IllegalArgumentException("No model found with id: " + modelId);
         }
 
-        // Fetch current model history list
-        List<ModelHistory> history = modelHistoryRepository.findByModelId(model.getId());
-
         // Move model to history and mark removed
         ModelHistory historyModel = createNewModelhistory(model);
         historyModel.setRemovalDate(Calendar.getInstance().getTime());
         persistModelHistory(historyModel);
 
-        deleteModelAndChildren(model);
-    }
-
-    protected void deleteModelAndChildren(Model model) {
-
-        // Models have relations with each other, in all kind of wicked and funny ways.
-        // Hence, we remove first all relations, comments, etc. while collecting all models.
-        // Then, once all foreign key problem makers are removed, we remove the models
-
-        List<Model> allModels = new ArrayList<>();
-        internalDeleteModelAndChildren(model, allModels);
-
-        for (Model modelToDelete : allModels) {
-            modelRepository.delete(modelToDelete);
-        }
-    }
-
-    protected void internalDeleteModelAndChildren(Model model, List<Model> allModels) {
         // Delete all related data
         modelRelationRepository.deleteModelRelationsForParentModel(model.getId());
 
-        allModels.add(model);
+        modelRepository.delete(model);
     }
 
     @Override
