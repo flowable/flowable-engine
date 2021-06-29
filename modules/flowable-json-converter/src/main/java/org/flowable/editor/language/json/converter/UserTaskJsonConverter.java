@@ -433,13 +433,15 @@ public class UserTaskJsonConverter extends BaseBpmnJsonConverter {
         ExtensionElement extensionElement = new ExtensionElement();
         extensionElement.setNamespace(NAMESPACE);
         extensionElement.setNamespacePrefix("modeler");
-        extensionElement.setName(name);
+        extensionElement.setName(StringUtils.replace(name, " ", "_"));
         extensionElement.setElementText(elementText);
         task.addExtensionElement(extensionElement);
     }
 
     protected void fillProperty(String propertyName, String extensionElementName, ObjectNode elementNode, UserTask task) {
-        List<ExtensionElement> extensionElementList = task.getExtensionElements().get(extensionElementName);
+        String changedExtensionElementName = StringUtils.replace(extensionElementName, " ", "_");
+        List<ExtensionElement> extensionElementList = task.getExtensionElements()
+                .get(changedExtensionElementName);
         if (CollectionUtils.isNotEmpty(extensionElementList)) {
             elementNode.put(propertyName, extensionElementList.get(0).getElementText());
         }
