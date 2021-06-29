@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.reactivation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.COMPLETED;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.TERMINATED;
@@ -312,6 +313,49 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
         } finally {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case.cmmn.xml")
+    public void simpleCaseReactivationWithoutAuthenticatedUser() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleReactivationTestCase")
+                .variable("foo", "fooValue")
+                .variable("bar", "barValue")
+                .start();
+
+        String caseInstanceId = caseInstance.getId();
+
+        cmmnRuntimeService.addUserIdentityLink(caseInstanceId, "kermit", IdentityLinkType.ASSIGNEE);
+        cmmnRuntimeService.addGroupIdentityLink(caseInstanceId, "frogs", IdentityLinkType.OWNER);
+
+        List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstanceId);
+        assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+
+        planItemInstances = getPlanItemInstances(caseInstanceId);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE);
+        cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult()).isNull();
+
+        List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceId);
+        assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("kermit", null, IdentityLinkType.ASSIGNEE),
+                        tuple(null, "frogs", IdentityLinkType.OWNER)
+                );
+
+        CaseInstance reactivatedCase = cmmnHistoryService.createCaseReactivationBuilder(caseInstanceId).reactivate();
+        assertThat(reactivatedCase).isNotNull();
+
+        assertThat(cmmnRuntimeService.getIdentityLinksForCaseInstance(reactivatedCase.getId()))
+                .extracting(IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getType)
+                .containsExactlyInAnyOrder(
+                        tuple("kermit", null, IdentityLinkType.ASSIGNEE),
+                        tuple(null, "frogs", IdentityLinkType.OWNER)
+                );
     }
 
     protected HistoricCaseInstance createAndFinishSimpleCase(String caseDefinitionKey) {
