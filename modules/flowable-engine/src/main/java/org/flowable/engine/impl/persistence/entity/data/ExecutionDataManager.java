@@ -63,6 +63,8 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
+    long countActiveExecutionsByParentId(String parentId);
+
     void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
 
     void updateAllExecutionRelatedEntityCountFlags(boolean newValue);
