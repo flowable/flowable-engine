@@ -528,6 +528,11 @@
     where PARENT_ID_ = #{parameter}
   </select>
 
+  <select id="countActiveExecutionsByParentId" parameterType="java.util.Map" resultType="long">
+    select count(ID_) from ${prefix}ACT_RU_EXECUTION
+    where PARENT_ID_ = #{parentId} and IS_ACTIVE_ = #{isActive}
+  </select>
+
   <select id="selectExecutionsByRootProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
     where ROOT_PROC_INST_ID_ = #{parameter}

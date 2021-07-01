@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="myProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />
+
+    <subProcess id="subprocess" flowable:async="true" flowable:exclusive="false">
+
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:noWaitStatesAsyncLeave="true">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+
+      <startEvent id="subStart" />
+      <sequenceFlow id="sub0" sourceRef="subStart" targetRef="serviceTask1" />
+
+      <serviceTask id="serviceTask1" flowable:expression="${true}"/>
+      <sequenceFlow id="sub1" sourceRef="serviceTask1" targetRef="serviceTask2" />
+
+      <serviceTask id="serviceTask2" flowable:expression="${true}"/>
+      <sequenceFlow id="sub2" sourceRef="serviceTask2" targetRef="serviceTask3" />
+
+      <serviceTask id="serviceTask3" flowable:expression="${true}"/>
+      <sequenceFlow id="sub3" sourceRef="serviceTask3" targetRef="subEnd" />
+
+      <endEvent id="subEnd" />
+
+    </subProcess>
+
+    <sequenceFlow id="flow3" sourceRef="subprocess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
