@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-        <version>6.6.1.16</version>
+        <version>6.6.1.17</version>
     </parent>
 
     <properties>
