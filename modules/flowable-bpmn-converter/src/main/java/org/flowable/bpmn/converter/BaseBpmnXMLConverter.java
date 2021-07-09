@@ -560,8 +560,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         xtw.writeStartElement(ELEMENT_EVENT_ERRORDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ERROR_REF, errorDefinition.getErrorCode(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_NAME, errorDefinition.getErrorVariableName(), xtw);
-        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope().toString(), xtw);
-        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient().toString(), xtw);
+        
+        if (errorDefinition.getErrorVariableLocalScope() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope().toString(), xtw);
+        }
+        
+        if (errorDefinition.getErrorVariableTransient() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient().toString(), xtw);
+        }
 
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(errorDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {

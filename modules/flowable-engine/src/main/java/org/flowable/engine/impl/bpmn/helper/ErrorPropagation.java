@@ -466,24 +466,24 @@ public class ErrorPropagation {
 
         for (EventDefinition eventDefinition : event.getEventDefinitions()) {
             if (!(eventDefinition instanceof ErrorEventDefinition)) {
-                break;
+                continue;
             }
 
             ErrorEventDefinition definition = (ErrorEventDefinition) eventDefinition;
             String variableName = definition.getErrorVariableName();
 
             if (variableName == null || variableName.isEmpty()) {
-                break;
+                continue;
             }
 
-            if (definition.getErrorVariableTransient()) {
-                if (definition.getErrorVariableLocalScope()) {
+            if (definition.getErrorVariableTransient() != null && definition.getErrorVariableTransient()) {
+                if (definition.getErrorVariableLocalScope() != null && definition.getErrorVariableLocalScope()) {
                     execution.setTransientVariableLocal(variableName, errorCode);
                 } else {
                     execution.setTransientVariable(variableName, errorCode);
                 }
             } else {
-                if (definition.getErrorVariableLocalScope()) {
+                if (definition.getErrorVariableLocalScope() != null && definition.getErrorVariableLocalScope()) {
                     execution.setVariableLocal(variableName, errorCode);
                 } else {
                     execution.setVariable(variableName, errorCode);
