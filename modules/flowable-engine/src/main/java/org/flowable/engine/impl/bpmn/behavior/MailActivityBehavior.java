@@ -518,7 +518,10 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         Charset defaultCharset = null;
         if(StringUtils.isNotBlank(tenantId)){
             MailServerInfo mailServerInfo = CommandContextUtil.getProcessEngineConfiguration().getMailServer(tenantId);
-            defaultCharset = mailServerInfo.getMailServerDefaultCharset();
+            if(mailServerInfo != null){
+                defaultCharset = mailServerInfo.getMailServerDefaultCharset();
+            }
+
         }
 
         if(defaultCharset == null){

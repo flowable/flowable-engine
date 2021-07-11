@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.WiserMessage;
 
@@ -57,7 +60,21 @@ public class EmailServiceTaskTest extends EmailTestCase {
         assertEmailSend(message, false, "Hello Kermit!", "This a text only e-mail.", "flowable@localhost", Collections.singletonList("kermit@activiti.org"), null);
         assertProcessEnded(procId);
     }
-    
+
+    @Test
+    @DisplayName("Check if the charset is used when configured in the process engine configuration.")
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSimpleTextMail.bpmn20.xml")
+    public void testSimpleTextMailCharset() throws Exception {
+        processEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.UTF_8);
+        String procId = runtimeService.startProcessInstanceByKey("simpleTextOnly").getId();
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+
+        WiserMessage message = messages.get(0);
+        assertThat(message.getMimeMessage().getContentType()).isEqualTo("text/plain; charset=UTF-8");
+    }
+
     @Test
     @Deployment
     public void testSkipExpression() throws Exception {
@@ -71,7 +88,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
         assertProcessEnded(procId);
     }
-    
+
     @Test
     @Deployment(resources="org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testSkipExpression.bpmn20.xml")
     public void testSkipExpressionEnabledFalse() throws Exception {
@@ -150,6 +167,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
 
     @Test
     public void testSimpleTextMailForNonExistentTenant() throws Exception {
+
         String tenantId = "nonExistentTenant";
 
         repositoryService.createDeployment()
