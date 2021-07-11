@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.naming.NamingException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -103,7 +105,7 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
             addBcc(commandContext, email, bccStr, planItemInstanceEntity.getTenantId());
             setSubject(email, subjectStr);
             setMailServerProperties(commandContext, email, planItemInstanceEntity.getTenantId());
-            setCharset(email, charSetStr);
+            setCharset(email, charSetStr, planItemInstanceEntity.getTenantId());
             attach(email, files, dataSources);
 
             email.send();
@@ -362,9 +364,14 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
     }
 
-    protected void setCharset(Email email, String charSetStr) {
+    protected void setCharset(Email email, String charSetStr, String tentantId) {
         if (charset != null) {
             email.setCharset(charSetStr);
+        }else{
+            Charset mailServerDefaultCharset = getDefaultCharSet(tentantId);
+            if(mailServerDefaultCharset != null){
+                email.setCharset(mailServerDefaultCharset.name());
+            }
         }
     }
 
@@ -494,6 +501,23 @@ public class MailActivityBehavior extends CoreCmmnActivityBehavior {
         }
 
         return forceTo;
+    }
+
+    protected Charset getDefaultCharSet(String tenantId){
+        Charset defaultCharset = null;
+        if(StringUtils.isNotBlank(tenantId)){
+            MailServerInfo mailServerInfo = CommandContextUtil.getCmmnEngineConfiguration().getMailServer(tenantId);
+            if(mailServerInfo != null){
+                defaultCharset = mailServerInfo.getMailServerDefaultCharset();
+            }
+
+        }
+
+        if(defaultCharset == null){
+            defaultCharset = CommandContextUtil.getCmmnEngineConfiguration().getMailServerDefaultCharset();
+        }
+
+        return defaultCharset;
     }
 
     public static class ContentItemDataSourceWrapper implements DataSource {

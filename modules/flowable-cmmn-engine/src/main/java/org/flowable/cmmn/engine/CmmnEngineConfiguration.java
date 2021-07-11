@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -511,6 +512,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
     protected String mailServerForceTo;
+    protected Charset mailServerDefaultCharset;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -3956,6 +3958,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CmmnEngineConfiguration setMailServerDefaultCharset(Charset mailServerDefaultCharset){
+        this.mailServerDefaultCharset = mailServerDefaultCharset;
+        return this;
+    }
+
+    public Charset getMailServerDefaultCharset() {
+        return mailServerDefaultCharset;
+    }
+
     public String getMailSessionJndi() {
         return mailSessionJndi;
     }
@@ -4105,4 +4116,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
         return this;
     }
+
+
 }
