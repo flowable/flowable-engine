@@ -13,7 +13,6 @@
 
 package org.flowable.variable.service.impl.types;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -83,27 +82,17 @@ public class JPAEntityMappings {
         if (!metaData.isJPAEntity()) {
             throw new FlowableIllegalArgumentException("Object is not a JPA Entity: class='" + value.getClass() + "', " + value);
         }
-        Object idValue = getIdValue(value, metaData);
+        Object idValue = getIdValue(value);
         return getIdString(idValue);
     }
 
-    public Object getIdValue(Object value, EntityMetaData metaData) {
+    public Object getIdValue(Object value) {
         try {
-            if (metaData.getIdMethod() != null) {
-                return metaData.getIdMethod().invoke(value);
-            } else if (metaData.getIdField() != null) {
-                return metaData.getIdField().get(value);
-            }
+            EntityManager em = Context.getCommandContext().getSession(EntityManagerSession.class).getEntityManager();
+            return em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(value);
         } catch (IllegalArgumentException iae) {
-            throw new FlowableException("Illegal argument exception when getting value from id method/field on JPAEntity", iae);
-        } catch (IllegalAccessException iae) {
-            throw new FlowableException("Cannot access id method/field for JPA Entity", iae);
-        } catch (InvocationTargetException ite) {
-            throw new FlowableException("Exception occurred while getting value from id field/method on JPAEntity: " + ite.getCause().getMessage(), ite.getCause());
+            throw new FlowableIllegalArgumentException("Unsupported Primary key type for JPA-Entity: " + value.getClass().getName(), iae);
         }
-
-        // Fall trough when no method and field is set
-        throw new FlowableException("Cannot get id from JPA Entity, no id method/field set");
     }
 
     public Object getJPAEntity(String className, String idString) {
