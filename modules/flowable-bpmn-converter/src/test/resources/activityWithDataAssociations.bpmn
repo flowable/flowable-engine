@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    typeLanguage="http://www.w3.org/2001/XMLSchema"
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="http://www.flowable.org/test">
+  <process id="process" name="process1" isExecutable="true">
+    <dataObject name="input" id="inputObject_1" itemSubjectRef="xsd:string"/>
+    <dataObject name="output" id="outputObject_1" itemSubjectRef="xsd:string"/>
+    <endEvent id="sid-F7795B38-72CD-41A4-9549-6CFB7D3E5FB5"></endEvent>
+    <sequenceFlow id="sid-C6C56AC3-9561-49E0-A58A-624F6CB8BB82" sourceRef="sid-F62B554B-FF4F-475E-94FF-A3F44EDA6A6A" targetRef="servicetask"></sequenceFlow>
+    <serviceTask id="servicetask" name="Service task">
+       <dataInputAssociation id="dataAssociation-inputObject">
+        <sourceRef>inputObject_1</sourceRef>
+        <targetRef>servicetask</targetRef>
+        <transformation>${dataOutputOfServiceTask.prettyPrint}</transformation>
+       </dataInputAssociation>
+       <dataOutputAssociation id="dataAssociation-outputObject">
+        <sourceRef>servicetask</sourceRef>
+        <targetRef>outputObject_1</targetRef>
+        <assignment>
+         <from>${dataInputOfProcess.prefix}</from>
+         <to>${dataInputOfServiceTask.prefix}</to>
+        </assignment>
+       </dataOutputAssociation>
+    </serviceTask>
+    <startEvent id="sid-F62B554B-FF4F-475E-94FF-A3F44EDA6A6A"></startEvent>
+    <sequenceFlow id="sid-91C0F3A0-649F-462E-A1C1-1CE499FEDE3E" sourceRef="servicetask" targetRef="sid-F7795B38-72CD-41A4-9549-6CFB7D3E5FB5"></sequenceFlow>
+  </process>
+</definitions>
