@@ -20,7 +20,7 @@ spec:
       initContainers:
       {{- if .Values.postgres.enabled }}
       - name: check-db-ready
-        image: postgres:9.6.5
+        image: {{ .Values.postgres.image }}
         command: ['sh', '-c', 'until pg_isready -h {{ .Values.postgres.service.name }} -p 5432; do echo waiting for database; sleep 2; done;']
       {{- end }}
       containers:
