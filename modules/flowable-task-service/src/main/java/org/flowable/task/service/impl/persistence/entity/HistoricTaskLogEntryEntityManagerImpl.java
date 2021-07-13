@@ -101,4 +101,16 @@ public class HistoricTaskLogEntryEntityManagerImpl
         getDataManager().insert(historicTaskLogEntryEntity);
     }
 
+    @Override
+    public long countChangeTenantIdHistoricTaskLogEntries(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdHistoricTaskLogEntries(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdHistoricTaskLogEntries(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdHistoricTaskLogEntries(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
 }

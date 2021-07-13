@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
-  
+
   <!-- HISTORIC DECISION EXECUTION INSERT -->
 
   <insert id="insertHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
@@ -22,7 +22,7 @@
             #{executionJson, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR})
   </insert>
-  
+
   <insert id="bulkInsertHistoricDecisionExecution" parameterType="java.util.List">
     insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
         ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_)
@@ -42,7 +42,7 @@
          #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
   </insert>
-  
+
   <insert id="bulkInsertHistoricDecisionExecution" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
     <foreach collection="list" item="historicDecisionExecution" index="index">
@@ -61,9 +61,9 @@
              #{historicDecisionExecution.executionJson, jdbcType=VARCHAR},
              #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
-    SELECT * FROM dual   
+    SELECT * FROM dual
   </insert>
-  
+
   <!-- HISTORIC DECISION EXECUTION UPDATE -->
 
   <update id="updateHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
@@ -73,13 +73,13 @@
     </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
-  
+
   <!-- HISTORIC DECISION EXECUTION DELETE -->
 
   <delete id="deleteHistoricDecisionExecutionsByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where DEPLOYMENT_ID_ = #{deploymenId} 
   </delete>
-  
+
   <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
 
   <resultMap id="historicDecisionExecutionResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
@@ -186,4 +186,24 @@
   <select id="selectHistoricDecisionExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <select id="countChangeTenantIdHistoricDecisionExecutions" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
+    <include refid="changeTenantIdDmnCriteriaSql" />
+  </select>
+
+  <update id="changeTenantIdHistoricDecisionExecutions" parameterType="java.util.Map">
+    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="changeTenantIdDmnCriteriaSql" />
+
+  </update>
+
+  <sql id="changeTenantIdDmnCriteriaSql">
+    where RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}
+    <if test="onlyInstancesFromDefaultTenantDefinitions">
+        and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+    </if>
+  </sql>
+  
 </mapper>

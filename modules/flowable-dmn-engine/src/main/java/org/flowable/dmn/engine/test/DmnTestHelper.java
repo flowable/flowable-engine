@@ -184,4 +184,11 @@ public abstract class DmnTestHelper {
         );
     }
 
+
+    public static void deleteDeployment(DmnEngineConfiguration dmnEngineConfiguration, String deploymentId) {
+        if (deploymentId != null) {
+            dmnEngineConfiguration.getDmnRepositoryService().deleteDeployment(deploymentId);
+        }
+    }
+
 }

@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
@@ -56,6 +57,7 @@ import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.engine.impl.externalworker.ExternalWorkerCompletionBuilderImpl;
+import org.flowable.engine.impl.tenant.ChangeTenantIdBuilderBpmnImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
@@ -434,6 +436,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
         return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId, configuration.getJobServiceConfiguration());
+    }
+
+    @Override
+    public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
+        return new ChangeTenantIdBuilderBpmnImpl(commandExecutor, fromTenantId, toTenantId);
     }
 
 }

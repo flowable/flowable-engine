@@ -31,6 +31,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseIn
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -224,4 +225,26 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
             }
         }
     }
+
+    @Override
+    public long countChangeTenantIdCmmnCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnCaseInstances", parameters);
+    }
+
+    @Override
+    public long changeTenantIdCmmnCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().update("changeTenantIdCmmnCaseInstances", parameters);
+    }
+    
 }

@@ -404,4 +404,16 @@
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
+
+    <select id="countChangeTenantIdSuspendedJobs" parameterType="string" resultType="long">
+        select count(RES.ID_) FROM ${prefix}ACT_RU_SUSPENDED_JOB RES
+        <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+      </select>
+    
+      <update id="changeTenantIdSuspendedJobs" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_SUSPENDED_JOB RES
+        <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+        <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+      </update>
+
 </mapper>

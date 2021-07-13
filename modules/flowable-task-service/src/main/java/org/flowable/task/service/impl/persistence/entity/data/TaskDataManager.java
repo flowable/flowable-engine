@@ -50,5 +50,9 @@ public interface TaskDataManager extends DataManager<TaskEntity> {
     void updateAllTaskRelatedEntityCountFlags(boolean newValue);
     
     void deleteTasksByExecutionId(String executionId);
+    
+    long countChangeTenantIdTasks(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
+    long changeTenantIdTasks(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
 
 }

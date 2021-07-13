@@ -95,4 +95,16 @@ public class ExternalWorkerJobEntityManagerImpl
         super.delete(entity, fireDeleteEvent);
     }
 
+    @Override
+    public long countChangeTenantIdExternalWorkerJobs(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.countChangeTenantIdExternalWorkerJobs(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
+    @Override
+    public long changeTenantIdExternalWorkerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        return dataManager.changeTenantIdExternalWorkerJobs(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    }
+
 }

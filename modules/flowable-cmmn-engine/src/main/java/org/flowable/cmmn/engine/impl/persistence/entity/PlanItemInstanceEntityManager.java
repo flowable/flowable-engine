@@ -55,4 +55,9 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     void deleteByCaseInstanceId(String caseInstanceId);
 
     void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
+
+    long countChangeTenantIdCmmnPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdCmmnPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }

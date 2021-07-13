@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
 import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
@@ -318,4 +319,31 @@ public interface CmmnManagementService {
      */
     CmmnExternalWorkerTransitionBuilder createCmmnExternalWorkerTransitionBuilder(String externalJobId, String workerId);
 
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the case instances
+     * and all the related instances, including:
+     * <ul>
+     *    <li>CaseInstances</li>
+     *    <li>HistoricCaseInstances</li>
+     *    <li>PlanItemInstances</li>
+     *    <li>HistoricPlanItemInstances</li>
+     *    <li>MilestoneInstances</li>
+     *    <li>HistoricMilestoneInstances</li>
+     *    <li>Tasks</li>
+     *    <li>HistoricTaskInstances</li>
+     *    <li>HistoricTaskLogEntries</li>
+     *    <li>EventSubscriptions</li>
+     *    <li>Jobs</li>
+     *    <li>TimerJobs</li>
+     *    <li>SuspendedJobs</li>
+     *    <li>DeadLetterJobs</li>
+     *    <li>HistoryJobs</li>
+     *    <li>ExternalWorkerJobs</li>
+     * </ul>
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the CMMN scope
+     * will be changed to the target tenant id.
+     * 
+     */    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+    
 }

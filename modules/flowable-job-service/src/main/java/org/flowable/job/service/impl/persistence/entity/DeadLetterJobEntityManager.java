@@ -54,4 +54,10 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
+    long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId, 
+        boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+        boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

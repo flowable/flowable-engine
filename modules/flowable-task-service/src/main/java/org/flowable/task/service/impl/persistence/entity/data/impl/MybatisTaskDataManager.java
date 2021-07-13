@@ -183,4 +183,28 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
             }
         }
     }
+
+    @Override
+    public long countChangeTenantIdTasks(String sourceTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdTasks", parameters);
+    }
+
+    @Override
+    public long changeTenantIdTasks(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdTasks", parameters);
+    }
+
 }

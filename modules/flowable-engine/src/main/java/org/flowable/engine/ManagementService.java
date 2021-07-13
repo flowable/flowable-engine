@@ -22,6 +22,7 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.api.management.TablePageQuery;
@@ -496,5 +497,31 @@ public interface ManagementService {
      * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
      */
     ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the process instances
+     * and all the related instances, including:
+     * <ul>
+     *    <li>Executions</li>
+     *    <li>HistoricProcessInstances</li>
+     *    <li>ActivityInstances</li>
+     *    <li>HistoricActivityInstances</li>
+     *    <li>Tasks</li>
+     *    <li>HistoricTaskInstances</li>
+     *    <li>HistoricTaskLogEntries</li>
+     *    <li>EventSubscriptions</li>
+     *    <li>Jobs</li>
+     *    <li>TimerJobs</li>
+     *    <li>SuspendedJobs</li>
+     *    <li>DeadLetterJobs</li>
+     *    <li>HistoryJobs</li>
+     *    <li>ExternalWorkerJobs</li>
+     * </ul>
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the BPMN scope
+     * will be changed to the target tenant id.
+     * 
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
 
 }

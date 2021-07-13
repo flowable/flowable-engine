@@ -31,5 +31,9 @@ public interface JobDataManager extends DataManager<JobEntity>, JobInfoDataManag
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
 
     void deleteJobsByExecutionId(String executionId);
-    
+
+    long countChangeTenantIdJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
+    long changeTenantIdJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
 }

@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -100,4 +101,28 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }
+
+    @Override
+    public long countChangeTenantIdSuspendedJobs(String sourceTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdSuspendedJobs", parameters);
+    }
+
+    @Override
+    public long changeTenantIdSuspendedJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdSuspendedJobs", parameters);
+    }
+
 }

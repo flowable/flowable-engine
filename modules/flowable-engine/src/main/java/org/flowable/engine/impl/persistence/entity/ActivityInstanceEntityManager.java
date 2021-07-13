@@ -108,4 +108,9 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      * @param execution execution which executed sequence flow
      */
     void recordSequenceFlowTaken(ExecutionEntity execution);
+
+    long countChangeTenantIdActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }

@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -23,6 +25,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.HistoricCaseInstanceByCaseDefinitionIdMatcher;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 
 /**
  * @author Joram Barrez
@@ -85,7 +88,7 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
         getDbSqlSession().delete("bulkDeleteHistoricCaseInstances", historicCaseInstanceQuery, getManagedEntityClass());
     }
-    
+
     protected void setSafeInValueLists(HistoricCaseInstanceQueryImpl caseInstanceQuery) {
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
@@ -97,4 +100,26 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
             }
         }
     }
+
+    @Override
+    public long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricCaseInstances", parameters);
+    }
+
+    @Override
+    public long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
+        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricCaseInstances", parameters);
+    }
+    
 }

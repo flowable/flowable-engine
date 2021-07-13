@@ -490,4 +490,16 @@ public class PlanItemInstanceEntityManagerImpl
         return engineConfiguration.getCaseInstanceEntityManager();
     }
     
+    @Override
+    public long countChangeTenantIdCmmnPlanItemInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdCmmnPlanItemInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdCmmnPlanItemInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdCmmnPlanItemInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

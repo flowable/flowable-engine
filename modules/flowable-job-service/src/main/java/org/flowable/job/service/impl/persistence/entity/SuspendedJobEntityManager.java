@@ -54,4 +54,8 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
+    long countChangeTenantIdSuspendedJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdSuspendedJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

@@ -1503,4 +1503,16 @@
   <select id="selectHistoricTaskInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
+
+  <select id="countChangeTenantIdHistoricTaskInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_HI_TASKINST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdHistoricTaskInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_HI_TASKINST RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+  </update>
+
 </mapper>

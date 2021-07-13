@@ -46,4 +46,9 @@ public interface HistoricTaskLogEntryEntityManager extends EntityManager<Histori
     void deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
     
     void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
+        
+    long countChangeTenantIdHistoricTaskLogEntries(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdHistoricTaskLogEntries(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

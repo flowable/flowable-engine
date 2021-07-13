@@ -103,4 +103,28 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     protected IdGenerator getIdGenerator() {
         return taskServiceConfiguration.getIdGenerator();
     }
+
+    @Override
+    public long countChangeTenantIdHistoricTaskLogEntries(String sourceTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricTaskLogEntries", parameters);
+    }
+
+    @Override
+    public long changeTenantIdHistoricTaskLogEntries(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdHistoricTaskLogEntries", parameters);
+    }
+
 }

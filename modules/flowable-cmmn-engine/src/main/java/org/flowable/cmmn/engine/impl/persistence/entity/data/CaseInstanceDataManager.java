@@ -45,4 +45,9 @@ public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity>
     void clearLockTime(String caseInstanceId);
 
     void clearAllLockTimes(String lockOwner);
+
+    long countChangeTenantIdCmmnCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdCmmnCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

@@ -21,8 +21,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
+import org.flowable.cmmn.engine.impl.tenant.ChangeTenantIdBuilderCmmnImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -245,6 +247,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
         return new CmmnExternalWorkerTransitionBuilderImpl(commandExecutor, externalJobId, workerId);
     }
     
+    @Override
+    public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
+        return new ChangeTenantIdBuilderCmmnImpl(commandExecutor, fromTenantId, toTenantId);
+    }
+
     public <T> T executeCommand(Command<T> command) {
         if (command == null) {
             throw new FlowableIllegalArgumentException("The command is null");

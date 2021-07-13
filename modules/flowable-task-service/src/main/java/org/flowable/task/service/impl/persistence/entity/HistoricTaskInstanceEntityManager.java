@@ -45,4 +45,9 @@ public interface HistoricTaskInstanceEntityManager extends EntityManager<Histori
     void deleteHistoricTaskInstancesForNonExistingProcessInstances();
     
     void deleteHistoricTaskInstancesForNonExistingCaseInstances();
+        
+    long countChangeTenantIdHistoricTaskInstances(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdHistoricTaskInstances(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

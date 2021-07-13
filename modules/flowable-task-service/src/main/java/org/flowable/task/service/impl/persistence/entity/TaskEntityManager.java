@@ -60,4 +60,9 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
     void updateAllTaskRelatedEntityCountFlags(boolean configProperty);
     
     void deleteTasksByExecutionId(String executionId);
+        
+    long countChangeTenantIdTasks(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
+    long changeTenantIdTasks(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    
 }

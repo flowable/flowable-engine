@@ -42,4 +42,8 @@ public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanc
     
     void deleteByCaseInstanceId(String caseInstanceId);
     
+    long countChangeTenantIdCmmnPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdCmmnPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

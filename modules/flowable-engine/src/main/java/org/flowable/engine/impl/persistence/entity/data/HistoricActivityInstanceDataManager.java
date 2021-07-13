@@ -47,4 +47,9 @@ public interface HistoricActivityInstanceDataManager extends DataManager<Histori
     void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
 
     void deleteHistoricActivityInstancesForNonExistingProcessInstances();
+
+    long countChangeTenantIdHistoricActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdHistoricActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

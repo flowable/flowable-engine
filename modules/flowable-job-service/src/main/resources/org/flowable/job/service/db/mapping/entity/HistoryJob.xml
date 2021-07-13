@@ -293,4 +293,15 @@
         </foreach>
     </update>
 
+    <select id="countChangeTenantIdHistoryJobs" parameterType="string" resultType="long">
+        select count(RES.ID_) FROM ${prefix}ACT_RU_HISTORY_JOB RES
+        <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+      </select>
+    
+      <update id="changeTenantIdHistoryJobs" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_HISTORY_JOB RES
+        <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+        <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
+      </update>
+
 </mapper>

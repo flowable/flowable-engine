@@ -42,4 +42,9 @@ public interface ActivityInstanceDataManager extends DataManager<ActivityInstanc
     List<ActivityInstance> findActivityInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+
+    long countChangeTenantIdActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

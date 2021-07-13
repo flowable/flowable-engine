@@ -95,4 +95,16 @@ public class HistoricProcessInstanceEntityManagerImpl
         return engineConfiguration.getHistoryManager();
     }
 
+    @Override
+    public long countChangeTenantIdHistoricProcessInstances(String sourceTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.countChangeTenantIdHistoricProcessInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
+    @Override
+    public long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        return dataManager.changeTenantIdHistoricProcessInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    }
+
 }

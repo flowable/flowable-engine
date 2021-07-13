@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -38,11 +39,11 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
     protected SingleCachedEntityMatcher<DeadLetterJobEntity> deadLetterByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
     protected JobServiceConfiguration jobServiceConfiguration;
-    
+
     public MybatisDeadLetterJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
-    
+
     @Override
     public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {
         return DeadLetterJobEntityImpl.class;
@@ -73,15 +74,15 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
     @Override
     public List<DeadLetterJobEntity> findJobsByExecutionId(String executionId) {
         DbSqlSession dbSqlSession = getDbSqlSession();
-        
-        // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
+
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database
         if (isEntityInserted(dbSqlSession, "execution", executionId)) {
             return getListFromCache(deadLetterByExecutionIdMatcher, executionId);
         }
-        
+
         return getList(dbSqlSession, "selectDeadLetterJobsByExecutionId", executionId, deadLetterByExecutionIdMatcher, true);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public List<DeadLetterJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
@@ -95,10 +96,33 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
     }
-    
+
     @Override
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }
-    
+
+    @Override
+    public long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdDeadLetterJobs", parameters);
+    }
+
+    @Override
+    public long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdDeadLetterJobs", parameters);
+    }
+
 }

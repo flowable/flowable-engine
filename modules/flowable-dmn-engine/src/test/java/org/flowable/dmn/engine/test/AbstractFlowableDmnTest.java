@@ -12,11 +12,16 @@
  */
 package org.flowable.dmn.engine.test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.flowable.dmn.api.DmnDecisionService;
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -41,6 +46,7 @@ public class AbstractFlowableDmnTest {
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnRepositoryService repositoryService;
     protected DmnDecisionService ruleService;
+    protected DmnHistoryService dmnHistoryService;
     protected DmnManagementService managementService;
 
     @Before
@@ -51,7 +57,25 @@ public class AbstractFlowableDmnTest {
         this.dmnEngineConfiguration = cachedDmnEngine.getDmnEngineConfiguration();
         this.repositoryService = cachedDmnEngine.getDmnRepositoryService();
         this.ruleService = cachedDmnEngine.getDmnDecisionService();
+        this.dmnHistoryService = cachedDmnEngine.getDmnHistoryService();
         this.managementService = cachedDmnEngine.getDmnManagementService();
+    }
+
+
+    protected Set<String> autoCleanupDeploymentIds = new HashSet<>();
+
+    protected void addDeploymentForAutoCleanup(String deploymentId) {
+        this.autoCleanupDeploymentIds.add(deploymentId);
+    }
+
+    @After
+    public void cleanup() {
+        if (autoCleanupDeploymentIds != null && !autoCleanupDeploymentIds.isEmpty()) {
+            for (String deploymentId : autoCleanupDeploymentIds) {
+                DmnTestHelper.deleteDeployment(dmnEngineConfiguration, deploymentId);
+            }
+        }
+        autoCleanupDeploymentIds = new HashSet<>();
     }
 
 }

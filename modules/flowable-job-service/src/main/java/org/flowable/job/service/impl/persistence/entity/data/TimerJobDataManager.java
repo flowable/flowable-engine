@@ -39,5 +39,9 @@ public interface TimerJobDataManager extends JobInfoDataManager<TimerJobEntity> 
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     void bulkDeleteWithoutRevision(List<TimerJobEntity> timerJobEntities);
+    
+    long countChangeTenantIdTimerJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
+    long changeTenantIdTimerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
 
 }

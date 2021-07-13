@@ -33,4 +33,8 @@ public interface MilestoneInstanceEntityManager extends EntityManager<MilestoneI
     
     void deleteByCaseInstanceId(String caseInstanceId);
 
+    long countChangeTenantIdCmmnMilestoneInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdCmmnMilestoneInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }

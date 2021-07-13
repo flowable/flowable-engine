@@ -166,4 +166,28 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }
+
+    @Override
+    public long countChangeTenantIdExternalWorkerJobs(String sourceTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().selectOne("countChangeTenantIdExternalWorkerJobs", parameters);
+    }
+
+    @Override
+    public long changeTenantIdExternalWorkerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, 
+            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("sourceTenantId", sourceTenantId);
+        parameters.put("targetTenantId", targetTenantId);
+        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
+        parameters.put("scope", scope);
+        return (long) getDbSqlSession().update("changeTenantIdExternalWorkerJobs", parameters);
+    }
+
 }

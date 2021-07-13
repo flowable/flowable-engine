@@ -38,4 +38,9 @@ public interface HistoricCaseInstanceDataManager extends DataManager<HistoricCas
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
     void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
+
+    long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
+    long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }

@@ -329,4 +329,16 @@
        delete from ${prefix}ACT_CO_CONTENT_ITEM where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
     </delete>
 
+
+  <select id="countChangeTenantIdContentItemInstances" parameterType="string" resultType="long">
+    select count(RES.ID_) FROM ${prefix}ACT_CO_CONTENT_ITEM RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
+  </select>
+
+  <update id="changeTenantIdContentItemInstances" parameterType="java.util.Map">
+    update ${prefix}ACT_CO_CONTENT_ITEM RES
+    <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
+  </update>
+
 </mapper>

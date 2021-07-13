@@ -39,4 +39,9 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     long countByCriteria(HistoricCaseInstanceQuery query);
     
     void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
+
+    long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+
 }

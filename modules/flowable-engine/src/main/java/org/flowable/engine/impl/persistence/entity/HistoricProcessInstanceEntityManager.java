@@ -45,4 +45,8 @@ public interface HistoricProcessInstanceEntityManager extends EntityManager<Hist
     
     void deleteHistoricProcessInstances(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery);
 
+    long countChangeTenantIdHistoricProcessInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
+    long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    
 }
