@@ -645,6 +645,9 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         List<Job> jobs = managementService.createJobQuery().list();
         assertThat(jobs).hasSize(1);
         jobs.forEach(job -> managementService.executeJob(job.getId()));
+        
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().singleResult().getId());
 
         // 5 async multi instance call activities after start
         jobs = managementService.createJobQuery().list();

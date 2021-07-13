@@ -1355,6 +1355,9 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 .variable("myList", Arrays.asList("one", "two", "three"))
                 .start();
 
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
