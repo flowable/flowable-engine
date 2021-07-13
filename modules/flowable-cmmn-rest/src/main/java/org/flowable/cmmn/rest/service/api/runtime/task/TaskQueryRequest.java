@@ -70,6 +70,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected Boolean withoutDueDate;
     protected Boolean active;
     protected Boolean includeTaskLocalVariables;
+    protected Boolean includeProcessVariables;
     protected String tenantId;
     protected String tenantIdLike;
     protected Boolean withoutTenantId;
@@ -401,6 +402,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setIncludeTaskLocalVariables(Boolean includeTaskLocalVariables) {
         this.includeTaskLocalVariables = includeTaskLocalVariables;
+    }
+
+    public Boolean getIncludeProcessVariables() {
+        return includeProcessVariables;
+    }
+
+    public void setIncludeProcessVariables(Boolean includeProcessVariables) {
+        this.includeProcessVariables = includeProcessVariables;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)

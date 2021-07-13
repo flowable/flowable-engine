@@ -76,6 +76,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskCreatedBefore", dataType = "string", format="date-time", value = "Return only historic task instances that were created before this date.", paramType = "query"),
             @ApiImplicitParam(name = "taskCreatedAfter", dataType = "string", format="date-time", value = "Return only historic task instances that were created after this date.", paramType = "query"),
             @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "An indication if the historic task instance local variables should be returned as well.", paramType = "query"),
+            @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include historic process variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -223,6 +224,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("includeTaskLocalVariables") != null) {
             queryRequest.setIncludeTaskLocalVariables(Boolean.valueOf(allRequestParams.get("includeTaskLocalVariables")));
+        }
+
+        if (allRequestParams.containsKey("includeProcessVariables")) {
+            queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
         }
 
         if (allRequestParams.get("tenantId") != null) {

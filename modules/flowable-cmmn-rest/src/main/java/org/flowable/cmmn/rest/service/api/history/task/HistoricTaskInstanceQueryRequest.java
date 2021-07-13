@@ -68,6 +68,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected Date taskCompletedBefore;
     protected Date taskCompletedAfter;
     protected Boolean includeTaskLocalVariables;
+    protected Boolean includeProcessVariables;
     protected List<QueryVariable> taskVariables;
     protected String tenantId;
     protected String tenantIdLike;
@@ -393,6 +394,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setIncludeTaskLocalVariables(Boolean includeTaskLocalVariables) {
         this.includeTaskLocalVariables = includeTaskLocalVariables;
+    }
+
+    public Boolean getIncludeProcessVariables() {
+        return includeProcessVariables;
+    }
+
+    public void setIncludeProcessVariables(Boolean includeProcessVariables) {
+        this.includeProcessVariables = includeProcessVariables;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
