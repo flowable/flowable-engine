@@ -97,7 +97,7 @@
             <if test="key != null">
                and model_key = #{key, jdbcType=VARCHAR}
             </if>
-            <if test="tenantId != null">
+            <if test="tenantId != null and tenantId != ''">
                and tenant_id = #{tenantId, jdbcType=VARCHAR}
             </if>
         </where>
@@ -120,7 +120,7 @@
     <select id="countByModelTypeAndCreatedBy" parameterType="map">
        select count(m.id) from ${prefix}ACT_DE_MODEL m 
        where m.created_by = #{createdBy, jdbcType=VARCHAR} and m.model_type = #{modelType, jdbcType=INTEGER}
-      <if test="tenantId != null">
+      <if test="tenantId != null and tenantId != ''">
          and tenant_id = #{tenantId, jdbcType=VARCHAR}
       </if>
     </select>
