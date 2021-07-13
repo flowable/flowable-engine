@@ -46,11 +46,18 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
  */
 public class InboundChannelModelProcessor implements ChannelModelProcessor {
+
+    protected ObjectMapper objectMapper;
+
+    public InboundChannelModelProcessor(ObjectMapper objectMapper){
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean canProcess(ChannelModel channelModel) {
@@ -98,7 +105,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         EventRepositoryService eventRepositoryService) {
         InboundEventDeserializer<JsonNode> eventDeserializer;
         if (StringUtils.isEmpty(channelModel.getDeserializerDelegateExpression())) {
-            eventDeserializer = new StringToJsonDeserializer();
+            eventDeserializer = new StringToJsonDeserializer(objectMapper);
         } else {
             //noinspection unchecked
             eventDeserializer = resolveExpression(channelModel.getDeserializerDelegateExpression(), InboundEventDeserializer.class);
@@ -131,9 +138,9 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
             eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
-            eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
+            eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(objectMapper, keyDetection.getJsonField());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonPointerExpression())) {
-            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression());
+            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(objectMapper, keyDetection.getJsonPointerExpression());
         } else if (StringUtils.isNotEmpty(keyDetection.getDelegateExpression())) {
             //noinspection unchecked
             eventKeyDetector = resolveExpression(keyDetection.getDelegateExpression(), InboundEventKeyDetector.class);
@@ -148,7 +155,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
                 eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getJsonPointerExpression())) {
-                eventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPointerExpression());
+                eventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(objectMapper, channelEventTenantIdDetection.getJsonPointerExpression());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getDelegateExpression())) {
                 //noinspection unchecked
                 eventTenantDetector = resolveExpression(channelEventTenantIdDetection.getDelegateExpression(), InboundEventTenantDetector.class);
@@ -176,7 +183,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
         InboundEventPayloadExtractor<Document> eventPayloadExtractor;
         if (StringUtils.isEmpty(channelModel.getPayloadExtractorDelegateExpression())) {
-            eventPayloadExtractor = new XmlElementsToMapPayloadExtractor();
+            eventPayloadExtractor = new XmlElementsToMapPayloadExtractor(objectMapper);
         } else {
             //noinspection unchecked
             eventPayloadExtractor = resolveExpression(channelModel.getPayloadExtractorDelegateExpression(), InboundEventPayloadExtractor.class);
@@ -270,9 +277,9 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         } else if (StringUtils.isNotEmpty(keyDetection.getFixedValue())) {
             eventKeyDetector = new InboundEventStaticKeyDetector<>(keyDetection.getFixedValue());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonField())) {
-            eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(keyDetection.getJsonField());
+            eventKeyDetector = new JsonFieldBasedInboundEventKeyDetector(objectMapper, keyDetection.getJsonField());
         } else if (StringUtils.isNotEmpty(keyDetection.getJsonPointerExpression())) {
-            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(keyDetection.getJsonPointerExpression());
+            eventKeyDetector = new JsonPointerBasedInboundEventKeyDetector(objectMapper, keyDetection.getJsonPointerExpression());
         } else if (StringUtils.isNotEmpty(keyDetection.getXmlXPathExpression())) {
             eventKeyDetector = new XpathBasedInboundEventKeyDetector(keyDetection.getXmlXPathExpression());
         } else {
@@ -288,7 +295,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
                 eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getJsonPointerExpression())) {
-                eventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(channelEventTenantIdDetection.getJsonPointerExpression());
+                eventTenantDetector = new JsonPointerBasedInboundEventTenantDetector(objectMapper, channelEventTenantIdDetection.getJsonPointerExpression());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getxPathExpression())) {
                 eventTenantDetector = new XpathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getxPathExpression());
             } else {

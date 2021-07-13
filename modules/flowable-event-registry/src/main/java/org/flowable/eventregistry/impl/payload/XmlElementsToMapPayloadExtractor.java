@@ -26,12 +26,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Joram Barrez
  */
 public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtractor<Document> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
+
+    protected ObjectMapper objectMapper;
+
+    public XmlElementsToMapPayloadExtractor(ObjectMapper objectMapper){
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, Document event) {
@@ -61,6 +70,14 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
 
             } else if (EventPayloadTypes.LONG.equals(definitionType)) {
                 return Long.valueOf(textContent);
+
+            } else if (EventPayloadTypes.JSON.equals(definitionType)) {
+                try {
+                    return objectMapper.readTree(textContent);
+                } catch (JsonProcessingException e) {
+                    LOGGER.warn("Unable to convert payload field '{}' into json", definitionName);
+                    return textContent;
+                }
 
             } else {
                 LOGGER.warn("Unsupported payload type: {} ", definitionType);

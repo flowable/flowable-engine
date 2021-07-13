@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.keydetector;
 import org.flowable.eventregistry.api.InboundEventKeyDetector;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -22,9 +23,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class JsonFieldBasedInboundEventKeyDetector implements InboundEventKeyDetector<JsonNode> {
 
+    protected ObjectMapper objectMapper;
     protected String field;
 
-    public JsonFieldBasedInboundEventKeyDetector(String field) {
+    public JsonFieldBasedInboundEventKeyDetector(ObjectMapper objectMapper, String field) {
+        this.objectMapper = objectMapper;
         this.field = field;
     }
 

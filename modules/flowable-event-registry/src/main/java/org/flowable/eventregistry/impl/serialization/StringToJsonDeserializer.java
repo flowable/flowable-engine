@@ -26,7 +26,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class StringToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
+
+    public StringToJsonDeserializer(ObjectMapper objectMapper){
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public JsonNode deserialize(String rawEvent) {
