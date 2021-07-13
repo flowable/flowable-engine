@@ -680,6 +680,12 @@
           "DESCRIPTION" : "定义信号的名称"
         }
       },
+      "COMPENSATIONACTIVITYREFPACKAGE" : {
+        "COMPENSATIONACTIVITYREF" : {
+          "TITLE" : "補償活動參考",
+          "DESCRIPTION" : "定義活動參考。"
+        }
+      },
       "ERRORREFPACKAGE" : {
         "ERRORREF" : {
           "TITLE" : "错误引用",
@@ -1117,6 +1123,10 @@
       "THROWESCALATIONEVENT" : {
         "TITLE" : "中间升级抛出事件",
         "DESCRIPTION" : "具有升级触发器的中间事件"
+      },
+      "THROWCOMPENSATIONEVENT": {
+        "TITLE" : "中間補償投擲事件",
+        "DESCRIPTION" : "帶有補償觸發器的中間事件"
       },
       "ENDNONEEVENT" : {
         "TITLE" : "结束事件",
