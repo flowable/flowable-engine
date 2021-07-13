@@ -187,6 +187,15 @@ public class DbSqlSessionFactory implements SessionFactory {
         addDatabaseSpecificStatement("mssql", "selectProcessInstanceWithVariablesByQueryCriteria", "selectProcessInstanceWithVariablesByQueryCriteria_mssql_or_db2");
         addDatabaseSpecificStatement("mssql", "selectHistoricProcessInstancesWithVariablesByQueryCriteria", "selectHistoricProcessInstancesWithVariablesByQueryCriteria_mssql_or_db2");
         addDatabaseSpecificStatement("mssql", "selectHistoricTaskInstancesWithVariablesByQueryCriteria", "selectHistoricTaskInstancesWithVariablesByQueryCriteria_mssql_or_db2");
+
+        // hana
+        databaseSpecificLimitBeforeStatements.put("hana", "");
+        databaseSpecificLimitAfterStatements.put("hana", "LIMIT #{maxResults} OFFSET #{firstResult}");
+        databaseSpecificLimitBetweenStatements.put("hana", "");
+        databaseOuterJoinLimitBetweenStatements.put("hana", "");
+        databaseSpecificOrderByStatements.put("hana", defaultOrderBy);
+        addDatabaseSpecificStatement("hana", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
+
     }
 
     /**

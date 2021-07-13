@@ -355,7 +355,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<EngineDeployer> customPreDeployers;
     protected List<EngineDeployer> customPostDeployers;
     protected List<EngineDeployer> deployers;
-    
+
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
@@ -375,6 +375,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
+    public static final String DATABASE_TYPE_HANA = "hana";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         Properties databaseTypeMappings = new Properties();
@@ -407,6 +408,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
+        databaseTypeMappings.setProperty("HDB", DATABASE_TYPE_HANA);
         return databaseTypeMappings;
     }
 
@@ -427,7 +429,7 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
-    
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -572,7 +574,6 @@ public abstract class AbstractEngineConfiguration {
         initCommandExecutor();
     }
 
-
     public void initDefaultCommandConfig() {
         if (defaultCommandConfig == null) {
             defaultCommandConfig = new CommandConfig();
@@ -668,7 +669,6 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract CommandInterceptor createTransactionInterceptor();
-
 
     public void initBeans() {
         if (beans == null) {
@@ -1018,7 +1018,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();
-    
+
     public void initConfigurators() {
 
         allConfigurators = new ArrayList<>();
@@ -1100,7 +1100,7 @@ public abstract class AbstractEngineConfiguration {
             configurator.beforeInit(this);
         }
     }
-    
+
     public void configuratorsAfterInit() {
         for (EngineConfigurator configurator : allConfigurators) {
             logger.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
@@ -1990,11 +1990,11 @@ public abstract class AbstractEngineConfiguration {
         this.customPostDeployers = customPostDeployers;
         return this;
     }
-    
+
     public boolean isEnableConfiguratorServiceLoader() {
         return enableConfiguratorServiceLoader;
     }
-    
+
     public AbstractEngineConfiguration setEnableConfiguratorServiceLoader(boolean enableConfiguratorServiceLoader) {
         this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
         return this;
