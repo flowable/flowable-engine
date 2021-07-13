@@ -75,8 +75,12 @@ public class ModelsResource {
     }
 
     @PostMapping(value = "/rest/import-process-model", produces = "application/json")
-    public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
-        return modelQueryService.importProcessModel(request, file);
+    public ModelRepresentation importProcessModel(
+            HttpServletRequest request,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("importNewVersionIndicator") Boolean importNewVersionIndicator) {
+
+        return modelQueryService.importProcessModel(request, file, importNewVersionIndicator);
     }
 
     /*

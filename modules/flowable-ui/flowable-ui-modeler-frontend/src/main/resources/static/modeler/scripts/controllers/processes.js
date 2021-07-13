@@ -246,7 +246,8 @@ angular.module('flowableModeler')
 .controller('ImportProcessModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {
-       loading: false
+       loading: false,
+       importNewVersionIndicator: false
   };
 
   $scope.onFileSelect = function($files, isIE) {
@@ -264,7 +265,8 @@ angular.module('flowableModeler')
           Upload.upload({
               url: url,
               method: 'POST',
-              file: file
+              file: file,
+              fields: { importNewVersionIndicator: $scope.model.importNewVersionIndicator }
           }).progress(function(evt) {
 	      $scope.model.loading = true;
               $scope.model.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);

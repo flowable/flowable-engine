@@ -41,6 +41,7 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.ui.common.model.ResultListDataRepresentation;
 import org.flowable.ui.common.security.SecurityUtils;
 import org.flowable.ui.common.service.exception.BadRequestException;
+import org.flowable.ui.common.service.exception.ConflictingRequestException;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
 import org.flowable.ui.common.util.XmlUtil;
 import org.flowable.ui.modeler.domain.AbstractModel;
@@ -176,6 +177,10 @@ public class FlowableModelQueryService {
     }
 
     public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
+        return importProcessModel(request, file, false);
+    }
+
+    public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file, boolean importAsNewVersionIfKeysAreMatching) {
 
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
@@ -194,21 +199,51 @@ public class FlowableModelQueryService {
                 }
 
                 ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
-
                 org.flowable.bpmn.model.Process process = bpmnModel.getMainProcess();
-                String name = process.getId();
-                if (StringUtils.isNotEmpty(process.getName())) {
-                    name = process.getName();
-                }
-                String description = process.getDocumentation();
+                final List<Model> existingModels = modelRepository.findByKeyAndType(process.getId(), AbstractModel.MODEL_TYPE_BPMN);
 
-                ModelRepresentation model = new ModelRepresentation();
-                model.setKey(process.getId());
-                model.setName(name);
-                model.setDescription(description);
-                model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
-                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserId());
-                return new ModelRepresentation(newModel);
+                if (!importAsNewVersionIfKeysAreMatching) {
+
+                    if (existingModels.size() > 0) {
+                        throw new ConflictingRequestException("Provided model key already exists: " + process.getId());
+                    }
+
+                    final String name = StringUtils.isNotEmpty(process.getName())
+                            ? process.getName()
+                            : process.getId();
+
+                    final ModelRepresentation modelRepresentation = new ModelRepresentation();
+                    modelRepresentation.setKey(process.getId());
+                    modelRepresentation.setName(name);
+                    modelRepresentation.setDescription(process.getDocumentation());
+                    modelRepresentation.setModelType(AbstractModel.MODEL_TYPE_BPMN);
+                    final Model newModel = modelService.createModel(
+                            modelRepresentation,
+                            modelNode.toString(),
+                            SecurityUtils.getCurrentUserId());
+                    return new ModelRepresentation(newModel);
+
+                } else {
+
+                    if (existingModels.size() == 0) {
+                        throw new ConflictingRequestException("Provided model for version import not available: " + process.getId());
+                    }
+                    if (existingModels.size() > 1) {
+                        throw new ConflictingRequestException("Provided model key is not unique: " + process.getId());
+                    }
+
+                    final Model existingModelToAddNewVersionTo = existingModels.get(0);
+                    final Model savedModel = modelService.saveModel(
+                            existingModelToAddNewVersionTo.getId(),
+                            existingModelToAddNewVersionTo.getName(),
+                            existingModelToAddNewVersionTo.getKey(),
+                            existingModelToAddNewVersionTo.getDescription(),
+                            modelNode.toString(),
+                            true,
+                            "Version import via Modeler App",
+                            SecurityUtils.getCurrentUserId());
+                    return new ModelRepresentation(savedModel);
+                }
 
             } catch (BadRequestException e) {
                 throw e;
