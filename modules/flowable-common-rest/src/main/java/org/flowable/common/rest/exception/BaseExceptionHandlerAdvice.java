@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BaseExceptionHandlerAdvice {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseExceptionHandlerAdvice.class);
+    @Value("${flowable.common.rest.exception.return-messages-for-500-errors:false}")
+    protected boolean returnErrorMessagesFor500Errors;
 
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE) // 415
     @ExceptionHandler(FlowableContentNotSupportedException.class)
@@ -99,7 +102,7 @@ public class BaseExceptionHandlerAdvice {
     @ResponseBody
     public ErrorInfo handleOtherException(Exception e) {
         LOGGER.error("Unhandled exception", e);
-        return new ErrorInfo("Internal server error", e);
+        return new ErrorInfo("Internal server error", returnErrorMessagesFor500Errors ? e : null);
     }
 
 }
