@@ -209,6 +209,8 @@ import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
+import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.CaseValidatorFactory;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
@@ -405,6 +407,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnDeployer cmmnDeployer;
     protected CmmnDeploymentManager deploymentManager;
     protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
+    protected CaseValidator caseValidator;
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
@@ -913,6 +916,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
         initFormFieldHandler();
+        initCaseValidator();
         initIdentityLinkInterceptor();
         initEventDispatcher();
         initIdentityLinkServiceConfiguration();
@@ -1434,6 +1438,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initFormFieldHandler() {
         if (this.formFieldHandler == null) {
             this.formFieldHandler = new DefaultFormFieldHandler();
+        }
+    }
+
+    public void initCaseValidator() {
+        if (this.caseValidator == null) {
+            this.caseValidator = new CaseValidatorFactory().createDefaultCaseValidator();
         }
     }
     
@@ -2562,6 +2572,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setDeploymentManager(CmmnDeploymentManager deploymentManager) {
         this.deploymentManager = deploymentManager;
         return this;
+    }
+
+    public CaseValidator getCaseValidator() {
+        return caseValidator;
     }
 
     public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {

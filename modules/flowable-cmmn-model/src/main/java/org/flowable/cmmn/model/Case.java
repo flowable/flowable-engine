@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Case extends CmmnElement implements HasLifecycleListeners {
 
@@ -84,6 +85,12 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
 
     public void setAllCaseElements(Map<String, CaseElement> allCaseElements) {
         this.allCaseElements = allCaseElements;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends CaseElement> List<T> findCaseElementsOfType(Class<T> type) {
+        return allCaseElements.values().stream().filter(type::isInstance).map(caseElement -> (T) caseElement)
+            .collect(Collectors.toList());
     }
 
     public ReactivateEventListener getReactivateEventListener() {
