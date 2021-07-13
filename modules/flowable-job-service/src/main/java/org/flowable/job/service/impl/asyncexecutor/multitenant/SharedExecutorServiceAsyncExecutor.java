@@ -12,9 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
@@ -40,14 +40,14 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
 
     protected TenantInfoHolder tenantInfoHolder;
 
-    protected Map<String, Thread> timerJobAcquisitionThreads = new HashMap<>();
-    protected Map<String, TenantAwareAcquireTimerJobsRunnable> timerJobAcquisitionRunnables = new HashMap<>();
+    protected Map<String, Thread> timerJobAcquisitionThreads = new ConcurrentHashMap<>();
+    protected Map<String, TenantAwareAcquireTimerJobsRunnable> timerJobAcquisitionRunnables = new ConcurrentHashMap<>();
 
-    protected Map<String, Thread> asyncJobAcquisitionThreads = new HashMap<>();
-    protected Map<String, TenantAwareAcquireAsyncJobsDueRunnable> asyncJobAcquisitionRunnables = new HashMap<>();
+    protected Map<String, Thread> asyncJobAcquisitionThreads = new ConcurrentHashMap<>();
+    protected Map<String, TenantAwareAcquireAsyncJobsDueRunnable> asyncJobAcquisitionRunnables = new ConcurrentHashMap<>();
 
-    protected Map<String, Thread> resetExpiredJobsThreads = new HashMap<>();
-    protected Map<String, TenantAwareResetExpiredJobsRunnable> resetExpiredJobsRunnables = new HashMap<>();
+    protected Map<String, Thread> resetExpiredJobsThreads = new ConcurrentHashMap<>();
+    protected Map<String, TenantAwareResetExpiredJobsRunnable> resetExpiredJobsRunnables = new ConcurrentHashMap<>();
 
     public SharedExecutorServiceAsyncExecutor(TenantInfoHolder tenantInfoHolder) {
         this.tenantInfoHolder = tenantInfoHolder;
