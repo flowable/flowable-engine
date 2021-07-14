@@ -401,6 +401,52 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testStartOnlyOneInstance.bpmn20.xml")
+    public void testStartOneInstanceWithSingleDefinition() {
+
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testStartOnlyOneInstance.bpmn20.xml")
+    public void testStartOneInstanceWithAsyncStartInConfiguration() {
+
+        boolean originalEventRegistryStartProcessInstanceAsync = processEngineConfiguration.isEventRegistryStartProcessInstanceAsync();
+        try {
+            processEngineConfiguration.setEventRegistryStartProcessInstanceAsync(true);
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+            assertThat(taskService.createTaskQuery().singleResult()).isNull();
+            waitForJobExecutorToProcessAllJobs(10000, 200);
+            assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+
+        } finally {
+            processEngineConfiguration.setEventRegistryStartProcessInstanceAsync(originalEventRegistryStartProcessInstanceAsync);
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testStartOnlyOneInstanceAsync.bpmn20.xml")
+    public void testStartOneInstanceWithAsyncStartInProcessModel() {
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().singleResult()).isNull();
+        waitForJobExecutorToProcessAllJobs(10000, 200);
+        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
+
+        inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("correlation").count()).isEqualTo(1);
+    }
+
+    @Test
     public void testRedeployDefinitionWithRuntimeEventSubscriptions() {
         org.flowable.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testRedeploy.bpmn20.xml")
@@ -417,9 +463,6 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
         inboundEventChannelAdapter.triggerTestEvent();
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
         assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition1.getId());
-
-        // Starting is always async
-        managementService.executeJob(managementService.createJobQuery().processDefinitionId(processDefinition1.getId()).singleResult().getId());
 
         assertThat( runtimeService.createEventSubscriptionQuery().list())
             .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
@@ -453,10 +496,16 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
 
         // Ended thanks to boundary event
         assertProcessEnded(processInstance.getId());
+        processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition2.getId());
 
         assertThat(runtimeService.createEventSubscriptionQuery().list())
             .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
-            .containsOnly(tuple("myEvent", processDefinition2.getId(), null));
+            .containsOnly(
+                    tuple("myEvent", processDefinition2.getId(), null),
+                    tuple("myEvent", processDefinition2.getId(), processInstance.getId()) // triggering the test event started a new process
+            );
     }
 
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {

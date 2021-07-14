@@ -917,6 +917,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean isFormFieldValidationEnabled;
     
     protected EventRegistryEventConsumer eventRegistryEventConsumer;
+    /**
+     * Whether process instances should be start asynchronously by the default {@link EventRegistryEventConsumer}.
+     * This is a fallback applied for all events. We suggest modelling your processes appropriately, i.e. making the start event async.
+     */
+    protected boolean eventRegistryStartProcessInstanceAsync = false;
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
@@ -4005,6 +4010,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventConsumer) {
         this.eventRegistryEventConsumer = eventRegistryEventConsumer;
+        return this;
+    }
+
+    public boolean isEventRegistryStartProcessInstanceAsync() {
+        return eventRegistryStartProcessInstanceAsync;
+    }
+
+    public ProcessEngineConfigurationImpl setEventRegistryStartProcessInstanceAsync(boolean eventRegistryStartProcessInstanceAsync) {
+        this.eventRegistryStartProcessInstanceAsync = eventRegistryStartProcessInstanceAsync;
         return this;
     }
 

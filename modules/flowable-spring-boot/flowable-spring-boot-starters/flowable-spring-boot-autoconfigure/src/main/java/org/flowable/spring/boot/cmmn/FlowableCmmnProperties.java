@@ -62,6 +62,12 @@ public class FlowableCmmnProperties {
     private boolean enableSafeXml = true;
 
     /**
+     * Whether case instances should be started asynchronously from an event registry.
+     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. using an async service task before all the other elements are initialized
+     */
+    private boolean eventRegistryStartCaseInstanceAsync = false;
+
+    /**
      * The servlet configuration for the CMMN Rest API.
      */
     @NestedConfigurationProperty
@@ -113,6 +119,14 @@ public class FlowableCmmnProperties {
 
     public void setEnableSafeXml(boolean enableSafeXml) {
         this.enableSafeXml = enableSafeXml;
+    }
+
+    public boolean isEventRegistryStartCaseInstanceAsync() {
+        return eventRegistryStartCaseInstanceAsync;
+    }
+
+    public void setEventRegistryStartCaseInstanceAsync(boolean eventRegistryStartCaseInstanceAsync) {
+        this.eventRegistryStartCaseInstanceAsync = eventRegistryStartCaseInstanceAsync;
     }
 
     public FlowableServlet getServlet() {
