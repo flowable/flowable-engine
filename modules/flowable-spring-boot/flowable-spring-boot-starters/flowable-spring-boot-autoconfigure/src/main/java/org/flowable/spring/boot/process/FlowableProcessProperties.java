@@ -46,6 +46,12 @@ public class FlowableProcessProperties {
      */
     private boolean enableSafeXml = true;
 
+    /**
+     * Whether process instances should be started asynchronously from an event registry.
+     * This is a fallback applied for all events. We suggest modelling your processes appropriately, i.e. making the start event async.
+     */
+    private boolean eventRegistryStartProcessInstanceAsync = false;
+
     public FlowableServlet getServlet() {
         return servlet;
     }
@@ -74,6 +80,14 @@ public class FlowableProcessProperties {
         this.enableSafeXml = enableSafeXml;
     }
     
+    public boolean isEventRegistryStartProcessInstanceAsync() {
+        return eventRegistryStartProcessInstanceAsync;
+    }
+
+    public void setEventRegistryStartProcessInstanceAsync(boolean eventRegistryStartProcessInstanceAsync) {
+        this.eventRegistryStartProcessInstanceAsync = eventRegistryStartProcessInstanceAsync;
+    }
+
     public static class AsyncHistory {
         
         private boolean enabled;

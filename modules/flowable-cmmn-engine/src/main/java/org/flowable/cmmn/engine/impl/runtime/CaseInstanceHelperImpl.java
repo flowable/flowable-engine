@@ -180,19 +180,25 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, 
                 cmmnModel, caseModel, caseInstanceBuilder);
 
-        // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
-        CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
+        if (!caseModel.isAsync()) {
+            // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
+            CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
 
-        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
+            CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
 
-        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-        }
+            FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
 
-        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " +
-                caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " +
+                        caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            }
+        } else {
+            // create a job to execute InitPlanModelOperation, which will take care of initializing all the child plan items of that stage
+            JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
+            createAsyncInitJob(caseInstanceEntity, caseDefinition, caseModel, jobService, commandContext);
         }
 
         return caseInstanceEntity;

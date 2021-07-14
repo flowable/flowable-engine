@@ -803,6 +803,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean isFormFieldValidationEnabled;
     
     protected EventRegistryEventConsumer eventRegistryEventConsumer;
+    /**
+     * Whether process instances should be start asynchronously by the default {@link EventRegistryEventConsumer}.
+     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. using an async service task before all the other elements are initialized
+     */
+    protected boolean eventRegistryStartCaseInstanceAsync = false;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -3222,6 +3227,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setEventRegistryEventConsumer(EventRegistryEventConsumer eventRegistryEventConsumer) {
         this.eventRegistryEventConsumer = eventRegistryEventConsumer;
+        return this;
+    }
+
+    public boolean isEventRegistryStartCaseInstanceAsync() {
+        return eventRegistryStartCaseInstanceAsync;
+    }
+
+    public CmmnEngineConfiguration setEventRegistryStartCaseInstanceAsync(boolean eventRegistryStartCaseInstanceAsync) {
+        this.eventRegistryStartCaseInstanceAsync = eventRegistryStartCaseInstanceAsync;
         return this;
     }
 
