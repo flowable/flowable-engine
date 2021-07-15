@@ -804,8 +804,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     protected EventRegistryEventConsumer eventRegistryEventConsumer;
     /**
-     * Whether process instances should be start asynchronously by the default {@link EventRegistryEventConsumer}.
-     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. using an async service task before all the other elements are initialized
+     * Whether case instances should be started asynchronously by the default {@link EventRegistryEventConsumer}.
+     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. marking the start of the case as async
      */
     protected boolean eventRegistryStartCaseInstanceAsync = false;
 

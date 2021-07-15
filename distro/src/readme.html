@@ -50,6 +50,16 @@
 
 <h4>ADDITIONAL</h4>
 
+<ul>
+    <li>
+        There has been a change in the way a process / case instance is started from an event from the event registry.
+        Instead of starting the process / case asynchronously, it is started synchronously.
+        Using this default value allows correct processing of in-order event coming on the same topic.
+        In case in order processing is not important you can configure that as part of your model by marking the Event Registry Start event as async or marking the Case Model as async.
+        If you want to go back to the previous default you can set the following properties: <code>flowable.process.event-registry-start-process-instance-async</code> and <code>flowable.cmmn.event-registry-start-case-instance-async</code> to <code>true</code>.
+    </li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.6.0</h3>
 
 <h4>GENERAL</h4>
