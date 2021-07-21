@@ -25,6 +25,8 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.JmsInboundChannelModel;
 import org.flowable.eventregistry.model.JmsOutboundChannelModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -58,6 +60,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
      */
     static final String DEFAULT_JMS_LISTENER_CONTAINER_FACTORY_BEAN_NAME = "jmsListenerContainerFactory";
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected JmsOperations jmsOperations;
 
     protected JmsListenerEndpointRegistry endpointRegistry;
@@ -83,12 +87,16 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
         
         if (channelModel instanceof JmsInboundChannelModel) {
             JmsInboundChannelModel jmsChannelModel = (JmsInboundChannelModel) channelModel;
+            logger.info("Starting to register inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
 
             JmsListenerEndpoint endpoint = createJmsListenerEndpoint(jmsChannelModel, tenantId, eventRegistry);
             registerEndpoint(endpoint, null);
+            logger.info("Finished registering inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             
         } else if (channelModel instanceof JmsOutboundChannelModel) {
+            logger.info("Starting to register outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             processOutboundDefinition((JmsOutboundChannelModel) channelModel);
+            logger.info("Finished registering outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         }
     }
 
@@ -137,17 +145,20 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
 
     @Override
     public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
+        logger.info("Starting to unregister channel {} in tenant {}", channelModel.getKey(), tenantId);
         String endpointId = getEndpointId(channelModel,tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228
         MessageListenerContainer listenerContainer = endpointRegistry.getListenerContainer(endpointId);
         if (listenerContainer != null) {
+            logger.debug("Stopping message listener {} for channel {} in tenant {}", listenerContainer, channelModel.getKey(), tenantId);
             listenerContainer.stop();
         }
 
         if (listenerContainer instanceof DisposableBean) {
             try {
+                logger.debug("Destroying message listener {} for channel {} in tenant {}", listenerContainer, channelModel.getKey(), tenantId);
                 ((DisposableBean) listenerContainer).destroy();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to destroy listener container", e);
@@ -165,6 +176,8 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
         } else {
             throw new IllegalStateException("Endpoint registry " + endpointRegistry + " does not have listenerContainers field");
         }
+
+        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
     }
 
     /**
@@ -185,7 +198,9 @@ public class JmsChannelModelProcessor implements BeanFactoryAware, ApplicationCo
         // We also need to start immediately if the application context has already been refreshed.
         // If we don't and the endpoint has no registered containers then our endpoint will never be started.
         boolean startImmediately = contextRefreshed || endpointRegistry.isRunning();
+        logger.info("Registering endpoint {} with start immediately {}", endpoint, startImmediately);
         endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), startImmediately);
+        logger.info("Finished registering endpoint {}", endpoint);
     }
 
     protected JmsListenerContainerFactory<?> resolveContainerFactory(JmsListenerEndpoint endpoint, JmsListenerContainerFactory<?> containerFactory) {

@@ -62,7 +62,7 @@ public class DefaultEventRegistryChangeDetectionManager implements EventRegistry
             // When no instance is returned, the channel definition has not yet been deployed before (e.g. deployed on another node)
             if (!channelDefinitionCacheIds.contains(channelDefinition.getId())) {
                 eventRegistryEngineConfiguration.getEventRepositoryService().getChannelModelById(channelDefinition.getId());
-                LOGGER.info("Deployed channel definition with key {}", channelDefinition.getKey());
+                LOGGER.info("Deployed channel definition with key {} and tenant {}", channelDefinition.getKey(), channelDefinition.getTenantId());
             }
 
         }
@@ -73,6 +73,7 @@ public class DefaultEventRegistryChangeDetectionManager implements EventRegistry
             if (!latestChannelDefinitionIds.contains(channelDefinitionCacheEntry.getChannelDefinitionEntity().getId())) {
                 // The cache is a synchronized map (default impl), so no need to synchronize, both adds (during deployment) and remove (here) are synchronized
                 deploymentManager.removeChannelDefinitionFromCache(channelDefinitionCacheEntry.getChannelDefinitionEntity());
+                LOGGER.info("Removed channel definition with key {} and tenant {} from cache", channelDefinitionCacheEntry.getChannelDefinitionEntity().getKey(), channelDefinitionCacheEntry.getChannelDefinitionEntity().getTenantId());
             }
         }
     }
