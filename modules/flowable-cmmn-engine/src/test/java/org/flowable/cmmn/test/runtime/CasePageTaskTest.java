@@ -30,6 +30,7 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -222,9 +223,12 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .orderByName().asc()
                 .list();
         assertThat(planItemInstances).hasSize(4);
-        
-        Set<String> testGroups = new HashSet<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(cmmnEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        Set<String> testGroups = new HashSet<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testGroups.add("group" + i);
         }
         

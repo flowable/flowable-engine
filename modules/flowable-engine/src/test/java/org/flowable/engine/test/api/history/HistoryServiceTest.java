@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -527,9 +528,12 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
         assertThat(taskInstances).hasSize(4);
-        
-        testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         
@@ -577,9 +581,12 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
         assertThat(taskInstances).hasSize(4);
-        
-        testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         

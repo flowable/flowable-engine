@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -698,9 +699,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.getIdentityLinksForTask(adhocTask.getId())).hasSize(1);
 
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).taskInvolvedGroups(Collections.singleton("testGroup")).count()).isEqualTo(1);
-            
-            List<String> testCandidateGroups = new ArrayList<>(2100);
-            for (int i = 0; i < 2100; i++) {
+
+            // SQL Server has a limit of 2100 on how many parameters a query might have
+            int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+            List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+            for (int i = 0; i < maxGroups; i++) {
                 testCandidateGroups.add("group" + i);
             }
             
@@ -730,9 +734,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedGroups(Collections.singleton("testGroup"))
                     .count()).isEqualTo(1);
-            
-            List<String> testCandidateGroups = new ArrayList<>(2100);
-            for (int i = 0; i < 2100; i++) {
+
+            // SQL Server has a limit of 2100 on how many parameters a query might have
+            int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+            List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+            for (int i = 0; i < maxGroups; i++) {
                 testCandidateGroups.add("group" + i);
             }
             
@@ -1421,9 +1428,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(12);
         tasks = query.list();
         assertThat(tasks).hasSize(12);
-        
-        List<String> testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         
@@ -1474,9 +1484,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(12);
         tasks = query.list();
         assertThat(tasks).hasSize(12);
-        
-        List<String> testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         
@@ -1675,9 +1688,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         query = taskService.createTaskQuery().taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
-        
-        List<String> testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         
@@ -1724,9 +1740,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         query = taskService.createTaskQuery().or().taskId("invalid").taskCandidateGroupIn(groups);
         assertThat(query.count()).isEqualTo(5);
         assertThat(query.list()).hasSize(5);
-        
-        List<String> testCandidateGroups = new ArrayList<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        List<String> testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testCandidateGroups.add("group" + i);
         }
         

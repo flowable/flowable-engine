@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.junit.Rule;
 import org.junit.Test;
@@ -175,9 +176,12 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(
                 Stream.of("testGroup", "testGroup2", "testGroup3").collect(Collectors.toSet())
         ).singleResult().getId()).isEqualTo(caseInstance.getId());
-        
-        Set<String> testGroups = new HashSet<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(cmmnEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        Set<String> testGroups = new HashSet<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testGroups.add("group" + i);
         }
         
