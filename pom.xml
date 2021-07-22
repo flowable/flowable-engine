@@ -14,18 +14,18 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.5.2</spring.boot.version>
-		<spring.framework.version>5.3.8</spring.framework.version>
+		<spring.boot.version>2.5.3</spring.boot.version>
+		<spring.framework.version>5.3.9</spring.framework.version>
 		<spring.security.version>5.5.1</spring.security.version>
-		<spring.amqp.version>2.3.8</spring.amqp.version>
-		<spring.kafka.version>2.7.2</spring.kafka.version>
+		<spring.amqp.version>2.3.10</spring.amqp.version>
+		<spring.kafka.version>2.7.4</spring.kafka.version>
 		<reactor-netty.version>1.0.6</reactor-netty.version>
-		<jackson.version>2.12.3</jackson.version>
+		<jackson.version>2.12.4</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
 		<cxf.version>3.4.2</cxf.version>
-		<slf4j.version>1.7.31</slf4j.version>
+		<slf4j.version>1.7.32</slf4j.version>
 		<groovy.version>3.0.8</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
@@ -222,12 +222,12 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>8.0.19</version>
+				<version>8.0.26</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.5.0</version>
+				<version>11.5.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
