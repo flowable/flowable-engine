@@ -98,7 +98,7 @@ public class EvaluateVariableListenerEventDefinitionsOperation extends AbstractO
                             changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asText();
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Error reading variable listener configuration value for " + eventSubscription.getActivityId(), e);
+                        LOGGER.error("Error reading variable listener configuration value for {}", eventSubscription.getActivityId(), e);
                     }
                 }
                 

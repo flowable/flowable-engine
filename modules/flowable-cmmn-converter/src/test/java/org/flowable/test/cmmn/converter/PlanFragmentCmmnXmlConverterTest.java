@@ -103,7 +103,7 @@ public class PlanFragmentCmmnXmlConverterTest {
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         if (planItemDefinition instanceof PlanFragment) {
             PlanFragment planFragment = (PlanFragment) planItemDefinition;
-            assertThat(planFragment.getPlanItems()).isEmpty();;
+            assertThat(planFragment.getPlanItems()).isEmpty();
         }
     }
 
