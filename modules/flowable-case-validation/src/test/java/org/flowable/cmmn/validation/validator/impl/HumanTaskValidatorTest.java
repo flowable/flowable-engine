@@ -15,12 +15,18 @@
 
 package org.flowable.cmmn.validation.validator.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.validation.CaseValidatorFactory;
+import org.flowable.cmmn.validation.validator.Problems;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.cmmn.validation.validator.ValidatorSetFactory;
+import org.flowable.cmmn.validation.validator.ValidatorSetNames;
 import org.junit.Test;
 
 /**
@@ -35,17 +41,30 @@ public class HumanTaskValidatorTest {
     @Test
     public void testValidateNoErrors() {
         CmmnModel cmmnModel = readXMLFile("humanTaskNoErrors.cmmn");
-        List<ValidationEntry> validationEntries = new HumanTaskValidator().validate(cmmnModel);
-        Assertions.assertThat(validationEntries.isEmpty()).isTrue();
+        List<ValidationEntry> validationEntries = new CaseValidatorFactory().createDefaultCaseValidator().validate(cmmnModel);
+        assertThat(validationEntries).isEmpty();
     }
 
     @Test
     public void testValidateMissingListenerImplementationType() {
         CmmnModel cmmnModel = readXMLFile("humanTaskMissingListenerImplementationType.cmmn");
-        List<ValidationEntry> validationEntries = new HumanTaskValidator().validate(cmmnModel);
-        Assertions.assertThat(validationEntries.isEmpty()).isFalse();
-        Assertions.assertThat(validationEntries.size()).isEqualTo(1);
-        Assertions.assertThat(validationEntries.get(0).getDefaultDescription())
-                .isEqualTo("Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener");
+        List<ValidationEntry> validationEntries = new CaseValidatorFactory().createDefaultCaseValidator().validate(cmmnModel);
+        assertThat(validationEntries)
+                .extracting(ValidationEntry::getProblem, ValidationEntry::getDefaultDescription)
+                .containsExactlyInAnyOrder(
+                        tuple(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING,
+                                "Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener")
+                );
+
+        ValidationEntry entry = validationEntries.get(0);
+        assertThat(entry.getLevel()).isEqualTo(ValidationEntry.Level.Error);
+        assertThat(entry.getValidatorSetName()).isEqualTo(ValidatorSetNames.FLOWABLE_CASE);
+        assertThat(entry.getCaseDefinitionId()).isEqualTo("humanTaskVariableNameCase");
+        assertThat(entry.getCaseDefinitionName()).isEqualTo("Human Task Variable Case");
+        assertThat(entry.getItemId()).isEqualTo("task1");
+        assertThat(entry.getItemName()).isEqualTo("Task 1");
+
+        assertThat(entry.getXmlLineNumber()).isEqualTo(23);
+        assertThat(entry.getXmlColumnNumber()).isEqualTo(54);
     }
 }

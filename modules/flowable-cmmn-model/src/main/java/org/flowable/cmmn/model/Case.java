@@ -96,10 +96,12 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
         this.allCaseElements = allCaseElements;
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends CaseElement> List<T> findCaseElementsOfType(Class<T> type) {
-        return allCaseElements.values().stream().filter(type::isInstance).map(caseElement -> (T) caseElement)
-            .collect(Collectors.toList());
+        return getAllCaseElements().values()
+                .stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .collect(Collectors.toList());
     }
 
     public ReactivateEventListener getReactivateEventListener() {

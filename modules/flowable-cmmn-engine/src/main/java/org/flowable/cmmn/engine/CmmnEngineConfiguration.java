@@ -2583,6 +2583,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return caseValidator;
     }
 
+    public CmmnEngineConfiguration setCaseValidator(CaseValidator caseValidator) {
+        this.caseValidator = caseValidator;
+        return this;
+    }
+
     public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {
         return caseDefinitionDiagramHelper;
     }

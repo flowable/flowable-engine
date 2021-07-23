@@ -15,12 +15,9 @@
 
 package org.flowable.cmmn.validation.validator.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.cmmn.validation.CaseValidationContext;
 import org.flowable.cmmn.validation.validator.Validator;
 
 /**
@@ -29,13 +26,11 @@ import org.flowable.cmmn.validation.validator.Validator;
 public abstract class CaseLevelValidator implements Validator {
 
     @Override
-    public List<ValidationEntry> validate(CmmnModel model) {
-        List<ValidationEntry> errors = new ArrayList<>();
+    public void validate(CmmnModel model, CaseValidationContext validationContext) {
         for (Case caze : model.getCases()) {
-            executeValidation(model, caze, errors);
+            executeValidation(model, caze, validationContext);
         }
-        return errors;
     }
 
-    abstract void executeValidation(CmmnModel model, Case caze, List<ValidationEntry> errors);
+    protected abstract void executeValidation(CmmnModel model, Case caze, CaseValidationContext validationContext);
 }

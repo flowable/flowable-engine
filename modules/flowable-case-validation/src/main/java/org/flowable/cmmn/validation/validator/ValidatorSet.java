@@ -22,12 +22,16 @@ import java.util.Set;
  */
 public class ValidatorSet {
 
-    private final String name;
+    protected final String name;
 
-    private Set<Validator> validators = new HashSet<>();
+    protected Set<Validator> validators = new HashSet<>();
 
     public ValidatorSet(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void addValidator(Validator validator) {

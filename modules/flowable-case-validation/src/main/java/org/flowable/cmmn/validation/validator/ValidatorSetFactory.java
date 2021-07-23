@@ -22,7 +22,7 @@ import org.flowable.cmmn.validation.validator.impl.HumanTaskValidator;
 public class ValidatorSetFactory {
 
     public ValidatorSet createFlowableExecutableCaseValidatorSet() {
-        ValidatorSet validatorSet = new ValidatorSet("flowable-executable-case");
+        ValidatorSet validatorSet = new ValidatorSet(ValidatorSetNames.FLOWABLE_CASE);
         validatorSet.addValidator(new HumanTaskValidator());
         return validatorSet;
     }

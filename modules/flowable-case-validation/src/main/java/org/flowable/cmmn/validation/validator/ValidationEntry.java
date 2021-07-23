@@ -24,15 +24,28 @@ public class ValidationEntry {
         Warning, Error
     }
 
-    private Level level;
-    private String caseDefinitionId;
-    private String caseDefinitionName;
+    protected String validatorSetName;
+
+    protected Level level;
+    protected String caseDefinitionId;
+    protected String caseDefinitionName;
     protected int xmlLineNumber;
     protected int xmlColumnNumber;
-    private String problem;
-    private String defaultDescription;
-    private String itemId;
-    private String itemName;
+    protected String problem;
+    // Default description in english.
+    // Other languages can map the validatorSetName/validatorName to the
+    // translated version.
+    protected String defaultDescription;
+    protected String itemId;
+    protected String itemName;
+
+    public String getValidatorSetName() {
+        return validatorSetName;
+    }
+
+    public void setValidatorSetName(String validatorSetName) {
+        this.validatorSetName = validatorSetName;
+    }
 
     public Level getLevel() {
         return level;

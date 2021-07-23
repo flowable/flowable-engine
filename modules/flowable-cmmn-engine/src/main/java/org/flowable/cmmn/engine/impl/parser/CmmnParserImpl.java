@@ -97,30 +97,34 @@ public class CmmnParserImpl implements CmmnParser {
         }
     }
 
-    private void validateCmmnModel(CaseValidator caseValidator, CmmnModel cmmnModel) {
+    protected void validateCmmnModel(CaseValidator caseValidator, CmmnModel cmmnModel) {
         if (caseValidator == null) {
             logger.warn("Case should be validated, but no case validator is configured on the case engine configuration!");
         } else {
             List<ValidationEntry> validationEntries = caseValidator.validate(cmmnModel);
-            StringBuilder warningBuilder = new StringBuilder();
-            StringBuilder errorBuilder = new StringBuilder();
+            if (validationEntries != null && !validationEntries.isEmpty()) {
 
-            for (ValidationEntry entry : validationEntries) {
-                if (entry.getLevel() == ValidationEntry.Level.Warning) {
-                    warningBuilder.append(entry).append("\n");
-                } else {
-                    errorBuilder.append(entry).append("\n");
+                StringBuilder warningBuilder = new StringBuilder();
+                StringBuilder errorBuilder = new StringBuilder();
+
+                for (ValidationEntry entry : validationEntries) {
+                    if (entry.getLevel() == ValidationEntry.Level.Warning) {
+                        warningBuilder.append(entry).append("\n");
+                    } else {
+                        errorBuilder.append(entry).append("\n");
+                    }
                 }
-            }
 
-            // Throw exception if there is any error
-            if (errorBuilder.length() > 0) {
-                throw new FlowableException("Errors while parsing:\n" + errorBuilder);
-            }
+                // Throw exception if there is any error
+                if (errorBuilder.length() > 0) {
+                    throw new FlowableException("Errors while parsing:\n" + errorBuilder);
+                }
 
-            // Write out warnings (if any)
-            if (warningBuilder.length() > 0) {
-                logger.warn("Following warnings encountered during case validation: {}", warningBuilder);
+                // Write out warnings (if any)
+                if (warningBuilder.length() > 0) {
+                    logger.warn("Following warnings encountered during case validation: {}", warningBuilder);
+                }
+
             }
         }
     }

@@ -17,10 +17,10 @@ package org.flowable.cmmn.validation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.cmmn.validation.validator.Validator;
 import org.flowable.cmmn.validation.validator.ValidatorSet;
 
 /**
@@ -28,14 +28,23 @@ import org.flowable.cmmn.validation.validator.ValidatorSet;
  */
 public class CaseValidatorImpl implements CaseValidator {
 
-    private List<ValidatorSet> validatorSets = new ArrayList<>();
+    protected List<ValidatorSet> validatorSets = new ArrayList<>();
 
     @Override
     public List<ValidationEntry> validate(CmmnModel model) {
-        return validatorSets.stream()
-                .flatMap(validatorSet -> validatorSet.getValidators().stream())
-                .flatMap(validator -> validator.validate(model).stream())
-                .collect(Collectors.toList());
+        List<ValidationEntry> allEntries = new ArrayList<>();
+
+        for (ValidatorSet validatorSet : validatorSets) {
+            CaseValidationContextImpl validationContext = new CaseValidationContextImpl(validatorSet);
+
+            for (Validator validator : validatorSet.getValidators()) {
+                validator.validate(model, validationContext);
+            }
+
+            allEntries.addAll(validationContext.getEntries());
+        }
+
+        return allEntries;
     }
 
     public void addValidatorSet(ValidatorSet validatorSet) {

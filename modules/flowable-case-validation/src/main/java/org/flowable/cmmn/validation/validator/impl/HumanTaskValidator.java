@@ -21,9 +21,8 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.HumanTask;
-import org.flowable.cmmn.validation.validator.Helpers;
+import org.flowable.cmmn.validation.CaseValidationContext;
 import org.flowable.cmmn.validation.validator.Problems;
-import org.flowable.cmmn.validation.validator.ValidationEntry;
 
 /**
  * @author Calin Cerchez
@@ -31,13 +30,13 @@ import org.flowable.cmmn.validation.validator.ValidationEntry;
 public class HumanTaskValidator extends CaseLevelValidator {
 
     @Override
-    void executeValidation(CmmnModel model, Case caze, List<ValidationEntry> errors) {
+    protected void executeValidation(CmmnModel model, Case caze, CaseValidationContext validationContext) {
         List<HumanTask> humanTasks = caze.findCaseElementsOfType(HumanTask.class);
         for (HumanTask humanTask : humanTasks) {
             if (humanTask.getTaskListeners() != null) {
                 for (FlowableListener listener : humanTask.getTaskListeners()) {
                     if (listener.getImplementationType() == null) {
-                        Helpers.addError(errors, Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING, caze, humanTask, listener,
+                        validationContext.addError(Problems.HUMAN_TASK_LISTENER_IMPLEMENTATION_MISSING, caze, humanTask, listener,
                                 "Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener");
                     }
                 }
