@@ -24,7 +24,6 @@ import org.flowable.validation.validator.impl.EventSubprocessValidator;
 import org.flowable.validation.validator.impl.EventValidator;
 import org.flowable.validation.validator.impl.ExclusiveGatewayValidator;
 import org.flowable.validation.validator.impl.ExecutionListenerValidator;
-import org.flowable.validation.validator.impl.ExternalInvocationTaskValidator;
 import org.flowable.validation.validator.impl.FlowElementValidator;
 import org.flowable.validation.validator.impl.FlowableEventListenerValidator;
 import org.flowable.validation.validator.impl.IntermediateCatchEventValidator;

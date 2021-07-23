@@ -15,7 +15,6 @@
 package org.flowable.cmmn.validation;
 
 import org.flowable.cmmn.validation.validator.ValidatorSetFactory;
-import org.flowable.cmmn.validation.validator.impl.HumanTaskValidator;
 
 /**
  * @author Calin Cerchez

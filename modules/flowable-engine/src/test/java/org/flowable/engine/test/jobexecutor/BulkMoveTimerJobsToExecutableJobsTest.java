@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  */
 public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  {
 
-    private final static int NR_OF_TIMER_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
+    private static final int NR_OF_TIMER_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {

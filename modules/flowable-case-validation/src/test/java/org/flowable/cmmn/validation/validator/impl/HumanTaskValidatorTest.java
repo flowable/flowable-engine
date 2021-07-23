@@ -25,7 +25,6 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.CaseValidatorFactory;
 import org.flowable.cmmn.validation.validator.Problems;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
-import org.flowable.cmmn.validation.validator.ValidatorSetFactory;
 import org.flowable.cmmn.validation.validator.ValidatorSetNames;
 import org.junit.Test;
 
