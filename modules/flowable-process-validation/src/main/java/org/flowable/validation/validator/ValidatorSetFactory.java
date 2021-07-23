@@ -24,7 +24,6 @@ import org.flowable.validation.validator.impl.EventSubprocessValidator;
 import org.flowable.validation.validator.impl.EventValidator;
 import org.flowable.validation.validator.impl.ExclusiveGatewayValidator;
 import org.flowable.validation.validator.impl.ExecutionListenerValidator;
-import org.flowable.validation.validator.impl.ExternalInvocationTaskValidator;
 import org.flowable.validation.validator.impl.FlowElementValidator;
 import org.flowable.validation.validator.impl.FlowableEventListenerValidator;
 import org.flowable.validation.validator.impl.IntermediateCatchEventValidator;
@@ -46,10 +45,6 @@ import org.flowable.validation.validator.impl.UserTaskValidator;
 public class ValidatorSetFactory {
 
     public ValidatorSet createFlowableExecutableProcessValidatorSet() {
-        return createFlowableExecutableProcessValidatorSet(null);
-    }
-
-    public ValidatorSet createFlowableExecutableProcessValidatorSet(ServiceTaskValidator customServiceTaskValidator) {
         ValidatorSet validatorSet = new ValidatorSet(ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS);
 
         validatorSet.addValidator(new AssociationValidator());
@@ -64,6 +59,7 @@ public class ValidatorSetFactory {
         validatorSet.addValidator(new StartEventValidator());
         validatorSet.addValidator(new SequenceflowValidator());
         validatorSet.addValidator(new UserTaskValidator());
+        validatorSet.addValidator(new ServiceTaskValidator());
         validatorSet.addValidator(new ScriptTaskValidator());
         validatorSet.addValidator(new SendTaskValidator());
         validatorSet.addValidator(new ExclusiveGatewayValidator());
@@ -81,12 +77,6 @@ public class ValidatorSetFactory {
         validatorSet.addValidator(new FlowableEventListenerValidator());
 
         validatorSet.addValidator(new DiagramInterchangeInfoValidator());
-
-        if (customServiceTaskValidator == null) {
-            validatorSet.addValidator(new ServiceTaskValidator());
-        } else {
-            validatorSet.addValidator(customServiceTaskValidator);
-        }
 
         return validatorSet;
     }
