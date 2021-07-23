@@ -52,6 +52,10 @@ public class CustomServiceTaskProcessValidatorTest {
         BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
         assertThat(bpmnModel).isNotNull();
 
+        // set custom type on service task
+        ServiceTask javaService = (ServiceTask) bpmnModel.getFlowElement("javaService");
+        javaService.setType("custom-service-task");
+
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
         assertThat(allErrors).hasSize(1);
 
