@@ -217,6 +217,7 @@ import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.validation.validator.impl.ServiceTaskValidator;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.types.BooleanType;
@@ -458,6 +459,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // PROCESS VALIDATION
 
     protected ProcessValidator processValidator;
+    protected ServiceTaskValidator customServiceTaskValidator;
 
     // OTHER ////////////////////////////////////////////////////////////////////
 
@@ -1502,7 +1504,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected void initProcessValidator() {
         if (this.processValidator == null) {
-            this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
+            if (customServiceTaskValidator == null) {
+                this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
+            } else {
+                this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator(customServiceTaskValidator);
+            }
         }
     }
 
@@ -2200,6 +2206,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void setProcessValidator(ProcessValidator processValidator) {
         this.processValidator = processValidator;
+    }
+
+    public ServiceTaskValidator getCustomServiceTaskValidator() {
+        return customServiceTaskValidator;
+    }
+
+    public void setCustomServiceTaskValidator(ServiceTaskValidator customServiceTaskValidator) {
+        this.customServiceTaskValidator = customServiceTaskValidator;
     }
     
     public XMLImporterFactory getWsdlImporterFactory() {

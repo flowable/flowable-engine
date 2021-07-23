@@ -13,6 +13,7 @@
 package org.flowable.validation;
 
 import org.flowable.validation.validator.ValidatorSetFactory;
+import org.flowable.validation.validator.impl.ServiceTaskValidator;
 
 /**
  * @author jbarrez
@@ -22,6 +23,12 @@ public class ProcessValidatorFactory {
     public ProcessValidator createDefaultProcessValidator() {
         ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
         processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet());
+        return processValidator;
+    }
+
+    public ProcessValidator createDefaultProcessValidator(ServiceTaskValidator customServiceTaskValidator) {
+        ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
+        processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet(customServiceTaskValidator));
         return processValidator;
     }
 
