@@ -23,7 +23,6 @@ import java.util.List;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.converter.ServiceTaskXMLConverter;
 import org.flowable.bpmn.model.BaseElement;
@@ -116,14 +115,10 @@ public class CustomServiceTaskProcessValidatorTest {
 
     class CustomServiceTaskValidator extends ServiceTaskValidator {
 
-        protected void verifyType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
-            if (StringUtils.isNotEmpty(serviceTask.getType())) {
-                switch (serviceTask.getType()) {
-                    case "custom-service-task":
-                        return;
-                    default:
-                        addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
-                }
+        @Override
+        protected void validateUnknownServiceTaskType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+            if (!"custom-service-task".equals(serviceTask.getType())) {
+                addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
         }
     }
