@@ -24,8 +24,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
-import org.flowable.bpmn.converter.ServiceTaskXMLConverter;
-import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ServiceTask;
@@ -51,9 +49,7 @@ public class CustomServiceTaskProcessValidatorTest {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        BpmnXMLConverter.addConverter(new CustomServiceTaskXMLConverter());
-        BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
-        BpmnModel bpmnModel = bpmnXMLConverter.convertToBpmnModel(xtr);
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
         assertThat(bpmnModel).isNotNull();
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
@@ -76,10 +72,12 @@ public class CustomServiceTaskProcessValidatorTest {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        BpmnXMLConverter.addConverter(new CustomServiceTaskXMLConverter());
-        BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
-        BpmnModel bpmnModel = bpmnXMLConverter.convertToBpmnModel(xtr);
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
         assertThat(bpmnModel).isNotNull();
+
+        // set custom type on service task
+        ServiceTask javaService = (ServiceTask) bpmnModel.getFlowElement("javaService");
+        javaService.setType("custom-service-task");
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
         assertThat(allErrors).hasSize(0);
@@ -120,17 +118,6 @@ public class CustomServiceTaskProcessValidatorTest {
             if (!"custom-service-task".equals(serviceTask.getType())) {
                 addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
-        }
-    }
-
-    class CustomServiceTaskXMLConverter extends ServiceTaskXMLConverter {
-
-        @Override
-        protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
-            ServiceTask serviceTask = (ServiceTask) super.convertXMLToElement(xtr, model);
-            serviceTask.setType("custom-service-task");
-
-            return serviceTask;
         }
     }
 
