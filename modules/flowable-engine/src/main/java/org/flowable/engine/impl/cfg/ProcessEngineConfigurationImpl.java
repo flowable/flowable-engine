@@ -409,6 +409,7 @@ import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.validation.validator.impl.ServiceTaskValidator;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -823,6 +824,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // PROCESS VALIDATION ///////////////////////////////////////////////////////
 
     protected ProcessValidator processValidator;
+    protected ServiceTaskValidator customServiceTaskValidator;
 
     // OTHER ////////////////////////////////////////////////////////////////////
 
@@ -2676,7 +2678,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initProcessValidator() {
         if (this.processValidator == null) {
-            this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
+            if (customServiceTaskValidator == null) {
+                this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
+            } else {
+                ProcessValidatorFactory processValidatorFactory = new ProcessValidatorFactory();
+                processValidatorFactory.setCustomServiceTaskValidator(customServiceTaskValidator);
+                this.processValidator = processValidatorFactory.createDefaultProcessValidator();
+            }
         }
     }
 
@@ -3983,6 +3991,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessValidator(ProcessValidator processValidator) {
         this.processValidator = processValidator;
+        return this;
+    }
+
+    public ServiceTaskValidator getCustomServiceTaskValidator() {
+        return customServiceTaskValidator;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomServiceTaskValidator(ServiceTaskValidator customServiceTaskValidator) {
+        this.customServiceTaskValidator = customServiceTaskValidator;
         return this;
     }
 
