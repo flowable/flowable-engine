@@ -1507,7 +1507,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (customServiceTaskValidator == null) {
                 this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator();
             } else {
-                this.processValidator = new ProcessValidatorFactory().createDefaultProcessValidator(customServiceTaskValidator);
+                ProcessValidatorFactory processValidatorFactory = new ProcessValidatorFactory();
+                processValidatorFactory.setCustomServiceTaskValidator(customServiceTaskValidator);
+                this.processValidator = processValidatorFactory.createDefaultProcessValidator();
             }
         }
     }

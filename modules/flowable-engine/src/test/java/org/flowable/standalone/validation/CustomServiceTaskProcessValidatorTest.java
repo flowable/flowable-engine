@@ -70,7 +70,8 @@ public class CustomServiceTaskProcessValidatorTest {
     @Test
     public void verifyValidationWithCustomServiceTaskValidator() throws Exception {
         ProcessValidatorFactory processValidatorFactory = new ProcessValidatorFactory();
-        ProcessValidator processValidator = processValidatorFactory.createDefaultProcessValidator(new CustomServiceTaskValidator());
+        processValidatorFactory.setCustomServiceTaskValidator(new CustomServiceTaskValidator());
+        ProcessValidator processValidator = processValidatorFactory.createDefaultProcessValidator();
 
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream("org/flowable/engine/test/validation/customServiceTaskProcess.bpmn20.xml");
         XMLInputFactory xif = XMLInputFactory.newInstance();

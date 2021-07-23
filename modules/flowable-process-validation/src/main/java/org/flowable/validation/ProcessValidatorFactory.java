@@ -12,6 +12,7 @@
  */
 package org.flowable.validation;
 
+import org.flowable.validation.validator.ValidatorSet;
 import org.flowable.validation.validator.ValidatorSetFactory;
 import org.flowable.validation.validator.impl.ServiceTaskValidator;
 
@@ -20,16 +21,28 @@ import org.flowable.validation.validator.impl.ServiceTaskValidator;
  */
 public class ProcessValidatorFactory {
 
+    protected ServiceTaskValidator customServiceTaskValidator;
+
     public ProcessValidator createDefaultProcessValidator() {
         ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
-        processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet());
+
+        ValidatorSet executableProcessValidatorSet = new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet();
+
+        if (customServiceTaskValidator != null) {
+            executableProcessValidatorSet.removeValidator(ServiceTaskValidator.class);
+            executableProcessValidatorSet.addValidator(customServiceTaskValidator);
+        }
+
+        processValidator.addValidatorSet(executableProcessValidatorSet);
+
         return processValidator;
     }
 
-    public ProcessValidator createDefaultProcessValidator(ServiceTaskValidator customServiceTaskValidator) {
-        ProcessValidatorImpl processValidator = new ProcessValidatorImpl();
-        processValidator.addValidatorSet(new ValidatorSetFactory().createFlowableExecutableProcessValidatorSet(customServiceTaskValidator));
-        return processValidator;
+    public ServiceTaskValidator getCustomServiceTaskValidator() {
+        return customServiceTaskValidator;
     }
 
+    public void setCustomServiceTaskValidator(ServiceTaskValidator customServiceTaskValidator) {
+        this.customServiceTaskValidator = customServiceTaskValidator;
+    }
 }
