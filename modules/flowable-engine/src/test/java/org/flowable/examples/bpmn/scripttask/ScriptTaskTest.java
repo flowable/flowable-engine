@@ -94,7 +94,7 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
                 .as("Starting process should result in error in script")
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Error in Script");
+                .hasMessageContaining("Error evaluating juel script");
     }
     
     @Test

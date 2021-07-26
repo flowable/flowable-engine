@@ -95,6 +95,10 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
         this.allCaseElements = allCaseElements;
     }
 
+    public <T extends PlanItemDefinition> List<T> findPlanItemDefinitionsOfType(Class<T> type) {
+        return planModel.findPlanItemDefinitionsOfType(type, true);
+    }
+
     public ReactivateEventListener getReactivateEventListener() {
         return reactivateEventListener;
     }

@@ -215,6 +215,89 @@ public class DeploymentTest extends AbstractFlowableEventTest {
     }
 
     @Test
+    @EventDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleChannel.channel", tenantId = "tenant1")
+    public void redeploySingleChannelDefinitionInMultipleTenants() {
+        ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery()
+                .channelDefinitionKey("myChannel")
+                .latestVersion()
+                .singleResult();
+        assertThat(channelDefinition).isNotNull();
+        assertThat(channelDefinition.getKey()).isEqualTo("myChannel");
+        assertThat(channelDefinition.getTenantId()).isEqualTo("tenant1");
+        assertThat(channelDefinition.getVersion()).isEqualTo(1);
+
+        ChannelModel channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
+        assertThat(channelModel)
+                .isInstanceOfSatisfying(JmsInboundChannelModel.class, channel -> {
+                    assertThat(channel.getKey()).isEqualTo("myChannel");
+                    assertThat(channel.getChannelType()).isEqualTo("inbound");
+                    assertThat(channel.getType()).isEqualTo("jms");
+
+                    assertThat(channel.getDestination()).isEqualTo("testQueue");
+                    assertThat(channel.getDeserializerType()).isEqualTo("json");
+                    assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent");
+                });
+
+        EventDeployment redeployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
+                .tenantId("tenant2")
+                .deploy();
+
+        channelDefinition = repositoryService.createChannelDefinitionQuery()
+                .channelDefinitionKey("myChannel")
+                .tenantId("tenant2")
+                .latestVersion()
+                .singleResult();
+        assertThat(channelDefinition).isNotNull();
+        assertThat(channelDefinition.getKey()).isEqualTo("myChannel");
+        assertThat(channelDefinition.getTenantId()).isEqualTo("tenant2");
+        assertThat(channelDefinition.getVersion()).isEqualTo(1);
+
+        channelModel = repositoryService.getChannelModelById(channelDefinition.getId());
+        assertThat(channelModel)
+                .isInstanceOfSatisfying(JmsInboundChannelModel.class, channel -> {
+                    assertThat(channel.getChannelType()).isEqualTo("inbound");
+                    assertThat(channel.getType()).isEqualTo("jms");
+                    assertThat(channel.getDestination()).isEqualTo("testQueue2");
+
+                    assertThat(channel.getDeserializerType()).isEqualTo("json");
+                    assertThat(channel.getChannelEventKeyDetection().getFixedValue()).isEqualTo("myEvent2");
+                });
+
+        List<ChannelDefinition> channelDefinitions = repositoryService.createChannelDefinitionQuery()
+                .channelDefinitionKey("myChannel")
+                .latestVersion()
+                .list();
+
+        assertThat(channelDefinitions)
+                .extracting(ChannelDefinition::getKey, ChannelDefinition::getTenantId, ChannelDefinition::getVersion)
+                .containsExactlyInAnyOrder(
+                        tuple("myChannel", "tenant1", 1),
+                        tuple("myChannel", "tenant2", 1)
+                );
+
+        EventDeployment redeployment2 = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/eventregistry/test/deployment/simpleChannel2.channel")
+                .tenantId("tenant1")
+                .deploy();
+
+        channelDefinitions = repositoryService.createChannelDefinitionQuery()
+                .channelDefinitionKey("myChannel")
+                .latestVersion()
+                .list();
+
+        assertThat(channelDefinitions)
+                .extracting(ChannelDefinition::getKey, ChannelDefinition::getTenantId, ChannelDefinition::getVersion)
+                .containsExactlyInAnyOrder(
+                        tuple("myChannel", "tenant1", 2),
+                        tuple("myChannel", "tenant2", 1)
+                );
+
+        repositoryService.deleteDeployment(redeployment.getId());
+        repositoryService.deleteDeployment(redeployment2.getId());
+    }
+
+    @Test
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/test/deployment/simpleEvent.event",
             "org/flowable/eventregistry/test/deployment/orderEvent.event" })
     public void deploy2EventDefinitions() {

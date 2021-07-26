@@ -18,13 +18,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "11-slim", "18" ]
+        oracle: [ "11-slim", "18-slim" ]
         include:
           - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
             serviceName: XE
-          - oracle: 18
+          - oracle: 18-slim
             driverVersion: 18.3.0.0
             driverArtifact: ojdbc8
             serviceName: XEPDB1
@@ -70,13 +70,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "11-slim", "18" ]
+        oracle: [ "11-slim", "18-slim" ]
         include:
           - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
             serviceName: XE
-          - oracle: 18
+          - oracle: 18-slim
             driverVersion: 18.3.0.0
             driverArtifact: ojdbc8
             serviceName: XEPDB1
@@ -123,13 +123,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "11-slim", "18" ]
+        oracle: [ "11-slim", "18-slim" ]
         include:
           - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
             serviceName: XE
-          - oracle: 18
+          - oracle: 18-slim
             driverVersion: 18.3.0.0
             driverArtifact: ojdbc8
             serviceName: XEPDB1

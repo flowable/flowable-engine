@@ -46,11 +46,15 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @author Filip Hrisafov
  */
 @RabbitEventTest
+@TestPropertySource(properties = {
+        "application.test.rabbit-queue=test-expression-customer"
+})
 class RabbitChannelDefinitionProcessorTest {
 
     @Autowired
@@ -112,6 +116,57 @@ class RabbitChannelDefinitionProcessorTest {
             .deploy();
 
         rabbitTemplate.convertAndSend("test-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}");
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void rabbitQueueIsCorrectlyResolvedFromExpression() {
+        rabbitAdmin.declareQueue(new Queue("test-expression-customer"));
+        queuesToDelete.add("test-expression-customer");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("testChannel")
+            .resourceName("test.channel")
+            .rabbitChannelAdapter("${application.test.rabbit-queue}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        rabbitTemplate.convertAndSend("test-expression-customer", "{"
             + "    \"eventKey\": \"test\","
             + "    \"customer\": \"kermit\","
             + "    \"name\": \"Kermit the Frog\""

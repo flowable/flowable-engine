@@ -63,7 +63,7 @@ public class FlowableCmmnProperties {
 
     /**
      * Whether case instances should be started asynchronously from an event registry.
-     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. using an async service task before all the other elements are initialized
+     * This is a fallback applied for all events. We suggest modelling your cases appropriately, i.e. marking the start of the case as async
      */
     private boolean eventRegistryStartCaseInstanceAsync = false;
 

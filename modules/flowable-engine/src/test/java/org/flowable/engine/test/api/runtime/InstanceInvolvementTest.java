@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -176,9 +177,12 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
         assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
-        
-        Set<String> testGroups = new HashSet<>(2100);
-        for (int i = 0; i < 2100; i++) {
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        Set<String> testGroups = new HashSet<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
             testGroups.add("group" + i);
         }
         
@@ -533,9 +537,12 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricProcessInstanceQuery().
                     or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
             assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
-            
-            Set<String> testGroups = new HashSet<>(2100);
-            for (int i = 0; i < 2100; i++) {
+
+            // SQL Server has a limit of 2100 on how many parameters a query might have
+            int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+            Set<String> testGroups = new HashSet<>(maxGroups);
+            for (int i = 0; i < maxGroups; i++) {
                 testGroups.add("group" + i);
             }
             

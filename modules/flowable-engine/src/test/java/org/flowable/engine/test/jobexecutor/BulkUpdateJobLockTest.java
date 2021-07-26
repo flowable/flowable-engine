@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  */
 public class BulkUpdateJobLockTest extends JobExecutorTestCase  {
 
-    private final static int NR_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
+    private static final int NR_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {

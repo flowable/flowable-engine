@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -352,9 +353,12 @@ public class StartAuthorizationTest extends PluggableFlowableTestCase {
             assertThat(repositoryService.createProcessDefinitionQuery().startableByUserOrGroups("user1", Collections.singletonList("group3")).list())
                 .extracting(ProcessDefinition::getKey)
                 .containsExactlyInAnyOrder("process2", "process3", "process4");
-            
-            Set<String> testGroups = new HashSet<>(2100);
-            for (int i = 0; i < 2100; i++) {
+
+            // SQL Server has a limit of 2100 on how many parameters a query might have
+            int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+            Set<String> testGroups = new HashSet<>(maxGroups);
+            for (int i = 0; i < maxGroups; i++) {
                 testGroups.add("groupa" + i);
             }
             
