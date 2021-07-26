@@ -80,8 +80,8 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
                 case ServiceTask.EXTERNAL_WORKER_TASK:
                     validateExternalWorkerTask(process, (ExternalWorkerServiceTask) serviceTask, errors);
                     return;
-                case "mule":
-                case "camel":
+                case ServiceTask.MULE:
+                case ServiceTask.CAMEL:
                     // Mule or camel have no special validation
                     return;
                 default:
