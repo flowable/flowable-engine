@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.cmmn.validation.validator.ValidatorSet;
 
 /**
  * @author Calin Cerchez
@@ -25,4 +26,6 @@ import org.flowable.cmmn.validation.validator.ValidationEntry;
 public interface CaseValidator {
     
     List<ValidationEntry> validate(CmmnModel model);
+
+    List<ValidatorSet> getValidatorSets();
 }

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.InputStream;
@@ -25,6 +26,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.h2.util.IOUtils;
@@ -32,6 +34,7 @@ import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class DeploymentTest extends FlowableCmmnTestCase {
 
@@ -170,5 +173,39 @@ public class DeploymentTest extends FlowableCmmnTestCase {
             );
 
         deploymentIds.forEach(deploymentId -> cmmnRepositoryService.deleteDeployment(deploymentId, true));
+    }
+
+    @Test
+    public void deployingCaseModelWithErrorsShouldFail() {
+        assertThatThrownBy(() -> cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithErrors.cmmn")
+                .deploy())
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("Errors while parsing:\n"
+                        + "[Validation set: 'flowable-case' "
+                        + "| Problem: 'flowable-humantask-listener-implementation-missing'] : Element 'class', 'expression' or 'delegateExpression' is mandatory on executionListener - "
+                        + "[Extra info : caseDefinitionId = myCase | caseDefinitionName = My Invalid Case Model |  | id = task1 |  | name = Task 1 | ] "
+                        + "( line: 12, column: 54)\n");
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list()).isEmpty();
+    }
+
+    @Test
+    public void deployingCaseModelWithWarningsShouldNotFail() {
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
+
+        try {
+            deployment = cmmnRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithNoPlanItems.cmmn")
+                    .deploy();
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list())
+                    .extracting(CaseDefinition::getKey)
+                    .containsExactlyInAnyOrder("emptyCase");
+        } finally {
+            if (deployment != null) {
+                cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+
     }
 }

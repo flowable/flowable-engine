@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.parser.CmmnParseContext;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
@@ -35,6 +36,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
@@ -79,7 +81,7 @@ public class CmmnDeployer implements EngineDeployer {
         for (EngineResource resource : deployment.getResources().values()) {
             if (isCmmnResource(resource.getName())) {
                 LOGGER.debug("Processing CMMN resource {}", resource.getName());
-                parseResult.merge(cmmnParser.parse(resource));
+                parseResult.merge(cmmnParser.parse(new CmmnParseContextImpl(resource)));
             }
         }
 
@@ -368,5 +370,44 @@ public class CmmnDeployer implements EngineDeployer {
 
     public void setUsePrefixId(boolean usePrefixId) {
         this.usePrefixId = usePrefixId;
+    }
+
+    protected class CmmnParseContextImpl implements CmmnParseContext {
+
+        protected final EngineResource resource;
+
+        public CmmnParseContextImpl(EngineResource resource) {
+            this.resource = resource;
+        }
+
+        @Override
+        public EngineResource resource() {
+            return resource;
+        }
+
+        @Override
+        public boolean enableSafeXml() {
+            return cmmnEngineConfiguration.isEnableSafeCmmnXml();
+        }
+
+        @Override
+        public String xmlEncoding() {
+            return cmmnEngineConfiguration.getXmlEncoding();
+        }
+
+        @Override
+        public boolean validateXml() {
+            return !cmmnEngineConfiguration.isDisableCmmnXmlValidation();
+        }
+
+        @Override
+        public boolean validateCmmnModel() {
+            return validateXml();
+        }
+
+        @Override
+        public CaseValidator caseValidator() {
+            return cmmnEngineConfiguration.getCaseValidator();
+        }
     }
 }

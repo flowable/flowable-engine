@@ -47,6 +47,11 @@ public class CaseValidatorImpl implements CaseValidator {
         return allEntries;
     }
 
+    @Override
+    public List<ValidatorSet> getValidatorSets() {
+        return validatorSets;
+    }
+
     public void addValidatorSet(ValidatorSet validatorSet) {
         this.validatorSets.add(validatorSet);
     }

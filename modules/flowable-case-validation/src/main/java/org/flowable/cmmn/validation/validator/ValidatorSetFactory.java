@@ -14,7 +14,9 @@
 
 package org.flowable.cmmn.validation.validator;
 
+import org.flowable.cmmn.validation.validator.impl.DecisionTaskValidator;
 import org.flowable.cmmn.validation.validator.impl.HumanTaskValidator;
+import org.flowable.cmmn.validation.validator.impl.PlanModelValidator;
 
 /**
  * @author Calin Cerchez
@@ -23,7 +25,9 @@ public class ValidatorSetFactory {
 
     public ValidatorSet createFlowableExecutableCaseValidatorSet() {
         ValidatorSet validatorSet = new ValidatorSet(ValidatorSetNames.FLOWABLE_CASE);
+        validatorSet.addValidator(new DecisionTaskValidator());
         validatorSet.addValidator(new HumanTaskValidator());
+        validatorSet.addValidator(new PlanModelValidator());
         return validatorSet;
     }
 }

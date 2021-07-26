@@ -26,7 +26,7 @@ public class ValidationEntry {
 
     protected String validatorSetName;
 
-    protected Level level;
+    protected Level level = Level.Error;
     protected String caseDefinitionId;
     protected String caseDefinitionName;
     protected int xmlLineNumber;
@@ -118,4 +118,44 @@ public class ValidationEntry {
     public void setItemName(String itemName) {
         this.itemName = itemName;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder strb = new StringBuilder();
+        strb.append("[Validation set: '").append(validatorSetName).append("' | Problem: '").append(problem).append("'] : ");
+        strb.append(defaultDescription);
+        strb.append(" - [Extra info : ");
+        boolean extraInfoAlreadyPresent = false;
+        if (caseDefinitionId != null) {
+            strb.append("caseDefinitionId = ").append(caseDefinitionId);
+            extraInfoAlreadyPresent = true;
+        }
+        if (caseDefinitionName != null) {
+            if (extraInfoAlreadyPresent) {
+                strb.append(" | ");
+            }
+            strb.append("caseDefinitionName = ").append(caseDefinitionName).append(" | ");
+            extraInfoAlreadyPresent = true;
+        }
+        if (itemId != null) {
+            if (extraInfoAlreadyPresent) {
+                strb.append(" | ");
+            }
+            strb.append("id = ").append(itemId).append(" | ");
+            extraInfoAlreadyPresent = true;
+        }
+        if (itemName != null) {
+            if (extraInfoAlreadyPresent) {
+                strb.append(" | ");
+            }
+            strb.append("name = ").append(itemName).append(" | ");
+            extraInfoAlreadyPresent = true;
+        }
+        strb.append("]");
+        if (xmlLineNumber > 0 && xmlColumnNumber > 0) {
+            strb.append(" ( line: ").append(xmlLineNumber).append(", column: ").append(xmlColumnNumber).append(")");
+        }
+        return strb.toString();
+    }
+
 }
