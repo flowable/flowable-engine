@@ -38,6 +38,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -103,6 +104,65 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
+    }
+
+    @Test
+    @Deployment
+    public void testMergeWithEndedExecution() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("myProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 1").singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 2").singleResult();
+
+        taskService.complete(task1.getId());
+        taskService.complete(task2.getId(), CollectionUtil.singletonMap("decision", "goDown"));
+
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<String> activityNames = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(pi.getId())
+                .list()
+                .stream()
+                .map(HistoricActivityInstance::getActivityName)
+                .collect(Collectors.toList());
+
+            assertThat(activityNames).contains("Other end"); // the path downwards needs to be followed
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testMergeWithEndedExecutionNestedCommand() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("myProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 1").singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 2").singleResult();
+
+        taskService.complete(task1.getId());
+
+        // Testing a bug: when the command is nested, the reuse flag gets set to true for the inner command context, never triggering the InactiveBehavior
+        managementService.executeCommand(new Command<Object>() {
+
+            @Override
+            public Object execute(CommandContext commandContext) {
+                taskService.complete(task2.getId(), CollectionUtil.singletonMap("decision", "goDown"));
+
+                return null;
+            }
+
+        });
+
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<String> activityNames = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(pi.getId())
+                .list()
+                .stream()
+                .map(HistoricActivityInstance::getActivityName)
+                .collect(Collectors.toList());
+
+            assertThat(activityNames).contains("Other end"); // the path downwards needs to be followed
+        }
     }
 
     @Test
