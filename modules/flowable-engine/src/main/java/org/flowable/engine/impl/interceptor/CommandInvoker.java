@@ -73,7 +73,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     
             // At the end, call the execution tree change listeners.
             Map<String, ExecutionEntity> involvedExecutions = CommandContextUtil.getInvolvedExecutions(commandContext);
-            if (involvedExecutions != null && !involvedExecutions.isEmpty()) {
+            if (!commandContext.isReused() && involvedExecutions != null && !involvedExecutions.isEmpty()) {
                 agenda.planExecuteInactiveBehaviorsOperation(involvedExecutions.values());
                 CommandContextUtil.clearInvolvedExecutions(commandContext);
                 executeOperations(commandContext);
