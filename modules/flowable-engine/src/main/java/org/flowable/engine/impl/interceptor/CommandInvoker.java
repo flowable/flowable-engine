@@ -71,8 +71,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             executeOperations(commandContext);
     
             // At the end, call the execution tree change listeners.
-            // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
-            if (!commandContext.isReused() && CommandContextUtil.hasInvolvedExecutions(commandContext)) {
+            if (CommandContextUtil.hasInvolvedExecutions(commandContext)) {
                 agenda.planExecuteInactiveBehaviorsOperation();
                 
                 executeOperations(commandContext);

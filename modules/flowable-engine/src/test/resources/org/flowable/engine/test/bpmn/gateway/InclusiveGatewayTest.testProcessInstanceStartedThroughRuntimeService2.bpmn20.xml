@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <process id="myProcess" name="Process with inclusive gateway" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startnoneevent1" name="Start" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        </startEvent>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="inclusiveGateway1">
+        </sequenceFlow>
+        <inclusiveGateway id="inclusiveGateway1">
+        </inclusiveGateway>
+        <serviceTask id="task1" name="Task 1" flowable:expression="${true}">
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow2" sourceRef="inclusiveGateway1" targetRef="task1">
+        </sequenceFlow>
+        <serviceTask id="task2" name="Task 2" flowable:expression="${true}">
+        </serviceTask>
+        <sequenceFlow id="sequenceFlow3" sourceRef="inclusiveGateway1" targetRef="task2">
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow5" sourceRef="task1" targetRef="inclusiveGateway2">
+        </sequenceFlow>
+        <inclusiveGateway id="inclusiveGateway2">
+        </inclusiveGateway>
+        <exclusiveGateway id="exclusive_Databased_Gateway1" name="Decision?">
+        </exclusiveGateway>
+        <sequenceFlow id="sequenceFlow6" sourceRef="task2" targetRef="exclusive_Databased_Gateway1">
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow7" name="go up" sourceRef="exclusive_Databased_Gateway1" targetRef="inclusiveGateway2">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${vars:equals(decision, 'goUp')}]]></conditionExpression>
+        </sequenceFlow>
+        <endEvent id="endNoneEvent1" name="End">
+        </endEvent>
+        <sequenceFlow id="sequenceFlow8" sourceRef="inclusiveGateway2" targetRef="endNoneEvent1">
+        </sequenceFlow>
+        <endEvent id="endNoneEvent2" name="Other end">
+        </endEvent>
+        <sequenceFlow id="sequenceFlow9" name="go down" sourceRef="exclusive_Databased_Gateway1" targetRef="endNoneEvent2">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${vars:equals(decision, 'goDown')}]]></conditionExpression>
+        </sequenceFlow>
+    </process>
+</definitions>
