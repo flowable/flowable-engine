@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivateAsyncPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ChangePlanItemInstanceToAvailableOperation;
@@ -44,6 +46,7 @@ import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.interceptor.MigrationContext;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
@@ -107,8 +110,8 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
-    public void planReactivatePlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
-        addOperation(new ReactivatePlanModelInstanceOperation(commandContext, caseInstanceEntity));
+    public void planReactivatePlanModelOperation(CaseInstanceEntity caseInstanceEntity, List<PlanItem> directlyReactivatedPlanItems) {
+        addOperation(new ReactivatePlanModelInstanceOperation(commandContext, caseInstanceEntity, directlyReactivatedPlanItems));
     }
 
     @Override

@@ -253,6 +253,16 @@ public class CommandContext {
         }
         return null;
     }
+
+    public void removeAttribute(String key) {
+        if (attributes != null) {
+            attributes.remove(key);
+
+            if (attributes.isEmpty()) {
+                attributes = null;
+            }
+        }
+    }
     
     @SuppressWarnings({ "unchecked" })
     public <T> T getSession(Class<T> sessionClass) {

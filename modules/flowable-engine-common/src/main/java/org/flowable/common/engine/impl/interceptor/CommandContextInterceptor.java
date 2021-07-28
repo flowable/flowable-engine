@@ -57,8 +57,13 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
         CommandContext commandContext = Context.getCommandContext();
 
+        /*
+         * This flag indicates whether the context is reused for the execution of the current command.
+         * If a valid command context exists, this means a nested service call is being executed.
+         * If so, this flag will change to 'true', with the purpose of closing the command context in the finally block.
+         */
         boolean contextReused = false;
-        
+
         // We need to check the exception, because the transaction can be in a
         // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
         if (!config.isContextReusePossible() || commandContext == null || commandContext.getException() != null) {

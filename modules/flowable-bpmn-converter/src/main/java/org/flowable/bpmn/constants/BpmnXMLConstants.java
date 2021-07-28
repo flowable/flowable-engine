@@ -178,6 +178,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE = "elementIndexVariable";
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS = "class";
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
+    public static final String ATTRIBUTE_MULTIINSTANCE_NO_WAIT_STATES_ASYNC_LEAVE = "noWaitStatesAsyncLeave";
 
     public static final String ELEMENT_VARIABLE_AGGREGATION = "variableAggregation";
     public static final String ATTRIBUTE_VARIABLE_AGGREGATION_VARIABLE = "variable";

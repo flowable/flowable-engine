@@ -280,6 +280,7 @@ import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.flowable.engine.impl.jobexecutor.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceActivityCompletionJobHandler;
+import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
@@ -2141,6 +2142,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         ParallelMultiInstanceActivityCompletionJobHandler parallelMultiInstanceActivityCompletionJobHandler = new ParallelMultiInstanceActivityCompletionJobHandler();
         jobHandlers.put(parallelMultiInstanceActivityCompletionJobHandler.getType(), parallelMultiInstanceActivityCompletionJobHandler);
+
+        ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler parallelMultiInstanceWithNoWaitStateCompletionJobHandler = new ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler();
+        jobHandlers.put(parallelMultiInstanceWithNoWaitStateCompletionJobHandler.getType(), parallelMultiInstanceWithNoWaitStateCompletionJobHandler);
 
         // if we have custom job handlers, register them
         if (getCustomJobHandlers() != null) {

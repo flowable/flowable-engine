@@ -283,6 +283,14 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
+    public long countActiveExecutionsByParentId(String parentId) {
+        Map<String, Object> parameterMap = new HashMap<>(2);
+        parameterMap.put("parentId", parentId);
+        parameterMap.put("isActive", true);
+        return (Long) getDbSqlSession().selectOne("countActiveExecutionsByParentId", parameterMap);
+    }
+
+    @Override
     public void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);

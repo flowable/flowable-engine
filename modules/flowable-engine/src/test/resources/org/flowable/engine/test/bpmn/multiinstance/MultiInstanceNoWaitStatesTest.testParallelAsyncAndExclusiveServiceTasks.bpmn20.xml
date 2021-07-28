@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="miParallelAsyncScriptTask">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miServiceTask" />
+
+    <serviceTask id="miServiceTask" flowable:async="true" flowable:exclusive="false" flowable:expression="${true}">
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:noWaitStatesAsyncLeave="true">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </serviceTask>
+
+    <sequenceFlow id="flow3" sourceRef="miServiceTask" targetRef="waitState" />
+    <receiveTask id="waitState" />
+
+     <sequenceFlow id="flow4" sourceRef="waitState" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
