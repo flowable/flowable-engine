@@ -29,6 +29,7 @@ import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.agenda.AbstractOperation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,9 +72,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             executeOperations(commandContext);
     
             // At the end, call the execution tree change listeners.
-            if (CommandContextUtil.hasInvolvedExecutions(commandContext)) {
-                agenda.planExecuteInactiveBehaviorsOperation();
-                
+            Map<String, ExecutionEntity> involvedExecutions = CommandContextUtil.getInvolvedExecutions(commandContext);
+            if (involvedExecutions != null && !involvedExecutions.isEmpty()) {
+                agenda.planExecuteInactiveBehaviorsOperation(involvedExecutions.values());
+                CommandContextUtil.clearInvolvedExecutions(commandContext);
                 executeOperations(commandContext);
             }
             
