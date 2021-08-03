@@ -77,6 +77,8 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
         ThrowingCallable propagateEscalation = () -> managementService
                         .executeJob(managementService.createJobQuery().processInstanceId(childProcId).singleResult().getId());
         String expectedErrorMessage = format("Cannot propagate escalation 'testChildEscalation' with code 'testEscalationCode', because execution '%s' is suspended.", boundaryEventExecutionId);
-        assertThatThrownBy(propagateEscalation).isInstanceOf(FlowableException.class).hasMessage(expectedErrorMessage);
+        assertThatThrownBy(propagateEscalation)
+        	.isInstanceOf(FlowableException.class)
+        	.hasMessage(expectedErrorMessage);
     }
 }
