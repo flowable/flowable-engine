@@ -32,6 +32,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -210,6 +211,12 @@ public class EscalationPropagation {
                         && childExecution.getActivityId().equals(event.getId())) {
                     boundaryExecution = childExecution;
                 }
+            }
+            
+            if (boundaryExecution != null && boundaryExecution.isSuspended()) {
+                String errorMessage = String.format("Escalation could not be propagated, because the process instance with ID %s, which catches it, is suspended.",
+                                boundaryExecution.getProcessInstanceId());
+                throw new FlowableException(errorMessage);
             }
 
             CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
