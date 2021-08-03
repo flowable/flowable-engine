@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <escalation id="testEscalation" name="testEscalation" escalationCode="testEscalation"></escalation>
+  <process id="escalationParent" name="escalationParent" isExecutable="true">
+    <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+    <callActivity id="sid-37EF6664-2E8B-48A7-A967-174DEAA04455" flowable:async="false" calledElement="escalationChild" flowable:calledElementType="key" flowable:fallbackToDefaultTenant="false"></callActivity>
+    <endEvent id="sid-9A49A7A1-A922-48E4-A968-DFEA2A0F4373"></endEvent>
+    <sequenceFlow id="sid-71FC3699-B283-4A66-A6DF-9901C0E4A373" sourceRef="sid-37EF6664-2E8B-48A7-A967-174DEAA04455" targetRef="sid-9A49A7A1-A922-48E4-A968-DFEA2A0F4373"></sequenceFlow>
+    <sequenceFlow id="sid-0A715B64-B396-47B9-A92F-66E5BEA35A9C" sourceRef="startEvent1" targetRef="sid-37EF6664-2E8B-48A7-A967-174DEAA04455"></sequenceFlow>
+    <boundaryEvent id="sid-1FDCBAE0-05F2-4AEF-BFE1-89E2D9B65DCF" attachedToRef="sid-37EF6664-2E8B-48A7-A967-174DEAA04455" cancelActivity="false">
+      <escalationEventDefinition escalationRef="testEscalation"></escalationEventDefinition>
+    </boundaryEvent>
+    <userTask id="sid-20DA7F80-DB59-4184-9DCB-5693DF448120" flowable:async="true" flowable:formFieldValidation="true"></userTask>
+    <sequenceFlow id="sid-498A26CC-3294-495C-B64E-2BD5DD6308B9" sourceRef="sid-1FDCBAE0-05F2-4AEF-BFE1-89E2D9B65DCF" targetRef="sid-20DA7F80-DB59-4184-9DCB-5693DF448120"></sequenceFlow>
+    <endEvent id="sid-AA43E405-8D96-48FA-870B-14AF2730E375"></endEvent>
+    <sequenceFlow id="sid-35A18DE9-6180-48B5-ABF2-0266F3B8CDDE" sourceRef="sid-20DA7F80-DB59-4184-9DCB-5693DF448120" targetRef="sid-AA43E405-8D96-48FA-870B-14AF2730E375"></sequenceFlow>
+  </process>
+</definitions>

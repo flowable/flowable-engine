@@ -12,12 +12,16 @@
  */
 package org.flowable.engine.test.bpmn.event.escalation;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 /**
  * @author Tijs Rademakers
@@ -56,5 +60,22 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
         // Completing the task will end the process instance
         taskService.complete(task.getId());
         assertProcessEnded(procId);
+    }
+    
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/event/escalation/BoundaryEscalationEventTest.testCatchEscalationOnCallActivitySuspendedParent.parent.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/event/escalation/BoundaryEscalationEventTest.testCatchEscalationOnCallActivitySuspendedParent.child.bpmn20.xml" })
+    public void testCatchEscalationOnCallActivitySuspendedParent() {
+        String parentProcId = runtimeService.startProcessInstanceByKey("escalationParent").getId();
+        String childProcId = runtimeService.createProcessInstanceQuery().processDefinitionKey("escalationChild").singleResult().getId();
+
+        runtimeService.suspendProcessInstanceById(parentProcId);
+
+        // Propagates escalation from the child process instance
+        Executable propagateEscalation = () -> managementService
+                        .executeJob(managementService.createJobQuery().processInstanceId(childProcId).singleResult().getId());
+        String expectedErrorMessage = format("Escalation could not be propagated, because the process instance with ID %s, which catches it, is suspended.", parentProcId);
+        assertThrows(FlowableException.class, propagateEscalation, expectedErrorMessage);
     }
 }
