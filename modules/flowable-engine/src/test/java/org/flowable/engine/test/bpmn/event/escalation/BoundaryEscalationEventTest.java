@@ -14,14 +14,14 @@ package org.flowable.engine.test.bpmn.event.escalation;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 /**
  * @author Tijs Rademakers
@@ -74,9 +74,9 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
         runtimeService.suspendProcessInstanceById(parentProcId);
 
         // Propagates escalation from the child process instance
-        Executable propagateEscalation = () -> managementService
+        ThrowingCallable propagateEscalation = () -> managementService
                         .executeJob(managementService.createJobQuery().processInstanceId(childProcId).singleResult().getId());
         String expectedErrorMessage = format("Cannot propagate escalation 'testChildEscalation' with code 'testEscalationCode', because execution '%s' is suspended.", boundaryEventExecutionId);
-        assertThrows(FlowableException.class, propagateEscalation, expectedErrorMessage);
+        assertThatThrownBy(propagateEscalation).isInstanceOf(FlowableException.class).hasMessage(expectedErrorMessage);
     }
 }

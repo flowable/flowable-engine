@@ -217,7 +217,7 @@ public class EscalationPropagation {
             
             if (boundaryExecution != null && boundaryExecution.isSuspended()) {
                 String errorMessage = format("Cannot propagate escalation '%s' with code '%s', because execution '%s' is suspended.",
-                                boundaryExecution.getId(), escalationName, escalationCode);
+                                escalationName, escalationCode, boundaryExecution.getId());
                 throw new FlowableException(errorMessage);
             }
 
