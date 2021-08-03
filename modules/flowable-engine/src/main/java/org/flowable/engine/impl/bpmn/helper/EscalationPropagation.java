@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.bpmn.helper;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -214,8 +216,8 @@ public class EscalationPropagation {
             }
             
             if (boundaryExecution != null && boundaryExecution.isSuspended()) {
-                String errorMessage = String.format("Escalation could not be propagated, because the process instance with ID %s, which catches it, is suspended.",
-                                boundaryExecution.getProcessInstanceId());
+                String errorMessage = format("Cannot propagate escalation '%s' with code '%s', because execution '%s' is suspended.",
+                                boundaryExecution.getId(), escalationName, escalationCode);
                 throw new FlowableException(errorMessage);
             }
 

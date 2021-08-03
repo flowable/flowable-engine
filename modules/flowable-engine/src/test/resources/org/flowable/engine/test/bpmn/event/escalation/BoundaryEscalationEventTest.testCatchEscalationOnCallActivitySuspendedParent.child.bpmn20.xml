@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
-  <escalation id="testEscalation" name="testEscalation" escalationCode="testEscalation"></escalation>
+  <escalation id="testEscalation" name="testChildEscalation" escalationCode="testEscalationCode"></escalation>
   <process id="escalationChild" name="escalationChild" isExecutable="true">
-    <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
-    <intermediateThrowEvent id="sid-9D4C6025-653C-4ED6-9D42-50E36F82B0D0" flowable:async="true">
+    <startEvent id="startEventId" flowable:formFieldValidation="true"></startEvent>
+    <intermediateThrowEvent id="intermediateThrowEventId" flowable:async="true">
       <escalationEventDefinition escalationRef="testEscalation"></escalationEventDefinition>
     </intermediateThrowEvent>
-    <userTask id="sid-FD8E7511-60C4-47F3-A913-3E3E22B29336" flowable:async="true" flowable:exclusive="false" flowable:formFieldValidation="true"></userTask>
-    <endEvent id="sid-44715608-5158-4EC0-9E4C-63FD700285D0"></endEvent>
-    <sequenceFlow id="sid-0271E216-0ED6-4616-9D2D-AA8A8A1A67AE" sourceRef="sid-FD8E7511-60C4-47F3-A913-3E3E22B29336" targetRef="sid-44715608-5158-4EC0-9E4C-63FD700285D0"></sequenceFlow>
-    <sequenceFlow id="sid-3C3A721E-1F67-4CAB-9277-364B8D5D388B" sourceRef="startEvent1" targetRef="sid-9D4C6025-653C-4ED6-9D42-50E36F82B0D0"></sequenceFlow>
-    <sequenceFlow id="sid-D294ECB7-D08F-431E-B310-D8BCA9061079" sourceRef="sid-9D4C6025-653C-4ED6-9D42-50E36F82B0D0" targetRef="sid-FD8E7511-60C4-47F3-A913-3E3E22B29336"></sequenceFlow>
+    <userTask id="userTaskId" flowable:async="true" flowable:exclusive="true" flowable:formFieldValidation="true"></userTask>
+    <endEvent id="endEventId"></endEvent>
+    <sequenceFlow id="sequenceFlow1Id" sourceRef="userTaskId" targetRef="endEventId"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow2Id" sourceRef="startEventId" targetRef="intermediateThrowEventId"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow3Id" sourceRef="intermediateThrowEventId" targetRef="userTaskId"></sequenceFlow>
   </process>
 </definitions>

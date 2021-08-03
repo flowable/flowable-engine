@@ -69,13 +69,14 @@ public class BoundaryEscalationEventTest extends PluggableFlowableTestCase {
     public void testCatchEscalationOnCallActivitySuspendedParent() {
         String parentProcId = runtimeService.startProcessInstanceByKey("escalationParent").getId();
         String childProcId = runtimeService.createProcessInstanceQuery().processDefinitionKey("escalationChild").singleResult().getId();
+        String boundaryEventExecutionId = runtimeService.createExecutionQuery().activityId("boundaryEventId").singleResult().getId();
 
         runtimeService.suspendProcessInstanceById(parentProcId);
 
         // Propagates escalation from the child process instance
         Executable propagateEscalation = () -> managementService
                         .executeJob(managementService.createJobQuery().processInstanceId(childProcId).singleResult().getId());
-        String expectedErrorMessage = format("Escalation could not be propagated, because the process instance with ID %s, which catches it, is suspended.", parentProcId);
+        String expectedErrorMessage = format("Cannot propagate escalation 'testChildEscalation' with code 'testEscalationCode', because execution '%s' is suspended.", boundaryEventExecutionId);
         assertThrows(FlowableException.class, propagateEscalation, expectedErrorMessage);
     }
 }
