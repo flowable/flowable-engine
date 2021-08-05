@@ -92,7 +92,7 @@ public class AppDeploymentResourceResource {
 
         if (resourceList.contains(resourceName)) {
             // Build resource representation
-            return restResponseFactory.createDeploymentResourceResponse(deploymentId, resourceName, contentTypeResolver.resolveContentType(resourceName);
+            return restResponseFactory.createDeploymentResourceResponse(deploymentId, resourceName, contentTypeResolver.resolveContentType(resourceName));
         } else {
             // Resource not found in deployment
             throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceName + "' in deployment '" + deploymentId + "'.");
