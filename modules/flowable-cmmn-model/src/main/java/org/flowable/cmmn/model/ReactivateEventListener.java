@@ -25,11 +25,25 @@ public class ReactivateEventListener extends UserEventListener {
      */
     protected ReactivationRule defaultReactivationRule;
 
+    /**
+     * If there is an available condition set for the reactivate event listener as part of the model, it will end up here as the default available
+     * condition of the generic event listener will be predefined for a reactivate event listener making it unavailable as long as the case is active.
+     */
+    protected String reactivationAvailableConditionExpression;
+
     public ReactivationRule getDefaultReactivationRule() {
         return defaultReactivationRule;
     }
 
     public void setDefaultReactivationRule(ReactivationRule defaultReactivationRule) {
         this.defaultReactivationRule = defaultReactivationRule;
+    }
+
+    public String getReactivationAvailableConditionExpression() {
+        return reactivationAvailableConditionExpression;
+    }
+    
+    public void setReactivationAvailableConditionExpression(String reactivationAvailableConditionExpression) {
+        this.reactivationAvailableConditionExpression = reactivationAvailableConditionExpression;
     }
 }
