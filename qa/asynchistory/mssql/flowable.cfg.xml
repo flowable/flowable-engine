@@ -85,5 +85,5 @@
   
   <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
   <bean id="throwCustomExceptionDelegate" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
-
+  <bean id="setVariableExpression" class="org.flowable.engine.test.bpmn.event.variable.SetVariableExpression" />
 </beans>

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -109,7 +110,8 @@ public class ResetExpiredJobsRunnable implements Runnable {
                 List<? extends JobInfoEntity> expiredJobs = jobServiceConfiguration.getCommandExecutor()
                         .execute(new FindExpiredJobsCmd(asyncExecutor.getResetExpiredJobsPageSize(), jobEntityManager, jobServiceConfiguration));
 
-                List<String> expiredJobIds = expiredJobs.stream().map(JobInfoEntity::getId).collect(Collectors.toList());
+                List<String> expiredJobIds = expiredJobs.stream().filter(j -> StringUtils.isNotEmpty(j.getLockOwner()) && j.getLockExpirationTime() != null)
+                        .map(JobInfoEntity::getId).collect(Collectors.toList());
                 if (!expiredJobIds.isEmpty()) {
                     asyncExecutor.getJobServiceConfiguration().getCommandExecutor().execute(
                             new ResetExpiredJobsCmd(expiredJobIds, jobEntityManager, jobServiceConfiguration));

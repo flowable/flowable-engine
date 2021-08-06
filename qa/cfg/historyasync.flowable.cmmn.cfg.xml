@@ -80,4 +80,5 @@
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
 
+  <bean id="setVariableExpression" class="org.flowable.engine.test.bpmn.event.variable.SetVariableExpression" />
 </beans>

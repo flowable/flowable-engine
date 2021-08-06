@@ -864,7 +864,7 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
                 assertThat(logEntries).hasSize(5);
-                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
+                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactlyInAnyOrder(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
 
                 assertThat(historicTaskLogEntryQuery.count()).isEqualTo(5);
 
@@ -1050,7 +1050,7 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().list();
-                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("1", "2", "3");
+                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactlyInAnyOrder("1", "2", "3");
 
                 taskLogEntries = historyService.createHistoricTaskLogEntryQuery().orderByLogNumber().desc().list();
                 assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("3", "2", "1");

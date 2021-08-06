@@ -680,8 +680,8 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
             assertThat(taskService.createTaskQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count()).isEqualTo(1);
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId()).or().taskId("invalid").taskInvolvedUser("fozzie").count())
-                        .isEqualTo(1);
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(adhocTask.getId())
+                        .or().taskId("invalid").taskInvolvedUser("fozzie").count()).isEqualTo(1);
             }
 
         } finally {
@@ -3228,8 +3228,17 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testIncludeIdentityLinksWithPaging() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(12);
+        }
+        
         // We don't need the existing tasks for this test
         taskService.deleteTasks(taskIds, true);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
+        }
+        
         taskIds.clear();
 
         for (int i = 0; i < 10; i++) {
@@ -3239,7 +3248,13 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             task.setName("task" + i);
             taskService.saveTask(task);
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult()).isNotNull();
+            }
+            
             taskService.setPriority(task.getId(), i);
+            
             taskService.addCandidateGroup(task.getId(), "group" + i);
             taskService.addCandidateGroup(task.getId(), "otherGroup" + i);
             taskService.addCandidateUser(task.getId(), "user" + i);
@@ -3307,8 +3322,17 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testIncludeProcessVariablesWithPaging() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(12);
+        }
+        
         // We don't need the existing tasks for this test
         taskService.deleteTasks(taskIds, true);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
+        }
+        
         taskIds.clear();
 
         for (int i = 0; i < 10; i++) {
@@ -3318,6 +3342,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             task.setName("task" + i);
             taskService.saveTask(task);
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult()).isNotNull();
+            }
+            
             taskService.setPriority(task.getId(), i);
         }
 
@@ -3373,8 +3402,17 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testIncludeProcessVariablesAndTaskLocalVariablesWithPaging() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(12);
+        }
+        
         // We don't need the existing tasks for this test
         taskService.deleteTasks(taskIds, true);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
+        }
+        
         taskIds.clear();
 
         for (int i = 0; i < 10; i++) {
@@ -3384,6 +3422,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             task.setName("task" + i);
             taskService.saveTask(task);
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult()).isNotNull();
+            }
+            
             taskService.setPriority(task.getId(), i);
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + i);
         }
@@ -3474,8 +3517,17 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
     public void testIncludeProcessVariablesAndTaskLocalVariablesAndIncludeIdentityLinksWithPaging() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(12);
+        }
+        
         // We don't need the existing tasks for this test
         taskService.deleteTasks(taskIds, true);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(0);
+        }
+        
         taskIds.clear();
 
         for (int i = 0; i < 10; i++) {
@@ -3485,7 +3537,13 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
             task.setName("task" + i);
             taskService.saveTask(task);
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult()).isNotNull();
+            }
+            
             taskService.setPriority(task.getId(), i);
+            
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + i);
             taskService.addCandidateGroup(task.getId(), "group" + i);
             taskService.addCandidateGroup(task.getId(), "otherGroup" + i);

@@ -19,10 +19,12 @@ import java.util.Collections;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
@@ -50,7 +52,8 @@ public class ChangeHistoryLevelTest {
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void noneToActivityTaskComplete(ProcessEngineConfiguration configuration, RuntimeService runtimeService,
-                                    TaskService taskService, HistoryService historyService) {
+            TaskService taskService, HistoryService historyService, ManagementService managementService) {
+        
         configuration.setHistoryLevel(HistoryLevel.NONE);
         ProcessInstance oneTaskProcess = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").start();
         configuration.setHistoryLevel(HistoryLevel.ACTIVITY);
@@ -64,24 +67,28 @@ public class ChangeHistoryLevelTest {
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void noneToFullVariableSet(ProcessEngineConfiguration configuration, RuntimeService runtimeService,
-                                    TaskService taskService, HistoryService historyService) {
+            TaskService taskService, HistoryService historyService, ManagementService managementService) {
+        
         configuration.setHistoryLevel(HistoryLevel.NONE);
         ProcessInstance oneTaskProcess = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
                 .variable("var", "initialValue").start();
         configuration.setHistoryLevel(HistoryLevel.FULL);
         Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
         taskService.complete(task.getId(), Collections.singletonMap("var", "updatedValue"));
-
-        HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId(task.getId()).singleResult();
-        assertThat(historicActivityInstance).isNull();
-        HistoricVariableInstance var = historyService.createHistoricVariableInstanceQuery().processInstanceId(oneTaskProcess.getId()).variableName("var").singleResult();
-        assertThat(var).extracting(HistoricVariableInstance::getValue).isEqualTo("updatedValue");
+        
+        if (!((ProcessEngineConfigurationImpl) configuration).isAsyncHistoryEnabled()) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId(task.getId()).singleResult();
+            assertThat(historicActivityInstance).isNull();
+            HistoricVariableInstance var = historyService.createHistoricVariableInstanceQuery().processInstanceId(oneTaskProcess.getId()).variableName("var").singleResult();
+            assertThat(var.getValue()).isEqualTo("updatedValue");
+        }
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     void noneToFullClaimTask(ProcessEngineConfiguration configuration, RuntimeService runtimeService,
-                                    TaskService taskService, HistoryService historyService) {
+            TaskService taskService, HistoryService historyService, ManagementService managementService) {
+        
         configuration.setHistoryLevel(HistoryLevel.NONE);
         ProcessInstance oneTaskProcess = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
                 .variable("var", "initialValue").start();
@@ -89,7 +96,7 @@ public class ChangeHistoryLevelTest {
         Task task = taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult();
         taskService.claim(task.getId(), "kermit");
         taskService.complete(task.getId(), Collections.singletonMap("var", "updatedValue"));
-
+        
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId(task.getId()).singleResult();
         assertThat(historicActivityInstance).isNull();
     }
