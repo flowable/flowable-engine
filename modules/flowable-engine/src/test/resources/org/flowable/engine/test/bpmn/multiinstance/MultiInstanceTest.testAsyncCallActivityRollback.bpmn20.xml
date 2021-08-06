@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncMiCallActivityWithScriptTask">
+
+    <startEvent id="theStart" flowable:async="true" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScript" />
+
+    <scriptTask id="theScript" scriptFormat="JavaScript" flowable:async="true">
+      <script>execution.setVariable("scriptExecuted", true);</script>
+    </scriptTask>
+
+    <sequenceFlow id="flow2" sourceRef="theScript" targetRef="miCallActivity" />
+
+    <callActivity id="miCallActivity" calledElement="doesNotMatter" flowable:async="true">
+      <multiInstanceLoopCharacteristics flowable:collection="nonExistingList" flowable:elementVariable="item"></multiInstanceLoopCharacteristics>
+    </callActivity>
+
+    <sequenceFlow id="flow3" sourceRef="miCallActivity" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

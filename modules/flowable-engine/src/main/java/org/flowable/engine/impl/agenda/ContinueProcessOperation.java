@@ -115,12 +115,13 @@ public class ContinueProcessOperation extends AbstractOperation {
             createChildExecutionForSubProcess((SubProcess) flowNode);
         }
 
-        if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
-            // the multi instance execution will look at async
-            executeMultiInstanceSynchronous(flowNode);
+        if (forceSynchronousOperation || !flowNode.isAsynchronous()) {
 
-        } else if (forceSynchronousOperation || !flowNode.isAsynchronous()) {
-            executeSynchronous(flowNode);
+            if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
+                executeMultiInstanceSynchronous(flowNode);
+            } else {
+                executeSynchronous(flowNode);
+            }
 
         } else {
             executeAsynchronous(flowNode);

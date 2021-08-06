@@ -494,6 +494,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
         // now there should be one job in the database:
         assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
                 .extracting(Job::getJobHandlerType )
@@ -596,6 +599,9 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
     public void testMultiInstanceAsyncSequentialTask() {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
+
+        // async-continuation into the async multi-instance activity
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         // now there should be one job in the database:
         assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
