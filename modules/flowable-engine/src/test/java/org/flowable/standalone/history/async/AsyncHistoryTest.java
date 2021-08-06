@@ -508,6 +508,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             @Override
             public Void execute(CommandContext commandContext) {
                 HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
+                ((HistoryJobEntity) historyJob).setLockOwner("test");
                 ((HistoryJobEntity) historyJob).setLockExpirationTime(new Date(Instant.now().minus(100, ChronoUnit.DAYS).toEpochMilli()));
                 return null;
             }
