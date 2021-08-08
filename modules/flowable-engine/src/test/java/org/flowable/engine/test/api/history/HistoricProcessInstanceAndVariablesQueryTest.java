@@ -77,7 +77,6 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     @AfterEach
     protected void tearDown() throws Exception {
         deleteDeployments();
-
     }
 
     @Test

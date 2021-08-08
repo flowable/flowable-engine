@@ -16,6 +16,7 @@ package org.flowable.engine.test.api.history;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.HistoryService;
@@ -28,6 +29,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTest;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -47,6 +49,10 @@ public class ChangeHistoryLevelTest {
     @AfterEach
     void restoreHistoryLevel(ProcessEngineConfiguration configuration) {
         configuration.setHistoryLevel(originalHistoryLevel);
+        List<HistoryJob> historyJobs = configuration.getManagementService().createHistoryJobQuery().list();
+        for (HistoryJob historyJob : historyJobs) {
+            configuration.getManagementService().deleteHistoryJob(historyJob.getId());
+        }
     }
 
     @Test
