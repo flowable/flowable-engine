@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.impl.test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -26,6 +29,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.persistence.entity.TablePageQueryImpl;
+import org.flowable.common.engine.impl.util.IoUtil;
 import org.slf4j.Logger;
 
 /**
@@ -62,14 +66,20 @@ public class EnsureCleanDbUtils {
                         .execute(commandContext -> tableDataManager.getTablePage(new TablePageQueryImpl().tableName(tableName), 0, count.intValue()));
                     if (tableData != null && tableData.getRows() != null) {
 
-                        StringJoiner stringJoiner = new StringJoiner(", ", "{", "}");
                         for (Map<String, Object> row : tableData.getRows()) {
+                            StringJoiner stringJoiner = new StringJoiner(", ", "{", "}");
                             outputMessage.append("    ");
                             for (String key: row.keySet()) {
                                 Object value = row.get(key);
                                 String stringValue = null;
                                 if (value instanceof byte[]) {
                                     stringValue = new String((byte[]) value);
+                                } else if (value instanceof InputStream) {
+                                    try (InputStream stream = (InputStream) value) {
+                                        stringValue = new String(IoUtil.readInputStream(stream, "row value for " + key));
+                                    } catch (Exception exception) {
+                                        stringValue = "Failed to read stream: " + Objects.toString(value, null) + ". Error: " + ExceptionUtils.getStackTrace(exception);
+                                    }
                                 } else {
                                     stringValue = Objects.toString(value, null);
                                 }
