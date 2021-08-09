@@ -12,7 +12,6 @@
  */
 package org.flowable.common.engine.impl.test;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
