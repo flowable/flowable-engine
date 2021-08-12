@@ -214,7 +214,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             logOptimisticLockingException(optimisticLockingException);
 
         } catch (Throwable e) {
-            LOGGER.error("exception during timer job acquisition: {}", e.getMessage(), e);
+            LOGGER.warn("exception during timer job acquisition: {}", e.getMessage(), e);
             millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
 
         }
@@ -237,7 +237,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             unlockTimerJobs(timerJobs); // jobs have been acquired before, so need to unlock when exception happens here
 
         } catch (Throwable t) {
-            LOGGER.error("exception during timer job move: {}", t.getMessage(), t);
+            LOGGER.warn("exception during timer job move: {}", t.getMessage(), t);
             unlockTimerJobs(timerJobs); // jobs have been acquired before, so need to unlock when exception happens here
 
         }
