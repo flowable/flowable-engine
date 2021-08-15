@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.bpmn.helper;
 
+import static java.lang.String.format;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +34,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -210,6 +213,12 @@ public class EscalationPropagation {
                         && childExecution.getActivityId().equals(event.getId())) {
                     boundaryExecution = childExecution;
                 }
+            }
+            
+            if (boundaryExecution != null && boundaryExecution.isSuspended()) {
+                String errorMessage = format("Cannot propagate escalation '%s' with code '%s', because execution '%s' is suspended.",
+                                escalationName, escalationCode, boundaryExecution.getId());
+                throw new FlowableException(errorMessage);
             }
 
             CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
