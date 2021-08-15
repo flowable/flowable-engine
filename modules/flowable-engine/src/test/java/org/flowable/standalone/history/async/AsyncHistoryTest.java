@@ -79,7 +79,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
         processEngineConfiguration.setAsyncFailedJobWaitTime(100);
         processEngineConfiguration.setDefaultFailedJobWaitTime(100);
-        processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
+        processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(100);
         processEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(100);
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setAsyncHistoryExecutorActivate(false);

@@ -18,6 +18,7 @@ package org.flowable.common.rest.resolver;
  * 
  * @author Tijs Rademakers
  * @author Yvo Swillens
+ * @author Tim Stephenson
  */
 public class DefaultContentTypeResolver implements ContentTypeResolver {
 
@@ -31,11 +32,12 @@ public class DefaultContentTypeResolver implements ContentTypeResolver {
                 contentType = "image/png";
             } else if (lowerResourceName.endsWith("xml")
                     || lowerResourceName.endsWith("bpmn")
-                    || lowerResourceName.endsWith("dmn")
-                    || lowerResourceName.endsWith("form")) {
+                    || lowerResourceName.endsWith("dmn")) {
                 contentType = "text/xml";
-            } else if (lowerResourceName.endsWith(".event")
-                || lowerResourceName.endsWith(".channel")) {
+            } else if (lowerResourceName.endsWith(".app")
+                    || lowerResourceName.endsWith(".event")
+                    || lowerResourceName.endsWith(".form")
+                    || lowerResourceName.endsWith(".channel")) {
                 contentType = "application/json";
             }
         }

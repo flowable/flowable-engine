@@ -221,7 +221,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
             }
         } catch (Throwable e) {
-            LOGGER.error("exception for engine {} during async job acquisition: {}", getEngineName(), e.getMessage(), e);
+            LOGGER.warn("exception for engine {} during async job acquisition: {}", getEngineName(), e.getMessage(), e);
         }
 
         return asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();

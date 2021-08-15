@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.converter;
 
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
