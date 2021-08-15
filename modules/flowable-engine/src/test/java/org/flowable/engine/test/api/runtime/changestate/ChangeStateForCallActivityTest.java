@@ -115,6 +115,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
