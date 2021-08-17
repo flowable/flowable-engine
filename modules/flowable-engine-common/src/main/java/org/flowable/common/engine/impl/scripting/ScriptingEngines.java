@@ -12,9 +12,9 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -50,7 +50,7 @@ public class ScriptingEngines {
 
     public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
         this.scriptEngineManager = scriptEngineManager;
-        cachedEngines = new HashMap<>();
+        cachedEngines = new ConcurrentHashMap<>();
     }
 
     public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
@@ -124,7 +124,7 @@ public class ScriptingEngines {
                     if (threadingParameter != null) {
                         // Add engine to cache as any non-null result from the
                         // threading-parameter indicates at least MT-access
-                        cachedEngines.put(language, scriptEngine);
+                        cachedEngines.putIfAbsent(language, scriptEngine);
                     }
                 }
             }
