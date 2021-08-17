@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
 
@@ -118,6 +119,22 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByInvalidNameLike() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike("%invalid%");
         verifyQueryResults(query, 0);
+    }
+
+    @Test
+    public void testQueryByNameLikeIgnoreCase() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLikeIgnoreCase("%two%");
+        verifyQueryResults(query, 1);
+    }
+
+    @Test
+    public void testQueryByInvalidNameLikeIgnoreCase() {
+        ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionNameLikeIgnoreCase("%invalid%");
+        verifyQueryResults(query, 0);
+
+        assertThatThrownBy(() -> repositoryService.createProcessDefinitionQuery().processDefinitionNameLikeIgnoreCase(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("nameLikeIgnoreCase is null");
     }
 
     @Test

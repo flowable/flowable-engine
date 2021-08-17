@@ -32,6 +32,7 @@ import org.junit.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
@@ -238,6 +239,22 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").list()).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLike("invalid%").count()).isZero();
+    }
+
+    @Test
+    public void testQueryByCaseDefinitionNameLikeIgnoreCase() {
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("ca%").list()).hasSize(4);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("ca%").count()).isEqualTo(4);
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("%A%2").list()).hasSize(1);
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("%A%2").count()).isEqualTo(1);
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("invalid%").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase("invalid%").count()).isZero();
+
+        assertThatThrownBy(() -> cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionNameLikeIgnoreCase(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("nameLikeIgnoreCase is null");
     }
 
     @Test

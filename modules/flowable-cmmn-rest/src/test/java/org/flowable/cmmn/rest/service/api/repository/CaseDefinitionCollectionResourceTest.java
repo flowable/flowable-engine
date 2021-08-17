@@ -94,6 +94,10 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             url = baseUrl + "?nameLike=" + encode("Repeating%");
             assertResultsPresentInDataResponse(url, repeatingStageCase.getId());
 
+            // Test nameLikeIgnoreCase filtering
+            url = baseUrl + "?nameLikeIgnoreCase=" + encode("REPEATING%");
+            assertResultsPresentInDataResponse(url, repeatingStageCase.getId());
+
             // Test key filtering
             url = baseUrl + "?key=testRepeatingStage";
             assertResultsPresentInDataResponse(url, repeatingStageCase.getId());

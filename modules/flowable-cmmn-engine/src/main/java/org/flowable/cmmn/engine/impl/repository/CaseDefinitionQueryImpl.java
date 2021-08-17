@@ -37,6 +37,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String categoryNotEquals;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
     protected String key;
@@ -127,6 +128,15 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
             throw new FlowableIllegalArgumentException("nameLike is null");
         }
         this.nameLike = nameLike;
+        return this;
+    }
+
+    @Override
+    public CaseDefinitionQueryImpl caseDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("nameLikeIgnoreCase is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
         return this;
     }
 
@@ -363,6 +373,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     public String getNameLike() {
         return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
     }
 
     public String getKey() {
