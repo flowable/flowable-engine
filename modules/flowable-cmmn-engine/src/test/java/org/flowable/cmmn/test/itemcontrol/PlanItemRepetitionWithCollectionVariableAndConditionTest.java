@@ -233,6 +233,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
         // enable the condition on Task B upfront -> nothing yet to happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskB", true);
 
@@ -242,6 +244,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
                 .variable("taskOutputList", taskOutputList)
                 .trigger();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -262,10 +266,14 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         taskOutputList = Arrays.asList("E", "F");
 
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
         // complete Task A again by providing a different collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
                 .variable("taskOutputList", taskOutputList)
                 .trigger();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(7);
@@ -277,6 +285,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
 
         // now let's complete all Tasks B -> nothing must happen additionally
         completeAllPlanItems(caseInstance.getId(), "Task B", 4);
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);

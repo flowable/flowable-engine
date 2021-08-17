@@ -542,6 +542,11 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
         CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
 
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                    .isNotEqualTo(destinationDefinition.getId());
+        }
+
         // Act
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())

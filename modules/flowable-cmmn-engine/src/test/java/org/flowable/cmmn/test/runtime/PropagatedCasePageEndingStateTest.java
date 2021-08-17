@@ -87,6 +87,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
             assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -101,6 +103,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             // now trigger Task C and D to complete the case
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
@@ -174,6 +178,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
@@ -258,6 +264,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
@@ -345,6 +353,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);

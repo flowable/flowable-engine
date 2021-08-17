@@ -46,10 +46,14 @@ public class TerminateChildPlanItemsOnAutoCompletionTest extends FlowableCmmnTes
                 .caseDefinitionKey("caseCompletionWithChildItemsTest")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(5);
             assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             assertPlanItemInstanceState(planItemInstances, "Ignore after first completion task", ACTIVE);
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Ignore after first completion task"));
@@ -85,10 +89,14 @@ public class TerminateChildPlanItemsOnAutoCompletionTest extends FlowableCmmnTes
                 .caseDefinitionKey("stageCompletionWithChildItemsTest")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(5);
             assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             assertPlanItemInstanceState(planItemInstances, "Ignore after first completion task", ACTIVE);
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Ignore after first completion task"));
