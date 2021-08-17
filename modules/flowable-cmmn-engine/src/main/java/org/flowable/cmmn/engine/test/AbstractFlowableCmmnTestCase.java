@@ -408,7 +408,9 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
     
     protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
-        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+        if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+            CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+        }
     }
 
     protected void waitForJobExecutorOnCondition(Callable<Boolean> predicate) {
