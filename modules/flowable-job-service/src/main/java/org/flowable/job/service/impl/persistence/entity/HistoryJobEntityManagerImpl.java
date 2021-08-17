@@ -40,6 +40,17 @@ public class HistoryJobEntityManagerImpl
     }
 
     @Override
+    public void insert(HistoryJobEntity jobEntity, boolean fireCreateEvent) {
+        doInsert(jobEntity, fireCreateEvent);
+    }
+
+    protected boolean doInsert(HistoryJobEntity jobEntity, boolean fireCreateEvent) {
+        jobEntity.setCreateTime(getClock().getCurrentTime());
+        super.insert(jobEntity, fireCreateEvent);
+        return true;
+    }
+
+    @Override
     public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return dataManager.findHistoryJobsByQueryCriteria(jobQuery);
     }
