@@ -119,7 +119,7 @@ public class ProcessDefinitionCollectionResource {
             processDefinitionQuery.processDefinitionNameLike(allRequestParams.get("nameLike"));
         }
         if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
-            processDefinitionQuery.processDefinitionNameLikeIgnoreCase(allRequestParams.get("nameLike"));
+            processDefinitionQuery.processDefinitionNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
         if (allRequestParams.containsKey("resourceName")) {
             processDefinitionQuery.processDefinitionResourceName(allRequestParams.get("resourceName"));
