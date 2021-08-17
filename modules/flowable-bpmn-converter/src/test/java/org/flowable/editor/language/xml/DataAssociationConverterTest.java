@@ -22,7 +22,6 @@ import java.util.List;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Assignment;
-import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.common.engine.impl.util.io.BytesStreamSource;
