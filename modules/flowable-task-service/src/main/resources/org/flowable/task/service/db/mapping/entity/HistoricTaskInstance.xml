@@ -799,7 +799,7 @@
             )
           </if>
           <if test="orQueryObject.caseDefinitionKey != null || orQueryObject.caseDefinitionKeyLike != null || orQueryObject.caseDefinitionKeyLikeIgnoreCase != null || (orQueryObject.caseDefinitionKeys != null &amp;&amp; orQueryObject.caseDefinitionKeys.size() &gt; 0) || orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0)">
-            and exists (
+            or exists (
                 select 1
                 from ${prefix}ACT_CMMN_CASEDEF CD
                 where RES.SCOPE_DEFINITION_ID_ = CD.ID_ and

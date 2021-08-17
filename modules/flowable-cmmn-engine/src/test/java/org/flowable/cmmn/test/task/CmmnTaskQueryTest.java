@@ -180,6 +180,24 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void queryHistoricTaskQueryByGroupOrAssigneeIncludeIdentityLinks() {
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+        assertThat(caseInstances).hasSize(5);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().includeIdentityLinks()
+                    .or()
+                        .taskCandidateGroupIn(Arrays.asList("group1", "group2"))
+                        .taskAssignee("kermit")
+                        .caseDefinitionKey("oneTaskCase")
+                    .endOr()
+                    .list())
+                    .hasSize(5);
+        }
+    }
+
+    @Test
     public void queryTasksByCaseInstanceIdIncludeIdentityLinksWithDifferentIdentityLinks() {
         List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
         assertThat(caseInstances).hasSize(5);
