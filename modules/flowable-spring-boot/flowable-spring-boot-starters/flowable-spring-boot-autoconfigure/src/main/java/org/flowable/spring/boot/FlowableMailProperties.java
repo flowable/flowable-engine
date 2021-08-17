@@ -15,6 +15,7 @@ package org.flowable.spring.boot;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Flowable Mail Properties.
@@ -65,7 +66,7 @@ public class FlowableMailProperties {
     /**
      * The default charset to use when not set in the mail task.
      */
-    private Charset defaultCharset;
+    private Charset defaultCharset = StandardCharsets.UTF_8;
 
     /**
      * Sets whether SSL/TLS encryption should be enabled for the SMTP transport upon connection (SMTPS/POPS).

@@ -565,7 +565,7 @@ public class CmmnEngineAutoConfigurationTest {
                     CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
 
                     assertThat(engineConfiguration).isNotNull();
-                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isNull();
+                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isEqualTo(StandardCharsets.UTF_8);
                     assertThat(engineConfiguration.getMailServerDefaultFrom()).isEqualTo("flowable@localhost");
                     assertThat(engineConfiguration.getMailServerHost()).isEqualTo("localhost");
                     assertThat(engineConfiguration.getMailServerUsername()).isNull();
