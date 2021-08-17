@@ -39,6 +39,7 @@ import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.boot.FlowableAutoDeploymentProperties;
 import org.flowable.spring.boot.FlowableHttpProperties;
 import org.flowable.spring.boot.FlowableJobConfiguration;
+import org.flowable.spring.boot.FlowableMailProperties;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.ProcessEngineAutoConfiguration;
 import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
@@ -76,6 +77,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnCmmnEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
+    FlowableMailProperties.class,
     FlowableAutoDeploymentProperties.class,
     FlowableIdmProperties.class,
     FlowableEventRegistryProperties.class,
@@ -101,16 +103,18 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     protected final FlowableCmmnProperties cmmnProperties;
     protected final FlowableIdmProperties idmProperties;
     protected final FlowableEventRegistryProperties eventProperties;
+    protected final FlowableMailProperties mailProperties;
     protected final FlowableHttpProperties httpProperties;
     protected final FlowableAutoDeploymentProperties autoDeploymentProperties;
 
     public CmmnEngineAutoConfiguration(FlowableProperties flowableProperties, FlowableCmmnProperties cmmnProperties, FlowableIdmProperties idmProperties,
-                    FlowableEventRegistryProperties eventProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
+                    FlowableEventRegistryProperties eventProperties, FlowableMailProperties mailProperties, FlowableHttpProperties httpProperties, FlowableAutoDeploymentProperties autoDeploymentProperties) {
         
         super(flowableProperties);
         this.cmmnProperties = cmmnProperties;
         this.idmProperties = idmProperties;
         this.eventProperties = eventProperties;
+        this.mailProperties = mailProperties;
         this.httpProperties = httpProperties;
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
@@ -188,6 +192,17 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setDisableEventRegistry(!eventProperties.isEnabled());
 
         configuration.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
+
+        configuration.setMailServerHost(mailProperties.getHost());
+        configuration.setMailServerPort(mailProperties.getPort());
+        configuration.setMailServerSSLPort(mailProperties.getSSLPort());
+        configuration.setMailServerUsername(mailProperties.getUsername());
+        configuration.setMailServerPassword(mailProperties.getPassword());
+        configuration.setMailServerDefaultFrom(mailProperties.getDefaultFrom());
+        configuration.setMailServerForceTo(mailProperties.getForceTo());
+        configuration.setMailServerUseSSL(mailProperties.isUseSsl());
+        configuration.setMailServerUseTLS(mailProperties.isUseTls());
+        configuration.setMailServerDefaultCharset(mailProperties.getDefaultCharset());
 
         configuration.getHttpClientConfig().setUseSystemProperties(httpProperties.isUseSystemProperties());
         configuration.getHttpClientConfig().setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout());
