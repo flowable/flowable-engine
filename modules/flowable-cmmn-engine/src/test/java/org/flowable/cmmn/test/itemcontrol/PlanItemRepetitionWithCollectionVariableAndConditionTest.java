@@ -161,6 +161,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
     public void testRepetitionOnCollectionTriggeredByUserTaskSeveralTimes() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("repetitionWithCollectionVariableTestTwo").start();
 
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
         List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
@@ -170,12 +172,16 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         // enable the condition on Task B upfront -> nothing yet to happen
         cmmnRuntimeService.setVariable(caseInstance.getId(), "enableTaskB", true);
 
+        waitForAsyncHistoryExecutorToProcessAllJobs();
+
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
         // complete Task A by providing the collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
                 .variable("taskOutputList", taskOutputList)
                 .trigger();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         // now we need to have 4 instances of Task B with adequate local variables
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -200,6 +206,8 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionTest extends Fl
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
                 .variable("taskOutputList", taskOutputList)
                 .trigger();
+
+        waitForAsyncHistoryExecutorToProcessAllJobs();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(5);

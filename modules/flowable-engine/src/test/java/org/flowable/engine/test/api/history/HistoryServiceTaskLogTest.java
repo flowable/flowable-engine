@@ -431,6 +431,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
     public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry() {
         task = taskService.createTaskBuilder().create();
 
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
+
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.create();
 
@@ -1043,8 +1045,11 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
         
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
         historicTaskLogEntryBuilder.taskId("1").timeStamp(getInsertDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("2").timeStamp(getCompareAfterDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("3").timeStamp(getCompareBeforeDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
 
         try {
 
