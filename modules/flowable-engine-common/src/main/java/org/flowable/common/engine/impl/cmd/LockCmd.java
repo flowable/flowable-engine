@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.cmd;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Duration;
 import java.time.Instant;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -51,10 +52,16 @@ public class LockCmd implements Command<Boolean> {
 
     protected String lockName;
     protected String engineType;
+    protected Duration forceAcquireAfter;
 
     public LockCmd(String lockName, String engineType) {
+        this(lockName, null, engineType);
+    }
+
+    public LockCmd(String lockName, Duration forceAcquireAfter, String engineType) {
         this.lockName = lockName;
         this.engineType = engineType;
+        this.forceAcquireAfter = forceAcquireAfter;
     }
 
     @Override
@@ -72,6 +79,16 @@ public class LockCmd implements Command<Boolean> {
         } else if (property.getValue() == null) {
             property.setValue(Instant.now().toString() + hostLockDescription);
             return true;
+        } else if (forceAcquireAfter != null) {
+            // If the lock is held longer than the force acquire duration we have to force the lock acquire
+            String value = property.getValue();
+            Instant lockAcquireTime = Instant.parse(value.substring(0, value.lastIndexOf('Z') + 1));
+            if (lockAcquireTime.plus(forceAcquireAfter).isAfter(Instant.now())) {
+                property.setValue(Instant.now().toString() + hostLockDescription);
+                return true;
+            }
+
+            return false;
         } else {
             return false;
         }

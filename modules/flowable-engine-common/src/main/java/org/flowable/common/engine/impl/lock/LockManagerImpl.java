@@ -41,13 +41,19 @@ public class LockManagerImpl implements LockManager {
     protected String engineType;
     protected CommandConfig lockCommandConfig;
     protected boolean hasAcquiredLock;
+    protected Duration lockForceAcquireAfter;
 
     public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, String engineType) {
+        this(commandExecutor, lockName, lockPollRate, null, engineType);
+    }
+
+    public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, Duration forceAcquireAfter, String engineType) {
         this.commandExecutor = commandExecutor;
         this.lockName = lockName;
         this.lockPollRate = lockPollRate;
         this.engineType = engineType;
         this.lockCommandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+        this.lockForceAcquireAfter = forceAcquireAfter;
     }
 
     @Override
@@ -78,7 +84,7 @@ public class LockManagerImpl implements LockManager {
         }
 
         try {
-            hasAcquiredLock = executeCommand(new LockCmd(lockName, engineType));
+            hasAcquiredLock = executeCommand(new LockCmd(lockName, lockForceAcquireAfter, engineType));
             if (hasAcquiredLock) {
                 LOGGER.debug("Successfully acquired lock {}", lockName);
             }
