@@ -86,6 +86,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     protected String globalAcquireLockPrefix;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
+    protected Duration lockForceAcquireAfter = Duration.ofMinutes(10);
     protected LockManager lockManager;
 
     protected volatile boolean isInterrupted;
@@ -149,7 +150,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_ASYNC_JOBS_GLOBAL_LOCK, lockPollRate, lockForceAcquireAfter, getEngineName());
     }
 
     protected long executeAcquireCycle(CommandExecutor commandExecutor) {
@@ -309,5 +310,13 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
 
     public void setLockPollRate(Duration lockPollRate) {
         this.lockPollRate = lockPollRate;
+    }
+
+    public Duration getLockForceAcquireAfter() {
+        return lockForceAcquireAfter;
+    }
+
+    public void setLockForceAcquireAfter(Duration lockForceAcquireAfter) {
+        this.lockForceAcquireAfter = lockForceAcquireAfter;
     }
 }

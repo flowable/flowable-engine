@@ -71,8 +71,10 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected String globalAcquireLockPrefix = "";
     protected Duration asyncJobsGlobalLockWaitTime = Duration.ofMinutes(1);
     protected Duration asyncJobsGlobalLockPollRate = Duration.ofMillis(500);
+    protected Duration asyncJobsGlobalLockForceAcquireAfter = Duration.ofMinutes(10);
     protected Duration timerLockWaitTime = Duration.ofMinutes(1);
     protected Duration timerLockPollRate = Duration.ofMillis(500);
+    protected Duration timerLockForceAcquireAfter = Duration.ofMinutes(10);
 
     protected int resetExpiredJobsInterval = 60 * 1000;
     protected int resetExpiredJobsPageSize = 3;
@@ -146,6 +148,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
             timerJobRunnable.setLockWaitTime(timerLockWaitTime);
             timerJobRunnable.setLockPollRate(timerLockPollRate);
+            timerJobRunnable.setLockForceAcquireAfter(timerLockForceAcquireAfter);
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
@@ -165,6 +168,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
             asyncJobsDueRunnable.setLockWaitTime(asyncJobsGlobalLockWaitTime);
             asyncJobsDueRunnable.setLockPollRate(asyncJobsGlobalLockPollRate);
+            asyncJobsDueRunnable.setLockForceAcquireAfter(asyncJobsGlobalLockForceAcquireAfter);
         }
     }
 
@@ -410,6 +414,17 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         }
     }
 
+    public Duration getAsyncJobsGlobalLockForceAcquireAfter() {
+        return asyncJobsGlobalLockForceAcquireAfter;
+    }
+
+    public void setAsyncJobsGlobalLockForceAcquireAfter(Duration asyncJobsGlobalLockForceAcquireAfter) {
+        this.asyncJobsGlobalLockForceAcquireAfter = asyncJobsGlobalLockForceAcquireAfter;
+        if (asyncJobsDueRunnable != null) {
+            asyncJobsDueRunnable.setLockForceAcquireAfter(asyncJobsGlobalLockForceAcquireAfter);
+        }
+    }
+
     public Duration getTimerLockWaitTime() {
         return timerLockWaitTime;
     }
@@ -429,6 +444,17 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.timerLockPollRate = timerLockPollRate;
         if (timerJobRunnable != null) {
             timerJobRunnable.setLockPollRate(timerLockPollRate);
+        }
+    }
+
+    public Duration getTimerLockForceAcquireAfter() {
+        return timerLockForceAcquireAfter;
+    }
+
+    public void setTimerLockForceAcquireAfter(Duration timerLockForceAcquireAfter) {
+        this.timerLockForceAcquireAfter = timerLockForceAcquireAfter;
+        if (timerJobRunnable != null) {
+            timerJobRunnable.setLockForceAcquireAfter(timerLockForceAcquireAfter);
         }
     }
 
