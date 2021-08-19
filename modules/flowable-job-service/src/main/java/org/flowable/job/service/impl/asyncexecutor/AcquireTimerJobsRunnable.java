@@ -80,6 +80,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected String globalAcquireLockPrefix;
     protected Duration lockWaitTime = Duration.ofMinutes(1);
     protected Duration lockPollRate = Duration.ofMillis(500);
+    protected Duration lockForceAcquireAfter = Duration.ofMinutes(10);
     protected LockManager lockManager;
 
     protected volatile boolean isInterrupted;
@@ -137,7 +138,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, lockForceAcquireAfter, getEngineName());
     }
 
     protected void createTimerMoveExecutorService(String threadName) {
@@ -335,4 +336,11 @@ public class AcquireTimerJobsRunnable implements Runnable {
         this.lockPollRate = lockPollRate;
     }
 
+    public Duration getLockForceAcquireAfter() {
+        return lockForceAcquireAfter;
+    }
+
+    public void setLockForceAcquireAfter(Duration lockForceAcquireAfter) {
+        this.lockForceAcquireAfter = lockForceAcquireAfter;
+    }
 }
