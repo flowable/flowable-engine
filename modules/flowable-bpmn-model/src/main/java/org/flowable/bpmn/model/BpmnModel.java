@@ -54,6 +54,8 @@ public class BpmnModel {
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
     protected Object eventSupport;
+    protected String exporter;
+    protected String exporterVersion;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
         return definitionsAttributes;
@@ -647,5 +649,18 @@ public class BpmnModel {
 
     public void setEventSupport(Object eventSupport) {
         this.eventSupport = eventSupport;
+    }
+
+    public String getExporter() {
+        return exporter;
+    }
+    public void setExporter(String exporter) {
+        this.exporter = exporter;
+    }
+    public String getExporterVersion() {
+        return exporterVersion;
+    }
+    public void setExporterVersion(String exporterVersion) {
+        this.exporterVersion = exporterVersion;
     }
 }

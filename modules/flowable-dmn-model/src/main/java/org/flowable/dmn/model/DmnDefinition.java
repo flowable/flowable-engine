@@ -25,6 +25,8 @@ public class DmnDefinition extends NamedElement {
     protected String expressionLanguage;
     protected String typeLanguage;
     protected String namespace;
+    protected String exporter;
+    protected String exporterVersion;
     protected List<InputData> inputData = new ArrayList<>();
     protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
     protected List<Decision> decisions = new ArrayList<>();
@@ -240,4 +242,16 @@ public class DmnDefinition extends NamedElement {
         decisionServiceDividerLocationMap.put(key, graphicInfoList);
     }
 
+    public String getExporter() {
+        return exporter;
+    }
+    public void setExporter(String exporter) {
+        this.exporter = exporter;
+    }
+    public String getExporterVersion() {
+        return exporterVersion;
+    }
+    public void setExporterVersion(String exporterVersion) {
+        this.exporterVersion = exporterVersion;
+    }
 }
