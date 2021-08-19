@@ -78,17 +78,6 @@ rest:
     username: rest-admin
     password: test
 
-# NGINX Ingress controller https://github.com/kubernetes/ingress-nginx
-nginx-ingress:
-  # disable when the cluster already has an nginx-ingress deployed
-  enabled: false
-  rbac:
-    create: true
-  # the controller will set the endpoint records on the ingress objects to reflect those on the service
-  controller:
-    publishService:
-      enabled: true
-
 postgres:
   enabled: true
   service:
