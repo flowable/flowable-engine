@@ -639,7 +639,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected ThreadFactory asyncExecutorThreadFactory;
 
-    protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
+    protected String asyncExecutorTenantId;
 
     /**
      * The number of timer jobs that are acquired during one query

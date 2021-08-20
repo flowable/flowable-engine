@@ -531,7 +531,11 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     public ResetExpiredJobsRunnable getResetExpiredJobsRunnable() {
         return resetExpiredJobsRunnable;
     }
-    
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

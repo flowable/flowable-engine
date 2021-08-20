@@ -15,8 +15,9 @@
     <property name="databaseSchemaUpdate" value="true" />
 
     <!-- job executor configurations -->
-    <property name="asyncExecutor" ref="asyncExecutor" />
     <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+    <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     
     <property name="asyncFailedJobWaitTime" value="1" />
 
@@ -66,11 +67,4 @@
     <property name="historyEnabled" value="true" />
   </bean>
   
-  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-    <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-  </bean>
-
-
-
 </beans>

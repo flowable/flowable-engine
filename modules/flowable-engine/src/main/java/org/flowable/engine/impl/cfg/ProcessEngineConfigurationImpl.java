@@ -796,7 +796,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected String jobExecutionScope;
     protected String historyJobExecutionScope;
     
-    protected String asyncExecutorTenantId = AbstractEngineConfiguration.NO_TENANT_ID;
+    protected String asyncExecutorTenantId;
     
     protected String batchStatusTimeCycleConfig = "30 * * * * ?";
 

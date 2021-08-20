@@ -30,8 +30,9 @@
         </property>
         <property name="databaseSchemaUpdate" value="drop-create" />
         
-        <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     
         <property name="asyncFailedJobWaitTime" value="1" />
         
@@ -64,10 +65,4 @@
     <bean id="testDelegateFieldsBean" class="org.flowable.cmmn.test.delegate.TestFieldsJavaDelegate" />
     
     <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
-    
-    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-    </bean>
-    
 </beans>
