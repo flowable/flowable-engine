@@ -48,7 +48,10 @@ public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  
         super.configureConfiguration(processEngineConfiguration);
 
         // Make sure more timer jobs are fetched in one go than possible in the in() clause, so the logic to split is used.
-        processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        }
     }
 
     @AfterEach
