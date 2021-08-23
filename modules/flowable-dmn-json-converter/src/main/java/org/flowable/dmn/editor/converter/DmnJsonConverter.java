@@ -89,6 +89,8 @@ public class DmnJsonConverter implements DmnJsonConstants, DmnStencilConstants {
             definition.setId("definition_" + modelId);
         }
         definition.setNamespace(MODEL_NAMESPACE);
+        definition.setExporter("Flowable Open Source Modeler");
+        definition.setExporterVersion(getClass().getPackage().getImplementationVersion());
         definition.setTypeLanguage(URI_JSON);
 
         if (DmnJsonConverterUtil.isDRD(modelNode)) {

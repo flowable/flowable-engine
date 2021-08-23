@@ -36,12 +36,14 @@
 
     <!-- job executor configurations -->
     <property name="asyncExecutorActivate" value="false" />
-    <property name="asyncExecutor" ref="asyncExecutor" />
+    <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+    <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     
     <property name="defaultFailedJobWaitTime" value="1" />
     <property name="asyncFailedJobWaitTime" value="1" />
     
     <property name="asyncHistoryEnabled" value="false" />
+    <property name="asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
 
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />
@@ -94,15 +96,6 @@
     <property name="history" value="full" />
   </bean>
   
-  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-    <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-  </bean>
-  
-  <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
-    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-  </bean>
-
   <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
 </beans>

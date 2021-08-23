@@ -32,6 +32,7 @@ import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobExecutorConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.AbstractSpringEngineAutoConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
@@ -119,19 +120,26 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
+    @Bean
+    @Cmmn
+    @ConfigurationProperties(prefix = "flowable.cmmn.async.executor")
+    public AsyncJobExecutorConfiguration cmmnAsyncExecutorConfiguration() {
+        return new AsyncJobExecutorConfiguration();
+    }
+
     /**
      * The Async Executor must not be shared between the engines.
      * Therefore a dedicated one is always created.
      */
     @Bean
     @Cmmn
-    @ConfigurationProperties(prefix = "flowable.cmmn.async.executor")
     @ConditionalOnMissingBean(name = "cmmnAsyncExecutor")
     public SpringAsyncExecutor cmmnAsyncExecutor(
+        @Cmmn AsyncJobExecutorConfiguration executorConfiguration,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Cmmn ObjectProvider<SpringRejectedJobsHandler> cmmnRejectedJobsHandler
     ) {
-        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor(executorConfiguration);
         asyncExecutor.setRejectedJobsHandler(getIfAvailable(cmmnRejectedJobsHandler, rejectedJobsHandler));
         return asyncExecutor;
     }

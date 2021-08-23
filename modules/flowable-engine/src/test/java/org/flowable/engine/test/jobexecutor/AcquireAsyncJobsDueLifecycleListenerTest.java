@@ -15,6 +15,7 @@ package org.flowable.engine.test.jobexecutor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Deque;
@@ -36,6 +37,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.asyncexecutor.AcquireAsyncJobsDueLifecycleListener;
 import org.flowable.job.service.impl.asyncexecutor.AcquireAsyncJobsDueRunnable;
+import org.flowable.job.service.impl.asyncexecutor.AcquireJobsRunnableConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.junit.jupiter.api.Test;
@@ -49,7 +51,8 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super.configureConfiguration(processEngineConfiguration);
-        processEngineConfiguration.setAsyncExecutorDefaultAsyncJobAcquireWaitTime(500);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxAsyncJobsDuePerAcquisition(1);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(500));
         if (processEngineConfiguration.getAsyncExecutor() != null) {
             processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(1);
             processEngineConfiguration.getAsyncExecutor().setDefaultAsyncJobAcquireWaitTimeInMillis(500);
@@ -63,7 +66,7 @@ class AcquireAsyncJobsDueLifecycleListenerTest extends JobExecutorTestCase {
         CountDownLatch waitingLatch = new CountDownLatch(2);
         TestAcquireAsyncJobsDueLifecycleListener listener = new TestAcquireAsyncJobsDueLifecycleListener(waitingLatch);
         AcquireAsyncJobsDueRunnable runnable = new AcquireAsyncJobsDueRunnable("test-acquire-jobs", asyncExecutor,
-                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager(), listener, false, "");
+                processEngineConfiguration.getJobServiceConfiguration().getJobEntityManager(), listener, AcquireJobsRunnableConfiguration.DEFAULT);
 
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 

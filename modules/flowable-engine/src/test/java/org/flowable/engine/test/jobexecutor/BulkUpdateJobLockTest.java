@@ -51,7 +51,10 @@ public class BulkUpdateJobLockTest extends JobExecutorTestCase  {
         super.configureConfiguration(processEngineConfiguration);
 
         // Make sure more timer jobs are fetched in one go than possible in the in() clause, so the logic to split is used.
-        processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        }
     }
 
     @AfterEach

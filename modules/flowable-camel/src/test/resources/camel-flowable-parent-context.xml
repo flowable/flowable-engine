@@ -29,8 +29,9 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     </bean>
 
     <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
@@ -44,11 +45,6 @@
     <bean id="taskService" factory-bean="processEngine"  factory-method="getTaskService" />
     <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService"/>
     
-    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-    </bean>
-
     <bean id="sleepBean" class="org.flowable.camel.util.SleepBean"/>
 
 </beans>

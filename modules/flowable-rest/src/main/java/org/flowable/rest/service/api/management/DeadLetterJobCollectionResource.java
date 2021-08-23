@@ -156,6 +156,6 @@ public class DeadLetterJobCollectionResource {
             restApiInterceptor.accessDeadLetterJobInfoWithQuery(query);
         }
 
-        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
+        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createDeadLetterJobResponseList);
     }
 }

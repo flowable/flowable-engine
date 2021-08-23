@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.common.engine.api.FlowableException;
@@ -76,10 +78,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected final JobManager jobManager;
     protected final AcquireTimerLifecycleListener lifecycleListener;
 
-    protected boolean globalAcquireLockEnabled;
-    protected String globalAcquireLockPrefix;
-    protected Duration lockWaitTime = Duration.ofMinutes(1);
-    protected Duration lockPollRate = Duration.ofMillis(500);
+    protected AcquireJobsRunnableConfiguration configuration;
     protected LockManager lockManager;
 
     protected volatile boolean isInterrupted;
@@ -92,16 +91,15 @@ public class AcquireTimerJobsRunnable implements Runnable {
     protected CommandExecutor commandExecutor;
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager, int moveExecutorPoolSize) {
-        this(asyncExecutor, jobManager, null, false, "", moveExecutorPoolSize);
+        this(asyncExecutor, jobManager, null, AcquireJobsRunnableConfiguration.DEFAULT, moveExecutorPoolSize);
     }
 
     public AcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, JobManager jobManager,
-            AcquireTimerLifecycleListener lifecycleListener,  boolean globalAcquireLockEnabled, String globalAcquireLockPrefix, int moveExecutorPoolSize) {
+            AcquireTimerLifecycleListener lifecycleListener, AcquireJobsRunnableConfiguration configuration, int moveExecutorPoolSize) {
         this.asyncExecutor = asyncExecutor;
         this.jobManager = jobManager;
         this.lifecycleListener = lifecycleListener != null ? lifecycleListener : NOOP_LIFECYCLE_LISTENER;
-        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-        this.globalAcquireLockPrefix = globalAcquireLockPrefix;
+        this.configuration = configuration;
         this.moveExecutorPoolSize = moveExecutorPoolSize;
     }
 
@@ -137,7 +135,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
-        return new LockManagerImpl(commandExecutor, globalAcquireLockPrefix + ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, lockPollRate, getEngineName());
+        return new LockManagerImpl(commandExecutor, configuration.getGlobalAcquireLockPrefix() + ACQUIRE_TIMER_JOBS_GLOBAL_LOCK, configuration.getLockPollRate(), configuration.getLockForceAcquireAfter(), getEngineName());
     }
 
     protected void createTimerMoveExecutorService(String threadName) {
@@ -161,12 +159,13 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
         try {
 
+            boolean globalAcquireLockEnabled = configuration.isGlobalAcquireLockEnabled();
             if (globalAcquireLockEnabled) {
 
                 // When running with global acquire lock, we only need to have the lock during the acquire.
                 // In the move phase, other nodes can already acquire timer jobs themselves (as the lock is free).
                 try {
-                    timerJobs = lockManager.waitForLockRunAndRelease(lockWaitTime, () -> {
+                    timerJobs = lockManager.waitForLockRunAndRelease(configuration.getLockWaitTime(), () -> {
                         return commandExecutor.execute(new AcquireTimerJobsWithGlobalAcquireLockCmd(asyncExecutor));
                     });
 
@@ -200,7 +199,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 if (globalAcquireLockEnabled) {
                     // Always wait when running with global acquire lock, to let other nodes have the ability to fill the queue
                     // If 0 was returned, it means there is still work to do, but we want to give other nodes a chance.
-                    millisToWait = lockPollRate.toMillis();
+                    millisToWait = configuration.getLockPollRate().toMillis();
 
                 } else {
                     // Otherwise (no global acquire lock),the node can retry immediately
@@ -226,7 +225,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
     protected void executeMoveTimerJobsToExecutableJobs(List<TimerJobEntity> timerJobs) {
         try {
-            if (globalAcquireLockEnabled) {
+            if (configuration.isGlobalAcquireLockEnabled()) {
                 commandExecutor.execute(new BulkMoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
             } else {
                 commandExecutor.execute(new MoveTimerJobsToExecutableJobsCmd(jobManager, timerJobs));
@@ -244,7 +243,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
     }
 
     protected void logOptimisticLockingException(FlowableOptimisticLockingException optimisticLockingException) {
-        if (globalAcquireLockEnabled) {
+        if (configuration.isGlobalAcquireLockEnabled()) {
             LOGGER.warn("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
 
         } else {
@@ -311,28 +310,8 @@ public class AcquireTimerJobsRunnable implements Runnable {
         }
     }
 
-    public boolean isGlobalAcquireLockEnabled() {
-        return globalAcquireLockEnabled;
-    }
-
-    public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
-        this.globalAcquireLockEnabled = globalAcquireLockEnabled;
-    }
-
-    public Duration getLockWaitTime() {
-        return lockWaitTime;
-    }
-
-    public void setLockWaitTime(Duration lockWaitTime) {
-        this.lockWaitTime = lockWaitTime;
-    }
-
-    public Duration getLockPollRate() {
-        return lockPollRate;
-    }
-
-    public void setLockPollRate(Duration lockPollRate) {
-        this.lockPollRate = lockPollRate;
+    public void setConfiguration(AcquireJobsRunnableConfiguration configuration) {
+        this.configuration = configuration;
     }
 
 }

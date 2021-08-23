@@ -1011,10 +1011,26 @@ public class RestResponseFactory {
     }
 
     public List<JobResponse> createJobResponseList(List<Job> jobs) {
+        return createJobResponseList(jobs, RestUrls.URL_JOB);
+    }
+
+    public List<JobResponse> createTimerJobResponseList(List<Job> jobs) {
+        return createJobResponseList(jobs, RestUrls.URL_TIMER_JOB);
+    }
+
+    public List<JobResponse> createSuspendedJobResponseList(List<Job> jobs) {
+        return createJobResponseList(jobs, RestUrls.URL_SUSPENDED_JOB);
+    }
+
+    public List<JobResponse> createDeadLetterJobResponseList(List<Job> jobs) {
+        return createJobResponseList(jobs, RestUrls.URL_DEADLETTER_JOB);
+    }
+
+    protected List<JobResponse> createJobResponseList(List<Job> jobs, String[] urlJobSegments) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<JobResponse> responseList = new ArrayList<>(jobs.size());
         for (Job instance : jobs) {
-            responseList.add(createJobResponse(instance, urlBuilder));
+            responseList.add(createJobResponse(instance, urlBuilder, urlJobSegments));
         }
         return responseList;
     }
@@ -1023,7 +1039,23 @@ public class RestResponseFactory {
         return createJobResponse(job, createUrlBuilder());
     }
 
+    public JobResponse createTimerJobResponse(Job job) {
+        return createJobResponse(job, createUrlBuilder(), RestUrls.URL_TIMER_JOB);
+    }
+
+    public JobResponse createSuspendedJobResponse(Job job) {
+        return createJobResponse(job, createUrlBuilder(), RestUrls.URL_SUSPENDED_JOB);
+    }
+
+    public JobResponse createDeadLetterJobResponse(Job job) {
+        return createJobResponse(job, createUrlBuilder(), RestUrls.URL_DEADLETTER_JOB);
+    }
+
     public JobResponse createJobResponse(Job job, RestUrlBuilder urlBuilder) {
+        return createJobResponse(job, urlBuilder, RestUrls.URL_JOB);
+    }
+
+    protected JobResponse createJobResponse(Job job, RestUrlBuilder urlBuilder, String[] urlJobSegments) {
         JobResponse response = new JobResponse();
         response.setId(job.getId());
         response.setCorrelationId(job.getCorrelationId());
@@ -1038,7 +1070,7 @@ public class RestResponseFactory {
         response.setCreateTime(job.getCreateTime());
         response.setTenantId(job.getTenantId());
 
-        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_JOB, job.getId()));
+        response.setUrl(urlBuilder.buildUrl(urlJobSegments, job.getId()));
 
         if (job.getProcessDefinitionId() != null) {
             response.setProcessDefinitionUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_DEFINITION, job.getProcessDefinitionId()));

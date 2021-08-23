@@ -15,6 +15,7 @@ package org.flowable.engine.test.jobexecutor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Deque;
@@ -34,6 +35,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.asyncexecutor.AcquireJobsRunnableConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerLifecycleListener;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -49,8 +51,11 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super.configureConfiguration(processEngineConfiguration);
-        processEngineConfiguration.setAsyncExecutorDefaultTimerJobAcquireWaitTime(1000);
-        processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(1);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setDefaultTimerJobAcquireWaitTime(Duration.ofSeconds(1));
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxTimerJobsPerAcquisition(1);
+        if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(1);
+        }
     }
 
     @Test
@@ -60,7 +65,7 @@ class AcquireTimerJobsLifecycleListenerTest extends JobExecutorTestCase {
         CountDownLatch waitingLatch = new CountDownLatch(2);
         TestAcquireTimerLifecycleListener listener = new TestAcquireTimerLifecycleListener(waitingLatch);
         AcquireTimerJobsRunnable runnable = new AcquireTimerJobsRunnable(asyncExecutor,
-            processEngineConfiguration.getJobServiceConfiguration().getJobManager(), listener, false, "", 1);
+            processEngineConfiguration.getJobServiceConfiguration().getJobManager(), listener, AcquireJobsRunnableConfiguration.DEFAULT, 1);
 
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
 

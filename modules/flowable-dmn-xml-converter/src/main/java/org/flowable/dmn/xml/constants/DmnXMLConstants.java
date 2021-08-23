@@ -23,6 +23,8 @@ public interface DmnXMLConstants {
     String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
     String MODEL_NAMESPACE = "http://www.flowable.org/dmn";
     String TARGET_NAMESPACE_ATTRIBUTE = "targetNamespace";
+    String ATTRIBUTE_EXPORTER = "exporter";
+    String ATTRIBUTE_EXPORTER_VERSION = "exporterVersion";
     String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/dmn";
     String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
     String DMNDI_NAMESPACE = "https://www.omg.org/spec/DMN/20191111/DMNDI/";

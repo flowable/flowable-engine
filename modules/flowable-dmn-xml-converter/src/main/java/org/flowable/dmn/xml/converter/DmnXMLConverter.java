@@ -261,6 +261,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 if (ELEMENT_DEFINITIONS.equals(xtr.getLocalName())) {
                     model.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
                     model.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
+                    model.setExporter(xtr.getAttributeValue(null, ATTRIBUTE_EXPORTER));
+                    model.setExporterVersion(xtr.getAttributeValue(null, ATTRIBUTE_EXPORTER_VERSION));
                     model.setNamespace(MODEL_NAMESPACE);
                     parentElement = model;
                 } else if (ELEMENT_DECISION.equals(xtr.getLocalName())) {
@@ -379,6 +381,12 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 xtw.writeAttribute(ATTRIBUTE_NAME, model.getName());
             }
             xtw.writeAttribute(ATTRIBUTE_NAMESPACE, MODEL_NAMESPACE);
+            if (StringUtils.isNotEmpty(model.getExporter())) {
+                xtw.writeAttribute(DmnXMLConstants.ATTRIBUTE_EXPORTER, model.getExporter());
+            }
+            if (StringUtils.isNotEmpty(model.getExporterVersion())) {
+                xtw.writeAttribute(DmnXMLConstants.ATTRIBUTE_EXPORTER_VERSION, model.getExporterVersion());
+            }
 
             DmnXMLUtil.writeElementDescription(model, xtw);
             DmnXMLUtil.writeExtensionElements(model, xtw);
