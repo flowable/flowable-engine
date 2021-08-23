@@ -12,7 +12,6 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,8 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.common.engine.api.FlowableException;
