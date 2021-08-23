@@ -15,8 +15,6 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.time.Duration;
 import java.util.UUID;
 
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-
 /**
  * @author Filip Hrisafov
  */
