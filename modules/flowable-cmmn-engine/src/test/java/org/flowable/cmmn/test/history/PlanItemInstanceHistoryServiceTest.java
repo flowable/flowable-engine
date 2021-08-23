@@ -332,7 +332,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
         //Two more planItemInstances in the history
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-            assertThat(historicPlanItems).hasSize(5);
+            assertThat(historicPlanItems).hasSize(6);
             checkHistoryCreateTimestamp(currentPlanItems, historicPlanItems, 1000L);
 
             //Both stages should be active now
@@ -362,10 +362,11 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 assertThat(h.getLastAvailableTime().getTime()).isLessThanOrEqualTo(h.getLastStartedTime().getTime());
             });
 
-            //There should be 3 eventListeners the history, two of them "occurred" and one should still be available
+            //There should be 4 eventListeners the history, two of them "occurred" and one is terminated (user event listener plan item instance) and one should still be available
+            historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
             assertThat(
                 cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count())
-                .isEqualTo(2);
+                .isEqualTo(3);
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER)
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE).count()).isEqualTo(1);
             historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery()

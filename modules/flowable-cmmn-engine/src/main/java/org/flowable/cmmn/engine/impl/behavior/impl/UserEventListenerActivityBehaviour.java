@@ -13,11 +13,15 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
+import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.UserEventListener;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -41,7 +45,16 @@ public class UserEventListenerActivityBehaviour extends CoreCmmnTriggerableActiv
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+        if (planItemInstanceEntity.getPlanItemDefinition() instanceof ReactivateEventListener) {
+            CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+            
+        } else {
+            PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+            eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+            agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
+            agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
+        }
     }
 
     @Override

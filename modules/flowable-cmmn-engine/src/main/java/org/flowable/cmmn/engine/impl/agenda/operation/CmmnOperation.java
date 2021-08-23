@@ -13,18 +13,16 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanFragment;
@@ -197,59 +195,9 @@ public abstract class CmmnOperation implements Runnable {
         }
         return false;
     }
-
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
-        boolean addToParent, boolean silentNameExpressionEvaluation) {
-        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent, silentNameExpressionEvaluation);
-    }
-
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
-        Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
-
-        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
-            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            if (localVariables == null) {
-                localVariables = new HashMap<>(0);
-            }
-            localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
-        }
-
-        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
-        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
-            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
-        }
-
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .createPlanItemInstanceEntityBuilder()
-            .planItem(planItemInstanceEntityToCopy.getPlanItem())
-            .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
-            .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
-            .stagePlanItemInstance(stagePlanItem)
-            .tenantId(planItemInstanceEntityToCopy.getTenantId())
-            .localVariables(localVariables)
-            .addToParent(addToParent)
-            .silentNameExpressionEvaluation(silentNameExpressionEvaluation)
-            .create();
-
-        return planItemInstanceEntity;
-    }
-    
-    protected int getRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        Integer counter = (Integer) repeatingPlanItemInstanceEntity.getVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity));
-        if (counter == null) {
-            return 0;
-        } else {
-            return counter.intValue();
-        }
-    }
     
     protected void setRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity, int counterValue) {
-        repeatingPlanItemInstanceEntity.setVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
-    }
-
-    protected String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
-        return repetitionCounterVariableName;
+        repeatingPlanItemInstanceEntity.setVariableLocal(PlanItemInstanceUtil.getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
     }
 
     /**

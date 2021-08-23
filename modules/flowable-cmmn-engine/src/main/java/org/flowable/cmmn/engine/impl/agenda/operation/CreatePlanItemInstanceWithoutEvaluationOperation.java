@@ -16,14 +16,12 @@ import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupAggreg
 
 import java.util.Map;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.engine.impl.variable.CmmnAggregation;
-import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -31,14 +29,14 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
+public class CreatePlanItemInstanceWithoutEvaluationOperation extends AbstractPlanItemInstanceOperation {
 
-    public CreatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public CreatePlanItemInstanceWithoutEvaluationOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
     @Override
-    protected void internalExecute() {
+    public void run() {
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
         if (repetitionRule != null) {
             //Increase repetition counter, value is kept from the previous instance of the repetition
@@ -62,30 +60,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
         CmmnHistoryManager cmmnHistoryManager = CommandContextUtil.getCmmnHistoryManager(commandContext);
         cmmnHistoryManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
 
-        //Extending classes might override getNewState, so need to check the available state again
-        if (getNewState().equals(PlanItemInstanceState.AVAILABLE)) {
-            planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
-            cmmnHistoryManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
-        }
+        planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
+        cmmnHistoryManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
     }
-
-    @Override
-    public String getNewState() {
-        if (isEventListenerWithAvailableCondition(planItemInstanceEntity.getPlanItem())) {
-            return PlanItemInstanceState.UNAVAILABLE;
-        } else {
-            return PlanItemInstanceState.AVAILABLE;
-        }
-    }
-
-    @Override
-    public String getLifeCycleTransition() {
-        return PlanItemTransition.CREATE;
-    }
-
-    @Override
-    public String getOperationName() {
-        return "[Create plan item]";
-    }
-
 }
