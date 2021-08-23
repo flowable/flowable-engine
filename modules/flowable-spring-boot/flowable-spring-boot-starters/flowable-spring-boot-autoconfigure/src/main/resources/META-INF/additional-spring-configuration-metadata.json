@@ -599,6 +599,173 @@
       "name": "flowable.process.servlet.path",
       "defaultValue": "/process-api",
       "description": "The context path for the Process rest servlet."
+    },
+    {
+      "name": "flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.default-timer-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.default-async-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async.executor.default-queue-size-full-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.default-queue-size-full-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async.executor.timer-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.timer-lock-time"
+      }
+    },
+    {
+      "name": "flowable.process.async.executor.async-job-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.async-job-lock-time"
+      }
+    },
+    {
+      "name": "flowable.process.async.executor.retry-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async.executor.retry-wait-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.default-timer-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.default-async-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.default-queue-size-full-wait-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.timer-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.timer-lock-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.async-job-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.async-job-lock-time"
+      }
+    },
+    {
+      "name": "flowable.cmmn.async.executor.retry-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.cmmn.async.executor.retry-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.default-timer-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.default-timer-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.default-async-job-acquire-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.default-async-job-acquire-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.default-queue-size-full-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.default-queue-size-full-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.timer-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.timer-lock-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.async-job-lock-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.async-job-lock-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.retry-wait-time-in-millis",
+      "type": "java.lang.Integer",
+      "deprecation": {
+        "level": "warning",
+        "reason": "Using a more clear name with a duration.",
+        "replacement": "flowable.process.async-history.executor.retry-wait-time"
+      }
+    },
+    {
+      "name": "flowable.process.async-history.executor.timer-runnable-needed",
+      "type": "java.lang.Boolean",
+      "defaultValue": false
     }
   ],
   "hints": [

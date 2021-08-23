@@ -65,6 +65,7 @@ import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
+import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -604,6 +605,182 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(engineConfiguration.getMailServerDefaultCharset()).isEqualTo(StandardCharsets.UTF_16);
                     assertThat(engineConfiguration.getMailServerUseSSL()).isTrue();
                     assertThat(engineConfiguration.getMailServerUseTLS()).isTrue();
+                });
+    }
+
+    @Test
+    void customAsyncExecutorProperties() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.process.async.executor.move-timer-executor-pool-size=10",
+                        "flowable.process.async.executor.max-timer-jobs-per-acquisition=1024",
+                        "flowable.process.async.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=20000",
+                        "flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis=30000",
+                        "flowable.process.async.executor.default-queue-size-full-wait-time-in-millis=15000",
+                        "flowable.process.async.executor.lock-owner=test-lock-owner",
+                        "flowable.process.async.executor.timer-lock-time-in-millis=7200000",
+                        "flowable.process.async.executor.async-job-lock-time-in-millis=10800000",
+                        "flowable.process.async.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.process.async.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.process.async.executor.timer-lock-wait-time=PT3M",
+                        "flowable.process.async.executor.timer-lock-poll-rate=PT2S",
+                        "flowable.process.async.executor.reset-expired-jobs-interval=300000",
+                        "flowable.process.async.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("processAsyncExecutor")
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    SpringAsyncExecutor executor = context.getBean("processAsyncExecutor", SpringAsyncExecutor.class);
+
+                    assertThat(configuration.getAsyncExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.getMoveTimerExecutorPoolSize()).isEqualTo(10);
+                    assertThat(executor.getMaxTimerJobsPerAcquisition()).isEqualTo(1024);
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultTimerJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(20).toMillis());
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getTimerLockTimeInMillis()).isEqualTo(Duration.ofHours(2).toMillis());
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getTimerLockWaitTime()).isEqualTo(Duration.ofMinutes(3));
+                    assertThat(executor.getTimerLockPollRate()).isEqualTo(Duration.ofSeconds(2));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
+    @Test
+    void customAsyncExecutorPropertiesWithNewPropertiesWithDuration() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.process.async.executor.move-timer-executor-pool-size=10",
+                        "flowable.process.async.executor.max-timer-jobs-per-acquisition=1024",
+                        "flowable.process.async.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.process.async.executor.default-timer-job-acquire-wait-time=PT20S",
+                        "flowable.process.async.executor.default-async-job-acquire-wait-time=PT30S",
+                        "flowable.process.async.executor.default-queue-size-full-wait-time=PT15S",
+                        "flowable.process.async.executor.lock-owner=test-lock-owner",
+                        "flowable.process.async.executor.timer-lock-time=PT2H",
+                        "flowable.process.async.executor.async-job-lock-time=PT3H",
+                        "flowable.process.async.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.process.async.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.process.async.executor.timer-lock-wait-time=PT3M",
+                        "flowable.process.async.executor.timer-lock-poll-rate=PT2S",
+                        "flowable.process.async.executor.reset-expired-jobs-interval=PT5M",
+                        "flowable.process.async.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("processAsyncExecutor")
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    SpringAsyncExecutor executor = context.getBean("processAsyncExecutor", SpringAsyncExecutor.class);
+
+                    assertThat(configuration.getAsyncExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.getMoveTimerExecutorPoolSize()).isEqualTo(10);
+                    assertThat(executor.getMaxTimerJobsPerAcquisition()).isEqualTo(1024);
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultTimerJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(20).toMillis());
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getTimerLockTimeInMillis()).isEqualTo(Duration.ofHours(2).toMillis());
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getTimerLockWaitTime()).isEqualTo(Duration.ofMinutes(3));
+                    assertThat(executor.getTimerLockPollRate()).isEqualTo(Duration.ofSeconds(2));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
+    @Test
+    void customAsyncHistoryExecutorProperties() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.process.async-history.enable=true",
+                        "flowable.process.async-history.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.process.async-history.executor.default-async-job-acquire-wait-time-in-millis=30000",
+                        "flowable.process.async-history.executor.default-queue-size-full-wait-time-in-millis=15000",
+                        "flowable.process.async-history.executor.lock-owner=test-lock-owner",
+                        "flowable.process.async-history.executor.async-job-lock-time-in-millis=10800000",
+                        "flowable.process.async-history.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.process.async-history.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.process.async-history.executor.reset-expired-jobs-interval=300000",
+                        "flowable.process.async-history.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("asyncHistoryExecutor")
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    SpringAsyncHistoryExecutor executor = context.getBean("asyncHistoryExecutor", SpringAsyncHistoryExecutor.class);
+
+                    assertThat(configuration.getAsyncHistoryExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.isTimerRunnableNeeded()).isFalse();
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
+    @Test
+    void customAsyncHistoryExecutorPropertiesWithNewPropertiesWithDuration() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.process.async-history.enable=true",
+                        "flowable.process.async-history.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.process.async-history.executor.default-async-job-acquire-wait-time=PT30S",
+                        "flowable.process.async-history.executor.default-queue-size-full-wait-time=PT15S",
+                        "flowable.process.async-history.executor.lock-owner=test-lock-owner",
+                        "flowable.process.async-history.executor.async-job-lock-time=PT3H",
+                        "flowable.process.async-history.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.process.async-history.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.process.async-history.executor.reset-expired-jobs-interval=PT5M",
+                        "flowable.process.async-history.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("asyncHistoryExecutor")
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    SpringAsyncHistoryExecutor executor = context.getBean("asyncHistoryExecutor", SpringAsyncHistoryExecutor.class);
+
+                    assertThat(configuration.getAsyncHistoryExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.isTimerRunnableNeeded()).isFalse();
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
                 });
     }
 

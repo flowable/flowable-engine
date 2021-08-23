@@ -30,6 +30,7 @@ import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobExecutorConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
@@ -122,19 +123,26 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
+    @Bean
+    @ProcessAsync
+    @ConfigurationProperties(prefix = "flowable.process.async.executor")
+    public AsyncJobExecutorConfiguration processAsyncExecutorConfiguration() {
+        return new AsyncJobExecutorConfiguration();
+    }
+
     /**
      * The Async Executor must not be shared between the engines.
      * Therefore a dedicated one is always created.
      */
     @Bean
     @ProcessAsync
-    @ConfigurationProperties(prefix = "flowable.process.async.executor")
     @ConditionalOnMissingBean(name = "processAsyncExecutor")
     public SpringAsyncExecutor processAsyncExecutor(
+        @ProcessAsync AsyncJobExecutorConfiguration executorConfiguration,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor(executorConfiguration);
         asyncExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
         return asyncExecutor;
     }
@@ -142,13 +150,21 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ProcessAsyncHistory
     @ConfigurationProperties(prefix = "flowable.process.async-history.executor")
+    @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
+    public AsyncJobExecutorConfiguration processAsyncHistoryExecutorConfiguration() {
+        return new AsyncJobExecutorConfiguration();
+    }
+
+    @Bean
+    @ProcessAsyncHistory
     @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
     @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
     public SpringAsyncHistoryExecutor asyncHistoryExecutor(
+        @ProcessAsyncHistory AsyncJobExecutorConfiguration executorConfiguration,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor();
+        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor(executorConfiguration);
         asyncHistoryExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
         return asyncHistoryExecutor;
     }
