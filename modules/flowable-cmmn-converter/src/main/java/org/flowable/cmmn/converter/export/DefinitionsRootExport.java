@@ -49,5 +49,12 @@ public class DefinitionsRootExport implements CmmnXmlConstants {
         } else {
             xtw.writeAttribute(ATTRIBUTE_TARGET_NAMESPACE, CASE_NAMESPACE);
         }
+
+        if (StringUtils.isNotEmpty(model.getExporter())) {
+            xtw.writeAttribute(CmmnXmlConstants.ATTRIBUTE_EXPORTER, model.getExporter());
+        }
+        if (StringUtils.isNotEmpty(model.getExporterVersion())) {
+            xtw.writeAttribute(CmmnXmlConstants.ATTRIBUTE_EXPORTER_VERSION, model.getExporterVersion());
+        }
     }
 }
