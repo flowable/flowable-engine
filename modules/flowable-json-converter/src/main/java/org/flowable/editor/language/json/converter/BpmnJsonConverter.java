@@ -470,6 +470,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         BpmnModel bpmnModel = new BpmnModel();
 
         bpmnModel.setTargetNamespace("http://flowable.org/test");
+        bpmnModel.setExporter("Flowable Open Source Modeler");
+        bpmnModel.setExporterVersion(getClass().getPackage().getImplementationVersion());
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
         Map<String, JsonNode> edgeMap = new HashMap<>();
