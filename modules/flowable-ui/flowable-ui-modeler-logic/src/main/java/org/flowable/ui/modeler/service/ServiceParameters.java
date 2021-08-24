@@ -102,7 +102,7 @@ public class ServiceParameters {
             name = params.nextElement();
             value = request.getParameter(name);
 
-            if (value != null && StringUtils.isNotEmpty(value)) {
+            if (StringUtils.isNotEmpty(value)) {
                 parameters.addParameter(name, value);
             }
         }

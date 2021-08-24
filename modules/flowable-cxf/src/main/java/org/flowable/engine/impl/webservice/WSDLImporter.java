@@ -253,11 +253,7 @@ public class WSDLImporter implements XMLImporter {
             Element root = (Element) doc.getFirstChild();
             Element typesElement = (Element) root.getElementsByTagName("wsdl:types").item(0);
             return (Element) typesElement.getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "schema").item(0);
-        } catch (SAXException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (ParserConfigurationException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new FlowableException(e.getMessage(), e);
         }
     }

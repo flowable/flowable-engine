@@ -103,7 +103,7 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
 
         if (!keyDefined) {
-            addError(errors, Problems.DMN_TASK_NO_KEY, process, task, "No decision table reference key is defined on the dmn activity");
+            addError(errors, Problems.DMN_TASK_NO_KEY, process, task, "No decision table or decision service reference key is defined on the dmn activity");
         }
     }
 
