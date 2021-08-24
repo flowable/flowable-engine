@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.zip.ZipInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -180,15 +181,20 @@ public class DeploymentCollectionResource {
         try {
             CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".cmmn.xml") || fileName.endsWith(".cmmn"))) {
+            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".cmmn.xml") || fileName
+                    .endsWith(".cmmn") || fileName.toLowerCase().endsWith(".bar") || fileName
+                    .toLowerCase().endsWith(".zip"))) {
 
                 fileName = file.getName();
             }
 
             if (fileName.endsWith(".cmmn.xml") || fileName.endsWith(".cmmn")) {
                 deploymentBuilder.addInputStream(fileName, file.getInputStream());
+            } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase()
+                    .endsWith(".zip")) {
+                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
             } else {
-                throw new FlowableIllegalArgumentException("File must be of type .cmmn.xml, .cmmn");
+                throw new FlowableIllegalArgumentException("File must be of type .cmmn.xml, .cmmn, .bar or .zip");
             }
 
             if (!decodedQueryStrings.containsKey("deploymentName") || StringUtils.isEmpty(decodedQueryStrings.get("deploymentName"))) {
