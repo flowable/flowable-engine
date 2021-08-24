@@ -5,23 +5,40 @@ This is a helm chart for the [Flowable UI apps][flowable].
 ## TL;DR;
 
 ```console
-helm install flowable
+helm repo add flowable https://flowable.org/helm/
+
+helm install my-flowable flowable/flowable
 ```
 
 ## Installing the Chart
 
-To install the chart with the release name `my-flowable`:
+To install the *local* chart with the release name `my-flowable`:
 
 ```console
-helm install my-flowable flowable
+helm install my-flowable ./flowable
 ```
+
+To install the *repo* chart with the release name `my-flowable`:
+
+```console
+helm repo add flowable https://flowable.org/helm/
+
+helm install my-flowable ./flowable \
+    --create-namespace --namespace=flowable \
+    --set host.external=<cluster public ip / hostname> --set ingress.useHost=true \
+    --set postgres.storage.storageClassName=default
+```
+
+This will install Flowable as the *my-flowable* release in the *flowable* namespace.
+It will also configure Ingress mapping rules for route on the specified *host*.
+The *StorageClassName* will be set to *default*.
 
 ## Uninstalling the Chart
 
 To uninstall/delete the `my-flowable` deployment:
 
 ```console
-helm delete my-flowable --purge
+helm remove my-flowable
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -83,7 +100,7 @@ The following tables lists the configurable parameters of the Unifi chart and th
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```console
-helm install --name my-flowable \
+helm install my-flowable \
   --set admin.enabled=false \
     flowable
 ```
@@ -91,8 +108,8 @@ helm install --name my-flowable \
 Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
 
 ```console
-helm install --name my-flowable -f values.yaml flowable
+helm install my-flowable -f values.yaml flowable
 ```
 
+
 [flowable]: https://github.com/flowable/flowable-engine
-[nginx-ingress]: https://github.com/kubernetes/ingress-nginx
