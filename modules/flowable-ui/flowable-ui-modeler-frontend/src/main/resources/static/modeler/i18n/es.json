@@ -710,6 +710,12 @@
             "DESCRIPTION" : "Define el nombre de la señal."
           }
         },
+        "COMPENSATIONACTIVITYREFPACKAGE" : {
+          "COMPENSATIONACTIVITYREF" : {
+            "TITLE" : "Referencia de la actividad de compensación",
+            "DESCRIPTION" : "Defina la referencia de actividad."
+          }
+        },
         "ERRORREFPACKAGE" : {
           "ERRORREF" : {
             "TITLE" : "Referencia de error",
@@ -1144,6 +1150,10 @@
         "THROWESCALATIONEVENT" : {
           "TITLE" : "Evento intermedio de lanzamiento de escalamiento",
           "DESCRIPTION" : "Un evento intermedio con un disparador de escalamiento"
+        },
+        "THROWCOMPENSATIONEVENT": {
+          "TITLE" : "Evento de lanzamiento de compensación intermedia",
+          "DESCRIPTION" : "Un evento intermedio con un disparador de compensación"
         },
         "ENDNONEEVENT" : {
           "TITLE" : "Evento de fin",
