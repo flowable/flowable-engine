@@ -256,6 +256,12 @@ public class TaskBaseResource {
             }
         }
 
+        if (request.getIncludeProcessVariables() != null) {
+            if (request.getIncludeProcessVariables()) {
+                taskQuery.includeProcessVariables();
+            }
+        }
+
         if (request.getCaseDefinitionId() != null) {
             taskQuery.caseDefinitionId(request.getCaseDefinitionId());
         }
