@@ -15,6 +15,7 @@ package org.flowable.content.engine.impl.cmd;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -64,14 +65,21 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             // Stream given, write to store and save a reference to the content object
 
             ContentStorage contentStorage = contentEngineConfiguration.getContentStorage();
-            ContentObject createContentObject = contentStorage.createContentObject(inputStream, new ContentItemContentObjectMetadata());
-            contentItemEntity.setContentStoreId(createContentObject.getId());
+            
+            ContentObject contentObject;
+            if (StringUtils.isNotEmpty(contentItemEntity.getContentStoreId())) {
+                contentObject = contentStorage.updateContentObject(contentItemEntity.getContentStoreId(), inputStream, new ContentItemContentObjectMetadata());
+            } else {
+                contentObject = contentStorage.createContentObject(inputStream, new ContentItemContentObjectMetadata());
+                contentItemEntity.setContentStoreId(contentObject.getId());
+            }
+            
             contentItemEntity.setContentStoreName(contentStorage.getContentStoreName());
             contentItemEntity.setContentAvailable(true);
 
             // After storing the stream, store the length to be accessible without having to consult the
             // underlying content storage to get file size
-            contentItemEntity.setContentSize(createContentObject.getContentLength());
+            contentItemEntity.setContentSize(contentObject.getContentLength());
 
             // Make lastModified timestamp update whenever the content changes
             contentItemEntity.setLastModified(contentEngineConfiguration.getClock().getCurrentTime());
