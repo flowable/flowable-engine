@@ -64,12 +64,9 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
             T result;
             try {
                 result = next.execute(config, command, commandExecutor);
-            } catch (RuntimeException ex) {
+            } catch (RuntimeException | Error ex) {
                 doRollback(isNew, ex);
                 throw ex;
-            } catch (Error err) {
-                doRollback(isNew, err);
-                throw err;
             } catch (Exception ex) {
                 doRollback(isNew, ex);
                 throw new UndeclaredThrowableException(ex, "TransactionCallback threw undeclared checked exception");
@@ -86,9 +83,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
     private void doBegin() {
         try {
             transactionManager.begin();
-        } catch (NotSupportedException e) {
-            throw new TransactionException("Unable to begin transaction", e);
-        } catch (SystemException e) {
+        } catch (NotSupportedException | SystemException e) {
             throw new TransactionException("Unable to begin transaction", e);
         }
     }
@@ -113,9 +108,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
         if (tx != null) {
             try {
                 transactionManager.resume(tx);
-            } catch (SystemException e) {
-                throw new TransactionException("Unable to resume transaction", e);
-            } catch (InvalidTransactionException e) {
+            } catch (SystemException | InvalidTransactionException e) {
                 throw new TransactionException("Unable to resume transaction", e);
             }
         }
@@ -124,18 +117,9 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
     private void doCommit() {
         try {
             transactionManager.commit();
-        } catch (HeuristicMixedException e) {
+        } catch (HeuristicMixedException | SystemException | RollbackException | HeuristicRollbackException e) {
             throw new TransactionException("Unable to commit transaction", e);
-        } catch (HeuristicRollbackException e) {
-            throw new TransactionException("Unable to commit transaction", e);
-        } catch (RollbackException e) {
-            throw new TransactionException("Unable to commit transaction", e);
-        } catch (SystemException e) {
-            throw new TransactionException("Unable to commit transaction", e);
-        } catch (RuntimeException e) {
-            doRollback(true, e);
-            throw e;
-        } catch (Error e) {
+        } catch (RuntimeException | Error e) {
             doRollback(true, e);
             throw e;
         }
@@ -151,10 +135,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
             }
         } catch (SystemException e) {
             LOGGER.debug("Error when rolling back transaction", e);
-        } catch (RuntimeException e) {
-            rollbackEx = e;
-            throw e;
-        } catch (Error e) {
+        } catch (RuntimeException | Error e) {
             rollbackEx = e;
             throw e;
         } finally {
