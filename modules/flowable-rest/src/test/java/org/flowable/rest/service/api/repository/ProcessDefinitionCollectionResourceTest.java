@@ -88,6 +88,10 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             url = baseUrl + "?nameLike=" + encode("The Two%");
             assertResultsPresentInDataResponse(url, twoTaskprocess.getId());
 
+            // Test nameLikeIgnoreCase filtering
+            url = baseUrl + "?nameLikeIgnoreCase=" + encode("the Two%");
+            assertResultsPresentInDataResponse(url, twoTaskprocess.getId());
+
             // Test key filtering
             url = baseUrl + "?key=twoTaskProcess";
             assertResultsPresentInDataResponse(url, twoTaskprocess.getId());

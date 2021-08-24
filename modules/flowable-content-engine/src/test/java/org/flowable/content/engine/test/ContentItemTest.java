@@ -120,6 +120,46 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
                 .isInstanceOf(FlowableObjectNotFoundException.class);
     }
+    
+    @Test
+    public void updateSimpleUncategorizedContentItemWithData() throws Exception {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setScopeId("123456");
+        contentItem.setScopeType(null);
+        contentItem.setName("testItem");
+        contentItem.setMimeType("application/pdf");
+
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test.txt")) {
+            contentService.saveContentItem(contentItem, in);
+        }
+
+        assertThat(contentItem.getId()).isNotNull();
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+        )).exists();
+        
+        String contentStoreId = contentItem.getContentStoreId();
+
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("test2.txt")) {
+            contentService.saveContentItem(contentItem, in);
+        }
+        
+        assertThat(contentService.createContentItemQuery().id(contentItem.getId()).singleResult().getContentStoreId()).isEqualTo(contentStoreId);
+
+        try (InputStream contentStream = contentService.getContentItemData(contentItem.getId())) {
+            String contentValue = IOUtils.toString(contentStream, StandardCharsets.UTF_8);
+            assertThat(contentValue).isEqualTo("hello2");
+        }
+
+        contentService.deleteContentItem(contentItem.getId());
+
+        assertThat(new File(contentEngineConfiguration.getContentRootFolder() + File.separator + "uncategorized" + File.separator +
+                contentItem.getContentStoreId().substring(contentItem.getContentStoreId().lastIndexOf('.') + 1)
+        )).doesNotExist();
+
+        assertThatThrownBy(() -> contentService.getContentItemData(contentItem.getId()))
+                .isInstanceOf(FlowableObjectNotFoundException.class);
+    }
 
     @Test
     public void createSimpleUncategorizedContentItemWithoutIdWithData() throws Exception {

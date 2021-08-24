@@ -16,6 +16,7 @@
         <script type="text/javascript">
         	var NORMAL_STROKE = 2;
         	var SEQUENCEFLOW_STROKE = 2;
+        	var ASSOCIATION_STROKE = 2;
         	var TASK_STROKE = 2;
         	var CALL_ACTIVITY_STROKE = 4;
         	var ENDEVENT_STROKE = 4;
@@ -461,7 +462,11 @@
 				    if (data.flows) {
 					    for (var i = 0; i < data.flows.length; i++) {
 					    	var flow = data.flows[i];
-					    	_drawFlow(flow, paper);
+					    	if (flow.type === 'sequenceFlow') {
+			                    _drawFlow(flow, paper);
+			                } else if (flow.type === 'association') {
+			                    _drawAssociation(flow, paper);
+			                }
 					    }
 				    }
 				    
@@ -523,7 +528,11 @@
                     if (data.flows) {
                         for (var i = 0; i < data.flows.length; i++) {
                             var flow = data.flows[i];
-                            _drawFlow(flow, migrationPaper);
+                            if (flow.type === 'sequenceFlow') {
+			                    _drawFlow(flow, migrationPaper);
+			                } else if (flow.type === 'association') {
+			                    _drawAssociation(flow, migrationPaper);
+			                }
                         }
                     }
                     

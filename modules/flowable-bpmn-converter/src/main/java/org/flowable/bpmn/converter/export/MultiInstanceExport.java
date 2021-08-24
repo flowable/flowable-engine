@@ -51,6 +51,9 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                 if (StringUtils.isNotEmpty(multiInstanceObject.getElementIndexVariable())) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE, multiInstanceObject.getElementIndexVariable(), xtw);
                 }
+                if (multiInstanceObject.isNoWaitStatesAsyncLeave()) {
+                    BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_NO_WAIT_STATES_ASYNC_LEAVE, "true", xtw);
+                }
 
                 // check for collection element handler extension first since process validation is order-dependent
                 if (handler != null) {

@@ -38,6 +38,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String categoryNotEquals;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
     protected String key;
@@ -46,6 +47,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String resourceNameLike;
     protected String authorizationUserId;
     protected Collection<String> authorizationGroups;
+    private List<List<String>> safeAuthorizationGroups;
     protected boolean authorizationGroupsSet;
     protected Integer version;
     protected Integer versionGt;
@@ -129,6 +131,15 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
             throw new FlowableIllegalArgumentException("nameLike is null");
         }
         this.nameLike = nameLike;
+        return this;
+    }
+
+    @Override
+    public CaseDefinitionQueryImpl caseDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("nameLikeIgnoreCase is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
         return this;
     }
 
@@ -386,6 +397,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return nameLike;
     }
 
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
     public String getKey() {
         return key;
     }
@@ -438,6 +453,14 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return categoryNotEquals;
     }
 
+    public String getAuthorizationUserId() {
+        return authorizationUserId;
+    }
+
+    public boolean isAuthorizationGroupsSet() {
+        return authorizationGroupsSet;
+    }
+
     public String getTenantId() {
         return tenantId;
     }
@@ -454,4 +477,11 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return authorizationUserId != null || (authorizationGroups != null && !authorizationGroups.isEmpty());
     }
 
+    public List<List<String>> getSafeAuthorizationGroups() {
+        return safeAuthorizationGroups;
+    }
+
+    public void setSafeAuthorizationGroups(List<List<String>> safeAuthorizationGroups) {
+        this.safeAuthorizationGroups = safeAuthorizationGroups;
+    }
 }

@@ -81,6 +81,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String extraValue;
     protected String involvedUser;
     protected Collection<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected boolean onlyStages;
     protected String tenantId;
     protected String tenantIdLike;
@@ -674,5 +675,13 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
     }
 }

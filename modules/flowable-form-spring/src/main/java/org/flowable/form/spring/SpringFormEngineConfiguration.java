@@ -20,6 +20,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
@@ -70,6 +71,13 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
         FormEngines.setInitialized(true);
         enginesBuild.add(formEngine.getName());
         return formEngine;
+    }
+
+    @Override
+    public void initBeans() {
+        if (beans == null) {
+            beans = new SpringBeanFactoryProxyMap(applicationContext);
+        }
     }
 
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {

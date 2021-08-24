@@ -2746,12 +2746,14 @@ The Http task is implemented as a dedicated [Service Task](bpmn/ch07b-BPMN-Const
 
     <serviceTask id="httpGet" flowable:type="http">
 
-It is possible possible to override the default Http Task behavior by providing a custom implementation.
-Custom implementations should extend org.flowable.http.HttpActivityBehavior and override the perform() method.
+It is possible to override the default Http Task behavior by providing a custom implementation.
+Custom implementations should extend org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate and override the methods you need.
 
-The fField 'httpActivityBehaviorClass' should be set in the task definition (Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorImpl').
+The field 'httpActivityBehaviorClass' should be set in the task definition (Default value for this field is 'org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate').
 
-Currently the default implementation 'HttpActivityBehaviorImpl' is based on Apache Http Client. As Apache Http Client can be customized in many ways, all possible options are not used in in the Http Client config.
+The http client is abstracted through `FlowableHttpClient`. The default implementation when using the `flowable-http` dependency is based on the Apache Http Client.
+As Apache Http Client can be customized in many ways, all possible options are not used in the Http Client config.
+There is also an implementation based on the Spring WebClient, which will be used when the Apache Http Client is not on the classpath.
 
 To create a custom client refer to [Http Client builder](http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/HttpClientBuilder.html)
 
@@ -2885,7 +2887,7 @@ For example, requestUrl is saved as 'task7RequestUrl' for task with id 'task7'.<
 <tr class="even">
 <td><p>httpActivityBehaviorClass</p></td>
 <td><p>no</p></td>
-<td><p>Full class name of custom extension of org.flowable.http.HttpActivityBehavior.</p></td>
+<td><p>Full class name of custom extension of org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate.</p></td>
 </tr>
 </tbody>
 </table>

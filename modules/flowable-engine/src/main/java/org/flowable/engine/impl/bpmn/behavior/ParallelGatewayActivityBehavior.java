@@ -103,7 +103,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
                     // The current execution will be reused and not deleted
                     if (!joinedExecution.getId().equals(execution.getId())) {
-                        executionEntityManager.deleteRelatedDataForExecution(joinedExecution, null);
+                        executionEntityManager.deleteRelatedDataForExecution(joinedExecution, null, false);
                         executionEntityManager.delete(joinedExecution);
                     }
 

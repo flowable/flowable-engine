@@ -762,8 +762,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(task).isNotNull();
             assertThat(task.getTaskDefinitionKey()).isEqualTo("formTask1");
 
-            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
-                    .count();
+            long numberOfActiveCaseInstances = cmmnRuntimeService.createCaseInstanceQuery().count();
             assertThat(numberOfActiveCaseInstances).isEqualTo(1);
 
             Execution caseTask1Execution = processEngineRuntimeService.createExecutionQuery().activityId("caseTask1").singleResult();

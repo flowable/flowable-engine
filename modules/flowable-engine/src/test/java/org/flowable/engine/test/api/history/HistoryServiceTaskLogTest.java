@@ -24,16 +24,11 @@ import java.util.function.Consumer;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableTest;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.HistoryJobService;
@@ -52,21 +47,29 @@ import org.junit.jupiter.api.Test;
 /**
  * @author martin.grofcik
  */
-@FlowableTest
-public class HistoryServiceTaskLogTest {
+public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCase {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     protected Task task;
 
+    public HistoryServiceTaskLogTest() {
+        super(HistoryServiceTaskLogTest.class.getName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.setEnableHistoricTaskLogging(true);
+    }
+
     @AfterEach
-    public void deleteTasks(TaskService taskService, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void deleteTasks() {
         if (task != null) {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
-    protected void deleteTaskWithLogEntries(TaskService taskService, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration, String taskId) {
+    protected void deleteTaskWithLogEntries(String taskId) {
         taskService.deleteTask(taskId, true);
         managementService.executeCommand(new Command<Void>() {
 
@@ -94,7 +97,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createTaskEvent(TaskService taskService, HistoryService historyService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void createTaskEvent() {
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
                 create();
@@ -124,8 +127,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void createTaskEventAsAuthenticatedUser() {
         String previousUserId = Authentication.getAuthenticatedUserId();
         Authentication.setAuthenticatedUserId("testUser");
         try {
@@ -148,7 +150,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForNonExistingTaskLogEntries(TaskService taskService, HistoryService historyService) {
+    public void queryForNonExistingTaskLogEntries() {
         task = taskService.createTaskBuilder().create();
 
         List<HistoricTaskLogEntry> taskLogsByTaskInstanceId = historyService.createHistoricTaskLogEntryQuery().taskId("NON-EXISTING-TASK-ID").list();
@@ -157,8 +159,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForNullTaskLogEntries_returnsAll(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForNullTaskLogEntries_returnsAll() {
 
         Task taskA = taskService.createTaskBuilder().create();
         Task taskB = taskService.createTaskBuilder().create();
@@ -171,15 +172,14 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, taskC.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, taskB.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, taskA.getId());
+            deleteTaskWithLogEntries(taskC.getId());
+            deleteTaskWithLogEntries(taskB.getId());
+            deleteTaskWithLogEntries(taskA.getId());
         }
     }
 
     @Test
-    public void deleteTaskEventLogEntry(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void deleteTaskEventLogEntry() {
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
                 create();
@@ -197,8 +197,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void deleteNonExistingTaskEventLogEntry(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void deleteNonExistingTaskEventLogEntry() {
         task = taskService.createTaskBuilder().create();
 
         if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
@@ -210,7 +209,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void taskAssigneeEvent(TaskService taskService, HistoryService historyService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void taskAssigneeEvent() {
         task = taskService.createTaskBuilder().
                 assignee("initialAssignee").
                 create();
@@ -232,14 +231,12 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeAssigneeTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
-        assertThatAuthenticatedUserIsSet(taskService, historyService, taskId -> taskService.setAssignee(taskId, "newAssignee"), processEngineConfiguration);
+    public void changeAssigneeTaskEventAsAuthenticatedUser() {
+        assertThatAuthenticatedUserIsSet(taskId -> taskService.setAssignee(taskId, "newAssignee"));
     }
 
     @Test
-    public void taskOwnerEvent(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void taskOwnerEvent() {
         task = taskService.createTaskBuilder().
                 assignee("initialAssignee").
                 create();
@@ -262,14 +259,12 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeOwnerTaskEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
-        assertThatAuthenticatedUserIsSet(taskService, historyService, taskId -> taskService.setOwner(taskId, "newOwner"), processEngineConfiguration);
+    public void changeOwnerTaskEventAsAuthenticatedUser() {
+        assertThatAuthenticatedUserIsSet(taskId -> taskService.setOwner(taskId, "newOwner"));
     }
 
     @Test
-    public void claimTaskEvent(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void claimTaskEvent() {
         task = taskService.createTaskBuilder().create();
 
         taskService.claim(task.getId(), "testUser");
@@ -289,7 +284,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void unclaimTaskEvent(TaskService taskService, HistoryService historyService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void unclaimTaskEvent() {
         task = taskService.createTaskBuilder().
                 assignee("initialAssignee").
                 create();
@@ -312,7 +307,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changePriority(TaskService taskService, HistoryService historyService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void changePriority() {
         task = taskService.createTaskBuilder().create();
         taskService.setPriority(task.getId(), Integer.MAX_VALUE);
 
@@ -332,13 +327,11 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changePriorityEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
-        assertThatAuthenticatedUserIsSet(taskService, historyService, taskId -> taskService.setPriority(taskId, Integer.MAX_VALUE), processEngineConfiguration);
+    public void changePriorityEventAsAuthenticatedUser() {
+        assertThatAuthenticatedUserIsSet(taskId -> taskService.setPriority(taskId, Integer.MAX_VALUE));
     }
 
-    protected void assertThatAuthenticatedUserIsSet(TaskService taskService, HistoryService historyService,
-            Consumer<String> functionToAssert, ProcessEngineConfiguration processEngineConfiguration) {
+    protected void assertThatAuthenticatedUserIsSet(Consumer<String> functionToAssert) {
 
         String previousUserId = Authentication.getAuthenticatedUserId();
         task = taskService.createTaskBuilder().
@@ -363,8 +356,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void changeDueDate(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void changeDueDate() {
         task = taskService.createTaskBuilder().create();
 
         taskService.setDueDate(task.getId(), new Date());
@@ -384,7 +376,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void saveTask(TaskService taskService, HistoryService historyService, ProcessEngineConfiguration configuration) {
+    public void saveTask() {
         task = taskService.createTaskBuilder().
                 create();
 
@@ -395,21 +387,19 @@ public class HistoryServiceTaskLogTest {
         task.setDueDate(new Date());
         taskService.saveTask(task);
 
-        if (HistoryTestHelper.isHistoricTaskLoggingEnabled(configuration)) {
+        if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
             List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
             assertThat(taskLogEntries).as("The only event is user task created").hasSize(1);
         }
     }
 
     @Test
-    public void changeDueDateEventAsAuthenticatedUser(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
-        assertThatAuthenticatedUserIsSet(taskService, historyService, taskId -> taskService.setDueDate(taskId, new Date()), processEngineConfiguration);
+    public void changeDueDateEventAsAuthenticatedUser() {
+        assertThatAuthenticatedUserIsSet(taskId -> taskService.setDueDate(taskId, new Date()));
     }
 
     @Test
-    public void createCustomTaskEventLog(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void createCustomTaskEventLog() {
         task = taskService.createTaskBuilder().create();
 
         Date todayDate = new Date();
@@ -438,9 +428,10 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry() {
         task = taskService.createTaskBuilder().create();
+
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
 
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.create();
@@ -460,8 +451,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void createCustomTaskEventLog_withoutTimeStamp_addsDefault(TaskService taskService, HistoryService historyService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void createCustomTaskEventLog_withoutTimeStamp_addsDefault() {
         task = taskService.createTaskBuilder().create();
 
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
@@ -482,8 +472,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logSuspensionStateEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logSuspensionStateEvents() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(processInstance).isNotNull();
@@ -517,7 +506,7 @@ public class HistoryServiceTaskLogTest {
         } finally {
             String taskId = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
             managementService.executeCommand(commandContext -> {
-                ((ProcessEngineConfigurationImpl) processEngineConfiguration).getTaskServiceConfiguration()
+                processEngineConfiguration.getTaskServiceConfiguration()
                     .getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(taskId);
                 return null;
             });
@@ -527,8 +516,7 @@ public class HistoryServiceTaskLogTest {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logProcessTaskEvents(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logProcessTaskEvents() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(processInstance).isNotNull();
@@ -556,14 +544,13 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddCandidateUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logAddCandidateUser() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -589,14 +576,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddParticipantUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logAddParticipantUser() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -622,14 +608,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddCandidateGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logAddCandidateGroup() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(processInstance).isNotNull();
@@ -655,14 +640,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logAddGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logAddGroup() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(processInstance).isNotNull();
@@ -688,14 +672,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logDeleteCandidateGroup(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logDeleteCandidateGroup() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertThat(processInstance).isNotNull();
@@ -721,14 +704,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
-    public void logDeleteCandidateUser(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logDeleteCandidateUser() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -755,14 +737,13 @@ public class HistoryServiceTaskLogTest {
 
         } finally {
             taskService.complete(task.getId());
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, task.getId());
+            deleteTaskWithLogEntries(task.getId());
         }
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testCustomIdentityLink.bpmn20.xml")
-    public void logIdentityLinkEventsForProcessIdentityLinks(RuntimeService runtimeService, TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void logIdentityLinkEventsForProcessIdentityLinks() {
 
         runtimeService.startProcessInstanceByKey("customIdentityLink");
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
@@ -813,8 +794,7 @@ public class HistoryServiceTaskLogTest {
     }
 
     @Test
-    public void queryForTaskLogEntriesByTasKId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByTasKId() {
 
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
@@ -831,20 +811,19 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
+            deleteTaskWithLogEntries(anotherTask.getId());
         }
     }
 
     @Test
-    public void queryForTaskLogEntriesByUserId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByUserId() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().userId("testUser"),
-                historyService.createHistoricTaskLogEntryQuery().userId("testUser"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().userId("testUser"),
+                historyService.createHistoricTaskLogEntryQuery().userId("testUser"));
     }
 
-    protected void assertThatTaskLogIsFetched(TaskService taskService, HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder,
-            HistoricTaskLogEntryQuery historicTaskLogEntryQuery, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    protected void assertThatTaskLogIsFetched(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder,
+            HistoricTaskLogEntryQuery historicTaskLogEntryQuery) {
 
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
@@ -868,12 +847,12 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
+            deleteTaskWithLogEntries(anotherTask.getId());
         }
     }
     
-    protected void assertThatAllTaskLogIsFetched(TaskService taskService, HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder,
-            HistoricTaskLogEntryQuery historicTaskLogEntryQuery, ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    protected void assertThatAllTaskLogIsFetched(HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder,
+            HistoricTaskLogEntryQuery historicTaskLogEntryQuery) {
 
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
@@ -887,7 +866,7 @@ public class HistoryServiceTaskLogTest {
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
                 assertThat(logEntries).hasSize(5);
-                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
+                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactlyInAnyOrder(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
 
                 assertThat(historicTaskLogEntryQuery.count()).isEqualTo(5);
 
@@ -897,61 +876,54 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
+            deleteTaskWithLogEntries(anotherTask.getId());
         }
     }
 
     @Test
-    public void queryForTaskLogEntriesByType(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByType() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().type("testType"),
-                historyService.createHistoricTaskLogEntryQuery().type("testType"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().type("testType"),
+                historyService.createHistoricTaskLogEntryQuery().type("testType"));
     }
 
     @Test
-    public void queryForTaskLogEntriesByProcessInstanceId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByProcessInstanceId() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().processInstanceId("testProcess"),
-                historyService.createHistoricTaskLogEntryQuery().processInstanceId("testProcess"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().processInstanceId("testProcess"),
+                historyService.createHistoricTaskLogEntryQuery().processInstanceId("testProcess"));
     }
 
     @Test
-    public void queryForTaskLogEntriesByScopeId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByScopeId() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().scopeId("testScopeId"),
-                historyService.createHistoricTaskLogEntryQuery().scopeId("testScopeId"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().scopeId("testScopeId"),
+                historyService.createHistoricTaskLogEntryQuery().scopeId("testScopeId"));
     }
 
     @Test
-    public void queryForTaskLogEntriesBySubScopeId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesBySubScopeId() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().subScopeId("testSubScopeId"),
-                historyService.createHistoricTaskLogEntryQuery().subScopeId("testSubScopeId"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().subScopeId("testSubScopeId"),
+                historyService.createHistoricTaskLogEntryQuery().subScopeId("testSubScopeId"));
     }
 
     @Test
-    public void queryForTaskLogEntriesByScopeType(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByScopeType() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().scopeType("testScopeType"),
-                historyService.createHistoricTaskLogEntryQuery().scopeType("testScopeType"), managementService, processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().scopeType("testScopeType"),
+                historyService.createHistoricTaskLogEntryQuery().scopeType("testScopeType"));
     }
 
     @Test
-    public void queryForTaskLogEntriesByFromTimeStamp(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByFromTimeStamp() {
 
-        assertThatAllTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
-                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()), managementService, processEngineConfiguration);
+        assertThatAllTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
+                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()));
     }
 
     @Test
-    public void queryForTaskLogEntriesByToTimeStamp(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByToTimeStamp() {
         
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate());
         HistoricTaskLogEntryQuery historicTaskLogEntryQuery = historyService.createHistoricTaskLogEntryQuery().to(getCompareAfterDate());
@@ -979,32 +951,27 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
+            deleteTaskWithLogEntries(anotherTask.getId());
             taskService.deleteTask(anotherTask.getId(), true);
         }
     }
 
     @Test
-    public void queryForTaskLogEntriesByFromToTimeStamp(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByFromToTimeStamp() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
-                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate()), managementService,
-                processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
+                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate()));
     }
 
     @Test
-    public void queryForTaskLogEntriesByTenantId(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByTenantId() {
 
-        assertThatTaskLogIsFetched(taskService, historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
-                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate()), managementService,
-                processEngineConfiguration);
+        assertThatTaskLogIsFetched(historyService.createHistoricTaskLogEntryBuilder().timeStamp(getInsertDate()),
+                historyService.createHistoricTaskLogEntryQuery().from(getCompareBeforeDate()).to(getCompareAfterDate()));
     }
 
     @Test
-    public void queryForTaskLogEntriesByLogNumber(TaskService taskService, HistoryService historyService,
-            ManagementService managementService, ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByLogNumber() {
 
         task = taskService.createTaskBuilder().
                 assignee("testAssignee").
@@ -1038,13 +1005,12 @@ public class HistoryServiceTaskLogTest {
                 assertThat(pagedLogEntries.get(0).getLogNumber()).isEqualTo(logEntries.get(1).getLogNumber());
             }
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, anotherTask.getId());
+            deleteTaskWithLogEntries(anotherTask.getId());
         }
     }
 
     @Test
-    public void queryForTaskLogEntriesByNativeQuery(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogEntriesByNativeQuery() {
         
         assertThat(managementService.getTableName(HistoricTaskLogEntryEntity.class, false)).isEqualTo("ACT_HI_TSK_LOG");
         assertThat(managementService.getTableName(HistoricTaskLogEntry.class, false)).isEqualTo("ACT_HI_TSK_LOG");
@@ -1067,27 +1033,29 @@ public class HistoryServiceTaskLogTest {
                         sql("SELECT count(*) FROM " + managementService.getTableName(HistoricTaskLogEntry.class) + " WHERE TASK_ID_ = #{taskId}").count())
                         .isEqualTo(1);
             } finally {
-                deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "1");
-                deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "2");
-                deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "3");
+                deleteTaskWithLogEntries("1");
+                deleteTaskWithLogEntries("2");
+                deleteTaskWithLogEntries("3");
             }
         }
     }
 
     @Test
-    public void queryForTaskLogOrderBy(TaskService taskService, HistoryService historyService, ManagementService managementService,
-            ProcessEngineConfiguration processEngineConfiguration) {
+    public void queryForTaskLogOrderBy() {
         
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
         historicTaskLogEntryBuilder.taskId("1").timeStamp(getInsertDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("2").timeStamp(getCompareAfterDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("3").timeStamp(getCompareBeforeDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
 
         try {
 
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().list();
-                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("1", "2", "3");
+                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactlyInAnyOrder("1", "2", "3");
 
                 taskLogEntries = historyService.createHistoricTaskLogEntryQuery().orderByLogNumber().desc().list();
                 assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("3", "2", "1");
@@ -1097,11 +1065,53 @@ public class HistoryServiceTaskLogTest {
             }
 
         } finally {
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "1");
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "2");
-            deleteTaskWithLogEntries(taskService, managementService, processEngineConfiguration, "3");
+            deleteTaskWithLogEntries("1");
+            deleteTaskWithLogEntries("2");
+            deleteTaskWithLogEntries("3");
         }
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void logProcessTaskEventsInSameTransaction() {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        assertThat(processInstance).isNotNull();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        try {
+            managementService.executeCommand(commandContext -> {
+                taskService.setAssignee(task.getId(), "newAssignee");
+                taskService.setOwner(task.getId(), "newOwner");
+
+                return null;
+            });
+
+            if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
+                List<HistoricTaskLogEntry> logEntries = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).list();
+                assertThat(logEntries)
+                        .extracting(HistoricTaskLogEntry::getType)
+                        .containsExactlyInAnyOrder(
+                                "USER_TASK_CREATED",
+                                "USER_TASK_ASSIGNEE_CHANGED",
+                                "USER_TASK_ASSIGNEE_CHANGED",
+                                "USER_TASK_OWNER_CHANGED"
+                        );
+
+                HistoricTaskLogEntry logEntry = historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type("USER_TASK_CREATED").singleResult();
+                assertThat(logEntry).isNotNull();
+                assertThat(logEntry.getProcessDefinitionId()).isEqualTo(processInstance.getProcessDefinitionId());
+                assertThat(logEntry.getExecutionId()).isEqualTo(task.getExecutionId());
+                assertThat(logEntry.getProcessInstanceId()).isEqualTo(processInstance.getId());
+            }
+
+        } finally {
+            taskService.complete(task.getId());
+            deleteTaskWithLogEntries(task.getId());
+        }
+    }
+
 
     protected Date getInsertDate() {
         Calendar cal = new GregorianCalendar(2019, 3, 10);

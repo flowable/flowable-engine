@@ -15,8 +15,11 @@ package org.flowable.engine.impl.variable;
 import java.util.List;
 
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -62,12 +65,25 @@ public class ParallelMultiInstanceLoopVariableType implements VariableType {
 
     @Override
     public Object getValue(ValueFields valueFields) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        if (commandContext != null) {
+            return getValue(valueFields, commandContext);
+        } else {
+            return processEngineConfiguration.getCommandExecutor()
+                    .execute(context -> getValue(valueFields, context));
+        }
+    }
+
+    protected Object getValue(ValueFields valueFields, CommandContext commandContext) {
         String multiInstanceRootId = valueFields.getTextValue();
         String type = valueFields.getTextValue2();
-        ExecutionEntity multiInstanceRootExecution = processEngineConfiguration.getExecutionEntityManager().findById(multiInstanceRootId);
+
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
+        ExecutionEntity multiInstanceRootExecution = executionEntityManager.findById(multiInstanceRootId);
         List<? extends ExecutionEntity> childExecutions = multiInstanceRootExecution.getExecutions();
-        int nrOfActiveInstances = (int) childExecutions.stream().filter(execution -> execution.isActive() && !(execution.getCurrentFlowElement() instanceof BoundaryEvent))
-                .count();
+        int nrOfActiveInstances = (int) childExecutions.stream().filter(execution -> execution.isActive()
+            && !(execution.getCurrentFlowElement() instanceof BoundaryEvent)).count();
         if (ParallelMultiInstanceLoopVariable.COMPLETED_INSTANCES.equals(type)) {
             Object nrOfInstancesValue = multiInstanceRootExecution.getVariable(NUMBER_OF_INSTANCES);
             int nrOfInstances = (Integer) (nrOfInstancesValue != null ? nrOfInstancesValue : 0);

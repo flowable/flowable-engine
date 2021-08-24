@@ -41,6 +41,17 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Test
+    public void exporterAndVersion() throws Exception {
+        DmnDefinition dmnModel = readXMLFile();
+        dmnModel.setExporter("Flowable");
+        dmnModel.setExporterVersion("latest");
+        DmnDefinition parsedModel = exportAndReadXMLFile(dmnModel);
+        validateModel(parsedModel);
+        assertThat(parsedModel.getExporter()).isEqualTo("Flowable");
+        assertThat(parsedModel.getExporterVersion()).isEqualTo("latest");
+    }
+
     @Override
     protected String getResource() {
         return "full.dmn";

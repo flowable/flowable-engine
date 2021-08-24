@@ -129,6 +129,15 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     }
 
     @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<JobEntity> jobEntities, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+
+        bulkUpdateEntities("updateJobLocks", params, "jobs", jobEntities);
+    }
+
+    @Override
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);

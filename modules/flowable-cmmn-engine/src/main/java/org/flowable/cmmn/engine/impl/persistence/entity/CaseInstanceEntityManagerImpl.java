@@ -16,8 +16,10 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -65,6 +67,11 @@ public class CaseInstanceEntityManagerImpl
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
         return new CaseInstanceQueryImpl(engineConfiguration.getCommandExecutor(), engineConfiguration);
+    }
+
+    @Override
+    public CaseInstanceEntity create(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables) {
+        return dataManager.create(historicCaseInstance, variables);
     }
 
     @Override

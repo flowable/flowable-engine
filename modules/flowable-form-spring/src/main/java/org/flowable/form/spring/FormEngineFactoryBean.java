@@ -49,7 +49,6 @@ public class FormEngineFactoryBean implements FactoryBean<FormEngine>, Disposabl
 
     @Override
     public FormEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
         
         if (formEngineConfiguration.getBeans() == null) {
@@ -60,12 +59,6 @@ public class FormEngineFactoryBean implements FactoryBean<FormEngine>, Disposabl
         return this.formEngine;
     }
     
-    protected void configureExpressionManager() {
-        if (formEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            formEngineConfiguration.setExpressionManager(new SpringFormExpressionManager(applicationContext, formEngineConfiguration.getBeans()));
-        }
-    }
-
     protected void configureExternallyManagedTransactions() {
         if (formEngineConfiguration instanceof SpringFormEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
             SpringFormEngineConfiguration engineConfiguration = (SpringFormEngineConfiguration) formEngineConfiguration;

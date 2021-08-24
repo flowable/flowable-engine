@@ -417,6 +417,154 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     @Test
+    public void testSimpleMigrationOfProcessInstancesById() {
+        //Deploy first version of the process
+        Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                .deploy();
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        Deployment oneActivityProcessDeploymentV2 = repositoryService.createDeployment()
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process-v2.bpmn20.xml")
+                .deploy();
+
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("MP")
+                .list();
+
+        assertThat(processDefinitions).hasSize(2);
+
+        ProcessDefinition version1ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 1).findFirst().get();
+        assertThat(version1ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeployment.getId());
+        ProcessDefinition version2ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 2).findFirst().get();
+        assertThat(version2ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeploymentV2.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(executions).hasSize(2); //includes root execution
+        executions.stream()
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("userTask1Id");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
+
+        ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask"))
+                .validateMigration(processInstance.getId());
+
+        assertThat(validationResult.isMigrationValid()).isTrue();
+
+        //Migrate process - moving all instances
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigrationOfProcessInstances(version1ProcessDef.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrateProcessInstances(version1ProcessDef.getId());
+
+        executions = runtimeService.createExecutionQuery().list();
+        assertThat(executions).hasSize(2); //includes root execution
+        executions.stream()
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "theTask"));
+
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testSimpleMigrationOfProcessInstancesByKey() {
+        //Deploy first version of the process
+        Deployment oneActivityProcessDeployment = repositoryService.createDeployment()
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml")
+                .deploy();
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        Deployment oneActivityProcessDeploymentV2 = repositoryService.createDeployment()
+                .name("My Process Deployment")
+                .addClasspathResource("org/flowable/engine/test/api/runtime/migration/one-task-simple-process-v2.bpmn20.xml")
+                .deploy();
+
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("MP")
+                .list();
+
+        assertThat(processDefinitions).hasSize(2);
+
+        ProcessDefinition version1ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 1).findFirst().get();
+        assertThat(version1ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeployment.getId());
+        ProcessDefinition version2ProcessDef = processDefinitions.stream().filter(d -> d.getVersion() == 2).findFirst().get();
+        assertThat(version2ProcessDef.getDeploymentId()).isEqualTo(oneActivityProcessDeploymentV2.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(executions).hasSize(2); //includes root execution
+        executions.stream()
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("userTask1Id");
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version1ProcessDef.getId(), "userTask1Id"));
+
+        ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask"))
+                .validateMigration(processInstance.getId());
+
+        assertThat(validationResult.isMigrationValid()).isTrue();
+
+        //Migrate process - moving all instances
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "theTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigrationOfProcessInstances("MP", 1, null);
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrateProcessInstances("MP", 1, null);
+
+        executions = runtimeService.createExecutionQuery().list();
+        assertThat(executions).hasSize(2); //includes root execution
+        executions.stream()
+                .map(e -> (ExecutionEntity) e)
+                .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId()));
+
+        tasks = taskService.createTaskQuery().list();
+        assertThat(tasks)
+                .extracting(Task::getProcessDefinitionId, Task::getTaskDefinitionKey)
+                .containsExactly(tuple(version2ProcessDef.getId(), "theTask"));
+
+        taskService.complete(tasks.get(0).getId());
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
     public void testSimpleMigrationWithExplicitActivityMapping1() {
         //Deploy first version of the process
         Deployment oneActivityProcessDeployment = repositoryService.createDeployment()

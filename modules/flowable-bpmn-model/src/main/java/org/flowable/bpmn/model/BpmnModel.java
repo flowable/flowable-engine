@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +34,11 @@ public class BpmnModel {
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, BpmnDiEdge> edgeMap = new LinkedHashMap<>();
     protected List<Signal> signals = new ArrayList<>();
     protected Map<String, MessageFlow> messageFlowMap = new LinkedHashMap<>();
     protected Map<String, Message> messageMap = new LinkedHashMap<>();
+    protected Map<String, List<String>> variableListenerToActivityMap = new HashMap<>();
     protected Map<String, String> errorMap = new LinkedHashMap<>();
     protected Map<String, Escalation> escalationMap = new LinkedHashMap<>();
     protected Map<String, ItemDefinition> itemDefinitionMap = new LinkedHashMap<>();
@@ -51,6 +54,8 @@ public class BpmnModel {
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
     protected Object eventSupport;
+    protected String exporter;
+    protected String exporterVersion;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
         return definitionsAttributes;
@@ -276,6 +281,14 @@ public class BpmnModel {
     public void removeFlowGraphicInfoList(String key) {
         flowLocationMap.remove(key);
     }
+    
+    public BpmnDiEdge getEdgeInfo(String key) {
+        return edgeMap.get(key);
+    }
+    
+    public void addEdgeInfo(String key, BpmnDiEdge edgeInfo) {
+        edgeMap.put(key, edgeInfo);
+    }
 
     public Map<String, GraphicInfo> getLocationMap() {
         return locationMap;
@@ -283,6 +296,10 @@ public class BpmnModel {
 
     public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
+    }
+
+    public Map<String, BpmnDiEdge> getEdgeMap() {
+        return edgeMap;
     }
 
     public GraphicInfo getLabelGraphicInfo(String key) {
@@ -424,9 +441,35 @@ public class BpmnModel {
         }
         return result;
     }
-
+    
     public boolean containsMessageId(String messageId) {
         return messageMap.containsKey(messageId);
+    }
+    
+    public List<String> getActivityIdsForVariableListenerName(String variableName) {
+        return variableListenerToActivityMap.get(variableName);
+    }
+
+    public void addActivityIdForVariableListenerName(String variableName, String activityId) {
+        List<String> activityIds = null;
+        if (variableListenerToActivityMap.containsKey(variableName)) {
+            activityIds = variableListenerToActivityMap.get(variableName);
+        }
+        
+        if (activityIds == null) {
+            activityIds = new ArrayList<>();
+        }
+        
+        activityIds.add(activityId);
+        variableListenerToActivityMap.put(variableName, activityIds);
+    }
+
+    public boolean containsVariableListenerForVariableName(String variableName) {
+        return variableListenerToActivityMap.containsKey(variableName);
+    }
+    
+    public boolean hasVariableListeners() {
+        return !variableListenerToActivityMap.isEmpty();
     }
 
     public Map<String, String> getErrors() {
@@ -606,5 +649,18 @@ public class BpmnModel {
 
     public void setEventSupport(Object eventSupport) {
         this.eventSupport = eventSupport;
+    }
+
+    public String getExporter() {
+        return exporter;
+    }
+    public void setExporter(String exporter) {
+        this.exporter = exporter;
+    }
+    public String getExporterVersion() {
+        return exporterVersion;
+    }
+    public void setExporterVersion(String exporterVersion) {
+        this.exporterVersion = exporterVersion;
     }
 }

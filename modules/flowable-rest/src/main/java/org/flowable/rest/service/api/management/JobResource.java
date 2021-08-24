@@ -78,7 +78,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/management/timer-jobs/{jobId}", produces = "application/json")
     public JobResponse getTimerJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getTimerJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createTimerJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single suspended job", tags = { "Jobs" })
@@ -89,7 +89,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/management/suspended-jobs/{jobId}", produces = "application/json")
     public JobResponse getSuspendedJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getSuspendedJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createSuspendedJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single deadletter job", tags = { "Jobs" })
@@ -100,7 +100,7 @@ public class JobResource extends JobBaseResource {
     @GetMapping(value = "/management/deadletter-jobs/{jobId}", produces = "application/json")
     public JobResponse getDeadletterJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletRequest request) {
         Job job = getDeadLetterJobById(jobId);
-        return restResponseFactory.createJobResponse(job);
+        return restResponseFactory.createDeadLetterJobResponse(job);
     }
 
     @ApiOperation(value = "Get a single history job job", tags = { "Jobs" })
@@ -124,7 +124,7 @@ public class JobResource extends JobBaseResource {
     @ApiOperation(value = "Delete a job", tags = { "Jobs" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the job was found and has been deleted. Response-body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested job was not found..")
+            @ApiResponse(code = 404, message = "Indicates the requested job was not found.")
     })
     @DeleteMapping("/management/jobs/{jobId}")
     public void deleteJob(@ApiParam(name = "jobId") @PathVariable String jobId, HttpServletResponse response) {

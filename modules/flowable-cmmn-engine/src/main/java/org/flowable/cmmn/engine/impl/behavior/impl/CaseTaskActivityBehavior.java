@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -121,12 +122,16 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
-        caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
-        caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
 
         if (sameDeployment) {
             caseInstanceBuilder.caseDefinitionParentDeploymentId(
                     CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId(), cmmnEngineConfiguration));
+        }
+
+        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
+        if (blocking) {
+            caseInstanceBuilder.callbackType(CallbackTypes.PLAN_ITEM_CHILD_CASE);
+            caseInstanceBuilder.callbackId(planItemInstanceEntity.getId());
         }
 
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
@@ -150,7 +155,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                             variablesFromFormSubmission, caseInstanceEntity.getTenantId());
         }
 
-        if (!evaluateIsBlocking(planItemInstanceEntity)) {
+        if (!blocking) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
@@ -215,6 +220,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
             CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
             CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(delegatePlanItemInstance.getReferenceId());
             if (caseInstance != null && !caseInstance.isDeleted()) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
+                        caseInstance, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
                 caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
             }
             

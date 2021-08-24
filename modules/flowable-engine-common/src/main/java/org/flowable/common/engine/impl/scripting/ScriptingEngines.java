@@ -23,6 +23,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -83,9 +84,17 @@ public class ScriptingEngines {
 
     protected Object evaluate(String script, String language, Bindings bindings) {
         ScriptEngine scriptEngine = getEngineByName(language);
+        return evaluate(scriptEngine, script, bindings);
+    }
+
+    protected Object evaluate(ScriptEngine scriptEngine, String script, Bindings bindings) {
         try {
             return scriptEngine.eval(script, bindings);
         } catch (ScriptException e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof FlowableException) {
+                throw (FlowableException) rootCause;
+            }
             throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
         }
     }
@@ -96,26 +105,35 @@ public class ScriptingEngines {
         if (cacheScriptingEngines) {
             scriptEngine = cachedEngines.get(language);
             if (scriptEngine == null) {
-                scriptEngine = scriptEngineManager.getEngineByName(language);
+                synchronized (scriptEngineManager) {
+                    // Get the cached engine again in case a different thread already created it
+                    scriptEngine = cachedEngines.get(language);
 
-                if (scriptEngine != null) {
-                    // ACT-1858: Special handling for groovy engine regarding GC
-                    if (GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
-                        try {
-                            scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak", ScriptContext.ENGINE_SCOPE);
-                        } catch (Exception ignore) {
-                            // ignore this, in case engine doesn't support the
-                            // passed attribute
-                        }
+                    if (scriptEngine != null) {
+                        return scriptEngine;
                     }
 
-                    // Check if script-engine allows caching, using "THREADING"
-                    // parameter as defined in spec
-                    Object threadingParameter = scriptEngine.getFactory().getParameter("THREADING");
-                    if (threadingParameter != null) {
-                        // Add engine to cache as any non-null result from the
-                        // threading-parameter indicates at least MT-access
-                        cachedEngines.put(language, scriptEngine);
+                    scriptEngine = scriptEngineManager.getEngineByName(language);
+
+                    if (scriptEngine != null) {
+                        // ACT-1858: Special handling for groovy engine regarding GC
+                        if (GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
+                            try {
+                                scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak", ScriptContext.ENGINE_SCOPE);
+                            } catch (Exception ignore) {
+                                // ignore this, in case engine doesn't support the
+                                // passed attribute
+                            }
+                        }
+
+                        // Check if script-engine allows caching, using "THREADING"
+                        // parameter as defined in spec
+                        Object threadingParameter = scriptEngine.getFactory().getParameter("THREADING");
+                        if (threadingParameter != null) {
+                            // Add engine to cache as any non-null result from the
+                            // threading-parameter indicates at least MT-access
+                            cachedEngines.put(language, scriptEngine);
+                        }
                     }
                 }
             }

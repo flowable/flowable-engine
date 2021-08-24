@@ -122,6 +122,15 @@ public class MybatisExternalWorkerJobDataManager extends AbstractDataManager<Ext
     }
 
     @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<ExternalWorkerJobEntity> externalWorkerJobs, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+
+        bulkUpdateEntities("updateExternalWorkerJobLocks", params, "externalWorkerJobs", externalWorkerJobs);
+    }
+
+    @Override
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);

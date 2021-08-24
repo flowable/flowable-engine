@@ -178,7 +178,21 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
     }
-    
+
+    @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+
+        bulkUpdateEntities("updateTimerJobLocks", params, "timerJobs", timerJobEntities);
+    }
+
+    @Override
+    public void bulkDeleteWithoutRevision(List<TimerJobEntity> timerJobEntities) {
+        bulkDeleteEntities("deleteTimerJobs", timerJobEntities);
+    }
+
     @Override
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();

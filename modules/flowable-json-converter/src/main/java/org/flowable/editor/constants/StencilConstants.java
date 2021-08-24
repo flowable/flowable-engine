@@ -130,11 +130,14 @@ public interface StencilConstants {
 
     final String PROPERTY_SIGNALREF = "signalref";
     final String PROPERTY_SIGNALEXPRESSION = "signalexpression";
-    
+
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 
     final String PROPERTY_ERRORREF = "errorref";
-    
+    final String PROPERTY_ERROR_VARIABLE_NAME = "errorvariablename";
+    final String PROPERTY_ERROR_VARIABLE_TRANSIENT = "errorvariabletransient";
+    final String PROPERTY_ERROR_VARIABLE_LOCAL_SCOPE = "errorvariablelocalscope";
+
     final String PROPERTY_ESCALATION_DEFINITIONS = "escalationdefinitions";
     final String PROPERTY_ESCALATION_DEFINITION_ID = "id";
     final String PROPERTY_ESCALATION_DEFINITION_NAME = "name";
@@ -347,7 +350,7 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_ERROR_REDIRECT = "shellerrorredirect";
     final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
-    
+
     final String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
 
     final String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
@@ -362,14 +365,14 @@ public interface StencilConstants {
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER = "keydetectionjsonpointer";
-    
+
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY = "triggereventkey";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME = "triggereventname";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_KEY = "triggerchannelkey";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_NAME = "triggerchannelname";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE = "triggerchanneltype";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION = "triggerchanneldestination";
-    
+
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME = "eventName";
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE = "eventType";
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME = "variableName";

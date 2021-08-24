@@ -13,7 +13,9 @@
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.job.service.impl.asyncexecutor.AcquireAsyncJobsDueLifecycleListener;
 import org.flowable.job.service.impl.asyncexecutor.AcquireAsyncJobsDueRunnable;
+import org.flowable.job.service.impl.asyncexecutor.AcquireJobsRunnableConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
@@ -27,8 +29,13 @@ public class TenantAwareAcquireAsyncJobsDueRunnable extends AcquireAsyncJobsDueR
     protected String tenantId;
 
     public TenantAwareAcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
+        this(asyncExecutor, tenantInfoHolder, tenantId, null, AcquireJobsRunnableConfiguration.DEFAULT);
+    }
+
+    public TenantAwareAcquireAsyncJobsDueRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId,
+            AcquireAsyncJobsDueLifecycleListener lifecycleListener, AcquireJobsRunnableConfiguration configuration) {
         super("flowable-tenant-" + tenantId + "-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-acquire-jobs",
-                asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager());
+                asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager(), lifecycleListener, configuration);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

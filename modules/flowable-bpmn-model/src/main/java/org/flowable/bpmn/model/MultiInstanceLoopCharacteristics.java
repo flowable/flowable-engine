@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class MultiInstanceLoopCharacteristics extends BaseElement {
 
@@ -25,6 +26,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     protected String elementVariable;
     protected String elementIndexVariable;
     protected boolean sequential;
+    protected boolean noWaitStatesAsyncLeave;
 
     protected VariableAggregationDefinitions aggregations;
 
@@ -92,6 +94,14 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.sequential = sequential;
     }
 
+    public boolean isNoWaitStatesAsyncLeave() {
+        return noWaitStatesAsyncLeave;
+    }
+
+    public void setNoWaitStatesAsyncLeave(boolean noWaitStatesAsyncLeave) {
+        this.noWaitStatesAsyncLeave = noWaitStatesAsyncLeave;
+    }
+
     public VariableAggregationDefinitions getAggregations() {
         return aggregations;
     }
@@ -126,6 +136,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         setElementVariable(otherLoopCharacteristics.getElementVariable());
         setElementIndexVariable(otherLoopCharacteristics.getElementIndexVariable());
         setSequential(otherLoopCharacteristics.isSequential());
+        setNoWaitStatesAsyncLeave(otherLoopCharacteristics.isNoWaitStatesAsyncLeave());
 
         if (otherLoopCharacteristics.getAggregations() != null) {
             setAggregations(otherLoopCharacteristics.getAggregations().clone());

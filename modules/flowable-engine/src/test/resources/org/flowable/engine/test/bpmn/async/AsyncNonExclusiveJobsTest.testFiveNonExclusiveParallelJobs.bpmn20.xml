@@ -11,23 +11,23 @@
         <parallelGateway id="parallelGateway1" name="Parallel Gateway"/>
 
         <sequenceFlow id="flowToService1" sourceRef="parallelGateway1" targetRef="serviceTaskSleep1"/>
-        <serviceTask id="serviceTaskSleep1" name="Service Task Sleep 1" flowable:class="org.flowable.engine.test.helper.SleepServiceTask" flowable:async="true"
+        <serviceTask id="serviceTaskSleep1" name="Service Task Sleep 1" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
                      flowable:exclusive="false"/>
 
         <sequenceFlow id="flowToService2" sourceRef="parallelGateway1" targetRef="serviceTaskSleep2"/>
-        <serviceTask id="serviceTaskSleep2" name="Service Task Sleep 2" flowable:class="org.flowable.engine.test.helper.SleepServiceTask" flowable:async="true"
+        <serviceTask id="serviceTaskSleep2" name="Service Task Sleep 2" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
                      flowable:exclusive="false"/>
 
         <sequenceFlow id="flowToService3" sourceRef="parallelGateway1" targetRef="serviceTaskSleep3"/>
-        <serviceTask id="serviceTaskSleep3" name="Service Task Sleep 3" flowable:class="org.flowable.engine.test.helper.SleepServiceTask" flowable:async="true"
+        <serviceTask id="serviceTaskSleep3" name="Service Task Sleep 3" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
                      flowable:exclusive="false"/>
 
         <sequenceFlow id="flowToService4" sourceRef="parallelGateway1" targetRef="serviceTaskSleep4"/>
-        <serviceTask id="serviceTaskSleep4" name="Service Task Sleep 4" flowable:class="org.flowable.engine.test.helper.SleepServiceTask" flowable:async="true"
+        <serviceTask id="serviceTaskSleep4" name="Service Task Sleep 4" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
                      flowable:exclusive="false"/>
 
         <sequenceFlow id="flowToService5" sourceRef="parallelGateway1" targetRef="serviceTaskSleep5"/>
-        <serviceTask id="serviceTaskSleep5" name="Service Task Sleep 5" flowable:class="org.flowable.engine.test.helper.SleepServiceTask" flowable:async="true"
+        <serviceTask id="serviceTaskSleep5" name="Service Task Sleep 5" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
                      flowable:exclusive="false"/>
 
 

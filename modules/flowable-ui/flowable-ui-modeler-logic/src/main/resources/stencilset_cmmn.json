@@ -1342,8 +1342,8 @@
       "hiddenPropertyPackages" : [],
       "roles" : [
         "Activity",
-        "sequence_start",
-        "sequence_end",
+        "association_start",
+        "association_end",
         "ActivitiesMorph",
         "all"
       ]
@@ -1381,8 +1381,8 @@
       "hiddenPropertyPackages" : [],
       "roles" : [
         "Activity",
-        "sequence_start",
-        "sequence_end",
+        "association_start",
+        "association_end",
         "ActivitiesMorph",
         "all"
       ]

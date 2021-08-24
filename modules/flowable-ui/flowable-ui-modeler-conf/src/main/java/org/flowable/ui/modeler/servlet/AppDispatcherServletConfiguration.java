@@ -14,14 +14,10 @@ package org.flowable.ui.modeler.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
@@ -35,23 +31,10 @@ public class AppDispatcherServletConfiguration extends WebMvcConfigurationSuppor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDispatcherServletConfiguration.class);
 
-    @Bean
-    public SessionLocaleResolver localeResolver() {
-        return new SessionLocaleResolver();
-    }
-
-    @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
-        LOGGER.debug("Configuring localeChangeInterceptor");
-        LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("language");
-    }
-
     @Override
     protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();
-        requestMappingHandlerMapping.setUseSuffixPatternMatch(false);
         requestMappingHandlerMapping.setRemoveSemicolonContent(false);
         return requestMappingHandlerMapping;
     }

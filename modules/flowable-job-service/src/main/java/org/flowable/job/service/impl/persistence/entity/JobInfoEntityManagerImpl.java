@@ -13,6 +13,7 @@
 
 package org.flowable.job.service.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.impl.Page;
@@ -58,14 +59,13 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity, DM exten
     }
 
     @Override
-    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime) {
+        dataManager.bulkUpdateJobLockWithoutRevisionCheck(jobEntities, lockOwner, lockExpirationTime);
     }
 
     @Override
-    public JobServiceConfiguration getJobServiceConfiguration() {
-        // TODO Auto-generated method stub
-        return null;
+    public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
 }

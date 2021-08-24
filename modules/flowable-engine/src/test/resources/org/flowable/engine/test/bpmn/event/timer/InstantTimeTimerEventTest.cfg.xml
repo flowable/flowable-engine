@@ -33,8 +33,9 @@
         <property name="databaseSchemaUpdate" value="drop-create"/>
 
         <!-- job executor configurations -->
-        <property name="asyncExecutor" ref="asyncExecutor"/>
         <property name="asyncExecutorActivate" value="false"/>
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
 
         <property name="asyncFailedJobWaitTime" value="1"/>
 
@@ -71,11 +72,6 @@
                 <entry key="instantTimeProvider" value-ref="instantTimeProvider"/>
             </map>
         </property>
-    </bean>
-
-    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
     </bean>
 
     <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean"/>

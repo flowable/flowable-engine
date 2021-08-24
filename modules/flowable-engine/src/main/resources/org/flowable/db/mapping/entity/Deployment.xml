@@ -91,11 +91,11 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
@@ -205,7 +205,7 @@
   </select>
 
   <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.agenda;
 
+import java.util.Collection;
+
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -111,6 +113,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     public void planEvaluateConditionalEventsOperation(ExecutionEntity execution) {
         planOperation(new EvaluateConditionalEventsOperation(commandContext, execution), execution);
     }
+    
+    @Override
+    public void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId) {
+        planOperation(new EvaluateVariableListenerEventDefinitionsOperation(commandContext, processDefinitionId, processInstanceId));
+    }
 
     @Override
     public void planDestroyScopeOperation(ExecutionEntity execution) {
@@ -118,8 +125,8 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     }
 
     @Override
-    public void planExecuteInactiveBehaviorsOperation() {
-        planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
+    public void planExecuteInactiveBehaviorsOperation(Collection<ExecutionEntity> executions) {
+        planOperation(new ExecuteInactiveBehaviorsOperation(commandContext, executions));
     }
 
 }

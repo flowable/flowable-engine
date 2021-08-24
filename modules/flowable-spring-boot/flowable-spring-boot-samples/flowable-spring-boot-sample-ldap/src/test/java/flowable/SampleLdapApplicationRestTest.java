@@ -18,8 +18,7 @@ import java.util.Base64;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.rest.service.api.repository.ProcessDefinitionResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,14 +30,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebClient(registerRestTemplate = true)
-@RunWith(SpringRunner.class)
 public class SampleLdapApplicationRestTest extends AbstractSampleLdapTest {
 
     @LocalServerPort

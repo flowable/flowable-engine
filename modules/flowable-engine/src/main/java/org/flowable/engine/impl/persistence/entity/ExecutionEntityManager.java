@@ -72,6 +72,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
+    long countActiveExecutionsByParentId(String parentId);
+
     /**
      * Returns all child executions of a given {@link ExecutionEntity}. 
      * In the list, child executions will be behind parent executions.
@@ -88,22 +90,28 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey);
 
     void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
-
+    
     void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);
+
+    void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean directDeleteInDatabase);
 
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
             String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
     void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, 
-            Collection<String> executionIdsNotToSendCancelledEventsFor, String deleteReason, boolean cancel, FlowElement cancelActivity);
+            Collection<String> executionIdsNotToSendCancelledEventsFor, String deleteReason,
+            boolean cancel, FlowElement cancelActivity);
     
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
-    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean cancel, FlowElement cancelActivity);
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, 
+            boolean directDeleteInDatabase, boolean cancel, FlowElement cancelActivity);
+    
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory, boolean directDeleteInDatabase);
     
     void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean deleteHistory);
     
-    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason);
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean directDeleteInDatabase);
 
     void updateProcessInstanceLockTime(String processInstanceId, String lockOwner, Date lockTime);
 

@@ -705,6 +705,12 @@
           "DESCRIPTION": "信号名を定義。"
         }
       },
+      "COMPENSATIONACTIVITYREFPACKAGE" : {
+        "COMPENSATIONACTIVITYREF" : {
+          "TITLE" : "報酬活動リファレンス",
+          "DESCRIPTION" : "アクティビティ参照を定義します。"
+        }
+      },
       "ERRORREFPACKAGE": {
         "ERRORREF": {
           "TITLE": "エラー参照",
@@ -1162,6 +1168,10 @@
       "THROWESCALATIONEVENT": {
         "TITLE": "エスカレーション中間送信イベント",
         "DESCRIPTION": "エスカレーショントリガー付きの中間送信イベント"
+      },
+      "THROWCOMPENSATIONEVENT": {
+        "TITLE" : "中間補償スローイベント",
+        "DESCRIPTION" : "補償トリガーを伴う中間イベント"
       },
       "ENDNONEEVENT": {
         "TITLE": "終了イベント",

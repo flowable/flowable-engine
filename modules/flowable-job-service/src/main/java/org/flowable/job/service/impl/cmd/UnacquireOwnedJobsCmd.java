@@ -42,8 +42,13 @@ public class UnacquireOwnedJobsCmd implements Command<Void> {
         JobQueryImpl jobQuery = new JobQueryImpl(commandContext, jobServiceConfiguration);
         jobQuery.lockOwner(lockOwner);
 
+        // The tenantId is only used if it has been explicitly set
         if (tenantId != null) {
-            jobQuery.jobTenantId(tenantId);
+            if (!tenantId.isEmpty()) {
+                jobQuery.jobTenantId(tenantId);
+            } else {
+                jobQuery.jobWithoutTenantId();
+            }
         }
 
         List<Job> jobs = jobServiceConfiguration.getJobEntityManager().findJobsByQueryCriteria(jobQuery);

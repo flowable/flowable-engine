@@ -28,6 +28,7 @@ import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
@@ -71,6 +72,10 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                 
                 } else if (eventDefinition instanceof EscalationEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEscalationStartEventActivityBehavior(element));
+                
+                } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+                    VariableListenerEventDefinition variableListenerEventDefinition = (VariableListenerEventDefinition) eventDefinition;
+                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessVariableListenerlStartEventActivityBehavior(element, variableListenerEventDefinition));
                 }
                 
             } else {

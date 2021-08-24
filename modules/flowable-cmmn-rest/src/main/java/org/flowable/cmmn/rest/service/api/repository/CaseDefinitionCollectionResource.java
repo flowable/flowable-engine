@@ -74,6 +74,7 @@ public class CaseDefinitionCollectionResource {
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return case definitions with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return case definitions with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return case definitions with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return case definitions with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return case definitions with the given key.", paramType = "query"),
             @ApiImplicitParam(name = "keyLike", dataType = "string", value = "Only return case definitions with a name like the given key.", paramType = "query"),
             @ApiImplicitParam(name = "resourceName", dataType = "string", value = "Only return case definitions with the given resource name.", paramType = "query"),
@@ -116,6 +117,9 @@ public class CaseDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("nameLike")) {
             caseDefinitionQuery.caseDefinitionNameLike(allRequestParams.get("nameLike"));
+        }
+        if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
+            caseDefinitionQuery.caseDefinitionNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
         if (allRequestParams.containsKey("resourceName")) {
             caseDefinitionQuery.caseDefinitionResourceName(allRequestParams.get("resourceName"));

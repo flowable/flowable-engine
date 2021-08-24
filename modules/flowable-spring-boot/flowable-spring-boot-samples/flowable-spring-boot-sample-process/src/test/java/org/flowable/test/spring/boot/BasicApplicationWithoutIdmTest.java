@@ -18,19 +18,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
 import org.flowable.idm.api.IdmIdentityService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.Application;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @TestPropertySource(properties = "flowable.idm.enabled=false")
 public class BasicApplicationWithoutIdmTest {

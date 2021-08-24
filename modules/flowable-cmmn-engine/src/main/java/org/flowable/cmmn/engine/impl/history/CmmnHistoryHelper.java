@@ -19,6 +19,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -58,6 +59,8 @@ public class CmmnHistoryHelper {
         for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
             historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
         }
+
+        TaskHelper.deleteHistoricTaskInstancesByCaseInstanceId(caseInstanceId, cmmnEngineConfiguration);
 
         historicCaseInstanceEntityManager.delete(historicCaseInstance);
 

@@ -22,6 +22,7 @@ import org.flowable.ui.admin.properties.FlowableAdminAppProperties;
 import org.flowable.ui.admin.repository.ServerConfigRepository;
 import org.flowable.ui.admin.service.engine.ServerConfigService;
 import org.flowable.ui.common.service.exception.InternalServerErrorException;
+import org.flowable.ui.common.util.LiquibaseUtil;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
@@ -85,6 +86,14 @@ public class AdminDatabaseConfiguration {
     public Liquibase liquibase(DataSource dataSource) {
         LOGGER.debug("Configuring Liquibase");
 
+        try {
+            return LiquibaseUtil.runInFlowableScope(() -> createAndUpdateLiquibase(dataSource));
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error creating liquibase database", e);
+        }
+    }
+
+    protected Liquibase createAndUpdateLiquibase(DataSource dataSource) {
         Liquibase liquibase = null;
         try {
 

@@ -49,9 +49,8 @@
     </select>
 
     <select id="selectJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -70,13 +69,13 @@
                 </foreach>
             </if>
         </where>
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
     
     <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
         <where>
             <if test="parameter.jobExecutionScope == null">
@@ -94,8 +93,9 @@
                     #{item}
                 </foreach>
             </if>
-        </where> 
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        </where>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
     
     <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
@@ -123,11 +123,11 @@
     </select>
 
     <select id="selectJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">
@@ -222,6 +222,9 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <if test="withoutScopeType">
+                and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
+            </if>
         </where>
     </sql>
 
@@ -267,6 +270,14 @@
         ) AS tempTask
 
         )
+    </update>
+
+    <update id="updateJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="jobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
     </update>
 
     <!-- JOB INSERT -->
@@ -411,10 +422,11 @@
             SCOPE_TYPE_, 
             SCOPE_DEFINITION_ID_,
             CORRELATION_ID_,
-            DUEDATE_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            DUEDATE_,
+            REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
             CUSTOM_VALUES_ID_,
@@ -437,10 +449,11 @@
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
             #{job.correlationId, jdbcType=VARCHAR},
-            #{job.duedate, jdbcType=TIMESTAMP},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
+            #{job.duedate, jdbcType=TIMESTAMP},
+            #{job.repeat, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
             #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},

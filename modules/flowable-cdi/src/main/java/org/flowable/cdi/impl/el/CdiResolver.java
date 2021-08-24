@@ -26,6 +26,19 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 
 /**
  * Resolver wrapping an instance of javax.el.ELResolver obtained from the {@link BeanManager}. Allows flowable-engine to resolve Cdi-Beans.
+ *
+ * This {@link ELResolver} implementation performs lazy lookup of the Cdi-BeanManager and can thus be configured using the spring-based configuration of the process engine:
+ *
+ * <pre>
+ * &lt;property name="customElResolvers"&gt;
+ *      &lt;list&gt;
+ *          &lt;bean class="org.flowable.cdi.impl.el.CdiResolver" /&gt;
+ *      &lt;/list&gt;
+ * &lt;/property&gt;
+ * </pre>
+ *
+ * <b>IMPORTANT:</b> If you are using the {@link org.flowable.cdi.CdiStandaloneProcessEngineConfiguration} or {@link org.flowable.cdi.CdiJtaProcessEngineConfiguration}
+ * then you don't need to configure this.
  * 
  * @author Daniel Meyer
  */

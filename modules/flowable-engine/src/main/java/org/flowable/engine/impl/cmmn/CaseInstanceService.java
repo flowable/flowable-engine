@@ -31,10 +31,12 @@ public interface CaseInstanceService {
     String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
             String executionId, String tenantId, boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap);
     
-    void handleSignalEvent(EventSubscriptionEntity eventSubscription);
+    void handleSignalEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> variables);
 
     void deleteCaseInstance(String caseInstanceId);
 
     void deleteCaseInstancesForExecutionId(String executionId);
+    
+    void deleteCaseInstanceWithoutAgenda(String caseInstanceId);
 
 }

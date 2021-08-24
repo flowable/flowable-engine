@@ -33,6 +33,8 @@ public interface HistoricCaseInstance {
     Date getStartTime();
     Date getEndTime();
     String getStartUserId();
+    Date getLastReactivationTime();
+    String getLastReactivationUserId();
     String getCallbackId();
     String getCallbackType();
     String getReferenceId();

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -507,6 +508,112 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskDefinitionKey("theTask").or().deploymentIdIn(deploymentIds).endOr();
         assertThat(taskInstanceQuery.count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessCandidateGroups.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryByCandidateGroups() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        List<String> testCandidateGroups = new ArrayList<>();
+        testCandidateGroups.add("groupA");
+        testCandidateGroups.add("groupC");
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").taskCandidateGroupIn(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(5);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(5);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("undefined").taskCandidateGroupIn(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        testCandidateGroups.add("groupB");
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcessCandidateGroups.bpmn20.xml", "org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml" })
+    public void testHistoricTaskInstanceQueryByInvolvedGroups() {
+        for (int i = 0; i < 4; i++) {
+            runtimeService.startProcessInstanceByKey("oneTaskProcess", String.valueOf(i));
+        }
+        runtimeService.startProcessInstanceByKey("oneTaskProcess2", "1");
+
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
+
+        List<String> testCandidateGroups = new ArrayList<>();
+        testCandidateGroups.add("groupA");
+        testCandidateGroups.add("groupC");
+        HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        List<HistoricTaskInstance> taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        testCandidateGroups = new ArrayList<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
+            testCandidateGroups.add("group" + i);
+        }
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("theTask").taskInvolvedGroups(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(5);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(5);
+        
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().or().taskDefinitionKey("undefined").taskInvolvedGroups(testCandidateGroups).endOr();
+        assertThat(taskInstanceQuery.count()).isEqualTo(0);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(0);
+        
+        testCandidateGroups.add("groupB");
+        taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskInvolvedGroups(testCandidateGroups);
+        assertThat(taskInstanceQuery.count()).isEqualTo(4);
+
+        taskInstances = taskInstanceQuery.list();
+        assertThat(taskInstances).hasSize(4);
     }
 
     @Test

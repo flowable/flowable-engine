@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.6.1-SNAPSHOT</version>
+		<version>6.7.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.14</version>
+			<version>8.0.19</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

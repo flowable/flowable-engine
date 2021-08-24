@@ -14,6 +14,8 @@ package org.flowable.cmmn.test.listener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -173,6 +175,8 @@ public class AvailableConditionTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeGenericEventListenerInstance(eventListenerPlanItemInstance.getId());
         eventListenerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.GENERIC_EVENT_LISTENER).includeEnded().singleResult();
         assertThat(eventListenerPlanItemInstance.getEndedTime()).isNotNull();
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
 
         Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(taskC.getName()).isEqualTo("C");

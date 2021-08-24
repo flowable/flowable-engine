@@ -106,9 +106,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Collection<String> taskDefinitionKeys;
     protected String candidateUser;
     protected String candidateGroup;
-    private Collection<String> candidateGroups;
+    protected Collection<String> candidateGroups;
+    private List<List<String>> safeCandidateGroups;
     protected String involvedUser;
     protected Collection<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected boolean ignoreAssigneeValue;
     protected Integer taskPriority;
     protected Integer taskMinPriority;
@@ -138,7 +140,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean withLocalizationFallback;
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
-    protected Integer taskVariablesLimit;
     protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
@@ -1579,7 +1580,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     @Override
     public HistoricTaskInstanceQuery limitTaskVariables(Integer taskVariablesLimit) {
-        this.taskVariablesLimit = taskVariablesLimit;
         return this;
     }
 
@@ -1587,10 +1587,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
-    }
-
-    public Integer getTaskVariablesLimit() {
-        return taskVariablesLimit;
     }
 
     @Override
@@ -1749,26 +1745,6 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public HistoricTaskInstanceQuery orderByTenantId() {
         orderBy(HistoricTaskInstanceQueryProperty.TENANT_ID_);
         return this;
-    }
-
-    @Override
-    protected void checkQueryOk() {
-        super.checkQueryOk();
-        // In case historic query variables are included, an additional order-by
-        // clause should be added
-        // to ensure the last value of a variable is used
-        if (includeProcessVariables || includeTaskLocalVariables) {
-            this.orderBy(HistoricTaskInstanceQueryProperty.INCLUDED_VARIABLE_TIME).asc();
-        }
-    }
-
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
-            specialOrderBy = specialOrderBy.replace("VAR.", "TEMPVAR_");
-        }
-        return specialOrderBy;
     }
 
     public Collection<String> getCandidateGroups() {
@@ -2163,7 +2139,43 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return locale;
     }
 
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
+
+    public Collection<String> getCaseDefinitionKeys() {
+        return caseDefinitionKeys;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
     public List<HistoricTaskInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCandidateGroups() {
+        return safeCandidateGroups;
+    }
+
+    public void setSafeCandidateGroups(List<List<String>> safeCandidateGroups) {
+        this.safeCandidateGroups = safeCandidateGroups;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
     }
 }

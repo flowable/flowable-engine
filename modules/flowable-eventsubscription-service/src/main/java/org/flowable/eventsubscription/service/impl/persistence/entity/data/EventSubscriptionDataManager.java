@@ -51,6 +51,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     List<SignalEventSubscriptionEntity> findSignalEventSubscriptionsByNameAndExecution(final String name, final String executionId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(final String executionId, final String type);
+    
+    List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndType(final String processInstanceId, final String type);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(final String processInstanceId, final String activityId, final String type);
 
@@ -59,6 +61,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    
+    List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByName(final String type, final String eventName, final String tenantId);
 

@@ -49,6 +49,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     public static ExtensionElement parseExtensionElement(XMLStreamReader xtr) throws Exception {
         ExtensionElement extensionElement = new ExtensionElement();
         extensionElement.setName(xtr.getLocalName());
+        addXMLLocation(extensionElement, xtr);
         if (StringUtils.isNotEmpty(xtr.getNamespaceURI())) {
             extensionElement.setNamespace(xtr.getNamespaceURI());
         }

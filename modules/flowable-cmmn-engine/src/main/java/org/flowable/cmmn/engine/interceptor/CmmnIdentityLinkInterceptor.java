@@ -27,4 +27,6 @@ public interface CmmnIdentityLinkInterceptor {
     void handleAddOwnerIdentityLinkToTask(TaskEntity taskEntity, String owner);
     
     void handleCreateCaseInstance(CaseInstanceEntity caseInstance);
+
+    void handleReactivateCaseInstance(CaseInstanceEntity caseInstance);
 }

@@ -338,6 +338,20 @@
     </annotation>
   </attribute>
 
+  <attribute name="noWaitStatesAsyncLeave" type="boolean">
+    <annotation>
+      <documentation>
+        This attribute can be set on the 'multiInstanceLoopCharacteristics' of an activity.
+        The default is false when not set. If set to true, the engine will assume all instances of
+        the multi-instances are automatic steps without wait states. When doing so, the leave of
+        the multi-instance activity will be happening asynchronous in an exclusive job that gets
+        scheduled (and rescheduled) to check whether the multi-instance is completed. Similar
+        to the async leave (engine-wide feature), this will also avoid optimistic locking exceptions
+        when completing.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <attribute name="useLocalScopeForResultVariable" type="boolean">
     <annotation>
       <documentation>

@@ -165,11 +165,11 @@
   </select>
   
   <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultType="long">
@@ -203,6 +203,9 @@
       </if>
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+      </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
@@ -272,11 +275,19 @@
                  exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.USER_ID_ = #{authorizationUserId})
              </if>
               <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
-                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.GROUP_ID_ IN
-                  <foreach item="group" index="index" collection="authorizationGroups"
-                           open="(" separator="," close=")">
-                      #{group}
-                  </foreach>
+                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and 
+                    (
+                    <foreach item="authorizationGroupListItem" index="groupIndex" collection="safeAuthorizationGroups">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        IDN.GROUP_ID_ IN
+                        <foreach item="group" index="index" collection="authorizationGroupListItem"
+                              open="(" separator="," close=")">
+                          #{group}
+                        </foreach>
+                    </foreach>
+                    )
                   )
               </if>
 

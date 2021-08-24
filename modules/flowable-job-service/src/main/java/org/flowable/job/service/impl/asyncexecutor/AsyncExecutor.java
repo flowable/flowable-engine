@@ -38,8 +38,6 @@ public interface AsyncExecutor {
      */
     boolean executeAsyncJob(JobInfo job);
 
-    int getRemainingCapacity();
-
     /* Getters and Setters */
 
     void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration);
@@ -82,8 +80,16 @@ public interface AsyncExecutor {
 
     void setMaxTimerJobsPerAcquisition(int maxJobs);
 
+    /**
+     * @deprecated no longer used
+     */
+    @Deprecated
     int getRetryWaitTimeInMillis();
 
+    /**
+     * @deprecated no longer used
+     */
+    @Deprecated
     void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
 
     int getResetExpiredJobsInterval();

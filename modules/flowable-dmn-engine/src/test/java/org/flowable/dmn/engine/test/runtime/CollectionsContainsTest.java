@@ -50,6 +50,7 @@ public class CollectionsContainsTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
     public void testContainsTrue() {
         Map<String, Object> processVariablesInput = new HashMap<>();
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         List inputVariable1 = Arrays.asList("test1", "test2", "test3");
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
@@ -59,6 +60,7 @@ public class CollectionsContainsTest {
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
         List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
         List inputVariable8 = Arrays.asList("100", "101");
+        LocalDate date1 = dtf.parseLocalDate("2021-02-02");
 
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
@@ -82,6 +84,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
+        processVariablesInput.put("date1", date1.toDate());
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
@@ -115,12 +118,15 @@ public class CollectionsContainsTest {
         assertThat(result.getRuleExecutions().get(27).isValid()).isTrue();
         assertThat(result.getRuleExecutions().get(28).isValid()).isTrue();
         assertThat(result.getRuleExecutions().get(29).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(30).isValid()).isTrue();
+        assertThat(result.getRuleExecutions().get(31).isValid()).isTrue();
     }
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
     public void testContainsFalse() {
         Map<String, Object> processVariablesInput = new HashMap<>();
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         List inputVariable1 = Arrays.asList("test1", "test2", "test3");
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
@@ -137,6 +143,7 @@ public class CollectionsContainsTest {
         ArrayNode arrayNode4 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F).add(20.5555F).add(50.5555F);
         ArrayNode arrayNode5 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F);
         ObjectNode nestedArrayNode1 = objectMapper.createObjectNode().putPOJO("property1", arrayNode1);
+        LocalDate date1 = dtf.parseLocalDate("2021-02-02");
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
@@ -153,6 +160,7 @@ public class CollectionsContainsTest {
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
+        processVariablesInput.put("date1", date1);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
@@ -179,6 +187,9 @@ public class CollectionsContainsTest {
         LocalDate date1 = dtf.parseLocalDate("2017-12-25");
         LocalDate date2 = dtf.parseLocalDate("2018-12-25");
 
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        java.time.LocalDate date3 = java.time.LocalDate.parse("2017-12-25", formatter);
+
         List<String> collectionString = Arrays.asList("test1", "test2", "test3");
         List<Boolean> collectionBoolean = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
         List<Date> collectionDate = Arrays.asList(date1.toDate(), date2.toDate());
@@ -196,6 +207,9 @@ public class CollectionsContainsTest {
         processVariablesInput.put("collectionLong", collectionLong);
         processVariablesInput.put("collectionFloat", collectionFloat);
         processVariablesInput.put("collectionDouble", collectionDouble);
+        processVariablesInput.put("stringLocalDate", "2017-12-25");
+        processVariablesInput.put("jodaLocalDate", date1);
+        processVariablesInput.put("javaLocalDate", date3);
 
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();

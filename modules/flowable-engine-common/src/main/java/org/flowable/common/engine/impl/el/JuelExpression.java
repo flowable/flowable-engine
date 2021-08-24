@@ -44,6 +44,8 @@ public class JuelExpression implements Expression {
     @Override
     public Object getValue(VariableContainer variableContainer) {
         ELContext elContext = expressionManager.getElContext(variableContainer);
+        Object originalVariableContainer = elContext.getContext(VariableContainer.class);
+        elContext.putContext(VariableContainer.class, variableContainer);
         Object originalValueContext = elContext.getContext(EvaluationState.class);
         elContext.putContext(EvaluationState.class, EvaluationState.READ);
         try {
@@ -58,6 +60,7 @@ public class JuelExpression implements Expression {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
         } finally {
             elContext.putContext(EvaluationState.class, originalValueContext);
+            elContext.putContext(VariableContainer.class, originalVariableContainer);
         }
     }
 
@@ -68,6 +71,8 @@ public class JuelExpression implements Expression {
     @Override
     public void setValue(Object value, VariableContainer variableContainer) {
         ELContext elContext = expressionManager.getElContext(variableContainer);
+        Object originalVariableContainer = elContext.getContext(VariableContainer.class);
+        elContext.putContext(VariableContainer.class, variableContainer);
         Object originalValueContext = elContext.getContext(EvaluationState.class);
         elContext.putContext(EvaluationState.class, EvaluationState.WRITE);
 
@@ -77,6 +82,7 @@ public class JuelExpression implements Expression {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
         } finally {
             elContext.putContext(EvaluationState.class, originalValueContext);
+            elContext.putContext(VariableContainer.class, originalVariableContainer);
         }
     }
 

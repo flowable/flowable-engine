@@ -359,7 +359,7 @@ public abstract class AbstractDynamicStateManager {
 
                 executionEntityManager.deleteChildExecutions(execution, "Change parent activity to " + flowElementIdsLine, true);
                 if (!moveExecutionContainer.isDirectExecutionMigration()) {
-                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, false, true, execution.getCurrentFlowElement());
+                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Change activity to " + flowElementIdsLine, false, false, true, execution.getCurrentFlowElement());
                 }
 
                 // Make sure we are not moving the root execution
@@ -489,7 +489,7 @@ public abstract class AbstractDynamicStateManager {
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, true, finalDeleteExecution.getCurrentFlowElement());
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, false, true, finalDeleteExecution.getCurrentFlowElement());
             }
         }
 
@@ -515,7 +515,7 @@ public abstract class AbstractDynamicStateManager {
 
                 String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
                 executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, true, finalDeleteExecution.getCurrentFlowElement());
+                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, false, true, finalDeleteExecution.getCurrentFlowElement());
             }
         }
 

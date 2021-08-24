@@ -77,6 +77,7 @@ public class SuspendedJobCollectionResource {
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns jobs without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "locked", dataType = "boolean", value = "If true, only return jobs which are locked.  If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "unlocked", dataType = "boolean", value = "If true, only return jobs which are unlocked. If false, this parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeType", dataType = "boolean", value = "If true, only returns jobs without a scope type set. If false, the withoutScopeType parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,dueDate,executionId,processInstanceId,retries,tenantId", paramType = "query")
     })
     @ApiResponses(value = {
@@ -156,11 +157,16 @@ public class SuspendedJobCollectionResource {
                 query.jobWithoutTenantId();
             }
         }
+        if (allRequestParams.containsKey("withoutScopeType")) {
+            if (Boolean.valueOf(allRequestParams.get("withoutScopeType"))) {
+                query.withoutScopeType();
+            }
+        }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessSuspendedJobInfoWithQuery(query);
         }
 
-        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createJobResponseList);
+        return paginateList(allRequestParams, query, "id", JobQueryProperties.PROPERTIES, restResponseFactory::createSuspendedJobResponseList);
     }
 }

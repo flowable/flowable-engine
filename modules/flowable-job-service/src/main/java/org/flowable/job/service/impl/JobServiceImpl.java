@@ -150,6 +150,13 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
 
     @Override
+    public void createAsyncJobNoTriggerAsyncExecutor(JobEntity job, boolean isExclusive) {
+        getJobManager().createAsyncJob(job, isExclusive);
+        job.setLockExpirationTime(null);
+        job.setLockOwner(null);
+    }
+
+    @Override
     public void insertJob(JobEntity job) {
         getJobEntityManager().insert(job);
     }

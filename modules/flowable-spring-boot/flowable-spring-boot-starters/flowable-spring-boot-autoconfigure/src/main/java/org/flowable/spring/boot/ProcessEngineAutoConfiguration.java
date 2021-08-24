@@ -30,6 +30,7 @@ import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobExecutorConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
@@ -62,6 +63,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
@@ -120,19 +123,26 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         this.autoDeploymentProperties = autoDeploymentProperties;
     }
 
+    @Bean
+    @ProcessAsync
+    @ConfigurationProperties(prefix = "flowable.process.async.executor")
+    public AsyncJobExecutorConfiguration processAsyncExecutorConfiguration() {
+        return new AsyncJobExecutorConfiguration();
+    }
+
     /**
      * The Async Executor must not be shared between the engines.
      * Therefore a dedicated one is always created.
      */
     @Bean
     @ProcessAsync
-    @ConfigurationProperties(prefix = "flowable.process.async.executor")
     @ConditionalOnMissingBean(name = "processAsyncExecutor")
     public SpringAsyncExecutor processAsyncExecutor(
+        @ProcessAsync AsyncJobExecutorConfiguration executorConfiguration,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor();
+        SpringAsyncExecutor asyncExecutor = new SpringAsyncExecutor(executorConfiguration);
         asyncExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
         return asyncExecutor;
     }
@@ -140,13 +150,21 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ProcessAsyncHistory
     @ConfigurationProperties(prefix = "flowable.process.async-history.executor")
+    @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
+    public AsyncJobExecutorConfiguration processAsyncHistoryExecutorConfiguration() {
+        return new AsyncJobExecutorConfiguration();
+    }
+
+    @Bean
+    @ProcessAsyncHistory
     @ConditionalOnMissingBean(name = "asyncHistoryExecutor")
     @ConditionalOnProperty(prefix = "flowable.process", name = "async-history.enable")
     public SpringAsyncHistoryExecutor asyncHistoryExecutor(
+        @ProcessAsyncHistory AsyncJobExecutorConfiguration executorConfiguration,
         ObjectProvider<SpringRejectedJobsHandler> rejectedJobsHandler,
         @Process ObjectProvider<SpringRejectedJobsHandler> processRejectedJobsHandler
     ) {
-        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor();
+        SpringAsyncHistoryExecutor asyncHistoryExecutor = new SpringAsyncHistoryExecutor(executorConfiguration);
         asyncHistoryExecutor.setRejectedJobsHandler(getIfAvailable(processRejectedJobsHandler, rejectedJobsHandler));
         return asyncHistoryExecutor;
     }
@@ -154,6 +172,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @Bean
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
+            ObjectProvider<ObjectMapper> objectMapperProvider,
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
@@ -200,6 +219,10 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
             conf.setAsyncHistoryExecutor(springAsyncHistoryExecutor);
         }
 
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            conf.setObjectMapper(objectMapper);
+        }
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 
@@ -220,6 +243,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setMailServerForceTo(mailProperties.getForceTo());
         conf.setMailServerUseSSL(mailProperties.isUseSsl());
         conf.setMailServerUseTLS(mailProperties.isUseTls());
+        conf.setMailServerDefaultCharset(mailProperties.getDefaultCharset());
 
         conf.getHttpClientConfig().setUseSystemProperties(httpProperties.isUseSystemProperties());
         conf.getHttpClientConfig().setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout());
@@ -232,6 +256,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         conf.setEnableProcessDefinitionHistoryLevel(processProperties.isEnableProcessDefinitionHistoryLevel());
         conf.setProcessDefinitionCacheLimit(processProperties.getDefinitionCacheLimit());
         conf.setEnableSafeBpmnXml(processProperties.isEnableSafeXml());
+        conf.setEventRegistryStartProcessInstanceAsync(processProperties.isEventRegistryStartProcessInstanceAsync());
 
         conf.setHistoryLevel(flowableProperties.getHistoryLevel());
         

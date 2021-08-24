@@ -57,6 +57,11 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
     
     /** Only select jobs for the given scope type. */
     TimerJobQuery scopeType(String scopeType);
+
+    /**
+     * Only return jobs that do not have a scope type.
+     */
+    TimerJobQuery withoutScopeType();
     
     /** Only select tasks for the given scope definition identifier. */
     TimerJobQuery scopeDefinitionId(String scopeDefinitionId);

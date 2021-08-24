@@ -14,12 +14,8 @@ package org.flowable.scripting.secure.behavior;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
-import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.scripting.secure.SecureJavascriptConfigurator;
 import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
@@ -30,35 +26,21 @@ import org.flowable.scripting.secure.impl.SecureJavascriptUtil;
 public class SecureJavascriptTaskActivityBehavior extends ScriptTaskActivityBehavior {
 
     public SecureJavascriptTaskActivityBehavior(String scriptTaskId, String script,
-            String language, String resultVariable, boolean storeScriptVariables) {
-        super(scriptTaskId, script, language, resultVariable, storeScriptVariables);
+        String language, String resultVariable, String skipExpression,
+        boolean storeScriptVariables) {
+        super(scriptTaskId, script, language, resultVariable, skipExpression, storeScriptVariables);
     }
 
     @Override
-    public void execute(DelegateExecution execution) {
-        boolean noErrors = true;
-        try {
-            Map<Object, Object> beans = null;
-            if (SecureJavascriptConfigurator.secureScriptContextFactory.isEnableAccessToBeans()) {
-                beans = CommandContextUtil.getProcessEngineConfiguration().getBeans();
-            }
-            Object result = SecureJavascriptUtil.evaluateScript(execution, script, beans);
-
-            if (resultVariable != null) {
-                execution.setVariable(resultVariable, result);
-            }
-
-        } catch (FlowableException e) {
-            noErrors = false;
-            Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof BpmnError) {
-                ErrorPropagation.propagateError((BpmnError) rootCause, execution);
-            } else {
-                throw e;
-            }
+    protected void executeScript(DelegateExecution execution) {
+        Map<Object, Object> beans = null;
+        if (SecureJavascriptConfigurator.secureScriptContextFactory.isEnableAccessToBeans()) {
+            beans = CommandContextUtil.getProcessEngineConfiguration().getBeans();
         }
-        if (noErrors) {
-            leave(execution);
+        Object result = SecureJavascriptUtil.evaluateScript(execution, script, beans);
+
+        if (resultVariable != null) {
+            execution.setVariable(resultVariable, result);
         }
     }
 

@@ -78,11 +78,13 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
     @Override
     @SuppressWarnings("unchecked")
     public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        setSafeInValueLists(processDefinitionQuery);
         return getDbSqlSession().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery);
     }
 
     @Override
     public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        setSafeInValueLists(processDefinitionQuery);
         return (Long) getDbSqlSession().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);
     }
 
@@ -177,4 +179,9 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         getDbSqlSession().update("updateProcessDefinitionVersionForProcessDefinitionId", params);
     }
 
+    protected void setSafeInValueLists(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        if (processDefinitionQuery.getAuthorizationGroups() != null) {
+            processDefinitionQuery.setSafeAuthorizationGroups(createSafeInValuesList(processDefinitionQuery.getAuthorizationGroups()));
+        }
+    }
 }

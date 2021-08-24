@@ -600,13 +600,12 @@ Here is a list of configuration properties that the Flowable Spring Boot support
 
     # Process Async Executor
     flowable.process.async-executor-activate=true # Whether the async executor should be activated.
-    flowable.process.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-    flowable.process.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
-    flowable.process.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
-    flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+    flowable.process.async.executor.async-job-lock-time=PT5M # The amount of time an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+    flowable.process.async.executor.default-async-job-acquire-wait-time=PT10S # The time the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+    flowable.process.async.executor.default-queue-size-full-wait-time=PT5S # The time the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query.
+    flowable.process.async.executor.default-timer-job-acquire-wait-time=PT10S # The time the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
     flowable.process.async.executor.max-async-jobs-due-per-acquisition=1 # ???
-    flowable.process.async.executor.retry-wait-time-in-millis=500 # ???
-    flowable.process.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+    flowable.process.async.executor.timer-lock-time=PT5M # The amount of time a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 
 
     # CMMN https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/cmmn/FlowableCmmnProperties.java
@@ -622,13 +621,12 @@ Here is a list of configuration properties that the Flowable Spring Boot support
 
     # CMMN Async Executor
     flowable.cmmn.async-executor-activate=true # Whether the async executor should be activated.
-    flowable.cmmn.async.executor.async-job-lock-time-in-millis=300000 # The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-    flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
-    flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=0 # The time (in milliseconds) the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query. By default set to 0 (for backwards compatibility)
-    flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=10000 # The time (in milliseconds) the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+    flowable.cmmn.async.executor.async-job-lock-time=PT5M # The amount of time an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+    flowable.cmmn.async.executor.default-async-job-acquire-wait-time=PT10S # The time the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
+    flowable.cmmn.async.executor.default-queue-size-full-wait-time=PT5S # The time the async job (both timer and async continuations) acquisition thread will wait when the queue is full to execute the next query.
+    flowable.cmmn.async.executor.default-timer-job-acquire-wait-time=PT10S # The time the timer job acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less async jobs have been fetched. Default value = 10 seconds.
     flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=1 # ???
-    flowable.cmmn.async.executor.retry-wait-time-in-millis=500 # ???
-    flowable.cmmn.async.executor.timer-lock-time-in-millis=300000 # The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
+    flowable.cmmn.async.executor.timer-lock-time=PT5M # The amount of time a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
 
     # Content https://github.com/flowable/flowable-engine/tree/master/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/content/FlowableContentProperties.java
     flowable.content.enabled=true # Whether the content engine needs to be started.

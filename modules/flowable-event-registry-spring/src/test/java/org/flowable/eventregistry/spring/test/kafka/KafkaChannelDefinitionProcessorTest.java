@@ -58,11 +58,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.TestPropertySource;
 
 /**
  * @author Filip Hrisafov
  */
 @KafkaEventTest
+@TestPropertySource(properties = {
+        "application.test.kafka-topic=test-expression-customer"
+})
 class KafkaChannelDefinitionProcessorTest {
 
     @Autowired
@@ -152,6 +156,61 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         kafkaTemplate.send("test-new-customer", "{"
+            + "    \"eventKey\": \"test\","
+            + "    \"customer\": \"kermit\","
+            + "    \"name\": \"Kermit the Frog\""
+            + "}")
+            .get(5, TimeUnit.SECONDS);
+
+        await("receive events")
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(200))
+            .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .containsExactlyInAnyOrder("test"));
+
+        EventInstance eventInstance = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(eventInstance).isNotNull();
+        assertThat(eventInstance.getPayloadInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit"),
+                tuple("name", "Kermit the Frog")
+            );
+        assertThat(eventInstance.getCorrelationParameterInstances())
+            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+            .containsExactlyInAnyOrder(
+                tuple("customer", "kermit")
+            );
+    }
+
+    @Test
+    void kafkaTopicIsCorrectlyResolvedFromExpression() throws Exception {
+        createTopic("test-expression-customer");
+
+        eventRepositoryService.createInboundChannelModelBuilder()
+            .key("newCustomerChannel")
+            .resourceName("customer.channel")
+            .kafkaChannelAdapter("${application.test.kafka-topic}")
+            .eventProcessingPipeline()
+            .jsonDeserializer()
+            .detectEventKeyUsingJsonField("eventKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+
+        // Give time for the consumers to register properly in the groups
+        // This is linked to the session timeout property for the consumers
+        Thread.sleep(600);
+
+        eventRepositoryService.createEventModelBuilder()
+            .resourceName("testEvent.event")
+            .key("test")
+            .correlationParameter("customer", EventPayloadTypes.STRING)
+            .payload("name", EventPayloadTypes.STRING)
+            .deploy();
+
+        kafkaTemplate.send("test-expression-customer", "{"
             + "    \"eventKey\": \"test\","
             + "    \"customer\": \"kermit\","
             + "    \"name\": \"Kermit the Frog\""

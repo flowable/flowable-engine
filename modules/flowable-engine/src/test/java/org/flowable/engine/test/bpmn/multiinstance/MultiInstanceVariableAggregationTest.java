@@ -1623,7 +1623,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
     @Test
     @Deployment
-    public void testParallelMultiInstanceSubProcessWithParallelMultiInstanceUserTaskWithCustomAggregator() {
+    public void testParallelSubProcessWithParallelUserTaskWithCustomAggregator() {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("myProcess")

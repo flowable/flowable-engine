@@ -12,9 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_COMPLETE;
+import static org.flowable.cmmn.model.Criterion.EXIT_EVENT_TYPE_FORCE_COMPLETE;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -22,12 +26,13 @@ import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskBeforeContext;
 import org.flowable.cmmn.model.CasePageTask;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.identitylink.api.IdentityLinkType;
 
-public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implements PlanItemActivityBehavior {
+public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implements PlanItemActivityBehavior, OnParentEndDependantActivityBehavior {
 
     protected CasePageTask casePageTask;
 
@@ -92,7 +97,18 @@ public class CasePageTaskActivityBehaviour extends TaskActivityBehavior implemen
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         
     }
-    
+
+    @Override
+    public void onParentEnd(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String parentEndTransition, String exitEventType) {
+        // a case page is working differently from default plan items as it gets completed, if its parent is completed and is terminated otherwise
+        // delegate the completion on parent complete or an exit sentry having exit event type complete or force complete
+        if (PlanItemTransition.COMPLETE.equals(parentEndTransition) || EXIT_EVENT_TYPE_COMPLETE.equals(exitEventType) || EXIT_EVENT_TYPE_FORCE_COMPLETE.equals(exitEventType)) {
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+        }
+    }
+
     protected String getExpressionValue(String value, PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager) {
         Object expressionValue = expressionManager.createExpression(value).getValue(planItemInstanceEntity);
         if (expressionValue != null) {

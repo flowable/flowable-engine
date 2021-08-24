@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.interceptor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -64,7 +66,38 @@ public class DefaultCmmnIdentityLinkInterceptor implements CmmnIdentityLinkInter
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.STARTER, cmmnEngineConfiguration);
         }
     }
-    
+
+    @Override
+    public void handleReactivateCaseInstance(CaseInstanceEntity caseInstance) {
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        List<IdentityLinkEntity> identityLinks = createCaseIdentityLinksFromHistoricCaseInstance(caseInstance.getId());
+
+        if (authenticatedUserId != null) {
+            for (IdentityLinkEntity identityLink : identityLinks) {
+                if (identityLink.isUser() && identityLink.getUserId().equals(authenticatedUserId) && IdentityLinkType.REACTIVATOR.equals(identityLink.getType())) {
+                    return;
+                }
+            }
+
+            IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstance, authenticatedUserId, null, IdentityLinkType.REACTIVATOR, cmmnEngineConfiguration);
+        }
+    }
+
+    protected List<IdentityLinkEntity> createCaseIdentityLinksFromHistoricCaseInstance(String caseInstanceId) {
+        List<HistoricIdentityLinkEntity> historicIdentityLinks = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
+                .getHistoricIdentityLinkService()
+                .findHistoricIdentityLinksByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+
+        List<IdentityLinkEntity> identityLinkEntities = new ArrayList<>(historicIdentityLinks.size());
+        for (HistoricIdentityLinkEntity historicIdentityLink : historicIdentityLinks) {
+            IdentityLinkEntity identityLink = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                    .createIdentityLinkFromHistoricIdentityLink(historicIdentityLink);
+            cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService().insertIdentityLink(identityLink);
+            identityLinkEntities.add(identityLink);
+        }
+        return identityLinkEntities;
+    }
+
     protected void addUserIdentityLinkToParent(Task task, String userId) {
         if (userId != null && ScopeTypes.CMMN.equals(task.getScopeType()) && StringUtils.isNotEmpty(task.getScopeId())) {
             CaseInstanceEntity caseInstanceEntity = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(task.getScopeId());

@@ -61,12 +61,20 @@ public class ActivityUpdateHistoryJsonTransformer extends AbstractHistoryJsonTra
             HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager = processEngineConfiguration.getHistoricActivityInstanceEntityManager();
             HistoricActivityInstanceEntity historicActivityInstance = historicActivityInstanceEntityManager.findById(activityInstanceId);
             if (historicActivityInstance != null) {
-                String taskId = getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID);
-                String assigneeId = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
-                String calledProcessInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.CALLED_PROCESS_INSTANCE_ID);
-                historicActivityInstance.setTaskId(taskId);
-                historicActivityInstance.setAssignee(assigneeId);
-                historicActivityInstance.setCalledProcessInstanceId(calledProcessInstanceId);
+                if (historicalData.has(HistoryJsonConstants.TASK_ID)) {
+                    String taskId = getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID);
+                    historicActivityInstance.setTaskId(taskId);
+                }
+                
+                if (historicalData.has(HistoryJsonConstants.ASSIGNEE)) {
+                    String assignee = getStringFromJson(historicalData, HistoryJsonConstants.ASSIGNEE);
+                    historicActivityInstance.setAssignee(assignee);
+                }
+                
+                if (historicalData.has(HistoryJsonConstants.CALLED_PROCESS_INSTANCE_ID)) {
+                    String calledProcessInstanceId = getStringFromJson(historicalData, HistoryJsonConstants.CALLED_PROCESS_INSTANCE_ID);
+                    historicActivityInstance.setCalledProcessInstanceId(calledProcessInstanceId);
+                }
             }
 
         }

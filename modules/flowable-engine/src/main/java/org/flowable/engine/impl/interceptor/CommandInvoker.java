@@ -12,6 +12,11 @@
  */
 package org.flowable.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
@@ -20,8 +25,11 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.agenda.AbstractOperation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +72,35 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             executeOperations(commandContext);
     
             // At the end, call the execution tree change listeners.
-            // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
-            if (!commandContext.isReused() && CommandContextUtil.hasInvolvedExecutions(commandContext)) {
-                agenda.planExecuteInactiveBehaviorsOperation();
+            Map<String, ExecutionEntity> involvedExecutions = CommandContextUtil.getInvolvedExecutions(commandContext);
+            if (!commandContext.isReused() && involvedExecutions != null && !involvedExecutions.isEmpty()) {
+                agenda.planExecuteInactiveBehaviorsOperation(involvedExecutions.values());
+                CommandContextUtil.clearInvolvedExecutions(commandContext);
                 executeOperations(commandContext);
+            }
+            
+            VariableListenerSession variableListenerSession = commandContext.getSession(VariableListenerSession.class);
+            Map<String, List<VariableListenerSessionData>> variableSessionData = variableListenerSession.getVariableData();
+            
+            List<String> processInstanceIds = new ArrayList<>();
+            if (variableSessionData != null) {
+                for (String variableName : variableSessionData.keySet()) {
+                    List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
+                    for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
+                        if (!ScopeTypes.BPMN.equals(variableListenerData.getScopeType())) {
+                            continue;
+                        }
+                        
+                        if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
+                            processInstanceIds.add(variableListenerData.getScopeId());
+                            agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                        }
+                    }
+                }
+                
+                if (!processInstanceIds.isEmpty()) {
+                    executeOperations(commandContext);
+                }
             }
     
             return (T) commandContext.getResult();

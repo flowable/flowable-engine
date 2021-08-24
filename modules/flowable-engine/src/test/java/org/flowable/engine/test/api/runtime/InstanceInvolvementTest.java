@@ -16,14 +16,19 @@ package org.flowable.engine.test.api.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -172,6 +177,35 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).count()).isEqualTo(1);
         assertThat(runtimeService.createProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
+
+        // SQL Server has a limit of 2100 on how many parameters a query might have
+        int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+        Set<String> testGroups = new HashSet<>(maxGroups);
+        for (int i = 0; i < maxGroups; i++) {
+            testGroups.add("group" + i);
+        }
+        
+        ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().involvedGroups(testGroups);
+        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.list()).hasSize(0);
+        
+        processInstanceQuery = runtimeService.createProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").involvedGroups(testGroups).endOr();
+        assertThat(processInstanceQuery.count()).isEqualTo(1);
+        assertThat(processInstanceQuery.list()).hasSize(1);
+        
+        processInstanceQuery = runtimeService.createProcessInstanceQuery().or().processDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+        assertThat(processInstanceQuery.count()).isEqualTo(0);
+        assertThat(processInstanceQuery.list()).hasSize(0);
+        
+        testGroups.add("testGroup");
+        processInstanceQuery = runtimeService.createProcessInstanceQuery().involvedGroups(testGroups);
+        assertThat(processInstanceQuery.count()).isEqualTo(1);
+        assertThat(processInstanceQuery.list()).hasSize(1);
+        
+        processInstanceQuery = runtimeService.createProcessInstanceQuery().or().processDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+        assertThat(processInstanceQuery.count()).isEqualTo(1);
+        assertThat(processInstanceQuery.list()).hasSize(1);
     }
 
     @Test
@@ -503,6 +537,43 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricProcessInstanceQuery().
                     or().processInstanceId("undefinedId").involvedGroups(Stream.of("testGroup", "testGroup2").collect(Collectors.toSet())).endOr().count()).isEqualTo(1);
             assertThat(historyService.createHistoricProcessInstanceQuery().involvedGroups(Collections.singleton("testGroup")).list().get(0).getId()).isEqualTo(processInstance.getId());
+
+            // SQL Server has a limit of 2100 on how many parameters a query might have
+            int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
+
+            Set<String> testGroups = new HashSet<>(maxGroups);
+            for (int i = 0; i < maxGroups; i++) {
+                testGroups.add("group" + i);
+            }
+            
+            HistoricProcessInstanceQuery processInstanceQuery = historyService.createHistoricProcessInstanceQuery().involvedGroups(testGroups);
+            assertThat(processInstanceQuery.count()).isEqualTo(0);
+            assertThat(processInstanceQuery.list()).hasSize(0);
+            
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().involvedGroups(testGroups).includeProcessVariables();
+            assertThat(processInstanceQuery.count()).isEqualTo(0);
+            assertThat(processInstanceQuery.list()).hasSize(0);
+            
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").involvedGroups(testGroups).endOr();
+            assertThat(processInstanceQuery.count()).isEqualTo(1);
+            assertThat(processInstanceQuery.list()).hasSize(1);
+            
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").involvedGroups(testGroups).endOr().includeProcessVariables();
+            assertThat(processInstanceQuery.count()).isEqualTo(1);
+            assertThat(processInstanceQuery.list()).hasSize(1);
+            
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+            assertThat(processInstanceQuery.count()).isEqualTo(0);
+            assertThat(processInstanceQuery.list()).hasSize(0);
+            
+            testGroups.add("testGroup");
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().involvedGroups(testGroups);
+            assertThat(processInstanceQuery.count()).isEqualTo(1);
+            assertThat(processInstanceQuery.list()).hasSize(1);
+            
+            processInstanceQuery = historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("unexisting").involvedGroups(testGroups).endOr();
+            assertThat(processInstanceQuery.count()).isEqualTo(1);
+            assertThat(processInstanceQuery.list()).hasSize(1);
         }
     }
 

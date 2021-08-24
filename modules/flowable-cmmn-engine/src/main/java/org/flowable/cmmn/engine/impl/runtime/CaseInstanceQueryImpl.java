@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
@@ -56,6 +57,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected Date startedBefore;
     protected Date startedAfter;
     protected String startedBy;
+    protected Date lastReactivatedBefore;
+    protected Date lastReactivatedAfter;
+    protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -70,13 +74,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String involvedUser;
     protected IdentityLinkQueryObject involvedUserIdentityLink;
     protected Set<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
 
     protected List<CaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected CaseInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
-
-    protected Integer caseInstanceVariablesLimit;
 
     protected String locale;
     protected boolean withLocalizationFallback;
@@ -274,6 +277,46 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.startedBy = userId;
         } else {
             this.startedBy = userId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceLastReactivatedBefore(Date beforeTime) {
+        if (beforeTime == null) {
+            throw new FlowableIllegalArgumentException("before time is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBefore = beforeTime;
+        } else {
+            this.lastReactivatedBefore = beforeTime;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceLastReactivatedAfter(Date afterTime) {
+        if (afterTime == null) {
+            throw new FlowableIllegalArgumentException("after time is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedAfter = afterTime;
+        } else {
+            this.lastReactivatedAfter = afterTime;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceLastReactivatedBy(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("user id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastReactivatedBy = userId;
+        } else {
+            this.lastReactivatedBy = userId;
         }
         return this;
     }
@@ -661,7 +704,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     @Override
     public CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit) {
-        this.caseInstanceVariablesLimit = caseInstanceVariablesLimit;
         return this;
     }
 
@@ -675,10 +717,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public CaseInstanceQuery withLocalizationFallback() {
         this.withLocalizationFallback = true;
         return this;
-    }
-
-    public Integer getCaseInstanceVariablesLimit() {
-        return this.caseInstanceVariablesLimit;
     }
 
     // results ////////////////////////////////////////////////////
@@ -849,11 +887,29 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return includeCaseVariables;
     }
 
-    public String getMssqlOrDB2OrderBy() {
-        String specialOrderBy = super.getOrderByColumns();
-        if (specialOrderBy != null && specialOrderBy.length() > 0) {
-            specialOrderBy = specialOrderBy.replace("RES.", "TEMPRES_");
+    public boolean isNeedsCaseDefinitionOuterJoin() {
+        if (isNeedsPaging()) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                // When using oracle, db2 or mssql we don't need outer join for the process definition join.
+                // It is not needed because the outer join order by is done by the row number instead
+                return false;
+            }
         }
-        return specialOrderBy;
+
+        return hasOrderByForColumn(CaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
+    }
+
+    public List<CaseInstanceQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
     }
 }

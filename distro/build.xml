@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.6.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.7.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="target.docs.root" value="${target.distro.root}/docs" />
 	<property name="target.newsite.root" value="target/website" />
@@ -382,6 +382,14 @@
 
 	<target name="build.docs" unless="nodocs">
 		<!-- JAVADOCS -->
+		<exec executable="${mvn.executable}" dir="../modules/flowable-bpmn-model">
+			<arg line="javadoc:javadoc" />
+		</exec>
+		<mkdir dir="${target.docs.root}/bpmn-model-javadocs" />
+		<copy todir="${target.docs.root}/bpmn-model-javadocs">
+			<fileset dir="../modules/flowable-bpmn-model/target/site/apidocs" />
+		</copy>
+		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-engine">
 			<arg line="-DexcludePackageNames=org.flowable.engine.impl* javadoc:javadoc" />
 		</exec>

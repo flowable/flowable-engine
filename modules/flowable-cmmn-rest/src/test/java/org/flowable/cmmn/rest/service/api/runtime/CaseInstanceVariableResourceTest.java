@@ -308,7 +308,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
-        assertThatJson(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLaterWithoutNanos);
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLaterWithoutNanos);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -340,7 +340,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
-        assertThatJson(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
@@ -372,7 +372,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
 
-        assertThatJson(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(tenDaysLater);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);

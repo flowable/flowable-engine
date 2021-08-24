@@ -60,6 +60,11 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     
     /** Only select jobs for the given scope type. */
     DeadLetterJobQuery scopeType(String scopeType);
+
+    /**
+     * Only select jobs that do not have a scope type.
+     */
+    DeadLetterJobQuery withoutScopeType();
     
     /** Only select jobs for the given scope definition identifier. */
     DeadLetterJobQuery scopeDefinitionId(String scopeDefinitionId);

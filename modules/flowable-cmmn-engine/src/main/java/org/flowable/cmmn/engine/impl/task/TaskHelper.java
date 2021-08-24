@@ -18,7 +18,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -54,7 +56,7 @@ public class TaskHelper {
 
         if (taskEntity.getAssignee() != null) {
             addAssigneeIdentityLinks(taskEntity, cmmnEngineConfiguration);
-            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+            fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
         }
 
     }
@@ -70,7 +72,6 @@ public class TaskHelper {
             deleteTask(task, deleteReason, cascade, true, cmmnEngineConfiguration);
             
         } else if (cascade) {
-            deleteHistoricTaskLogEntries(taskId, cmmnEngineConfiguration);
             deleteHistoricTask(taskId, cmmnEngineConfiguration);
         }
     }
@@ -114,7 +115,6 @@ public class TaskHelper {
             
             if (cascade) {
                 deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
-                deleteHistoricTaskLogEntries(task.getId(), cmmnEngineConfiguration);
             } else {
                 cmmnEngineConfiguration.getCmmnHistoryManager().recordTaskEnd(task, deleteReason,
                         cmmnEngineConfiguration.getClock().getCurrentTime());
@@ -130,7 +130,7 @@ public class TaskHelper {
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskAssignee(taskEntity, assignee);
-            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+            fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
 
             if (taskEntity.getId() != null) {
                 addAssigneeIdentityLinks(taskEntity, cmmnEngineConfiguration);
@@ -162,6 +162,19 @@ public class TaskHelper {
         }
     }
 
+    public static void deleteHistoricTaskInstancesByCaseInstanceId(String caseInstanceId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            List<HistoricTaskInstance> taskInstances = cmmnEngineConfiguration.getCmmnHistoryService()
+                    .createHistoricTaskInstanceQuery()
+                    .caseInstanceId(caseInstanceId)
+                    .list();
+
+            for (HistoricTaskInstance taskInstance : taskInstances) {
+                deleteHistoricTask(taskInstance.getId(), cmmnEngineConfiguration);
+            }
+        }
+    }
+
     public static void deleteHistoricTask(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
             HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
@@ -171,7 +184,6 @@ public class TaskHelper {
                 List<HistoricTaskInstanceEntity> subTasks = historicTaskService.findHistoricTasksByParentTaskId(historicTaskInstance.getId());
                 for (HistoricTaskInstance subTask : subTasks) {
                     deleteHistoricTask(subTask.getId(), cmmnEngineConfiguration);
-                    deleteHistoricTaskLogEntries(subTask.getId(), cmmnEngineConfiguration);
                 }
     
                 cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByTaskId(taskId);
@@ -180,6 +192,7 @@ public class TaskHelper {
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
+        deleteHistoricTaskLogEntries(taskId, cmmnEngineConfiguration);
     }
 
     public static void deleteHistoricTaskLogEntries(String taskId, CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -237,6 +250,15 @@ public class TaskHelper {
             }
         }
         return null;
+    }
+
+    protected static void fireAssignmentEvents(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createTaskAssignedEvent(taskEntity), cmmnEngineConfiguration.getEngineCfgKey());
+        }
     }
 
 }

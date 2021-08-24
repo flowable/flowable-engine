@@ -342,6 +342,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
         cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overridden later with actual value
+        cmmnModel.setExporter("Flowable Open Source Modeler");
+        cmmnModel.setExporterVersion(getClass().getPackage().getImplementationVersion());
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
         Map<String, JsonNode> edgeMap = new HashMap<>();
@@ -486,10 +488,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
             } else {
                 criterion = cmmnModel.getCriterion(association.getTargetRef());
+                
                 if (criterion == null) {
+                    postProcessAssociationForTextAnnotation(association, cmmnModel);
                     continue;
-                }
-
+                } 
+                
                 sourceIsCriterion = false;
                 planItemDefinition = cmmnModel.findPlanItemDefinition(association.getSourceRef());
                 if (planItemDefinition == null) { // exit criteria on planmodel
@@ -541,6 +545,20 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             associationMap.get(criterion.getId()).add(association);
         }
         return associationMap;
+    }
+    
+    protected void postProcessAssociationForTextAnnotation(Association association, CmmnModel cmmnModel) {
+        PlanItemDefinition sourcePlanItemDefinition = cmmnModel.findPlanItemDefinition(association.getSourceRef());
+        PlanItemDefinition targetPlanItemDefinition = cmmnModel.findPlanItemDefinition(association.getTargetRef());
+        if (sourcePlanItemDefinition != null && targetPlanItemDefinition != null) {
+            PlanItem sourcePlanItem = cmmnModel.findPlanItem(sourcePlanItemDefinition.getPlanItemRef());
+            PlanItem targetPlanItem = cmmnModel.findPlanItem(targetPlanItemDefinition.getPlanItemRef());
+            
+            association.setSourceElement(sourcePlanItem);
+            sourcePlanItem.addOutgoingAssociation(association);
+            association.setTargetElement(targetPlanItem);
+            targetPlanItem.addIncomingAssociation(association);
+        }
     }
 
     protected void postProcessElements(Stage parentStage, List<PlanItem> planItems, Map<String, JsonNode> edgeMap,

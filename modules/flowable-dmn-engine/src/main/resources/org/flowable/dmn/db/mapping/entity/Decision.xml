@@ -107,11 +107,11 @@
   </select>
 
   <select id="selectDecisionsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionQueryImpl" resultMap="decisionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectDecisionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectDecisionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DecisionQueryImpl" resultType="long">
@@ -262,7 +262,7 @@
   </select>
   
   <select id="selectDecisionByNativeQuery" parameterType="java.util.Map" resultMap="decisionResultMap">
-    <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectDecisionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

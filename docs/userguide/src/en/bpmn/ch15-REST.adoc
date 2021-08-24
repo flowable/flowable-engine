@@ -1320,7 +1320,7 @@ POST runtime/process-instances
 {
    "processDefinitionKey":"oneTaskProcess",
    "businessKey":"myBusinessKey",
-   "returnVariables":false,
+   "returnVariables":true,
    "tenantId": "tenant1",
    "variables": [
       {
@@ -1350,7 +1350,7 @@ POST runtime/process-instances
 
 Note that also a _transientVariables_ property is accepted as part of this json, that follows the same structure as the _variables_ property.
 
-The _returnVariables_ property can be used to get the existing variables in the process instance context back in the response. By default the variables are not returned.
+The _returnVariables_ property can be used to get the existing variables in the process instance context back in the response. By default the variables are returned.
 
 Only one of +processDefinitionId+, +processDefinitionKey+ or +message+ can be used in the request body. Parameters +businessKey+, +variables+ and +tenantId+ are optional. If +tenantId+ is omitted, the default tenant will be used. More information about the variable format can be found in <<restVariables,the REST variables section>>. Note that the variable-scope that is supplied is ignored, process-variables are always +local+.
 

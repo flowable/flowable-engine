@@ -57,7 +57,7 @@ public class FlowableCaseModelService extends BaseFlowableModelService {
         List<CaseRepresentation> reps = new ArrayList<>();
 
         for (Model model : models) {
-            if (excludeId == null || !model.getId().equals(excludeId)) {
+            if (!model.getId().equals(excludeId)) {
                 reps.add(new CaseRepresentation(model));
             }
         }

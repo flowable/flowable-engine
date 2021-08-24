@@ -98,6 +98,25 @@ function _drawSubProcess(element, isMigrationModelElement, currentPaper)
     }
 }
 
+function _drawTransaction(element)
+{
+	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
+
+	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
+
+	rect.attr({"stroke-width": 1,
+		"stroke": strokeColor,
+		"fill": "white"
+ 	});
+
+	var borderRect = paper.rect(element.x + 2, element.y + 2, element.width - 4, element.height -4, 4);
+
+	borderRect.attr({"stroke-width": 1,
+		"stroke": "black",
+		"fill": "none"
+ 	});
+}
+
 function _drawEventSubProcess(element, isMigrationModelElement, currentPaper)
 {
 	var rect = currentPaper.rect(element.x, element.y, element.width, element.height, 4);
@@ -523,6 +542,25 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     }
 }
 
+function _drawTextAnnotation(element, isMigrationModelElement, currentPaper)
+{
+	var path1 = currentPaper.path("M20,1 L1,1 L1,50 L20,50");
+	path1.attr({
+		"stroke": "#585858",
+		"fill": "none"
+ 	});
+
+	var annotation = currentPaper.set();
+	annotation.push(path1);
+
+	annotation.transform("T" + element.x + "," + element.y);
+
+	if (element.text) {
+		this._drawMultilineText(element.text, element.x + 2, element.y, element.width, element.height, "start", 
+			"middle", 11, _bpmnGetColor(element, TEXT_COLOR), currentPaper);
+	}
+}
+
 function _drawFlow(flow, currentPaper){
 
 	var polyline = new Polyline(flow.id, flow.waypoints, SEQUENCEFLOW_STROKE, currentPaper);
@@ -599,6 +637,39 @@ function _drawFlow(flow, currentPaper){
 	});
 
 	_drawArrowHead(line, strokeColor, currentPaper);
+}
+
+function _drawAssociation(flow, currentPaper){
+
+	var polyline = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
+	
+	var strokeColor = _bpmnGetColor(flow, MAIN_STROKE_COLOR);
+
+	polyline.element = currentPaper.path(polyline.path);
+	polyline.element.attr({"stroke-width": ASSOCIATION_STROKE});
+	polyline.element.attr({"stroke-dasharray": ". "});
+	polyline.element.attr({"stroke":strokeColor});
+
+	polyline.element.id = flow.id;
+
+	var polylineInvisible = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
+
+	polylineInvisible.element = currentPaper.path(polyline.path);
+	polylineInvisible.element.attr({
+			"opacity": 0,
+			"stroke-width": 8,
+            "stroke" : "#000000"
+	});
+
+	_showTip(jQuery(polylineInvisible.element.node), flow);
+
+	polylineInvisible.element.mouseover(function() {
+		currentPaper.getById(polyline.element.id).attr({"stroke":HOVER_COLOR});
+	});
+
+	polylineInvisible.element.mouseout(function() {
+		currentPaper.getById(polyline.element.id).attr({"stroke":strokeColor});
+	});
 }
 
 function _drawArrowHead(line, color, currentPaper)

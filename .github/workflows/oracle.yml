@@ -15,30 +15,33 @@ jobs:
   test_oracle:
     name: Oracle ${{ matrix.oracle }}
     runs-on: ubuntu-latest
-    if: github.repository == 'flowable/flowable-engine'
     strategy:
       fail-fast: false
       matrix:
-        oracle: ["11.2.0.2-xe"]
+        oracle: [ "11-slim", "18-slim" ]
         include:
-          - oracle: 11.2.0.2-xe
+          - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
+            serviceName: XE
+          - oracle: 18-slim
+            driverVersion: 18.3.0.0
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
-        credentials:
-          username: ${{ secrets.flowable_docker_user }}
-          password: ${{ secrets.flowable_docker_user_password }}
+        image: gvenzl/oracle-xe:${{ matrix.oracle }}
         env:
-          ORACLE_USER: flowable
-          ORACLE_USER_PASSWORD: flowable
+          ORACLE_PASSWORD: flowable
+          APP_USER: flowable
+          APP_USER_PASSWORD: flowable
         ports:
           - 1521/tcp
         options: >-
           --shm-size=2g
-          --health-interval 30s
-          --health-timeout 40s
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
           --health-retries 10
     steps:
       - uses: actions/checkout@v2
@@ -54,7 +57,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver
@@ -64,30 +67,33 @@ jobs:
   test_oracle_dmn:
     name: Oracle ${{ matrix.oracle }} DMN
     runs-on: ubuntu-latest
-    if: github.repository == 'flowable/flowable-engine'
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "11.2.0.2-xe" ]
+        oracle: [ "11-slim", "18-slim" ]
         include:
-          - oracle: 11.2.0.2-xe
+          - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
+            serviceName: XE
+          - oracle: 18-slim
+            driverVersion: 18.3.0.0
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
-        credentials:
-          username: ${{ secrets.flowable_docker_user }}
-          password: ${{ secrets.flowable_docker_user_password }}
+        image: gvenzl/oracle-xe:${{ matrix.oracle }}
         env:
-          ORACLE_USER: flowable
-          ORACLE_USER_PASSWORD: flowable
+          ORACLE_PASSWORD: flowable
+          APP_USER: flowable
+          APP_USER_PASSWORD: flowable
         ports:
           - 1521/tcp
         options: >-
           --shm-size=2g
-          --health-interval 30s
-          --health-timeout 40s
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
           --health-retries 10
     steps:
       - uses: actions/checkout@v2-beta
@@ -103,7 +109,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -Pdmn,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver
@@ -114,30 +120,33 @@ jobs:
   test_oracle_content:
     name: Oracle ${{ matrix.oracle }} Content
     runs-on: ubuntu-latest
-    if: github.repository == 'flowable/flowable-engine'
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "11.2.0.2-xe" ]
+        oracle: [ "11-slim", "18-slim" ]
         include:
-          - oracle: 11.2.0.2-xe
+          - oracle: 11-slim
             driverVersion: 11.2.0.4
             driverArtifact: ojdbc6
+            serviceName: XE
+          - oracle: 18-slim
+            driverVersion: 18.3.0.0
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
     services:
       oracle:
-        image: ${{ secrets.flowable_docker_repository }}/infra/oracle:${{ matrix.oracle }}
-        credentials:
-          username: ${{ secrets.flowable_docker_user }}
-          password: ${{ secrets.flowable_docker_user_password }}
+        image: gvenzl/oracle-xe:${{ matrix.oracle }}
         env:
-          ORACLE_USER: flowable
-          ORACLE_USER_PASSWORD: flowable
+          ORACLE_PASSWORD: flowable
+          APP_USER: flowable
+          APP_USER_PASSWORD: flowable
         ports:
           - 1521/tcp
         options: >-
           --shm-size=2g
-          --health-interval 30s
-          --health-timeout 40s
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
           --health-retries 10
     steps:
       - uses: actions/checkout@v2
@@ -153,7 +162,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -Pcontent,oracle
-          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}:XE
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=oracle.jdbc.driver.OracleDriver

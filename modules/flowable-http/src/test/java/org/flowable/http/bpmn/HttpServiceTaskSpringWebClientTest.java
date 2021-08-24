@@ -19,6 +19,7 @@ import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import io.netty.handler.timeout.ReadTimeoutException;
 
@@ -41,8 +42,8 @@ public class HttpServiceTaskSpringWebClientTest extends HttpServiceTaskTest {
     @Override
     public void testConnectTimeout() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("connectTimeout"))
-                .isExactlyInstanceOf(ReadTimeoutException.class)
-                .hasNoCause();
+                .isInstanceOf(WebClientRequestException.class)
+                .hasCauseInstanceOf(ReadTimeoutException.class);
     }
 
     @Disabled("Nothing special to test. It is the same as the testRequestTimeout")
@@ -58,8 +59,8 @@ public class HttpServiceTaskSpringWebClientTest extends HttpServiceTaskTest {
     @Override
     public void testRequestTimeout() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
-                .isExactlyInstanceOf(ReadTimeoutException.class)
-                .hasNoCause();
+                .isInstanceOf(WebClientRequestException.class)
+                .hasCauseInstanceOf(ReadTimeoutException.class);
     }
 
     @Override

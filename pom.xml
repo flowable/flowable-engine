@@ -8,40 +8,40 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>6.6.1-SNAPSHOT</version>
+	<version>6.7.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>1.8</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>2.3.8.RELEASE</spring.boot.version>
-		<spring.framework.version>5.2.12.RELEASE</spring.framework.version>
-		<spring.security.version>5.3.6.RELEASE</spring.security.version>
-		<spring.amqp.version>2.2.14.RELEASE</spring.amqp.version>
-		<spring.kafka.version>2.5.11.RELEASE</spring.kafka.version>
-		<reactor-netty.version>0.9.12.RELEASE</reactor-netty.version>
-		<jackson.version>2.11.4</jackson.version>
+		<spring.boot.version>2.5.4</spring.boot.version>
+		<spring.framework.version>5.3.9</spring.framework.version>
+		<spring.security.version>5.5.2</spring.security.version>
+		<spring.amqp.version>2.3.10</spring.amqp.version>
+		<spring.kafka.version>2.7.6</spring.kafka.version>
+		<reactor-netty.version>1.0.6</reactor-netty.version>
+		<jackson.version>2.12.4</jackson.version>
 		<jakarta-jms.version>2.0.3</jakarta-jms.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.25.0</camel.version>
-		<cxf.version>3.4.0</cxf.version>
-		<slf4j.version>1.7.30</slf4j.version>
-		<groovy.version>3.0.7</groovy.version>
+		<cxf.version>3.4.2</cxf.version>
+		<slf4j.version>1.7.32</slf4j.version>
+		<groovy.version>3.0.8</groovy.version>
 		<jib-maven-plugin.version>2.6.0</jib-maven-plugin.version>
 
-		<junit.version>4.13</junit.version>
-		<junit.jupiter.version>5.7.0</junit.jupiter.version>
+		<junit.version>4.13.2</junit.version>
+		<junit.jupiter.version>5.7.2</junit.jupiter.version>
 		<hikari.version>3.4.5</hikari.version>
 		<maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-		<mockito.version>3.5.13</mockito.version>
+		<mockito.version>3.7.7</mockito.version>
 		<testcontainers.version>1.12.4</testcontainers.version>
 
 		<oracle.jdbc.version>12.2.0.1</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
 
         <!-- JVM params for test execution -->
-		<argLine>-Duser.language=en -XX:+UseParallelGC</argLine>
+		<argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>
 
 		<!-- OSGi bundles properties -->
 		<flowable.artifact />
@@ -127,7 +127,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.12</version>
+				<version>4.5.13</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -137,7 +137,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.12</version>
+				<version>4.5.13</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.database.jdbc</groupId>
@@ -227,7 +227,7 @@
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
-				<version>11.5.5.0</version>
+				<version>11.5.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
@@ -247,6 +247,11 @@
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-cdi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-cmmn-cdi</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -444,6 +449,11 @@
                 <artifactId>flowable-cmmn-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-case-validation</artifactId>
+				<version>${project.version}</version>
+			</dependency>
             <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-external-job-rest</artifactId>
@@ -775,7 +785,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>5.4.25.Final</version>
+				<version>5.4.32.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
@@ -810,12 +820,12 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.5</version>
+				<version>3.5.6</version>
 			</dependency>
 			<dependency>
               <groupId>org.mybatis</groupId>
               <artifactId>mybatis-spring</artifactId>
-              <version>2.0.5</version>
+              <version>2.0.6</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -978,11 +988,11 @@
 			<dependency>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-core</artifactId>
-				<version>3.8.0</version>
+				<version>4.3.5</version>
 				<exclusions>
 					<exclusion>
-						<groupId>ch.qos.logback</groupId>
-						<artifactId>logback-classic</artifactId>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -995,42 +1005,29 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.2.6</version>
+				<version>42.2.22</version>
 			</dependency>
 			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
-				<version>2.12.0</version>
+				<version>2.12.1</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.10.6</version>
+				<version>2.10.10</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>29.0-jre</version>
+				<version>30.1-jre</version>
 			</dependency>
 			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
 				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.datatype</groupId>
-				<artifactId>jackson-datatype-joda</artifactId>
-				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
@@ -1078,13 +1075,13 @@
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.18.0</version>
+				<version>3.19.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.19.0</version>
+				<version>2.24.0</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -1138,6 +1135,7 @@
         <module>modules/flowable-cmmn-model</module>
         <module>modules/flowable-cmmn-converter</module>
         <module>modules/flowable-cmmn-image-generator</module>
+        <module>modules/flowable-case-validation</module>
         <module>modules/flowable-cmmn-engine</module>
 		<module>modules/flowable-cmmn-engine-configurator</module>
 		<module>modules/flowable-engine</module>
@@ -1340,6 +1338,12 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>ui</id>
+			<modules>
+				<module>modules/flowable-ui</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>deploy</id>
 			<modules>
 				<module>modules/flowable-bpmn-model</module>
@@ -1371,6 +1375,7 @@
                 <module>modules/flowable-cmmn-model</module>
                 <module>modules/flowable-cmmn-converter</module>
                 <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-case-validation</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
@@ -1409,6 +1414,7 @@
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-cdi</module>
+				<module>modules/flowable-cmmn-cdi</module>
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
@@ -1507,6 +1513,7 @@
                 <module>modules/flowable-cmmn-model</module>
                 <module>modules/flowable-cmmn-converter</module>
                 <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-case-validation</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
@@ -1543,6 +1550,7 @@
 			<id>checkcdi</id>
 			<modules>
 				<module>modules/flowable-cdi</module>
+				<module>modules/flowable-cmmn-cdi</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1638,6 +1646,7 @@
                 <module>modules/flowable-cmmn-model</module>
                 <module>modules/flowable-cmmn-converter</module>
                 <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-case-validation</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>
@@ -1659,6 +1668,7 @@
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
 				<module>modules/flowable-cdi</module>
+				<module>modules/flowable-cmmn-cdi</module>
 				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
@@ -1838,6 +1848,7 @@
                 <module>modules/flowable-cmmn-model</module>
                 <module>modules/flowable-cmmn-converter</module>
                 <module>modules/flowable-cmmn-json-converter</module>
+                <module>modules/flowable-case-validation</module>
                 <module>modules/flowable-cmmn-engine</module>
                 <module>modules/flowable-cmmn-engine-configurator</module>
                 <module>modules/flowable-cmmn-spring</module>

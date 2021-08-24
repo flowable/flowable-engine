@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.jms.ConnectionFactory;
 
 import org.flowable.eventregistry.api.ChannelModelProcessor;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.actuate.metrics.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,13 +28,12 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = "flowable.task.app.kafka-enabled=true")
+@AutoConfigureMetrics
 public class FlowableUiApplicationWithEnabledKafkaTest {
 
     @Autowired
@@ -53,7 +52,7 @@ public class FlowableUiApplicationWithEnabledKafkaTest {
                 "systemProperties",
                 "systemEnvironment",
                 "random",
-                "applicationConfig: [classpath:/application.properties]",
+                "Config resource 'class path resource [application.properties]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
                 "flowableTaskDefaultConfig: [classpath:/flowable-task-default.properties]",
                 "flowable-liquibase-override",

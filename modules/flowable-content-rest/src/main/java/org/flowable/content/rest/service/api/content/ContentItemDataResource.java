@@ -18,14 +18,13 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.rest.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +61,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
             @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item does not have a binary stream available. Status message provides additional information.")
     })
     @GetMapping(value = "/content-service/content-items/{contentItemId}/data")
-    public ResponseEntity<byte[]> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {
+    public ResponseEntity<InputStreamResource> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {
 
         ContentItem contentItem = getContentItemFromRequest(contentItemId);
         if (!contentItem.isContentAvailable()) {
@@ -74,26 +73,25 @@ public class ContentItemDataResource extends ContentItemBaseResource {
             throw new FlowableObjectNotFoundException("Content item with id '" + contentItemId + "' doesn't have content associated with it.");
         }
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        MediaType mediaType = null;
+        MediaType mediaType = getContentItemMediaType(contentItem);
+
+        return ResponseEntity
+                .ok()
+                .contentType(mediaType)
+                .body(new InputStreamResource(dataStream, "resource for content Item " + contentItemId));
+    }
+
+    protected MediaType getContentItemMediaType(ContentItem contentItem) {
+
         if (contentItem.getMimeType() != null) {
             try {
-                mediaType = MediaType.valueOf(contentItem.getMimeType());
-                responseHeaders.set("Content-Type", contentItem.getMimeType());
-            } catch (Exception e) {
+                return MediaType.valueOf(contentItem.getMimeType());
+            } catch (IllegalArgumentException e) {
                 // ignore if unknown media type
             }
         }
-
-        if (mediaType == null) {
-            responseHeaders.set("Content-Type", "application/octet-stream");
-        }
-
-        try {
-            return new ResponseEntity<>(IOUtils.toByteArray(dataStream), responseHeaders, HttpStatus.OK);
-        } catch (Exception e) {
-            throw new FlowableException("Error getting content item data " + contentItemId, e);
-        }
+        // default to application/octet-stream
+        return MediaType.APPLICATION_OCTET_STREAM;
     }
 
     @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "Save the content item data with an attached file. "

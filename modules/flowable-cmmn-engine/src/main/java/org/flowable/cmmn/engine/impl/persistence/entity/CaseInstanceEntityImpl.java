@@ -27,6 +27,8 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -46,6 +48,8 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String state;
     protected Date startTime;
     protected String startUserId;
+    protected Date lastReactivationTime;
+    protected String lastReactivationUserId;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
@@ -67,6 +71,33 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String caseDefinitionName;
     protected Integer caseDefinitionVersion;
     protected String caseDefinitionDeploymentId;
+
+    public CaseInstanceEntityImpl() {
+    }
+
+    public CaseInstanceEntityImpl(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables) {
+        this.id = historicCaseInstance.getId();
+        this.businessKey = historicCaseInstance.getBusinessKey();
+        this.name = historicCaseInstance.getName();
+        this.parentId = historicCaseInstance.getParentId();
+        this.caseDefinitionId = historicCaseInstance.getCaseDefinitionId();
+        this.caseDefinitionKey = historicCaseInstance.getCaseDefinitionKey();
+        this.caseDefinitionName = historicCaseInstance.getCaseDefinitionName();
+        this.caseDefinitionVersion = historicCaseInstance.getCaseDefinitionVersion();
+        this.caseDefinitionDeploymentId = historicCaseInstance.getCaseDefinitionDeploymentId();
+        this.state = historicCaseInstance.getState();
+        this.startTime = historicCaseInstance.getStartTime();
+        this.startUserId = historicCaseInstance.getStartUserId();
+        this.callbackId = historicCaseInstance.getCallbackId();
+        this.callbackType = historicCaseInstance.getCallbackType();
+        this.referenceId = historicCaseInstance.getReferenceId();
+        this.referenceType = historicCaseInstance.getReferenceType();
+
+        if (historicCaseInstance.getTenantId() != null) {
+            this.tenantId = historicCaseInstance.getTenantId();
+        }
+        this.variableInstances = variables;
+    }
 
     @Override
     public Object getPersistentState() {
@@ -147,6 +178,22 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    @Override
+    public Date getLastReactivationTime() {
+        return lastReactivationTime;
+    }
+    @Override
+    public void setLastReactivationTime(Date lastReactivationTime) {
+        this.lastReactivationTime = lastReactivationTime;
+    }
+    @Override
+    public String getLastReactivationUserId() {
+        return lastReactivationUserId;
+    }
+    @Override
+    public void setLastReactivationUserId(String lastReactivationUserId) {
+        this.lastReactivationUserId = lastReactivationUserId;
     }
     @Override
     public boolean isCompletable() {
@@ -309,6 +356,26 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
                 .scopeType(ScopeTypes.CMMN)
                 .names(variableNames)
                 .list();
+    }
+    
+    @Override
+    protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
+        VariableInstanceEntity variableInstance = super.createVariableInstance(variableName, value);
+        
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_CREATE, 
+                variableInstance.getScopeId(), ScopeTypes.CMMN, caseDefinitionId);
+
+        return variableInstance;
+    }
+    
+    @Override
+    protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value) {
+        super.updateVariableInstance(variableInstance, value);
+
+        VariableListenerSession variableListenerSession = Context.getCommandContext().getSession(VariableListenerSession.class);
+        variableListenerSession.addVariableData(variableInstance.getName(), VariableListenerSessionData.VARIABLE_UPDATE, 
+                variableInstance.getScopeId(), ScopeTypes.CMMN, caseDefinitionId);
     }
 
     @Override

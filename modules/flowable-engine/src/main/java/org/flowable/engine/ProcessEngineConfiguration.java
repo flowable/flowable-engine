@@ -14,6 +14,7 @@
 package org.flowable.engine;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +99,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
     protected String mailServerForceTo;
+    protected Charset mailServerDefaultCharset;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -121,11 +123,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected AsyncExecutor asyncHistoryExecutor;
     protected AsyncTaskExecutor asyncHistoryTaskExecutor;
     protected boolean shutdownAsyncHistoryTaskExecutor;
-    /**
-     * Define the default lock time for an async job in seconds. The lock time is used when creating an async job and when it expires the async executor assumes that the job has failed. It will be
-     * retried again.
-     */
-    protected int lockTimeAsyncJobWaitTime = 60;
+
     /** define the default wait time for a failed job in seconds */
     protected int defaultFailedJobWaitTime = 10;
     /** define the default wait time for a failed async job in seconds */
@@ -292,6 +290,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public Charset getMailServerDefaultCharset() {
+        return mailServerDefaultCharset;
+    }
+
+    public ProcessEngineConfiguration setMailServerDefaultCharset(Charset mailServerDefaultCharset) {
+        this.mailServerDefaultCharset = mailServerDefaultCharset;
         return this;
     }
 
@@ -752,15 +759,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncHistoryTaskExecutor(AsyncTaskExecutor asyncHistoryTaskExecutor) {
         this.asyncHistoryTaskExecutor = asyncHistoryTaskExecutor;
-        return this;
-    }
-
-    public int getLockTimeAsyncJobWaitTime() {
-        return lockTimeAsyncJobWaitTime;
-    }
-
-    public ProcessEngineConfiguration setLockTimeAsyncJobWaitTime(int lockTimeAsyncJobWaitTime) {
-        this.lockTimeAsyncJobWaitTime = lockTimeAsyncJobWaitTime;
         return this;
     }
 

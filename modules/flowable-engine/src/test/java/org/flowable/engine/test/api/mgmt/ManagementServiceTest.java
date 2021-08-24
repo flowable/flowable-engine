@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
@@ -27,6 +29,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.ProcessEngineImpl;
@@ -407,6 +410,43 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    void testAcquireExpiredAcquiredLock() {
+        String lockName = "testLock";
+        try {
+            Instant startTime = Instant.now();
+            LockManager testLockManager1 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), processEngineConfiguration.getEngineCfgKey());
+
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            // acquiring the lock from the same lock manager should always return true
+            assertThat(testLockManager1.acquireLock()).isTrue();
+            Map<String, String> properties = managementService.getProperties();
+            assertThat(properties).containsKey(lockName);
+            assertThat(properties.get(lockName)).isNotNull();
+
+            String updatedPropertyValue = startTime.minus(2, ChronoUnit.HOURS).toString();
+            updatePropertyValue(lockName, updatedPropertyValue);
+
+            LockManager testLockManager2 = managementService.getLockManager(lockName);
+            assertThat(testLockManager2.acquireLock()).isFalse();
+
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(1), processEngineConfiguration.getEngineCfgKey());
+            assertThat(testLockManager2.acquireLock()).isFalse();
+
+            properties = managementService.getProperties();
+            assertThat(properties.get(lockName)).isEqualTo(updatedPropertyValue);
+
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(3), processEngineConfiguration.getEngineCfgKey());
+            assertThat(testLockManager2.acquireLock()).isTrue();
+
+            properties = managementService.getProperties();
+            assertThat(properties.get(lockName)).isNotEqualTo(updatedPropertyValue);
+
+        } finally {
+            deletePropertyIfExists(lockName);
+        }
+    }
+
+    @Test
     void testFindJobByCorrelationId() {
         Job asyncJob = managementService.executeCommand(context -> {
             JobService jobService = CommandContextUtil.getJobService(context);
@@ -513,6 +553,19 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             if (property != null) {
                 propertyEntityManager.delete(property);
             }
+            return null;
+        });
+    }
+
+    protected void updatePropertyValue(String propertyName, String propertyValue) {
+        managementService.executeCommand(commandContext -> {
+            PropertyEntityManager propertyEntityManager = CommandContextUtil.getPropertyEntityManager(commandContext);
+            PropertyEntity property = propertyEntityManager.findById(propertyName);
+            if (property == null) {
+                throw new FlowableObjectNotFoundException("Property with name " + propertyName + " does not exist");
+            }
+            property.setValue(propertyValue);
+            propertyEntityManager.update(property);
             return null;
         });
     }

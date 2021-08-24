@@ -205,12 +205,12 @@ public class WSDLImporter implements XMLImporter {
                     // loaded from classloader. It should be contain "$" instead of "." as separator
                     boolean isFieldParameterTypeNeestedClass = false;
                     final Iterator<JDefinedClass> theClassNeestedClassIt = theClass.classes();
-                    do {
+                    while (theClassNeestedClassIt.hasNext() && !isFieldParameterTypeNeestedClass) {
                         final JDefinedClass neestedType = theClassNeestedClassIt.next();
                         if (neestedType.name().equals(fieldParameterType.name())) {
                             isFieldParameterTypeNeestedClass = true;
                         }
-                    } while (!isFieldParameterTypeNeestedClass);
+                    }
                     if (isFieldParameterTypeNeestedClass) {
                         // The parameter type is a nested class
                         fieldParameterClass = ReflectUtil
@@ -253,11 +253,7 @@ public class WSDLImporter implements XMLImporter {
             Element root = (Element) doc.getFirstChild();
             Element typesElement = (Element) root.getElementsByTagName("wsdl:types").item(0);
             return (Element) typesElement.getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "schema").item(0);
-        } catch (SAXException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (ParserConfigurationException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new FlowableException(e.getMessage(), e);
         }
     }

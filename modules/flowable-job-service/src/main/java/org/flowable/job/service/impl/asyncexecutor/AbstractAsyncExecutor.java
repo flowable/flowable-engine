@@ -12,8 +12,8 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import java.time.Duration;
 import java.util.LinkedList;
-import java.util.UUID;
 
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -32,14 +32,13 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAsyncExecutor.class);
 
-    private String tenantId;
-    
-    protected boolean timerRunnableNeeded = true; // default true for backwards compatibility (History Async executor came later)
+    protected AsyncJobExecutorConfiguration configuration;
+
     protected AcquireTimerJobsRunnable timerJobRunnable;
-    protected String acquireRunnableThreadName;
+    protected AcquireTimerLifecycleListener timerLifecycleListener;
     protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
     protected AcquireAsyncJobsDueRunnable asyncJobsDueRunnable;
-    protected String resetExpiredRunnableName;
+    protected AcquireAsyncJobsDueLifecycleListener asyncJobsDueLifecycleListener;
     protected ResetExpiredJobsRunnable resetExpiredJobsRunnable;
 
     protected ExecuteAsyncRunnableFactory executeAsyncRunnableFactory;
@@ -50,25 +49,19 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected boolean isActive;
     protected boolean isMessageQueueMode;
 
-    protected int maxTimerJobsPerAcquisition = 1;
-    protected int maxAsyncJobsDuePerAcquisition = 1;
-    protected int defaultTimerJobAcquireWaitTimeInMillis = 10 * 1000;
-    protected int defaultAsyncJobAcquireWaitTimeInMillis = 10 * 1000;
-    protected int defaultQueueSizeFullWaitTime;
-
-    protected String lockOwner = UUID.randomUUID().toString();
-    protected int timerLockTimeInMillis = 5 * 60 * 1000;
-    protected int asyncJobLockTimeInMillis = 5 * 60 * 1000;
-    protected int retryWaitTimeInMillis = 500;
-
-    protected int resetExpiredJobsInterval = 60 * 1000;
-    protected int resetExpiredJobsPageSize = 3;
-
     // Job queue used when async executor is not yet started and jobs are already added.
     // This is mainly used for testing purpose.
     protected LinkedList<JobInfo> temporaryJobQueue = new LinkedList<>();
 
     protected JobServiceConfiguration jobServiceConfiguration;
+
+    public AbstractAsyncExecutor() {
+        this(new AsyncJobExecutorConfiguration());
+    }
+
+    public AbstractAsyncExecutor(AsyncJobExecutorConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public boolean executeAsyncJob(final JobInfo job) {
@@ -92,7 +85,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected abstract boolean executeAsyncJob(final JobInfo job, Runnable runnable);
 
     protected void unlockOwnedJobs() {
-        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(lockOwner, tenantId, jobServiceConfiguration));
+        jobServiceConfiguration.getCommandExecutor().execute(new UnacquireOwnedJobsCmd(configuration.getLockOwner(), configuration.getTenantId(), jobServiceConfiguration));
     }
 
     protected Runnable createRunnableForJob(final JobInfo job) {
@@ -127,23 +120,28 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     protected void initializeRunnables() {
-        if (timerRunnableNeeded && timerJobRunnable == null) {
-            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager());
+        if (configuration.isTimerRunnableNeeded() && timerJobRunnable == null) {
+            timerJobRunnable = new AcquireTimerJobsRunnable(this, jobServiceConfiguration.getJobManager(),
+                timerLifecycleListener, new AcquireTimerRunnableConfiguration(), configuration.getMoveTimerExecutorPoolSize());
         }
 
         JobInfoEntityManager<? extends JobInfoEntity> jobEntityManagerToUse = jobEntityManager != null
                 ? jobEntityManager : jobServiceConfiguration.getJobEntityManager();
 
         if (resetExpiredJobsRunnable == null) {
+            String resetExpiredRunnableName = configuration.getResetExpiredRunnableName();
             String resetRunnableName = resetExpiredRunnableName != null ?
                     resetExpiredRunnableName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-reset-expired-jobs";
             resetExpiredJobsRunnable = createResetExpiredJobsRunnable(resetRunnableName);
         }
 
         if (!isMessageQueueMode && asyncJobsDueRunnable == null) {
+            String acquireRunnableThreadName = configuration.getAcquireRunnableThreadName();
             String acquireJobsRunnableName = acquireRunnableThreadName != null ?
                     acquireRunnableThreadName : "flowable-" + getJobServiceConfiguration().getEngineName() + "-acquire-async-jobs";
-            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse);
+            asyncJobsDueRunnable = new AcquireAsyncJobsDueRunnable(acquireJobsRunnableName, this, jobEntityManagerToUse,
+                asyncJobsDueLifecycleListener, new AcquireAsyncJobsDueRunnableConfiguration());
+
         }
     }
 
@@ -227,71 +225,79 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     @Override
     public String getLockOwner() {
-        return lockOwner;
+        return configuration.getLockOwner();
     }
 
     public void setLockOwner(String lockOwner) {
-        this.lockOwner = lockOwner;
+        configuration.setLockOwner(lockOwner);
     }
 
     @Override
     public int getTimerLockTimeInMillis() {
-        return timerLockTimeInMillis;
+        return (int) configuration.getTimerLockTime().toMillis();
     }
 
     @Override
     public void setTimerLockTimeInMillis(int timerLockTimeInMillis) {
-        this.timerLockTimeInMillis = timerLockTimeInMillis;
+        configuration.setTimerLockTime(Duration.ofMillis(timerLockTimeInMillis));
     }
 
     @Override
     public int getAsyncJobLockTimeInMillis() {
-        return asyncJobLockTimeInMillis;
+        return (int) configuration.getAsyncJobLockTime().toMillis();
     }
 
     @Override
     public void setAsyncJobLockTimeInMillis(int asyncJobLockTimeInMillis) {
-        this.asyncJobLockTimeInMillis = asyncJobLockTimeInMillis;
+        configuration.setAsyncJobLockTime(Duration.ofMillis(asyncJobLockTimeInMillis));
+    }
+
+    public int getMoveTimerExecutorPoolSize() {
+        return configuration.getMoveTimerExecutorPoolSize();
+    }
+
+    public void setMoveTimerExecutorPoolSize(int moveTimerExecutorPoolSize) {
+        configuration.setMoveTimerExecutorPoolSize(moveTimerExecutorPoolSize);
     }
 
     @Override
     public int getMaxTimerJobsPerAcquisition() {
-        return maxTimerJobsPerAcquisition;
+        return configuration.getMaxTimerJobsPerAcquisition();
     }
 
     @Override
     public void setMaxTimerJobsPerAcquisition(int maxTimerJobsPerAcquisition) {
-        this.maxTimerJobsPerAcquisition = maxTimerJobsPerAcquisition;
+        configuration.setMaxTimerJobsPerAcquisition(maxTimerJobsPerAcquisition);
     }
 
     @Override
     public int getMaxAsyncJobsDuePerAcquisition() {
-        return maxAsyncJobsDuePerAcquisition;
+        return configuration.getMaxAsyncJobsDuePerAcquisition();
     }
 
     @Override
     public void setMaxAsyncJobsDuePerAcquisition(int maxAsyncJobsDuePerAcquisition) {
-        this.maxAsyncJobsDuePerAcquisition = maxAsyncJobsDuePerAcquisition;
+        this.configuration.setMaxAsyncJobsDuePerAcquisition(maxAsyncJobsDuePerAcquisition);
     }
 
     @Override
     public int getDefaultTimerJobAcquireWaitTimeInMillis() {
-        return defaultTimerJobAcquireWaitTimeInMillis;
+        return (int) configuration.getDefaultTimerJobAcquireWaitTime().toMillis();
     }
 
     @Override
     public void setDefaultTimerJobAcquireWaitTimeInMillis(int defaultTimerJobAcquireWaitTimeInMillis) {
-        this.defaultTimerJobAcquireWaitTimeInMillis = defaultTimerJobAcquireWaitTimeInMillis;
+        configuration.setDefaultTimerJobAcquireWaitTime(Duration.ofMillis(defaultTimerJobAcquireWaitTimeInMillis));
     }
 
     @Override
     public int getDefaultAsyncJobAcquireWaitTimeInMillis() {
-        return defaultAsyncJobAcquireWaitTimeInMillis;
+        return (int) configuration.getDefaultAsyncJobAcquireWaitTime().toMillis();
     }
 
     @Override
     public void setDefaultAsyncJobAcquireWaitTimeInMillis(int defaultAsyncJobAcquireWaitTimeInMillis) {
-        this.defaultAsyncJobAcquireWaitTimeInMillis = defaultAsyncJobAcquireWaitTimeInMillis;
+        configuration.setDefaultAsyncJobAcquireWaitTime(Duration.ofMillis(defaultAsyncJobAcquireWaitTimeInMillis));
     }
 
     public void setTimerJobRunnable(AcquireTimerJobsRunnable timerJobRunnable) {
@@ -300,24 +306,92 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     @Override
     public int getDefaultQueueSizeFullWaitTimeInMillis() {
-        return defaultQueueSizeFullWaitTime;
+        return (int) configuration.getDefaultQueueSizeFullWaitTime().toMillis();
     }
 
     @Override
     public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTime) {
-        this.defaultQueueSizeFullWaitTime = defaultQueueSizeFullWaitTime;
+        configuration.setDefaultQueueSizeFullWaitTime(Duration.ofMillis(defaultQueueSizeFullWaitTime));
     }
 
     public void setAsyncJobsDueRunnable(AcquireAsyncJobsDueRunnable asyncJobsDueRunnable) {
         this.asyncJobsDueRunnable = asyncJobsDueRunnable;
     }
 
+    public AcquireAsyncJobsDueLifecycleListener getAsyncJobsDueLifecycleListener() {
+        return asyncJobsDueLifecycleListener;
+    }
+
+    public void setAsyncJobsDueLifecycleListener(AcquireAsyncJobsDueLifecycleListener asyncJobsDueLifecycleListener) {
+        this.asyncJobsDueLifecycleListener = asyncJobsDueLifecycleListener;
+    }
+
+    public boolean isTimerRunnableNeeded() {
+        return configuration.isTimerRunnableNeeded();
+    }
+
     public void setTimerRunnableNeeded(boolean timerRunnableNeeded) {
-        this.timerRunnableNeeded = timerRunnableNeeded;
+        configuration.setTimerRunnableNeeded(timerRunnableNeeded);
+    }
+
+    public AcquireTimerLifecycleListener getTimerLifecycleListener() {
+        return timerLifecycleListener;
+    }
+
+    public void setTimerLifecycleListener(AcquireTimerLifecycleListener timerLifecycleListener) {
+        this.timerLifecycleListener = timerLifecycleListener;
+    }
+
+    public boolean isGlobalAcquireLockEnabled() {
+        return configuration.isGlobalAcquireLockEnabled();
+    }
+
+    public void setGlobalAcquireLockEnabled(boolean globalAcquireLockEnabled) {
+        configuration.setGlobalAcquireLockEnabled(globalAcquireLockEnabled);
+    }
+
+    public String getGlobalAcquireLockPrefix() {
+        return configuration.getGlobalAcquireLockPrefix();
+    }
+
+    public void setGlobalAcquireLockPrefix(String globalAcquireLockPrefix) {
+        configuration.setGlobalAcquireLockPrefix(globalAcquireLockPrefix);
+    }
+
+    public Duration getAsyncJobsGlobalLockWaitTime() {
+        return configuration.getAsyncJobsGlobalLockWaitTime();
+    }
+
+    public void setAsyncJobsGlobalLockWaitTime(Duration asyncJobsGlobalLockWaitTime) {
+        configuration.setAsyncJobsGlobalLockWaitTime(asyncJobsGlobalLockWaitTime);
+    }
+
+    public Duration getAsyncJobsGlobalLockPollRate() {
+        return configuration.getAsyncJobsGlobalLockPollRate();
+    }
+
+    public void setAsyncJobsGlobalLockPollRate(Duration asyncJobsGlobalLockPollRate) {
+        configuration.setAsyncJobsGlobalLockPollRate(asyncJobsGlobalLockPollRate);
+    }
+
+    public Duration getTimerLockWaitTime() {
+        return configuration.getTimerLockWaitTime();
+    }
+
+    public void setTimerLockWaitTime(Duration timerLockWaitTime) {
+        configuration.setTimerLockWaitTime(timerLockWaitTime);
+    }
+
+    public Duration getTimerLockPollRate() {
+        return configuration.getTimerLockPollRate();
+    }
+
+    public void setTimerLockPollRate(Duration timerLockPollRate) {
+        configuration.setTimerLockPollRate(timerLockPollRate);
     }
 
     public void setAcquireRunnableThreadName(String acquireRunnableThreadName) {
-        this.acquireRunnableThreadName = acquireRunnableThreadName;
+        configuration.setAcquireRunnableThreadName(acquireRunnableThreadName);
     }
 
     public void setJobEntityManager(JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
@@ -325,7 +399,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
     
     public void setResetExpiredRunnableName(String resetExpiredRunnableName) {
-        this.resetExpiredRunnableName = resetExpiredRunnableName;
+        configuration.setResetExpiredRunnableName(resetExpiredRunnableName);
     }
 
     public void setResetExpiredJobsRunnable(ResetExpiredJobsRunnable resetExpiredJobsRunnable) {
@@ -333,33 +407,36 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     @Override
+    @Deprecated
     public int getRetryWaitTimeInMillis() {
-        return retryWaitTimeInMillis;
+        // No longer used
+        return Integer.MAX_VALUE;
     }
 
     @Override
+    @Deprecated
     public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        this.retryWaitTimeInMillis = retryWaitTimeInMillis;
+        // No longer used
     }
 
     @Override
     public int getResetExpiredJobsInterval() {
-        return resetExpiredJobsInterval;
+        return (int) configuration.getResetExpiredJobsInterval().toMillis();
     }
 
     @Override
     public void setResetExpiredJobsInterval(int resetExpiredJobsInterval) {
-        this.resetExpiredJobsInterval = resetExpiredJobsInterval;
+        configuration.setResetExpiredJobsInterval(Duration.ofMillis(resetExpiredJobsInterval));
     }
 
     @Override
     public int getResetExpiredJobsPageSize() {
-        return resetExpiredJobsPageSize;
+        return configuration.getResetExpiredJobsPageSize();
     }
 
     @Override
     public void setResetExpiredJobsPageSize(int resetExpiredJobsPageSize) {
-        this.resetExpiredJobsPageSize = resetExpiredJobsPageSize;
+        configuration.setResetExpiredJobsPageSize(resetExpiredJobsPageSize);
     }
 
     public ExecuteAsyncRunnableFactory getExecuteAsyncRunnableFactory() {
@@ -389,9 +466,76 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     public ResetExpiredJobsRunnable getResetExpiredJobsRunnable() {
         return resetExpiredJobsRunnable;
     }
-    
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
+
+    public String getTenantId() {
+        return configuration.getTenantId();
     }
-    
+
+    public void setTenantId(String tenantId) {
+        configuration.setTenantId(tenantId);
+    }
+
+    public AsyncJobExecutorConfiguration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(AsyncJobExecutorConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    public class AcquireTimerRunnableConfiguration implements AcquireJobsRunnableConfiguration {
+
+        @Override
+        public boolean isGlobalAcquireLockEnabled() {
+            return configuration.isGlobalAcquireLockEnabled();
+        }
+
+        @Override
+        public String getGlobalAcquireLockPrefix() {
+            return configuration.getGlobalAcquireLockPrefix();
+        }
+
+        @Override
+        public Duration getLockWaitTime() {
+            return configuration.getTimerLockWaitTime();
+        }
+
+        @Override
+        public Duration getLockPollRate() {
+            return configuration.getTimerLockPollRate();
+        }
+
+        @Override
+        public Duration getLockForceAcquireAfter() {
+            return configuration.getTimerLockForceAcquireAfter();
+        }
+    }
+
+    public class AcquireAsyncJobsDueRunnableConfiguration implements AcquireJobsRunnableConfiguration {
+
+        @Override
+        public boolean isGlobalAcquireLockEnabled() {
+            return configuration.isGlobalAcquireLockEnabled();
+        }
+
+        @Override
+        public String getGlobalAcquireLockPrefix() {
+            return configuration.getGlobalAcquireLockPrefix();
+        }
+
+        @Override
+        public Duration getLockWaitTime() {
+            return configuration.getAsyncJobsGlobalLockWaitTime();
+        }
+
+        @Override
+        public Duration getLockPollRate() {
+            return configuration.getAsyncJobsGlobalLockPollRate();
+        }
+
+        @Override
+        public Duration getLockForceAcquireAfter() {
+            return configuration.getAsyncJobsGlobalLockForceAcquireAfter();
+        }
+    }
 }

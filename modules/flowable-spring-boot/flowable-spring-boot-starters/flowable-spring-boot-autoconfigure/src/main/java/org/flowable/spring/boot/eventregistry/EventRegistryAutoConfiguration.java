@@ -68,6 +68,8 @@ import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Auto configuration for the event registry.
  */
@@ -107,6 +109,7 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
     public SpringEventRegistryEngineConfiguration eventEngineConfiguration(
         DataSource dataSource,
         PlatformTransactionManager platformTransactionManager,
+        ObjectProvider<ObjectMapper> objectMapperProvider,
         ObjectProvider<List<ChannelModelProcessor>> channelModelProcessors,
         ObjectProvider<List<AutoDeploymentStrategy<EventRegistryEngine>>> eventAutoDeploymentStrategies,
         ObjectProvider<TaskScheduler> taskScheduler,
@@ -128,6 +131,10 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
 
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
+        ObjectMapper objectMapper = objectMapperProvider.getIfAvailable();
+        if (objectMapper != null) {
+            configuration.setObjectMapper(objectMapper);
+        }
 
         // We cannot use orderedStream since we want to support Boot 1.5 which is on pre 5.x Spring
         List<AutoDeploymentStrategy<EventRegistryEngine>> deploymentStrategies = eventAutoDeploymentStrategies.getIfAvailable();

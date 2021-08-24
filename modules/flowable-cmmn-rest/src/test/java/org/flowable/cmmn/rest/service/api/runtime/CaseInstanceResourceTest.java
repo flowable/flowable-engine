@@ -120,10 +120,10 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting a single case instance.
+     * Test terminating a single case instance.
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testDeleteCaseInstance() {
+    public void testTerminateCaseInstance() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
         closeResponse(
                 executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId())),
@@ -134,10 +134,32 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
+     * Test terminating an unexisting case instance.
+     */
+    public void testTerminateUnexistingCaseInstance() {
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexisting")),
+                HttpStatus.SC_NOT_FOUND));
+    }
+    
+    /**
+     * Test deleting a single case instance.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testDeleteCaseInstance() {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+        closeResponse(
+                executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId(), "delete")),
+                        HttpStatus.SC_NO_CONTENT));
+
+        // Check if process-instance is gone
+        assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    /**
      * Test deleting an unexisting case instance.
      */
     public void testDeleteUnexistingCaseInstance() {
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistini")),
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexisting", "delete")),
                 HttpStatus.SC_NOT_FOUND));
     }
 

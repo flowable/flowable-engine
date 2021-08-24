@@ -65,6 +65,7 @@ public class JobCollectionResource {
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return jobs part of a plan item instance with the given id", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return jobs with the given case definition id", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return jobs with the given scope definition id", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return jobs with the given scope type", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "Only return jobs with the given element id", paramType = "query"),
             @ApiImplicitParam(name = "elementName", dataType = "string", value = "Only return jobs with the given element name", paramType = "query"),
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
@@ -159,6 +160,9 @@ public class JobCollectionResource {
             if (Boolean.valueOf(allRequestParams.get("unlocked"))) {
                 query.unlocked();
             }
+        }
+        if (allRequestParams.containsKey("scopeType")) {
+            query.scopeType(allRequestParams.get("scopeType"));
         }
         
         if (restApiInterceptor != null) {

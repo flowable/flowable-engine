@@ -167,7 +167,12 @@
     delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
-  
+
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -212,11 +217,11 @@
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultType="long">
@@ -260,7 +265,7 @@
   </sql>
 
   <select id="selectHistoricDetailByNativeQuery" parameterType="java.util.Map" resultMap="historicDetailResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricDetailCountByNativeQuery" parameterType="java.util.Map" resultType="long">

@@ -54,6 +54,10 @@ public class CaseXmlConverter extends BaseCmmnXmlConverter {
             caze.setCandidateStarterGroups(candidateGroups);
         }
 
+        if ("true".equals(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS))) {
+            caze.setAsync(true);
+        }
+
         conversionHelper.getCmmnModel().addCase(caze);
         conversionHelper.setCurrentCase(caze);
         return caze;

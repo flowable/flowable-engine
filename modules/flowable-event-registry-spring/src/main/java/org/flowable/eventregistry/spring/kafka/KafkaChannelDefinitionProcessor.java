@@ -28,6 +28,8 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -57,6 +59,8 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
 
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected KafkaOperations<Object, Object> kafkaOperations;
 
     protected KafkaListenerEndpointRegistry endpointRegistry;
@@ -83,12 +87,16 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         
         if (channelModel instanceof KafkaInboundChannelModel) {
             KafkaInboundChannelModel kafkaChannelModel = (KafkaInboundChannelModel) channelModel;
+            logger.info("Starting to register inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
 
             KafkaListenerEndpoint endpoint = createKafkaListenerEndpoint(kafkaChannelModel, tenantId, eventRegistry);
             registerEndpoint(endpoint, null);
+            logger.info("Finished registering inbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             
         } else if (channelModel instanceof KafkaOutboundChannelModel) {
+            logger.info("Starting to register outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
             processOutboundDefinition((KafkaOutboundChannelModel) channelModel);
+            logger.info("Finished registering outbound channel {} in tenant {}", channelModel.getKey(), tenantId);
         }
     }
 
@@ -209,17 +217,20 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
 
     @Override
     public void unregisterChannelModel(ChannelModel channelModel, String tenantId, EventRepositoryService eventRepositoryService) {
+        logger.info("Starting to unregister channel {} in tenant {}", channelModel.getKey(), tenantId);
         String endpointId = getEndpointId(channelModel, tenantId);
         // currently it is not possible to unregister a listener container
         // In order not to do a lot of the logic that Spring does we are manually accessing the containers to remove them
         // see https://github.com/spring-projects/spring-framework/issues/24228
         MessageListenerContainer listenerContainer = endpointRegistry.getListenerContainer(endpointId);
         if (listenerContainer != null) {
+            logger.debug("Stopping message listener {} for channel {} in tenant {}", listenerContainer, channelModel.getKey(), tenantId);
             listenerContainer.stop();
         }
 
         if (listenerContainer instanceof DisposableBean) {
             try {
+                logger.debug("Destroying message listener {} for channel {} in tenant {}", listenerContainer, channelModel.getKey(), tenantId);
                 ((DisposableBean) listenerContainer).destroy();
             } catch (Exception e) {
                 throw new RuntimeException("Failed to destroy listener container", e);
@@ -238,6 +249,8 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         } else {
             throw new IllegalStateException("Endpoint registry " + endpointRegistry + " does not have listenerContainers field");
         }
+
+        logger.info("Finished unregistering channel {} in tenant {}", channelModel.getKey(), tenantId);
     }
 
     /**
@@ -254,7 +267,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Channe
         // There is no need to use a specific flag for starting immediately for Kafka since the KafkaListenerEndpointRegistry
         // handles the start of the containers differently then the JMS and Rabbit ones.
         // It has its own state for whether it is running or not and does not depend on the underlying containers.
+        logger.info("Registering endpoint {}", endpoint);
         endpointRegistry.registerListenerContainer(endpoint, resolveContainerFactory(endpoint, factory), true);
+        logger.info("Finished registering endpoint {}", endpoint);
     }
 
     protected KafkaListenerContainerFactory<?> resolveContainerFactory(KafkaListenerEndpoint endpoint, KafkaListenerContainerFactory<?> containerFactory) {

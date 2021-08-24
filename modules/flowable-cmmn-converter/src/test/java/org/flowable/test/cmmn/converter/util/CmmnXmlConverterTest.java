@@ -32,4 +32,10 @@ public @interface CmmnXmlConverterTest {
      * The location of the XML resource that needs to be tested.
      */
     String value();
+
+    /**
+     * The directions for which the test should be executed.
+     * If nothing is defined then all are used.
+     */
+    ConversionDirection[] directions() default {};
 }

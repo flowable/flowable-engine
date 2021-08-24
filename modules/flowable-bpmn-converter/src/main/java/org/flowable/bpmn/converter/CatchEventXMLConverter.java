@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
+import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -35,6 +36,8 @@ public class CatchEventXMLConverter extends BaseBpmnXMLConverter {
     public CatchEventXMLConverter() {
         InParameterParser inParameterParser = new InParameterParser();
         childParserMap.put(inParameterParser.getElementName(), inParameterParser);
+        VariableListenerEventDefinitionParser variableListenerEventDefinitionParser = new VariableListenerEventDefinitionParser();
+        childParserMap.put(variableListenerEventDefinitionParser.getElementName(), variableListenerEventDefinitionParser);
     }
 
     @Override
@@ -51,6 +54,8 @@ public class CatchEventXMLConverter extends BaseBpmnXMLConverter {
     protected BaseElement convertXMLToElement(XMLStreamReader xtr, BpmnModel model) throws Exception {
         IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
         BpmnXMLUtil.addXMLLocation(catchEvent, xtr);
+        String elementId = xtr.getAttributeValue(null, ATTRIBUTE_ID);
+        catchEvent.setId(elementId);
         parseChildElements(getXMLElementName(), catchEvent, childParserMap, model, xtr);
         return catchEvent;
     }
@@ -58,6 +63,13 @@ public class CatchEventXMLConverter extends BaseBpmnXMLConverter {
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
 
+    }
+    
+    @Override
+    protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) element;
+        didWriteExtensionStartElement = writeVariableListenerDefinition(catchEvent, didWriteExtensionStartElement, xtw);        
+        return didWriteExtensionStartElement;
     }
 
     @Override

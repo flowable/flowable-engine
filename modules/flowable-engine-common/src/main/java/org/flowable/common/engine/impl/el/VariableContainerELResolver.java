@@ -30,16 +30,11 @@ public class VariableContainerELResolver extends ELResolver {
     public static final String VARIABLE_CONTAINER_KEY = "variableContainer";
     public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
 
-    protected VariableContainer variableContainer;
-
-    public VariableContainerELResolver(VariableContainer variableContainer) {
-        this.variableContainer = variableContainer;
-    }
-    
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             String variable = (String) property; // according to javadoc, can only be a String
+            VariableContainer variableContainer = getVariableContainer(context);
             if (LOGGED_IN_USER_KEY.equals(property)) {
                 context.setPropertyResolved(true);
                 return Authentication.getAuthenticatedUserId();
@@ -73,7 +68,7 @@ public class VariableContainerELResolver extends ELResolver {
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (base == null) {
             String variable = (String) property;
-            return !variableContainer.hasVariable(variable);
+            return !getVariableContainer(context).hasVariable(variable);
         }
         return true;
     }
@@ -82,6 +77,7 @@ public class VariableContainerELResolver extends ELResolver {
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
             String variable = (String) property;
+            VariableContainer variableContainer = getVariableContainer(context);
             if (variableContainer.hasVariable(variable)) {
                 context.setPropertyResolved(true);
                 if (variableContainer instanceof VariableScope) {
@@ -94,6 +90,10 @@ public class VariableContainerELResolver extends ELResolver {
                 }
             }
         }
+    }
+
+    protected VariableContainer getVariableContainer(ELContext elContext) {
+        return (VariableContainer) elContext.getContext(VariableContainer.class);
     }
 
     @Override

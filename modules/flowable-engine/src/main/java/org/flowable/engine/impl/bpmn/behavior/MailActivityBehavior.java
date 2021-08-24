@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import java.util.Map;
 import javax.activation.DataSource;
 import javax.naming.NamingException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
@@ -104,7 +106,11 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 List<File> files = new LinkedList<>();
                 List<DataSource> dataSources = new LinkedList<>();
                 getFilesFromFields(attachments, execution, files, dataSources);
-    
+
+                if (StringUtils.isAllEmpty(toStr, ccStr, bccStr)) {
+                    throw new FlowableException("No recipient could be found for sending email");
+                }
+
                 email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
                 addHeader(email, headersStr);
                 addTo(email, toStr, execution.getTenantId());
@@ -113,7 +119,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
                 addBcc(email, bccStr, execution.getTenantId());
                 setSubject(email, subjectStr);
                 setMailServerProperties(email, execution.getTenantId());
-                setCharset(email, charSetStr);
+                setCharset(email, charSetStr, execution.getTenantId());
                 attach(email, files, dataSources);
     
                 email.send();
@@ -196,8 +202,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     protected void addTo(Email email, String to, String tenantId) {
         if (to == null) {
-            // To has to be set, otherwise it can fallback to the forced To and then it won't be noticed early on
-            throw new FlowableException("No recipient could be found for sending email");
+            return;
         }
         String newTo = getForceTo(tenantId);
         if (newTo == null) {
@@ -372,9 +377,14 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
     }
 
-    protected void setCharset(Email email, String charSetStr) {
+    protected void setCharset(Email email, String charSetStr, String tenantId) {
         if (charset != null) {
             email.setCharset(charSetStr);
+        } else {
+            Charset mailServerDefaultCharset = getDefaultCharSet(tenantId);
+            if (mailServerDefaultCharset != null) {
+                email.setCharset(mailServerDefaultCharset.name());
+            }
         }
     }
 
@@ -504,6 +514,23 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         return forceTo;
+    }
+
+    protected Charset getDefaultCharSet(String tenantId) {
+        Charset defaultCharset = null;
+        if (StringUtils.isNotBlank(tenantId)) {
+            MailServerInfo mailServerInfo = CommandContextUtil.getProcessEngineConfiguration().getMailServer(tenantId);
+            if (mailServerInfo != null) {
+                defaultCharset = mailServerInfo.getMailServerDefaultCharset();
+            }
+
+        }
+
+        if (defaultCharset == null) {
+            defaultCharset = CommandContextUtil.getProcessEngineConfiguration().getMailServerDefaultCharset();
+        }
+
+        return defaultCharset;
     }
 
     public static class ContentItemDataSourceWrapper implements DataSource {

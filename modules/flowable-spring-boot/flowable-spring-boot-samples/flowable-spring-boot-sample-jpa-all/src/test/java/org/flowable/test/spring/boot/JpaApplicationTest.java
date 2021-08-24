@@ -29,12 +29,10 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import flowable.Application;
 import flowable.Photo;
@@ -43,7 +41,6 @@ import flowable.PhotoRepository;
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class JpaApplicationTest {
 
@@ -65,7 +62,7 @@ public class JpaApplicationTest {
     @Autowired
     private TaskService taskService;
 
-    @After
+    @AfterEach
     public void tearDown() {
         runtimeService.createProcessInstanceQuery()
             .processDefinitionKey("dogeProcess")

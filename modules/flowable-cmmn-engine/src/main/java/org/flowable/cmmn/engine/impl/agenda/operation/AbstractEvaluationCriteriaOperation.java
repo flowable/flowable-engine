@@ -43,6 +43,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
@@ -148,6 +149,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 if (collection == null && !ExpressionUtil.hasOnParts(planItem)) {
                     // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
                     activatePlanItemInstance = false;
+                    
                 } else {
 
                     if (collection != null) {
@@ -178,6 +180,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
                     }
                 }
+                
             } else if (!noEntryCriteria) {
                 // check the plan item to be repeating by evaluating its repetition rule
                 if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer)) {
@@ -235,8 +238,17 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // check, if the plan item can be ignored for further processing and if so, immediately return
             if (planItem.getItemControl() != null && planItem.getItemControl().getParentCompletionRule() != null) {
                 ParentCompletionRule parentCompletionRule = planItem.getItemControl().getParentCompletionRule();
+
+                // first check for the always ignore rule
                 if (ParentCompletionRule.IGNORE.equals(parentCompletionRule.getType())) {
                     return true;
+                }
+
+                // now check, if we can ignore it because it was completed before
+                if (ParentCompletionRule.IGNORE_AFTER_FIRST_COMPLETION.equals(parentCompletionRule.getType())) {
+                    if (evaluationResult.hasCompletedPlanItemInstance(planItemInstanceEntity)) {
+                        return true;
+                    }
                 }
             }
 
@@ -268,7 +280,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
         // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
         // modification, we add them at the end of the evaluation loop to the parent container
-        PlanItemEvaluationResult evaluationResult = new PlanItemEvaluationResult();
+        PlanItemEvaluationResult evaluationResult = new PlanItemEvaluationResult(planItemInstances);
 
         // Check the existing plan item instances: this means the plan items that have been created and became available.
         // This does not include the plan items which haven't been created (for example because they're part of a stage which isn't active yet).
@@ -410,7 +422,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(entryDependentPlanItemInstance, satisfiedCriterion.getId());
                         for (int i = parentPlanItemInstancesToActivate.size() - 1; i >= 0; i--) {
                             PlanItemInstanceEntity parentPlanItemInstance = parentPlanItemInstancesToActivate.get(i);
-                            if (parentPlanItemInstance == null) { // newly created one
+                            if (parentPlanItemInstance.getState() == null) { // newly created one
                                 CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(parentPlanItemInstance);
                             }
                             CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(parentPlanItemInstance, null); // null -> no sentry satisfied, activation is because of child activation
@@ -770,7 +782,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
@@ -795,7 +807,11 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             localVariables.put(repetitionRule.getElementIndexVariableName(), index);
         }
 
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+
+        // record the plan item being created based on the collection, so it gets synchronized to the history as well
+        CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(childPlanItemInstanceEntity);
+
         // The repetition counter is 1 based
         setRepetitionCounter(childPlanItemInstanceEntity, index + 1);
 

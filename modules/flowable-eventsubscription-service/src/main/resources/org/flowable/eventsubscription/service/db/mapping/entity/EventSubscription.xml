@@ -46,11 +46,11 @@
   </select>
 
   <select id="selectEventSubscriptionByQueryCriteria" parameterType="org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl" resultMap="eventSubscriptionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectEventSubscriptionCountByQueryCriteria" parameterType="org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl" resultType="long">
@@ -260,6 +260,13 @@
     	and (EXECUTION_ID_ = #{parameter.executionId})
   </select>
   
+  <select id="selectEventSubscriptionsByProcessInstanceAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select * 
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = #{parameter.eventType})
+    	and (PROC_INST_ID_ = #{parameter.processInstanceId})
+  </select>
+  
   <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
@@ -299,6 +306,13 @@
           and (TENANT_ID_ = '' or TENANT_ID_ is null)
       </if>  
     </where>   
+  </select>
+  
+  <select id="selectEventSubscriptionsByScopeIdAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select * 
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = #{parameter.eventType})
+    	and (SCOPE_ID_ = #{parameter.scopeId})
   </select>
   
   <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">

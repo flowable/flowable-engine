@@ -235,14 +235,14 @@
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
         <property name="queryTablePrefixSelect" value="RES"/>
         <property name="queryTablePrefix" value="RES."/>
     </include>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
@@ -273,6 +273,11 @@
 
   <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
   
@@ -352,7 +357,7 @@
   </sql>
   
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
-  	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+  	<include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

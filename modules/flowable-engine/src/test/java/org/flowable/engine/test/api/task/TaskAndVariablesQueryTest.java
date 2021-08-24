@@ -282,9 +282,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     @Test
     public void testQueryWithLimitAndVariables() throws Exception {
 
-        int taskVariablesLimit = 2000;
-        int expectedNumberOfTasks = 103;
-
         try {
             // setup - create 100 tasks
             multipleTaskIds = generateMultipleTestTasks();
@@ -294,18 +291,16 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
                     .includeProcessVariables()
                     .includeTaskLocalVariables()
-                    .limitTaskVariables(taskVariablesLimit)
                     .orderByTaskPriority()
                     .asc()
                     .listPage(0, 200);
             // 100 tasks created by generateMultipleTestTasks and 3 created previously at setUp
-            assertThat(tasks).hasSize(expectedNumberOfTasks);
+            assertThat(tasks).hasSize(103);
 
             tasks = taskService.createTaskQuery()
                     .includeProcessVariables()
                     .includeTaskLocalVariables()
                     .orderByTaskPriority()
-                    .limitTaskVariables(taskVariablesLimit)
                     .asc()
                     .listPage(50, 100);
             assertThat(tasks).hasSize(53);

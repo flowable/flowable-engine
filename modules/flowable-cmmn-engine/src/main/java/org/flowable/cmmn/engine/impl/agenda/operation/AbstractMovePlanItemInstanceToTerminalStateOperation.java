@@ -31,20 +31,31 @@ import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
+import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.EventListener;
+import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.SignalEventListener;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.cmmn.model.VariableAggregationDefinitions;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -55,6 +66,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  *
  * @author Joram Barrez
  * @author Filip Hrisafov
+ * @author Micha Kiener
  */
 public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation extends AbstractChangePlanItemInstanceStateOperation {
 
@@ -83,35 +95,45 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
             String plannedNewState = getNewState();
 
-            if (isRepeatingOnDelete(originalState, plannedNewState) && !isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity)) {
+            boolean isRepeatingOnDelete = isRepeatingOnDelete(originalState, plannedNewState);
+            boolean isWaitingForRepetitionPlanItemInstanceExists = isWaitingForRepetitionPlanItemInstanceExists(planItemInstanceEntity);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+            if (isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists) {
 
-                // Create new repeating instance
-                PlanItemInstanceEntity newPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
-
-                if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener) {
-                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
-
-                } else {
-
-                    String oldState = newPlanItemInstanceEntity.getState();
-                    String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-                    newPlanItemInstanceEntity.setState(newState);
-                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-                        .executeLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
-
-                    // Plan item creation "for Repetition"
-                    CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
-
-                    // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-                    if (hasRepetitionRuleAndNoEntryCriteria(planItemInstanceEntity.getPlanItem())) {
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+                if (planItemInstanceEntity.getPlanItem() == null || planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof TimerEventListener || 
+                        !(planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener)) {
+                
+                    PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+                    
+                    // Create new repeating instance
+                    PlanItemInstanceEntity newPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, true, false);
+    
+                    if (planItemInstanceEntity.getPlanItem() != null && (planItemDefinition instanceof TimerEventListener || planItemDefinition instanceof ReactivateEventListener)) {
+                        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
+                        
+                    } else {
+                        String oldState = newPlanItemInstanceEntity.getState();
+                        String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
+                        newPlanItemInstanceEntity.setState(newState);
+                        cmmnEngineConfiguration.getListenerNotificationHelper()
+                            .executeLifecycleListeners(commandContext, newPlanItemInstanceEntity, oldState, newState);
+        
+                        // Plan item creation "for Repetition"
+                        agenda.planCreatePlanItemInstanceForRepetitionOperation(newPlanItemInstanceEntity);
+        
+                        // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
+                        if (hasRepetitionRuleAndNoEntryCriteria(planItemInstanceEntity.getPlanItem())) {
+                            agenda.planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity, null);
+                        }
                     }
                 }
 
             } else if (shouldAggregate) {
                 aggregateVariablesForAllInstances(planItemInstanceEntity, aggregations);
-
             }
+            
+            cleanupRepetitionPlanItemInstances(isRepeatingOnDelete, isWaitingForRepetitionPlanItemInstanceExists, cmmnEngineConfiguration);
 
             removeSentryRelatedData();
         }
@@ -121,6 +143,16 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
         return repetitionRule != null ? repetitionRule.getAggregations() : null;
     }
+    
+    protected String resolveEventDefinitionKey(String eventType, PlanItemInstanceEntity planItemInstanceEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        Object key = cmmnEngineConfiguration.getExpressionManager().createExpression(eventType).getValue(planItemInstanceEntity);
+
+        if (key == null) {
+            throw new FlowableException("Could not resolve key from expression: " + eventType);
+        }
+
+        return key.toString();
+    }
 
     /**
      * Implementing classes should be aware that unlike extending from AbstractChangePlanItemInstanceStateOperation, this
@@ -128,6 +160,58 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
      */
     @Override
     protected abstract void internalExecute();
+    
+    protected void cleanupRepetitionPlanItemInstances(boolean isRepeatingOnDelete, boolean isWaitingForRepetitionPlanItemInstanceExists,
+            CmmnEngineConfiguration cmmnEngineConfiguration) {
+        
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        if (planItem != null && planItemDefinition instanceof EventListener && !(planItemDefinition instanceof TimerEventListener) && 
+                !(planItemDefinition instanceof ReactivateEventListener)) {
+            
+            if ((!isRepeatingOnDelete && !isWaitingForRepetitionPlanItemInstanceExists && !hasRepetitionOnCollection(planItem)) ||
+                    !hasRepetitionRule(planItem)) {
+                
+                List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndPlanItemId(
+                        planItemInstanceEntity.getCaseInstanceId(), planItem.getId());
+                for (PlanItemInstanceEntity planItemInstanceEntry : planItemInstances) {
+                    if (!planItemInstanceEntry.getId().equals(planItemInstanceEntity.getId())) {
+                        
+                        planItemInstanceEntry.setState(PlanItemInstanceState.COMPLETED);
+                        planItemInstanceEntry.setEndedTime(getCurrentTime(commandContext));
+                        planItemInstanceEntry.setCompletedTime(planItemInstanceEntry.getEndedTime());
+                        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntry);
+                        
+                        if (planItemDefinition instanceof GenericEventListener) {
+                            GenericEventListener genericEventListener = (GenericEventListener) planItemDefinition;
+                            if (StringUtils.isNotEmpty(genericEventListener.getEventType())) {
+                                
+                                EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+                                String eventDefinitionKey = resolveEventDefinitionKey(genericEventListener.getEventType(), planItemInstanceEntry,
+                                        cmmnEngineConfiguration);
+
+                                List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntry.getId());
+                                for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                                    if (Objects.equals(eventDefinitionKey, eventSubscription.getEventType())) {
+                                        eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                                    }
+                                }
+                            }
+                        
+                        } else if (planItemDefinition instanceof SignalEventListener) {
+                            EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+                            List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntry.getId());
+                            for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+                                eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                            }
+                        }
+                        
+                        cmmnEngineConfiguration.getPlanItemInstanceEntityManager().delete(planItemInstanceEntry.getId());
+                    }
+                }  
+            }
+        }
+    }
 
     public boolean isRepeatingOnDelete(String originalState, String newState) {
         
@@ -192,6 +276,12 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             && planItem.getItemControl() != null
             && planItem.getItemControl().getRepetitionRule() != null;
     }
+    
+    public boolean hasRepetitionRule(PlanItem planItem) {
+        return planItem != null
+            && planItem.getItemControl() != null
+            && planItem.getItemControl().getRepetitionRule() != null;
+    }
 
     public boolean isWaitingForRepetitionPlanItemInstanceExists(PlanItemInstanceEntity planItemInstanceEntity) {
         PlanItemInstanceEntity stagePlanItemInstanceEntity = planItemInstanceEntity.getStagePlanItemInstanceEntity();
@@ -206,27 +296,29 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
         return false;
     }
 
-    protected void completeChildPlanItemInstances() {
-        completeChildPlanItemInstances(null);
-    }
-
-    protected void completeChildPlanItemInstances(String exitCriterionId) {
+    /**
+     * Exits (terminates) all child plan items of the current one (e.g. if the current one is a stage or plan model) on a terminate or complete transition of
+     * the parent as in this case, child plan items not being in an ending state must also be terminated.
+     * Depending on the plan item behavior, it might be delegated to the behavior or the default one is to simply exit the child plan item as well.
+     *
+     * @param parentTransition the transition of the parent plan item to an ending state as it might have an impact on how to end the child plan item
+     * @param exitCriterionId the optional exit criterion being triggered on the parent to end it, might be null
+     * @param exitEventType the optional exit event type, if an exit sentry was triggered, as it might have an impact on the child ending as well
+     */
+    protected void exitChildPlanItemInstances(String parentTransition, String exitCriterionId, String exitEventType) {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
-            if (StateTransition.isPossible(child, PlanItemTransition.COMPLETE)) {
-                CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(child);
-            }
-        }
-    }
-    
-    protected void exitChildPlanItemInstances() {
-        exitChildPlanItemInstances(null);
-    }
-
-    protected void exitChildPlanItemInstances(String exitCriterionId) {
-        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
-            if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
-                // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
+            // if the plan item implements the specific behavior interface for ending, invoke it, otherwise use the default one which is terminate, regardless,
+            // if the case got completed or terminated
+            Object behavior = child.getPlanItem().getBehavior();
+            if (behavior instanceof OnParentEndDependantActivityBehavior) {
+                // if the specific behavior is implemented, invoke it
+                ((OnParentEndDependantActivityBehavior) behavior).onParentEnd(commandContext, child, parentTransition, exitEventType);
+            } else {
+                // use default behavior, if the interface is not implemented
+                if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
+                    // don't propagate the exit event type and exit type to child plan items, it only has an impact where it was set using the exit sentry
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child, exitCriterionId, null, null);
+                }
             }
         }
     }
@@ -246,7 +338,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
 
                 String targetVarName = aggregatedVarInstance.getName();
 
-                int repetitionCounter = getRepetitionCounter(planItemInstanceEntity);
+                int repetitionCounter = PlanItemInstanceUtil.getRepetitionCounter(planItemInstanceEntity);
                 String repetitionValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + repetitionCounter;
                 VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
                         aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), repetitionValue, variableServiceConfiguration);

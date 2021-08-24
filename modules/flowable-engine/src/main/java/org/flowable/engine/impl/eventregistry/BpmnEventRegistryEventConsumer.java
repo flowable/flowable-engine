@@ -28,7 +28,9 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventregistry.impl.consumer.BaseEventRegistryEventConsumer;
@@ -102,12 +104,19 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
 
                     CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
+                    
+                    ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService().getProcessDefinition(eventSubscription.getProcessDefinitionId());
 
-                    long processInstanceCount = runtimeService.createProcessInstanceQuery()
-                        .processDefinitionId(eventSubscription.getProcessDefinitionId())
+                    ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
+                        .processDefinitionKey(processDefinition.getKey())
                         .processInstanceReferenceId(correlationKeyWithAllParameters.getValue())
-                        .processInstanceReferenceType(ReferenceTypes.EVENT_PROCESS)
-                        .count();
+                        .processInstanceReferenceType(ReferenceTypes.EVENT_PROCESS);
+                    
+                    if (eventInstance.getTenantId() != null && !Objects.equals(ProcessEngineConfiguration.NO_TENANT_ID, eventInstance.getTenantId())) {
+                        processInstanceQuery.processInstanceTenantId(eventInstance.getTenantId());
+                    }
+                    
+                    long processInstanceCount = processInstanceQuery.count();
 
                     if (processInstanceCount > 0) {
                         // Returning, no new instance should be started
@@ -121,7 +130,11 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 }
             }
 
-            processInstanceBuilder.startAsync();
+            if (processEngineConfiguration.isEventRegistryStartProcessInstanceAsync()) {
+                processInstanceBuilder.startAsync();
+            } else {
+                processInstanceBuilder.start();
+            }
         }
 
     }

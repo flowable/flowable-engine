@@ -42,14 +42,7 @@ public class ConvertCmmnModelResolver implements ParameterResolver {
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         ExtensionContext.Store store = extensionContext.getRoot().getStore(NAMESPACE);
 
-        // Ideally we would use store.getOrComputeIfAbsent
-        // However, due to https://github.com/junit-team/junit5/issues/2455 when the default creator throws an exception it will be called twice
-        CmmnModel cmmnModel = store.get(extensionContext.getUniqueId(), CmmnModel.class);
-        if (cmmnModel == null) {
-            cmmnModel = modelSupplier.get();
-            store.put(extensionContext.getUniqueId(), cmmnModel);
-        }
-        return cmmnModel;
+        return store.getOrComputeIfAbsent(extensionContext.getUniqueId(), key -> modelSupplier.get(), CmmnModel.class);
     }
 
 }

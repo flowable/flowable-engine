@@ -846,8 +846,16 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
         return isCountEnabled;
     }
 
+    public boolean getIsCountEnabled() {
+        return isCountEnabled;
+    }
+
     @Override
     public void setCountEnabled(boolean isCountEnabled) {
+        this.isCountEnabled = isCountEnabled;
+    }
+
+    public void setIsCountEnabled(boolean isCountEnabled) {
         this.isCountEnabled = isCountEnabled;
     }
 

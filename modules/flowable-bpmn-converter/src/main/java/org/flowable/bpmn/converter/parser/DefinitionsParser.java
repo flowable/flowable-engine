@@ -28,11 +28,18 @@ import org.flowable.bpmn.model.ExtensionAttribute;
  */
 public class DefinitionsParser implements BpmnXMLConstants {
 
-    protected static final List<ExtensionAttribute> defaultAttributes = Arrays.asList(new ExtensionAttribute(TYPE_LANGUAGE_ATTRIBUTE), new ExtensionAttribute(EXPRESSION_LANGUAGE_ATTRIBUTE),
-            new ExtensionAttribute(TARGET_NAMESPACE_ATTRIBUTE));
+    protected static final List<ExtensionAttribute> defaultAttributes = Arrays.asList(
+            new ExtensionAttribute(TYPE_LANGUAGE_ATTRIBUTE),
+            new ExtensionAttribute(EXPRESSION_LANGUAGE_ATTRIBUTE),
+            new ExtensionAttribute(TARGET_NAMESPACE_ATTRIBUTE),
+            new ExtensionAttribute(ATTRIBUTE_EXPORTER),
+            new ExtensionAttribute(ATTRIBUTE_EXPORTER_VERSION)
+        );
 
     @SuppressWarnings("unchecked")
     public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
+        model.setExporter(xtr.getAttributeValue(null, ATTRIBUTE_EXPORTER));
+        model.setExporterVersion(xtr.getAttributeValue(null, ATTRIBUTE_EXPORTER_VERSION));
         model.setTargetNamespace(xtr.getAttributeValue(null, TARGET_NAMESPACE_ATTRIBUTE));
         for (int i = 0; i < xtr.getNamespaceCount(); i++) {
             String prefix = xtr.getNamespacePrefix(i);

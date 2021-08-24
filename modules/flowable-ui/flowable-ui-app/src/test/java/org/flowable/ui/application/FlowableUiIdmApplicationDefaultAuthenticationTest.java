@@ -16,8 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,14 +29,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
  * @author Filip Hrisafov
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(FlowableUiIdmApplicationDefaultAuthenticationTest.TestBootstrapConfiguration.class)
 public class FlowableUiIdmApplicationDefaultAuthenticationTest {

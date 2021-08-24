@@ -184,7 +184,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     
     @Override
     public EventSubscriptionQueryImpl subScopeId(String subScopeId) {
-        if (scopeId == null) {
+        if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
 

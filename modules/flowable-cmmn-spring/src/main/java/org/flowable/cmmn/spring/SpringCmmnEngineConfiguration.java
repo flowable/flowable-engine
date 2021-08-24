@@ -27,6 +27,7 @@ import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymen
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.spring.AutoDeploymentStrategy;
@@ -72,6 +73,13 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         CmmnEngines.setInitialized(true);
         enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;
+    }
+
+    @Override
+    public void initBeans() {
+        if (beans == null) {
+            beans = new SpringBeanFactoryProxyMap(applicationContext);
+        }
     }
 
     @Override

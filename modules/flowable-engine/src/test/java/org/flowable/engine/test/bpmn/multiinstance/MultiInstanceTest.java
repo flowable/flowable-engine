@@ -60,6 +60,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -106,13 +108,22 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.sequentialUserTasks.bpmn20.xml" })
     public void testSequentialUserTasksHistory() {
         String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", CollectionUtil.singletonMap("nrOfLoops", 4)).getId();
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(procId).list()).hasSize(1);
+        }
+        
         for (int i = 0; i < 4; i++) {
-            taskService.complete(taskService.createTaskQuery().singleResult().getId());
+            String taskId = taskService.createTaskQuery().singleResult().getId();
+            taskService.complete(taskId);
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult()).isNotNull();
+            }
         }
         assertProcessEnded(procId);
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-
             List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery().list();
             assertThat(historicTaskInstances).hasSize(4);
             for (HistoricTaskInstance ht : historicTaskInstances) {
@@ -130,7 +141,6 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 assertThat(hai.getEndTime()).isNotNull();
                 assertThat(hai.getAssignee()).isNotNull();
             }
-
         }
     }
 
@@ -608,38 +618,77 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testParallelAsyncScriptTasks() {
-        runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("miParallelAsyncScriptTask")
-                .variable("nrOfLoops", 10)
-                .start();
-        List<Job> jobs = managementService.createJobQuery().list();
-        // There are 10 jobs for each async execution
-        assertThat(jobs).hasSize(10);
-
-        // When a job fails it is moved to the timer jobs, so it can be executed later
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000000, 200);
-        jobs = managementService.createJobQuery().list();
-        assertThat(jobs).isEmpty();
-        List<Job> timerJobs = managementService.createTimerJobQuery().list();
-        assertThat(timerJobs).isEmpty();
-
-        List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
-        assertThat(deadLetterJobs).isEmpty();
-
-
-        List<Execution> executions = runtimeService.createExecutionQuery().list();
-        assertThat(executions).hasSize(2);
-        Execution processInstanceExecution = null;
-        Execution waitStateExecution = null;
-        for (Execution execution : executions) {
-            if (execution.getId().equals(execution.getProcessInstanceId())) {
-                processInstanceExecution = execution;
-            } else {
-                waitStateExecution = execution;
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("miParallelAsyncScriptTask")
+                    .variable("nrOfLoops", 10)
+                    .start();
+            List<Job> jobs = managementService.createJobQuery().list();
+            // There are 10 jobs for each async execution
+            assertThat(jobs).hasSize(10);
+    
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance varInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("nrOfCompletedInstances")
+                        .singleResult();
+                assertThat(varInstance).isNotNull();
+                assertThat(varInstance.getValue()).isEqualTo(0);
+    
+                varInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstance.getId())
+                        .variableName("nrOfActiveInstances")
+                        .singleResult();
+                assertThat(varInstance).isNotNull();
+                assertThat(varInstance.getValue()).isEqualTo(10);
+            }
+    
+            // When a job fails it is moved to the timer jobs, so it can be executed later
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 200);
+            jobs = managementService.createJobQuery().list();
+            assertThat(jobs).isEmpty();
+            List<Job> timerJobs = managementService.createTimerJobQuery().list();
+            assertThat(timerJobs).isEmpty();
+    
+            List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().list();
+            assertThat(deadLetterJobs).isEmpty();
+    
+    
+            List<Execution> executions = runtimeService.createExecutionQuery().list();
+            assertThat(executions).hasSize(2);
+            Execution processInstanceExecution = null;
+            Execution waitStateExecution = null;
+            for (Execution execution : executions) {
+                if (execution.getId().equals(execution.getProcessInstanceId())) {
+                    processInstanceExecution = execution;
+                } else {
+                    waitStateExecution = execution;
+                }
+            }
+            assertThat(processInstanceExecution).isNotNull();
+            assertThat(waitStateExecution).isNotNull();
+    
+            Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(processInstanceExecution.getProcessInstanceId());
+            assertThat(variableInstances).containsOnlyKeys("nrOfLoops");
+            VariableInstance nrOfLoops = variableInstances.get("nrOfLoops");
+            assertThat(nrOfLoops.getValue()).isEqualTo(10);
+    
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                HistoricVariableInstance varInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstanceExecution.getProcessInstanceId())
+                        .variableName("nrOfCompletedInstances")
+                        .singleResult();
+                assertThat(varInstance).isNotNull();
+                assertThat(varInstance.getValue()).isEqualTo(10);
+    
+                varInstance = historyService.createHistoricVariableInstanceQuery()
+                        .processInstanceId(processInstanceExecution.getProcessInstanceId())
+                        .variableName("nrOfActiveInstances")
+                        .singleResult();
+                assertThat(varInstance).isNotNull();
+                assertThat(varInstance.getValue()).isEqualTo(0);
             }
         }
-        assertThat(processInstanceExecution).isNotNull();
-        assertThat(waitStateExecution).isNotNull();
     }
 
     @Test
