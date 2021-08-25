@@ -3,7 +3,7 @@ name: Flowable SQL Server Build
 on:
   push:
     branches:
-      - master
+      - main
       - 'flowable-release-*'
 
 env:
