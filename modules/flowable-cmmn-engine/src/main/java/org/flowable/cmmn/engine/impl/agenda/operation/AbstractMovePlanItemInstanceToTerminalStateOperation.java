@@ -180,7 +180,7 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
                         planItemInstanceEntry.setState(PlanItemInstanceState.COMPLETED);
                         planItemInstanceEntry.setEndedTime(getCurrentTime(commandContext));
                         planItemInstanceEntry.setCompletedTime(planItemInstanceEntry.getEndedTime());
-                        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntry);
+                        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceCompleted(planItemInstanceEntry);
                         
                         if (planItemDefinition instanceof GenericEventListener) {
                             GenericEventListener genericEventListener = (GenericEventListener) planItemDefinition;

@@ -362,7 +362,7 @@ public class PlanItemInstanceHistoryServiceTest extends FlowableCmmnTestCase {
                 assertThat(h.getLastAvailableTime().getTime()).isLessThanOrEqualTo(h.getLastStartedTime().getTime());
             });
 
-            //There should be 4 eventListeners the history, two of them "occurred" and one is terminated (user event listener plan item instance) and one should still be available
+            //There should be 3 eventListeners the history, one of them "occurred" and one is completed (user event listener plan item instance) and one should still be available
             historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).list();
             assertThat(
                 cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceDefinitionType(PlanItemDefinitionType.USER_EVENT_LISTENER).count())

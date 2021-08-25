@@ -102,13 +102,22 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // complete Task A and B to complete Stage A
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
-            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
+            cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+            
             waitForAsyncHistoryExecutorToProcessAllJobs();
 
             // now trigger Task C and D to complete the case
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
 
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -280,8 +289,13 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // complete Task A and B to complete Stage A, then Task C to make the case completable
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             // exit Stage A to also terminate the task and the case page
             cmmnRuntimeService.setVariable(caseInstance.getId(), "completeCase", true);

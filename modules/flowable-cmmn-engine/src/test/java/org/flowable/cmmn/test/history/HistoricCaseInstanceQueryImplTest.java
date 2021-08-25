@@ -1157,11 +1157,13 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             }
         });
 
-        HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).singleResult();
-        assertThat(caseInstance.getName()).isEqualTo("Default name");
-
-        caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).locale("pt").singleResult();
-        assertThat(caseInstance.getName()).isEqualTo("Caso 1");
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).singleResult();
+            assertThat(caseInstance.getName()).isEqualTo("Default name");
+    
+            caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(createdCase.getId()).locale("pt").singleResult();
+            assertThat(caseInstance.getName()).isEqualTo("Caso 1");
+        }
     }
   
     @Test

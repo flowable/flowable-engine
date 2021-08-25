@@ -224,23 +224,25 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
             }
         });
 
-        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
-                .extracting(HistoricPlanItemInstance::getName)
-                .containsExactlyInAnyOrder(
-                        "Stage one",
-                        "Stage two",
-                        "A",
-                        "B"
-                );
-
-        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().locale("pt").list())
-                .extracting(HistoricPlanItemInstance::getName)
-                .containsExactlyInAnyOrder(
-                        "Plano traduzido",
-                        "Plano traduzido",
-                        "Plano traduzido",
-                        "Plano traduzido"
-                );
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder(
+                            "Stage one",
+                            "Stage two",
+                            "A",
+                            "B"
+                    );
+    
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().locale("pt").list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder(
+                            "Plano traduzido",
+                            "Plano traduzido",
+                            "Plano traduzido",
+                            "Plano traduzido"
+                    );
+        }
     }
 
     private List<String> startInstances(int numberOfInstances) {
