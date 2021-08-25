@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -57,6 +58,8 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    protected String locale;
+    protected boolean withLocalizationFallback;
 
     public CaseDefinitionQueryImpl() {
     }
@@ -268,7 +271,19 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         this.withoutTenantId = true;
         return this;
     }
-    
+
+    @Override
+    public CaseDefinitionQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public CaseDefinitionQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
     public Collection<String> getAuthorizationGroups() {
         // if authorizationGroupsSet is true then startableByUserOrGroups was called
         // and the groups passed in that methods have precedence
@@ -346,7 +361,14 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     @Override
     public List<CaseDefinition> executeList(CommandContext commandContext) {
-        return CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionsByQueryCriteria(this);
+        List<CaseDefinition> caseDefinitionList = CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findCaseDefinitionsByQueryCriteria(this);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getCaseDefinitionLocalizationManager() != null) {
+            for (CaseDefinition caseDefinition : caseDefinitionList) {
+                cmmnEngineConfiguration.getCaseDefinitionLocalizationManager().localize(caseDefinition, locale, withLocalizationFallback);
+            }
+        }
+        return caseDefinitionList;
     }
 
     // getters ////////////////////////////////////////////

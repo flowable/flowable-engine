@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.CaseDefinitionLocalizationManager;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.junit.After;
@@ -479,6 +480,27 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
         assertThat(caseDefinitions.get(0).getKey()).isEqualTo("myCase2");
         assertThat(caseDefinitions.get(1).getVersion()).isEqualTo(3);
         assertThat(caseDefinitions.get(1).getKey()).isEqualTo("myCase");
+    }
+
+    @Test
+    public void testLocalization() {
+        cmmnEngineConfiguration.setCaseDefinitionLocalizationManager(new CaseDefinitionLocalizationManager() {
+            @Override
+            public void localize(CaseDefinition caseDefinition, String locale, boolean withLocalizationFallback) {
+                if ("pt".equals(locale)) {
+                    caseDefinition.setLocalizedName("Caso 1");
+                    caseDefinition.setLocalizedDescription("Isto é o exemplo de uma descrição");
+                }
+            }
+        });
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().singleResult();
+        assertThat(caseDefinition.getName()).isEqualTo("Case 1");
+        assertThat(caseDefinition.getDescription()).isEqualTo("This is a sample description");
+
+        caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("myCase").latestVersion().locale("pt").singleResult();
+        assertThat(caseDefinition.getName()).isEqualTo("Caso 1");
+        assertThat(caseDefinition.getDescription()).isEqualTo("Isto é o exemplo de uma descrição");
     }
 
     private List<String> getCaseDefinitionIds(String deploymentId) {

@@ -91,6 +91,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected List<HistoricCaseInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricCaseInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
+    protected String locale;
+    protected boolean withLocalizationFallback;
 
     public HistoricCaseInstanceQueryImpl() {
     }
@@ -540,6 +542,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findByCriteria(this);
         }
 
+        if (cmmnEngineConfiguration.getCaseLocalizationManager() != null) {
+            for (HistoricCaseInstance historicCaseInstance : results) {
+                cmmnEngineConfiguration.getCaseLocalizationManager().localize(historicCaseInstance, locale, withLocalizationFallback);
+            }
+        }
+
         return results;
     }
 
@@ -865,6 +873,18 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         } else {
             return variableNotExists(name, false);
         }
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
     }
 
     public String getCaseDefinitionId() {

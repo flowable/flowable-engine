@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -38,6 +39,8 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected boolean isIdentityLinksInitialized;
     protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<>();
+    protected String localizedName;
+    protected String localizedDescription;
     
     @Override
     public Object getPersistentState() {
@@ -58,6 +61,9 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
 
     @Override
     public String getName() {
+        if (StringUtils.isNotBlank(localizedName)) {
+            return localizedName;
+        }
         return name;
     }
 
@@ -68,6 +74,9 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
 
     @Override
     public String getDescription() {
+        if (StringUtils.isNotBlank(localizedDescription)) {
+            return localizedDescription;
+        }
         return description;
     }
 
@@ -171,4 +180,22 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
         return definitionIdentityLinkEntities;
     }
     
+
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
+    }
+
+    public String getLocalizedDescription() {
+        return localizedDescription;
+    }
+
+    @Override
+    public void setLocalizedDescription(String localizedDescription) {
+        this.localizedDescription = localizedDescription;
+    }
 }

@@ -340,6 +340,17 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      */
     HistoricCaseInstanceQuery variableNotExists(String name);
     
+
+    /**
+     * Localize case name to specified locale.
+     */
+    HistoricCaseInstanceQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    HistoricCaseInstanceQuery withLocalizationFallback();
+
     HistoricCaseInstanceQuery orderByCaseInstanceId();
     HistoricCaseInstanceQuery orderByCaseInstanceName();
     HistoricCaseInstanceQuery orderByCaseDefinitionKey();

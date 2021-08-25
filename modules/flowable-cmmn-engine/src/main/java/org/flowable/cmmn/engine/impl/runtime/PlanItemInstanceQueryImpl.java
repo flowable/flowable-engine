@@ -86,7 +86,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     private List<List<String>> safeInvolvedGroups;
     protected String tenantId;
     protected boolean withoutTenantId;
-    
+    protected String locale;
+    protected boolean withLocalizationFallback;
+
     public PlanItemInstanceQueryImpl() {
         
     }
@@ -643,6 +645,18 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
+    @Override
     public long executeCount(CommandContext commandContext) {
         ensureVariablesInitialized();
         return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().countByCriteria(this);
@@ -651,7 +665,15 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
+        List<PlanItemInstance> planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
+      
+        if (cmmnEngineConfiguration.getPlanItemLocalizationManager() != null) {
+            for (PlanItemInstance planItemInstance : planItems) {
+                cmmnEngineConfiguration.getPlanItemLocalizationManager().localize(planItemInstance, locale, withLocalizationFallback);
+            }
+        }
+
+        return planItems;
     }
     
     @Override

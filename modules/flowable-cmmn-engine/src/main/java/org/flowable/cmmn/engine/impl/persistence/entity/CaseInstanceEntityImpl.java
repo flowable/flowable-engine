@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -63,6 +64,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
+    protected String localizedName;
 
     protected List<VariableInstanceEntity> queryVariables;
 
@@ -129,6 +131,9 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
     @Override
     public String getName() {
+        if(StringUtils.isNotBlank(localizedName)) {
+            return localizedName;
+        }
         return name;
     }
     @Override
@@ -404,6 +409,15 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         }
 
         return caseVariables;
+    }
+
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    @Override
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
     }
 
     @Override

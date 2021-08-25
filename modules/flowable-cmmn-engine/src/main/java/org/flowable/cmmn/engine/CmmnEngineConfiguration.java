@@ -714,6 +714,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
 
+    // Localization support
+    protected CaseDefinitionLocalizationManager caseDefinitionLocalizationManager;
+    protected CaseLocalizationManager caseLocalizationManager;
+    protected PlanItemLocalizationManager planItemLocalizationManager;
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -4192,6 +4197,33 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
         this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
+        return this;
+    }
+
+    public CaseDefinitionLocalizationManager getCaseDefinitionLocalizationManager() {
+        return caseDefinitionLocalizationManager;
+    }
+
+    public CmmnEngineConfiguration setCaseDefinitionLocalizationManager(CaseDefinitionLocalizationManager caseDefinitionLocalizationManager) {
+        this.caseDefinitionLocalizationManager = caseDefinitionLocalizationManager;
+        return this;
+    }
+
+    public CaseLocalizationManager getCaseLocalizationManager() {
+        return caseLocalizationManager;
+    }
+
+    public CmmnEngineConfiguration setCaseLocalizationManager(CaseLocalizationManager caseLocalizationManager) {
+        this.caseLocalizationManager = caseLocalizationManager;
+        return this;
+    }
+
+    public PlanItemLocalizationManager getPlanItemLocalizationManager() {
+        return planItemLocalizationManager;
+    }
+
+    public CmmnEngineConfiguration setPlanItemLocalizationManager(PlanItemLocalizationManager planItemLocalizationManager) {
+        this.planItemLocalizationManager = planItemLocalizationManager;
         return this;
     }
 }
