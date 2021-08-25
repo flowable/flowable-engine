@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.CommentQueryImpl;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
@@ -174,6 +175,16 @@ public class CommentEntityManagerImpl
                     commentEntity, processInstanceId, processInstanceId, processDefinitionId),
                     engineConfiguration.getEngineCfgKey());
         }
+    }
+
+    @Override
+    public List<Comment> findCommentsByQueryCriteria(CommentQueryImpl query) {
+        return dataManager.findCommentsByQueryCriteria(query);
+    }
+
+    @Override
+    public long findCommentCountByQueryCriteria(CommentQueryImpl query) {
+        return dataManager.findCommentCountByQueryCriteria(query);
     }
 
     protected void checkHistoryEnabled() {

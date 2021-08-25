@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.engine.task.CommentQuery;
 import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -815,6 +816,11 @@ public interface TaskService {
 
     /** The comments related to the given process instance. */
     List<Comment> getProcessInstanceComments(String processInstanceId, String type);
+
+    /**
+     * Returns a new {@link CommentQuery} that can be used to dynamically query comments.
+     */
+    CommentQuery createCommentQuery();
 
     /**
      * Add a new attachment to a task and/or a process instance and use an input stream to provide the content

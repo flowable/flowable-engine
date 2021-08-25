@@ -72,6 +72,7 @@ import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.CommentQuery;
 import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
@@ -458,6 +459,11 @@ public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfig
     @Override
     public List<Comment> getProcessInstanceComments(String processInstanceId, String type) {
         return commandExecutor.execute(new GetProcessInstanceCommentsCmd(processInstanceId, type));
+    }
+
+    @Override
+    public CommentQuery createCommentQuery() {
+        return new CommentQueryImpl(getCommandExecutor(), getConfiguration());
     }
 
     @Override

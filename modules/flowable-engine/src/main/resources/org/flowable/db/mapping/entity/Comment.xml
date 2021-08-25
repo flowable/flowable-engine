@@ -170,4 +170,54 @@
     order by TIME_ desc
   </select>
 
+  <select id="selectCommentCountByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectCommentByQueryCriteriaSql"/>
+  </select>
+
+  <select id="selectCommentByQueryCriteria" parameterType="org.flowable.engine.impl.CommentQueryImpl" resultMap="commentResultMap">
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectCommentByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+
+  <sql id="selectCommentByQueryCriteriaSql">
+    from ${prefix}ACT_HI_COMMENT RES
+    <where>
+      <if test="commentId != null">
+        RES.ID_ = #{commentId}
+      </if>
+      <if test="taskId != null">
+        RES.TASK_ID_ = #{taskId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+      <if test="createdBy != null">
+        and RES.USER_ID_ = #{createdBy}
+      </if>
+      <if test="createdByOneOf != null &amp;&amp; createdByOneOf.size() &gt; 0">
+        and RES.USER_ID_ IN
+        <foreach item="userId" index="index" collection="createdByOneOf"
+                 open="(" separator="," close=")">
+          #{userId}
+        </foreach>
+      </if>
+      <if test="createdBefore != null">
+        and RES.TIME_ &lt; #{createdBefore}
+      </if>
+      <if test="createdAfter != null">
+        and RES.TIME_ &gt; #{createdAfter}
+      </if>
+      <if test="createdOn != null">
+        and RES.TIME_ = #{createdOn}
+      </if>
+    </where>
+  </sql>
+
 </mapper>
