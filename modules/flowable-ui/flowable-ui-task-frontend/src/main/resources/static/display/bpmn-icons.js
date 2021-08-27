@@ -265,6 +265,10 @@ function _drawEventIcon(paper, element)
 		{
 			_drawMessageIcon(paper, element);
 		}
+		else if ("variable" === element.eventDefinition.type)
+		{
+			_drawVariableListenerIcon(paper, element);
+		}
 	}
 }
 
@@ -273,6 +277,20 @@ function _drawConditionalIcon(paper, element)
     var fill = "none";
     
     var path = paper.path("M 10 10 L 22 10 M 10 14 L 22 14 M 10 18 L 22 18 M 10 22 L 22 22");
+    path.attr({
+        "stroke": "black",
+        "stroke-width": 1,
+        "fill": fill
+    });
+    path.transform("T" + (element.x - 1) + "," + (element.y - 1));
+    return path;
+}
+
+function _drawVariableListenerIcon(paper, element)
+{
+    var fill = "none";
+    
+    var path = paper.path("M 20.834856,22.874369 L 10.762008,22.873529 L 7.650126,13.293421 L 15.799725,7.3734296 L 23.948336,13.294781 L 20.834856,22.874369 z");
     path.attr({
         "stroke": "black",
         "stroke-width": 1,

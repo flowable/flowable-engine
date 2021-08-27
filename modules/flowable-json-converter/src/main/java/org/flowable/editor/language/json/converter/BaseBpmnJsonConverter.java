@@ -61,6 +61,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.bpmn.model.VariableAggregationDefinitions;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.editor.constants.EditorJsonConstants;
 import org.flowable.editor.constants.StencilConstants;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
@@ -833,6 +834,16 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
                 TerminateEventDefinition terminateEventDefinition = (TerminateEventDefinition) eventDefinition;
                 propertiesNode.put(PROPERTY_TERMINATE_ALL, terminateEventDefinition.isTerminateAll());
                 propertiesNode.put(PROPERTY_TERMINATE_MULTI_INSTANCE, terminateEventDefinition.isTerminateMultiInstance());
+                
+            } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+                VariableListenerEventDefinition variableListenerEventDefinition = (VariableListenerEventDefinition) eventDefinition;
+                if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableName())) {
+                    propertiesNode.put(PROPERTY_VARIABLE_LISTENER_VARIABLE_NAME, variableListenerEventDefinition.getVariableName());
+                }
+                
+                if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableChangeType())) {
+                    propertiesNode.put(PROPERTY_VARIABLE_LISTENER_VARIABLE_CHANGE_TYPE, variableListenerEventDefinition.getVariableChangeType());
+                }
 
             } else if (eventDefinition instanceof CompensateEventDefinition) {
                 CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) eventDefinition;
@@ -1149,6 +1160,20 @@ public abstract class BaseBpmnJsonConverter implements EditorJsonConstants, Sten
 
         return aggregations;
 
+    }
+    
+    protected void convertJsonToVariableListenerDefinition(JsonNode objectNode, Event event) {
+        String variableName = getPropertyValueAsString(PROPERTY_VARIABLE_LISTENER_VARIABLE_NAME, objectNode);
+        VariableListenerEventDefinition eventDefinition = new VariableListenerEventDefinition();
+        if (StringUtils.isNotEmpty(variableName)) {
+            eventDefinition.setVariableName(variableName);
+            
+            String variableChangeType = getPropertyValueAsString(PROPERTY_VARIABLE_LISTENER_VARIABLE_CHANGE_TYPE, objectNode);
+            if (StringUtils.isNotEmpty(variableChangeType)) {
+                eventDefinition.setVariableChangeType(variableChangeType);
+            }
+        }
+        event.getEventDefinitions().add(eventDefinition);
     }
 
     protected void convertJsonToConditionalDefinition(JsonNode objectNode, Event event) {

@@ -33,6 +33,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnDiEdge;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Escalation;
 import org.flowable.bpmn.model.Event;
@@ -149,6 +150,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_START_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_START_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_START_EVENT_REGISTRY);
+        DI_CIRCLES.add(STENCIL_EVENT_START_VARIABLE_LISTENER);
 
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CONDITIONAL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_ERROR);
@@ -157,6 +159,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_TIMER);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_MESSAGE);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY);
+        DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_VARIABLE_LISTENER);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_CANCEL);
         DI_CIRCLES.add(STENCIL_EVENT_BOUNDARY_COMPENSATION);
 
@@ -164,6 +167,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_MESSAGE);
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_SIGNAL);
         DI_CIRCLES.add(STENCIL_EVENT_CATCH_TIMER);
+        DI_CIRCLES.add(STENCIL_EVENT_CATCH_EVENT_REGISTRY);
+        DI_CIRCLES.add(STENCIL_EVENT_CATCH_VARIABLE_LISTENER);
 
         DI_CIRCLES.add(STENCIL_EVENT_THROW_NONE);
         DI_CIRCLES.add(STENCIL_EVENT_THROW_SIGNAL);
@@ -1068,6 +1073,20 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             } else {
                 lastLine = firstLine;
             }
+            
+            BpmnDiEdge edgeInfo = new BpmnDiEdge();
+            edgeInfo.setWaypoints(graphicInfoList);
+            GraphicInfo sourceDockerInfo = new GraphicInfo();
+            sourceDockerInfo.setX(dockersNode.get(0).get(EDITOR_BOUNDS_X).asDouble());
+            sourceDockerInfo.setY(dockersNode.get(0).get(EDITOR_BOUNDS_Y).asDouble());
+            edgeInfo.setSourceDockerInfo(sourceDockerInfo);
+
+            GraphicInfo targetDockerInfo = new GraphicInfo();
+            targetDockerInfo.setX(dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble());
+            targetDockerInfo.setY(dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble());
+            edgeInfo.setTargetDockerInfo(targetDockerInfo);
+
+            bpmnModel.addEdgeInfo(edgeId, edgeInfo);
 
             Area target2D = null;
             if (DI_RECTANGLES.contains(targetRefStencilId)) {

@@ -124,6 +124,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/escalation-property-write-template.html"
     },
+    "flowable-variablechangetype" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/variable-change-type-property-write-template.html"
+    },
     "oryx-duedatedefinition-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/duedate-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/duedate-write-template.html"

@@ -58,7 +58,7 @@ function _drawSubProcess(element)
  	});
 }
 
-function _drawVariableServiceTaskIcon(element)
+function _drawServiceTaskTypeIcon(element)
 {
 	_drawTask(element);
 	if (element.taskType === "mail")
@@ -162,7 +162,7 @@ function _drawDecisionTask(element)
 function _drawServiceTask(element)
 {
     _drawTask(element);
-    _drawVariableServiceTaskIcon(element);
+    _drawServiceTaskTypeIcon(element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
@@ -209,6 +209,13 @@ function _drawUserEventListener(element)
 {
     _drawEventListener(element);
     _drawUserEventListenerIcon(paper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawVariableEventListener(element)
+{
+    _drawEventListener(element);
+    _drawVariableEventListenerIcon(paper, element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 

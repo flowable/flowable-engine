@@ -37,6 +37,7 @@ import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.ExtensionElement;
@@ -90,6 +91,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         GenericEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         UserEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        VariableEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ScriptTaskJsonConverter.fillTypes(convertersToCmmnMap);
 
@@ -111,16 +113,19 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
         DI_CIRCLES.add(STENCIL_USER_EVENT_LISTENER);
         DI_CIRCLES.add(STENCIL_GENERIC_EVENT_LISTENER);
+        DI_CIRCLES.add(STENCIL_VARIABLE_EVENT_LISTENER);
 
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
         DI_RECTANGLES.add(STENCIL_TASK_SERVICE);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
+        DI_RECTANGLES.add(STENCIL_TASK_MAIL);
         DI_RECTANGLES.add(STENCIL_TASK_SEND_EVENT);
         DI_RECTANGLES.add(STENCIL_TASK_EXTERNAL_WORKER);
         DI_RECTANGLES.add(STENCIL_TASK_CASE);
         DI_RECTANGLES.add(STENCIL_TASK_PROCESS);
+        DI_RECTANGLES.add(STENCIL_TASK_SCRIPT);
         DI_RECTANGLES.add(STENCIL_MILESTONE);
         DI_RECTANGLES.add(STENCIL_STAGE);
 
@@ -900,6 +905,23 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             } else {
                 lastLine = firstLine;
             }
+            
+            CmmnDiEdge edgeInfo = new CmmnDiEdge();
+            edgeInfo.setCmmnElementRef(sourceId);
+            edgeInfo.setTargetCmmnElementRef(targetId);
+            edgeInfo.setWaypoints(graphicInfoList);
+            
+            GraphicInfo sourceDockerInfo = new GraphicInfo();
+            sourceDockerInfo.setX(dockersNode.get(0).get(EDITOR_BOUNDS_X).asDouble());
+            sourceDockerInfo.setY(dockersNode.get(0).get(EDITOR_BOUNDS_Y).asDouble());
+            edgeInfo.setSourceDockerInfo(sourceDockerInfo);
+            
+            GraphicInfo targetDockerInfo = new GraphicInfo();
+            targetDockerInfo.setX(dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble());
+            targetDockerInfo.setY(dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble());
+            edgeInfo.setTargetDockerInfo(targetDockerInfo);
+            
+            cmmnModel.addEdgeInfo(edgeId, edgeInfo);
 
             Area target2D = null;
             if (DI_CIRCLES.contains(targetRefStencilId)) {

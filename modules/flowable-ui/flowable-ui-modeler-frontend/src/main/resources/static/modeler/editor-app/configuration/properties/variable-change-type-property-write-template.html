@@ -1,0 +1,9 @@
+
+<div ng-controller="FlowableVariableChangeTypeCtrl">
+    <select ng-model="property.value" ng-change="variableChangeTypeChanged()">
+    	<option value="all">All</option>
+    	<option value="create">Create only</option>
+    	<option value="update">Update only</option>
+    	<option value="createupdate">Create and update</option>
+    </select>
+</div>

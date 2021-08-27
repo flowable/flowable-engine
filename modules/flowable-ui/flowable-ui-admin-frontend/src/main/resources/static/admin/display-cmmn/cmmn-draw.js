@@ -188,21 +188,28 @@ function _drawTask(element, isMigrationModelElement, currentPaper)
 
 function _drawTimerEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element, currentPaper);
+    _drawEventListener(element, isMigrationModelElement, currentPaper);
     _drawTimerEventListenerIcon(currentPaper, element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
 function _drawUserEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element, currentPaper);
+    _drawEventListener(element, isMigrationModelElement, currentPaper);
     _drawUserEventListenerIcon(currentPaper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
+}
+
+function _drawVariableEventListener(element, isMigrationModelElement, currentPaper)
+{
+    _drawEventListener(element, isMigrationModelElement, currentPaper);
+    _drawVariableEventListenerIcon(currentPaper, element);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 
 function _drawGenericEventListener(element, isMigrationModelElement, currentPaper)
 {
-    _drawEventListener(element, currentPaper);
+    _drawEventListener(element, isMigrationModelElement, currentPaper);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR, isMigrationModelElement, currentPaper);
 }
 

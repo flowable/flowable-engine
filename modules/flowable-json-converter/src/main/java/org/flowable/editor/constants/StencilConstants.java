@@ -25,6 +25,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_START_SIGNAL = "StartSignalEvent";
     final String STENCIL_EVENT_START_ERROR = "StartErrorEvent";
     final String STENCIL_EVENT_START_EVENT_REGISTRY = "StartEventRegistryEvent";
+    final String STENCIL_EVENT_START_VARIABLE_LISTENER = "StartVariableListenerEvent";
     final String STENCIL_EVENT_START_CONDITIONAL = "StartConditionalEvent";
     final String STENCIL_EVENT_START_ESCALATION = "StartEscalationEvent";
 
@@ -72,6 +73,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_BOUNDARY_SIGNAL = "BoundarySignalEvent";
     final String STENCIL_EVENT_BOUNDARY_MESSAGE = "BoundaryMessageEvent";
     final String STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY = "BoundaryEventRegistryEvent";
+    final String STENCIL_EVENT_BOUNDARY_VARIABLE_LISTENER = "BoundaryVariableListenerEvent";
     final String STENCIL_EVENT_BOUNDARY_CANCEL = "BoundaryCancelEvent";
     final String STENCIL_EVENT_BOUNDARY_COMPENSATION = "BoundaryCompensationEvent";
 
@@ -80,6 +82,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_CATCH_MESSAGE = "CatchMessageEvent";
     final String STENCIL_EVENT_CATCH_CONDITIONAL = "CatchConditionalEvent";
     final String STENCIL_EVENT_CATCH_EVENT_REGISTRY = "CatchEventRegistryEvent";
+    final String STENCIL_EVENT_CATCH_VARIABLE_LISTENER = "CatchVariableListenerEvent";
 
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
@@ -130,6 +133,9 @@ public interface StencilConstants {
 
     final String PROPERTY_SIGNALREF = "signalref";
     final String PROPERTY_SIGNALEXPRESSION = "signalexpression";
+    
+    final String PROPERTY_VARIABLE_LISTENER_VARIABLE_NAME = "variablelistenervariablename";
+    final String PROPERTY_VARIABLE_LISTENER_VARIABLE_CHANGE_TYPE = "variablelistenervariablechangetype";
 
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 
