@@ -25,7 +25,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.HistoricCaseInstanceByCaseDefinitionIdMatcher;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 
 /**
  * @author Joram Barrez
@@ -103,21 +102,19 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
 
     @Override
     public long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricCaseInstances", parameters);
     }
 
     @Override
     public long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricCaseInstances", parameters);
     }

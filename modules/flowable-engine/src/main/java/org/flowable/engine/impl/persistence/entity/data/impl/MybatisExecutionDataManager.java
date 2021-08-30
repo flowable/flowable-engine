@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -358,21 +357,19 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public long countChangeTenantIdExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().selectOne("countChangeTenantIdExecutions", parameters);
     }
 
     @Override
     public long changeTenantIdExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().update("changeTenantIdExecutions", parameters);
     }

@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
@@ -118,21 +117,19 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
 
     @Override
     public long countChangeTenantIdActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().selectOne("countChangeTenantIdActivityInstances", parameters);
     }
 
     @Override
     public long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().update("changeTenantIdActivityInstances", parameters);
     }

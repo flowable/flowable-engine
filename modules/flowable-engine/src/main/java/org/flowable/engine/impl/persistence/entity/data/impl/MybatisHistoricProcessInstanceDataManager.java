@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -111,21 +110,19 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
     }
     @Override
     public long countChangeTenantIdHistoricProcessInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricProcessInstances", parameters);
     }
 
     @Override
     public long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getProcessEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().update("changeTenantIdHistoricProcessInstances", parameters);
     }

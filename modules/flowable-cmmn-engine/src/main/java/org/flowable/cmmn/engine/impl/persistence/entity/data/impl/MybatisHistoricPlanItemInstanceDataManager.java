@@ -24,7 +24,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
@@ -96,21 +95,19 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
 
     @Override
     public long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricPlanItemInstances", parameters);
     }
 
     @Override
     public long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = getCmmnEngineConfiguration().getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.CMMN, null);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("sourceTenantId", sourceTenantId);
         parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
+        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
         parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
         return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricPlanItemInstances", parameters);
     }

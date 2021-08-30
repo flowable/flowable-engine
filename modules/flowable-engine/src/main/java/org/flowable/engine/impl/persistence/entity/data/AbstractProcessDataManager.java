@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -40,6 +41,10 @@ public abstract class AbstractProcessDataManager<EntityImpl extends Entity> exte
     @Override
     protected IdGenerator getIdGenerator() {
         return processEngineConfiguration.getIdGenerator();
+    }
+
+    protected String getDefaultTenantId(String tenantId) {
+        return processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.CMMN, null);
     }
     
 }
