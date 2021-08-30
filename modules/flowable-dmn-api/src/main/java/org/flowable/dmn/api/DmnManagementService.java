@@ -52,6 +52,7 @@ public interface DmnManagementService {
      * <p>
      * You must provide the source tenant id and the destination tenant id. 
      * 
-     */    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
     
 }
