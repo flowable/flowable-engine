@@ -199,10 +199,18 @@
 
   </update>
 
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+  </sql>
+
   <sql id="changeTenantIdDmnCriteriaSql">
     where RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}
     <if test="onlyInstancesFromDefaultTenantDefinitions">
-        and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+        <include refid="onlyInstancesFromDefaultTenantDefinitionsSql"/>
     </if>
   </sql>
   

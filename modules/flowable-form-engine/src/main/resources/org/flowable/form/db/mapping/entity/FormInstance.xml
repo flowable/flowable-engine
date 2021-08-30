@@ -220,6 +220,14 @@
     <include refid="changeTenantIdFormInstanceCriteriaSql" />
   </update>
 
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+  </sql>
+
   <sql id="changeTenantIdFormInstanceCriteriaSql">
       <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
       <choose>
@@ -231,7 +239,7 @@
           </otherwise>
       </choose>
       <if test="onlyInstancesFromDefaultTenantDefinitions">
-          and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+          <include refid="onlyInstancesFromDefaultTenantDefinitionsSql"/>
       </if>
   </sql>
     

@@ -28,6 +28,32 @@
         where RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}
     </sql>
 
+    <sql id="changeTenantIdCriteriaSql" databaseId="oracle">
+        where COALESCE(RES.TENANT_ID_,'DEFAULT') = COALESCE(#{sourceTenantId, jdbcType=VARCHAR},'DEFAULT')
+    </sql>
+
+    <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+        <choose>
+            <when test="scope == 'bpmn'">
+                and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+            </when>
+            <when test="scope =='cmmn'">
+                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+            </when>
+        </choose>
+    </sql>
+
+    <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+        <choose>
+            <when test="scope == 'bpmn'">
+                and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+            </when>
+            <when test="scope =='cmmn'">
+                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB COALESCE(where SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+            </when>
+        </choose>
+    </sql>
+
     <!-- This criteria is used in services (jobs, tasks, etc.) that can be used in BPMN and in CMMN -->
     <sql id="changeTenantIdProcessOrCaseCriteriaSql">
 		<include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
@@ -40,14 +66,7 @@
             </otherwise>
         </choose>
         <if test="onlyInstancesFromDefaultTenantDefinitions">
-            <choose>
-                <when test="scope == 'bpmn'">
-                    and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
-                </when>
-                <when test="scope =='cmmn'">
-                    and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
-                </when>
-            </choose>
+            <include refid="org.flowable.common.db.mapping.onlyInstancesFromDefaultTenantDefinitionsSql"/>
 		</if>
 	</sql>
 
