@@ -28,36 +28,35 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - Upcoming</h3>
-
-<h4>GENERAL</h4>
-
-<h4>BPMN</h4>
+<h3>Release Notes - Flowable - 6.7.0</h3>
 
 <ul>
-    <li>Exceptions thrown from Task listeners are no longer wrapped in FlowableException</li>
-</ul>
-
-<h4>CMMN</h4>
-
-<ul>
-    <li>Exceptions thrown from Task, case lifecycle and plan item lifecycle listeners are no longer wrapped in FlowableException</li>
-</ul>
-
-<h4>DMN</h4>
-
-<h4>APPS</h4>
-
-<h4>ADDITIONAL</h4>
-
-<ul>
-    <li>
-        There has been a change in the way a process / case instance is started from an event from the event registry.
-        Instead of starting the process / case asynchronously, it is started synchronously.
-        Using this default value allows correct processing of in-order event coming on the same topic.
-        In case in order processing is not important you can configure that as part of your model by marking the Event Registry Start event as async or marking the Case Model as async.
-        If you want to go back to the previous default you can set the following properties: <code>flowable.process.event-registry-start-process-instance-async</code> and <code>flowable.cmmn.event-registry-start-case-instance-async</code> to <code>true</code>.
-    </li>
+	<li>Implemented a global locking mechanism to have better support for using the async executor in a setup with multiple Flowable Engines. Together with this the async executor default configuration was changed
+	to be able to handle more jobs per second by default. A 4-part article series describe all the fine details and a performance benchmark of this, <a href="https://blog.flowable.org/2021/04/14/handling-asynchronous-operations-with-flowable-part-1-introducing-the-new-async-executor/">Part 1</a>,
+	<a href="https://blog.flowable.org/2021/04/21/handling-asynchronous-operations-with-flowable-part-2-components-configuration/">Part 2</a>, <a href="https://blog.flowable.org/2021/04/28/handling-asynchronous-operations-with-flowable-part-3-performance-benchmarks/">Part 3</a>,
+	<a href="https://blog.flowable.org/2021/05/05/handling-asynchronous-operations-with-flowable-part-4-evolution-of-the-async-executor/">Part 4</a>.</li>
+	<li>Added support for multi instance variable aggregation, <a href="https://blog.flowable.org/2021/02/16/multi-instance-variable-aggregation/">https://blog.flowable.org/2021/02/16/multi-instance-variable-aggregation/</a>.</li>
+	Aggregating values from a multi instance execution has always been tricky, but now with the support for variable aggregation this can be handled in an elegant way.</li>
+	<li>Added support for case reactivation to support reactivating historic and completed case instances to a running case instance. Case definitions can have a case reactivation listener.
+	that can be triggered to reactivate a historic case instance and the variable context etc will be re-created.</li>
+	<li>A variable listener has been added to allow for BPMN and CMMN models to listen to changes for a specific variable and handle this trigger in the model.</li>
+	<li>Add support for repetition signal and generic event listener in the CMMN engine to be triggered in parallel.</li>
+	<li>Added an optimization flag for asynchronous multi-instance usage when the multi-instance is an automatic step or a sequence of automatic steps. If set, the engine will drastically lower resource consumption, and remove the optimistic locking exceptions and typically be more performant.</li>
+	<li>Added support of synchronous handling of event registry events.</li>
+	<li>Added support for DMN 1.3 version models.</li>
+	<li>Added support for method overloading in JUEL / backend expressions.</li>
+	<li>Added localization support for case definitions and runtime and history case instances and plan item instances.</li>
+	<li>Added basic CMMN model validation to the CMMN engine.</li>
+	<li>Added basic CDI support to the CMMN engine.</li>
+	<li>Exceptions thrown from Task listeners are no longer wrapped in FlowableException.</li>
+	<li>Exceptions thrown from Task, case lifecycle and plan item lifecycle listeners are no longer wrapped in FlowableException.</li>
+	<li>Improved paging of runtime and historic process and case instance queries including variables. In earlier versions queries with include variables did paging in memory with a lot of limitations.</li>
+	This is now done on a query level and the limitations are not present anymore.</li>
+	<li>In this release an upgrade to Spring Boot 2.5.4 and Spring 5.3.9 was done.</li>
+	<li> There has been a change in the way a process / case instance is started from an event from the event registry.
+    Instead of starting the process / case asynchronously, it is started synchronously. Using this default value allows correct processing of in-order event coming on the same topic.
+    In case in order processing is not important you can configure that as part of your model by marking the Event Registry Start event as async or marking the Case Model as async.
+    If you want to go back to the previous default you can set the following properties: <code>flowable.process.event-registry-start-process-instance-async</code> and <code>flowable.cmmn.event-registry-start-case-instance-async</code> to <code>true</code>.</li>
 </ul>
 
 <h3>Release Notes - Flowable - 6.6.0</h3>
