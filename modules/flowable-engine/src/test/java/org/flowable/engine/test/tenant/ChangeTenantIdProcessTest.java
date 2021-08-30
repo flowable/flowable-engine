@@ -253,5 +253,4 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
     }
 
-
 }

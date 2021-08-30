@@ -48,6 +48,3 @@ public class ChangeTenantIdContentSimulateCmd implements Command<ChangeTenantIdR
         }
 
 }
-
-
-

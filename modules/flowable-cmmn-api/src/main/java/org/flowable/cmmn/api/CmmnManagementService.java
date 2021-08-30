@@ -344,6 +344,7 @@ public interface CmmnManagementService {
      * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the CMMN scope
      * will be changed to the target tenant id.
      * 
-     */    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
     
 }

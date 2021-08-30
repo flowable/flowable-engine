@@ -160,7 +160,6 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         return jobServiceConfiguration.getIdGenerator();
     }
 
-
     @Override
     public long countChangeTenantIdJobs(String sourceTenantId, String defaultTenantId, 
             boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {

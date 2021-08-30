@@ -54,4 +54,3 @@ public class ChangeTenantIdDmnSimulateCmd implements Command<ChangeTenantIdResul
         }
 
 }
-

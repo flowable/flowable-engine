@@ -93,7 +93,4 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
         contentService.deleteContentItem(contentItemId);
     }
 
-
-    
-    
 }
