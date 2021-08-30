@@ -58,7 +58,8 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    public void testDeployments() {
+    public void testChangeTenantIdCaseInstance() {
+        //testDeployments {
         assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(4);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count())
@@ -67,10 +68,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
                 .isEqualTo(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_C).count())
                 .isEqualTo(1);
-    }
 
-    @Test
-    public void testChangeTenantIdCaseInstance() {
         // Starting case instances that will be sent to the history
         String caseInstanceIdACompleted = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceACompleted", true);
         String caseInstanceIdBCompleted = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBCompleted", true);

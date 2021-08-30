@@ -55,16 +55,14 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
     }
 
     @Test
-    public void testDeployments() {
+    public void testChangeTenantIdDecision() {
+        //testDeployments
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(4);
         assertThat(repositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_B).count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_C).count()).isEqualTo(1);
-    }
 
-    @Test
-    public void testChangeTenantIdDecision() {
         // Executing a Decision for every context
         executeDecision(TEST_TENANT_A, "testDecision");
         executeDecision(TEST_TENANT_B, "testDecision");

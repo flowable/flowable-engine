@@ -62,16 +62,13 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testDeployments() {
+    public void testChangeTenantIdProcessInstance() {
+        //testDeployments() {
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(4);
         assertThat(repositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_B).count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_C).count()).isEqualTo(1);
-    }
-
-    @Test
-    public void testChangeTenantIdProcessInstance() {
 
         //Starting process instances that will be completed
         String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", true, false);
