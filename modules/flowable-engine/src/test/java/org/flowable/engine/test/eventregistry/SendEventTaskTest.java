@@ -18,7 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -142,7 +144,45 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   eventProperty: 'test'"
                         + " }");
     }
-    
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceSendEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        assertThat(managementService.createJobQuery().list()).hasSize(3);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(3); // loopCardinality of 3
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("sendEventTask").list();
+            assertThat(historicActivityInstances).hasSize(3);
+            assertThat(historicActivityInstances).extracting(HistoricActivityInstance::getEndTime).isNotNull();
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testSequentialMultiInstanceSendEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+
+        for (int i = 0; i < 3; i++) {
+            Job job = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+        }
+        assertThat(managementService.createJobQuery().list()).isEmpty();
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(3); // loopCardinality of 3
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            List<HistoricActivityInstance> historicActivityInstances = historyService.createHistoricActivityInstanceQuery().activityId("sendEventTask").list();
+            assertThat(historicActivityInstances).hasSize(3);
+            assertThat(historicActivityInstances).extracting(HistoricActivityInstance::getEndTime).isNotNull();
+        }
+    }
+
     @Test
     @Deployment
     public void testSendEventSynchronously() throws Exception {
