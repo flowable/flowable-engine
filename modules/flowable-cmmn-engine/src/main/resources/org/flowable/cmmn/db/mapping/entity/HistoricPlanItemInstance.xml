@@ -495,14 +495,21 @@
         </where>
     </sql>
 
+    <sql id="changeTenantIdCaseCriteriaSql">
+        <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
+        <if test="onlyInstancesFromDefaultTenantDefinitions">
+            and RES.CASE_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+        </if>
+    </sql>
+
     <select id="countChangeTenantIdCmmnHistoricPlanItemInstances" parameterType="string" resultType="long">
         select count(RES.ID_) FROM ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST RES
-        <include refid="org.flowable.cmmn.db.mapping.changeTenantIdCaseCriteriaSql"/>
+        <include refid="changeTenantIdCaseCriteriaSql"/>
     </select>
     <update id="changeTenantIdCmmnHistoricPlanItemInstances" parameterType="java.util.Map">
         update ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
-        <include refid="org.flowable.cmmn.db.mapping.changeTenantIdCaseCriteriaSql"/>
+        <include refid="changeTenantIdCaseCriteriaSql"/>
     </update>
 
 </mapper>
