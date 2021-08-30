@@ -72,6 +72,8 @@ public class AsyncCmmnHistoryManager extends AbstractAsyncCmmnHistoryManager {
             if (caseInstanceEntity.getStartTime() != null) {
                 putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_DURATION, endTime.getTime() - caseInstanceEntity.getStartTime().getTime());
             }
+
+            putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, state);
             
             getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), CmmnAsyncHistoryConstants.TYPE_CASE_INSTANCE_END, data, caseInstanceEntity.getTenantId());
         }

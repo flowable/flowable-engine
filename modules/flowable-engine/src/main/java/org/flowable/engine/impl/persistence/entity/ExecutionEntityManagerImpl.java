@@ -229,6 +229,10 @@ public class ExecutionEntityManagerImpl
     public long findExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
         return dataManager.findExecutionCountByNativeQuery(parameterMap);
     }
+    @Override
+    public long countActiveExecutionsByParentId(String parentId) {
+        return dataManager.countActiveExecutionsByParentId(parentId);
+    }
 
     // CREATE METHODS
 

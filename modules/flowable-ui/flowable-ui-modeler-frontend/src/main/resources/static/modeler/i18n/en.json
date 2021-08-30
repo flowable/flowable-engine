@@ -718,6 +718,12 @@
             "DESCRIPTION" : "Define the signal name."
           }
         },
+        "COMPENSATIONACTIVITYREFPACKAGE" : {
+          "COMPENSATIONACTIVITYREF" : {
+            "TITLE" : "Compensation activity reference",
+            "DESCRIPTION" : "Define the activity reference."
+          }
+        },
         "SIGNALEXPRESSIONPACKAGE" : {
           "SIGNALEXPRESSION" : {
             "TITLE" : "Signal expression",
@@ -729,6 +735,20 @@
             "TITLE" : "Error reference",
             "DESCRIPTION" : "Define the error name."
           }
+        },
+        "ERRORVARIABLEPACKAGE" : {
+          "ERRORVARIABLENAME" : {
+            "TITLE" : "Error variable name",
+            "DESCRIPTION" : "Define the error variable name."
+          },          
+          "ERRORVARIABLETRANSIENT" : {
+            "TITLE" : "Store as transient variable",
+            "DESCRIPTION" : "Flag defines whether a variable will be stored transiently."
+          },
+          "ERRORVARIABLELOCALSCOPE" : {
+            "TITLE" : "Store to a local scope",
+            "DESCRIPTION" : "Flag defines whether variable will be stored to a local scope."
+          }          
         },
         "ESCALATIONREFPACKAGE" : {
           "ESCALATIONREF" : {
@@ -898,6 +918,16 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer expression"
           }
         },
+        "VARIABLELISTENERPACKAGE": {
+          "VARIABLENAME" : {
+            "TITLE" : "Variable name",
+            "DESCRIPTION" : "Defines the variable that will be watched for value changes"
+          },
+          "VARIABLECHANGETYPE" : {
+            "TITLE" : "Variable change type",
+            "DESCRIPTION" : "Configures for which change type the variable listener will be triggered"
+          }
+        },
         "EXTERNALWORKERJOBPACKAGE": {
           "TOPIC": {
             "TITLE": "Job topic",
@@ -1010,6 +1040,10 @@
         "STARTEVENTREGISTRYEVENT" : {
           "TITLE" : "Start event registry event",
           "DESCRIPTION" : "A start event with an event registry trigger"
+        },
+        "STARTVARIABLELISTENEREVENT" : {
+          "TITLE" : "Start variable listener event",
+          "DESCRIPTION" : "A start event that is triggered when the configured variable value changes"
         },
         "STARTCONDITIONALEVENT" : {
           "TITLE" : "Start conditional event",
@@ -1151,6 +1185,10 @@
           "TITLE" : "Boundary event registry event",
           "DESCRIPTION" : "A boundary event registry event"
         },
+        "BOUNDARYVARIABLELISTENEREVENT" : {
+          "TITLE" : "Boundary variable listener event",
+          "DESCRIPTION" : "A boundary variable listener event that is triggered when the configured variable value changes"
+        },
         "BOUNDARYCOMPENSATIONEVENT" : {
           "TITLE" : "Boundary compensation event",
           "DESCRIPTION" : "A boundary compensation event"
@@ -1175,6 +1213,10 @@
           "TITLE" : "Intermediate event registry catching event",
           "DESCRIPTION" : "An intermediate catching event waiting to receive an event from the event registry"
         },
+        "CATCHVARIABLELISTENEREVENT": {
+          "TITLE" : "Intermediate variable listener catching event",
+          "DESCRIPTION" : "An intermediate catching event waiting to receive an event when the configured variable is changed"
+        },
         "THROWNONEEVENT" : {
           "TITLE" : "Intermediate none throwing event",
           "DESCRIPTION" : "An intermediate event without a specific trigger"
@@ -1186,6 +1228,10 @@
         "THROWESCALATIONEVENT" : {
           "TITLE" : "Intermediate escalation throwing event",
           "DESCRIPTION" : "An intermediate event with an escalation trigger"
+        },
+        "THROWCOMPENSATIONEVENT": {
+          "TITLE" : "Intermediate compensation throwing event",
+          "DESCRIPTION" : "An intermediate event with a compensation trigger"
         },
         "ENDNONEEVENT" : {
           "TITLE" : "End event",
@@ -1646,6 +1692,16 @@
             "DESCRIPTION" : "Definition of the event key detection with a json pointer value"
           }
         },
+        "VARIABLELISTENERPACKAGE": {
+          "VARIABLENAME" : {
+            "TITLE" : "Variable name",
+            "DESCRIPTION" : "Defines the variable that will be watched for value changes"
+          },
+          "VARIABLECHANGETYPE" : {
+            "TITLE" : "Variable change type",
+            "DESCRIPTION" : "Configures for which change type the variable listener will be triggered"
+          }
+        },
         "EXTERNALWORKERJOBPACKAGE": {
           "TOPIC": {
             "TITLE": "Job topic",
@@ -1926,7 +1982,11 @@
         },
         "USEREVENTLISTENER" : {
           "TITLE" : "User event listener",
-          "DESCRIPTION" : "An listener for user events"
+          "DESCRIPTION" : "A listener for user events"
+        },
+        "VARIABLEEVENTLISTENER" : {
+          "TITLE" : "Variable event listener",
+          "DESCRIPTION" : "A listener for variable events"
         },
         "ENTRYCRITERION" : {
           "TITLE" : "Entry criterion",
@@ -1987,7 +2047,7 @@
             "NAME-DESC": "Name, Z-A"
         }
     },
-    
+
     "CASE-LIST" : {
         "TITLE" : "Case Models",
         "SEARCH-PLACEHOLDER": "Search",
@@ -2185,7 +2245,7 @@
             "CREATE-DESCRIPTION": "You need to give a name for the new sub process and you may want to add a description at the same time."
         }
     },
-    
+
     "CASE": {
       "NAME": "Model name",
       "KEY": "Model key",
@@ -2517,7 +2577,7 @@
             "GENERAL": "General",
             "OPTIONS": "Options",
             "UPLOAD-OPTIONS": "Upload options",
-	    "ADVANCED-OPTIONS":"Advanced" 
+	    "ADVANCED-OPTIONS":"Advanced"
         },
         "VERSION": "Version {{version}}",
         "LAST-UPDATED": "Last updated by {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
@@ -2901,7 +2961,7 @@
     "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No message definitions configured",
     "PROPERTY.MESSAGEDEFINITIONS.ID" : "Id",
     "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Name",
-    
+
     "PROPERTY.ESCALATIONDEFINITIONS.DISPLAY" : "{{length}} escalation definitions",
     "PROPERTY.ESCALATIONDEFINITIONS.EMPTY" : "No escalation definitions configured",
     "PROPERTY.ESCALATIONDEFINITIONS.ID" : "Id",
@@ -2925,7 +2985,7 @@
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "Expression definition",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Fixed duration after task creation",
     "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Based on field",
-    
+
     "PROPERTY.EVENTINPARAMETERS.VALUE" : "{{length}} event in parameter items",
     "PROPERTY.EVENTINPARAMETERS.EMPTY" : "No in parameter configured",
 
@@ -2935,7 +2995,7 @@
     "PROPERTY.EVENTINPARAMETERS.VARIABLENAME" : "Variable name",
     "PROPERTY.EVENTINPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
     "PROPERTY.EVENTINPARAMETERS.NOSELECTION" : "No parameter selected",
-    
+
     "PROPERTY.EVENTOUTPARAMETERS.VALUE" : "{{length}} event out parameter items",
     "PROPERTY.EVENTOUTPARAMETERS.EMPTY" : "No out parameter configured",
 
@@ -2945,7 +3005,7 @@
     "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME" : "Variable name",
     "PROPERTY.EVENTOUTPARAMETERS.VARIABLENAME.PLACEHOLDER" : "Enter a variable name",
     "PROPERTY.EVENTOUTPARAMETERS.NOSELECTION" : "No parameter selected",
-    
+
     "PROPERTY.EVENTCORRELATIONPARAMETERS.VALUE" : "{{length}} correlation parameters",
     "PROPERTY.EVENTCORRELATIONPARAMETERS.EMPTY" : "No correlation parameters configured",
 
@@ -3010,7 +3070,7 @@
     "PROPERTY.DECISIONSERVICEREFERENCE.ERROR.FORM" : "There was an error loading the decision services. Try again later",
     "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.LOADING" : "Loading decision services...",
     "PROPERTY.DECISIONSERVICEREFERENCE.DECISIONSERVICE.EMPTY" : "This folder contains no decision services",
-    
+
     "PROPERTY.CASEREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.CASEREFERENCE.TITLE" : "Case model reference",
     "PROPERTY.CASEREFERENCE.ERROR.FORM" : "There was an error loading the case models. Try again later",

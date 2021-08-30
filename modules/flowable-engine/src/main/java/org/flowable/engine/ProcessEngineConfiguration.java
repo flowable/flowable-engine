@@ -14,6 +14,7 @@
 package org.flowable.engine;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +99,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean useTLS;
     protected String mailServerDefaultFrom = "flowable@localhost";
     protected String mailServerForceTo;
+    protected Charset mailServerDefaultCharset;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -288,6 +290,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
         this.mailServerPort = mailServerPort;
+        return this;
+    }
+
+    public Charset getMailServerDefaultCharset() {
+        return mailServerDefaultCharset;
+    }
+
+    public ProcessEngineConfiguration setMailServerDefaultCharset(Charset mailServerDefaultCharset) {
+        this.mailServerDefaultCharset = mailServerDefaultCharset;
         return this;
     }
 

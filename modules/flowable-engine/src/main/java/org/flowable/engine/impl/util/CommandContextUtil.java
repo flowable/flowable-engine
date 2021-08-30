@@ -403,8 +403,8 @@ public class CommandContextUtil {
         return null;
     }
 
-    public static boolean hasInvolvedExecutions(CommandContext commandContext) {
-        return getInvolvedExecutions(commandContext) != null;
+    public static void clearInvolvedExecutions(CommandContext commandContext) {
+        commandContext.removeAttribute(ATTRIBUTE_INVOLVED_EXECUTIONS);
     }
 
     public static TableDataManager getTableDataManager() {

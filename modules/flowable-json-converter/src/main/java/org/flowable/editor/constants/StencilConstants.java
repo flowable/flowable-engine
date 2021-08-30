@@ -25,6 +25,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_START_SIGNAL = "StartSignalEvent";
     final String STENCIL_EVENT_START_ERROR = "StartErrorEvent";
     final String STENCIL_EVENT_START_EVENT_REGISTRY = "StartEventRegistryEvent";
+    final String STENCIL_EVENT_START_VARIABLE_LISTENER = "StartVariableListenerEvent";
     final String STENCIL_EVENT_START_CONDITIONAL = "StartConditionalEvent";
     final String STENCIL_EVENT_START_ESCALATION = "StartEscalationEvent";
 
@@ -72,6 +73,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_BOUNDARY_SIGNAL = "BoundarySignalEvent";
     final String STENCIL_EVENT_BOUNDARY_MESSAGE = "BoundaryMessageEvent";
     final String STENCIL_EVENT_BOUNDARY_EVENT_REGISTRY = "BoundaryEventRegistryEvent";
+    final String STENCIL_EVENT_BOUNDARY_VARIABLE_LISTENER = "BoundaryVariableListenerEvent";
     final String STENCIL_EVENT_BOUNDARY_CANCEL = "BoundaryCancelEvent";
     final String STENCIL_EVENT_BOUNDARY_COMPENSATION = "BoundaryCompensationEvent";
 
@@ -80,6 +82,7 @@ public interface StencilConstants {
     final String STENCIL_EVENT_CATCH_MESSAGE = "CatchMessageEvent";
     final String STENCIL_EVENT_CATCH_CONDITIONAL = "CatchConditionalEvent";
     final String STENCIL_EVENT_CATCH_EVENT_REGISTRY = "CatchEventRegistryEvent";
+    final String STENCIL_EVENT_CATCH_VARIABLE_LISTENER = "CatchVariableListenerEvent";
 
     final String STENCIL_EVENT_THROW_SIGNAL = "ThrowSignalEvent";
     final String STENCIL_EVENT_THROW_ESCALATION = "ThrowEscalationEvent";
@@ -131,10 +134,16 @@ public interface StencilConstants {
     final String PROPERTY_SIGNALREF = "signalref";
     final String PROPERTY_SIGNALEXPRESSION = "signalexpression";
     
+    final String PROPERTY_VARIABLE_LISTENER_VARIABLE_NAME = "variablelistenervariablename";
+    final String PROPERTY_VARIABLE_LISTENER_VARIABLE_CHANGE_TYPE = "variablelistenervariablechangetype";
+
     final String PROPERTY_CONDITIONAL_EVENT_CONDITION = "conditionaleventcondition";
 
     final String PROPERTY_ERRORREF = "errorref";
-    
+    final String PROPERTY_ERROR_VARIABLE_NAME = "errorvariablename";
+    final String PROPERTY_ERROR_VARIABLE_TRANSIENT = "errorvariabletransient";
+    final String PROPERTY_ERROR_VARIABLE_LOCAL_SCOPE = "errorvariablelocalscope";
+
     final String PROPERTY_ESCALATION_DEFINITIONS = "escalationdefinitions";
     final String PROPERTY_ESCALATION_DEFINITION_ID = "id";
     final String PROPERTY_ESCALATION_DEFINITION_NAME = "name";
@@ -347,7 +356,7 @@ public interface StencilConstants {
     final String PROPERTY_SHELLTASK_ERROR_REDIRECT = "shellerrorredirect";
     final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
     final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
-    
+
     final String PROPERTY_EXTERNAL_WORKER_JOB_TOPIC = "topic";
 
     final String PROPERTY_EVENT_REGISTRY_EVENT_KEY = "eventkey";
@@ -362,14 +371,14 @@ public interface StencilConstants {
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_FIXED_VALUE = "keydetectionfixedvalue";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_FIELD = "keydetectionjsonfield";
     final String PROPERTY_EVENT_REGISTRY_KEY_DETECTION_JSON_POINTER = "keydetectionjsonpointer";
-    
+
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_KEY = "triggereventkey";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_EVENT_NAME = "triggereventname";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_KEY = "triggerchannelkey";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_NAME = "triggerchannelname";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_TYPE = "triggerchanneltype";
     final String PROPERTY_EVENT_REGISTRY_TRIGGER_CHANNEL_DESTINATION = "triggerchanneldestination";
-    
+
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTNAME = "eventName";
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_EVENTTYPE = "eventType";
     final String PROPERTY_EVENT_REGISTRY_PARAMETER_VARIABLENAME = "variableName";

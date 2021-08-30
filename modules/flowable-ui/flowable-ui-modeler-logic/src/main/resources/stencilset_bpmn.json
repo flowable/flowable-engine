@@ -1148,6 +1148,30 @@
         "popular" : true
       } ]
     }, {
+      "name" : "errorvariablepackage",
+      "properties" : [ {
+        "id" : "errorvariablename",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLENAME.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLENAME.DESCRIPTION",
+        "popular" : true
+      }, {
+        "id" : "errorvariabletransient",
+        "type" : "Boolean",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLETRANSIENT.TITLE",
+        "value" : "true",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLETRANSIENT.DESCRIPTION",
+        "popular" : true
+      }, {
+        "id" : "errorvariablelocalscope",
+        "type" : "Boolean",
+        "title" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLELOCALSCOPE.TITLE",
+        "value" : "true",
+        "description" : "BPMN.PROPERTYPACKAGES.ERRORVARIABLEPACKAGE.ERRORVARIABLELOCALSCOPE.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
       "name" : "eventregistryeventpackage",
       "properties" : [ {
         "id" : "eventkey",
@@ -1325,6 +1349,26 @@
         "title" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.TITLE",
         "value" : "",
         "description" : "BPMN.PROPERTYPACKAGES.EVENTREGISTRYPACKAGE.KEYDETECTIONJSONPOINTER.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "variablelistenervariablenamepackage",
+      "properties" : [ {
+        "id" : "variablelistenervariablename",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.VARIABLELISTENERPACKAGE.VARIABLENAME.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.VARIABLELISTENERPACKAGE.VARIABLENAME.DESCRIPTION",
+        "popular" : true
+      } ]
+    }, {
+      "name" : "variablelistenervariablechangetypepackage",
+      "properties" : [ {
+        "id" : "variablelistenervariablechangetype",
+        "type" : "flowable-variablechangetype",
+        "title" : "BPMN.PROPERTYPACKAGES.VARIABLELISTENERPACKAGE.VARIABLECHANGETYPE.TITLE",
+        "value" : "all",
+        "description" : "BPMN.PROPERTYPACKAGES.VARIABLELISTENERPACKAGE.VARIABLECHANGETYPE.DESCRIPTION",
         "popular" : true
       } ]
     }, {
@@ -1610,6 +1654,16 @@
         "description" : "BPMN.PROPERTYPACKAGES.CANCELREMAININGINSTANCESPACKAGE.CANCELREMAININGINSTANCES.DESCRIPTION",
         "popular" : true
       } ]
+    }, {
+      "name" : "compensationactivityrefpackage",
+      "properties" : [ {
+        "id" : "compensationactivityref",
+        "type" : "String",
+        "title" : "BPMN.PROPERTYPACKAGES.COMPENSATIONACTIVITYREFPACKAGE.COMPENSATIONACTIVITYREF.TITLE",
+        "value" : "",
+        "description" : "BPMN.PROPERTYPACKAGES.COMPENSATIONACTIVITYREFPACKAGE.COMPENSATIONACTIVITYREF.DESCRIPTION",
+        "popular" : true
+      } ]
     } ],
   "stencils" : [ {
     "type" : "node",
@@ -1676,7 +1730,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z\"\n         id=\"errorPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
     "icon" : "startevent/error.png",
     "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage", "interruptingpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "errorrefpackage", "errorvariablepackage", "interruptingpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
   }, {
@@ -1688,6 +1742,17 @@
     "icon" : "startevent/message.png",
     "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage", "interruptingpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
+  }, {
+    "type" : "node",
+    "id" : "StartVariableListenerEvent",
+    "title" : "BPMN.STENCILS.STARTVARIABLELISTENEREVENT.TITLE",
+    "description" : "BPMN.STENCILS.STARTVARIABLELISTENEREVENT.DESCRIPTION",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\">\n    <circle \n    \tid=\"bg_frame\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"15\" \n    \tstroke=\"#585858\" \n    \tfill=\"#ffffff\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 5.5, 3\" />\n    \n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n    <path transform=\"translate(0,0)\" id=\"path1\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\" d=\"M 20.834856,22.874369 L 10.762008,22.873529 L 7.650126,13.293421 L 15.799725,7.3734296 L 23.948336,13.294781 L 20.834856,22.874369 z\"/>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+    "icon" : "startevent/multiple.png",
+    "groups" : [ "BPMN.STENCILS.GROUPS.STARTEVENTS" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "variablelistenervariablenamepackage", "variablelistenervariablechangetypepackage", "interruptingpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "sequence_start", "Startevents_all", "StartEventsMorph", "all" ]
   }, {
@@ -2019,7 +2084,7 @@
       "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n    <path\n         stroke=\"#585858\"\n         style=\"fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10\"\n         d=\"M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z\"\n         id=\"errorPolygon\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
       "icon" : "catching/error.png",
       "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
-      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "errorrefpackage" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "errorrefpackage", "errorvariablepackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
     }, {
@@ -2090,6 +2155,17 @@
       "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
     }, {
       "type" : "node",
+      "id" : "BoundaryVariableListenerEvent",
+      "title" : "BPMN.STENCILS.BOUNDARYVARIABLELISTENEREVENT.TITLE",
+      "description" : "BPMN.STENCILS.BOUNDARYVARIABLELISTENEREVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle \n    \tid=\"bg_frame\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"15\" \n    \tstroke=\"#585858\" \n    \tfill=\"#ffffff\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 5.5, 3\" />\n    \t\n    <circle \n    \tid=\"frame2_non_interrupting\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"12\" \n    \tstroke=\"#585858\" \n    \tfill=\"none\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 4.5, 3\" />\n    \t\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    <circle id=\"frame2\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n\t<g id=\"messageCatching\">\n\t\t<path transform=\"translate(0,0)\" id=\"path1\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\" d=\"M 20.834856,22.874369 L 10.762008,22.873529 L 7.650126,13.293421 L 15.799725,7.3734296 L 23.948336,13.294781 L 20.834856,22.874369 z \"/>\n\t</g>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n\t\n  </g>\n</svg>",
+      "icon" : "catching/multiple.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.BOUNDARYEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "variablelistenervariablenamepackage", "variablelistenervariablechangetypepackage", "cancelactivitypackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "sequence_start", "BoundaryEventsMorph", "IntermediateEventOnActivityBoundary" ]
+    }, {
+      "type" : "node",
       "id" : "BoundaryConditionalEvent",
       "title" : "BPMN.STENCILS.BOUNDARYCONDITIONALEVENT.TITLE",
       "description" : "BPMN.STENCILS.BOUNDARYCONDITIONALEVENT.DESCRIPTION",
@@ -2154,8 +2230,7 @@
       "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "conditionaleventpackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "sequence_start", "sequence_end", "CatchEventsMorph", "all" ]
-    },
-    {
+    }, {
       "type" : "node",
       "id" : "CatchEventRegistryEvent",
       "title" : "BPMN.STENCILS.CATCHEVENTREGISTRYEVENT.TITLE",
@@ -2166,8 +2241,18 @@
       "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "cancelactivitypackage", "eventregistryeventpackage", "eventregistryeventnamepackage", "eventregistryoutparameterspackage", "eventregistrycorrelationpackage", "eventregistrychannelkeypackage", "eventregistrychannelnamepackage", "eventregistrychanneltypepackage", "eventregistrychanneldestinationpackage", "eventregistrykeydetectionfixedvaluepackage", "eventregistrykeydetectionjsonfieldpackage", "eventregistrykeydetectionjsonpointerpackage" ],
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "sequence_start", "sequence_end", "CatchEventsMorph", "all" ]
-    },
-    {
+    }, {
+      "type" : "node",
+      "id" : "CatchVariableListenerEvent",
+      "title" : "BPMN.STENCILS.CATCHVARIABLELISTENEREVENT.TITLE",
+      "description" : "BPMN.STENCILS.CATCHVARIABLELISTENEREVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle \n    \tid=\"bg_frame\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"15\" \n    \tstroke=\"#585858\" \n    \tfill=\"#ffffff\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 5.5, 3\" />\n    \t\n    <circle \n    \tid=\"frame2_non_interrupting\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"12\" \n    \tstroke=\"#585858\" \n    \tfill=\"none\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 4.5, 3\" />\n    \t\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    <circle id=\"frame2\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n\t<g id=\"messageCatching\">\n\t\t<path transform=\"translate(0,0)\" id=\"path1\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\" d=\"M 20.834856,22.874369 L 10.762008,22.873529 L 7.650126,13.293421 L 15.799725,7.3734296 L 23.948336,13.294781 L 20.834856,22.874369 z \"/>\n\t</g>\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n\t\n  </g>\n</svg>",
+      "icon" : "catching/multiple.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.INTERMEDIATECATCHINGEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "variablelistenervariablenamepackage", "variablelistenervariablechangetypepackage", "interruptingpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "sequence_start", "sequence_end", "CatchEventsMorph", "all" ]
+    }, {
       "type" : "node",
       "id" : "ThrowNoneEvent",
       "title" : "BPMN.STENCILS.THROWNONEEVENT.TITLE",
@@ -2201,6 +2286,17 @@
       "hiddenPropertyPackages" : [ ],
       "roles" : [ "ThrowEventsMorph", "sequence_start", "sequence_end", "all" ]
     }, {
+      "type" : "node",
+      "id" : "ThrowCompensationEvent",
+      "title" : "BPMN.STENCILS.THROWCOMPENSATIONEVENT.TITLE",
+      "description" : "BPMN.STENCILS.THROWCOMPENSATIONEVENT.DESCRIPTION",
+      "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" />\n  <g pointer-events=\"fill\">\n    <circle id=\"bg_frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/>\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"12\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    <path\n\t   id=\"escalationThrowing\"\n       d=\"m 7.0,16 7,-6.5 0,13 z m 7.3,-0.4 8.7,-6.1 0,13 -8.7,-6.1 z\" \n       fill=\"#585858\"\n       stroke=\"#585858\"\n       style=\"stroke-width:1.4;stroke-miterlimit:4;stroke-dasharray:none\" />\n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
+      "icon" : "throwing/compensation.png",
+      "groups" : [ "BPMN.STENCILS.GROUPS.INTERMEDIATETHROWINGEVENTS" ],
+      "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "compensationactivityrefpackage", "executionlistenerspackage", "asynchronousdefinitionpackage" ],
+      "hiddenPropertyPackages" : [ ],
+      "roles" : [ "ThrowEventsMorph", "sequence_start", "sequence_end", "all" ]
+    },{
       "type" : "node",
       "id" : "EndNoneEvent",
       "title" : "BPMN.STENCILS.ENDNONEEVENT.TITLE",

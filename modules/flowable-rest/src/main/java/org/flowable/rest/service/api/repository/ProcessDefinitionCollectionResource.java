@@ -74,6 +74,7 @@ public class ProcessDefinitionCollectionResource {
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return process definitions with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return process definitions with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return process definitions with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return process definitions with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return process definitions with the given key.", paramType = "query"),
             @ApiImplicitParam(name = "keyLike", dataType = "string", value = "Only return process definitions with a name like the given key.", paramType = "query"),
             @ApiImplicitParam(name = "resourceName", dataType = "string", value = "Only return process definitions with the given resource name.", paramType = "query"),
@@ -116,6 +117,9 @@ public class ProcessDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("nameLike")) {
             processDefinitionQuery.processDefinitionNameLike(allRequestParams.get("nameLike"));
+        }
+        if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
+            processDefinitionQuery.processDefinitionNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
         if (allRequestParams.containsKey("resourceName")) {
             processDefinitionQuery.processDefinitionResourceName(allRequestParams.get("resourceName"));

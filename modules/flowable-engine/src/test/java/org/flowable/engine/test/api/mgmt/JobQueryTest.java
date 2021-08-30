@@ -542,16 +542,16 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testHistoryQueryWithoutScopeType() {
-        managementService.executeCommand((Command<Void>) commandContext -> {
+        HistoryJobEntity historyJobEntity = managementService.executeCommand((Command<HistoryJobEntity>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             HistoryJobService historyJobService = jobServiceConfiguration.getHistoryJobService();
             HistoryJobEntity historyJob = historyJobService.createHistoryJob();
             historyJobService.scheduleHistoryJob(historyJob);
 
-            return null;
+            return historyJob;
         });
 
-        HistoryJobQuery query = managementService.createHistoryJobQuery().withoutScopeType();
+        HistoryJobQuery query = managementService.createHistoryJobQuery().jobId(historyJobEntity.getId()).withoutScopeType();
         assertThat(query.singleResult()).isNotNull();
 
         managementService.executeCommand((Command<Void>) commandContext -> {

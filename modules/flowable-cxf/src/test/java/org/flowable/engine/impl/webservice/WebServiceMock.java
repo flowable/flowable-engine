@@ -14,9 +14,13 @@ package org.flowable.engine.impl.webservice;
 
 import java.util.Date;
 
+import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.xml.ws.Holder;
+import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
 
 /**
  * A simple WS for unit test purpose
@@ -107,4 +111,14 @@ public interface WebServiceMock {
 
     @WebResult(name = "static")
     String reservedWordAsName(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
+
+    @WebMethod(action = "http://flowable.org/test/unit/returnsSeveralParams")
+    @RequestWrapper(localName = "returnsSeveralParams", className = "org.flowable.engine.impl.webservice.wrappers.ReturnsSeveralParams")
+    @ResponseWrapper(localName = "returnsSeveralParamsResponse", className = "org.flowable.engine.impl.webservice.wrappers.ReturnsSeveralParamsResponse")
+    public void returnsSeveralParams(
+
+            @WebParam(name = "in-param-1", targetNamespace = "") final String inParam,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-1", targetNamespace = "") final Holder<String> outParam1,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-2", targetNamespace = "") final Holder<Integer> outParam2,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-3", targetNamespace = "") final Holder<String> outParam3);
 }

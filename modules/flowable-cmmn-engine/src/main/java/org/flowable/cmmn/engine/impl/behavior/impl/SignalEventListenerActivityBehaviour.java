@@ -16,12 +16,15 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -81,25 +84,12 @@ public class SignalEventListenerActivityBehaviour extends CoreCmmnTriggerableAct
     }
 
     @Override
-    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-        
-        String signalName = null;
-        if (StringUtils.isNotEmpty(signalRef)) {
-            Expression signalExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                            .getExpressionManager().createExpression(signalRef);
-            signalName = signalExpression.getValue(planItemInstanceEntity).toString();
-        }
-        
-        List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
-        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-            if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(signalName)) {
-                eventSubscriptionService.deleteEventSubscription(eventSubscription);
-            }
-        }
-        
-        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {        
+        PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+        eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+        CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+        agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
+        agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
     }
 
 }

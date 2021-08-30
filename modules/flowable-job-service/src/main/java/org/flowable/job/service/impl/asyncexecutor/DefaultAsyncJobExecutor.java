@@ -36,21 +36,6 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAsyncJobExecutor.class);
 
     /**
-     * If true (default), the thread for acquiring async jobs will be started.
-     */
-    protected boolean isAsyncJobAcquisitionEnabled = true;
-
-    /**
-     * If true (default), the thread for acquiring timer jobs will be started.
-     */
-    protected boolean isTimerJobAcquisitionEnabled = true;
-
-    /**
-     * If true (default), the thread for acquiring expired jobs will be started.
-     */
-    protected boolean isResetExpiredJobEnabled = true;
-
-    /**
      * Thread responsible for async job acquisition.
      */
     protected Thread asyncJobAcquisitionThread;
@@ -66,16 +51,18 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     protected Thread resetExpiredJobThread;
 
     /**
-     * Whether to unlock jobs that are owned by this executor (have the same
-     * lockOwner) at startup or shutdown.
-     */
-    protected boolean unlockOwnedJobs = true;
-
-    /**
      * The async task executor used for job execution.
      */
     protected AsyncTaskExecutor taskExecutor;
     protected boolean shutdownTaskExecutor;
+
+    public DefaultAsyncJobExecutor() {
+        super();
+    }
+
+    public DefaultAsyncJobExecutor(AsyncJobExecutorConfiguration configuration) {
+        super(configuration);
+    }
 
     @Override
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
@@ -125,11 +112,11 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
             startJobAcquisitionThread();
         }
 
-        if (unlockOwnedJobs) {
+        if (configuration.isUnlockOwnedJobs()) {
             unlockOwnedJobs();
         }
 
-        if (timerRunnableNeeded) {
+        if (configuration.isTimerRunnableNeeded()) {
             startTimerAcquisitionThread();
         }
         startResetExpiredJobsThread();
@@ -142,7 +129,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
         stopJobAcquisitionThread();
         stopExecutingAsyncJobs();
 
-        if (unlockOwnedJobs) {
+        if (configuration.isUnlockOwnedJobs()) {
             unlockOwnedJobs();
         }
 
@@ -177,7 +164,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the acquisition thread */
     protected void startJobAcquisitionThread() {
-        if (isAsyncJobAcquisitionEnabled) {
+        if (configuration.isAsyncJobAcquisitionEnabled()) {
             if (asyncJobAcquisitionThread == null) {
                 asyncJobAcquisitionThread = new Thread(asyncJobsDueRunnable);
             }
@@ -186,7 +173,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     }
 
     protected void startTimerAcquisitionThread() {
-        if (isTimerJobAcquisitionEnabled) {
+        if (configuration.isTimerJobAcquisitionEnabled()) {
             if (timerJobAcquisitionThread == null) {
                 timerJobAcquisitionThread = new Thread(timerJobRunnable);
             }
@@ -219,7 +206,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     /** Starts the reset expired jobs thread */
     protected void startResetExpiredJobsThread() {
-        if (isResetExpiredJobEnabled) {
+        if (configuration.isResetExpiredJobEnabled()) {
             if (resetExpiredJobThread == null) {
                 resetExpiredJobThread = new Thread(resetExpiredJobsRunnable);
             }
@@ -241,27 +228,27 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     }
 
     public boolean isAsyncJobAcquisitionEnabled() {
-        return isAsyncJobAcquisitionEnabled;
+        return configuration.isAsyncJobAcquisitionEnabled();
     }
 
     public void setAsyncJobAcquisitionEnabled(boolean isAsyncJobAcquisitionEnabled) {
-        this.isAsyncJobAcquisitionEnabled = isAsyncJobAcquisitionEnabled;
+        configuration.setAsyncJobAcquisitionEnabled(isAsyncJobAcquisitionEnabled);
     }
 
     public boolean isTimerJobAcquisitionEnabled() {
-        return isTimerJobAcquisitionEnabled;
+        return configuration.isTimerJobAcquisitionEnabled();
     }
 
     public void setTimerJobAcquisitionEnabled(boolean isTimerJobAcquisitionEnabled) {
-        this.isTimerJobAcquisitionEnabled = isTimerJobAcquisitionEnabled;
+        configuration.setTimerJobAcquisitionEnabled(isTimerJobAcquisitionEnabled);
     }
 
     public boolean isResetExpiredJobEnabled() {
-        return isResetExpiredJobEnabled;
+        return configuration.isResetExpiredJobEnabled();
     }
 
     public void setResetExpiredJobEnabled(boolean isResetExpiredJobEnabled) {
-        this.isResetExpiredJobEnabled = isResetExpiredJobEnabled;
+        configuration.setResetExpiredJobEnabled(isResetExpiredJobEnabled);
     }
 
     public Thread getTimerJobAcquisitionThread() {
@@ -289,11 +276,11 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
     }
 
     public boolean isUnlockOwnedJobs() {
-        return unlockOwnedJobs;
+        return configuration.isUnlockOwnedJobs();
     }
 
     public void setUnlockOwnedJobs(boolean unlockOwnedJobs) {
-        this.unlockOwnedJobs = unlockOwnedJobs;
+        configuration.setUnlockOwnedJobs(unlockOwnedJobs);
     }
 
     @Override

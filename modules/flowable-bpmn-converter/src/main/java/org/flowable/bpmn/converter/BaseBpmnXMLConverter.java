@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,11 +29,13 @@ import org.flowable.bpmn.converter.export.MultiInstanceExport;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Assignment;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
+import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
@@ -224,6 +226,12 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
             final Activity activity = (Activity) baseElement;
             MultiInstanceExport.writeMultiInstance(activity, model, xtw);
 
+            for (DataAssociation dataInputAssociation : activity.getDataInputAssociations()) {
+                writeDataAssociation(ELEMENT_INPUT_ASSOCIATION, dataInputAssociation, xtw);
+            }
+            for (DataAssociation dataOutputAssociation : activity.getDataOutputAssociations()) {
+                writeDataAssociation(ELEMENT_OUTPUT_ASSOCIATION, dataOutputAssociation, xtw);
+            }
         }
 
         writeAdditionalChildElements(baseElement, model, xtw);
@@ -539,39 +547,49 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         }
         xtw.writeEndElement();
     }
-    
+
     protected void writeConditionalDefinition(Event parentEvent, ConditionalEventDefinition conditionalDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_CONDITIONALDEFINITION);
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(conditionalDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
-        
+
         if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
             xtw.writeStartElement(ELEMENT_CONDITION);
             xtw.writeCharacters(conditionalDefinition.getConditionExpression());
             xtw.writeEndElement();
         }
-        
+
         xtw.writeEndElement();
     }
 
     protected void writeErrorDefinition(Event parentEvent, ErrorEventDefinition errorDefinition, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         xtw.writeStartElement(ELEMENT_EVENT_ERRORDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ERROR_REF, errorDefinition.getErrorCode(), xtw);
+        writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_NAME, errorDefinition.getErrorVariableName(), xtw);
+        
+        if (errorDefinition.getErrorVariableLocalScope() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_LOCAL_SCOPE, errorDefinition.getErrorVariableLocalScope().toString(), xtw);
+        }
+        
+        if (errorDefinition.getErrorVariableTransient() != null) {
+            writeQualifiedAttribute(ATTRIBUTE_ERROR_VARIABLE_TRANSIENT, errorDefinition.getErrorVariableTransient().toString(), xtw);
+        }
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(errorDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
         }
         xtw.writeEndElement();
     }
-    
+
     protected void writeEscalationDefinition(Event parentEvent, EscalationEventDefinition escalationDefinition, BpmnModel model,
                     XMLStreamWriter xtw) throws Exception {
-        
+
         xtw.writeStartElement(ELEMENT_EVENT_ESCALATIONDEFINITION);
         writeDefaultAttribute(ATTRIBUTE_ESCALATION_REF, escalationDefinition.getEscalationCode(), xtw);
-        
+
         boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(escalationDefinition, false, model.getNamespaces(), xtw);
         if (didWriteExtensionStartElement) {
             xtw.writeEndElement();
@@ -631,5 +649,34 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
     protected void writeQualifiedAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         BpmnXMLUtil.writeQualifiedAttribute(attributeName, value, xtw);
+    }
+
+    protected void writeDataAssociation(String elementName, DataAssociation dataAssociation, XMLStreamWriter xtw) throws Exception {
+        xtw.writeStartElement(elementName);
+        writeDefaultAttribute(ATTRIBUTE_ID, dataAssociation.getId(), xtw);
+        if (!StringUtils.isEmpty(dataAssociation.getSourceRef())) {
+            xtw.writeStartElement(ELEMENT_SOURCE_REF);
+            xtw.writeCharacters(dataAssociation.getSourceRef());
+            xtw.writeEndElement();
+        }
+        xtw.writeStartElement(ELEMENT_TARGET_REF);
+        xtw.writeCharacters(dataAssociation.getTargetRef());
+        xtw.writeEndElement();
+        if (!StringUtils.isEmpty(dataAssociation.getTransformation())) {
+            xtw.writeStartElement(ELEMENT_TRANSFORMATION);
+            xtw.writeCharacters(dataAssociation.getTransformation());
+            xtw.writeEndElement();
+        }
+        for (Assignment assignment : dataAssociation.getAssignments()) {
+            xtw.writeStartElement(ELEMENT_ASSIGNMENT);
+            xtw.writeStartElement(ELEMENT_FROM);
+            xtw.writeCharacters(assignment.getFrom());
+            xtw.writeEndElement();
+            xtw.writeStartElement(ELEMENT_TO);
+            xtw.writeCharacters(assignment.getTo());
+            xtw.writeEndElement();
+            xtw.writeEndElement();
+        }
+        xtw.writeEndElement();
     }
 }

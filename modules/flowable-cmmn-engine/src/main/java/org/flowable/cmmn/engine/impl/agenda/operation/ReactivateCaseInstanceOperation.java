@@ -57,14 +57,14 @@ public class ReactivateCaseInstanceOperation extends AbstractCaseInstanceOperati
         PlanItemInstanceEntity reactivationListener = reactivatePlanItem(reactivationListenerPlanItemInstance);
 
         // all directly depending plan items need to be reactivated as well to be in the correct state before the listener is triggered
-        reactivateDependingPlanItems(reactivationListener, planItemInstances);
+        List<PlanItem> directlyReactivatedPlanItems = reactivateDependingPlanItems(reactivationListener, planItemInstances);
 
         // now as all depending plan items have been reactivated, trigger the reactivation event listener to start the reactivation of the case
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(reactivationListener);
 
         // PHASE 2:
         // execute phase 2 of the reactivation: step through all root plan items and reactivate them according the cae model
-        CommandContextUtil.getAgenda(commandContext).planReactivatePlanModelOperation(caseInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planReactivatePlanModelOperation(caseInstanceEntity, directlyReactivatedPlanItems);
     }
 
     /**
@@ -75,8 +75,9 @@ public class ReactivateCaseInstanceOperation extends AbstractCaseInstanceOperati
      *
      * @param planItemInstance the plan item instance to activate depending plan items for
      * @param planItemInstances the list of plan items of the case to search for depending ones
+     * @return the list of reactivated, directly depending plan items
      */
-    protected void reactivateDependingPlanItems(PlanItemInstanceEntity planItemInstance, List<PlanItemInstanceEntity> planItemInstances) {
+    protected List<PlanItem> reactivateDependingPlanItems(PlanItemInstanceEntity planItemInstance, List<PlanItemInstanceEntity> planItemInstances) {
         // search for all the direct dependencies the reactivation listener has as we need to (re-)activate them as well in order to be triggered
         // by the listener, which is what we call first phase of reactivation
         List<PlanItem> entryDependentPlanItems = planItemInstance.getPlanItem().getEntryDependentPlanItems();
@@ -85,6 +86,7 @@ public class ReactivateCaseInstanceOperation extends AbstractCaseInstanceOperati
                 reactivatePlanItem(searchPlanItemInstance(entryDependentPlanItem.getPlanItemDefinition().getId(), planItemInstances));
             }
         }
+        return entryDependentPlanItems;
     }
 
     /**

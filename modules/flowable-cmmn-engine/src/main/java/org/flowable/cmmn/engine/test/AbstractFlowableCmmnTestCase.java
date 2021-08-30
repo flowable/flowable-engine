@@ -193,25 +193,27 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
 
     protected void assertSamePlanItemState(CaseInstance c1) {
-        List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
-        List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
+            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
 
-        assertNotNull(runtimePlanItems);
-        assertNotNull(historicPlanItems);
-        assertEquals(runtimePlanItems.size(), historicPlanItems.size());
+            assertNotNull(runtimePlanItems);
+            assertNotNull(historicPlanItems);
+            assertEquals(runtimePlanItems.size(), historicPlanItems.size());
 
-        Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
-        for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
-            historyMap.put(historicPlanItem.getId(), historicPlanItem);
+            Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
+            for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
+                historyMap.put(historicPlanItem.getId(), historicPlanItem);
+            }
+
+            for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
+                HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
+                assertNotNull(historicPlanItemInstance);
+                assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
+            }
+
+            assertEquals(historyMap.size(), 0);
         }
-
-        for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
-            HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
-            assertNotNull(historicPlanItemInstance);
-            assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
-        }
-
-        assertEquals(historyMap.size(), 0);
     }
 
     protected void assertPlanItemInstanceState(CaseInstance caseInstance, String name, String ... states) {
@@ -234,7 +236,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             fail("No plan item instances found with name " + name);
         }
 
-        assertEquals("Incorrect number of states found: " + planItemInstanceStates + "", states.length, planItemInstanceStates.size());
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
@@ -251,7 +253,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             fail("No historic plan item instances found with name " + name);
         }
 
-        assertEquals("Incorrect number of states found: " + planItemInstanceStates + "", states.length, planItemInstanceStates.size());
+        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
         List<String> originalStates = new ArrayList<>(planItemInstanceStates);
         for (String state : states) {
             assertTrue("State '" + state + "' not found in historic plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
@@ -414,7 +416,9 @@ public abstract class AbstractFlowableCmmnTestCase {
     }
     
     protected void waitForAsyncHistoryExecutorToProcessAllJobs() {
-        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+        if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
+            CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 20000L, 200L, true);
+        }
     }
 
     protected void waitForJobExecutorOnCondition(Callable<Boolean> predicate) {

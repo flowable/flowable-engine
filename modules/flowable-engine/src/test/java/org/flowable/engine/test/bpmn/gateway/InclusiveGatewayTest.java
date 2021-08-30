@@ -36,12 +36,15 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -103,6 +106,105 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
 
         runtimeService.deleteProcessInstance(pi.getId(), "testing deletion");
+    }
+
+    @Test
+    @Deployment
+    public void testMergeWithEndedExecution() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("myProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 1").singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 2").singleResult();
+
+        taskService.complete(task1.getId());
+        taskService.complete(task2.getId(), CollectionUtil.singletonMap("decision", "goDown"));
+
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<String> activityNames = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(pi.getId())
+                .list()
+                .stream()
+                .map(HistoricActivityInstance::getActivityName)
+                .collect(Collectors.toList());
+
+            assertThat(activityNames).contains("Other end"); // the path downwards needs to be followed
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testMergeWithEndedExecutionNestedCommand() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("myProcess");
+        Task task1 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 1").singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceId(pi.getId()).taskName("Task 2").singleResult();
+
+        taskService.complete(task1.getId());
+
+        // Testing a bug: when the command is nested, the reuse flag gets set to true for the inner command context, never triggering the InactiveBehavior
+        managementService.executeCommand(new Command<Object>() {
+
+            @Override
+            public Object execute(CommandContext commandContext) {
+                taskService.complete(task2.getId(), CollectionUtil.singletonMap("decision", "goDown"));
+
+                return null;
+            }
+
+        });
+
+        assertProcessEnded(pi.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<String> activityNames = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(pi.getId())
+                .list()
+                .stream()
+                .map(HistoricActivityInstance::getActivityName)
+                .collect(Collectors.toList());
+
+            assertThat(activityNames).contains("Other end"); // the path downwards needs to be followed
+        }
+    }
+
+    @Test
+    @Deployment(extraResources = "org/flowable/engine/test/bpmn/gateway/InclusiveGatewayTest.testProcessInstanceStartedThroughRuntimeService2.bpmn20.xml")
+    public void testProcessInstanceStartedThroughRuntimeService() {
+
+        // A slightly odd unit test: the process is started through the runtime service (and that one has an inclusive gateway).
+        // This is because of a bugfix that fixes a bug in the handling of nested command context that happened before.
+
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+        // After starting the process instance, two process instances should be fully finished.
+        // Before the bugfix, only one was finished, the one with the inclusive gateway wasn't.
+        runtimeService.startProcessInstanceByKey("oneServiceTaskProcess");
+
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            List<String> activityNames = historyService.createHistoricActivityInstanceQuery()
+                .processInstanceId(InclusiveGatewayTestDelegate01.PROCESS_INSTANCE_ID)
+                .list()
+                .stream()
+                .map(HistoricActivityInstance::getActivityName)
+                .collect(Collectors.toList());
+
+            assertThat(activityNames).contains("Other end"); // the path downwards needs to be followed
+        }
+    }
+
+    public static class InclusiveGatewayTestDelegate01 implements JavaDelegate  {
+
+        public static String PROCESS_INSTANCE_ID;
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            ProcessInstance processInstance = CommandContextUtil.getProcessEngineConfiguration().getRuntimeService()
+                .startProcessInstanceByKey("myProcess", CollectionUtil.singletonMap("decision", "goDown"));
+            PROCESS_INSTANCE_ID = processInstance.getId();
+        }
+
     }
 
     @Test

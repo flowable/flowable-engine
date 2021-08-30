@@ -13,12 +13,13 @@
 package org.flowable.engine.impl.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
@@ -32,40 +33,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class ExecutionGraphUtil {
-
-    /**
-     * Takes in a collection of executions belonging to the same process instance. Orders the executions in a list, first elements are the leaf, last element is the root elements.
-     */
-    public static List<ExecutionEntity> orderFromRootToLeaf(Collection<ExecutionEntity> executions) {
-        List<ExecutionEntity> orderedList = new ArrayList<>(executions.size());
-
-        // Root elements
-        HashSet<String> previousIds = new HashSet<>();
-        for (ExecutionEntity execution : executions) {
-            if (execution.getParentId() == null) {
-                orderedList.add(execution);
-                previousIds.add(execution.getId());
-            }
-        }
-
-        // Non-root elements
-        while (orderedList.size() < executions.size()) {
-            for (ExecutionEntity execution : executions) {
-                if (!previousIds.contains(execution.getId()) && previousIds.contains(execution.getParentId())) {
-                    orderedList.add(execution);
-                    previousIds.add(execution.getId());
-                }
-            }
-        }
-
-        return orderedList;
-    }
-
-    public static List<ExecutionEntity> orderFromLeafToRoot(Collection<ExecutionEntity> executions) {
-        List<ExecutionEntity> orderedList = orderFromRootToLeaf(executions);
-        Collections.reverse(orderedList);
-        return orderedList;
-    }
 
     /**
      * Verifies if the element with the given source identifier can reach the element with the target identifier through following sequence flow.
@@ -178,18 +145,6 @@ public class ExecutionGraphUtil {
         return multiInstanceRootExecution;
     }
 
-    public static DelegateExecution getMultiInstanceRootExecution(ExecutionEntity execution, String elementId) {
-        DelegateExecution parentExecution = getMultiInstanceRootExecution(execution);
-        if (parentExecution != null) {
-            if (elementId.equals(parentExecution.getCurrentActivityId())) {
-                return parentExecution;
-            } else {
-                return getMultiInstanceRootExecution((ExecutionEntity) parentExecution, elementId);
-            }
-        }
-        return null;
-    }
-
     public static DelegateExecution getParentInstanceExecutionInMultiInstance(ExecutionEntity execution) {
         ExecutionEntity instanceExecution = null;
         ExecutionEntity currentExecution = execution;
@@ -203,16 +158,29 @@ public class ExecutionGraphUtil {
         return instanceExecution;
     }
 
-    public static DelegateExecution getParentInstanceExecutionInMultiInstance(ExecutionEntity execution, String elementId) {
-        DelegateExecution parentExecution = getParentInstanceExecutionInMultiInstance(execution);
-        if (parentExecution != null) {
-            if (elementId.equals(parentExecution.getCurrentActivityId())) {
-                return parentExecution;
-            } else {
-                return getParentInstanceExecutionInMultiInstance((ExecutionEntity) parentExecution, elementId);
+    /**
+     * Returns the list of boundary event activity ids that are in the the process model,
+     * associated with the current activity of the passed execution.
+     * Note that no check if made here whether this an active child execution for those boundary events.
+     */
+    public static List<String> getBoundaryEventActivityIds(DelegateExecution execution) {
+        Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
+
+        String activityId = execution.getCurrentActivityId();
+        if (StringUtils.isNotEmpty(activityId)) {
+            List<String> boundaryEventActivityIds = new ArrayList<>();
+            List<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
+            for (BoundaryEvent boundaryEvent : boundaryEvents) {
+                if (activityId.equals(boundaryEvent.getAttachedToRefId())) {
+                    boundaryEventActivityIds.add(boundaryEvent.getId());
+                }
             }
+            return boundaryEventActivityIds;
+
+        } else {
+            return Collections.emptyList();
+
         }
-        return null;
     }
 
 }

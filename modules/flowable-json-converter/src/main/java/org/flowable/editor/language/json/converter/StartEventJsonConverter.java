@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -49,6 +50,7 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_EVENT_START_ESCALATION, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_MESSAGE, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_EVENT_REGISTRY, StartEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_START_VARIABLE_LISTENER, StartEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_START_SIGNAL, StartEventJsonConverter.class);
     }
 
@@ -73,6 +75,8 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
                 return STENCIL_EVENT_START_MESSAGE;
             } else if (eventDefinition instanceof SignalEventDefinition) {
                 return STENCIL_EVENT_START_SIGNAL;
+            } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+                return STENCIL_EVENT_START_VARIABLE_LISTENER;
             }
             
         } else if (event.getExtensionElements().get("eventType") != null && event.getExtensionElements().get("eventType").size() > 0) {
@@ -172,7 +176,9 @@ public class StartEventJsonConverter extends BaseBpmnJsonConverter {
         
         } else if (STENCIL_EVENT_START_EVENT_REGISTRY.equals(stencilId)) {
             addReceiveEventExtensionElements(elementNode, startEvent);
-
+        
+        } else if (STENCIL_EVENT_START_VARIABLE_LISTENER.equals(stencilId)) {
+            convertJsonToVariableListenerDefinition(elementNode, startEvent);
         }
 
         if (!getPropertyValueAsBoolean(PROPERTY_INTERRUPTING, elementNode)) {

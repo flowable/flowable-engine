@@ -20,7 +20,9 @@ import java.util.List;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
+import org.flowable.test.cmmn.converter.util.ConversionDirection;
 
 /**
  * @author Filip Hrisafov
@@ -42,6 +44,32 @@ public class CaseCustomExtensionElementXmlConverterTest {
                         ExtensionElement::getNamespace,
                         extensionElement -> extensionElement.getAttributeValue(null, "attribute"))
                 .containsExactly(tuple("Element text", "flowable", "http://flowable.org/cmmn", "Value"));
+    }
+
+
+    @CmmnXmlConverterTest(value = "org/flowable/test/cmmn/converter/extensionsXmlLocation.cmmn", directions = ConversionDirection.xmlToModel)
+    void validateXmlLocations(CmmnModel cmmnModel) {
+
+        assertThat(cmmnModel).isNotNull();
+        Case primaryCase = cmmnModel.getPrimaryCase();
+        assertThat(primaryCase).isNotNull();
+        PlanItemDefinition definition = primaryCase.getPlanModel().findPlanItemDefinitionInStageOrDownwards("rootTask");
+
+        assertThat(definition).isNotNull();
+        assertThat(definition.getXmlRowNumber()).isEqualTo(11);
+        assertThat(definition.getXmlColumnNumber()).isEqualTo(67);
+
+        List<ExtensionElement> extensionElements = definition.getExtensionElements().get("test");
+        assertThat(extensionElements).hasSize(1);
+        ExtensionElement element = extensionElements.get(0);
+        assertThat(element.getXmlRowNumber()).isEqualTo(13);
+        assertThat(element.getXmlColumnNumber()).isEqualTo(47);
+
+        extensionElements = definition.getExtensionElements().get("testValue");
+        assertThat(extensionElements).hasSize(1);
+        element = extensionElements.get(0);
+        assertThat(element.getXmlRowNumber()).isEqualTo(14);
+        assertThat(element.getXmlColumnNumber()).isEqualTo(54);
     }
 
 }

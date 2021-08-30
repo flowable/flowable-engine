@@ -431,6 +431,8 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
     public void createCustomTaskEventLog_taskIdIsEnoughToCreateTaskLogEntry() {
         task = taskService.createTaskBuilder().create();
 
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
+
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder(task);
         historicTaskLogEntryBuilder.create();
 
@@ -864,7 +866,7 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> logEntries = historicTaskLogEntryQuery.list();
                 assertThat(logEntries).hasSize(5);
-                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactly(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
+                assertThat(logEntries).extracting(HistoricTaskLogEntry::getTaskId).containsExactlyInAnyOrder(task.getId(), anotherTask.getId(), task.getId(), task.getId(), task.getId());
 
                 assertThat(historicTaskLogEntryQuery.count()).isEqualTo(5);
 
@@ -1043,14 +1045,17 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
         
         HistoricTaskLogEntryBuilder historicTaskLogEntryBuilder = historyService.createHistoricTaskLogEntryBuilder();
         historicTaskLogEntryBuilder.taskId("1").timeStamp(getInsertDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("2").timeStamp(getCompareAfterDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
         historicTaskLogEntryBuilder.taskId("3").timeStamp(getCompareBeforeDate()).create();
+        waitForHistoryJobExecutorToProcessAllJobs(20000, 200);
 
         try {
 
             if (HistoryTestHelper.isHistoricTaskLoggingEnabled(processEngineConfiguration)) {
                 List<HistoricTaskLogEntry> taskLogEntries = historyService.createHistoricTaskLogEntryQuery().list();
-                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("1", "2", "3");
+                assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactlyInAnyOrder("1", "2", "3");
 
                 taskLogEntries = historyService.createHistoricTaskLogEntryQuery().orderByLogNumber().desc().list();
                 assertThat(taskLogEntries).extracting(taskLogEntry -> taskLogEntry.getTaskId()).containsExactly("3", "2", "1");

@@ -80,6 +80,7 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        setSafeInValueLists(historicTaskInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
     }
 

@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.engine.impl.variable.CmmnAggregation;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.RepetitionRule;
@@ -43,7 +44,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
             //Increase repetition counter, value is kept from the previous instance of the repetition
             //@see CmmOperation.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
             //Or if its the first instance of the repetition, this call sets the counter to 1
-            int repetitionCounter = getRepetitionCounter(planItemInstanceEntity);
+            int repetitionCounter = PlanItemInstanceUtil.getRepetitionCounter(planItemInstanceEntity);
             if (repetitionCounter == 0 && repetitionRule.getAggregations() != null) {
                 // This is the first repetition counter so we need to create the aggregated overview values
                 // If there are aggregations we need to create an overview variable for every aggregation

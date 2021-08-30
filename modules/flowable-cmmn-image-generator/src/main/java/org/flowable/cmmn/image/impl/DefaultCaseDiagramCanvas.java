@@ -104,6 +104,7 @@ public class DefaultCaseDiagramCanvas {
     protected static final int ICON_PADDING = 5;
     protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage USERLISTENER_IMAGE;
+    protected static BufferedImage VARIABLELISTENER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage CASETASK_IMAGE;
@@ -198,6 +199,7 @@ public class DefaultCaseDiagramCanvas {
         try {
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
             USERLISTENER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/user.png", customClassLoader));
+            VARIABLELISTENER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/variablelistener.png", customClassLoader));
             USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/userTask.png", customClassLoader));
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
@@ -324,6 +326,10 @@ public class DefaultCaseDiagramCanvas {
 
     public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
+    }
+    
+    public void drawVariableEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, VARIABLELISTENER_IMAGE, scaleFactor);
     }
 
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
@@ -625,7 +631,7 @@ public class DefaultCaseDiagramCanvas {
     public List<GraphicInfo> connectionPerfectionizer(SHAPE_TYPE sourceShapeType, SHAPE_TYPE targetShapeType, GraphicInfo sourceGraphicInfo, GraphicInfo targetGraphicInfo, List<GraphicInfo> graphicInfoList) {
         Shape shapeFirst = createShape(sourceShapeType, sourceGraphicInfo);
         Shape shapeLast = createShape(targetShapeType, targetGraphicInfo);
-
+        
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             GraphicInfo graphicInfoFirst = graphicInfoList.get(0);
             GraphicInfo graphicInfoLast = graphicInfoList.get(graphicInfoList.size() - 1);
@@ -641,8 +647,10 @@ public class DefaultCaseDiagramCanvas {
             Point p = null;
 
             if (shapeFirst != null) {
-                Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
-                p = getIntersection(shapeFirst, lineFirst);
+                if (graphicInfoList.size() > 1) {
+                    Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
+                    p = getIntersection(shapeFirst, lineFirst);
+                }
                 if (p != null) {
                     graphicInfoFirst.setX(p.getX());
                     graphicInfoFirst.setY(p.getY());
@@ -650,8 +658,10 @@ public class DefaultCaseDiagramCanvas {
             }
 
             if (shapeLast != null) {
-                Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
-                p = getIntersection(shapeLast, lineLast);
+                if (graphicInfoList.size() >= 2) {
+                    Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
+                    p = getIntersection(shapeLast, lineLast);
+                }
                 if (p != null) {
                     graphicInfoLast.setX(p.getX());
                     graphicInfoLast.setY(p.getY());

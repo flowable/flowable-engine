@@ -3,7 +3,7 @@ name: Flowable Java EA Build
 on:
   push:
     branches:
-      - master
+      - main
       - 'flowable-release-*'
 
 env:

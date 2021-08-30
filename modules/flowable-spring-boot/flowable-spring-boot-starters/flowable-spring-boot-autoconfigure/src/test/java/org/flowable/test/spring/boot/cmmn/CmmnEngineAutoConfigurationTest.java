@@ -18,6 +18,7 @@ import static org.flowable.test.spring.boot.util.DeploymentCleanerUtil.deleteDep
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -555,6 +556,158 @@ public class CmmnEngineAutoConfigurationTest {
                             .isEqualTo(context.getBean(TaskExecutor.class));
                 });
     }
+
+    @Test
+    void cmmnEngineDefaultMailProperties(){
+        contextRunner
+                .run(context -> {
+                    CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                    CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
+
+                    assertThat(engineConfiguration).isNotNull();
+                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isEqualTo(StandardCharsets.UTF_8);
+                    assertThat(engineConfiguration.getMailServerDefaultFrom()).isEqualTo("flowable@localhost");
+                    assertThat(engineConfiguration.getMailServerHost()).isEqualTo("localhost");
+                    assertThat(engineConfiguration.getMailServerUsername()).isNull();
+                    assertThat(engineConfiguration.getMailServerPassword()).isNull();
+                    assertThat(engineConfiguration.getMailServerPort()).isEqualTo(1025);
+                    assertThat(engineConfiguration.getMailServerSSLPort()).isEqualTo(1465);
+                    assertThat(engineConfiguration.getMailServerUseSSL()).isFalse();
+                    assertThat(engineConfiguration.getMailServerUseTLS()).isFalse();
+                });
+    }
+
+    @Test
+    void cmmnEngineMailProperties(){
+        contextRunner
+                .withPropertyValues(
+                        "flowable.mail.server.host=my-server",
+                        "flowable.mail.server.port=4040",
+                        "flowable.mail.server.sslPort=5050",
+                        "flowable.mail.server.username=username",
+                        "flowable.mail.server.password=password",
+                        "flowable.mail.server.defaultFrom=customfrom@localhost",
+                        "flowable.mail.server.forceTo=internal@localhost",
+                        "flowable.mail.server.defaultCharset=utf-16",
+                        "flowable.mail.server.useSsl=true",
+                        "flowable.mail.server.useTls=true"
+                )
+                .run(context -> {
+                    CmmnEngine cmmnEngine = context.getBean(CmmnEngine.class);
+                    CmmnEngineConfiguration engineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
+
+                    assertThat(engineConfiguration).isNotNull();
+                    assertThat(engineConfiguration.getMailServerHost()).isEqualTo("my-server");
+                    assertThat(engineConfiguration.getMailServerPort()).isEqualTo(4040);
+                    assertThat(engineConfiguration.getMailServerSSLPort()).isEqualTo(5050);
+                    assertThat(engineConfiguration.getMailServerUsername()).isEqualTo("username");
+                    assertThat(engineConfiguration.getMailServerPassword()).isEqualTo("password");
+                    assertThat(engineConfiguration.getMailServerDefaultFrom()).isEqualTo("customfrom@localhost");
+                    assertThat(engineConfiguration.getMailServerForceTo()).isEqualTo("internal@localhost");
+                    assertThat(engineConfiguration.getMailServerDefaultCharset()).isEqualTo(StandardCharsets.UTF_16);
+                    assertThat(engineConfiguration.getMailServerUseSSL()).isTrue();
+                    assertThat(engineConfiguration.getMailServerUseTLS()).isTrue();
+                });
+    }
+
+    @Test
+    void customAsyncExecutorProperties() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.cmmn.deploy-resources=false",
+                        "flowable.cmmn.async.executor.move-timer-executor-pool-size=10",
+                        "flowable.cmmn.async.executor.max-timer-jobs-per-acquisition=1024",
+                        "flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.cmmn.async.executor.default-timer-job-acquire-wait-time-in-millis=20000",
+                        "flowable.cmmn.async.executor.default-async-job-acquire-wait-time-in-millis=30000",
+                        "flowable.cmmn.async.executor.default-queue-size-full-wait-time-in-millis=15000",
+                        "flowable.cmmn.async.executor.lock-owner=test-lock-owner",
+                        "flowable.cmmn.async.executor.timer-lock-time-in-millis=7200000",
+                        "flowable.cmmn.async.executor.async-job-lock-time-in-millis=10800000",
+                        "flowable.cmmn.async.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.cmmn.async.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.cmmn.async.executor.timer-lock-wait-time=PT3M",
+                        "flowable.cmmn.async.executor.timer-lock-poll-rate=PT2S",
+                        "flowable.cmmn.async.executor.reset-expired-jobs-interval=300000",
+                        "flowable.cmmn.async.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("cmmnAsyncExecutor")
+                            .hasSingleBean(CmmnEngineConfiguration.class);
+
+                    CmmnEngineConfiguration configuration = context.getBean(CmmnEngineConfiguration.class);
+                    SpringAsyncExecutor executor = context.getBean("cmmnAsyncExecutor", SpringAsyncExecutor.class);
+
+                    assertThat(configuration.getAsyncExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.getMoveTimerExecutorPoolSize()).isEqualTo(10);
+                    assertThat(executor.getMaxTimerJobsPerAcquisition()).isEqualTo(1024);
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultTimerJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(20).toMillis());
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getTimerLockTimeInMillis()).isEqualTo(Duration.ofHours(2).toMillis());
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getTimerLockWaitTime()).isEqualTo(Duration.ofMinutes(3));
+                    assertThat(executor.getTimerLockPollRate()).isEqualTo(Duration.ofSeconds(2));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
+    @Test
+    void customAsyncExecutorPropertiesWithNewPropertiesWithDuration() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.cmmn.deploy-resources=false",
+                        "flowable.cmmn.async.executor.move-timer-executor-pool-size=10",
+                        "flowable.cmmn.async.executor.max-timer-jobs-per-acquisition=1024",
+                        "flowable.cmmn.async.executor.max-async-jobs-due-per-acquisition=2048",
+                        "flowable.cmmn.async.executor.default-timer-job-acquire-wait-time=PT20S",
+                        "flowable.cmmn.async.executor.default-async-job-acquire-wait-time=PT30S",
+                        "flowable.cmmn.async.executor.default-queue-size-full-wait-time=PT15S",
+                        "flowable.cmmn.async.executor.lock-owner=test-lock-owner",
+                        "flowable.cmmn.async.executor.timer-lock-time=PT2H",
+                        "flowable.cmmn.async.executor.async-job-lock-time=PT3H",
+                        "flowable.cmmn.async.executor.async-jobs-global-lock-wait-time=PT2M",
+                        "flowable.cmmn.async.executor.async-jobs-global-lock-poll-rate=PT1S",
+                        "flowable.cmmn.async.executor.timer-lock-wait-time=PT3M",
+                        "flowable.cmmn.async.executor.timer-lock-poll-rate=PT2S",
+                        "flowable.cmmn.async.executor.reset-expired-jobs-interval=PT5M",
+                        "flowable.cmmn.async.executor.reset-expired-jobs-page-size=5"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasBean("cmmnAsyncExecutor")
+                            .hasSingleBean(CmmnEngineConfiguration.class);
+
+                    CmmnEngineConfiguration configuration = context.getBean(CmmnEngineConfiguration.class);
+                    SpringAsyncExecutor executor = context.getBean("cmmnAsyncExecutor", SpringAsyncExecutor.class);
+
+                    assertThat(configuration.getAsyncExecutor()).isEqualTo(executor);
+
+                    assertThat(executor.getMoveTimerExecutorPoolSize()).isEqualTo(10);
+                    assertThat(executor.getMaxTimerJobsPerAcquisition()).isEqualTo(1024);
+                    assertThat(executor.getMaxAsyncJobsDuePerAcquisition()).isEqualTo(2048);
+                    assertThat(executor.getDefaultTimerJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(20).toMillis());
+                    assertThat(executor.getDefaultAsyncJobAcquireWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(30).toMillis());
+                    assertThat(executor.getDefaultQueueSizeFullWaitTimeInMillis()).isEqualTo(Duration.ofSeconds(15).toMillis());
+                    assertThat(executor.getLockOwner()).isEqualTo("test-lock-owner");
+                    assertThat(executor.getTimerLockTimeInMillis()).isEqualTo(Duration.ofHours(2).toMillis());
+                    assertThat(executor.getAsyncJobLockTimeInMillis()).isEqualTo(Duration.ofHours(3).toMillis());
+                    assertThat(executor.getAsyncJobsGlobalLockWaitTime()).isEqualTo(Duration.ofMinutes(2));
+                    assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
+                    assertThat(executor.getTimerLockWaitTime()).isEqualTo(Duration.ofMinutes(3));
+                    assertThat(executor.getTimerLockPollRate()).isEqualTo(Duration.ofSeconds(2));
+                    assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
+                    assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
 
     private void assertAllServicesPresent(ApplicationContext context, CmmnEngine cmmnEngine) {
         List<Method> methods = Stream.of(CmmnEngine.class.getDeclaredMethods())

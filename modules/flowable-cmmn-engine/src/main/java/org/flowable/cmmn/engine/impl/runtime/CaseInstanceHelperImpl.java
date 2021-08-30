@@ -66,8 +66,6 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
-import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
-import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -182,19 +180,25 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         CaseInstanceEntity caseInstanceEntity = initializeCaseInstanceEntity(commandContext, caseDefinition, 
                 cmmnModel, caseModel, caseInstanceBuilder);
 
-        // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
-        CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
+        if (!caseModel.isAsync()) {
+            // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
+            CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
 
-        CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
+            CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, "", CaseInstanceState.ACTIVE);
 
-        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-        }
+            FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseStartedEvent(caseInstanceEntity), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
 
-        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " +
-                caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_CASE_STARTED, "Started case instance with id " +
+                        caseInstanceEntity.getId(), caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            }
+        } else {
+            // create a job to execute InitPlanModelOperation, which will take care of initializing all the child plan items of that stage
+            JobService jobService = cmmnEngineConfiguration.getJobServiceConfiguration().getJobService();
+            createAsyncInitJob(caseInstanceEntity, caseDefinition, caseModel, jobService, commandContext);
         }
 
         return caseInstanceEntity;
@@ -490,9 +494,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         // create runtime plan items from the history and set them as the new child plan item list
         caseInstanceEntity.setChildPlanItemInstances(createCasePlanItemsFromHistoricCaseInstance(historicCaseInstance, caseInstanceEntity));
 
-        // create identity links from history back to runtime
-        createCaseIdentityLinksFromHistoricCaseInstance(historicCaseInstance);
-
         return caseInstanceEntity;
     }
 
@@ -560,21 +561,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             return newVars;
         }
         return Collections.emptyMap();
-    }
-
-    protected List<IdentityLinkEntity> createCaseIdentityLinksFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance) {
-        List<HistoricIdentityLinkEntity> historicIdentityLinks = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
-            .getHistoricIdentityLinkService()
-            .findHistoricIdentityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
-
-        List<IdentityLinkEntity> identityLinkEntities = new ArrayList<>(historicIdentityLinks.size());
-        for (HistoricIdentityLinkEntity historicIdentityLink : historicIdentityLinks) {
-            IdentityLinkEntity identityLink = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
-                .createIdentityLinkFromHistoricIdentityLink(historicIdentityLink);
-            cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService().insertIdentityLink(identityLink);
-            identityLinkEntities.add(identityLink);
-        }
-        return identityLinkEntities;
     }
 
     @Override

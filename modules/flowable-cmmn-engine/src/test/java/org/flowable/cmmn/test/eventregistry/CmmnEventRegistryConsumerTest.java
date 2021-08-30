@@ -309,9 +309,6 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().singleResult();
         assertThat(caseInstance.getCaseDefinitionId()).isEqualTo(caseDefinition.getId());
 
-        // Starting is always async
-        cmmnManagementService.executeJob(cmmnManagementService.createJobQuery().caseDefinitionId(caseDefinition.getId()).singleResult().getId());
-
         eventSubscriptions = cmmnRuntimeService.createEventSubscriptionQuery().scopeType(ScopeTypes.CMMN).list();
         assertThat(eventSubscriptions)
             .extracting(EventSubscription::getEventType, EventSubscription::getScopeDefinitionId,  EventSubscription::getScopeType, EventSubscription::getScopeId)
@@ -375,6 +372,7 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         for (int i = 1; i <= 9; i++) {
             inboundEventChannelAdapter.triggerTestEvent("testCustomer");
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
         }
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceId()).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_CASE);
@@ -382,9 +380,67 @@ public class CmmnEventRegistryConsumerTest extends FlowableEventRegistryCmmnTest
         for (int i = 1; i <= 4; i++) {
             inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(2);
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(4);
         }
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseStartOnlyOneInstance.cmmn")
+    public void testCaseStartOnlyOneInstanceWithAsyncStartInConfiguration() {
+        boolean originalEventRegistryStartCaseInstanceAsync = cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync();
+
+        try {
+            cmmnEngineConfiguration.setEventRegistryStartCaseInstanceAsync(true);
+            for (int i = 1; i <= 9; i++) {
+                inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+                assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
+                assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
+            }
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceId()).isNotNull();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_CASE);
+
+            waitForJobExecutorToProcessAllJobs();
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
+
+            for (int i = 1; i <= 4; i++) {
+                inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
+                assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(2);
+                assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
+            }
+
+            waitForJobExecutorToProcessAllJobs();
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(4);
+        } finally {
+            cmmnEngineConfiguration.setEventRegistryStartCaseInstanceAsync(originalEventRegistryStartCaseInstanceAsync);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseStartOnlyOneInstanceAsync.cmmn")
+    public void testCaseStartOnlyOneInstanceWithAsyncStartInCaseModel() {
+        for (int i = 1; i <= 9; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("testCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(1);
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(0);
+        }
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceId()).isNotNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().singleResult().getReferenceType()).isEqualTo(ReferenceTypes.EVENT_CASE);
+
+        waitForJobExecutorToProcessAllJobs();
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
+
+        for (int i = 1; i <= 4; i++) {
+            inboundEventChannelAdapter.triggerTestEvent("anotherCustomer");
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).hasSize(2);
+            assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
+        }
+
+        waitForJobExecutorToProcessAllJobs();
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(4);
+    }
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/eventregistry/CmmnEventRegistryConsumerTest.testCaseStartOnlyOneInstance.cmmn")
     public void testCaseStartOneInstanceWithMultipleCaseDefinitionVersions() {

@@ -39,6 +39,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
             kafkaOperations.send(topic, key, rawEvent).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new FlowableException("Sending the event was interrupted", e);
         } catch (ExecutionException e) {
             if (e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();

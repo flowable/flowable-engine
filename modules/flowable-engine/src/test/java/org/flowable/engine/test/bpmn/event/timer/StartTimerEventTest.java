@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class StartTimerEventTest extends PluggableFlowableTestCase {
 
@@ -231,6 +233,10 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().setCurrentTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime() + ((minutes * 60 * 1000) + 5000)));
     }
 
+    private void moveBy(Duration duration) {
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(processEngineConfiguration.getClock().getCurrentTime().toInstant().plus(duration)));
+    }
+
     @Test
     @Deployment
     public void testCycleWithLimitStartTimerEvent() throws Exception {
@@ -256,6 +262,119 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             
         } finally {
             processEngineConfiguration.resetClock();
+        }
+    }
+
+    @Test
+    public void testCycleWithRepeatStartTimeAndPeriodAndCurrentTimeBeforeStart() {
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            Instant startTime = Instant.parse("2021-07-01T19:22:00.000Z");
+            Instant currentTime = startTime.minus(5, ChronoUnit.MINUTES);
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(currentTime));
+
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testCycleWithRepeatStartTimeAndPeriod.bpmn20.xml").deploy();
+
+            // After process deployment, there should be timer created
+            Job timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNotNull();
+            assertThat(timerJob.getDuedate()).isEqualTo(startTime);
+
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+            moveBy(Duration.ofMinutes(6));
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+
+            // After the first start there should be one process instance and one job
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+
+            timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNotNull();
+            assertThat(timerJob.getDuedate()).isEqualTo(startTime.plus(1, ChronoUnit.DAYS));
+
+            moveBy(Duration.ofDays(1));
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+
+            // After the second start there should be two process instances and no jobs
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(2);
+
+            timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNull();
+        } finally {
+            processEngineConfiguration.resetClock();
+            repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
+        }
+    }
+
+    @Test
+    public void testCycleWithRepeatStartTimeAndPeriodAndCurrentTimeAfterStart() {
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            Instant startTime = Instant.parse("2021-07-01T19:22:00.000Z");
+            Instant currentTime = Instant.parse("2021-07-01T19:50:00.000Z");
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(currentTime));
+
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testCycleWithRepeatStartTimeAndPeriod.bpmn20.xml").deploy();
+
+            // After process deployment, there should be timer created for the next day
+            Job timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNotNull();
+            assertThat(timerJob.getDuedate()).isEqualTo(startTime.plus(1, ChronoUnit.DAYS));
+
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+            moveBy(Duration.ofDays(1));
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+
+            // After the first start there should be one process instance and one job
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+
+            timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNotNull();
+            assertThat(timerJob.getDuedate()).isEqualTo(startTime.plus(2, ChronoUnit.DAYS));
+
+            moveBy(Duration.ofDays(1));
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+
+            // After the second start there should be two process instances and no jobs
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(2);
+
+            timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNull();
+        } finally {
+            processEngineConfiguration.resetClock();
+            repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
+        }
+    }
+
+    @Test
+    public void testCycleWithRepeatStartTimePeriodAndEndAndCurrentTimeAfterStart() {
+        try {
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            Instant startTime = Instant.parse("2021-07-01T19:22:00.000Z");
+            Instant currentTime = Instant.parse("2021-07-01T19:50:00.000Z");
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(currentTime));
+
+            repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/bpmn/event/timer/StartTimerEventTest.testCycleWithRepeatStartTimePeriodAndEnd.bpmn20.xml").deploy();
+
+            // After process deployment, there should be timer created for the next day
+            Job timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNotNull();
+            assertThat(timerJob.getDuedate()).isEqualTo(startTime.plus(1, ChronoUnit.DAYS));
+
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+
+            moveBy(Duration.ofDays(1));
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+
+            // After the first start there should be one process instance and no jobs since the end date is reached
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+
+            timerJob = managementService.createTimerJobQuery().singleResult();
+            assertThat(timerJob).isNull();
+        } finally {
+            processEngineConfiguration.resetClock();
+            repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
         }
     }
 

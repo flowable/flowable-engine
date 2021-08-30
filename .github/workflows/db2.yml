@@ -3,7 +3,7 @@ name: Flowable DB2 Build
 on:
   push:
     branches:
-      - master
+      - main
       - 'flowable-release-*'
 env:
   MAVEN_ARGS: >-

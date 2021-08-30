@@ -41,14 +41,17 @@ import org.junit.jupiter.api.Test;
  */
 public class BulkMoveTimerJobsToExecutableJobsTest extends JobExecutorTestCase  {
 
-    private final static int NR_OF_TIMER_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
+    private static final int NR_OF_TIMER_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super.configureConfiguration(processEngineConfiguration);
 
         // Make sure more timer jobs are fetched in one go than possible in the in() clause, so the logic to split is used.
-        processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxTimerJobsPerAcquisition(NR_OF_TIMER_JOBS);
+        }
     }
 
     @AfterEach

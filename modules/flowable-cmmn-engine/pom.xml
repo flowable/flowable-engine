@@ -92,6 +92,10 @@
             <artifactId>flowable-http-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-case-validation</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
         </dependency>
@@ -664,6 +668,8 @@
                                 <exclude>**/CacheTaskTest.java</exclude>
                                 <exclude>**/PlanItemInjectionTest.java</exclude>
                                 <exclude>**/CmmnStandaloneTaskBuilderTest.java</exclude>
+                                <exclude>**/SimpleCaseReactivationTest.java</exclude>
+                                <exclude>**/StageReactivationTest.java</exclude>
 
                                 <!-- Needs investigation -->
                                 <exclude>**/CmmnHistoryServiceDisableTaskLogTest.java</exclude>

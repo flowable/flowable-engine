@@ -43,6 +43,10 @@ public class LDAPConnectionUtil {
         properties.put(Context.SECURITY_PRINCIPAL, principal);
         properties.put(Context.SECURITY_CREDENTIALS, credentials);
 
+        if (ldapConfigurator.isConnectionPooling()) {
+            properties.put("com.sun.jndi.ldap.connect.pool", "true");
+        }
+
         if (ldapConfigurator.getCustomConnectionParameters() != null) {
             for (String customParameter : ldapConfigurator.getCustomConnectionParameters().keySet()) {
                 properties.put(customParameter, ldapConfigurator.getCustomConnectionParameters().get(customParameter));

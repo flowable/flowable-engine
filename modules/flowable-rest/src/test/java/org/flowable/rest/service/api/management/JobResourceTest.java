@@ -49,7 +49,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
      */
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
-    public void testGetJob() throws Exception {
+    public void testGetTimerJob() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
@@ -78,11 +78,123 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: " + new TextNode(getISODateStringWithTZ(timerJob.getDuedate())) + ","
                         + "tenantId: ''"
                         + "}");
+        assertThat(responseNode.path("url").asText(null))
+                .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
 
         // Set tenant on deployment
         managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
 
         response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId())),
+                HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "tenantId: 'myTenant'"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void testGetSuspendedJob() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        Job suspendedJob = managementService.createSuspendedJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(suspendedJob).isNull();
+
+        runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNull();
+
+        suspendedJob = managementService.createSuspendedJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(suspendedJob).isNotNull();
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, suspendedJob.getId())), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + suspendedJob.getId() + "',"
+                        + "correlationId: '" + suspendedJob.getCorrelationId() + "',"
+                        + "exceptionMessage: " + suspendedJob.getExceptionMessage() + ","
+                        + "executionId: '" + suspendedJob.getExecutionId() + "',"
+                        + "processDefinitionId: '" + suspendedJob.getProcessDefinitionId() + "',"
+                        + "processInstanceId: '" + suspendedJob.getProcessInstanceId() + "',"
+                        + "elementId: 'escalationTimer',"
+                        + "elementName: 'Escalation',"
+                        + "retries: " + suspendedJob.getRetries() + ","
+                        + "dueDate: " + new TextNode(getISODateStringWithTZ(suspendedJob.getDuedate())) + ","
+                        + "tenantId: ''"
+                        + "}");
+        assertThat(responseNode.path("url").asText(null))
+                .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, suspendedJob.getId()));
+
+        // Set tenant on deployment
+        managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, suspendedJob.getId())),
+                HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "tenantId: 'myTenant'"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void testGetDeadLetterJob() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        Job deadLetterJob = managementService.createDeadLetterJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(deadLetterJob).isNull();
+
+        managementService.moveJobToDeadLetterJob(timerJob.getId());
+
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNull();
+
+        deadLetterJob = managementService.createDeadLetterJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(deadLetterJob).isNotNull();
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId())), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + deadLetterJob.getId() + "',"
+                        + "correlationId: '" + deadLetterJob.getCorrelationId() + "',"
+                        + "exceptionMessage: " + deadLetterJob.getExceptionMessage() + ","
+                        + "executionId: '" + deadLetterJob.getExecutionId() + "',"
+                        + "processDefinitionId: '" + deadLetterJob.getProcessDefinitionId() + "',"
+                        + "processInstanceId: '" + deadLetterJob.getProcessInstanceId() + "',"
+                        + "elementId: 'escalationTimer',"
+                        + "elementName: 'Escalation',"
+                        + "retries: " + deadLetterJob.getRetries() + ","
+                        + "dueDate: " + new TextNode(getISODateStringWithTZ(deadLetterJob.getDuedate())) + ","
+                        + "tenantId: ''"
+                        + "}");
+        assertThat(responseNode.path("url").asText(null))
+                .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId()));
+
+        // Set tenant on deployment
+        managementService.executeCommand(new ChangeDeploymentTenantIdCmd(deploymentId, "myTenant"));
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId())),
                 HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);

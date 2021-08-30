@@ -127,10 +127,8 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             businessKey = processInstance.getBusinessKey();
         }
         
-        Map<String, Object> variables = new HashMap<>();
-        
         StartSubProcessInstanceBeforeContext instanceBeforeContext = new StartSubProcessInstanceBeforeContext(businessKey, callActivity.getProcessInstanceName(), 
-                        variables, executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(), 
+                        new HashMap<>(), executionEntity, callActivity.getInParameters(), callActivity.isInheritVariables(),
                         initialFlowElement.getId(), initialFlowElement, subProcess, processDefinition);
         
         if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
@@ -143,7 +141,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
+            eventDispatcher.dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance),
                     processEngineConfiguration.getEngineCfgKey());
         }

@@ -712,8 +712,7 @@ function _drawFlow(flow){
 
 	if (line == undefined) return;
 
-	if (flow.type == "connection" && flow.conditions)
-	{
+	if (flow.type == "connection" && flow.conditions) {
 		var middleX = (line.x1 + line.x2) / 2;
 		var middleY = (line.y1 + line.y2) / 2;
 		var image = paper.image("../editor/images/condition-flow.png", middleX - 8, middleY - 8, 16, 16);

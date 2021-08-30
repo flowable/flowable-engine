@@ -40,7 +40,7 @@ public abstract class AbstractEventHandler implements EventHandler {
 
         if (activity == null) {
             throw new ActivitiException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
-                    + "no activity associated with event subscription");
+                    + "no activity associated with event subscription. Hint: The activityId of this event should be present in the BPMN.");
         }
 
         if (payload instanceof Map) {

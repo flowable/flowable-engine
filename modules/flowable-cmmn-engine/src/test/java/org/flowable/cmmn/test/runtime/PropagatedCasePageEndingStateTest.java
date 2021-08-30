@@ -25,6 +25,8 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.junit.Test;
 
@@ -85,6 +87,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
             assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -98,23 +102,36 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // complete Task A and B to complete Stage A
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             // now trigger Task C and D to complete the case
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task D"));
 
-            // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-            assertThat(historicPlanItems).hasSize(7);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItems).hasSize(7);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            }
 
             assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
@@ -171,6 +188,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
             assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -184,16 +203,18 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // exit Stage A to also terminate the task and the case page
             cmmnRuntimeService.setVariable(caseInstance.getId(), "exitCase", true);
 
-            // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-            assertThat(historicPlanItems).hasSize(7);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", TERMINATED);
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItems).hasSize(7);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", TERMINATED);
+            }
 
             assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
@@ -253,6 +274,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
             assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -266,22 +289,29 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // complete Task A and B to complete Stage A, then Task C to make the case completable
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task A"));
             cmmnRuntimeService.startPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task B"));
             cmmnRuntimeService.triggerPlanItemInstance(getPlanItemInstanceIdByName(planItemInstances, "Task C"));
+            
+            waitForAsyncHistoryExecutorToProcessAllJobs();
 
             // exit Stage A to also terminate the task and the case page
             cmmnRuntimeService.setVariable(caseInstance.getId(), "completeCase", true);
 
-            // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-            assertThat(historicPlanItems).hasSize(7);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", COMPLETED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItems).hasSize(7);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", COMPLETED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            }
 
             assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
@@ -338,6 +368,8 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("casePageEndingStateTestCase")
                 .start();
 
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
             List<PlanItemInstance> planItemInstances = getPlanItemInstances(caseInstance.getId());
             assertThat(planItemInstances).hasSize(7);
             assertPlanItemInstanceState(planItemInstances, "Stage A", ACTIVE);
@@ -351,16 +383,18 @@ public class PropagatedCasePageEndingStateTest extends FlowableCmmnTestCase {
             // exit Stage A to also terminate the task and the case page
             cmmnRuntimeService.setVariable(caseInstance.getId(), "forceCompleteCase", true);
 
-            // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
-            List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
-            assertThat(historicPlanItems).hasSize(7);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
-            assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+                // check the historic plan item instances, as the case is already terminated and no longer in the runtime tables
+                List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+                assertThat(historicPlanItems).hasSize(7);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Stage A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task B", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page A", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task C", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Task D", TERMINATED);
+                assertHistoricPlanItemInstanceState(historicPlanItems, "Case page B", COMPLETED);
+            }
 
             assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();

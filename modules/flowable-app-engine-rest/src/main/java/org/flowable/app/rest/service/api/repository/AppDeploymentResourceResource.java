@@ -17,7 +17,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.http.entity.ContentType;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestApiInterceptor;
@@ -38,6 +37,7 @@ import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
+ * @author Tim Stephenson
  */
 @RestController
 @Api(tags = { "App Deployments" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
@@ -91,16 +91,7 @@ public class AppDeploymentResourceResource {
 
         if (resourceList.contains(resourceName)) {
             // Build resource representation
-            String contentType = null;
-            if (resourceName.toLowerCase().endsWith(".app")) {
-                contentType = ContentType.APPLICATION_JSON.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceName);
-            }
-            
-            AppDeploymentResourceResponse response = restResponseFactory.createDeploymentResourceResponse(deploymentId, resourceName, contentType);
-            return response;
-
+            return restResponseFactory.createDeploymentResourceResponse(deploymentId, resourceName, contentTypeResolver.resolveContentType(resourceName));
         } else {
             // Resource not found in deployment
             throw new FlowableObjectNotFoundException("Could not find a resource with id '" + resourceName + "' in deployment '" + deploymentId + "'.");

@@ -62,6 +62,7 @@ public class HistoryTestHelper {
 
         ProcessEngineConfigurationImpl processEngineConfigurationImpl = (ProcessEngineConfigurationImpl) processEngineConfiguration;
         if (processEngineConfigurationImpl.isAsyncHistoryEnabled()) {
+            
             AsyncExecutor asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
             
             if (!asyncHistoryExecutor.isActive()) {

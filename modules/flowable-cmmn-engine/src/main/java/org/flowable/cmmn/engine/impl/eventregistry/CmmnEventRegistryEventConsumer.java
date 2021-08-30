@@ -131,7 +131,11 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
                 }
             }
 
-            caseInstanceBuilder.startAsync();
+            if (cmmnEngineConfiguration.isEventRegistryStartCaseInstanceAsync()) {
+                caseInstanceBuilder.startAsync();
+            } else {
+                caseInstanceBuilder.start();
+            }
 
         }
     }

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.repository;
 
 import java.io.InputStream;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
 
@@ -35,6 +36,8 @@ public interface CmmnDeploymentBuilder {
     CmmnDeploymentBuilder addString(String resourceName, String text);
     
     CmmnDeploymentBuilder addBytes(String resourceName, byte[] bytes);
+
+    CmmnDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
 
     /**
      * If called, no XML schema validation against the BPMN 2.0 XSD.

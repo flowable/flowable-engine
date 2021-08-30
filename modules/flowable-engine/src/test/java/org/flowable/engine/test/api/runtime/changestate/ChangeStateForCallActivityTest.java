@@ -59,10 +59,15 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInParentProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
 
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
         assertThat(subProcessInstance).isNotNull();
@@ -74,6 +79,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
                 .processInstanceId(subProcessInstance.getId())
                 .moveActivityIdToParentActivityId("theTask", "secondTask")
                 .changeState();
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -93,9 +100,14 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcessV2.bpmn20.xml", "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityInParentProcessV2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
         assertThat(subProcessInstance).isNotNull();
@@ -103,6 +115,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
@@ -115,7 +129,7 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
 
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration, 60000)) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertThat(historicTaskInstance.getTaskDefinitionKey()).isEqualTo("secondTask");
         }
@@ -135,6 +149,9 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
 
@@ -142,6 +159,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
                 .processInstanceId(processInstance.getId())
                 .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
                 .changeState();
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
         assertThat(subProcessInstance).isNotNull();
@@ -155,6 +174,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
         taskService.complete(task.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
 
@@ -170,6 +191,9 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcessV2.bpmn20.xml", "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstanceV2() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+        
         Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(firstTask.getTaskDefinitionKey()).isEqualTo("firstTask");
 
@@ -240,6 +264,8 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
                 );
 
         taskService.complete(firstSecondTask.getId());
+        
+        waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
 
@@ -254,110 +280,127 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/variables/callActivityWithCalledElementExpression.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstanceWithCalledElementExpression() {
-
-        //Deploy second version of the process definition
-        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calledElementExpression");
-
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
-
-        //First change state attempt fails as the calledElement expression cannot be evaluated
-        assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
-                .changeState())
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Cannot resolve calledElement expression '${subProcessDefId}' of callActivity 'callActivity'");
-
-        //Change state specifying the variable with the value
-        runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
-                .processVariable("subProcessDefId", "oneTaskProcess")
-                .changeState();
-
-        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
-        assertThat(subProcessInstance).isNotNull();
-
-        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
-        assertThat(taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count()).isEqualTo(1);
-
-        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
-        assertThat(runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
-
-        task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
-        taskService.complete(task.getId());
-
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
-
-        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
-
-        taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
-
-        deleteDeployments();
+        try {
+            //Deploy second version of the process definition
+            deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml");
+    
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("calledElementExpression");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+    
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
+    
+            //First change state attempt fails as the calledElement expression cannot be evaluated
+            assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstance.getId())
+                    .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
+                    .changeState())
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Cannot resolve calledElement expression '${subProcessDefId}' of callActivity 'callActivity'");
+    
+            //Change state specifying the variable with the value
+            runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstance.getId())
+                    .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
+                    .processVariable("subProcessDefId", "oneTaskProcess")
+                    .changeState();
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+    
+            ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+            assertThat(subProcessInstance).isNotNull();
+    
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            assertThat(taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count()).isEqualTo(1);
+    
+            assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
+            assertThat(runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
+    
+            task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
+            taskService.complete(task.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+    
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
+    
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("lastTask");
+    
+            taskService.complete(task.getId());
+    
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            deleteDeployments();
+        }
     }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksParentProcess.bpmn20.xml", "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetCurrentActivityInSubProcessInstanceSpecificVersion() {
-
-        //Deploy second version of the process definition
-        deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcessV2.bpmn20.xml");
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
-
-        assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
-                .changeState())
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
-
-        //Invalid "unExistent" process definition version
-        assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 5)
-                .changeState())
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
-
-        //Change state specifying the first version
-        runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstance.getId())
-                .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
-                .changeState();
-
-        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
-        assertThat(subProcessInstance).isNotNull();
-
-        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
-        assertThat(taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count()).isEqualTo(1);
-
-        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
-        assertThat(runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
-
-        task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
-        taskService.complete(task.getId());
-
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
-
-        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
-
-        taskService.complete(task.getId());
-
-        assertProcessEnded(processInstance.getId());
-
-        deleteDeployments();
+        try {
+            // Deploy second version of the process definition
+            deployProcessDefinition("my deploy", "org/flowable/engine/test/api/oneTaskProcessV2.bpmn20.xml");
+    
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksParentProcess");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+            
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("firstTask");
+    
+            assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstance.getId())
+                    .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
+                    .changeState())
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
+    
+            //Invalid "unExistent" process definition version
+            assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstance.getId())
+                    .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 5)
+                    .changeState())
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
+    
+            //Change state specifying the first version
+            runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstance.getId())
+                    .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 1)
+                    .changeState();
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+    
+            ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+            assertThat(subProcessInstance).isNotNull();
+    
+            assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            assertThat(taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count()).isEqualTo(1);
+    
+            assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
+            assertThat(runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count()).isEqualTo(1);
+    
+            task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
+            taskService.complete(task.getId());
+            
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 200);
+    
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(subProcessInstance.getId()).count()).isZero();
+    
+            task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("secondTask");
+    
+            taskService.complete(task.getId());
+    
+            assertProcessEnded(processInstance.getId());
+            
+        } finally {
+            deleteDeployments();
+        }
     }
 
 }

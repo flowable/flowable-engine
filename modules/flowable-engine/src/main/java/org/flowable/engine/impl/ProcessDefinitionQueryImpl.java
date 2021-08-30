@@ -44,6 +44,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected String categoryNotEquals;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
     protected String key;
@@ -137,6 +138,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
             throw new FlowableIllegalArgumentException("nameLike is null");
         }
         this.nameLike = nameLike;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQueryImpl processDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("nameLikeIgnoreCase is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
         return this;
     }
 
@@ -437,6 +447,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public String getNameLike() {
         return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
     }
 
     public String getKey() {

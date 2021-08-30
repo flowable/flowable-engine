@@ -52,6 +52,7 @@ public class TimerEventListenerJsonConverter extends AbstractEventListenerJsonCo
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
             BaseElement baseElement, CmmnModel cmmnModel, CmmnJsonConverterContext converterContext) {
+        
         PlanItem planItem = (PlanItem) baseElement;
         TimerEventListener timerEventListener = (TimerEventListener) planItem.getPlanItemDefinition();
 

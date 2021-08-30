@@ -76,7 +76,7 @@ use the `external-ip` value in the next step(s)
 Deploys Flowabe Helm chart with Flowable REST active
 
 ```console
-helm install flowable-6.6.0 flowable/ --set host.external=<external-ip> --set ui.enabled=false --set rest.enabled=true
+helm install flowable-6.7.0 flowable/ --set host.external=<external-ip> --set ui.enabled=false --set rest.enabled=true
 ```
 
 ### Check pod(s) status

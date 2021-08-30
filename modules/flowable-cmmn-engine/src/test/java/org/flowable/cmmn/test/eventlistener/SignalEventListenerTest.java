@@ -242,5 +242,110 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
                 tuple("My task 2", caseInstance.getId()));
     }
 
+    @Test
+    @CmmnDeployment
+    public void testWithRepetitionMultiple() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetition")
+                .variable("keepRepeating", true)
+                .start();
+
+        SignalEventListenerInstance signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).singleResult();
+        String signalPlanItemInstanceId = signalEventListenerInstance.getId();
+        
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().subScopeId(signalEventListenerInstance.getId()).singleResult();
+        String eventSubScriptionId = eventSubscription.getId();
+        assertThat(eventSubscription).isNotNull();
+        
+        cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+        
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "keepRepeating", false);
+
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskDefinitionKey("taskA").active().singleResult().getId());
+        
+        signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(signalEventListenerInstance.getId()).isEqualTo(signalPlanItemInstanceId);
+        
+        eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().subScopeId(signalEventListenerInstance.getId()).singleResult();
+        assertThat(eventSubscription.getId()).isEqualTo(eventSubScriptionId);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).count()).isZero();
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testWithRepetitionParallel() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetition")
+                .variable("keepRepeating", true)
+                .start();
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                SignalEventListenerInstance signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                        .caseInstanceId(caseInstance.getId()).singleResult();
+                cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+                
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "keepRepeating", false);
+                
+                signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                        .caseInstanceId(caseInstance.getId()).singleResult();
+                cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+                
+                return null;
+            }
+            
+        });
+        
+        cmmnTaskService.complete(cmmnTaskService.createTaskQuery().taskDefinitionKey("taskA").active().singleResult().getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testWithRepetitionParallelMultipleTasks() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testRepetition")
+                .variable("keepRepeating", true)
+                .variable("keepRepeatingTask", true)
+                .start();
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+            @Override
+            public Void execute(CommandContext commandContext) {
+                SignalEventListenerInstance signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                        .caseInstanceId(caseInstance.getId()).singleResult();
+                cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+                
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "keepRepeating", false);
+                
+                signalEventListenerInstance = cmmnRuntimeService.createSignalEventListenerInstanceQuery()
+                        .caseInstanceId(caseInstance.getId()).singleResult();
+                cmmnRuntimeService.triggerPlanItemInstance(signalEventListenerInstance.getId());
+                
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "keepRepeatingTask", false);
+                
+                return null;
+            }
+            
+        });
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("taskA").count()).isEqualTo(2);
+        for (Task task : cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("taskA").list()) {
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
 }
 

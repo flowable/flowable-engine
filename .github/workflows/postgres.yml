@@ -3,7 +3,7 @@ name: Flowable Postgres Build
 on:
   push:
     branches:
-      - master
+      - main
       - 'flowable-release-*'
 
 env:

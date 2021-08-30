@@ -187,6 +187,9 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>

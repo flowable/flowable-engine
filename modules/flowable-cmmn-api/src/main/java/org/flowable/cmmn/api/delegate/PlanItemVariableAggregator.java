@@ -35,12 +35,12 @@ public interface PlanItemVariableAggregator {
     Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context);
 
     /**
-     * Aggregated the provide variable instances into one variable value.
+     * Aggregated the provided variable instances into one variable value.
      *
-     * This is called when all repeatable plan item instances are complete, or an overview for repeatable plan item insatnces is needed.
+     * This is called when all repeatable plan item instances are complete, or an overview for repeatable plan item instances is needed.
      *
      * @param planItemInstance the delegated planItemInstance for which we need to do the aggregation
-     * @param instances the variable values that should be aggregated (this variables are created based on the value from {@link #aggregateSingleVariable(DelegatePlanItemInstance, PlanItemVariableAggregatorContext)})
+     * @param instances the variable values that should be aggregated (these variables are created based on the value from {@link #aggregateSingleVariable(DelegatePlanItemInstance, PlanItemVariableAggregatorContext)})
      * @param context the aggregation context
      * @return the aggregated value
      */

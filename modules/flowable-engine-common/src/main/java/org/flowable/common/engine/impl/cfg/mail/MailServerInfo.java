@@ -13,6 +13,8 @@
 
 package org.flowable.common.engine.impl.cfg.mail;
 
+import java.nio.charset.Charset;
+
 /**
  * @author Tom Baeyens
  */
@@ -27,6 +29,7 @@ public class MailServerInfo {
     protected String mailServerPassword;
     protected boolean mailServerUseSSL;
     protected boolean mailServerUseTLS;
+    protected Charset mailServerDefaultCharset;
 
     public String getMailServerDefaultFrom() {
         return mailServerDefaultFrom;
@@ -98,5 +101,13 @@ public class MailServerInfo {
 
     public void setMailServerUseTLS(boolean mailServerUseTLS) {
         this.mailServerUseTLS = mailServerUseTLS;
+    }
+
+    public Charset getMailServerDefaultCharset() {
+        return mailServerDefaultCharset;
+    }
+
+    public void setMailServerDefaultCharset(Charset mailServerDefaultCharset) {
+        this.mailServerDefaultCharset = mailServerDefaultCharset;
     }
 }

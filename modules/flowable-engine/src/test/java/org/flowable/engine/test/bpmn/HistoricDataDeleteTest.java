@@ -308,6 +308,11 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
 
             runtimeService.deleteProcessInstance(processInstance.getProcessInstanceId(), "for test");
+            
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                // nothing
+            }
+            
             historyService.deleteHistoricProcessInstance(processInstance.getId());
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {

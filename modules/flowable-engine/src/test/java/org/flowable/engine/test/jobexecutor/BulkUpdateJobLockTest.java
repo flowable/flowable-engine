@@ -44,14 +44,17 @@ import org.junit.jupiter.api.Test;
  */
 public class BulkUpdateJobLockTest extends JobExecutorTestCase  {
 
-    private final static int NR_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
+    private static final int NR_JOBS = AbstractDataManager.MAX_ENTRIES_IN_CLAUSE + (AbstractDataManager.MAX_ENTRIES_IN_CLAUSE/2);
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super.configureConfiguration(processEngineConfiguration);
 
         // Make sure more timer jobs are fetched in one go than possible in the in() clause, so the logic to split is used.
-        processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        processEngineConfiguration.getAsyncExecutorConfiguration().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        if (processEngineConfiguration.getAsyncExecutor() != null) {
+            processEngineConfiguration.getAsyncExecutor().setMaxAsyncJobsDuePerAcquisition(NR_JOBS);
+        }
     }
 
     @AfterEach

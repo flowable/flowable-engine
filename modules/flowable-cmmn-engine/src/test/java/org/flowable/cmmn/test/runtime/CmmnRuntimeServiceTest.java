@@ -150,6 +150,25 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment
+    public void createCaseInstanceAsyncDefinedInModel() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(caseInstance).isNotNull();
+        assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count())
+                .as("Plan items are created asynchronously").isZero();
+
+        Job job = this.cmmnManagementService.createJobQuery().singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.isExclusive()).isFalse();
+
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 7000L, 200, true);
+        assertThat(this.cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
     public void createCaseInstanceAsync() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

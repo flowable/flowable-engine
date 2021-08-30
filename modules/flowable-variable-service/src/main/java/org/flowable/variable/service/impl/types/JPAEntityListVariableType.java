@@ -166,10 +166,8 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
             }
 
             return (String[]) read;
-        } catch (IOException ioe) {
+        } catch (IOException | ClassNotFoundException ioe) {
             throw new FlowableException("Unexpected exception when deserializing JPA id's", ioe);
-        } catch (ClassNotFoundException e) {
-            throw new FlowableException("Unexpected exception when deserializing JPA id's", e);
         }
     }
 

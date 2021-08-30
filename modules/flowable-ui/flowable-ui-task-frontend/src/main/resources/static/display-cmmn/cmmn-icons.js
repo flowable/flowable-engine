@@ -192,3 +192,25 @@ function _drawUserEventListenerIcon(paper, element) {
     userTaskIcon.transform("S0.7,0.7" + "T" + (element.x + 2) + "," + (element.y + 2));
     return userTaskIcon;
 }
+
+function _drawVariableEventListenerIcon(paper, element) {
+	var x = element.x + (element.width / 2);
+    var y = element.y + (element.height / 2);
+
+	var circle = paper.circle(x, y, 10);
+
+	circle.attr({"stroke-width": 1,
+		"stroke": "black",
+		"fill": "none"
+ 	});
+
+	var path = paper.path("M 20.834856,22.874369 L 10.762008,22.873529 L 7.650126,13.293421 L 15.799725,7.3734296 L 23.948336,13.294781 L 20.834856,22.874369 z");
+	path.attr({
+		"stroke": "#585858",
+		"fill": "none"
+ 	});
+
+	path.transform("S0.8,0.8T" + (element.x - 1) + "," + (element.y - 1));
+
+	return path;
+}

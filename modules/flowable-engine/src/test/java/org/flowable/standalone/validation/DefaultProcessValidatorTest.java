@@ -402,6 +402,19 @@ public class DefaultProcessValidatorTest {
                 );
     }
 
+    @Test
+    void testMailTask() {
+        BpmnModel bpmnModel = readBpmnModelFromXml("org/flowable/standalone/validation/processWithMailTask.bpmn20.xml");
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactlyInAnyOrder(
+                        tuple(Problems.MAIL_TASK_NO_RECIPIENT, "No recipient is defined on the mail activity", "sendMailWithoutanything", false)
+                );
+    }
+
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);
 

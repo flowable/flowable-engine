@@ -12,15 +12,9 @@
  */
 package org.flowable.test.cmmn.converter.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.converter.CmmnXmlConverter;
-import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.common.engine.api.io.InputStreamProvider;
-import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
@@ -38,40 +32,21 @@ public class CmmnXmlConverterTestExtension implements TestTemplateInvocationCont
 
     @Override
     public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(ExtensionContext context) {
-        String resource = AnnotationSupport.findAnnotation(
+        CmmnXmlConverterTest annotation = AnnotationSupport.findAnnotation(
                 context.getTestMethod(),
                 CmmnXmlConverterTest.class
-        )
-                .map(CmmnXmlConverterTest::value)
-                .filter(StringUtils::isNotBlank)
-                .orElseThrow(() -> new IllegalArgumentException("No resource has been provided"));
-        return Stream.of(
-                new ConvertCmmnModelTestInvocationContext("xmlToModel", () -> readXMLFile(resource)),
-                new ConvertCmmnModelTestInvocationContext("xmlToModelAndBack", () -> readXmlExportAndReadAgain(resource))
-        );
-    }
-
-    protected CmmnModel readXmlExportAndReadAgain(String resource) {
-        CmmnModel model = readXMLFile(resource);
-        byte[] xml = new CmmnXmlConverter().convertToXML(model);
-        return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
-    }
-
-    protected CmmnModel readXMLFile(String resource) {
-        return new CmmnXmlConverter().convertToCmmnModel(new ClasspathStreamResource(resource), true, false);
-    }
-
-    protected static class ClasspathStreamResource implements InputStreamProvider {
-
-        protected final String resource;
-
-        public ClasspathStreamResource(String resource) {
-            this.resource = resource;
+        ).orElseThrow(() -> new IllegalArgumentException("No annotation been provided"));
+        String resource = annotation.value();
+        if (StringUtils.isBlank(resource)) {
+            throw new IllegalArgumentException("No resource has been provided");
         }
 
-        @Override
-        public InputStream getInputStream() {
-            return this.getClass().getClassLoader().getResourceAsStream(resource);
+        ConversionDirection[] directions = annotation.directions();
+        if (directions.length == 0) {
+            directions = ConversionDirection.values();
         }
+
+        return Stream.of(directions)
+                .map(direction -> new ConvertCmmnModelTestInvocationContext(direction.name(), direction.supplyCmmnModel(resource)));
     }
 }

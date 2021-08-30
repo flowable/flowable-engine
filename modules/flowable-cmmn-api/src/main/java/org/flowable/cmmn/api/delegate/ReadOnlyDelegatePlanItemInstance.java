@@ -42,4 +42,9 @@ public interface ReadOnlyDelegatePlanItemInstance extends PlanItemInstance, Vari
     default void setTransientVariable(String variableName, Object variableValue) {
         throw new UnsupportedOperationException("Setting transient variable is not supported for read only delegate execution");
     }
+
+    @Override
+    default void setLocalizedName(String localizedName) {
+        throw new UnsupportedOperationException("Setting localized name is not supported for read only delegate execution");
+    }
 }

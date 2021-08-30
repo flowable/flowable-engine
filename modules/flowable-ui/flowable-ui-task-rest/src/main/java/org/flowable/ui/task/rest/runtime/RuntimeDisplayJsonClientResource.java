@@ -42,6 +42,7 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -560,6 +561,16 @@ public class RuntimeDisplayJsonClientResource {
                     eventNode.put("type", "message");
                     if (StringUtils.isNotEmpty(messageDef.getMessageRef())) {
                         eventNode.put("messageRef", messageDef.getMessageRef());
+                    }
+                    
+                } else if (eventDef instanceof VariableListenerEventDefinition) {
+                    VariableListenerEventDefinition variableDef = (VariableListenerEventDefinition) eventDef;
+                    eventNode.put("type", "variable");
+                    if (StringUtils.isNotEmpty(variableDef.getVariableName())) {
+                        eventNode.put("variableName", variableDef.getVariableName());
+                    }
+                    if (StringUtils.isNotEmpty(variableDef.getVariableChangeType())) {
+                        eventNode.put("variableChangeType", variableDef.getVariableChangeType());
                     }
                 }
                 elementNode.set("eventDefinition", eventNode);

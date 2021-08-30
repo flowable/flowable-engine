@@ -13,18 +13,16 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanFragment;
@@ -86,19 +84,25 @@ public abstract class CmmnOperation implements Runnable {
      * @param commandContext the command context to run this method with
      * @param caseModel the case model the given stage or plan model is contained within
      * @param planItems the plan items of the stage to be checked for creation
+     * @param directlyReactivatedPlanItems an optional list of plan items already having been reactivated as part of phase 1 of a case reactivation, might be
+     *      null or empty, specially for a regular case
      * @param caseInstanceEntity the case instance entity, must be provided as it is used to check for a first time running case or a reactivated one
      * @param stagePlanItemInstanceEntity the optional stage plan item instance, if already available, might be null in very specific use cases (e.g. cross-stage activities, etc)
      * @param tenantId the id of the tenant to run within
      * @return the list of created plan item instances for this stage or plan model
      */
     protected List<PlanItemInstanceEntity> createPlanItemInstancesForNewOrReactivatedStage(CommandContext commandContext, Case caseModel, List<PlanItem> planItems,
-        CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
+        List<PlanItem> directlyReactivatedPlanItems, CaseInstanceEntity caseInstanceEntity, PlanItemInstanceEntity stagePlanItemInstanceEntity, String tenantId) {
         List<PlanItemInstanceEntity> newPlanItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
 
             if (planItem.isInstanceLifecycleEnabled()) {
-                createPlanItemInstanceIfNeeded(commandContext, planItem, caseModel, caseInstanceEntity,
-                    stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
+                // check, if the plan item was already reactivated as part of phase 1 of a case reactivation and if so, skip it to prevent it from being
+                // reactivated more than once
+                if (directlyReactivatedPlanItems == null || directlyReactivatedPlanItems.stream().noneMatch(i -> i.getId().equals(planItem.getId()))) {
+                    createPlanItemInstanceIfNeeded(commandContext, planItem, caseModel, caseInstanceEntity,
+                        stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
+                }
 
             } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment){
                 // Some plan items (plan fragments) exist as plan item, but not as plan item instance
@@ -191,59 +195,9 @@ public abstract class CmmnOperation implements Runnable {
         }
         return false;
     }
-
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
-        boolean addToParent, boolean silentNameExpressionEvaluation) {
-        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, null, addToParent, silentNameExpressionEvaluation);
-    }
-
-    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy,
-        Map<String, Object> localVariables, boolean addToParent, boolean silentNameExpressionEvaluation) {
-
-        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntityToCopy)) {
-            int counter = getRepetitionCounter(planItemInstanceEntityToCopy);
-            if (localVariables == null) {
-                localVariables = new HashMap<>(0);
-            }
-            localVariables.put(getCounterVariable(planItemInstanceEntityToCopy), counter);
-        }
-
-        PlanItemInstance stagePlanItem = planItemInstanceEntityToCopy.getStagePlanItemInstanceEntity();
-        if (stagePlanItem == null && planItemInstanceEntityToCopy.getStageInstanceId() != null) {
-            stagePlanItem = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceEntityToCopy.getStageInstanceId());
-        }
-
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
-            .createPlanItemInstanceEntityBuilder()
-            .planItem(planItemInstanceEntityToCopy.getPlanItem())
-            .caseDefinitionId(planItemInstanceEntityToCopy.getCaseDefinitionId())
-            .caseInstanceId(planItemInstanceEntityToCopy.getCaseInstanceId())
-            .stagePlanItemInstance(stagePlanItem)
-            .tenantId(planItemInstanceEntityToCopy.getTenantId())
-            .localVariables(localVariables)
-            .addToParent(addToParent)
-            .silentNameExpressionEvaluation(silentNameExpressionEvaluation)
-            .create();
-
-        return planItemInstanceEntity;
-    }
-    
-    protected int getRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        Integer counter = (Integer) repeatingPlanItemInstanceEntity.getVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity));
-        if (counter == null) {
-            return 0;
-        } else {
-            return counter.intValue();
-        }
-    }
     
     protected void setRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity, int counterValue) {
-        repeatingPlanItemInstanceEntity.setVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
-    }
-
-    protected String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
-        return repetitionCounterVariableName;
+        repeatingPlanItemInstanceEntity.setVariableLocal(PlanItemInstanceUtil.getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
     }
 
     /**
@@ -266,7 +220,6 @@ public abstract class CmmnOperation implements Runnable {
         }
 
         // if the case was reactivated, we need to check the reactivation rules, if any specified on the plan item or a default one on the listener
-        ReactivationRule reactivationRule = null;
         PlanItemControl itemControl = planItem.getItemControl();
         if (itemControl != null && itemControl.getReactivationRule() != null) {
             // evaluate the specific reactivation rule on the plan item directly as a first step

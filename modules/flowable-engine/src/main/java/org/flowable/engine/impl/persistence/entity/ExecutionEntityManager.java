@@ -72,6 +72,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
+    long countActiveExecutionsByParentId(String parentId);
+
     /**
      * Returns all child executions of a given {@link ExecutionEntity}. 
      * In the list, child executions will be behind parent executions.

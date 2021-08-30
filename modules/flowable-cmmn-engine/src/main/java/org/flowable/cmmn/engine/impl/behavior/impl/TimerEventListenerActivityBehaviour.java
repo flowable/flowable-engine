@@ -74,6 +74,16 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
         }
     }
+    
+    @Override
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
+    }
+    
+    @Override
+    public void trigger(DelegatePlanItemInstance planItemInstance) {
+        execute(planItemInstance);
+    }
 
     protected void handleCreateTransition(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         Object timerValue = resolveTimerExpression(commandContext, planItemInstance);
@@ -181,11 +191,6 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
     }
 
-    @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
-    }
-
     protected Object resolveTimerExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
         Expression expression = expressionManager.createExpression(timerEventListener.getTimerExpression());
@@ -207,10 +212,4 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
         return dueDate;
     }
-    
-    @Override
-    public void trigger(DelegatePlanItemInstance planItemInstance) {
-        execute(planItemInstance);
-    }
-    
 }

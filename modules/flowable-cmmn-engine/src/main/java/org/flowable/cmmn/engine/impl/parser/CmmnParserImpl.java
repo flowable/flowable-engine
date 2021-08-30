@@ -12,28 +12,27 @@
  */
 package org.flowable.cmmn.engine.impl.parser;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.converter.CmmnXMLException;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.validator.ValidationEntry;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CmmnParserImpl implements CmmnParser {
 
@@ -44,38 +43,24 @@ public class CmmnParserImpl implements CmmnParser {
     protected ExpressionManager expressionManager;
 
     @Override
-    public CmmnParseResult parse(EngineResource resourceEntity) {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
-            CmmnParseResult cmmnParseResult = parse(resourceEntity, new InputStreamSource(inputStream));
-            processDI(cmmnParseResult.getCmmnModel(), cmmnParseResult.getAllCaseDefinitions());
-            return cmmnParseResult;
-
-        } catch (IOException e) {
-            logger.error("Could not read bytes from CMMN resource", e);
-            return new CmmnParseResult();
-        }
+    public CmmnParseResult parse(CmmnParseContext context) {
+        EngineResource resourceEntity = context.resource();
+        CmmnParseResult cmmnParseResult = parse(context, new BytesStreamSource(resourceEntity.getBytes()));
+        processDI(cmmnParseResult.getCmmnModel(), cmmnParseResult.getAllCaseDefinitions());
+        return cmmnParseResult;
     }
 
-    public CmmnParseResult parse(EngineResource resourceEntity, StreamSource cmmnSource) {
+    public CmmnParseResult parse(CmmnParseContext context, StreamSource cmmnSource) {
         try {
-            boolean enableSafeBpmnXml = false;
-            String encoding = null;
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
-            if (cmmnEngineConfiguration != null) {
-                enableSafeBpmnXml = cmmnEngineConfiguration.isEnableSafeCmmnXml();
-                encoding = cmmnEngineConfiguration.getXmlEncoding();
-            }
-
             CmmnParseResult cmmnParseResult = new CmmnParseResult();
-            cmmnParseResult.setResourceEntity(resourceEntity);
+            cmmnParseResult.setResourceEntity(context.resource());
 
-            boolean validateCmmnXml = true;
-            if (cmmnEngineConfiguration.isDisableCmmnXmlValidation()) {
-                validateCmmnXml = false;
-            }
-            
-            CmmnModel cmmnModel = new CmmnXmlConverter().convertToCmmnModel(cmmnSource, validateCmmnXml, enableSafeBpmnXml, encoding);
+            CmmnModel cmmnModel = convertToCmmnModel(context, cmmnSource);
             cmmnParseResult.setCmmnModel(cmmnModel);
+
+            if (context.validateCmmnModel()) {
+                validateCmmnModel(context.caseValidator(), cmmnModel);
+            }
 
             processCmmnElements(cmmnModel, cmmnParseResult);
 
@@ -88,6 +73,46 @@ public class CmmnParserImpl implements CmmnParser {
                 throw (CmmnXMLException) e;
             } else {
                 throw new FlowableException("Error parsing XML", e);
+            }
+        }
+    }
+
+    protected CmmnModel convertToCmmnModel(CmmnParseContext context, StreamSource cmmnSource) {
+        boolean enableSafeBpmnXml = context.enableSafeXml();
+        String encoding = context.xmlEncoding();
+        boolean validateCmmnXml = context.validateXml();
+
+        return new CmmnXmlConverter().convertToCmmnModel(cmmnSource, validateCmmnXml, enableSafeBpmnXml, encoding);
+    }
+
+    protected void validateCmmnModel(CaseValidator caseValidator, CmmnModel cmmnModel) {
+        if (caseValidator == null) {
+            logger.warn("Case should be validated, but no case validator is configured on the case engine configuration!");
+        } else {
+            List<ValidationEntry> validationEntries = caseValidator.validate(cmmnModel);
+            if (validationEntries != null && !validationEntries.isEmpty()) {
+
+                StringBuilder warningBuilder = new StringBuilder();
+                StringBuilder errorBuilder = new StringBuilder();
+
+                for (ValidationEntry entry : validationEntries) {
+                    if (entry.getLevel() == ValidationEntry.Level.Warning) {
+                        warningBuilder.append(entry).append("\n");
+                    } else {
+                        errorBuilder.append(entry).append("\n");
+                    }
+                }
+
+                // Throw exception if there is any error
+                if (errorBuilder.length() > 0) {
+                    throw new FlowableException("Errors while parsing:\n" + errorBuilder);
+                }
+
+                // Write out warnings (if any)
+                if (warningBuilder.length() > 0) {
+                    logger.warn("Following warnings encountered during case validation: {}", warningBuilder);
+                }
+
             }
         }
     }

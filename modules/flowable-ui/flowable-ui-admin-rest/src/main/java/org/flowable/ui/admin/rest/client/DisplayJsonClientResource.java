@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.Artifact;
+import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -38,7 +40,9 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.SubProcess;
+import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.ui.admin.domain.EndpointType;
 import org.flowable.ui.admin.domain.ServerConfig;
 import org.flowable.ui.admin.rest.client.modelinfo.InfoMapper;
@@ -308,6 +312,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         for (org.flowable.bpmn.model.Process process : pojoModel.getProcesses()) {
             processElements(process.getFlowElements(), pojoModel, elementArray, flowArray,
                             collapsedArray, diagramInfo, completedElements, currentElements, null);
+            processArtifacts(process.getArtifacts(), pojoModel, elementArray, flowArray, diagramInfo);
         }
 
         displayNode.set("elements", elementArray);
@@ -410,9 +415,60 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
                     processElements(subProcess.getFlowElements(), model, elementArray, flowArray, collapsedArray,
                                     diagramInfo, completedElements, currentElements, newCollapsedNode);
+                    processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }
             }
         }
+    }
+    
+    protected void processArtifacts(Collection<Artifact> artifactList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, GraphicInfo diagramInfo) {
+
+        for (Artifact artifact : artifactList) {
+
+            if (artifact instanceof Association) {
+                ObjectNode elementNode = objectMapper.createObjectNode();
+                Association flow = (Association) artifact;
+                elementNode.put("id", flow.getId());
+                elementNode.put("type", "association");
+                elementNode.put("sourceRef", flow.getSourceRef());
+                elementNode.put("targetRef", flow.getTargetRef());
+                fillWaypoints(flow.getId(), model, elementNode, diagramInfo);
+                flowArray.add(elementNode);
+
+            } else {
+
+                ObjectNode elementNode = objectMapper.createObjectNode();
+                elementNode.put("id", artifact.getId());
+
+                if (artifact instanceof TextAnnotation) {
+                    TextAnnotation annotation = (TextAnnotation) artifact;
+                    elementNode.put("text", annotation.getText());
+                }
+
+                GraphicInfo graphicInfo = model.getGraphicInfo(artifact.getId());
+                if (graphicInfo != null) {
+                    fillGraphicInfo(elementNode, graphicInfo, true);
+                    fillDiagramInfo(graphicInfo, diagramInfo);
+                }
+
+                String className = artifact.getClass().getSimpleName();
+                elementNode.put("type", className);
+
+                elementArray.add(elementNode);
+            }
+        }
+    }
+    
+    protected void fillWaypoints(String id, BpmnModel model, ObjectNode elementNode, GraphicInfo diagramInfo) {
+        List<GraphicInfo> flowInfo = model.getFlowLocationGraphicInfo(id);
+        ArrayNode waypointArray = objectMapper.createArrayNode();
+        for (GraphicInfo graphicInfo : flowInfo) {
+            ObjectNode pointNode = objectMapper.createObjectNode();
+            fillGraphicInfo(pointNode, graphicInfo, false);
+            waypointArray.add(pointNode);
+            fillDiagramInfo(graphicInfo, diagramInfo);
+        }
+        elementNode.set("waypoints", waypointArray);
     }
 
     protected void fillEventTypes(String className, FlowElement element, ObjectNode elementNode) {
@@ -467,6 +523,16 @@ public class DisplayJsonClientResource extends AbstractClientResource {
                     eventNode.put("type", "message");
                     if (StringUtils.isNotEmpty(messageDef.getMessageRef())) {
                         eventNode.put("messageRef", messageDef.getMessageRef());
+                    }
+                    
+                } else if (eventDef instanceof VariableListenerEventDefinition) {
+                    VariableListenerEventDefinition variableDef = (VariableListenerEventDefinition) eventDef;
+                    eventNode.put("type", "variable");
+                    if (StringUtils.isNotEmpty(variableDef.getVariableName())) {
+                        eventNode.put("variableName", variableDef.getVariableName());
+                    }
+                    if (StringUtils.isNotEmpty(variableDef.getVariableChangeType())) {
+                        eventNode.put("variableChangeType", variableDef.getVariableChangeType());
                     }
                 }
                 elementNode.set("eventDefinition", eventNode);

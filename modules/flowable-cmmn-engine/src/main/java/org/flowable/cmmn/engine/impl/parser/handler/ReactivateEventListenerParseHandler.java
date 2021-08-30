@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
@@ -51,6 +52,12 @@ public class ReactivateEventListenerParseHandler extends AbstractPlanItemParseHa
             planItem.setItemControl(planItemControl);
         }
         planItem.getItemControl().setParentCompletionRule(parentCompletionRule);
+
+        // check, if there is an available condition set on the listener and set it on the reactivation listener as the reactivate condition expression
+        // explicitly as we need the default one to be a predefined one making the listener unavailable at runtime
+        if (StringUtils.isNotEmpty(reactivateEventListener.getAvailableConditionExpression())) {
+            reactivateEventListener.setReactivationAvailableConditionExpression(reactivateEventListener.getAvailableConditionExpression());
+        }
 
         // additionally, we only set the listener to be available once the case is not active anymore (which in fact will make the listener unavailable at
         // all at runtime as it is used only in history to reactivate the case again)

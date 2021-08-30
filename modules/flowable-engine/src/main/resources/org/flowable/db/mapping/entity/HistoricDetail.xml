@@ -167,7 +167,12 @@
     delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
     PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
   </delete>
-  
+
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />

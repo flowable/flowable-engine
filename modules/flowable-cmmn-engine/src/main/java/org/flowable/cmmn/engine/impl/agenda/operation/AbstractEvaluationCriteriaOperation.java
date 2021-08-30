@@ -43,6 +43,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
@@ -148,6 +149,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 if (collection == null && !ExpressionUtil.hasOnParts(planItem)) {
                     // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
                     activatePlanItemInstance = false;
+                    
                 } else {
 
                     if (collection != null) {
@@ -178,6 +180,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
                     }
                 }
+                
             } else if (!noEntryCriteria) {
                 // check the plan item to be repeating by evaluating its repetition rule
                 if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer)) {
@@ -779,7 +782,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     }
 
     protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
 
         String oldState = childPlanItemInstanceEntity.getState();
         String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
@@ -804,7 +807,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             localVariables.put(repetitionRule.getElementIndexVariableName(), index);
         }
 
-        PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
+        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
 
         // record the plan item being created based on the collection, so it gets synchronized to the history as well
         CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(childPlanItemInstanceEntity);

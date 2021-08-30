@@ -37,6 +37,8 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
 
     CaseDefinitionQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
+    CaseDefinitionQuery caseDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase);
+
     CaseDefinitionQuery deploymentId(String deploymentId);
 
     CaseDefinitionQuery deploymentIds(Set<String> deploymentIds);
@@ -70,6 +72,16 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
     CaseDefinitionQuery caseDefinitionTenantIdLike(String tenantIdLike);
 
     CaseDefinitionQuery caseDefinitionWithoutTenantId();
+
+    /**
+     * Localize case definition name and description to specified locale.
+     */
+    CaseDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    CaseDefinitionQuery withLocalizationFallback();
 
     CaseDefinitionQuery orderByCaseDefinitionCategory();
 

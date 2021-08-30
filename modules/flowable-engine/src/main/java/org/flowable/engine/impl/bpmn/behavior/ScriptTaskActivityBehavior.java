@@ -117,7 +117,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
         if (null != result) {
             if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
-                throw new FlowableException("Error in Script");
+                throw new FlowableException(String.format("Error evaluating juel script: \"%s\" of activity id: %s of process definition id: %s",
+                        script, execution.getCurrentActivityId(), execution.getProcessDefinitionId()));
             }
         }
 

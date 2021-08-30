@@ -26,25 +26,13 @@
           </itemControl>
         </planItem>
         <planItem id="planItem3" definitionRef="sid-78E30C00-2BDA-4ECB-9974-9E9DABECE9C6"></planItem>
-        <humanTask id="sid-2FFF0804-A535-41A8-8794-0CAA3EBB9ECF" name="A" flowable:assignee="${initiator}">
-          <extensionElements>
-            <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
-          </extensionElements>
-        </humanTask>
-        <humanTask id="sid-904F0F61-2FFD-4CDC-BF87-348B5CF66BC8" name="B" flowable:assignee="${initiator}">
-          <extensionElements>
-            <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
-          </extensionElements>
-        </humanTask>
+        <humanTask id="sid-2FFF0804-A535-41A8-8794-0CAA3EBB9ECF" name="A" flowable:assignee="${initiator}" />
+        <humanTask id="sid-904F0F61-2FFD-4CDC-BF87-348B5CF66BC8" name="B" flowable:assignee="${initiator}" />
         <eventListener id="sid-78E30C00-2BDA-4ECB-9974-9E9DABECE9C6" flowable:availableCondition="${cmmn:isStageCompletable()}"></eventListener>
       </stage>
       <stage id="sid-12A8FD20-5DC4-460C-8EE2-1473BE9B667E" name="Stage 2">
         <planItem id="planItem5" name="C" definitionRef="sid-6B78E674-BAAD-4CA3-88FF-52862774F454"></planItem>
-        <humanTask id="sid-6B78E674-BAAD-4CA3-88FF-52862774F454" name="C" flowable:assignee="${initiator}">
-          <extensionElements>
-            <modeler:flowable-idm-initiator xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:flowable-idm-initiator>
-          </extensionElements>
-        </humanTask>
+        <humanTask id="sid-6B78E674-BAAD-4CA3-88FF-52862774F454" name="C" flowable:assignee="${initiator}" />
       </stage>
     </casePlanModel>
   </case>

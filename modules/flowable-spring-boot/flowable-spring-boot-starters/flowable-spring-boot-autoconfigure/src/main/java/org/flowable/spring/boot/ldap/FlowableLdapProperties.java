@@ -93,6 +93,11 @@ public class FlowableLdapProperties {
     private int searchTimeLimit = 0;
 
     /**
+     * Sets if connections to the LDAP system should be pooled and reused. Enabled by default.
+     */
+    private boolean connectionPooling = true;
+
+    /**
      * Configuration for the queries performed by the IDM Service.
      */
     @NestedConfigurationProperty
@@ -206,6 +211,14 @@ public class FlowableLdapProperties {
         this.searchTimeLimit = searchTimeLimit;
     }
 
+    public boolean isConnectionPooling() {
+        return connectionPooling;
+    }
+
+    public void setConnectionPooling(boolean connectionPooling) {
+        this.connectionPooling = connectionPooling;
+    }
+
     public Query getQuery() {
         return query;
     }
@@ -230,6 +243,7 @@ public class FlowableLdapProperties {
         configuration.setUserBaseDn(getUserBaseDn());
         configuration.setGroupBaseDn(getGroupBaseDn());
         configuration.setSearchTimeLimit(getSearchTimeLimit());
+        configuration.setConnectionPooling(isConnectionPooling());
         query.customize(configuration);
         attribute.customize(configuration);
         cache.customize(configuration);

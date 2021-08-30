@@ -122,7 +122,7 @@ javax.annotation                jsr250-api                  1.0             COMM
 joda-time                       joda-time                   2.10.10         Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
-org.apache.commons              commons-lang3               3.11            The Apache Software License, Version 2.0
+org.apache.commons              commons-lang3               3.12.0          The Apache Software License, Version 2.0
 org.apache.httpcomponents       httpclient                  4.5.13          Apache License, Version 2.0
 org.apache.httpcomponents       httpcore                    4.4.14          Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.13          Apache License, Version 2.0
@@ -130,28 +130,28 @@ org.apache.geronimo.bundles     json                        20090211_1      The 
 org.codehaus.groovy             groovy                      3.0.8           The Apache Software License, Version 2.0
 org.codehaus.groovy             groovy-jsr223               3.0.8           The Apache Software License, Version 2.0
 org.liquibase                   liquibase-core              4.3.5           Apache License, Version 2.0
-org.mybatis                     mybatis                     3.5.6           The Apache Software License, Version 2.0
+org.mybatis                     mybatis                     3.5.7           The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              2.0.6           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
-org.slf4j                       jcl-over-slf4j              1.7.30          MIT License
-org.slf4j                       slf4j-api                   1.7.30          MIT License
-org.slf4j                       slf4j-log4j12               1.7.30          MIT License
-org.springframework             spring-beans                5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-context              5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-context-support      5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-tx                   5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-web                  5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-aop                  5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-core                 5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-expression           5.3.7           The Apache Software License, Version 2.0
-org.springframework             spring-orm                  5.3.7           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      5.4.6           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        5.4.6           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      5.4.6           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         5.4.6           The Apache Software License, Version 2.0
+org.slf4j                       jcl-over-slf4j              1.7.32          MIT License
+org.slf4j                       slf4j-api                   1.7.32          MIT License
+org.slf4j                       slf4j-log4j12               1.7.32          MIT License
+org.springframework             spring-beans                5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-context              5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-context-support      5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-tx                   5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-web                  5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-aop                  5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-core                 5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-expression           5.3.9           The Apache Software License, Version 2.0
+org.springframework             spring-orm                  5.3.9           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      5.5.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        5.5.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      5.5.2           The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         5.5.2           The Apache Software License, Version 2.0
 org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0

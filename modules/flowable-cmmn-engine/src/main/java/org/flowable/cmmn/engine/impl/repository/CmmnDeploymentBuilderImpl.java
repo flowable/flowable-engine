@@ -14,6 +14,8 @@ package org.flowable.cmmn.engine.impl.repository;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
@@ -105,6 +107,27 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         resource.setName(resourceName);
         resource.setBytes(bytes);
         deployment.addResource(resource);
+        return this;
+    }
+
+    @Override
+    public CmmnDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
+        try {
+            ZipEntry entry = zipInputStream.getNextEntry();
+            while (entry != null) {
+                if (!entry.isDirectory()) {
+                    String entryName = entry.getName();
+                    byte[] bytes = IoUtil.readInputStream(zipInputStream, entryName);
+                    CmmnResourceEntity resource = resourceEntityManager.create();
+                    resource.setName(entryName);
+                    resource.setBytes(bytes);
+                    deployment.addResource(resource);
+                }
+                entry = zipInputStream.getNextEntry();
+            }
+        } catch (Exception e) {
+            throw new FlowableException("problem reading zip input stream", e);
+        }
         return this;
     }
 

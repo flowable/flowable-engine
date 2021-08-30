@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.converter;
 
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamReader;
 
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Criterion;
@@ -41,9 +41,7 @@ public abstract class BaseCmmnXmlConverter {
         if (baseElement != null) {
 
             baseElement.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
-            Location location = xtr.getLocation();
-            baseElement.setXmlRowNumber(location.getLineNumber());
-            baseElement.setXmlColumnNumber(location.getColumnNumber());
+            CmmnXmlUtil.addXMLLocation(baseElement, xtr);
 
             if (baseElement instanceof CmmnElement) {
                 CmmnElement cmmnElement = (CmmnElement) baseElement;

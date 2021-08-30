@@ -79,7 +79,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         processEngineConfiguration.setAsyncHistoryJsonGroupingThreshold(1);
         processEngineConfiguration.setAsyncFailedJobWaitTime(100);
         processEngineConfiguration.setDefaultFailedJobWaitTime(100);
-        processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(10);
+        processEngineConfiguration.setAsyncHistoryExecutorNumberOfRetries(100);
         processEngineConfiguration.setAsyncHistoryExecutorDefaultAsyncJobAcquireWaitTime(100);
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setAsyncHistoryExecutorActivate(false);
@@ -90,11 +90,10 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
         // The tests are doing deployments, which trigger async history. Therefore, we need to invoke them manually and then wait for the jobs to finish
         // so there can be clean data in the DB
         for (String autoDeletedDeploymentId : deploymentIdsForAutoCleanup) {
-            repositoryService.deleteDeployment(autoDeletedDeploymentId, true);
+            deleteDeployment(autoDeletedDeploymentId);
         }
         deploymentIdsForAutoCleanup.clear();
 
-        waitForHistoryJobExecutorToProcessAllJobs(10000, 100);
         for (Job job : managementService.createJobQuery().list()) {
             if (job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY)
                     || job.getJobHandlerType().equals(HistoryJsonConstants.JOB_HANDLER_TYPE_DEFAULT_ASYNC_HISTORY_ZIPPED)) {
@@ -142,7 +141,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
 
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count()).isZero();
 
-            waitForHistoryJobExecutorToProcessAllJobs(7000L, 100L);
+            waitForHistoryJobExecutorToProcessAllJobs(7000L, 200L);
 
             assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceId).count()).isEqualTo(2);
 
@@ -508,6 +507,7 @@ public class AsyncHistoryTest extends CustomConfigurationFlowableTestCase {
             @Override
             public Void execute(CommandContext commandContext) {
                 HistoryJob historyJob = managementService.createHistoryJobQuery().singleResult();
+                ((HistoryJobEntity) historyJob).setLockOwner("test");
                 ((HistoryJobEntity) historyJob).setLockExpirationTime(new Date(Instant.now().minus(100, ChronoUnit.DAYS).toEpochMilli()));
                 return null;
             }

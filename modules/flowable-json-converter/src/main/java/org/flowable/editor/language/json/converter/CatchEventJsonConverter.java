@@ -24,6 +24,7 @@ import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,6 +46,7 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_SIGNAL, CatchEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_CONDITIONAL, CatchEventJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_EVENT_CATCH_EVENT_REGISTRY, CatchEventJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_EVENT_CATCH_VARIABLE_LISTENER, CatchEventJsonConverter.class);
     }
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -69,6 +71,8 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
             return STENCIL_EVENT_CATCH_CONDITIONAL;
         } else if (eventDefinition instanceof TimerEventDefinition) {
             return STENCIL_EVENT_CATCH_TIMER;
+        } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+            return STENCIL_EVENT_CATCH_VARIABLE_LISTENER;
         } else if (baseElement.getExtensionElements().get("eventType") != null && baseElement.getExtensionElements().get("eventType").size() > 0) {
             String eventType = baseElement.getExtensionElements().get("eventType").get(0).getElementText();
             if (StringUtils.isNotEmpty(eventType)) {
@@ -99,9 +103,10 @@ public class CatchEventJsonConverter extends BaseBpmnJsonConverter {
             convertJsonToSignalDefinition(elementNode, catchEvent);
         } else if (STENCIL_EVENT_CATCH_CONDITIONAL.equals(stencilId)) {
             convertJsonToConditionalDefinition(elementNode, catchEvent);
-        }  else if (STENCIL_EVENT_CATCH_EVENT_REGISTRY.equals(stencilId)) {
+        } else if (STENCIL_EVENT_CATCH_EVENT_REGISTRY.equals(stencilId)) {
             addReceiveEventExtensionElements(elementNode, catchEvent);
-
+        } else if (STENCIL_EVENT_CATCH_VARIABLE_LISTENER.equals(stencilId)) {
+            convertJsonToVariableListenerDefinition(elementNode, catchEvent);
         }
         return catchEvent;
     }

@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.asyncexecutor.multitenant;
 import java.util.List;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.job.service.impl.asyncexecutor.AcquireJobsRunnableConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerJobsRunnable;
 import org.flowable.job.service.impl.asyncexecutor.AcquireTimerLifecycleListener;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -31,14 +32,14 @@ public class TenantAwareAcquireTimerJobsRunnable extends AcquireTimerJobsRunnabl
     protected String tenantId;
 
     public TenantAwareAcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId, int moveExecutorPoolSize) {
-        this(asyncExecutor, tenantInfoHolder, tenantId, null, false, "", moveExecutorPoolSize);
+        this(asyncExecutor, tenantInfoHolder, tenantId, null, AcquireJobsRunnableConfiguration.DEFAULT, moveExecutorPoolSize);
     }
 
     public TenantAwareAcquireTimerJobsRunnable(AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId,
-            AcquireTimerLifecycleListener lifecycleListener, boolean globalAcquireLockEnabled, String globalAcquireLockPrefix, int moveExecutorPoolSize) {
+            AcquireTimerLifecycleListener lifecycleListener, AcquireJobsRunnableConfiguration configuration, int moveExecutorPoolSize) {
 
         super(asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobManager(), lifecycleListener,
-            globalAcquireLockEnabled, globalAcquireLockPrefix, moveExecutorPoolSize);
+            configuration, moveExecutorPoolSize);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

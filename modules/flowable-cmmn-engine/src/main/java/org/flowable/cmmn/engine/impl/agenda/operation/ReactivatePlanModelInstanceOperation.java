@@ -12,10 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -26,8 +29,11 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class ReactivatePlanModelInstanceOperation extends AbstractCaseInstanceOperation {
 
-    public ReactivatePlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
+    protected List<PlanItem> directlyReactivatedPlanItems;
+
+    public ReactivatePlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity, List<PlanItem> directlyReactivatedPlanItems) {
         super(commandContext, null, caseInstanceEntity);
+        this.directlyReactivatedPlanItems = directlyReactivatedPlanItems;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class ReactivatePlanModelInstanceOperation extends AbstractCaseInstanceOp
 
         Case caseModel = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId());
         createPlanItemInstancesForNewOrReactivatedStage(commandContext, caseModel,
-                caseModel.getPlanModel().getPlanItems(),
+                caseModel.getPlanModel().getPlanItems(), directlyReactivatedPlanItems,
                 caseInstanceEntity,
                 null,
                 caseInstanceEntity.getTenantId());

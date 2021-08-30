@@ -35,8 +35,9 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_SCRIPT = "ScriptTask";
     String STENCIL_MILESTONE = "Milestone";
     String STENCIL_GENERIC_EVENT_LISTENER = "EventListener";
-    String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
-    String STENCIL_USER_EVENT_LISTENER ="UserEventListener";
+    String STENCIL_TIMER_EVENT_LISTENER = "TimerEventListener";
+    String STENCIL_USER_EVENT_LISTENER = "UserEventListener";
+    String STENCIL_VARIABLE_EVENT_LISTENER = "VariableEventListener";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";
@@ -198,6 +199,9 @@ public interface CmmnStencilConstants {
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";
     String PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT = "transitionevent";
+    
+    String PROPERTY_VARIABLE_LISTENER_VARIABLE_NAME = "variablelistenervariablename";
+    String PROPERTY_VARIABLE_LISTENER_VARIABLE_CHANGE_TYPE = "variablelistenervariablechangetype";
 
     String PROPERTY_EVENT_LISTENER_AVAILABLE_CONDITION = "availablecondition";
 
