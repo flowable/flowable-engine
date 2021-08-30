@@ -50,9 +50,13 @@ public class AsyncSendEventJobHandler implements JobHandler {
                 job.getId(), flowElement.getId(), behavior.getClass()));
         }
 
-        ActivityBehavior activityBehavior = (ActivityBehavior) behavior;
-        commandContext.addAttribute(TYPE, true); // Will be read in the SendEventTaskActivityBehavior
-        activityBehavior.execute(executionEntity);
+        try {
+            ActivityBehavior activityBehavior = (ActivityBehavior) behavior;
+            commandContext.addAttribute(TYPE, true); // Will be read in the SendEventTaskActivityBehavior
+            activityBehavior.execute(executionEntity);
+        } finally {
+            commandContext.removeAttribute(TYPE);
+        }
     }
 
 }
