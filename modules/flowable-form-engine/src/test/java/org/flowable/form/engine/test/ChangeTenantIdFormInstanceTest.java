@@ -145,7 +145,7 @@ public class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
         // First we simulate the change
         ChangeTenantIdResult simulationResult = formEngine.getFormManagementService()
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions(true)
+                .onlyInstancesFromDefaultTenantDefinitions()
                 .simulate();
 
         // All the instances should stay in the original tenant after the simulation
@@ -161,7 +161,7 @@ public class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
         // We now proceed with the changeTenantId operation for all the instances
         ChangeTenantIdResult result = formEngine.getFormManagementService()
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions(true)
+                .onlyInstancesFromDefaultTenantDefinitions()
                 .complete();
         
 

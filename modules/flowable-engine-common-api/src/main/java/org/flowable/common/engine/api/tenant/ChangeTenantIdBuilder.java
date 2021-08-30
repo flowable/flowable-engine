@@ -28,7 +28,7 @@ public interface ChangeTenantIdBuilder {
      * that is, if the instance was created with the "fallback to default tenant" feature.
      *
      */    
-    ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions(boolean onlyInstancesFromDefaultTenantDefinitionsEnabled);
+    ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions();
 
     /**
      * Executes a simulation of the change of tenant id, calculating the amount of instances that will be affected

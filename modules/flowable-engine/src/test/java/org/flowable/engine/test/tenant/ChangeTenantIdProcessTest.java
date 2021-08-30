@@ -187,7 +187,7 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         // First, we simulate the change
         ChangeTenantIdResult simulationResult = managementService
         .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-        .onlyInstancesFromDefaultTenantDefinitions(true)
+        .onlyInstancesFromDefaultTenantDefinitions()
         .simulate();
         
         // All the instances should stay in the original tenant after the simulation
@@ -198,7 +198,7 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         // We now proceed with the changeTenantId operation for all the instances
         ChangeTenantIdResult result = managementService
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions(true)
+                .onlyInstancesFromDefaultTenantDefinitions()
                 .complete();
 
         // All the instances from the default tenant should now be assigned to the tenant B

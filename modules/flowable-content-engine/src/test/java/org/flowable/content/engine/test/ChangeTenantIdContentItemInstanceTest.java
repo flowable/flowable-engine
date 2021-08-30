@@ -65,7 +65,7 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
     @Test
     public void check_onlyInstancesFromDefaultTenantDefinitions_set_to_true_throws_UnsupportedOperationException() {
         assertThatThrownBy(() -> contentManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-            .onlyInstancesFromDefaultTenantDefinitions(true)
+            .onlyInstancesFromDefaultTenantDefinitions()
             .complete())
         .isInstanceOf(UnsupportedOperationException.class);
 

@@ -118,7 +118,7 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
         // First we simulate the change
         ChangeTenantIdResult simulationResult = managementService
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions(true)
+                .onlyInstancesFromDefaultTenantDefinitions()
                 .simulate();
 
         // All the instances should stay in the original tenant after the simulation
@@ -131,7 +131,7 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
         // We now proceed with the changeTenantId operation
         ChangeTenantIdResult result = managementService
                 .createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_B)
-                .onlyInstancesFromDefaultTenantDefinitions(true)
+                .onlyInstancesFromDefaultTenantDefinitions()
                 .complete();
 
         // The instance created with the definition from the default tenant should now be assigned to the tenant B

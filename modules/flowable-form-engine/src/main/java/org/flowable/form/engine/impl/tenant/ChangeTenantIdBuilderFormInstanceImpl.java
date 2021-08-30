@@ -35,9 +35,8 @@ public class ChangeTenantIdBuilderFormInstanceImpl implements ChangeTenantIdBuil
     }
 
     @Override
-    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions(
-            boolean onlyInstancesFromDefaultTenantDefinitionsEnabled) {
-        this.onlyInstancesFromDefaultTenantDefinitions = onlyInstancesFromDefaultTenantDefinitionsEnabled;
+    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions() {
+        this.onlyInstancesFromDefaultTenantDefinitions = true;
         return this;
     }
 

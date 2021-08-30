@@ -33,12 +33,8 @@ public class ChangeTenantIdBuilderContentImpl implements ChangeTenantIdBuilder {
     }
 
     @Override
-    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions(
-        boolean onlyInstancesFromDefaultTenantDefinitionsEnabled) {
-        if (onlyInstancesFromDefaultTenantDefinitionsEnabled) {
+    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions() {
             throw new UnsupportedOperationException("Content items do not have definitions. Unsupported builder option.");
-        }
-        return this;
     }
 
     @Override

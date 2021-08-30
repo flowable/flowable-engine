@@ -34,9 +34,8 @@ public class ChangeTenantIdBuilderBpmnImpl implements ChangeTenantIdBuilder {
     }
 
     @Override
-    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions(
-            boolean onlyInstancesFromDefaultTenantDefinitionsEnabled) {
-        this.onlyInstancesFromDefaultTenantDefinitions = onlyInstancesFromDefaultTenantDefinitionsEnabled;
+    public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions() {
+        this.onlyInstancesFromDefaultTenantDefinitions = true;
         return this;
     }
 
