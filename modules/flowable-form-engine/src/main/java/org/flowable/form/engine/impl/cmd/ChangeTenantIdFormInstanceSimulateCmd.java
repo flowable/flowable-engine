@@ -13,13 +13,15 @@
 
 package org.flowable.form.engine.impl.cmd;
 
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.FORM_INSTANCES;
 
-import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.FormInstances;
+import java.util.Collections;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdResult;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -27,35 +29,34 @@ import org.slf4j.LoggerFactory;
 
 public class ChangeTenantIdFormInstanceSimulateCmd implements Command<ChangeTenantIdResult> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdFormInstanceSimulateCmd.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTenantIdFormInstanceSimulateCmd.class);
 
-        private final String sourceTenantId;
-        private final String targetTenantId;
-        private final boolean onlyInstancesFromDefaultTenantDefinitions;
+    private final String sourceTenantId;
+    private final String targetTenantId;
+    private final boolean onlyInstancesFromDefaultTenantDefinitions;
 
-        public ChangeTenantIdFormInstanceSimulateCmd(String sourceTenantId, String targetTenantId,
-                        boolean onlyInstancesFromDefaultTenantDefinitions) {
-                this.sourceTenantId = sourceTenantId;
-                this.targetTenantId = targetTenantId;
-                this.onlyInstancesFromDefaultTenantDefinitions = onlyInstancesFromDefaultTenantDefinitions;
-        }
+    public ChangeTenantIdFormInstanceSimulateCmd(String sourceTenantId, String targetTenantId,
+            boolean onlyInstancesFromDefaultTenantDefinitions) {
+        this.sourceTenantId = sourceTenantId;
+        this.targetTenantId = targetTenantId;
+        this.onlyInstancesFromDefaultTenantDefinitions = onlyInstancesFromDefaultTenantDefinitions;
+    }
 
-        @Override
-        public ChangeTenantIdResult execute(CommandContext commandContext) {
-                LOGGER.debug("Simulating Form Instance migration from '{}' to '{}'{}.", sourceTenantId, targetTenantId,
-                                onlyInstancesFromDefaultTenantDefinitions
-                                                ? " but only for instances from the default tenant definitions"
-                                                : "");
-                FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration(commandContext);
-                long changeTenantIdBpmnFormInstances = formEngineConfiguration.getFormInstanceEntityManager()
-                                                .countChangeTenantIdFormInstances(sourceTenantId,
-                                                                onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.BPMN);
-                long changeTenantIdCmmnFormInstances = formEngineConfiguration.getFormInstanceEntityManager()
-                                                .countChangeTenantIdFormInstances(sourceTenantId,
-                                                                onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.CMMN);
-                return ChangeTenantIdResult.builder()
-                                .addResult(FormInstances,changeTenantIdBpmnFormInstances + changeTenantIdCmmnFormInstances)
-                                .build();
-        }
+    @Override
+    public ChangeTenantIdResult execute(CommandContext commandContext) {
+        LOGGER.debug("Simulating Form Instance migration from '{}' to '{}'{}.", sourceTenantId, targetTenantId,
+                onlyInstancesFromDefaultTenantDefinitions
+                        ? " but only for instances from the default tenant definitions"
+                        : "");
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration(commandContext);
+        long changeTenantIdBpmnFormInstances = formEngineConfiguration.getFormInstanceEntityManager()
+                .countChangeTenantIdFormInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions,
+                        ScopeTypes.BPMN);
+        long changeTenantIdCmmnFormInstances = formEngineConfiguration.getFormInstanceEntityManager()
+                .countChangeTenantIdFormInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions,
+                        ScopeTypes.CMMN);
+        return new DefaultChangeTenantIdResult(Collections.singletonMap(FORM_INSTANCES,
+                changeTenantIdBpmnFormInstances + changeTenantIdCmmnFormInstances));
+    }
 
 }

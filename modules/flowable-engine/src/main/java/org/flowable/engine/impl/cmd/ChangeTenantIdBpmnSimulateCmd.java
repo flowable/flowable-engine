@@ -13,11 +13,14 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
-import org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdResult;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -25,6 +28,29 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.ACTIVITY_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.EXECUTIONS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.CASE_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.PLAN_ITEM_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.MILESTONE_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.EVENT_SUBSCRIPTIONS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.TASKS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.FORM_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.EXTERNAL_WORKER_JOBS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.CONTENT_ITEM_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_ACTIVITY_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_CASE_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_DECISION_EXECUTIONS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_MILESTONE_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_PLAN_ITEM_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_PROCESS_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_TASK_LOG_ENTRIES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORIC_TASK_INSTANCES;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.HISTORY_JOBS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.JOBS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.SUSPENDED_JOBS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.TIMER_JOBS;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.DEADLETTER_JOBS;
 
 public class ChangeTenantIdBpmnSimulateCmd  implements Command<ChangeTenantIdResult>{
 
@@ -53,65 +79,65 @@ public class ChangeTenantIdBpmnSimulateCmd  implements Command<ChangeTenantIdRes
         JobServiceConfiguration jobServiceConfiguration = engineConfiguration.getJobServiceConfiguration();
         TaskServiceConfiguration taskServiceConfiguration = engineConfiguration.getTaskServiceConfiguration();
 
-        return ChangeTenantIdResult.builder()
-                .addResult(Key.Executions, engineConfiguration.getExecutionEntityManager()
-                                .countChangeTenantIdExecutions(sourceTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions))
-                .addResult(Key.ActivityInstances, engineConfiguration.getActivityInstanceEntityManager()
-                                .countChangeTenantIdActivityInstances(sourceTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions))
-                .addResult(Key.HistoricProcessInstances, engineConfiguration.getHistoricProcessInstanceEntityManager()
-                                .countChangeTenantIdHistoricProcessInstances(sourceTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions))
-                .addResult(Key.HistoricActivityInstances, engineConfiguration.getHistoricActivityInstanceEntityManager()
-                                .countChangeTenantIdHistoricActivityInstances(sourceTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions))
-                .addResult(Key.Jobs, jobServiceConfiguration.getJobEntityManager().countChangeTenantIdJobs(
-                                sourceTenantId, defaultTenantId,
-                                onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.BPMN))
-                .addResult(Key.TimerJobs, jobServiceConfiguration.getTimerJobEntityManager()
-                                .countChangeTenantIdTimerJobs(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.SuspendedJobs, jobServiceConfiguration.getSuspendedJobEntityManager()
-                                .countChangeTenantIdSuspendedJobs(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.DeadLetterJobs, jobServiceConfiguration.getDeadLetterJobEntityManager()
-                                .countChangeTenantIdDeadLetterJobs(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.HistoryJobs,
-                                jobServiceConfiguration.getHistoryJobEntityManager()
-                                                .countChangeTenantIdHistoryJobs(sourceTenantId))
-                .addResult(Key.ExternalWorkerJobs, jobServiceConfiguration
-                                .getExternalWorkerJobEntityManager()
-                                .countChangeTenantIdExternalWorkerJobs(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.EventSubscriptions, engineConfiguration
-                                .getEventSubscriptionServiceConfiguration()
-                                .getEventSubscriptionEntityManager()
-                                .countChangeTenantIdEventSubscriptions(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.Tasks, taskServiceConfiguration.getTaskEntityManager()
-                                .countChangeTenantIdTasks(sourceTenantId, defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.HistoricTaskInstances, taskServiceConfiguration
-                                .getHistoricTaskInstanceEntityManager()
-                                .countChangeTenantIdHistoricTaskInstances(sourceTenantId,
-                                                defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .addResult(Key.HistoricTaskLogEntries, taskServiceConfiguration
-                                .getHistoricTaskLogEntryEntityManager()
-                                .countChangeTenantIdHistoricTaskLogEntries(sourceTenantId,
-                                                defaultTenantId,
-                                                onlyInstancesFromDefaultTenantDefinitions,
-                                                ScopeTypes.BPMN))
-                .build();
+        Map<String,Long> resultMap = new HashMap<>();
+        resultMap.put(EXECUTIONS, engineConfiguration.getExecutionEntityManager()
+                        .countChangeTenantIdExecutions(sourceTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions));
+        resultMap.put(ACTIVITY_INSTANCES, engineConfiguration.getActivityInstanceEntityManager()
+                        .countChangeTenantIdActivityInstances(sourceTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions));
+        resultMap.put(HISTORIC_PROCESS_INSTANCES, engineConfiguration.getHistoricProcessInstanceEntityManager()
+                        .countChangeTenantIdHistoricProcessInstances(sourceTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions));
+        resultMap.put(HISTORIC_ACTIVITY_INSTANCES, engineConfiguration.getHistoricActivityInstanceEntityManager()
+                        .countChangeTenantIdHistoricActivityInstances(sourceTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions));
+        resultMap.put(JOBS, jobServiceConfiguration.getJobEntityManager().countChangeTenantIdJobs(
+                        sourceTenantId, defaultTenantId,
+                        onlyInstancesFromDefaultTenantDefinitions, ScopeTypes.BPMN));
+        resultMap.put(TIMER_JOBS, jobServiceConfiguration.getTimerJobEntityManager()
+                        .countChangeTenantIdTimerJobs(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(SUSPENDED_JOBS, jobServiceConfiguration.getSuspendedJobEntityManager()
+                        .countChangeTenantIdSuspendedJobs(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(DEADLETTER_JOBS, jobServiceConfiguration.getDeadLetterJobEntityManager()
+                        .countChangeTenantIdDeadLetterJobs(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(HISTORY_JOBS,
+                        jobServiceConfiguration.getHistoryJobEntityManager()
+                                        .countChangeTenantIdHistoryJobs(sourceTenantId));
+        resultMap.put(EXTERNAL_WORKER_JOBS, jobServiceConfiguration
+                        .getExternalWorkerJobEntityManager()
+                        .countChangeTenantIdExternalWorkerJobs(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(EVENT_SUBSCRIPTIONS, engineConfiguration
+                        .getEventSubscriptionServiceConfiguration()
+                        .getEventSubscriptionEntityManager()
+                        .countChangeTenantIdEventSubscriptions(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(TASKS, taskServiceConfiguration.getTaskEntityManager()
+                        .countChangeTenantIdTasks(sourceTenantId, defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(HISTORIC_TASK_INSTANCES, taskServiceConfiguration
+                        .getHistoricTaskInstanceEntityManager()
+                        .countChangeTenantIdHistoricTaskInstances(sourceTenantId,
+                                        defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        resultMap.put(HISTORIC_TASK_LOG_ENTRIES, taskServiceConfiguration
+                        .getHistoricTaskLogEntryEntityManager()
+                        .countChangeTenantIdHistoricTaskLogEntries(sourceTenantId,
+                                        defaultTenantId,
+                                        onlyInstancesFromDefaultTenantDefinitions,
+                                        ScopeTypes.BPMN));
+        return new DefaultChangeTenantIdResult(resultMap);
     }
 
 }

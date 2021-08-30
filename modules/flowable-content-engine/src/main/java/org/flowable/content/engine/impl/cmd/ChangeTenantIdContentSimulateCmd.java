@@ -14,11 +14,14 @@
 package org.flowable.content.engine.impl.cmd;
 
 
-import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.Key.ContentItemInstances;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdResult.CONTENT_ITEM_INSTANCES;
+
+import java.util.Collections;
 
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdResult;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
@@ -38,13 +41,11 @@ public class ChangeTenantIdContentSimulateCmd implements Command<ChangeTenantIdR
 
         @Override
         public ChangeTenantIdResult execute(CommandContext commandContext) {
-                LOGGER.debug("Simulating Content Instance migration from '{}' to '{}'.", sourceTenantId, targetTenantId);
-                ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration(commandContext);
-                long changeTenantIdContentItemInstances = contentEngineConfiguration.getContentItemEntityManager()
-                                                .countChangeTenantIdContentItemInstances(sourceTenantId);
-                return ChangeTenantIdResult.builder()
-                                .addResult(ContentItemInstances,changeTenantIdContentItemInstances)
-                                .build();
+            LOGGER.debug("Simulating Content Instance migration from '{}' to '{}'.", sourceTenantId, targetTenantId);
+            ContentEngineConfiguration contentEngineConfiguration = CommandContextUtil.getContentEngineConfiguration(commandContext);
+            long changeTenantIdContentItemInstances = contentEngineConfiguration.getContentItemEntityManager()
+                                            .countChangeTenantIdContentItemInstances(sourceTenantId);
+            return new DefaultChangeTenantIdResult(Collections.singletonMap(CONTENT_ITEM_INSTANCES, changeTenantIdContentItemInstances));
         }
 
 }
