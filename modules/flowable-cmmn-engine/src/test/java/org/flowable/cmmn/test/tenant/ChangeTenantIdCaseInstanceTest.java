@@ -15,6 +15,8 @@ package org.flowable.cmmn.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +27,6 @@ import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 
 public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
 
@@ -79,9 +80,9 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", false);
         String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", false);
         
-        Set<String> caseInstanceIdsTenantA = Sets.newSet(caseInstanceIdACompleted, caseInstanceIdAActive);
-        Set<String> caseInstanceIdsTenantB = Sets.newSet(caseInstanceIdBCompleted, caseInstanceIdBActive);
-        Set<String> caseInstanceIdsTenantC = Sets.newSet(caseInstanceIdCCompleted, caseInstanceIdCActive);
+        Set<String> caseInstanceIdsTenantA = new HashSet<>(Arrays.asList(caseInstanceIdACompleted, caseInstanceIdAActive));
+        Set<String> caseInstanceIdsTenantB = new HashSet<>(Arrays.asList(caseInstanceIdBCompleted, caseInstanceIdBActive));
+        Set<String> caseInstanceIdsTenantC = new HashSet<>(Arrays.asList(caseInstanceIdCCompleted, caseInstanceIdCActive));
 
         // Prior to changing the Tenant Id, all elements are associated to the original tenant
         checkTenantIdForAllInstances(caseInstanceIdsTenantA, TEST_TENANT_A, "prior to changing to " + TEST_TENANT_B);
@@ -204,11 +205,11 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", false);
         String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", false);
         
-        Set<String> caseInstanceIdsTenantADTOnly = Sets.newSet(caseInstanceIdADTCompleted, caseInstanceIdADTActive);
-        Set<String> caseInstanceIdsTenantANotDT = Sets.newSet(caseInstanceIdACompleted, caseInstanceIdAActive);
-        Set<String> caseInstanceIdsTenantAAll = Sets.newSet(caseInstanceIdADTCompleted, caseInstanceIdADTActive, caseInstanceIdACompleted, caseInstanceIdAActive);
-        Set<String> caseInstanceIdsTenantB = Sets.newSet(caseInstanceIdBCompleted, caseInstanceIdBActive);
-        Set<String> caseInstanceIdsTenantC = Sets.newSet(caseInstanceIdCCompleted, caseInstanceIdCActive);
+        Set<String> caseInstanceIdsTenantADTOnly = new HashSet<>(Arrays.asList(caseInstanceIdADTCompleted, caseInstanceIdADTActive));
+        Set<String> caseInstanceIdsTenantANotDT = new HashSet<>(Arrays.asList(caseInstanceIdACompleted, caseInstanceIdAActive));
+        Set<String> caseInstanceIdsTenantAAll = new HashSet<>(Arrays.asList(caseInstanceIdADTCompleted, caseInstanceIdADTActive, caseInstanceIdACompleted, caseInstanceIdAActive));
+        Set<String> caseInstanceIdsTenantB = new HashSet<>(Arrays.asList(caseInstanceIdBCompleted, caseInstanceIdBActive));
+        Set<String> caseInstanceIdsTenantC = new HashSet<>(Arrays.asList(caseInstanceIdCCompleted, caseInstanceIdCActive));
 
         // Prior to changing the Tenant Id, all elements are associate to the original
         // tenant

@@ -15,6 +15,8 @@ package org.flowable.engine.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
@@ -25,7 +27,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.util.collections.Sets;
 
 public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
 
@@ -80,9 +81,9 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", false, false);
         String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", false, false);
 
-        Set<String> processInstancesTenantA = Sets.newSet(processInstanceIdACompleted, processInstanceIdAActive);
-        Set<String> processInstancesTenantB = Sets.newSet(processInstanceIdBCompleted, processInstanceIdBActive);
-        Set<String> processInstancesTenantC = Sets.newSet(processInstanceIdCCompleted, processInstanceIdCActive);
+        Set<String> processInstancesTenantA = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive));
+        Set<String> processInstancesTenantB = new HashSet<>(Arrays.asList(processInstanceIdBCompleted, processInstanceIdBActive));
+        Set<String> processInstancesTenantC = new HashSet<>(Arrays.asList(processInstanceIdCCompleted, processInstanceIdCActive));
 
         // Prior to changing the Tenant Id, all elements are associated to the original tenant
         checkTenantIdForAllInstances(processInstancesTenantA, TEST_TENANT_A, "prior to changing to " + TEST_TENANT_B);
@@ -172,11 +173,11 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", false, false);
         String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", false, false);
 
-        Set<String> processInstancesTenantADTOnly = Sets.newSet(processInstanceIdADTCompleted, processInstanceIdADTActive);
-        Set<String> processInstancesTenantANonDT = Sets.newSet(processInstanceIdACompleted, processInstanceIdAActive);
-        Set<String> processInstancesTenantAAll = Sets.newSet(processInstanceIdACompleted, processInstanceIdAActive, processInstanceIdADTCompleted, processInstanceIdADTActive);
-        Set<String> processInstancesTenantB = Sets.newSet(processInstanceIdBCompleted, processInstanceIdBActive);
-        Set<String> processInstancesTenantC = Sets.newSet(processInstanceIdCCompleted, processInstanceIdCActive);
+        Set<String> processInstancesTenantADTOnly = new HashSet<>(Arrays.asList(processInstanceIdADTCompleted, processInstanceIdADTActive));
+        Set<String> processInstancesTenantANonDT = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive));
+        Set<String> processInstancesTenantAAll = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive, processInstanceIdADTCompleted, processInstanceIdADTActive));
+        Set<String> processInstancesTenantB = new HashSet<>(Arrays.asList(processInstanceIdBCompleted, processInstanceIdBActive));
+        Set<String> processInstancesTenantC = new HashSet<>(Arrays.asList(processInstanceIdCCompleted, processInstanceIdCActive));
 
         // Prior to changing the Tenant Id, all elements are associated to the original tenant
         checkTenantIdForAllInstances(processInstancesTenantAAll, TEST_TENANT_A, "prior to changing to " + TEST_TENANT_B);
