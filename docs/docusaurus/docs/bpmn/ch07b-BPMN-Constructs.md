@@ -3536,7 +3536,7 @@ The External Worker task is implemented as a dedicated [Service Task](bpmn/ch07b
 <serviceTask id="externalWorkerOrder" flowable:type="external-worker">
 ```
 
-The External Worker task is configured by se setting the `topic` (can be an EL expression) which the External Worker uses to query for jobs to execute.
+The External Worker task is configured by setting the `topic` (can be an EL expression) which the External Worker uses to query for jobs to execute.
 
 #### Example usage
 
