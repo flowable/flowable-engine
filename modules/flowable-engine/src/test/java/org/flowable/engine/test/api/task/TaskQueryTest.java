@@ -1429,6 +1429,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         tasks = query.list();
         assertThat(tasks).hasSize(12);
 
+        query = taskService.createTaskQuery().taskCandidateOrAssigned("invalid");
+        assertThat(query.count()).isEqualTo(0);
+        tasks = query.list();
+        assertThat(tasks).isEmpty();
+
         // SQL Server has a limit of 2100 on how many parameters a query might have
         int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
 
@@ -1484,6 +1489,11 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         assertThat(query.count()).isEqualTo(12);
         tasks = query.list();
         assertThat(tasks).hasSize(12);
+
+        query = taskService.createTaskQuery().or().taskId("invalid").taskCandidateOrAssigned("invalid");
+        assertThat(query.count()).isEqualTo(0);
+        tasks = query.list();
+        assertThat(tasks).isEmpty();
 
         // SQL Server has a limit of 2100 on how many parameters a query might have
         int maxGroups = AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType()) ? 2050 : 2100;
