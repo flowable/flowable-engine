@@ -702,7 +702,7 @@
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
                                 <tags>
-                                    <tag>flowable/flowable-rest:latest</tag>
+                                    <tag>latest</tag>
                                 </tags>
                             </to>
                         </configuration>
