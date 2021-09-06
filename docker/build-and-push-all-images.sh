@@ -1,14 +1,12 @@
 #!/bin/bash
-echo "Building all Java artifacts"
 cd ..
-mvn clean install -Pdistro -DskipTests -T 2C
 
 echo "Building and pushing REST app image"
 cd modules/flowable-app-rest
-mvn clean package -PdockerPublish,swagger -DskipTests 
+mvn clean package -PdockerPublish,swagger
 
 echo "Building and pushing UI app image"
 cd ../flowable-ui
-mvn clean package -PdockerPublish -DskipTests
+mvn clean package -pl flowable-ui-app -PdockerPublish -DskipTests
 
 echo "Done..."
