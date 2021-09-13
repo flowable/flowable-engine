@@ -127,7 +127,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
         isActive = true;
 
-        LOGGER.info("Starting up the async job executor [{}].", getClass().getName());
+        LOGGER.info("Starting up the async job executor [{}] for engine {}", getClass().getName(), getJobServiceConfiguration().getEngineName());
 
         initializeJobEntityManager();
         initializeRunnables();
@@ -189,7 +189,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         if (!isActive) {
             return;
         }
-        LOGGER.info("Shutting down the async job executor [{}].", getClass().getName());
+        LOGGER.info("Shutting down the async job executor [{}] for engine {}", getClass().getName(), getJobServiceConfiguration().getEngineName());
 
         stopRunnables();
         shutdownAdditionalComponents();

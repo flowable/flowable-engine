@@ -60,7 +60,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
     @Override
     public synchronized void run() {
-        LOGGER.info("starting to reset expired jobs for engine {}", asyncExecutor.getJobServiceConfiguration().getEngineName());
+        LOGGER.info("starting to reset expired jobs for engine {}", getEngineName());
         Thread.currentThread().setName(name);
 
         while (!isInterrupted) {
@@ -79,7 +79,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
 
             } catch (InterruptedException e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("async reset expired jobs wait interrupted");
+                    LOGGER.debug("async reset expired jobs wait for engine {} interrupted", getEngineName());
                 }
             } finally {
                 isWaiting.set(false);
@@ -146,6 +146,10 @@ public class ResetExpiredJobsRunnable implements Runnable {
                 MONITOR.notifyAll();
             }
         }
+    }
+
+    protected String getEngineName() {
+        return asyncExecutor.getJobServiceConfiguration().getEngineName();
     }
     
 }

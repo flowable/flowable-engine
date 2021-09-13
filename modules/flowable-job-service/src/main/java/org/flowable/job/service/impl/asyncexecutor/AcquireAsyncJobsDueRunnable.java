@@ -109,7 +109,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         // Always initialize the lock manager, allowing to switch execution modes if needed
         this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
 
-        LOGGER.info("starting to acquire async jobs due");
+        LOGGER.info("starting to acquire async jobs due for engine {}", getEngineName());
         Thread.currentThread().setName(name);
 
         final CommandExecutor commandExecutor = asyncExecutor.getJobServiceConfiguration().getCommandExecutor();
@@ -126,7 +126,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
                     millisToWait = asyncExecutor.getDefaultAsyncJobAcquireWaitTimeInMillis();
 
                     if (!(e instanceof FlowableException)) { // FlowableExeption doesn't need to be logged, could be regular lock logic
-                        LOGGER.warn("Error while waiting for global acquire lock", e);
+                        LOGGER.warn("Error while waiting for global acquire lock for engine {}", getEngineName(), e);
                     }
                 }
 
@@ -209,7 +209,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
             lifecycleListener.optimistLockingException(getEngineName(), asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 
             if (globalAcquireLockEnabled) {
-                LOGGER.warn("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+                LOGGER.warn("Optimistic locking exception (using global acquire lock) for engine {}", getEngineName(), optimisticLockingException);
 
             } else {
                 LOGGER.debug(
