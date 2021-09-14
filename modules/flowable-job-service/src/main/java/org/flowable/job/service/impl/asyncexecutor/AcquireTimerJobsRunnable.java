@@ -106,7 +106,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
         // Always initialize the lock manager, allowing to switch execution modes if needed
         this.lockManager = createLockManager(asyncExecutor.getJobServiceConfiguration().getCommandExecutor());
 
-        LOGGER.info("starting to acquire async jobs due");
+        LOGGER.info("starting to acquire async jobs due for engine {}", getEngineName());
         String threadName = "flowable-" + getEngineName() + "-acquire-timer-jobs";
         Thread.currentThread().setName(threadName);
 
@@ -128,7 +128,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             moveTimerJobsExecutorService.shutdown();
         }
 
-        LOGGER.info("stopped async job due acquisition");
+        LOGGER.info("stopped async job due acquisition for engine {}", getEngineName());
     }
 
     protected LockManager createLockManager(CommandExecutor commandExecutor) {
@@ -170,7 +170,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
                     // Don't do anything, lock will be tried again next time
 
                     if (!(e instanceof FlowableException)) { // FlowableException doesn't need to be logged, could be regular lock logic
-                        LOGGER.warn("Error while waiting for global acquire lock", e);
+                        LOGGER.warn("Error while waiting for global acquire lock for engine {}", getEngineName(), e);
                     }
                 }
 
@@ -210,7 +210,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             logOptimisticLockingException(optimisticLockingException);
 
         } catch (Throwable e) {
-            LOGGER.warn("exception during timer job acquisition: {}", e.getMessage(), e);
+            LOGGER.warn("exception during timer job acquisition for engine {}. Exception message: {}", getEngineName(), e.getMessage(), e);
             millisToWait = asyncExecutor.getDefaultTimerJobAcquireWaitTimeInMillis();
 
         }
@@ -233,7 +233,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             unlockTimerJobs(timerJobs); // jobs have been acquired before, so need to unlock when exception happens here
 
         } catch (Throwable t) {
-            LOGGER.warn("exception during timer job move: {}", t.getMessage(), t);
+            LOGGER.warn("exception during timer job move for engine {}. Exception message: {}", getEngineName(), t.getMessage(), t);
             unlockTimerJobs(timerJobs); // jobs have been acquired before, so need to unlock when exception happens here
 
         }
@@ -241,7 +241,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
 
     protected void logOptimisticLockingException(FlowableOptimisticLockingException optimisticLockingException) {
         if (configuration.isGlobalAcquireLockEnabled()) {
-            LOGGER.warn("Optimistic locking exception (using global acquire lock)", optimisticLockingException);
+            LOGGER.warn("Optimistic locking exception (using global acquire lock) for engine {}", getEngineName(), optimisticLockingException);
 
         } else {
             LOGGER.debug(
@@ -259,7 +259,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
         if (millisToWait > 0) {
             try {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("timer job acquisition thread sleeping for {} millis", millisToWait);
+                    LOGGER.debug("timer job acquisition thread for engine {} sleeping for {} millis", getEngineName(), millisToWait);
                 }
                 synchronized (MONITOR) {
                     if (!isInterrupted) {
@@ -270,11 +270,11 @@ public class AcquireTimerJobsRunnable implements Runnable {
                 }
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("timer job acquisition thread woke up");
+                    LOGGER.debug("timer job acquisition thread for engine {} woke up", getEngineName());
                 }
             } catch (InterruptedException e) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("timer job acquisition wait interrupted");
+                    LOGGER.debug("timer job acquisition wait for engine {} interrupted", getEngineName());
                 }
             } finally {
                 isWaiting.set(false);
@@ -293,7 +293,7 @@ public class AcquireTimerJobsRunnable implements Runnable {
             }
         } catch (Throwable e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Failed to unlock timer jobs during acquiring. This is OK since they will be unlocked when the reset expired jobs thread runs", e);
+                LOGGER.debug("Failed to unlock timer jobs during acquiring for engine {}. This is OK since they will be unlocked when the reset expired jobs thread runs", getEngineName(), e);
             }
         }
     }

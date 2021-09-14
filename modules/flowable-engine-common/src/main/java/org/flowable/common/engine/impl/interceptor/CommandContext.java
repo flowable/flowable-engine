@@ -38,6 +38,7 @@ public class CommandContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandContext.class);
 
     protected Map<String, AbstractEngineConfiguration> engineConfigurations;
+    protected LinkedList<String> engineCfgStack = new LinkedList<String>();
     protected Command<?> command;
     protected Map<Class<?>, SessionFactory> sessionFactories;
     protected Map<Class<?>, Session> sessions = new HashMap<>();
@@ -293,6 +294,40 @@ public class CommandContext {
     
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
+    }
+
+    public void pushEngineCfgToStack(String engineCfgKey) {
+        engineCfgStack.push(engineCfgKey);
+    }
+
+    public String popEngineCfgStack() {
+        return engineCfgStack.pop();
+    }
+
+    /**
+     * @return Returns whether (at the time of calling this method) the current engine
+     * is being executed as the 'root engine'. Or said differently: this will return
+     * <em>false</em> when the current engine is being used in a nested {@link Command} execution call
+     * and will return <em>true</em> if it is the root usage of the current engine.
+     *
+     * For example:
+     * CMMN engine executes process task, that in its turn calls a CMMN task.
+     * The hierarchy of engine will be CMMN (a) - BPMN (b) - CMMN (c).
+     *
+     * If this method is called in the context of (c), false is returned.
+     * In the context of (a), true will be returned. For (b), there is but one
+     * usage and it will be true.
+     */
+    public boolean isRootUsageOfCurrentEngine() {
+        String currentEngineCfgKey = engineCfgStack.peek();
+        if (currentEngineCfgKey != null) {
+            for (int i = 1; i < engineCfgStack.size(); i++) {
+                if (currentEngineCfgKey.equals(engineCfgStack.get(i))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
     public void addEngineConfiguration(String engineKey, String scopeType, AbstractEngineConfiguration engineConfiguration) {

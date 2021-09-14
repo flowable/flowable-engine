@@ -225,6 +225,11 @@
 				<version>8.0.19</version>
 			</dependency>
 			<dependency>
+				<groupId>org.mariadb.jdbc</groupId>
+				<artifactId>mariadb-java-client</artifactId>
+				<version>2.7.4</version>
+			</dependency>
+			<dependency>
 				<groupId>com.ibm.db2</groupId>
 				<artifactId>jcc</artifactId>
 				<version>11.5.6.0</version>
@@ -1927,6 +1932,15 @@
 				<dependency>
 					<groupId>mysql</groupId>
 					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>mariadb</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.mariadb.jdbc</groupId>
+					<artifactId>mariadb-java-client</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
