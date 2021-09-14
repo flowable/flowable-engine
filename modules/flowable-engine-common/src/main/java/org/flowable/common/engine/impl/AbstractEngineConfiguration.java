@@ -624,6 +624,7 @@ public abstract class AbstractEngineConfiguration {
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory, 
                         classLoader, useClassForNameClassLoading, clock, objectMapper);
                 engineConfigurations.put(engineCfgKey, this);
+                commandContextInterceptor.setEngineCfgKey(engineCfgKey);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
                 interceptors.add(commandContextInterceptor);
             }

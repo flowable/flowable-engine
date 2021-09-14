@@ -25,7 +25,6 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.junit.Test;
@@ -98,10 +97,8 @@ public class CaseCompletionOnStageListenerTest extends CustomCmmnConfigurationFl
         }
 
         public void readVariable(PlanItemInstance planItemInstance, String var) {
-            // if this method gets invoked on the cmmn runtime service, it creates a new context which will lead to the case completion at the end of the context
-            // TODO: once fixed, uncomment the line below and remove the one through the plan item instance entity
-            //caseService.getVariable(planItemInstance.getCaseInstanceId(), var);
-            ((PlanItemInstanceEntity)planItemInstance).getVariable(var);
+            // If this method gets invoked on the cmmn runtime service, it creates a new context which will lead to the case completion at the end of the context
+            caseService.getVariable(planItemInstance.getCaseInstanceId(), var);
         }
 
     }
