@@ -30,6 +30,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity implements HistoricCaseInstanceEntity {
     
     protected String businessKey;
+    protected String businessStatus;
     protected String name;
     protected String parentId;
     protected String caseDefinitionId;
@@ -61,6 +62,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     public HistoricCaseInstanceEntityImpl(CaseInstance caseInstance) {
         this.id = caseInstance.getId();
         this.businessKey = caseInstance.getBusinessKey();
+        this.businessStatus = caseInstance.getBusinessStatus();
         this.name = caseInstance.getName();
         this.parentId = caseInstance.getParentId();
         this.caseDefinitionId = caseInstance.getCaseDefinitionId();
@@ -85,6 +87,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("businessKey", businessKey);
+        persistentState.put("businessStatus", businessStatus);
         persistentState.put("name", name);
         persistentState.put("parentId", parentId);
         persistentState.put("caseDefinitionId", caseDefinitionId);
@@ -107,6 +110,14 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    @Override
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+    @Override
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
     @Override
     public String getName() {

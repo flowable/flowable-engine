@@ -41,7 +41,8 @@
         CALLBACK_TYPE_,
         REFERENCE_ID_,
         REFERENCE_TYPE_,
-        PROPAGATED_STAGE_INST_ID_
+        PROPAGATED_STAGE_INST_ID_,
+        BUSINESS_STATUS_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1, #{processInstanceId, jdbcType=VARCHAR},
@@ -61,7 +62,8 @@
         #{callbackType, jdbcType=VARCHAR},
         #{referenceId, jdbcType=VARCHAR},
         #{referenceType, jdbcType=VARCHAR},
-        #{propagatedStageInstanceId, jdbcType=VARCHAR}
+        #{propagatedStageInstanceId, jdbcType=VARCHAR},
+        #{businessStatus, jdbcType=VARCHAR}
       )
   </insert>
   
@@ -86,7 +88,8 @@
         CALLBACK_TYPE_,
         REFERENCE_ID_,
         REFERENCE_TYPE_,
-        PROPAGATED_STAGE_INST_ID_
+        PROPAGATED_STAGE_INST_ID_,
+        BUSINESS_STATUS_
       ) values
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
@@ -108,7 +111,8 @@
            #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
            #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
            #{historicProcessInstance.referenceType, jdbcType=VARCHAR},
-           #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR}
+           #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR},
+           #{historicProcessInstance.businessStatus, jdbcType=VARCHAR}
           )
          </foreach>
   </insert>
@@ -136,7 +140,8 @@
             CALLBACK_TYPE_,
             REFERENCE_ID_,
             REFERENCE_TYPE_,
-            PROPAGATED_STAGE_INST_ID_
+            PROPAGATED_STAGE_INST_ID_,
+            BUSINESS_STATUS_
           ) VALUES
               (
                #{historicProcessInstance.id ,jdbcType=VARCHAR},
@@ -157,7 +162,8 @@
                #{historicProcessInstance.callbackType, jdbcType=VARCHAR},
                #{historicProcessInstance.referenceId, jdbcType=VARCHAR},
                #{historicProcessInstance.referenceType, jdbcType=VARCHAR},
-               #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR}
+               #{historicProcessInstance.propagatedStageInstanceId, jdbcType=VARCHAR},
+               #{historicProcessInstance.businessStatus, jdbcType=VARCHAR}
               )
        </foreach>
     SELECT * FROM dual
@@ -206,7 +212,10 @@
           REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
-            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
+          PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.businessStatus != businessStatus">
+          BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR},
         </if>
       </set>
     where ID_ = #{id}
@@ -233,6 +242,7 @@
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" /> 
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
@@ -260,6 +270,7 @@
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR"/>
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionName" column="PROC_DEF_NAME_" jdbcType="VARCHAR" /> 
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
@@ -694,6 +705,12 @@
       <if test="businessKeyLike != null">
         and ${queryTablePrefix}BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
       </if>
+      <if test="businessStatus != null">
+        and ${queryTablePrefix}BUSINESS_STATUS_ = #{businessStatus}
+      </if>
+      <if test="businessStatusLike != null">
+        and ${queryTablePrefix}BUSINESS_STATUS_ like #{businessStatusLike}${wildcardEscapeClause}
+      </if>
       <if test="startedBefore != null">
         and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
       </if>
@@ -815,6 +832,12 @@
       </if>
       <if test="orQueryObject.businessKeyLike != null">
         or ${queryTablePrefix}BUSINESS_KEY_ like #{orQueryObject.businessKeyLike}${wildcardEscapeClause}
+      </if>
+      <if test="orQueryObject.businessStatus != null">
+        or ${queryTablePrefix}BUSINESS_STATUS_ = #{orQueryObject.businessStatus}
+      </if>
+      <if test="orQueryObject.businessStatusLike != null">
+        or ${queryTablePrefix}BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.startedBefore != null">
         or ${queryTablePrefix}START_TIME_ &lt;= #{orQueryObject.startedBefore}

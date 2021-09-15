@@ -56,6 +56,11 @@ public interface ProcessInstance extends Execution {
      * The business key of this process instance.
      */
     String getBusinessKey();
+    
+    /**
+     * The business status of this process instance.
+     */
+    String getBusinessStatus();
 
     /**
      * returns true if the process instance is suspended

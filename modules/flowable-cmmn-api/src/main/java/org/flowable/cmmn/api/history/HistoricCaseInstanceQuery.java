@@ -42,6 +42,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
     
     /**
+     * Only select historic case instances with the given business status.
+     */
+    HistoricCaseInstanceQuery caseInstanceBusinessStatus(String caseInstanceBusinessStatus);
+    
+    /**
      * Only select historic case instances with the parent identifier.
      */
     HistoricCaseInstanceQuery caseInstanceParentId(String parentId);

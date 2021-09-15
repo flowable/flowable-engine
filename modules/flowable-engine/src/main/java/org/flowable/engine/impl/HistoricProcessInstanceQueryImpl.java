@@ -57,6 +57,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String processDefinitionId;
     protected String businessKey;
     protected String businessKeyLike;
+    protected String businessStatus;
+    protected String businessStatusLike;
     protected String deploymentId;
     protected List<String> deploymentIds;
     protected boolean finished;
@@ -218,6 +220,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.businessKeyLike = businessKeyLike;
         } else {
             this.businessKeyLike = businessKeyLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery processInstanceBusinessStatus(String businessStatus) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatus = businessStatus;
+        } else {
+            this.businessStatus = businessStatus;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatusLike = businessStatusLike;
+        } else {
+            this.businessStatusLike = businessStatusLike;
         }
         return this;
     }
@@ -885,6 +907,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getBusinessKeyLike() {
         return businessKeyLike;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public String getBusinessStatusLike() {
+        return businessStatusLike;
     }
 
     public boolean isOpen() {

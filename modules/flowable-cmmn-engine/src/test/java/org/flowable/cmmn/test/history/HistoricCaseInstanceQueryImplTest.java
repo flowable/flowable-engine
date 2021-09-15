@@ -393,6 +393,45 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .isEqualTo(caseInstance.getId());
         }
     }
+    
+    @Test
+    public void getCaseInstanceByBusinessStatus() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        
+        cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "businessStatus");
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("businessStatus")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count())
+                .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("businessStatus")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("undefined")
+                .caseDefinitionId("undefined")
+                .endOr()
+                .singleResult())
+                .isNull();
+        }
+    }
 
     @Test
     public void getCaseInstanceByStartedBefore() {

@@ -511,5 +511,17 @@
         </addColumn>
 
     </changeSet>
+    
+    <changeSet id="13" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="BUSINESS_STATUS_" type="varchar(255)" />
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="BUSINESS_STATUS_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
 
 </databaseChangeLog>

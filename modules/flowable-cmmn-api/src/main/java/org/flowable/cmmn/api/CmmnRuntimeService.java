@@ -325,5 +325,15 @@ public interface CmmnRuntimeService {
      *     new businessKey value
      */
     void updateBusinessKey(String caseInstanceId, String businessKey);
+    
+    /**
+     * Updates the business status for the provided case instance
+     *
+     * @param caseInstanceId
+     *     id of the case instance to set the business status, cannot be null
+     * @param businessStatus
+     *     new business status value
+     */
+    void updateBusinessStatus(String caseInstanceId, String businessStatus);
 
 }

@@ -796,7 +796,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
     }
-
+    
     public String getProcessBusinessKey() {
         return getProcessInstance().getBusinessKey();
     }
@@ -804,6 +804,11 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     @Override
     public String getProcessInstanceBusinessKey() {
         return getProcessInstance().getBusinessKey();
+    }
+    
+    @Override
+    public String getProcessInstanceBusinessStatus() {
+        return null;
     }
 
     // process definition ///////////////////////////////////////////////////////

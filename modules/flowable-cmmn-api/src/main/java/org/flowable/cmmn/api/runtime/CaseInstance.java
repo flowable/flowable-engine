@@ -23,6 +23,7 @@ public interface CaseInstance {
     String getId();
     String getParentId();
     String getBusinessKey();
+    String getBusinessStatus();
     String getName();
     String getCaseDefinitionId();
     String getCaseDefinitionKey();

@@ -197,6 +197,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
      * Persisted reference to the business key.
      */
     protected String businessKey;
+    
+    /**
+     * Persisted reference to the business status.
+     */
+    protected String businessStatus;
 
     /**
      * Persisted reference to the parent of this execution.
@@ -259,6 +264,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
         persistentState.put("businessKey", this.businessKey);
+        persistentState.put("businessStatus", this.businessStatus);
         persistentState.put("activityId", this.activityId);
         persistentState.put("isActive", this.isActive);
         persistentState.put("isConcurrent", this.isConcurrent);
@@ -383,8 +389,23 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    @Override
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+    }
+
+    @Override
     public String getProcessInstanceBusinessKey() {
         return getProcessInstance().getBusinessKey();
+    }
+    
+    @Override
+    public String getProcessInstanceBusinessStatus() {
+        return getProcessInstance().getBusinessStatus();
     }
 
     // process definition ///////////////////////////////////////////////////////

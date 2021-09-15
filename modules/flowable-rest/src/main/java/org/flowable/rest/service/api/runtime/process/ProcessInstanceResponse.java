@@ -36,6 +36,7 @@ public class ProcessInstanceResponse {
     protected String url;
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected boolean suspended;
     protected boolean ended;
     protected String processDefinitionId;
@@ -91,6 +92,15 @@ public class ProcessInstanceResponse {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    @ApiModelProperty(example = "myBusinessStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     public boolean isSuspended() {

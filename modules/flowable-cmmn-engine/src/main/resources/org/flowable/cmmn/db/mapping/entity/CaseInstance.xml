@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
 
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_) values (
             #{id ,jdbcType=VARCHAR},
             1, #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
@@ -21,12 +21,13 @@
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
             #{completeable ,jdbcType=BOOLEAN},
-            #{tenantId ,jdbcType=VARCHAR}
+            #{tenantId ,jdbcType=VARCHAR},
+            #{businessStatus ,jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_)
         values
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
@@ -45,7 +46,8 @@
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
                 #{caseInstance.referenceType ,jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
-                #{caseInstance.tenantId ,jdbcType=VARCHAR}
+                #{caseInstance.tenantId ,jdbcType=VARCHAR},
+                #{caseInstance.businessStatus ,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -53,7 +55,7 @@
     <insert id="bulkInsertCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="caseInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_) VALUES
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
                 1, #{caseInstance.parentId ,jdbcType=VARCHAR},
@@ -70,7 +72,8 @@
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
                 #{caseInstance.referenceType ,jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
-                #{caseInstance.tenantId ,jdbcType=VARCHAR}
+                #{caseInstance.tenantId ,jdbcType=VARCHAR},
+                #{caseInstance.businessStatus ,jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -125,6 +128,9 @@
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.businessStatus != businessStatus">
+                BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR},
+            </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </update>
@@ -164,6 +170,7 @@
         <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
         <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+        <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
         <result property="name" column="NAME_" jdbcType="VARCHAR" />
         <result property="state" column="STATE_" jdbcType="VARCHAR" />
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
@@ -379,6 +386,9 @@
             </if>
             <if test="businessKey != null">
                 and RES.BUSINESS_KEY_ = #{businessKey}
+            </if>
+            <if test="businessStatus != null">
+                and RES.BUSINESS_STATUS_ = #{businessStatus}
             </if>
             <if test="startedBefore != null">
                 and RES.START_TIME_ &lt;= #{startedBefore}
@@ -597,6 +607,9 @@
                     </if>
                     <if test="orQueryObject.businessKey != null">
                         or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
+                    </if>
+                    <if test="orQueryObject.businessStatus != null">
+                        or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus}
                     </if>
                     <if test="orQueryObject.startedBefore != null">
                         or RES.START_TIME_ &lt;= #{orQueryObject.startedBefore}

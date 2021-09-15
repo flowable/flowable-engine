@@ -42,6 +42,8 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     void delete(String caseInstanceId, boolean cascade, String deleteReason);
     
     void updateCaseInstanceBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+    
+    void updateCaseInstanceBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus);
 
     void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime);
 

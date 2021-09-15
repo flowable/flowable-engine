@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntity implements CaseInstanceEntity {
 
     protected String businessKey;
+    protected String businessStatus;
     protected String name;
     protected String parentId;
     protected String caseDefinitionId;
@@ -79,6 +80,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public CaseInstanceEntityImpl(HistoricCaseInstance historicCaseInstance, Map<String, VariableInstanceEntity> variables) {
         this.id = historicCaseInstance.getId();
         this.businessKey = historicCaseInstance.getBusinessKey();
+        this.businessStatus = historicCaseInstance.getBusinessStatus();
         this.name = historicCaseInstance.getName();
         this.parentId = historicCaseInstance.getParentId();
         this.caseDefinitionId = historicCaseInstance.getCaseDefinitionId();
@@ -104,6 +106,7 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("businessKey", businessKey);
+        persistentState.put("businessStatus", businessStatus);
         persistentState.put("name", name);
         persistentState.put("parentId", parentId);
         persistentState.put("caseDefinitionId", caseDefinitionId);
@@ -128,6 +131,14 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    @Override
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+    @Override
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
     @Override
     public String getName() {
