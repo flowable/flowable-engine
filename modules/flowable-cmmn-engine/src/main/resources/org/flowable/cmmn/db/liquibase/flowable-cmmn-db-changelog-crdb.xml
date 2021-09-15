@@ -524,4 +524,56 @@
 
     </changeSet>
 
+    <changeSet id="13" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="LAST_UNAVAILABLE_TIME_" type="datetime(3)" />
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_PLAN_ITEM_INST">
+            <column name="LAST_UNAVAILABLE_TIME_" type="datetime(3)" />
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="14" author="flowable">
+
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="LAST_REACTIVATION_TIME_" type="datetime(3)" />
+            <column name="LAST_REACTIVATION_USER_ID_" type="varchar(255)" />
+        </addColumn>
+
+        <addColumn tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="LAST_REACTIVATION_TIME_" type="datetime(3)" />
+            <column name="LAST_REACTIVATION_USER_ID_" type="varchar(255)" />
+        </addColumn>
+
+    </changeSet>
+
+    <changeSet id="15" author="flowable" dbms="mariadb">
+
+        <modifyDataType tableName="ACT_CMMN_DEPLOYMENT" columnName="DEPLOY_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="START_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_RU_PLAN_ITEM_INST" columnName="CREATE_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_RU_SENTRY_PART_INST" columnName="TIME_STAMP_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_RU_MIL_INST" columnName="TIME_STAMP_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="START_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="END_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_MIL_INST" columnName="TIME_STAMP_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="LOCK_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="CREATE_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_AVAILABLE_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_ENABLED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_DISABLED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_STARTED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_SUSPENDED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="COMPLETED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="OCCURRED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="TERMINATED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="EXIT_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="ENDED_TIME_" newDataType="datetime(3)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="LAST_UPDATED_TIME_" newDataType="datetime(3)" />
+
+    </changeSet>
+
 </databaseChangeLog>
