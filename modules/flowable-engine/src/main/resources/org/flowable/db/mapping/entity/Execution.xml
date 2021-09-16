@@ -732,7 +732,7 @@
         and RES.BUSINESS_STATUS_ = #{businessStatus}
       </if>
       <if test="businessStatusLike != null">
-        and RES.BUSINESS_STATUS_ like #{businessStatusLike}
+        and RES.BUSINESS_STATUS_ like #{businessStatusLike}${wildcardEscapeClause}
       </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId} and RES.IS_ACTIVE_ = #{isActive}
@@ -1022,7 +1022,7 @@
             or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus}
           </if>
           <if test="orQueryObject.businessStatusLike != null">
-            or RES.BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike}
+            or RES.BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike}${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.activityId != null">
             or (RES.ACT_ID_ = #{orQueryObject.activityId} and RES.IS_ACTIVE_ = #{isActive})
