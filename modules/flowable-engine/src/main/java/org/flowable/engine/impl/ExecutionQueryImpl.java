@@ -961,6 +961,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public String getBusinessKeyLike() {
         return businessKeyLike;
     }
+    
+    public String getBusinessStatus() {
+        return null;
+    }
+    
+    public String getBusinessStatusLike() {
+        return null;
+    }
 
     public String getExecutionId() {
         return executionId;
