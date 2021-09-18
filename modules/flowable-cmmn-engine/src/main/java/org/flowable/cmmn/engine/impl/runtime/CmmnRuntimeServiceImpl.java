@@ -133,7 +133,7 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
 
     @Override
     public void completeStagePlanItemInstance(String planItemInstanceId, boolean force) {
-        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, true));
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId, force));
     }
 
     @Override
