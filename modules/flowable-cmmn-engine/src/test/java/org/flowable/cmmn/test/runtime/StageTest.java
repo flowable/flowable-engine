@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.junit.Test;
@@ -918,4 +920,26 @@ public class StageTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testForceComplete() {
+        CaseInstance caseInstance = cmmnRuntimeService
+                .createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService
+                .createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .onlyStages()
+                .singleResult();
+
+        assertThatThrownBy(() -> cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId(), false))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageStartingWith("Can only complete a stage plan item instance that is marked as completable");
+        assertCaseInstanceNotEnded(caseInstance);
+
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId(), true);
+        assertCaseInstanceEnded(caseInstance);
+    }
 }
