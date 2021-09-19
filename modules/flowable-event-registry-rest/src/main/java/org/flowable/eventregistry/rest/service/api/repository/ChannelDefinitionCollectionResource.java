@@ -85,7 +85,8 @@ public class ChannelDefinitionCollectionResource {
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return channel definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return channel definitions with a category like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return channel definitions which do not have the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return channel definitions with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return channel definitions which are part of a deployment with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return channel definitions which are part of a deployment awith the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest channel definition versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name,id,key,category,deploymentId,version", paramType = "query"),
     })
@@ -145,6 +146,9 @@ public class ChannelDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("deploymentId")) {
             channelDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            channelDefinitionQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
         }
         if (allRequestParams.containsKey("tenantId")) {
             channelDefinitionQuery.tenantId(allRequestParams.get("tenantId"));

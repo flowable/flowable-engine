@@ -40,6 +40,7 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
     protected String nameLike;
     protected String deploymentId;
     protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
     protected Integer version;
@@ -140,6 +141,15 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
             throw new FlowableIllegalArgumentException("ids are null");
         }
         this.deploymentIds = deploymentIds;
+        return this;
+    }
+
+    @Override
+    public ChannelDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -327,6 +337,10 @@ public class ChannelDefinitionQueryImpl extends AbstractQuery<ChannelDefinitionQ
 
     public Set<String> getDeploymentIds() {
         return deploymentIds;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getId() {

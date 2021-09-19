@@ -116,6 +116,38 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void testQueryByParentDeploymentId() {
+        CmmnDeployment deployment1 = cmmnRepositoryService.createDeployment()
+                .parentDeploymentId("parent1")
+                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
+                .deploy();
+
+        CmmnDeployment deployment2 = cmmnRepositoryService.createDeployment()
+                .parentDeploymentId("parent2")
+                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/repository/simple-case2.cmmn")
+                .deploy();
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent1").list())
+                .extracting(CaseDefinition::getKey, CaseDefinition::getDeploymentId)
+                .containsExactlyInAnyOrder(
+                        tuple("myCase", deployment1.getId())
+                );
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").list())
+                .extracting(CaseDefinition::getKey, CaseDefinition::getDeploymentId)
+                .containsExactlyInAnyOrder(
+                        tuple("myCase", deployment2.getId()),
+                        tuple("myCase2", deployment2.getId())
+                );
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("parent2").count()).isEqualTo(2);
+
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
+        assertThat(cmmnRepositoryService.createCaseDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
+    }
+
+    @Test
     public void testQueryByInvalidDeploymentIds() {
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).list()).isEmpty();
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().deploymentIds(new HashSet<>(Collections.singletonList("invalid"))).count()).isZero();

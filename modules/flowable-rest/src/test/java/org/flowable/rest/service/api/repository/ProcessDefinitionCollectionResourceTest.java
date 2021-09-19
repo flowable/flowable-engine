@@ -42,9 +42,15 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
     public void testGetProcessDefinitions() throws Exception {
 
         try {
-            Deployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml").deploy();
+            Deployment firstDeployment = repositoryService.createDeployment()
+                    .name("Deployment 1")
+                    .parentDeploymentId("parent1")
+                    .addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml")
+                    .deploy();
 
-            Deployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml")
+            Deployment secondDeployment = repositoryService.createDeployment().name("Deployment 2")
+                    .parentDeploymentId("parent2")
+                    .addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml")
                     .addClasspathResource("org/flowable/rest/service/api/repository/twoTaskProcess.bpmn20.xml").deploy();
 
             Deployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3").addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcessWithDi.bpmn20.xml").deploy();
@@ -137,6 +143,14 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();
             assertResultsPresentInDataResponse(url, twoTaskprocess.getId(), latestOneTaskProcess.getId());
+
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent2";
+            assertResultsPresentInDataResponse(url, twoTaskprocess.getId(), latestOneTaskProcess.getId());
+
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent1";
+            assertResultsPresentInDataResponse(url, oneTaskProcess.getId());
 
             // Test startableByUser
             url = baseUrl + "?startableByUser=kermit";

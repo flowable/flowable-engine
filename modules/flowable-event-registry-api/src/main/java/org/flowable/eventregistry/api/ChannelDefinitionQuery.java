@@ -65,6 +65,11 @@ public interface ChannelDefinitionQuery extends Query<ChannelDefinitionQuery, Ch
     ChannelDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
     /**
+     * Only select channel definitions that are deployed in a deployment with the given parent deployment id
+     */
+    ChannelDefinitionQuery parentDeploymentId(String parentDeploymentId);
+
+    /**
      * Only select channel definition with the given key.
      */
     ChannelDefinitionQuery channelDefinitionKey(String channelDefinitionKey);

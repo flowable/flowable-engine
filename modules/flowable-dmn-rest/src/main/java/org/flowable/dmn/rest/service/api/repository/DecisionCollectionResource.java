@@ -82,7 +82,8 @@ public class DecisionCollectionResource {
             @ApiImplicitParam(name = "resourceNameLike", dataType = "string", value = "Only return decision with a name like the given resource name.", paramType = "query"),
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return decision with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest decision versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return decision with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return decisions which are part of a deployment with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return decisions which are part of a deployment with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision with the given tenant ID.", paramType = "query"),
             @ApiImplicitParam(name = "decisionType", dataType = "string", value = "Only return decision with the given type.", paramType = "query"),
             @ApiImplicitParam(name = "decisionTypeLike", dataType = "string", value = "Only return decision like the given type.", paramType = "query"),
@@ -136,6 +137,9 @@ public class DecisionCollectionResource {
         }
         if (allRequestParams.containsKey("deploymentId")) {
             definitionQuery.deploymentId(allRequestParams.get("deploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            definitionQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
         }
         if (allRequestParams.containsKey("tenantId")) {
             definitionQuery.decisionTenantId(allRequestParams.get("tenantId"));
