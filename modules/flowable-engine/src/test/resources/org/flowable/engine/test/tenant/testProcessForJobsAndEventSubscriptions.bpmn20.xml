@@ -24,7 +24,7 @@
         <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
       </extensionElements>
       <timerEventDefinition>
-        <timeDuration>P100Y</timeDuration>
+        <timeDuration>P1Y</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
     <serviceTask id="externalWorkerTask1" name="External Worker task" flowable:type="external-worker" flowable:topic="aJobTopic" flowable:exclusive="false">
@@ -44,7 +44,7 @@
         <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
       </extensionElements>
       <timerEventDefinition>
-        <timeDuration>P100Y</timeDuration>
+        <timeDuration>P1Y</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
     <intermediateCatchEvent id="intermediateTimerEvent3" name="Timer to create a deadletter job">
@@ -52,7 +52,7 @@
         <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
       </extensionElements>
       <timerEventDefinition>
-        <timeDuration>P100Y</timeDuration>
+        <timeDuration>P1Y</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
     <parallelGateway id="parallelGateway2">
