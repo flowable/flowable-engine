@@ -13,38 +13,59 @@
 
 package org.flowable.content.engine.impl.tenant;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
+
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
+import org.flowable.common.engine.impl.cmd.ChangeTenantIdCmd;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.content.engine.impl.cmd.ChangeTenantIdContentCompleteCmd;
-import org.flowable.content.engine.impl.cmd.ChangeTenantIdContentSimulateCmd;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdRequest;
+import org.flowable.content.engine.ContentEngineConfiguration;
 
 public class ChangeTenantIdBuilderContentImpl implements ChangeTenantIdBuilder {
 
     private final CommandExecutor commandExecutor;
     private final String fromTenantId;
     private final String toTenantId;
+    private final String defaultTenantId;
+    private final Map<String, Function<ChangeTenantIdRequest, Long>> mapOfEntitiesAndFunctions;
 
-    public ChangeTenantIdBuilderContentImpl(CommandExecutor commandExecutor, String fromTenantId,
-            String toTenantId) {
+    public ChangeTenantIdBuilderContentImpl(CommandExecutor commandExecutor,
+            ContentEngineConfiguration contentEngineConfiguration, String fromTenantId, String toTenantId) {
         this.commandExecutor = commandExecutor;
         this.fromTenantId = fromTenantId;
         this.toTenantId = toTenantId;
+        this.defaultTenantId = contentEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(fromTenantId,
+                null, null);
+        this.mapOfEntitiesAndFunctions = Collections.singletonMap(ChangeTenantIdEntityTypes.CONTENT_ITEM_INSTANCES,
+                r -> contentEngineConfiguration.getContentItemEntityManager().changeTenantIdContentItemInstances(r));
     }
 
     @Override
     public ChangeTenantIdBuilder onlyInstancesFromDefaultTenantDefinitions() {
-            throw new UnsupportedOperationException("Content items do not have definitions. Unsupported builder option.");
+        throw new UnsupportedOperationException("Content items do not have definitions. Unsupported builder option.");
     }
 
     @Override
     public ChangeTenantIdResult simulate() {
-        return commandExecutor.execute(new ChangeTenantIdContentSimulateCmd(fromTenantId, toTenantId));
+        ChangeTenantIdRequest changeTenantIdRequest = DefaultChangeTenantIdRequest
+                .builder(this.fromTenantId, this.toTenantId).defaultTenantId(defaultTenantId)
+                .dryRun(true) // This is a drill.
+                .build();
+        return commandExecutor.execute(new ChangeTenantIdCmd(changeTenantIdRequest, mapOfEntitiesAndFunctions));
     }
 
     @Override
     public ChangeTenantIdResult complete() {
-        return commandExecutor.execute(new ChangeTenantIdContentCompleteCmd(fromTenantId, toTenantId));
+        ChangeTenantIdRequest changeTenantIdRequest = DefaultChangeTenantIdRequest
+                .builder(this.fromTenantId, this.toTenantId).defaultTenantId(defaultTenantId)
+                .dryRun(false) // This is NOT a drill!
+                .build();
+        return commandExecutor.execute(new ChangeTenantIdCmd(changeTenantIdRequest, mapOfEntitiesAndFunctions));
     }
 
 }

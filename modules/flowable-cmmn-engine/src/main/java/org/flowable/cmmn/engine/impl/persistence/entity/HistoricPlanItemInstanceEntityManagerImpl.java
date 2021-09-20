@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -65,15 +66,8 @@ public class HistoricPlanItemInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdCmmnHistoricPlanItemInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdCmmnHistoricPlanItemInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdCmmnHistoricPlanItemInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdCmmnHistoricPlanItemInstances(changeTenantIdRequest);
     }
 
 }

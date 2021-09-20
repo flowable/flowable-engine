@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
@@ -375,26 +376,12 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     }
     
     @Override
-    public long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdEventSubscriptions", parameters);
-    }
-
-    @Override
-    public long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().update("changeTenantIdEventSubscriptions", parameters);
+    public long changeTenantIdEventSubscriptions(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdEventSubscriptions", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdEventSubscriptions", changeTenantIdRequest);
+        }
     }
 
 }

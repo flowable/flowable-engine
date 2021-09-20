@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
@@ -109,14 +110,7 @@ public class HistoricTaskInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdHistoricTaskInstances(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdHistoricTaskInstances(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdHistoricTaskInstances(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdHistoricTaskInstances(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdHistoricTaskInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdHistoricTaskInstances(changeTenantIdRequest);
     }
 }

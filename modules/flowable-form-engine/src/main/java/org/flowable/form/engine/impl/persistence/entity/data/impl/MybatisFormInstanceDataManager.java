@@ -12,11 +12,9 @@
  */
 package org.flowable.form.engine.impl.persistence.entity.data.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
@@ -71,28 +69,12 @@ public class MybatisFormInstanceDataManager extends AbstractFormDataManager<Form
     }
 
     @Override
-    public long countChangeTenantIdFormInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-                String defaultTenantId = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.FORM, null);
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("sourceTenantId", sourceTenantId);
-                parameters.put("defaultTenantId", defaultTenantId);
-                parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-                parameters.put("scope", scope);
-                return (long) getDbSqlSession().selectOne("countChangeTenantIdFormInstances", parameters);
-    }
-
-    @Override
-    public long changeTenantIdFormInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-                String defaultTenantId = formEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.FORM, null);
-                Map<String, Object> parameters = new HashMap<>();
-                parameters.put("sourceTenantId", sourceTenantId);
-                parameters.put("targetTenantId", targetTenantId);
-                parameters.put("defaultTenantId", defaultTenantId);
-                parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-                parameters.put("scope", scope);
-                return (long) getDbSqlSession().update("changeTenantIdFormInstances", parameters);
+    public long changeTenantIdFormInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdFormInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdFormInstances", changeTenantIdRequest);
+        }
     }
     
 }

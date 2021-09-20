@@ -64,7 +64,7 @@ public class ContentManagementServiceImpl extends CommonEngineServiceImpl<Conten
 
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
-        return new ChangeTenantIdBuilderContentImpl(commandExecutor, fromTenantId, toTenantId);
+        return new ChangeTenantIdBuilderContentImpl(commandExecutor, super.getConfiguration(), fromTenantId, toTenantId);
     }
 
 }

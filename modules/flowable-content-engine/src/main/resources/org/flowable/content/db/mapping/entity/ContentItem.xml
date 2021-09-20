@@ -330,12 +330,12 @@
     </delete>
 
 
-  <select id="countChangeTenantIdContentItemInstances" parameterType="string" resultType="long">
+  <select id="countChangeTenantIdContentItemInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_CO_CONTENT_ITEM RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
   </select>
 
-  <update id="changeTenantIdContentItemInstances" parameterType="java.util.Map">
+  <update id="changeTenantIdContentItemInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_CO_CONTENT_ITEM RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
     <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>

@@ -14,6 +14,7 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
@@ -101,9 +102,7 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     List<CompensateEventSubscriptionEntity> findCompensateEventSubscriptionsByExecutionIdAndActivityId(String executionId, String activityId);
 
     List<CompensateEventSubscriptionEntity> findCompensateEventSubscriptionsByProcessInstanceIdAndActivityId(String processInstanceId, String activityId);
-        
-    long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+            
+    long changeTenantIdEventSubscriptions(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
@@ -54,9 +55,7 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
     long findJobCountByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery);
 
     List<ExternalWorkerJobEntity> findExternalJobsToExecute(ExternalWorkerJobAcquireBuilderImpl builder, int numberOfJobs);
-        
-    long countChangeTenantIdExternalWorkerJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdExternalWorkerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+            
+    long changeTenantIdExternalWorkerJobs(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

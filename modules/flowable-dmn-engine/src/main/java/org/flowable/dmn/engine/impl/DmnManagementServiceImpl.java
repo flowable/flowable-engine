@@ -64,7 +64,7 @@ public class DmnManagementServiceImpl extends CommonEngineServiceImpl<DmnEngineC
 
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
-        return new ChangeTenantIdBuilderDmnImpl(commandExecutor, fromTenantId, toTenantId);
+        return new ChangeTenantIdBuilderDmnImpl(commandExecutor, super.getConfiguration(), fromTenantId, toTenantId);
     }
 
 }

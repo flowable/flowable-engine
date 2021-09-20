@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl;
@@ -33,9 +34,7 @@ public interface HistoricDecisionExecutionEntityManager extends EntityManager<Hi
     List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap);
-
-    long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
     
-    long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdHistoricDecisionExecutions(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

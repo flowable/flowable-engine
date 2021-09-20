@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -24,6 +22,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstance
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricPlanItemInstanceDataManager;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
@@ -94,22 +93,12 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     }
 
     @Override
-    public long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricPlanItemInstances", parameters);
-    }
-
-    @Override
-    public long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricPlanItemInstances", parameters);
+    public long changeTenantIdCmmnHistoricPlanItemInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnHistoricPlanItemInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdCmmnHistoricPlanItemInstances", changeTenantIdRequest);
+        }
     }
 
 }

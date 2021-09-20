@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
@@ -55,9 +56,7 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     void deleteByCaseInstanceId(String caseInstanceId);
 
     void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
-
-    long countChangeTenantIdCmmnPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
     
-    long changeTenantIdCmmnPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdCmmnPlanItemInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -71,15 +72,8 @@ public class HistoricCaseInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdCmmnHistoricCaseInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdCmmnHistoricCaseInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdCmmnHistoricCaseInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdCmmnHistoricCaseInstances(changeTenantIdRequest);
     }
 
 }

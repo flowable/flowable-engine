@@ -14,6 +14,7 @@ package org.flowable.content.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
@@ -32,9 +33,7 @@ public interface ContentItemEntityManager extends EntityManager<ContentItemEntit
     void deleteContentItemsByProcessInstanceId(String processInstanceId);
 
     void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType);
-
-    long countChangeTenantIdContentItemInstances(String sourceTenantId);
     
-    long changeTenantIdContentItemInstances(String sourceTenantId, String targetTenantId);
+    long changeTenantIdContentItemInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

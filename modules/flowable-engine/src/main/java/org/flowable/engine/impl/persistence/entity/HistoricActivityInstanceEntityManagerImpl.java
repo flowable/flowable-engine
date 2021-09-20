@@ -16,6 +16,7 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
@@ -98,15 +99,8 @@ public class HistoricActivityInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdHistoricActivityInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdHistoricActivityInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdHistoricActivityInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdHistoricActivityInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdHistoricActivityInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdHistoricActivityInstances(changeTenantIdRequest);
     }
 
 }

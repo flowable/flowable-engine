@@ -12,9 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -23,6 +21,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityI
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 
 /**
@@ -79,22 +78,12 @@ public class MybatisMilestoneInstanceDataManager extends AbstractCmmnDataManager
     }
 
     @Override
-    public long countChangeTenantIdCmmnMilestoneInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnMilestoneInstances", parameters);
-    }
-
-    @Override
-    public long changeTenantIdCmmnMilestoneInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdCmmnMilestoneInstances", parameters);
+    public long changeTenantIdCmmnMilestoneInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnMilestoneInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdCmmnMilestoneInstances", changeTenantIdRequest);
+        }
     }
 
 }

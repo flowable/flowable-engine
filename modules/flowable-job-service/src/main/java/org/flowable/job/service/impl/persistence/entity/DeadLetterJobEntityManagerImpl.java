@@ -16,6 +16,7 @@ package org.flowable.job.service.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -131,17 +132,8 @@ public class DeadLetterJobEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdDeadLetterJobs(sourceTenantId, defaultTenantId,
-                onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdDeadLetterJobs(sourceTenantId, targetTenantId, defaultTenantId,
-                onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdDeadLetterJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdDeadLetterJobs(changeTenantIdRequest);
     }
 
 }

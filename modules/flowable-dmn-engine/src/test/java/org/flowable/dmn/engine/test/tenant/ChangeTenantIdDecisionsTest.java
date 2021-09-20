@@ -14,9 +14,14 @@
 package org.flowable.dmn.engine.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
@@ -96,6 +101,20 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
 
         // The simulation result must match the actual result
         assertThat(simulationResult).isEqualTo(result).as("The simulation result must match the actual result.");
+
+        //Expected results map
+        Map<String, Long> resultMap = Collections.singletonMap(HISTORIC_DECISION_EXECUTIONS, 1L);
+
+        //Check that all the entities are returned
+        simulationResult.getChangedEntityTypes().containsAll(resultMap.keySet());
+        result.getChangedEntityTypes().containsAll(resultMap.keySet());
+        
+        //Check simulation result content
+        resultMap.entrySet().forEach(e -> assertThat(simulationResult.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
+        //Check result content
+        resultMap.entrySet().forEach(e -> assertThat(result.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+
     }
 
     @Test
@@ -147,6 +166,12 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
 
         // The simulation result must match the actual result
         assertThat(simulationResult).isEqualTo(result).as("The simulation result must match the actual result.");
+    }
+
+    @Test
+    public void testChangeTenantId_whenSourceAndTargetAreEqual_AFlowableExceptionIsThrown() {
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).simulate()).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).complete()).isInstanceOf(FlowableException.class);
     }
 
     private void executeDecision(String tenantId, String decisionKey) {

@@ -19,6 +19,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -48,9 +49,7 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     void clearLockTime(String caseInstanceId);
 
     void clearAllLockTimes(String lockOwner);
-
-    long countChangeTenantIdCmmnCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
     
-    long changeTenantIdCmmnCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdCmmnCaseInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

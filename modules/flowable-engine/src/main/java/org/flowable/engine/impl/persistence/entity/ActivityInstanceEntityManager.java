@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -109,8 +110,6 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
      */
     void recordSequenceFlowTaken(ExecutionEntity execution);
 
-    long countChangeTenantIdActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
-    
-    long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdActivityInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

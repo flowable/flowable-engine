@@ -209,24 +209,16 @@
     </where>
   </sql>
 
-  <select id="countChangeTenantIdFormInstances" parameterType="string" resultType="long">
+  <select id="countChangeTenantIdFormInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_FO_FORM_INSTANCE RES
     <include refid="changeTenantIdFormInstanceCriteriaSql" />
   </select>
 
-  <update id="changeTenantIdFormInstances" parameterType="java.util.Map">
+  <update id="changeTenantIdFormInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_FO_FORM_INSTANCE RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
     <include refid="changeTenantIdFormInstanceCriteriaSql" />
   </update>
-
-  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
-    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
-  </sql>
-
-  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
-    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
-  </sql>
 
   <sql id="changeTenantIdFormInstanceCriteriaSql">
       <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
@@ -241,6 +233,19 @@
       <if test="onlyInstancesFromDefaultTenantDefinitions">
           <include refid="onlyInstancesFromDefaultTenantDefinitionsSql"/>
       </if>
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+    and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB 
+    <choose>
+        <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
+        <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+    </choose>
+    )
   </sql>
     
 </mapper>

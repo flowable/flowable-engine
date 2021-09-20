@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
@@ -39,9 +40,7 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     long countByCriteria(HistoricCaseInstanceQuery query);
     
     void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
-
-    long countChangeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
     
-    long changeTenantIdCmmnHistoricCaseInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdCmmnHistoricCaseInstances(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

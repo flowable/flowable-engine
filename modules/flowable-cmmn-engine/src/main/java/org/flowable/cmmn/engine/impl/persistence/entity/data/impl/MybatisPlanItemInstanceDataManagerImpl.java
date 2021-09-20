@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityIm
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 
@@ -190,23 +191,14 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
         }
     }
-    @Override
-    public long countChangeTenantIdCmmnPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnPlanItemInstances", parameters);
-    }
 
     @Override
-    public long changeTenantIdCmmnPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdCmmnPlanItemInstances", parameters);
+    public long changeTenantIdCmmnPlanItemInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdCmmnPlanItemInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdCmmnPlanItemInstances", changeTenantIdRequest);
+        }
     }
 
 }

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -96,15 +97,8 @@ public class HistoricProcessInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdHistoricProcessInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdHistoricProcessInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdHistoricProcessInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdHistoricProcessInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdHistoricProcessInstances(changeTenantIdRequest);
     }
 
 }

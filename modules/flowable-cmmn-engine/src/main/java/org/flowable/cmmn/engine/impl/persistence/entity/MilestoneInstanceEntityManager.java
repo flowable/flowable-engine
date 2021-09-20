@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
@@ -32,9 +33,7 @@ public interface MilestoneInstanceEntityManager extends EntityManager<MilestoneI
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
     void deleteByCaseInstanceId(String caseInstanceId);
-
-    long countChangeTenantIdCmmnMilestoneInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
     
-    long changeTenantIdCmmnMilestoneInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdCmmnMilestoneInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

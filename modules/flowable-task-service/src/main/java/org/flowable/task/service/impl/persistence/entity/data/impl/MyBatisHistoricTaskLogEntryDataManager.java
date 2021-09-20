@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
@@ -105,26 +106,12 @@ public class MyBatisHistoricTaskLogEntryDataManager extends AbstractDataManager<
     }
 
     @Override
-    public long countChangeTenantIdHistoricTaskLogEntries(String sourceTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricTaskLogEntries", parameters);
-    }
-
-    @Override
-    public long changeTenantIdHistoricTaskLogEntries(String sourceTenantId, String targetTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().update("changeTenantIdHistoricTaskLogEntries", parameters);
+    public long changeTenantIdHistoricTaskLogEntries(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricTaskLogEntries", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdHistoricTaskLogEntries", changeTenantIdRequest);
+        }
     }
 
 }

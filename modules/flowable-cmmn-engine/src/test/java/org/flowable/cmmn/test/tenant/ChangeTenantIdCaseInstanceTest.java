@@ -14,16 +14,20 @@
 package org.flowable.cmmn.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +42,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
     private String deploymentIdWithTenantB;
     private String deploymentIdWithTenantC;
     private String deploymentIdWithoutTenant;
+    private String deploymentIdWithTenantAForJobs;
 
     @Before
     public void setUp() {
@@ -56,29 +61,37 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         this.deploymentIdWithoutTenant = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/tenant/caseWithMilestoneDup.cmmn").deploy().getId();
         addDeploymentForAutoCleanup(deploymentIdWithoutTenant);
+        this.deploymentIdWithTenantAForJobs = cmmnRepositoryService.createDeployment()
+        .addClasspathResource("org/flowable/cmmn/test/tenant/caseForJobsAndEventSubscriptions.cmmn.xml").tenantId(TEST_TENANT_A)
+        .deploy().getId();
+        addDeploymentForAutoCleanup(deploymentIdWithTenantAForJobs);
     }
 
     @Test
     public void testChangeTenantIdCaseInstance() {
         //testDeployments {
-        assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(4);
+        assertThat(cmmnRepositoryService.createDeploymentQuery().count()).isEqualTo(5);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count())
-                .isEqualTo(1);
+                .isEqualTo(2);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_B).count())
                 .isEqualTo(1);
         assertThat(cmmnRepositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_C).count())
                 .isEqualTo(1);
 
         // Starting case instances that will be sent to the history
-        String caseInstanceIdACompleted = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceACompleted", true);
-        String caseInstanceIdBCompleted = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBCompleted", true);
-        String caseInstanceIdCCompleted = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCCompleted", true);
+        String caseInstanceIdACompleted = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceACompleted", 2);
+        String caseInstanceIdBCompleted = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBCompleted", 2);
+        String caseInstanceIdCCompleted = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCCompleted", 2);
         
         // Starting case instances that will be kept active
-        String caseInstanceIdAActive = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceAActive", false);
-        String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", false);
-        String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", false);
+        String caseInstanceIdAActive = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceAActive", 1);
+        String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", 1);
+        String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", 1);
+        String caseInstanceIdAForJobs = startCase(TEST_TENANT_A, "caseForJobsAndEventSubscriptions","caseInstanceAForJobs", 0);
+        Job jobToBeSentToDeadLetter = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstanceIdAForJobs).elementName("Timer for a Deadletter Job").singleResult();
+        Job jobInTheDeadLetterQueue = cmmnManagementService.moveJobToDeadLetterJob(jobToBeSentToDeadLetter.getId());
+        assertThat(jobInTheDeadLetterQueue).as("We have a job in the deadletter queue.").isNotNull();
         
         Set<String> caseInstanceIdsTenantA = new HashSet<>(Arrays.asList(caseInstanceIdACompleted, caseInstanceIdAActive));
         Set<String> caseInstanceIdsTenantB = new HashSet<>(Arrays.asList(caseInstanceIdBCompleted, caseInstanceIdBActive));
@@ -112,6 +125,35 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         // The simulation result must match the actual result
         assertThat(simulationResult).isEqualTo(result).as("The simulation result must match the actual result.");
 
+        //Expected results map
+        Map<String, Long> resultMap = new HashMap<>();
+        resultMap.put(CASE_INSTANCES, 2L);
+        resultMap.put(PLAN_ITEM_INSTANCES, 10L);
+        resultMap.put(MILESTONE_INSTANCES, 1L);
+        resultMap.put(HISTORIC_CASE_INSTANCES, 3L);
+        resultMap.put(HISTORIC_PLAN_ITEM_INSTANCES, 15L);
+        resultMap.put(HISTORIC_MILESTONE_INSTANCES, 2L);
+        resultMap.put(DEADLETTER_JOBS, 1L);
+        resultMap.put(EVENT_SUBSCRIPTIONS, 1L);
+        resultMap.put(EXTERNAL_WORKER_JOBS, 1L);
+        resultMap.put(HISTORIC_TASK_INSTANCES, 4L);
+        resultMap.put(HISTORIC_TASK_LOG_ENTRIES, 7L);
+        resultMap.put(HISTORY_JOBS, 0L);
+        resultMap.put(JOBS, 1L);
+        resultMap.put(SUSPENDED_JOBS, 0L);
+        resultMap.put(TASKS, 1L);
+        resultMap.put(TIMER_JOBS, 1L);
+        
+        //Check that all the entities are returned
+        simulationResult.getChangedEntityTypes().containsAll(resultMap.keySet());
+        result.getChangedEntityTypes().containsAll(resultMap.keySet());
+        
+        //Check simulation result content
+        resultMap.entrySet().forEach(e -> assertThat(simulationResult.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
+        //Check result content
+        resultMap.entrySet().forEach(e -> assertThat(result.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+
         //Check that we can complete the active instances that we have changed
         completeTask(caseInstanceIdAActive);
         assertCaseInstanceEnded(caseInstanceIdAActive);
@@ -119,24 +161,20 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstanceIdBActive);
         completeTask(caseInstanceIdCActive);
         assertCaseInstanceEnded(caseInstanceIdCActive);
-
     }
 
-    private String startCase(String tenantId, String caseDefinitionKey, String name, boolean completeCase) {
-        return startCase(tenantId, caseDefinitionKey, name, completeCase, false);
+    private String startCase(String tenantId, String caseDefinitionKey, String name, int completeTaskLoops) {
+        return startCase(tenantId, caseDefinitionKey, name, completeTaskLoops, false);
     }
 
-    private String startCase(String tenantId, String caseDefinitionKey, String name, boolean completeCase, boolean overrideCaseDefinitionTenantIdEnabled) {
+    private String startCase(String tenantId, String caseDefinitionKey, String name, int completeTaskLoops, boolean overrideCaseDefinitionTenantIdEnabled) {
         CaseInstanceBuilder caseInstanceBuilder = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(caseDefinitionKey)
                 .name(name).tenantId(tenantId).fallbackToDefaultTenant();
         if (overrideCaseDefinitionTenantIdEnabled) {
             caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
         }
         CaseInstance caseInstance = caseInstanceBuilder.start();
-        // Completing A will reach milestone M1, which sets a variable that activates the second stage
-        completeTask(caseInstance.getId());
-        if (completeCase) {
-            // Completing task B to send the caseInstance and all the plan items to the history
+        for (int i = 0; i < completeTaskLoops; i++) {
             completeTask(caseInstance.getId());
         }
         return caseInstance.getId();
@@ -187,23 +225,22 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         });
     }
 
-
     @Test
     public void testChangeTenantIdCaseInstance_onlyDefaultTenantDefinitionInstances() {
         // In this test we will mark the instances created with a definition from the
         // default tenant with DT
 
         // Starting case instances that will be sent to the history
-        String caseInstanceIdACompleted = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceACompleted", true);
-        String caseInstanceIdADTCompleted = startCase(TEST_TENANT_A, "caseWithMilestoneDup", "caseInstanceADTCompleted", true, true); // For this instance we want to override the tenant Id.
-        String caseInstanceIdBCompleted = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBCompleted", true);
-        String caseInstanceIdCCompleted = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCCompleted", true);
+        String caseInstanceIdACompleted = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceACompleted", 2);
+        String caseInstanceIdADTCompleted = startCase(TEST_TENANT_A, "caseWithMilestoneDup", "caseInstanceADTCompleted", 2, true); // For this instance we want to override the tenant Id.
+        String caseInstanceIdBCompleted = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBCompleted", 2);
+        String caseInstanceIdCCompleted = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCCompleted", 2);
         
         // Starting case instances that will be kept active
-        String caseInstanceIdAActive = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceAActive", false);
-        String caseInstanceIdADTActive = startCase(TEST_TENANT_A, "caseWithMilestoneDup", "caseInstanceADTActive", false, true); // For this instance we want to override the tenant Id.
-        String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", false);
-        String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", false);
+        String caseInstanceIdAActive = startCase(TEST_TENANT_A, "caseWithMilestone", "caseInstanceAActive", 1);
+        String caseInstanceIdADTActive = startCase(TEST_TENANT_A, "caseWithMilestoneDup", "caseInstanceADTActive", 1, true); // For this instance we want to override the tenant Id.
+        String caseInstanceIdBActive = startCase(TEST_TENANT_B, "caseWithMilestone", "caseInstanceBActive", 1);
+        String caseInstanceIdCActive = startCase(TEST_TENANT_C, "caseWithMilestone", "caseInstanceCActive", 1);
         
         Set<String> caseInstanceIdsTenantADTOnly = new HashSet<>(Arrays.asList(caseInstanceIdADTCompleted, caseInstanceIdADTActive));
         Set<String> caseInstanceIdsTenantANotDT = new HashSet<>(Arrays.asList(caseInstanceIdACompleted, caseInstanceIdAActive));
@@ -256,8 +293,6 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstanceIdBActive);
         completeTask(caseInstanceIdCActive);
         assertCaseInstanceEnded(caseInstanceIdCActive);
-        
-
     }
 
 }

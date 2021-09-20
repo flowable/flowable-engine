@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
@@ -328,15 +329,8 @@ public class TaskEntityManagerImpl extends AbstractTaskServiceEntityManager<Task
     }
 
     @Override
-    public long countChangeTenantIdTasks(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdTasks(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdTasks(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdTasks(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdTasks(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdTasks(changeTenantIdRequest);
     }
 
 }

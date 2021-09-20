@@ -132,7 +132,13 @@
     </sql>
 
     <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
-        and RES.CASE_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+        and RES.CASE_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB 
+        where SUB.TENANT_ID_
+        <choose>
+            <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
+            <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+        </choose>
+        )
     </sql>
 
     <sql id="changeTenantIdCaseCriteriaSql">
@@ -142,12 +148,12 @@
         </if>
     </sql>
     
-    <select id="countChangeTenantIdCmmnMilestoneInstances" parameterType="string" resultType="long">
+    <select id="countChangeTenantIdCmmnMilestoneInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
         select count(RES.ID_) FROM ${prefix}ACT_CMMN_RU_MIL_INST RES
         <include refid="changeTenantIdCaseCriteriaSql"/>
     </select>
 
-    <update id="changeTenantIdCmmnMilestoneInstances" parameterType="java.util.Map">
+    <update id="changeTenantIdCmmnMilestoneInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
         update ${prefix}ACT_CMMN_RU_MIL_INST RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
         <include refid="changeTenantIdCaseCriteriaSql"/>

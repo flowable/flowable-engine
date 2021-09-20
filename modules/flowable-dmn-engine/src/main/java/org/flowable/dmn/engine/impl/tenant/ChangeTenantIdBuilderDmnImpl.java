@@ -13,11 +13,20 @@
 
 package org.flowable.dmn.engine.impl.tenant;
 
-import org.flowable.dmn.engine.impl.cmd.ChangeTenantIdDmnCompleteCmd;
-import org.flowable.dmn.engine.impl.cmd.ChangeTenantIdDmnSimulateCmd;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
+
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
+import org.flowable.common.engine.impl.cmd.ChangeTenantIdCmd;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdRequest;
 
 public class ChangeTenantIdBuilderDmnImpl implements ChangeTenantIdBuilder {
 
@@ -25,12 +34,19 @@ public class ChangeTenantIdBuilderDmnImpl implements ChangeTenantIdBuilder {
     private final String fromTenantId;
     private final String toTenantId;
     private boolean onlyInstancesFromDefaultTenantDefinitions;
+    private final String defaultTenantId;
+    private final Map<String, Function<ChangeTenantIdRequest, Long>> mapOfEntitiesAndFunctions;
 
-    public ChangeTenantIdBuilderDmnImpl(CommandExecutor commandExecutor, String fromTenantId,
-            String toTenantId) {
+    public ChangeTenantIdBuilderDmnImpl(CommandExecutor commandExecutor, DmnEngineConfiguration dmnEngineConfiguration,
+            String fromTenantId, String toTenantId) {
         this.commandExecutor = commandExecutor;
         this.fromTenantId = fromTenantId;
         this.toTenantId = toTenantId;
+        this.defaultTenantId = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(fromTenantId,
+        ScopeTypes.DMN, null);
+        this.mapOfEntitiesAndFunctions = Collections.singletonMap(ChangeTenantIdEntityTypes.HISTORIC_DECISION_EXECUTIONS,
+                r -> dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager()
+                        .changeTenantIdHistoricDecisionExecutions(r));
     }
 
     @Override
@@ -41,14 +57,22 @@ public class ChangeTenantIdBuilderDmnImpl implements ChangeTenantIdBuilder {
 
     @Override
     public ChangeTenantIdResult simulate() {
-        return commandExecutor.execute(new ChangeTenantIdDmnSimulateCmd(fromTenantId, toTenantId,
-                onlyInstancesFromDefaultTenantDefinitions));
+        ChangeTenantIdRequest changeTenantIdRequest = DefaultChangeTenantIdRequest
+                .builder(this.fromTenantId, this.toTenantId).defaultTenantId(defaultTenantId)
+                .onlyInstancesFromDefaultTenantDefinitions(onlyInstancesFromDefaultTenantDefinitions)
+                .scope(ScopeTypes.DMN).dryRun(true) // This is a drill.
+                .build();
+        return commandExecutor.execute(new ChangeTenantIdCmd(changeTenantIdRequest, mapOfEntitiesAndFunctions));
     }
 
     @Override
     public ChangeTenantIdResult complete() {
-        return commandExecutor.execute(new ChangeTenantIdDmnCompleteCmd(fromTenantId, toTenantId,
-                onlyInstancesFromDefaultTenantDefinitions));
+        ChangeTenantIdRequest changeTenantIdRequest = DefaultChangeTenantIdRequest
+                .builder(this.fromTenantId, this.toTenantId).defaultTenantId(defaultTenantId)
+                .onlyInstancesFromDefaultTenantDefinitions(onlyInstancesFromDefaultTenantDefinitions)
+                .scope(ScopeTypes.DMN).dryRun(false) // This is NOT a drill!
+                .build();
+        return commandExecutor.execute(new ChangeTenantIdCmd(changeTenantIdRequest, mapOfEntitiesAndFunctions));
     }
 
 }

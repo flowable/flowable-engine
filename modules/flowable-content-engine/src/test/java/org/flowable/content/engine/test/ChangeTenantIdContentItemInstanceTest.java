@@ -15,8 +15,12 @@ package org.flowable.content.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes.*;
 
+import java.util.Collections;
+import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.content.api.ContentItem;
 import org.junit.Test;
@@ -60,6 +64,19 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
         // The simulation result must match the actual result
         assertThat(simulationResult).as("The simulation result must match the actual result.").isEqualTo(result).as("The simulation result must match the actual result.");
 
+        //Expected results map
+        Map<String, Long> resultMap = Collections.singletonMap(CONTENT_ITEM_INSTANCES, 1L);
+
+        //Check that all the entities are returned
+        simulationResult.getChangedEntityTypes().containsAll(resultMap.keySet());
+        result.getChangedEntityTypes().containsAll(resultMap.keySet());
+        
+        //Check simulation result content
+        resultMap.entrySet().forEach(e -> assertThat(simulationResult.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
+        //Check result content
+        resultMap.entrySet().forEach(e -> assertThat(result.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
     }
 
     @Test
@@ -68,7 +85,12 @@ public class ChangeTenantIdContentItemInstanceTest extends AbstractFlowableConte
             .onlyInstancesFromDefaultTenantDefinitions()
             .complete())
         .isInstanceOf(UnsupportedOperationException.class);
+    }
 
+    @Test
+    public void testChangeTenantId_whenSourceAndTargetAreEqual_AFlowableExceptionIsThrown() {
+        assertThatThrownBy(() -> contentManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).simulate()).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> contentManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).complete()).isInstanceOf(FlowableException.class);
     }
 
     private void checkContentItemInTenant(String contentItemId, String expectedTenantId, String moment) {

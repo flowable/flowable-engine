@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -241,15 +242,8 @@ public class TimerJobEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdTimerJobs(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdTimerJobs(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdTimerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdTimerJobs(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdTimerJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdTimerJobs(changeTenantIdRequest);
     }
 
 }

@@ -15,6 +15,7 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskBuilder;
@@ -60,9 +61,7 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
     void updateAllTaskRelatedEntityCountFlags(boolean configProperty);
     
     void deleteTasksByExecutionId(String executionId);
-        
-    long countChangeTenantIdTasks(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdTasks(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+            
+    long changeTenantIdTasks(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

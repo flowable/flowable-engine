@@ -14,14 +14,19 @@
  package org.flowable.form.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormInstance;
+import org.flowable.form.api.FormManagementService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -109,6 +114,20 @@ public class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
 
         // The simulation result must match the actual result
         assertThat(simulationResult).as("The simulation result must match the actual result.").isEqualTo(result);
+        
+        //Expected results map
+        Map<String, Long> resultMap = Collections.singletonMap(FORM_INSTANCES, 2L);
+
+        //Check that all the entities are returned
+        simulationResult.getChangedEntityTypes().containsAll(resultMap.keySet());
+        result.getChangedEntityTypes().containsAll(resultMap.keySet());
+        
+        //Check simulation result content
+        resultMap.entrySet().forEach(e -> assertThat(simulationResult.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
+        //Check result content
+        resultMap.entrySet().forEach(e -> assertThat(result.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+
     }
 
     private void checkFormInstanceTenant(String formInstanceId, String expectedTenantId, String moment) {
@@ -180,6 +199,13 @@ public class ChangeTenantIdFormInstanceTest extends AbstractFlowableFormTest {
 
         // The simulation result must match the actual result
         assertThat(simulationResult).isEqualTo(result).as("The simulation result must match the actual result.");
+    }
+
+    @Test
+    public void testChangeTenantId_whenSourceAndTargetAreEqual_AFlowableExceptionIsThrown() {
+        FormManagementService formManagementService = formEngine.getFormManagementService();
+        assertThatThrownBy(() -> formManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).simulate()).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> formManagementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).complete()).isInstanceOf(FlowableException.class);
     }
 
     private String createFormInstance(String tenantId, String formDefinitionKey, boolean fallbackToDefaultTenant, String scope) {

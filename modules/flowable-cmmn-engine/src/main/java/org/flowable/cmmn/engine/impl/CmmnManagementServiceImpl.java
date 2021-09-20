@@ -249,7 +249,7 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
-        return new ChangeTenantIdBuilderCmmnImpl(commandExecutor, fromTenantId, toTenantId);
+        return new ChangeTenantIdBuilderCmmnImpl(commandExecutor, super.getConfiguration(), fromTenantId, toTenantId);
     }
 
     public <T> T executeCommand(Command<T> command) {

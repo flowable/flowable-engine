@@ -396,12 +396,12 @@
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <select id="countChangeTenantIdDeadLetterJobs" parameterType="string" resultType="long">
+    <select id="countChangeTenantIdDeadLetterJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
         select count(RES.ID_) FROM ${prefix}ACT_RU_DEADLETTER_JOB RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
       </select>
     
-    <update id="changeTenantIdDeadLetterJobs" parameterType="java.util.Map">
+    <update id="changeTenantIdDeadLetterJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
         update ${prefix}ACT_RU_DEADLETTER_JOB RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>

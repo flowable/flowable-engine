@@ -30,6 +30,7 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
@@ -289,15 +290,8 @@ public class CaseInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdCmmnCaseInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdCmmnCaseInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdCmmnCaseInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdCmmnCaseInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdCmmnCaseInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdCmmnCaseInstances(changeTenantIdRequest);
     }
 
 }

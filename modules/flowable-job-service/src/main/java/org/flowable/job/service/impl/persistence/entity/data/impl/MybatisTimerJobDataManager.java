@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -197,28 +198,14 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }
-
+    
     @Override
-    public long countChangeTenantIdTimerJobs(String sourceTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdTimerJobs", parameters);
-    }
-
-    @Override
-    public long changeTenantIdTimerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, 
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().update("changeTenantIdTimerJobs", parameters);
+    public long changeTenantIdTimerJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdTimerJobs", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdTimerJobs", changeTenantIdRequest);
+        }
     }
 
 }

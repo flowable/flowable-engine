@@ -1036,12 +1036,12 @@
      and SCOPE_ID_ is null
   </delete>
 
-  <select id="countChangeTenantIdEventSubscriptions" parameterType="string" resultType="long">
+  <select id="countChangeTenantIdEventSubscriptions" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_RU_EVENT_SUBSCR RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
   </select>
 
-  <update id="changeTenantIdEventSubscriptions" parameterType="java.util.Map">
+  <update id="changeTenantIdEventSubscriptions" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_RU_EVENT_SUBSCR RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
     <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>

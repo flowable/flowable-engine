@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.ContentItemQueryImpl;
@@ -73,17 +74,11 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
     }
 
     @Override
-    public long countChangeTenantIdContentItemInstances(String sourceTenantId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdContentItemInstances", parameters);
-    }
-
-    @Override
-    public long changeTenantIdContentItemInstances(String sourceTenantId, String targetTenantId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        return (long) getDbSqlSession().update("changeTenantIdContentItemInstances", parameters);
+    public long changeTenantIdContentItemInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdContentItemInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdContentItemInstances", changeTenantIdRequest);
+        }
     }
 }

@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
@@ -40,9 +41,7 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
      * This delete doesn't delete the referenced byte array entities (configuration and exception).
      */
     void deleteNoCascade(HistoryJobEntity historyJobEntity);
-    
-    long countChangeTenantIdHistoryJobs(String sourceTenantId);
-    
-    long changeTenantIdHistoryJobs(String sourceTenantId, String targetTenantId);
+        
+    long changeTenantIdHistoryJobs(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

@@ -187,31 +187,37 @@
     ${sql}
   </select>
 
-  <select id="countChangeTenantIdHistoricDecisionExecutions" parameterType="string" resultType="long">
+  <select id="countChangeTenantIdHistoricDecisionExecutions" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
     <include refid="changeTenantIdDmnCriteriaSql" />
   </select>
 
-  <update id="changeTenantIdHistoricDecisionExecutions" parameterType="java.util.Map">
+  <update id="changeTenantIdHistoricDecisionExecutions" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
     <include refid="changeTenantIdDmnCriteriaSql" />
 
   </update>
 
-  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
-    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
-  </sql>
-
-  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
-    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
-  </sql>
-
   <sql id="changeTenantIdDmnCriteriaSql">
     where RES.TENANT_ID_ = #{sourceTenantId, jdbcType=VARCHAR}
     <if test="onlyInstancesFromDefaultTenantDefinitions">
         <include refid="onlyInstancesFromDefaultTenantDefinitionsSql"/>
     </if>
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+    and RES.DEPLOYMENT_ID_ in (select SUB.ID_ from ${prefix}ACT_DMN_DEPLOYMENT SUB 
+    where SUB.TENANT_ID_
+    <choose>
+        <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
+        <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+    </choose>
+    )
   </sql>
   
 </mapper>

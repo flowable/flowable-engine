@@ -15,6 +15,7 @@ package org.flowable.content.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.engine.ContentEngineConfiguration;
@@ -59,13 +60,8 @@ public class ContentItemEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdContentItemInstances(String sourceTenantId) {
-        return dataManager.countChangeTenantIdContentItemInstances(sourceTenantId);
-    }
-
-    @Override
-    public long changeTenantIdContentItemInstances(String sourceTenantId, String targetTenantId) {
-        return dataManager.changeTenantIdContentItemInstances(sourceTenantId, targetTenantId);
+    public long changeTenantIdContentItemInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdContentItemInstances(changeTenantIdRequest);
     }
 
 }

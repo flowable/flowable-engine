@@ -17,11 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.ListQueryParameterObject;
+import org.flowable.common.engine.impl.tenant.DefaultChangeTenantIdRequest;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
@@ -129,20 +131,17 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     }
     
     @Override
-    public long countChangeTenantIdHistoryJobs(String sourceTenantId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", false); //because History Jobs don't have references to definitions (at this moment)
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoryJobs", parameters);
-    }
+    public long changeTenantIdHistoryJobs(ChangeTenantIdRequest changeTenantIdRequest) {
 
-    @Override
-    public long changeTenantIdHistoryJobs(String sourceTenantId, String targetTenantId) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", false); //because History Jobs don't have references to definitions (at this moment)
-        return (long) getDbSqlSession().update("changeTenantIdHistoryJobs", parameters);
+        //History jobs don't have references to definitions
+        ChangeTenantIdRequest changeTenantIdRequestIgnoringOnlyInstancesFromDefaultTenantDefinitions = DefaultChangeTenantIdRequest
+        .builder(changeTenantIdRequest).onlyInstancesFromDefaultTenantDefinitions(false).build();
+
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoryJobs", changeTenantIdRequestIgnoringOnlyInstancesFromDefaultTenantDefinitions);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdHistoryJobs", changeTenantIdRequestIgnoringOnlyInstancesFromDefaultTenantDefinitions);
+        }
     }
 
 }

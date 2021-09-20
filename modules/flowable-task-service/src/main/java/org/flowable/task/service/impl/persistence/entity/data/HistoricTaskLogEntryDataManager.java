@@ -15,6 +15,7 @@ package org.flowable.task.service.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.service.impl.HistoricTaskLogEntryQueryImpl;
@@ -45,8 +46,6 @@ public interface HistoricTaskLogEntryDataManager extends DataManager<HistoricTas
     
     void deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
         
-    long countChangeTenantIdHistoricTaskLogEntries(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-
-    long changeTenantIdHistoricTaskLogEntries(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    long changeTenantIdHistoricTaskLogEntries(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

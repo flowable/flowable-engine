@@ -14,8 +14,8 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
@@ -101,28 +101,14 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
     protected IdGenerator getIdGenerator() {
         return jobServiceConfiguration.getIdGenerator();
     }
-
+    
     @Override
-    public long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdDeadLetterJobs", parameters);
-    }
-
-    @Override
-    public long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        parameters.put("scope", scope);
-        return (long) getDbSqlSession().update("changeTenantIdDeadLetterJobs", parameters);
+    public long changeTenantIdDeadLetterJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdDeadLetterJobs", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdDeadLetterJobs", changeTenantIdRequest);
+        }
     }
 
 }

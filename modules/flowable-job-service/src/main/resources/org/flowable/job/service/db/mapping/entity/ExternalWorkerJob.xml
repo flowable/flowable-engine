@@ -548,12 +548,12 @@
         where ID_ = #{parameter.id,jdbcType=VARCHAR}
     </update>
 
-    <select id="countChangeTenantIdExternalWorkerJobs" parameterType="string" resultType="long">
+    <select id="countChangeTenantIdExternalWorkerJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
         select count(RES.ID_) FROM ${prefix}ACT_RU_EXTERNAL_JOB RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
       </select>
     
-      <update id="changeTenantIdExternalWorkerJobs" parameterType="java.util.Map">
+      <update id="changeTenantIdExternalWorkerJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
         update ${prefix}ACT_RU_EXTERNAL_JOB RES
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>

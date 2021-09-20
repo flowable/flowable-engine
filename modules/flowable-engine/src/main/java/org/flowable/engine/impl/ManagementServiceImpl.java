@@ -440,7 +440,7 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
-        return new ChangeTenantIdBuilderBpmnImpl(commandExecutor, fromTenantId, toTenantId);
+        return new ChangeTenantIdBuilderBpmnImpl(commandExecutor, super.getConfiguration(), fromTenantId, toTenantId);
     }
 
 }

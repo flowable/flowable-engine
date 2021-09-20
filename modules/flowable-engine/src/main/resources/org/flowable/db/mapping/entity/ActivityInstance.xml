@@ -332,15 +332,36 @@
     where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
   </select>
   
-  <select id="countChangeTenantIdActivityInstances" parameterType="string" resultType="long">
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
+    and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
+  </sql>
+
+  <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
+      and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB 
+      where SUB.TENANT_ID_ 
+      <choose>
+          <when test="defaultTenantId == null or defaultTenantId == ''"> IS NULL</when>
+          <otherwise> = #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+      </choose>
+      )
+  </sql>
+  
+  <sql id="changeTenantIdProcessCriteriaSql">
+      <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
+      <if test="onlyInstancesFromDefaultTenantDefinitions">
+          <include refid="onlyInstancesFromDefaultTenantDefinitionsSql"/>
+      </if>
+  </sql>
+
+  <select id="countChangeTenantIdActivityInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_RU_ACTINST RES
-    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
   </select>
 
-  <update id="changeTenantIdActivityInstances" parameterType="java.util.Map">
+  <update id="changeTenantIdActivityInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_RU_ACTINST RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
-    <include refid="org.flowable.common.engine.db.changeTenantIdProcessCriteriaSql"/>
+    <include refid="changeTenantIdProcessCriteriaSql"/>
   </update>
 
 </mapper>

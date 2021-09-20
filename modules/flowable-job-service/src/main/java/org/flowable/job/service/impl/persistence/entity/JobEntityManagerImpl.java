@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -102,15 +103,8 @@ public class JobEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdJobs(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdJobs(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdJobs(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdJobs(changeTenantIdRequest);
     }
 
 }

@@ -16,6 +16,7 @@ package org.flowable.dmn.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -62,15 +63,8 @@ public class HistoricDecisionExecutionEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdHistoricDecisionExecutions(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdHistoricDecisionExecutions(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdHistoricDecisionExecutions(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdHistoricDecisionExecutions(changeTenantIdRequest);
     }
 
 }

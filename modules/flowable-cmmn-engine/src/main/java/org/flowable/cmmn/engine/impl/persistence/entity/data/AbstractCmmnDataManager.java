@@ -42,5 +42,4 @@ public abstract class AbstractCmmnDataManager<EntityImpl extends Entity> extends
         return cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.CMMN, null);
     }
 
-
 }

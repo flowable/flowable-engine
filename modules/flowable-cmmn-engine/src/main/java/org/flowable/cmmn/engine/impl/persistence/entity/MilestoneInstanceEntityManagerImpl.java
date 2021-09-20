@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -59,15 +60,8 @@ public class MilestoneInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdCmmnMilestoneInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdCmmnMilestoneInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdCmmnMilestoneInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdCmmnMilestoneInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdCmmnMilestoneInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdCmmnMilestoneInstances(changeTenantIdRequest);
     }
     
 }

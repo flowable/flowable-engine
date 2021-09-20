@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -79,9 +80,7 @@ public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEnti
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
 
     void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities);
-    
-    long countChangeTenantIdTimerJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdTimerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+        
+    long changeTenantIdTimerJobs(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

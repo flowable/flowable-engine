@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -356,22 +357,12 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
-    public long countChangeTenantIdExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdExecutions", parameters);
-    }
-
-    @Override
-    public long changeTenantIdExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdExecutions", parameters);
+    public long changeTenantIdExecutions(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdExecutions", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdExecutions", changeTenantIdRequest);
+        }
     }
 
 } 

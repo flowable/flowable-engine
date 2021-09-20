@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
@@ -336,15 +337,8 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdEventSubscriptions(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdEventSubscriptions(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdEventSubscriptions(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdEventSubscriptions(changeTenantIdRequest);
     }
 
 }

@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -108,23 +108,14 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
             }
         }
     }
+    
     @Override
-    public long countChangeTenantIdHistoricProcessInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricProcessInstances", parameters);
-    }
-
-    @Override
-    public long changeTenantIdHistoricProcessInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", getDefaultTenantId(sourceTenantId));
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdHistoricProcessInstances", parameters);
+    public long changeTenantIdHistoricProcessInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricProcessInstances", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdHistoricProcessInstances", changeTenantIdRequest);
+        }
     }
 
 }

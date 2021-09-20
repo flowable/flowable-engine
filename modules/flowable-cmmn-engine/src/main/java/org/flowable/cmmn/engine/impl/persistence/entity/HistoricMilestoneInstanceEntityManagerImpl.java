@@ -20,6 +20,7 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -54,15 +55,8 @@ public class HistoricMilestoneInstanceEntityManagerImpl
     }
     
     @Override
-    public long countChangeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdCmmnHistoricMilestoneInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdCmmnHistoricMilestoneInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdCmmnHistoricMilestoneInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdCmmnHistoricMilestoneInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdCmmnHistoricMilestoneInstances(changeTenantIdRequest);
     }
 
 }

@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -45,9 +46,7 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
      * Same as {@link #findJobsByQueryCriteria(JobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
-        
-    long countChangeTenantIdJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+      
+    long changeTenantIdJobs(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

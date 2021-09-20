@@ -18,6 +18,7 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
@@ -37,8 +38,6 @@ public interface HistoricPlanItemInstanceDataManager extends DataManager<Histori
 
     void deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
 
-    long countChangeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
-
-    long changeTenantIdCmmnHistoricPlanItemInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdCmmnHistoricPlanItemInstances(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

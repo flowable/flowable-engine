@@ -14,6 +14,7 @@ package org.flowable.form.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.impl.FormInstanceQueryImpl;
@@ -34,8 +35,6 @@ public interface FormInstanceDataManager extends DataManager<FormInstanceEntity>
     
     void deleteFormInstancesByScopeDefinitionId(String scopeDefinitionId);
 
-    long countChangeTenantIdFormInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-
-    long changeTenantIdFormInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    long changeTenantIdFormInstances(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

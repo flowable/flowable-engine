@@ -15,6 +15,7 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
@@ -45,9 +46,7 @@ public interface HistoricTaskInstanceEntityManager extends EntityManager<Histori
     void deleteHistoricTaskInstancesForNonExistingProcessInstances();
     
     void deleteHistoricTaskInstancesForNonExistingCaseInstances();
-        
-    long countChangeTenantIdHistoricTaskInstances(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-    
-    long changeTenantIdHistoricTaskInstances(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+
+    long changeTenantIdHistoricTaskInstances(ChangeTenantIdRequest changeTenantIdRequest);
     
 }

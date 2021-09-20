@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -75,8 +76,6 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     void clearAllProcessInstanceLockTimes(String lockOwner);
 
-    long countChangeTenantIdExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
-
-    long changeTenantIdExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdExecutions(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

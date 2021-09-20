@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
@@ -28,8 +29,6 @@ public interface HistoryJobDataManager extends DataManager<HistoryJobEntity>, Jo
 
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl query);
 
-    long countChangeTenantIdHistoryJobs(String sourceTenantId);
-
-    long changeTenantIdHistoryJobs(String sourceTenantId, String targetTenantId);
+    long changeTenantIdHistoryJobs(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

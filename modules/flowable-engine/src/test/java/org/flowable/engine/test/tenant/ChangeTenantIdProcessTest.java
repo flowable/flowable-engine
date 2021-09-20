@@ -14,15 +14,22 @@
 package org.flowable.engine.test.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.common.engine.api.tenant.ChangeTenantIdEntityTypes.*;
+
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +45,7 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
     private String deploymentIdWithTenantB;
     private String deploymentIdWithTenantC;
     private String deploymentIdWithoutTenant;
+    private String deploymentIdWithTenantAForJobs;
 
     @BeforeEach
     public void setUp() {
@@ -52,6 +60,9 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
                 .deploy().getId();
         this.deploymentIdWithoutTenant = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/tenant/testProcessDup.bpmn20.xml").deploy().getId();
+        this.deploymentIdWithTenantAForJobs = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/tenant/testProcessForJobsAndEventSubscriptions.bpmn20.xml").tenantId(TEST_TENANT_A)
+                .deploy().getId();
     }
 
     @AfterEach
@@ -60,28 +71,39 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         repositoryService.deleteDeployment(deploymentIdWithTenantB,true);
         repositoryService.deleteDeployment(deploymentIdWithTenantC,true);
         repositoryService.deleteDeployment(deploymentIdWithoutTenant,true);
+        repositoryService.deleteDeployment(deploymentIdWithTenantAForJobs, true);
     }
 
     @Test
     public void testChangeTenantIdProcessInstance() {
         //testDeployments() {
-        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(4);
+        assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(5);
         assertThat(repositoryService.createDeploymentQuery().deploymentWithoutTenantId().count()).isEqualTo(1);
-        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count()).isEqualTo(1);
+        assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_A).count()).isEqualTo(2);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_B).count()).isEqualTo(1);
         assertThat(repositoryService.createDeploymentQuery().deploymentTenantId(TEST_TENANT_C).count()).isEqualTo(1);
+        
 
         //Starting process instances that will be completed
-        String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", true, false);
-        String processInstanceIdBCompleted = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBCompleted", true, false);
-        String processInstanceIdCCompleted = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCCompleted", true, false);
+        String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", 2, false);
+        String processInstanceIdBCompleted = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBCompleted", 2, false);
+        String processInstanceIdCCompleted = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCCompleted", 2, false);
         
-        //Starting process instances that will remain active
-        String processInstanceIdAActive = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdAActive", false, false);
-        String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", false, false);
-        String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", false, false);
+        
+        //Starting process instances that will remain active and moving jobs to different states
+        String processInstanceIdAActive = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdAActive", 1, false);
+        String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", 1, false);
+        String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", 1, false);
+        String processInstanceIdAAForJobs = startProcess(TEST_TENANT_A, "testProcessForJobsAndEventSubscriptions", "processInstanceIdAAForJobs", 0, false);
+        Job jobToBeSentToDeadLetter = managementService.createTimerJobQuery().processInstanceId(processInstanceIdAAForJobs).elementName("Timer to create a deadletter job").singleResult();
+        Job jobInTheDeadLetterQueue = managementService.moveJobToDeadLetterJob(jobToBeSentToDeadLetter.getId());
+        assertThat(jobInTheDeadLetterQueue).as("We have a job in the deadletter queue.").isNotNull();
+        String processInstanceIdAForSuspendedJobs = startProcess(TEST_TENANT_A, "testProcessForJobsAndEventSubscriptions", "processInstanceIdAAForJobsActive", 0, false);
+        runtimeService.suspendProcessInstanceById(processInstanceIdAForSuspendedJobs);
+        Job aSuspendedJob = managementService.createSuspendedJobQuery().processInstanceId(processInstanceIdAForSuspendedJobs).elementName("Timer to create a suspended job").singleResult();
+        assertThat(aSuspendedJob).as("We have a suspended job.").isNotNull();
 
-        Set<String> processInstancesTenantA = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive));
+        Set<String> processInstancesTenantA = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive, processInstanceIdAAForJobs, processInstanceIdAForSuspendedJobs));
         Set<String> processInstancesTenantB = new HashSet<>(Arrays.asList(processInstanceIdBCompleted, processInstanceIdBActive));
         Set<String> processInstancesTenantC = new HashSet<>(Arrays.asList(processInstanceIdCCompleted, processInstanceIdCActive));
 
@@ -111,7 +133,34 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         checkTenantIdForAllInstances(processInstancesTenantC, TEST_TENANT_C, "after the change to " + TEST_TENANT_B);
 
         // The simulation result must match the actual result
-        assertThat(simulationResult).isEqualTo(result).as("The simulation result must match the actual result.");
+        assertThat(simulationResult).as("The simulation result must match the actual result.").isEqualTo(result);
+        
+        //Expected results map
+        Map<String, Long> resultMap = new HashMap<>();
+        resultMap.put(ACTIVITY_INSTANCES, 35L);
+        resultMap.put(EXECUTIONS, 16L);
+        resultMap.put(EVENT_SUBSCRIPTIONS, 2L);
+        resultMap.put(TASKS, 1L);
+        resultMap.put(EXTERNAL_WORKER_JOBS, 1L);
+        resultMap.put(HISTORIC_ACTIVITY_INSTANCES, 44L);
+        resultMap.put(HISTORIC_PROCESS_INSTANCES, 4L);
+        resultMap.put(HISTORIC_TASK_LOG_ENTRIES, 7L);
+        resultMap.put(HISTORIC_TASK_INSTANCES, 4L);
+        resultMap.put(HISTORY_JOBS, 0L);
+        resultMap.put(JOBS, 1L);
+        resultMap.put(SUSPENDED_JOBS, 5L);
+        resultMap.put(TIMER_JOBS, 2L);
+        resultMap.put(DEADLETTER_JOBS, 1L);
+
+        //Check that all the entities are returned
+        simulationResult.getChangedEntityTypes().containsAll(resultMap.keySet());
+        result.getChangedEntityTypes().containsAll(resultMap.keySet());
+        
+        //Check simulation result content
+        resultMap.entrySet().forEach(e -> assertThat(simulationResult.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
+        
+        //Check result content
+        resultMap.entrySet().forEach(e -> assertThat(result.getChangedInstances(e.getKey())).isEqualTo(e.getValue()));
 
         //Check that we can complete the active instances that we have changed
         completeTask(processInstanceIdAActive);
@@ -120,7 +169,6 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         assertProcessEnded(processInstanceIdBActive);
         completeTask(processInstanceIdCActive);
         assertProcessEnded(processInstanceIdCActive);
-
     }
 
     private void checkTenantIdForAllInstances(Set<String> processInstanceIds, String expectedTenantId, String moment) {
@@ -162,16 +210,16 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
     public void testChangeTenantIdProcessInstance_onlyDefaultTenantDefinitionInstances() {
 
         //Starting process instances that will be completed
-        String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", true, false);
-        String processInstanceIdADTCompleted = startProcess(TEST_TENANT_A, "testProcessDup", "processInstanceIdADTCompleted", true, true); // For this instance we want to override the tenant Id.
-        String processInstanceIdBCompleted = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBCompleted", true, false);
-        String processInstanceIdCCompleted = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCCompleted", true, false);
+        String processInstanceIdACompleted = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdACompleted", 2, false);
+        String processInstanceIdADTCompleted = startProcess(TEST_TENANT_A, "testProcessDup", "processInstanceIdADTCompleted", 2, true); // For this instance we want to override the tenant Id.
+        String processInstanceIdBCompleted = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBCompleted", 2, false);
+        String processInstanceIdCCompleted = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCCompleted", 2, false);
         
         //Starting process instances that will remain active
-        String processInstanceIdAActive = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdAActive", false, false);
-        String processInstanceIdADTActive = startProcess(TEST_TENANT_A, "testProcessDup", "processInstanceIdADTActive", false, true); // For this instance we want to override the tenant Id.
-        String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", false, false);
-        String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", false, false);
+        String processInstanceIdAActive = startProcess(TEST_TENANT_A, "testProcess", "processInstanceIdAActive", 1, false);
+        String processInstanceIdADTActive = startProcess(TEST_TENANT_A, "testProcessDup", "processInstanceIdADTActive", 1, true); // For this instance we want to override the tenant Id.
+        String processInstanceIdBActive = startProcess(TEST_TENANT_B, "testProcess", "processInstanceIdBActive", 1, false);
+        String processInstanceIdCActive = startProcess(TEST_TENANT_C, "testProcess", "processInstanceIdCActive", 1, false);
 
         Set<String> processInstancesTenantADTOnly = new HashSet<>(Arrays.asList(processInstanceIdADTCompleted, processInstanceIdADTActive));
         Set<String> processInstancesTenantANonDT = new HashSet<>(Arrays.asList(processInstanceIdACompleted, processInstanceIdAActive));
@@ -228,18 +276,22 @@ public class ChangeTenantIdProcessTest  extends PluggableFlowableTestCase {
         
     }
 
-    private String startProcess(String tenantId, String processDefinitionKey, String processInstanceName, boolean completeProcess, boolean overrideProcessDefinitionTenantIdEnabled) {
+    @Test
+    public void testChangeTenantId_whenSourceAndTargetAreEqual_AFlowableExceptionIsThrown() {
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).simulate()).isInstanceOf(FlowableException.class);
+        assertThatThrownBy(() -> managementService.createChangeTenantIdBuilder(TEST_TENANT_A, TEST_TENANT_A).complete()).isInstanceOf(FlowableException.class);
+    }
+
+    private String startProcess(String tenantId, String processDefinitionKey, String processInstanceName, int completeTaskLoops, boolean overrideProcessDefinitionTenantIdEnabled) {
         ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder().processDefinitionKey(processDefinitionKey).name(processInstanceName).tenantId(tenantId).fallbackToDefaultTenant();
         if (overrideProcessDefinitionTenantIdEnabled) {
             processInstanceBuilder.overrideProcessDefinitionTenantId(tenantId);
         }
         ProcessInstance processInstance = processInstanceBuilder.start();
-        completeTask(processInstance);
-        if (completeProcess) {
+        for (int i = 0; i < completeTaskLoops; i++) {
             completeTask(processInstance);
         }
         return processInstance.getId();
-        
     }
 
     private void completeTask(ProcessInstance processInstance) {

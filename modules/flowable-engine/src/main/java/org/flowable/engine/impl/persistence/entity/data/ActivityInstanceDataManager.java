@@ -15,6 +15,7 @@ package org.flowable.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntity;
@@ -43,8 +44,6 @@ public interface ActivityInstanceDataManager extends DataManager<ActivityInstanc
 
     long findActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
 
-    long countChangeTenantIdActivityInstances(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
-
-    long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions);
+    long changeTenantIdActivityInstances(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

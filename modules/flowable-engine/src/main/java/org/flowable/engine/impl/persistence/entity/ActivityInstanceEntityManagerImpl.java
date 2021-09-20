@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.ActivityInstanceQueryImpl;
@@ -452,15 +453,8 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdActivityInstances(String sourceTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.countChangeTenantIdActivityInstances(sourceTenantId, onlyInstancesFromDefaultTenantDefinitions);
-    }
-
-    @Override
-    public long changeTenantIdActivityInstances(String sourceTenantId, String targetTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions) {
-        return dataManager.changeTenantIdActivityInstances(sourceTenantId, targetTenantId, onlyInstancesFromDefaultTenantDefinitions);
+    public long changeTenantIdActivityInstances(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdActivityInstances(changeTenantIdRequest);
     }
 
 }

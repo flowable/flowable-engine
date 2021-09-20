@@ -12,11 +12,10 @@
  */
 package org.flowable.dmn.engine.impl.persistence.entity.data.impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl;
@@ -70,26 +69,14 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     public long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricDecisionExecutionCountByNativeQuery", parameterMap);
     }
-
+    
     @Override
-    public long countChangeTenantIdHistoricDecisionExecutions(String sourceTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.DMN, null);
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricDecisionExecutions", parameters);
-    }
-
-    @Override
-    public long changeTenantIdHistoricDecisionExecutions(String sourceTenantId, String targetTenantId, boolean onlyInstancesFromDefaultTenantDefinitions) {
-        String defaultTenantId = dmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(sourceTenantId, ScopeTypes.DMN, null);
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("sourceTenantId", sourceTenantId);
-        parameters.put("targetTenantId", targetTenantId);
-        parameters.put("defaultTenantId", defaultTenantId);
-        parameters.put("onlyInstancesFromDefaultTenantDefinitions", onlyInstancesFromDefaultTenantDefinitions);
-        return (long) getDbSqlSession().update("changeTenantIdHistoricDecisionExecutions", parameters);
+    public long changeTenantIdHistoricDecisionExecutions(ChangeTenantIdRequest changeTenantIdRequest) {
+        if (changeTenantIdRequest.isDryRun()) {
+            return (long) getDbSqlSession().selectOne("countChangeTenantIdHistoricDecisionExecutions", changeTenantIdRequest);
+        } else {
+            return (long) getDbSqlSession().update("changeTenantIdHistoricDecisionExecutions", changeTenantIdRequest);
+        }
     }
 
 }

@@ -64,7 +64,7 @@ public class FormManagementServiceImpl extends CommonEngineServiceImpl<FormEngin
 
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
-        return new ChangeTenantIdBuilderFormInstanceImpl(commandExecutor, fromTenantId, toTenantId);
+        return new ChangeTenantIdBuilderFormInstanceImpl(commandExecutor, super.getConfiguration(), fromTenantId, toTenantId);
     }
 
 }

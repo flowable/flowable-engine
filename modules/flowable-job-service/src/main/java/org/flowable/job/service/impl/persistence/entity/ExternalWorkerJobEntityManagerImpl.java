@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
@@ -96,15 +97,8 @@ public class ExternalWorkerJobEntityManagerImpl
     }
 
     @Override
-    public long countChangeTenantIdExternalWorkerJobs(String sourceTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.countChangeTenantIdExternalWorkerJobs(sourceTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
-    }
-
-    @Override
-    public long changeTenantIdExternalWorkerJobs(String sourceTenantId, String targetTenantId, String defaultTenantId,
-            boolean onlyInstancesFromDefaultTenantDefinitions, String scope) {
-        return dataManager.changeTenantIdExternalWorkerJobs(sourceTenantId, targetTenantId, defaultTenantId, onlyInstancesFromDefaultTenantDefinitions, scope);
+    public long changeTenantIdExternalWorkerJobs(ChangeTenantIdRequest changeTenantIdRequest) {
+        return dataManager.changeTenantIdExternalWorkerJobs(changeTenantIdRequest);
     }
 
 }

@@ -29,7 +29,11 @@
     </sql>
 
     <sql id="changeTenantIdCriteriaSql" databaseId="oracle">
-        where COALESCE(RES.TENANT_ID_,'DEFAULT') = COALESCE(#{sourceTenantId, jdbcType=VARCHAR},'DEFAULT')
+        where RES.TENANT_ID_
+        <choose>
+            <when test="sourceTenantId == null or sourceTenantId == ''"> IS NULL</when>
+            <otherwise> = #{sourceTenantId, jdbcType=VARCHAR}</otherwise>
+        </choose>
     </sql>
 
     <sql id="onlyInstancesFromDefaultTenantDefinitionsSql">
@@ -37,20 +41,33 @@
             <when test="scope == 'bpmn'">
                 and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
             </when>
-            <when test="scope =='cmmn'">
+            <!-- Do the sub-query looking for definitions from the default tenant outside, in the  commands, that is, in the java logic.  -->
+            <otherwise>
                 and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB where SUB.TENANT_ID_ = #{defaultTenantId, jdbcType=VARCHAR})
-            </when>
+            </otherwise>
         </choose>
     </sql>
 
     <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
         <choose>
             <when test="scope == 'bpmn'">
-                and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB where COALESCE(SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
+                and RES.PROC_DEF_ID_ in (select SUB.ID_ from ${prefix}ACT_RE_PROCDEF SUB
+                where SUB.TENANT_ID_
+                <choose>
+                    <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
+                    <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+                </choose>
+                )
             </when>
-            <when test="scope =='cmmn'">
-                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB COALESCE(where SUB.TENANT_ID_,'DEFAULT') = COALESCE(#{defaultTenantId, jdbcType=VARCHAR},'DEFAULT'))
-            </when>
+            <otherwise>
+                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF where
+                where SUB.TENANT_ID_
+                <choose>
+                    <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
+                    <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+                </choose>
+                )
+            </otherwise>
         </choose>
     </sql>
 

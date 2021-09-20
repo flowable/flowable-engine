@@ -1516,12 +1516,12 @@
      ${sql}
   </select>
 
-  <select id="countChangeTenantIdTasks" parameterType="string" resultType="long">
+  <select id="countChangeTenantIdTasks" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest" resultType="long">
     select count(RES.ID_) FROM ${prefix}ACT_RU_TASK RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
   </select>
 
-  <update id="changeTenantIdTasks" parameterType="java.util.Map">
+  <update id="changeTenantIdTasks" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_RU_TASK RES
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
     <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>

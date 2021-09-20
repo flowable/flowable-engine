@@ -14,6 +14,7 @@ package org.flowable.eventsubscription.service.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
@@ -82,8 +83,6 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
         
-    long countChangeTenantIdEventSubscriptions(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
-
-    long changeTenantIdEventSubscriptions(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    long changeTenantIdEventSubscriptions(ChangeTenantIdRequest changeTenantIdRequest);
 
 }

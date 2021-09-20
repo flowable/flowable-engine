@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.common.engine.api.tenant.ChangeTenantIdRequest;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
@@ -35,9 +36,7 @@ public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntit
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
-    
-    long countChangeTenantIdDeadLetterJobs(String sourceTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
 
-    long changeTenantIdDeadLetterJobs(String sourceTenantId, String targetTenantId, String defaultTenantId, boolean onlyInstancesFromDefaultTenantDefinitions, String scope);
+    long changeTenantIdDeadLetterJobs(ChangeTenantIdRequest changeTenantIdRequest);
 
 }
