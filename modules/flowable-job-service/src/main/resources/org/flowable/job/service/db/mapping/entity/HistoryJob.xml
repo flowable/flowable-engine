@@ -299,7 +299,7 @@
       </select>
     
       <update id="changeTenantIdHistoryJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-        update ${prefix}ACT_RU_HISTORY_JOB RES <if test="_databaseId != 'mssql'">RES</if>
+        update ${prefix}ACT_RU_HISTORY_JOB <if test="_databaseId != 'mssql'">RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
         <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_HISTORY_JOB RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
