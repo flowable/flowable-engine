@@ -222,7 +222,6 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
-            //TODO: Use an if selector like this one when the tenant id is empty and add a Junit test (and test with an oracle db)
             <if test="withoutScopeType">
                 and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
             </if>
