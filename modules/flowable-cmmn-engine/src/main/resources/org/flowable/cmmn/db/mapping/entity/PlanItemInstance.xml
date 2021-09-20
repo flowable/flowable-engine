@@ -662,6 +662,7 @@
         <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
         <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
     </choose>
+    )
   </sql>
 
   <sql id="changeTenantIdCaseCriteriaSql">
@@ -675,6 +676,7 @@
     select count(RES.ID_) FROM ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
     <include refid="changeTenantIdCaseCriteriaSql"/>
   </select>
+
   <update id="changeTenantIdCmmnPlanItemInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
     update ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST <if test="_databaseId != 'mssql'">RES</if>
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>

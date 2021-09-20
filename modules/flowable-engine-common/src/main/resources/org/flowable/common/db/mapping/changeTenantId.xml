@@ -60,8 +60,8 @@
                 )
             </when>
             <otherwise>
-                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF where
-                where SUB.TENANT_ID_
+                and RES.SCOPE_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_CMMN_CASEDEF SUB
+                where SUB.TENANT_ID_ 
                 <choose>
                     <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
                     <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
