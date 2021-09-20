@@ -101,6 +101,8 @@ public interface HistoryJsonConstants {
     String TASK_ID = "taskId";
 
     String BUSINESS_KEY = "businessKey";
+    
+    String BUSINESS_STATUS = "businessStatus";
 
     String PROCESS_DEFINITION_ID = "processDefinitionId";
 

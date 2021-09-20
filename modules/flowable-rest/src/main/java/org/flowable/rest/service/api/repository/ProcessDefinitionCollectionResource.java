@@ -82,7 +82,8 @@ public class ProcessDefinitionCollectionResource {
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return process definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return process definitions with a category like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return process definitions which do not have the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return process definitions with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return process definitions which are part of a deployment with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return process definitions which are part of a deployment with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "startableByUser", dataType = "string", value = "Only return process definitions which are part of a deployment with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest process definition versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
             @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only returns process definitions which are suspended. If false, only active process definitions (which are not suspended) are returned.", paramType = "query"),
@@ -148,6 +149,9 @@ public class ProcessDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("deploymentId")) {
             processDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            processDefinitionQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
         }
         if (allRequestParams.containsKey("startableByUser")) {
             processDefinitionQuery.startableByUser(allRequestParams.get("startableByUser"));

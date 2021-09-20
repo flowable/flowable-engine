@@ -44,6 +44,11 @@ public interface ReadOnlyDelegateExecution extends VariableContainer {
      * The business key for the process instance this execution is associated with.
      */
     String getProcessInstanceBusinessKey();
+    
+    /**
+     * The business status for the process instance this execution is associated with.
+     */
+    String getProcessInstanceBusinessStatus();
 
     /**
      * The process definition key for the process instance this execution is associated with.

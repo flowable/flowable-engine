@@ -41,6 +41,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
     protected String resourceName;
@@ -160,6 +161,15 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
             throw new FlowableIllegalArgumentException("ids is an empty collection");
         }
         this.deploymentIds = deploymentIds;
+        return this;
+    }
+
+    @Override
+    public CaseDefinitionQuery parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -379,6 +389,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
     public Set<String> getDeploymentIds() {
         return deploymentIds;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getId() {

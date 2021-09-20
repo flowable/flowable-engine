@@ -449,13 +449,22 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance) {
         if (processInstance != null) {
             if (isHistoryEnabled(processInstance.getProcessDefinitionId())) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("updateProcessBusinessKeyInHistory : {}", processInstance.getId());
-                }
-                
                 HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
                 if (historicProcessInstance != null) {
                     historicProcessInstance.setBusinessKey(processInstance.getProcessInstanceBusinessKey());
+                    getHistoricProcessInstanceEntityManager().update(historicProcessInstance, false);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance) {
+        if (processInstance != null) {
+            if (isHistoryEnabled(processInstance.getProcessDefinitionId())) {
+                HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
+                if (historicProcessInstance != null) {
+                    historicProcessInstance.setBusinessStatus(processInstance.getProcessInstanceBusinessStatus());
                     getHistoricProcessInstanceEntityManager().update(historicProcessInstance, false);
                 }
             }

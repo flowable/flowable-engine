@@ -65,10 +65,18 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
             historyManager.recordUpdateCaseInstanceName(caseInstanceEntity, name);
         }
     }
+    
     @Override
     public void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordUpdateBusinessKey(caseInstanceEntity, businessKey);
+        }
+    }
+    
+    @Override
+    public void recordUpdateBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordUpdateBusinessStatus(caseInstanceEntity, businessStatus);
         }
     }
 

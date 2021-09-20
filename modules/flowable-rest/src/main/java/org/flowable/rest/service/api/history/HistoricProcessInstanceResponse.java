@@ -33,6 +33,7 @@ public class HistoricProcessInstanceResponse {
     protected String url;
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
     protected String processDefinitionName;
@@ -89,6 +90,15 @@ public class HistoricProcessInstanceResponse {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    
+    @ApiModelProperty(example = "myStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     @ApiModelProperty(example = "oneTaskProcess%3A1%3A4")

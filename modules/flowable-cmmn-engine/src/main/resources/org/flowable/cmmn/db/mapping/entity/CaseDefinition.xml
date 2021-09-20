@@ -243,6 +243,9 @@
           #{item}
         </foreach>
       </if>
+      <if test="parentDeploymentId != null">
+          and EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = RES.DEPLOYMENT_ID_)
+      </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_CMMN_CASEDEF where KEY_ = RES.KEY_ 
              <if test="tenantId != null">

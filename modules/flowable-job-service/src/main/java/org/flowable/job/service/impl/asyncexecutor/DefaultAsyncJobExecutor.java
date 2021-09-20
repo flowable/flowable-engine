@@ -107,13 +107,13 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
     @Override
     protected void startAdditionalComponents() {
+        if (configuration.isUnlockOwnedJobs()) {
+            unlockOwnedJobs();
+        }
+
         if (!isMessageQueueMode) {
             initAsyncJobExecutionThreadPool();
             startJobAcquisitionThread();
-        }
-
-        if (configuration.isUnlockOwnedJobs()) {
-            unlockOwnedJobs();
         }
 
         if (configuration.isTimerRunnableNeeded()) {

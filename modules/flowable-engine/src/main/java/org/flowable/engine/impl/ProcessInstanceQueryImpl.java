@@ -52,6 +52,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String businessKey;
     protected String businessKeyLike;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
+    protected String businessStatus;
+    protected String businessStatusLike;
     protected String processDefinitionId;
     protected Set<String> processDefinitionIds;
     protected String processDefinitionCategory;
@@ -182,6 +184,29 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.businessKeyLike = businessKeyLike;
         } else {
             this.businessKeyLike = businessKeyLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus) {
+        if (businessStatus == null) {
+            throw new FlowableIllegalArgumentException("Business status is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatus = businessStatus;
+        } else {
+            this.businessStatus = businessStatus;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatusLike = businessStatusLike;
+        } else {
+            this.businessStatusLike = businessStatusLike;
         }
         return this;
     }
@@ -891,6 +916,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getBusinessKeyLike() {
         return businessKeyLike;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public String getBusinessStatusLike() {
+        return businessStatusLike;
     }
 
     public boolean isIncludeChildExecutionsWithBusinessKeyQuery() {

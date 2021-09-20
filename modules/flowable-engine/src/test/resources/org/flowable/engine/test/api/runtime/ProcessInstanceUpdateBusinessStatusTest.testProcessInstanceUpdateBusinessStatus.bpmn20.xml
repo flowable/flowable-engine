@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskListenerExample"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="Examples">
+
+	<process id="businessStatusProcess" name="Update business status Example">
+		<extensionElements>
+			<flowable:executionListener event="start"
+				class="org.flowable.engine.test.api.runtime.ProcessInstanceUpdateBusinessStatusTest$UpdateBusinessStatusExecutionListener" />
+		</extensionElements>
+
+		<startEvent id="theStart" />
+
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+
+		<userTask id="task1" />
+
+		<sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
+
+		<userTask id="task2" />
+
+		<sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
+
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

@@ -75,6 +75,11 @@ public interface DmnDecisionQuery extends Query<DmnDecisionQuery, DmnDecision> {
     DmnDecisionQuery deploymentIds(Set<String> deploymentIds);
 
     /**
+     * Only select decisions that are deployed in a deployment with the given parent deployment id
+     */
+    DmnDecisionQuery parentDeploymentId(String parentDeploymentId);
+
+    /**
      * Only select decision with the given key.
      */
     DmnDecisionQuery decisionKey(String decisionKey);

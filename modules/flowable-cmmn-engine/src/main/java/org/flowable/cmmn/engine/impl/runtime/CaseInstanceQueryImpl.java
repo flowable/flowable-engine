@@ -50,6 +50,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String caseDefinitionName;
     protected Integer caseDefinitionVersion;
     protected String businessKey;
+    protected String businessStatus;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
     protected String caseInstanceParentId;
@@ -211,6 +212,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.businessKey = businessKey;
         } else {
             this.businessKey = businessKey;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceBusinessStatus(String businessStatus) {
+        if (businessStatus == null) {
+            throw new FlowableIllegalArgumentException("Business status is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatus = businessStatus;
+        } else {
+            this.businessStatus = businessStatus;
         }
         return this;
     }
@@ -789,6 +803,22 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getBusinessKey() {
         return businessKey;
+    }
+
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public Date getLastReactivatedBefore() {
+        return lastReactivatedBefore;
+    }
+
+    public Date getLastReactivatedAfter() {
+        return lastReactivatedAfter;
+    }
+
+    public String getLastReactivatedBy() {
+        return lastReactivatedBy;
     }
 
     public String getExecutionId() {

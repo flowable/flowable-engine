@@ -32,11 +32,18 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
     public void testGetChannelDefinitions() throws Exception {
 
         try {
-            EventDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel").deploy();
+            EventDeployment firstDeployment = repositoryService.createDeployment()
+                    .name("Deployment 1")
+                    .parentDeploymentId("parent1")
+                    .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel")
+                    .deploy();
 
             ChannelDefinition firstChannelDef = repositoryService.createChannelDefinitionQuery().channelDefinitionKey("myChannel").deploymentId(firstDeployment.getId()).singleResult();
             
-            EventDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel")
+            EventDeployment secondDeployment = repositoryService.createDeployment()
+                    .name("Deployment 2")
+                    .parentDeploymentId("parent2")
+                    .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel")
                     .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/orderChannel.channel").deploy();
             
             EventDeployment thirdDeployment = repositoryService.createDeployment().name("Deployment 3").addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleChannel2.channel")
@@ -93,6 +100,14 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();
             assertResultsPresentInDataResponse(url, myChannelDef.getId(), orderChannelDef.getId());
+
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent2";
+            assertResultsPresentInDataResponse(url, myChannelDef.getId(), orderChannelDef.getId());
+
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent1";
+            assertResultsPresentInDataResponse(url, firstChannelDef.getId());
 
         } finally {
             // Always cleanup any created deployments, even if the test failed

@@ -454,6 +454,7 @@ public class CmmnRestResponseFactory {
     public CaseInstanceResponse createCaseInstanceResponse(CaseInstance caseInstance, RestUrlBuilder urlBuilder) {
         CaseInstanceResponse result = new CaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
+        result.setBusinessStatus(caseInstance.getBusinessStatus());
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
         result.setStartTime(caseInstance.getStartTime());
@@ -581,6 +582,7 @@ public class CmmnRestResponseFactory {
     public HistoricCaseInstanceResponse createHistoricCaseInstanceResponse(HistoricCaseInstance caseInstance, RestUrlBuilder urlBuilder) {
         HistoricCaseInstanceResponse result = new HistoricCaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
+        result.setBusinessStatus(caseInstance.getBusinessStatus());
         result.setName(caseInstance.getName());
         result.setEndTime(caseInstance.getEndTime());
         result.setId(caseInstance.getId());

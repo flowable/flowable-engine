@@ -64,8 +64,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     private static final long serialVersionUID = 1L;
     
     protected SendEventServiceTask sendEventServiceTask;
-    protected boolean executedAsAsyncJob;
-    
+
     public SendEventTaskActivityBehavior(SendEventServiceTask sendEventServiceTask) {
         this.sendEventServiceTask = sendEventServiceTask;
     }
@@ -79,6 +78,7 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        boolean executedAsAsyncJob = Boolean.TRUE.equals(commandContext.getAttribute(AsyncSendEventJobHandler.TYPE));
         boolean sendSynchronously = sendEventServiceTask.isSendSynchronously() || executedAsAsyncJob;
         if (!sendSynchronously) {
             JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
@@ -250,10 +250,4 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         }
     }
 
-    public boolean isExecutedAsAsyncJob() {
-        return executedAsAsyncJob;
-    }
-    public void setExecutedAsAsyncJob(boolean executedAsAsyncJob) {
-        this.executedAsAsyncJob = executedAsAsyncJob;
-    }
 }

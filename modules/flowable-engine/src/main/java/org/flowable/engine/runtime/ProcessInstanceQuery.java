@@ -47,6 +47,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select process instances with a business key like the given value.
      */
     ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
+    
+    /** Select process instances with the given business status */
+    ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus);
+
+    /**
+     * Select process instances with a business status like the given value.
+     */
+    ProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
 
     /**
      * Only select process instances that have the given tenant id.

@@ -136,6 +136,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey123");
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "someType");
         runtimeService.setProcessInstanceName(processInstance.getId(), "The name");
+        runtimeService.updateBusinessStatus(processInstance.getId(), "businessStatus123");
         Calendar hourAgo = Calendar.getInstance();
         hourAgo.add(Calendar.HOUR_OF_DAY, -1);
         Calendar hourFromNow = Calendar.getInstance();
@@ -183,6 +184,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count()).isZero();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatus("businessStatus123").count()).isEqualTo(1);
 
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
@@ -217,6 +219,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey123");
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "someType");
         runtimeService.setProcessInstanceName(processInstance.getId(), "The name");
+        runtimeService.updateBusinessStatus(processInstance.getId(), "businessStatus123");
         Calendar hourAgo = Calendar.getInstance();
         hourAgo.add(Calendar.HOUR_OF_DAY, -1);
         Calendar hourFromNow = Calendar.getInstance();
@@ -285,6 +288,8 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("undefined").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("undefined").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLike("b%123").processDefinitionId("undefined").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatus("businessStatus123").processDefinitionId("undefined").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatusLike("b%123").processDefinitionId("undefined").endOr().count()).isEqualTo(1);
         
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");

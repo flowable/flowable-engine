@@ -43,6 +43,8 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     Comparator<ExecutionEntity> EXECUTION_ENTITY_START_TIME_ASC_COMPARATOR = comparing(ProcessInstance::getStartTime);
 
     void setBusinessKey(String businessKey);
+    
+    void setBusinessStatus(String businessStatus);
 
     void setProcessDefinitionId(String processDefinitionId);
 

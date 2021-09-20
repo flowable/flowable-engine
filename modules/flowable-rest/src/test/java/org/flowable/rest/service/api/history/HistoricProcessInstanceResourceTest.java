@@ -54,6 +54,8 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
                 .referenceType("testReferenceType")
                 .stageInstanceId("testStageInstanceId")
                 .start();
+        
+        runtimeService.updateBusinessStatus(processInstance.getId(), "myBusinessStatus");
 
         CloseableHttpResponse response = executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, processInstance.getId())),
@@ -69,6 +71,7 @@ public class HistoricProcessInstanceResourceTest extends BaseSpringRestTestCase 
                 .isEqualTo("{"
                         + "id: '" + processInstance.getId() + "',"
                         + "businessKey: 'myBusinessKey',"
+                        + "businessStatus: 'myBusinessStatus',"
                         + "callbackId: 'testCallbackId',"
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"

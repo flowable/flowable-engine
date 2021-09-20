@@ -26,6 +26,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 public interface HistoricCaseInstanceEntity extends Entity, HasRevision, HistoricCaseInstance {
 
     void setBusinessKey(String businessKey);
+    void setBusinessStatus(String businessStatus);
     void setName(String name);
     void setParentId(String parentId);
     void setCaseDefinitionId(String caseDefinitionId);

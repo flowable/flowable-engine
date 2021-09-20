@@ -61,6 +61,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Set<String> caseInstanceIds;
     protected String caseInstanceNameLikeIgnoreCase;
     protected String businessKey;
+    protected String businessStatus;
     protected String caseInstanceParentId;
     protected String deploymentId;
     protected List<String> deploymentIds;
@@ -216,6 +217,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.businessKey = businessKey;
         } else {
             this.businessKey = businessKey;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceBusinessStatus(String businessStatus) {
+        if (businessStatus == null) {
+            throw new FlowableIllegalArgumentException("Business status is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatus = businessStatus;
+        } else {
+            this.businessStatus = businessStatus;
         }
         return this;
     }
@@ -930,6 +944,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getBusinessKey() {
         return businessKey;
+    }
+    
+    public String getBusinessStatus() {
+        return businessStatus;
     }
 
     public String getCaseInstanceParentId() {

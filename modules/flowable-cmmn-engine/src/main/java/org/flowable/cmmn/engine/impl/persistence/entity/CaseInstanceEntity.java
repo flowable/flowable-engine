@@ -27,6 +27,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstances, VariableScope, HasRevision, PlanItemInstanceContainer, CaseInstance {
 
     void setBusinessKey(String businessKey);
+    void setBusinessStatus(String businessStatus);
     void setName(String name);
     void setParentId(String parentId);
     void setCaseDefinitionId(String caseDefinitionId);

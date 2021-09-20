@@ -58,6 +58,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, caseInstanceEntity.getName());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, caseInstanceEntity.getState());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_KEY, caseInstanceEntity.getBusinessKey());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_STATUS, caseInstanceEntity.getBusinessStatus());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PARENT_ID, caseInstanceEntity.getParentId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, caseInstanceEntity.getCaseDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_USER_ID, caseInstanceEntity.getStartUserId());
@@ -80,6 +81,7 @@ public abstract class AbstractAsyncCmmnHistoryManager implements CmmnHistoryMana
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_NAME, historicCaseInstanceEntity.getName());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_STATE, historicCaseInstanceEntity.getState());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_KEY, historicCaseInstanceEntity.getBusinessKey());
+        putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_BUSINESS_STATUS, historicCaseInstanceEntity.getBusinessStatus());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_PARENT_ID, historicCaseInstanceEntity.getParentId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_CASE_DEFINITION_ID, historicCaseInstanceEntity.getCaseDefinitionId());
         putIfNotNull(data, CmmnAsyncHistoryConstants.FIELD_START_USER_ID, historicCaseInstanceEntity.getStartUserId());

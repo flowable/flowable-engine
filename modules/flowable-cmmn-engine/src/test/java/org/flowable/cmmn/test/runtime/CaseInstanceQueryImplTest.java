@@ -284,6 +284,38 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
     }
+    
+    @Test
+    public void getCaseInstanceByBusinessStatus() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        
+        cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "businessStatus");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatus("businessStatus").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("businessStatus")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("businessStatus")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatus("undefined")
+                .caseDefinitionId("undefined")
+                .endOr()
+                .singleResult()).isNull();
+    }
 
     @Test
     public void getCaseInstanceByStartedBefore() {

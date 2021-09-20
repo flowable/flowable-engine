@@ -424,6 +424,16 @@ public interface RuntimeService {
      *     new businessKey value
      */
     void updateBusinessKey(String processInstanceId, String businessKey);
+    
+    /**
+     * Updates the business status for the provided process instance
+     *
+     * @param processInstanceId
+     *     id of the process instance to set the business status, cannot be null
+     * @param businessStatus
+     *     new business status value
+     */
+    void updateBusinessStatus(String processInstanceId, String businessStatus);
 
     // Identity Links
     // ///////////////////////////////////////////////////////////////

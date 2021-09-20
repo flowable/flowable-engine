@@ -30,6 +30,7 @@ public class ProcessInstancePropertyChangedHistoryJsonTransformer extends Abstra
 
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_BUSINESS_KEY = "businessKey";
+    public static final String PROPERTY_BUSINESS_STATUS = "businessStatus";
 
     public ProcessInstancePropertyChangedHistoryJsonTransformer(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -52,6 +53,9 @@ public class ProcessInstancePropertyChangedHistoryJsonTransformer extends Abstra
 
             } else if (PROPERTY_BUSINESS_KEY.equals(property)) {
                 historicProcessInstance.setBusinessKey(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_KEY));
+            
+            } else if (PROPERTY_BUSINESS_STATUS.equals(property)) {
+                historicProcessInstance.setBusinessStatus(getStringFromJson(historicalData, HistoryJsonConstants.BUSINESS_STATUS));
             }
         }
     }

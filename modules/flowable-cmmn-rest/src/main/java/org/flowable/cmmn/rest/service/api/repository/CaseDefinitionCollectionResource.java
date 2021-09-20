@@ -82,7 +82,8 @@ public class CaseDefinitionCollectionResource {
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return case definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return case definitions with a category like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return case definitions which do not have the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return case definitions with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return case definitions which are part of a deployment with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return case definitions which are part of a deployment with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "startableByUser", dataType = "string", value = "Only return case definitions which are part of a deployment with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest case definition versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
             @ApiImplicitParam(name = "suspended", dataType = "boolean", value = "If true, only returns case definitions which are suspended. If false, only active process definitions (which are not suspended) are returned.", paramType = "query"),
@@ -138,6 +139,9 @@ public class CaseDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("deploymentId")) {
             caseDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            caseDefinitionQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
         }
         if (allRequestParams.containsKey("startableByUser")) {
             caseDefinitionQuery.startableByUser(allRequestParams.get("startableByUser"));

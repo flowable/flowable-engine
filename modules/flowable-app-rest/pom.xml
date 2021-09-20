@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
         <relativePath>../flowable-spring-boot/pom.xml</relativePath>
-        <version>6.7.0-SNAPSHOT</version>
+        <version>6.7.1-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -702,7 +702,7 @@
                             <to>
                                 <image>flowable/flowable-rest:${project.version}</image>
                                 <tags>
-                                    <tag>flowable/flowable-rest:latest</tag>
+                                    <tag>latest</tag>
                                 </tags>
                             </to>
                         </configuration>
