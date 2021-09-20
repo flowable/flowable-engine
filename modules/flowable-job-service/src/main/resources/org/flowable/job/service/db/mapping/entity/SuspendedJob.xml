@@ -411,8 +411,9 @@
       </select>
     
       <update id="changeTenantIdSuspendedJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-        update ${prefix}ACT_RU_SUSPENDED_JOB RES
+        update ${prefix}ACT_RU_SUSPENDED_JOB RES <if test="_databaseId != 'mssql'">RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+        <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_SUSPENDED_JOB RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
       </update>
 

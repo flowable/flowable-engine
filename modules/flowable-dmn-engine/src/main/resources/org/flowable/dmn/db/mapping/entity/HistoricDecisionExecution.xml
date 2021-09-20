@@ -193,8 +193,9 @@
   </select>
 
   <update id="changeTenantIdHistoricDecisionExecutions" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
+    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES <if test="_databaseId != 'mssql'">RES</if>
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES</if>
     <include refid="changeTenantIdDmnCriteriaSql" />
 
   </update>

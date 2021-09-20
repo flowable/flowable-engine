@@ -554,8 +554,9 @@
       </select>
     
       <update id="changeTenantIdExternalWorkerJobs" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-        update ${prefix}ACT_RU_EXTERNAL_JOB RES
+        update ${prefix}ACT_RU_EXTERNAL_JOB RES <if test="_databaseId != 'mssql'">RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+        <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_RU_EXTERNAL_JOB RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdProcessOrCaseCriteriaSql"/>
       </update>
 

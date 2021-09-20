@@ -154,8 +154,9 @@
     </select>
 
     <update id="changeTenantIdCmmnMilestoneInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-        update ${prefix}ACT_CMMN_RU_MIL_INST RES
+        update ${prefix}ACT_CMMN_RU_MIL_INST RES <if test="_databaseId != 'mssql'">RES</if>
         <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+        <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_CMMN_RU_MIL_INST RES</if>
         <include refid="changeTenantIdCaseCriteriaSql"/>
     </update>
 

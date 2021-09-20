@@ -336,8 +336,9 @@
   </select>
 
   <update id="changeTenantIdContentItemInstances" parameterType="org.flowable.common.engine.api.tenant.ChangeTenantIdRequest">
-    update ${prefix}ACT_CO_CONTENT_ITEM RES
+    update ${prefix}ACT_CO_CONTENT_ITEM RES <if test="_databaseId != 'mssql'">RES</if>
     <include refid="org.flowable.common.db.mapping.changeTenantIdSetSql"/>
+    <if test="_databaseId == 'mssql'">FROM ${prefix}ACT_CO_CONTENT_ITEM RES</if>
     <include refid="org.flowable.common.db.mapping.changeTenantIdCriteriaSql"/>
   </update>
 
