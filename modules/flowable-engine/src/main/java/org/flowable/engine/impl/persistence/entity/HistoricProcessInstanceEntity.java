@@ -28,6 +28,8 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
     void setEndActivityId(String endActivityId);
 
     void setBusinessKey(String businessKey);
+    
+    void setBusinessStatus(String businessStatus);
 
     void setStartUserId(String startUserId);
 

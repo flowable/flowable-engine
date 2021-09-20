@@ -34,6 +34,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     protected String endActivityId;
     protected String businessKey;
+    protected String businessStatus;
     protected String startUserId;
     protected String startActivityId;
     protected String superProcessInstanceId;
@@ -61,6 +62,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         this.id = processInstance.getId();
         this.processInstanceId = processInstance.getId();
         this.businessKey = processInstance.getBusinessKey();
+        this.businessStatus = processInstance.getBusinessStatus();
         this.name = processInstance.getName();
         this.processDefinitionId = processInstance.getProcessDefinitionId();
         this.processDefinitionKey = processInstance.getProcessDefinitionKey();
@@ -89,6 +91,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("startTime", startTime);
         persistentState.put("endTime", endTime);
         persistentState.put("businessKey", businessKey);
+        persistentState.put("businessStatus", businessStatus);
         persistentState.put("name", name);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
@@ -127,6 +130,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    @Override
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    @Override
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     @Override

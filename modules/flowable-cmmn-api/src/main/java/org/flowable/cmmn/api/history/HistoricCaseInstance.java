@@ -24,6 +24,7 @@ public interface HistoricCaseInstance {
     String getName();
     String getParentId();
     String getBusinessKey();
+    String getBusinessStatus();
     String getCaseDefinitionId();
     String getCaseDefinitionKey();
     String getCaseDefinitionName();

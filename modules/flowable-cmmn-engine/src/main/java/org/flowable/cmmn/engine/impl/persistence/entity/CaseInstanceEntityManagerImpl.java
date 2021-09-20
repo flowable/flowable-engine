@@ -260,6 +260,14 @@ public class CaseInstanceEntityManagerImpl
             engineConfiguration.getCmmnHistoryManager().recordUpdateBusinessKey(caseInstanceEntity, businessKey);
         }
     }
+    
+    @Override
+    public void updateCaseInstanceBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus) {
+        if (businessStatus != null) {
+            caseInstanceEntity.setBusinessStatus(businessStatus);
+            engineConfiguration.getCmmnHistoryManager().recordUpdateBusinessStatus(caseInstanceEntity, businessStatus);
+        }
+    }
 
     protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
         return engineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager();

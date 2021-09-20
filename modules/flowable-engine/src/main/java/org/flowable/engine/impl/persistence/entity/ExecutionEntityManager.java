@@ -89,6 +89,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
 
     String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey);
+    
+    String updateProcessInstanceBusinessStatus(ExecutionEntity executionEntity, String businessStatus);
 
     void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
     

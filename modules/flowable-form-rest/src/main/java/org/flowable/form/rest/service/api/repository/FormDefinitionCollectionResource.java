@@ -84,7 +84,8 @@ public class FormDefinitionCollectionResource {
             @ApiImplicitParam(name = "versionGreaterThanOrEquals", dataType = "string", value = "Only return form definitions with a version greater than or equal to the given value.", paramType = "query"),
             @ApiImplicitParam(name = "versionLowerThan", dataType = "string", value = "Only return form definitions with a version lower than the given value.", paramType = "query"),
             @ApiImplicitParam(name = "versionLowerThanOrEquals", dataType = "string", value = "Only return form definitions with a version lower than or equal to the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return form definitions with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return form definitions which are part of a deployment with the given deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return form definitions which are part of a deployment with the given parent deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form definitions with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form definitions with a tenant id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "Only return form definitions without a tenant id.", paramType = "query"),
@@ -144,6 +145,9 @@ public class FormDefinitionCollectionResource {
         }
         if (allRequestParams.containsKey("deploymentId")) {
             formDefinitionQuery.deploymentId(allRequestParams.get("deploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            formDefinitionQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
         }
         if (allRequestParams.containsKey("tenantId")) {
             formDefinitionQuery.formTenantId(allRequestParams.get("tenantId"));

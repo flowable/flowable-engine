@@ -959,9 +959,9 @@
                 RES.ASSIGNEE_ is null and
               </if>
                 exists(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_
-                and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{userIdForCandidateAndAssignee} or
+                and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{userIdForCandidateAndAssignee}
                 <if test="candidateGroups != null &amp;&amp; candidateGroups.size() &gt; 0">
-                    (
+                    or (
                     <foreach item="candidateGroupListItem" index="groupIndex" collection="safeCandidateGroups">
                         <if test="groupIndex &gt; 0">
                         or
@@ -1471,9 +1471,9 @@
                         RES.ASSIGNEE_ is null and
                     </if>
                     exists(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_
-                    and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{orQueryObject.userIdForCandidateAndAssignee} or
+                    and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = #{orQueryObject.userIdForCandidateAndAssignee}
                     <if test="orQueryObject.candidateGroups != null &amp;&amp; orQueryObject.candidateGroups.size() &gt; 0">
-                        (
+                        or (
                         <foreach item="candidateGroupListItem" index="groupIndex" collection="orQueryObject.safeCandidateGroups">
                             <if test="groupIndex &gt; 0">
                             or

@@ -457,6 +457,17 @@ public class AsyncHistoryManager extends AbstractAsyncHistoryManager {
     }
     
     @Override
+    public void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance) {
+        if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processInstance.getProcessDefinitionId())) {
+            ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();
+            putIfNotNull(data, HistoryJsonConstants.PROCESS_INSTANCE_ID, processInstance.getId());
+            putIfNotNull(data, HistoryJsonConstants.BUSINESS_STATUS, processInstance.getBusinessStatus());
+            putIfNotNull(data, HistoryJsonConstants.PROPERTY, ProcessInstancePropertyChangedHistoryJsonTransformer.PROPERTY_BUSINESS_STATUS);
+            getAsyncHistorySession().addHistoricData(getJobServiceConfiguration(), HistoryJsonConstants.TYPE_PROCESS_INSTANCE_PROPERTY_CHANGED, data);
+        }
+    }
+    
+    @Override
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
         if (isHistoryEnabled(processDefinitionEntity.getId())) {
             ObjectNode data = processEngineConfiguration.getObjectMapper().createObjectNode();

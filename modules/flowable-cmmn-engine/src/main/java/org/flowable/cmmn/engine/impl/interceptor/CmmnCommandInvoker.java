@@ -54,15 +54,13 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         if (commandContext.isReused() && !agenda.isEmpty()) {
             commandContext.setResult(command.execute(commandContext));
         } else {
-            agenda.planOperation(new Runnable() {
-                @Override
-                public void run() {
-                    commandContext.setResult(command.execute(commandContext));
-                }
-            });
+            agenda.planOperation(() -> commandContext.setResult(command.execute(commandContext)));
 
             executeOperations(commandContext, true); // true -> always store the case instance id for the regular operation loop, even if it's a no-op operation.
-            evaluateUntilStable(commandContext);
+
+            if (commandContext.isRootUsageOfCurrentEngine()) {
+                evaluateUntilStable(commandContext);
+            }
         }
         
         return (T) commandContext.getResult();

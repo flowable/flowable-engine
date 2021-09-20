@@ -47,6 +47,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
     protected String resourceName;
@@ -165,6 +166,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
             throw new FlowableIllegalArgumentException("ids are null");
         }
         this.deploymentIds = deploymentIds;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -431,6 +441,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public Set<String> getDeploymentIds() {
         return deploymentIds;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getId() {

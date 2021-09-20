@@ -68,6 +68,7 @@ CREATE TABLE ACT_RU_EXECUTION (
     REFERENCE_ID_ varchar(255),
     REFERENCE_TYPE_ varchar(255),
     PROPAGATED_STAGE_INST_ID_ varchar(255),
+    BUSINESS_STATUS_ varchar(255),
     primary key (ID_)
 );
 
@@ -347,9 +348,9 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.6.2.1', 1);
+values ('schema.version', '6.7.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.6.2.1)', 1);
+values ('schema.history', 'create(6.7.0.1)', 1);
 
 --force-commit

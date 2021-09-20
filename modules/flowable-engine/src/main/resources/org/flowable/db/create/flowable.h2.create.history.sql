@@ -19,6 +19,7 @@ create table ACT_HI_PROCINST (
     REFERENCE_ID_ varchar(255),
     REFERENCE_TYPE_ varchar(255),
     PROPAGATED_STAGE_INST_ID_ varchar(255),
+    BUSINESS_STATUS_ varchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );

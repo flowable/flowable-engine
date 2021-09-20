@@ -33,6 +33,7 @@ public class HistoricCaseInstanceResponse {
     protected String url;
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected String caseDefinitionId;
     protected String caseDefinitionUrl;
     protected String caseDefinitionName;
@@ -85,6 +86,15 @@ public class HistoricCaseInstanceResponse {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    
+    @ApiModelProperty(example = "myStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     @ApiModelProperty(example = "oneTaskCase%3A1%3A4")

@@ -95,6 +95,11 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
     public String getBusinessKey() {
         return activiti5ProcessInstance.getBusinessKey();
     }
+    
+    @Override
+    public String getBusinessStatus() {
+        return null;
+    }
 
     @Override
     public boolean isSuspended() {

@@ -35,6 +35,7 @@ public class CaseInstanceResponse {
     protected String name;
     protected String url;
     protected String businessKey;
+    protected String businessStatus;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     protected String startUserId;
@@ -89,6 +90,15 @@ public class CaseInstanceResponse {
         this.businessKey = businessKey;
     }
     
+    @ApiModelProperty(example = "myBusinessStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+    }
+
     @ApiModelProperty(example = "2019-04-17T10:17:43.902+0000")
     public Date getStartTime() {
         return startTime;

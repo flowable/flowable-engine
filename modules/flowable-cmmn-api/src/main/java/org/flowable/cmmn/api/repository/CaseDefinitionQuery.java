@@ -43,6 +43,8 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
 
     CaseDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
+    CaseDefinitionQuery parentDeploymentId(String parentDeploymentId);
+
     CaseDefinitionQuery caseDefinitionKey(String caseDefinitionKey);
 
     CaseDefinitionQuery caseDefinitionKeyLike(String caseDefinitionKeyLike);

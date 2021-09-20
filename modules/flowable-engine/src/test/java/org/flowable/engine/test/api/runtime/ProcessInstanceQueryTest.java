@@ -80,9 +80,14 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         processInstanceIds = new ArrayList<>();
         for (int i = 0; i < PROCESS_DEFINITION_KEY_DEPLOY_COUNT; i++) {
-            processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i)).getId());
+            String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i)).getId();
+            runtimeService.updateBusinessStatus(processInstanceId, String.valueOf(i));
+            processInstanceIds.add(processInstanceId);
         }
-        processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId());
+        
+        String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId();
+        runtimeService.updateBusinessStatus(processInstanceId, "1");
+        processInstanceIds.add(processInstanceId);
     }
 
     @AfterEach
@@ -299,6 +304,38 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("invalid").count()).isZero();
 
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(null).count())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+    
+    @Test
+    public void testQueryByBusinessStatus() {
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatus("0").count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatus("1").count()).isEqualTo(2);
+    }
+
+    @Test
+    public void testQueryByBusinessStatusLike() {
+        String processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+        processInstanceIds.add(processInstanceId);
+        runtimeService.updateBusinessStatus(processInstanceId, "1A");
+        
+        processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+        processInstanceIds.add(processInstanceId);
+        runtimeService.updateBusinessStatus(processInstanceId, "A1");
+        
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("%0").count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("1%").count()).isEqualTo(3);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("%1").count()).isEqualTo(3);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("%1%").count()).isEqualTo(4);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("%A%").count()).isEqualTo(2);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatusLike("%B%").count()).isZero();
+    }
+
+    @Test
+    public void testQueryByInvalidBusinessStatus() {
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceBusinessStatus("invalid").count()).isZero();
+
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processInstanceBusinessStatus(null).count())
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 

@@ -92,6 +92,44 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByParentDeploymentId() {
+        Deployment deployment1 = repositoryService.createDeployment()
+                .parentDeploymentId("parent1")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .deploy();
+
+        Deployment deployment2 = repositoryService.createDeployment()
+                .parentDeploymentId("parent2")
+                .addClasspathResource("org/flowable/engine/test/repository/one.bpmn20.xml")
+                .addClasspathResource("org/flowable/engine/test/repository/two.bpmn20.xml")
+                .deploy();
+
+        try {
+
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("parent1").list())
+                    .extracting(ProcessDefinition::getKey, ProcessDefinition::getDeploymentId)
+                    .containsExactlyInAnyOrder(
+                            tuple("one", deployment1.getId())
+                    );
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("parent1").count()).isEqualTo(1);
+
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("parent2").list())
+                    .extracting(ProcessDefinition::getKey, ProcessDefinition::getDeploymentId)
+                    .containsExactlyInAnyOrder(
+                            tuple("one", deployment2.getId()),
+                            tuple("two", deployment2.getId())
+                    );
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("parent2").count()).isEqualTo(2);
+
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("unknown").list()).isEmpty();
+            assertThat(repositoryService.createProcessDefinitionQuery().parentDeploymentId("unknown").count()).isEqualTo(0);
+        } finally {
+            repositoryService.deleteDeployment(deployment1.getId(), true);
+            repositoryService.deleteDeployment(deployment2.getId(), true);
+        }
+    }
+
+    @Test
     public void testQueryByName() {
         ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionName("Two");
         verifyQueryResults(query, 1);

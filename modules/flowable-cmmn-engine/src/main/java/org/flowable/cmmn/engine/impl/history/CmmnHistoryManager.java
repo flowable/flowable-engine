@@ -38,6 +38,8 @@ public interface CmmnHistoryManager {
     void recordUpdateCaseInstanceName(CaseInstanceEntity caseInstanceEntity, String name);
 
     void recordUpdateBusinessKey(CaseInstanceEntity caseInstanceEntity, String businessKey);
+    
+    void recordUpdateBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus);
 
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
