@@ -241,9 +241,10 @@
 
   <sql id="onlyInstancesFromDefaultTenantDefinitionsSql" databaseId="oracle">
     and RES.FORM_DEFINITION_ID_ in (select SUB.ID_ from ${prefix}ACT_FO_FORM_DEFINITION SUB 
+    where SUB.TENANT_ID_ 
     <choose>
-        <when test="defaultTenantId == null or defaultTenantId == ''">IS NULL</when>
-        <otherwise>= #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
+        <when test="defaultTenantId == null or defaultTenantId == ''"> IS NULL</when>
+        <otherwise> = #{defaultTenantId, jdbcType=VARCHAR}</otherwise>
     </choose>
     )
   </sql>
