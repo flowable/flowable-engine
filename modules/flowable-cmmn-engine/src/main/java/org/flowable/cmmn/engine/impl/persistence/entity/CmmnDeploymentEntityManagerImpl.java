@@ -121,7 +121,7 @@ public class CmmnDeploymentEntityManagerImpl
 
     protected CaseDefinition findNewLatestCaseDefinitionAfterRemovalOf(CaseDefinition caseDefinitionToBeRemoved) {
 
-        // The case process definition is not necessarily the one with 'version -1' (some versions could have been deleted)
+        // The case definition is not necessarily the one with 'version -1' (some versions could have been deleted)
         // Hence, the following logic
 
         CaseDefinitionQuery query = getCaseDefinitionEntityManager().createCaseDefinitionQuery();
