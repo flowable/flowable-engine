@@ -16,8 +16,10 @@ package org.flowable.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -25,6 +27,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -38,12 +41,16 @@ import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
+import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionBuilder;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.service.TimerJobService;
@@ -184,6 +191,14 @@ public class DeploymentEntityManagerImpl
                                     restoreMessageStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventDefinition);
                                 }
 
+                            } else {
+                                if (startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE) != null) {
+                                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+                                    if (!eventTypeElements.isEmpty()) {
+                                        String eventDefinitionKey = eventTypeElements.get(0).getElementText();
+                                        restoreEventRegistryStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventDefinitionKey);
+                                    }
+                                }
                             }
 
                         }
@@ -256,6 +271,23 @@ public class DeploymentEntityManagerImpl
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(newSubscription);
     }
 
+    protected void restoreEventRegistryStartEvent(ProcessDefinition previousProcessDefinition, BpmnModel bpmnModel, StartEvent startEvent, String eventDefinitionKey) {
+        CommandContext commandContext = Context.getCommandContext();
+        EventSubscriptionService eventSubscriptionService = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        EventSubscriptionBuilder eventSubscriptionBuilder = eventSubscriptionService.createEventSubscriptionBuilder()
+                .eventType(eventDefinitionKey)
+                .activityId(startEvent.getId())
+                .processDefinitionId(previousProcessDefinition.getId())
+                .scopeType(ScopeTypes.BPMN)
+                .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, startEvent, null));
+
+        if (previousProcessDefinition.getTenantId() != null) {
+            eventSubscriptionBuilder.tenantId(previousProcessDefinition.getTenantId());
+        }
+
+        EventSubscription eventSubscription = eventSubscriptionBuilder.create();
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+    }
     protected ProcessDefinitionEntity findLatestProcessDefinition(ProcessDefinition processDefinition) {
         ProcessDefinitionEntity latestProcessDefinition = null;
         if (processDefinition.getTenantId() != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
