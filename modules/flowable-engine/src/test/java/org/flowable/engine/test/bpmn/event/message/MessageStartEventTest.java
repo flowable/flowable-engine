@@ -283,6 +283,32 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
         assertEventSubscriptionQuery(runtimeService.createEventSubscriptionQuery().createdBefore(compareCal.getTime()), 2);
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+    public void testMessageSubscriptionsRecreatedOnDeploymentDelete() {
+        ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery().singleResult();
+
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+                .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), null));
+
+        String deploymentId2 = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
+                .deploy().getId();
+        ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId2).singleResult();
+
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+                .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition2.getId(), null)); // Note the changed definition id
+
+        repositoryService.deleteDeployment(deploymentId2, true);
+
+        Assertions.assertThat(runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+                .containsOnly(tuple(MessageEventSubscriptionEntity.EVENT_TYPE, processDefinition1.getId(), null)); // Note the changed definition id to v1
+    }
+
+
     protected void assertEventSubscriptionQuery(EventSubscriptionQuery query, int count) {
         assertThat(query.count()).isEqualTo(count);
         assertThat(query.list()).hasSize(count);

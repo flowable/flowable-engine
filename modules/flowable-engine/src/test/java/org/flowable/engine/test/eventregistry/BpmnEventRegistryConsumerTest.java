@@ -508,6 +508,80 @@ public class BpmnEventRegistryConsumerTest extends FlowableEventRegistryBpmnTest
             );
     }
 
+    @Test
+    public void testEventRegistrySubscriptionsRecreatedOnDeploymentDelete() {
+        org.flowable.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testRedeploy.bpmn20.xml")
+            .deploy();
+        deploymentIdsForAutoCleanup.add(deployment1.getId());
+        ProcessDefinition processDefinition1 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment1.getId()).singleResult();
+
+        // After deploying, there should be one eventsubscription: to start the instance
+        assertThat( runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(tuple("myEvent", processDefinition1.getId(), null));
+
+        // After the instance is started, there should be one additional eventsubscription
+        inboundEventChannelAdapter.triggerTestEvent();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition1.getId());
+
+        assertThat( runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(
+                tuple("myEvent", processDefinition1.getId(), null),
+                tuple("myEvent", processDefinition1.getId(), processInstance.getId())
+            );
+
+        // Redeploying the same definition:
+        // Event subscription to start should reflect new definition id
+        // Existing subscription for boundary event should remain
+        org.flowable.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
+            .addClasspathResource("org/flowable/engine/test/eventregistry/BpmnEventRegistryConsumerTest.testRedeploy.bpmn20.xml")
+            .deploy();
+        deploymentIdsForAutoCleanup.add(deployment2.getId());
+        ProcessDefinition processDefinition2 = repositoryService.createProcessDefinitionQuery().deploymentId(deployment2.getId()).singleResult();
+
+        assertThat( runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(
+                tuple("myEvent", processDefinition2.getId(), null), // note the new definition id
+                tuple("myEvent", processDefinition1.getId(), processInstance.getId()) // note the original id
+            );
+
+        // Triggering the instance event subscription should continue the case instance like before
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+            .extracting(Task::getName)
+            .containsOnly("My task");
+
+        inboundEventChannelAdapter.triggerTestEvent();
+
+        // Ended thanks to boundary event
+        assertProcessEnded(processInstance.getId());
+        processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition2.getId());
+
+        assertThat(runtimeService.createEventSubscriptionQuery().list())
+            .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+            .containsOnly(
+                    tuple("myEvent", processDefinition2.getId(), null),
+                    tuple("myEvent", processDefinition2.getId(), processInstance.getId()) // triggering the test event started a new process
+            );
+
+        deploymentIdsForAutoCleanup.remove(deployment2.getId());
+
+        // Removing the second definition should recreate the one from the first one
+        // There won't be a process instance since we will do cascaded delete of the deployment
+        repositoryService.deleteDeployment(deployment2.getId(), true);
+
+        assertThat( runtimeService.createEventSubscriptionQuery().list())
+                .extracting(EventSubscription::getEventType, EventSubscription::getProcessDefinitionId, EventSubscription::getProcessInstanceId)
+                .containsOnly(
+                        tuple("myEvent", processDefinition1.getId(), null)
+                );
+    }
+
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public InboundChannelModel inboundChannelModel;
