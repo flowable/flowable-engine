@@ -31,6 +31,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
+import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -209,22 +210,7 @@ public class CmmnDeployer implements EngineDeployer {
     }
 
     protected String getEventCorrelationKey(Case caseModel) {
-        String correlationKey = null;
-        List<ExtensionElement> eventCorrelationParamExtensions = caseModel.getExtensionElements()
-            .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, Collections.emptyList());
-        if (!eventCorrelationParamExtensions.isEmpty()) {
-
-            // Cannot evaluate expressions for start events, hence why values are taken as-is
-            Map<String, Object> correlationParameters = new HashMap<>();
-            for (ExtensionElement eventCorrelation : eventCorrelationParamExtensions) {
-                String name = eventCorrelation.getAttributeValue(null, "name");
-                String value = eventCorrelation.getAttributeValue(null, "value");
-                correlationParameters.put(name, value);
-            }
-
-            correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
-        }
-        return correlationKey;
+        return CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel);
     }
 
     protected void makeCaseDefinitionsConsistentWithPersistedVersions(CmmnParseResult parseResult) {

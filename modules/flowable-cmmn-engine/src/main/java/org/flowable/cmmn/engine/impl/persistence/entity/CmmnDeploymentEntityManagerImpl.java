@@ -16,11 +16,18 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
@@ -61,9 +68,82 @@ public class CmmnDeploymentEntityManagerImpl
             } else {
                 caseDefinitionEntityManager.delete(caseDefinition.getId());
             }
+
+            // If previous case definition version has an event registry start event, it must be added
+            // Only if the currently deleted case definition is the latest version,
+            // we fall back to the previous event registry start event
+            restorePreviousStartEventsIfNeeded(caseDefinition);
         }
         getCmmnResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
+    }
+
+    protected void restorePreviousStartEventsIfNeeded(CaseDefinition caseDefinition) {
+        CaseDefinitionEntity latestCaseDefinition = findLatestCaseDefinition(caseDefinition);
+        if (latestCaseDefinition != null && caseDefinition.getId().equals(latestCaseDefinition.getId())) {
+
+            // Try to find a previous version (it could be some versions are missing due to deletions)
+            CaseDefinition previousCaseDefinition = findNewLatestCaseDefinitionAfterRemovalOf(caseDefinition);
+            if (previousCaseDefinition != null) {
+                CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
+                Case caseModel = cmmnModel.getPrimaryCase();
+                String startEventType = caseModel.getStartEventType();
+                if (startEventType != null) {
+                    restoreEventRegistryStartEvent(previousCaseDefinition, caseModel, startEventType);
+                }
+            }
+        }
+    }
+
+    protected void restoreEventRegistryStartEvent(CaseDefinition previousCaseDefinition, Case caseModel, String startEventType) {
+        engineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService()
+                .createEventSubscriptionBuilder()
+                .eventType(startEventType)
+                .configuration(CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel))
+                .scopeDefinitionId(previousCaseDefinition.getId())
+                .scopeType(ScopeTypes.CMMN)
+                .tenantId(previousCaseDefinition.getTenantId())
+                .create();
+    }
+
+    protected CaseDefinitionEntity findLatestCaseDefinition(CaseDefinition caseDefinition) {
+        CaseDefinitionEntity latestCaseDefinition = null;
+        if (caseDefinition.getTenantId() != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinition.getTenantId())) {
+            latestCaseDefinition = getCaseDefinitionEntityManager()
+                    .findLatestCaseDefinitionByKeyAndTenantId(caseDefinition.getKey(), caseDefinition.getTenantId());
+        } else {
+            latestCaseDefinition = getCaseDefinitionEntityManager()
+                    .findLatestCaseDefinitionByKey(caseDefinition.getKey());
+        }
+        return latestCaseDefinition;
+    }
+
+    protected CaseDefinition findNewLatestCaseDefinitionAfterRemovalOf(CaseDefinition caseDefinitionToBeRemoved) {
+
+        // The case process definition is not necessarily the one with 'version -1' (some versions could have been deleted)
+        // Hence, the following logic
+
+        CaseDefinitionQuery query = getCaseDefinitionEntityManager().createCaseDefinitionQuery();
+        query.caseDefinitionKey(caseDefinitionToBeRemoved.getKey());
+
+        if (caseDefinitionToBeRemoved.getTenantId() != null
+                && !CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinitionToBeRemoved.getTenantId())) {
+            query.caseDefinitionTenantId(caseDefinitionToBeRemoved.getTenantId());
+        } else {
+            query.caseDefinitionWithoutTenantId();
+        }
+
+        if (caseDefinitionToBeRemoved.getVersion() > 0) {
+            query.caseDefinitionVersionLowerThan(caseDefinitionToBeRemoved.getVersion());
+        }
+        query.orderByCaseDefinitionVersion().desc();
+
+        List<CaseDefinition> caseDefinitions = query.listPage(0, 1);
+        if (caseDefinitions != null && caseDefinitions.size() > 0) {
+            return caseDefinitions.get(0);
+        }
+        return null;
     }
 
     @Override
