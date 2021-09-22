@@ -106,7 +106,7 @@ public class CmmnClassDelegate implements CmmnTriggerableActivityBehavior, TaskL
 
     protected TaskListener getTaskListenerInstance(DelegateTask delegateTask) {
         Object delegateInstance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, delegateTask, false);
+        applyFieldExtensions(fieldExtensions, delegateInstance, false);
 
         if (delegateInstance instanceof TaskListener) {
             return (TaskListener) delegateInstance;
