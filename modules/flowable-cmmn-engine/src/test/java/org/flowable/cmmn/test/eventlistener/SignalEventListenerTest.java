@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.eventlistener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -25,7 +26,9 @@ import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -53,6 +56,13 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
 
         //3 PlanItems reachable
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionType, PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER, "eventListener", PlanItemInstanceState.AVAILABLE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.AVAILABLE)
+                );
 
         //1 Signal Event Listener
         PlanItemInstance listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
@@ -99,6 +109,16 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
         assertThat(eventSubscription.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
 
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionType, HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER, "eventListener", PlanItemInstanceState.AVAILABLE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.AVAILABLE)
+                    );
+        }
+
         // Trigger the signal
         cmmnRuntimeService.triggerPlanItemInstance(listenerInstance.getId());
 
@@ -107,6 +127,12 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
 
         // Only 2 PlanItems left
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list()).hasSize(2);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionType, PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.ACTIVE)
+                );
 
         // Both Human task should be "active" now, as the sentry kicks on the SignalEventListener transition
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateActive()
@@ -114,6 +140,16 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
 
         eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(eventListenerInstance.getCaseInstanceId()).singleResult();
         assertThat(eventSubscription).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionType, HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple(PlanItemDefinitionType.SIGNAL_EVENT_LISTENER, "eventListener", PlanItemInstanceState.COMPLETED),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.ACTIVE)
+                    );
+        }
 
         // Finish the case instance
         assertCaseInstanceNotEnded(caseInstance);
