@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 
 /**
  * @author Joram Barrez
@@ -300,54 +301,13 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
     }
     
     protected List<List<String>> createSafeInValuesList(Collection<String> values) {
-        if (values == null) {
-            return null;
-        }
-        
-        List<String> valuesList = new ArrayList<>(values);
-        List<List<String>> safeValuesList = new ArrayList<>();
-        int valuesSize = values.size();
-        if (valuesSize <= MAX_ENTRIES_IN_CLAUSE) {
-            safeValuesList.add(valuesList);
-
-        } else {
-
-            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
-
-            for (int startIndex = 0; startIndex < valuesSize; startIndex += MAX_ENTRIES_IN_CLAUSE) {
-
-                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
-                if (endIndex > valuesSize) {
-                    endIndex = valuesSize; // endIndex in #subList is exclusive
-                }
-
-                safeValuesList.add(valuesList.subList(startIndex, endIndex));
-            }
-        }
-        
-        return safeValuesList;
+        // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+        return CollectionUtil.partition(values, MAX_ENTRIES_IN_CLAUSE);
     }
 
-    protected void executeChangeWithInClause(List<EntityImpl> entities, Consumer<Collection<EntityImpl>> consumer) {
-        if (entities.size() <= MAX_ENTRIES_IN_CLAUSE) {
-            consumer.accept(entities);
-
-        } else {
-
-            // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
-
-            for (int startIndex = 0; startIndex < entities.size(); startIndex += MAX_ENTRIES_IN_CLAUSE) {
-
-                int endIndex = startIndex + MAX_ENTRIES_IN_CLAUSE;
-                if (endIndex > entities.size()) {
-                    endIndex = entities.size(); // endIndex in #subList is exclusive
-                }
-
-                List<EntityImpl> subList = entities.subList(startIndex, endIndex);
-                consumer.accept(subList);
-            }
-
-        }
+    protected void executeChangeWithInClause(List<EntityImpl> entities, Consumer<List<EntityImpl>> consumer) {
+        // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+        CollectionUtil.consumePartitions(entities, MAX_ENTRIES_IN_CLAUSE, consumer);
     }
 
     protected void bulkDeleteEntities(String statement, List<EntityImpl> entities) {
