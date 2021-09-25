@@ -40,6 +40,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author 分享牛
  */
 public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance>
         implements HistoricTaskInstanceQuery, CacheAwareQuery<HistoricTaskInstanceEntity> {
@@ -58,6 +59,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String processDefinitionName;
     protected String processDefinitionNameLike;
     protected Collection<String> processCategoryInList;
+    protected Collection<String> taskIdList;
     protected Collection<String> processCategoryNotInList;
     protected String deploymentId;
     protected Collection<String> deploymentIds;
@@ -650,6 +652,34 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return this;
     }
 
+    /**
+     * Only select tasks with a task id that is in the given list
+     *
+     * @param taskIdList
+     * @throws FlowableIllegalArgumentException When task id list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    @Override
+    public HistoricTaskInstanceQuery taskIdIn(Collection<String> taskIdList) {
+        if (taskIdList == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIdList.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+        for (String taskId : taskIdList) {
+            if (taskId == null) {
+                throw new FlowableIllegalArgumentException("None of the given task ids can be null");
+            }
+        }
+
+        if (inOrStatement) {
+            currentOrQueryObject.taskIdList = taskIdList;
+        } else {
+            this.taskIdList = taskIdList;
+        }
+        return this;
+    }
+
     @Override
     public HistoricTaskInstanceQuery taskNameIn(Collection<String> taskNameList) {
         if (taskNameList == null) {
@@ -907,6 +937,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.taskOwnerLikeIgnoreCase = taskOwnerLikeIgnoreCase.toLowerCase();
         }
         return this;
+    }
+
+    public Collection<String> getTaskIdList() {
+        return taskIdList;
     }
 
     @Override

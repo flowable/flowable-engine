@@ -43,6 +43,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Tom Baeyens
  * @author Falko Menge
  * @author Tijs Rademakers
+ * @author 分享牛
  */
 public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> implements TaskQuery, CacheAwareQuery<TaskEntity> {
 
@@ -56,6 +57,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String nameLike;
     protected String nameLikeIgnoreCase;
     protected Collection<String> nameList;
+    protected Collection<String> taskIdList;
     protected Collection<String> nameListIgnoreCase;
     protected String description;
     protected String descriptionLike;
@@ -196,6 +198,34 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.name = name;
         } else {
             this.name = name;
+        }
+        return this;
+    }
+
+    /**
+     * Only select tasks with a task id that is in the given list
+     *
+     * @param taskIdList
+     * @throws FlowableIllegalArgumentException When task id list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    @Override
+    public TaskQuery taskIdIn(Collection<String> taskIdList) {
+        if (taskIdList == null) {
+            throw new FlowableIllegalArgumentException("Task id list is null");
+        }
+        if (taskIdList.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Task id list is empty");
+        }
+        for (String taskId : taskIdList) {
+            if (taskId == null) {
+                throw new FlowableIllegalArgumentException("None of the given task ids can be null");
+            }
+        }
+
+        if (orActive) {
+            currentOrQueryObject.taskIdList = taskIdList;
+        } else {
+            this.taskIdList = taskIdList;
         }
         return this;
     }
@@ -2066,6 +2096,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return dueAfter;
     }
 
+    public Collection<String> getTaskIdList() {
+        return taskIdList;
+    }
+
     public boolean isWithoutDueDate() {
         return withoutDueDate;
     }
@@ -2187,4 +2221,5 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
     }
+
 }

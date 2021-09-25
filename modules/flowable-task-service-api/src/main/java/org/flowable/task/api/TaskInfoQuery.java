@@ -35,6 +35,13 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
 
     /** Only select tasks with the given name */
     T taskName(String name);
+    /**
+     * Only select tasks with a task id that is in the given list
+     *
+     * @throws FlowableIllegalArgumentException
+     *             When task id list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    T taskIdIn(Collection<String> taskIdList);
 
     /**
      * Only select tasks with a name that is in the given list
@@ -788,5 +795,7 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Order by category (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     T orderByCategory();
+
+
 
 }

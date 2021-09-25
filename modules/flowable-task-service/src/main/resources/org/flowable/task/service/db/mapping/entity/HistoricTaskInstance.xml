@@ -996,6 +996,12 @@
       <if test="processInstanceId != null">
         and ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
       </if>
+    <if test="taskIdList != null &amp;&amp; taskIdList.size() &gt; 0">
+      and ${queryTablePrefix}ID_ in
+      <foreach item="item" index="index" collection="taskIdList" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
       <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() &gt; 0">
         and ${queryTablePrefix}PROC_INST_ID_ IN
         <foreach item="processInstance" index="index" collection="processInstanceIds"

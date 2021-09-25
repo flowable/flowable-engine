@@ -556,6 +556,13 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
+      <if test="taskIdList != null &amp;&amp; taskIdList.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="taskId" index="index" collection="taskIdList"
+                 open="(" separator="," close=")">
+          #{taskId}
+        </foreach>
+      </if>
       <if test="processInstanceIds != null &amp;&amp; processInstanceIds.size() &gt; 0">
         and RES.PROC_INST_ID_ IN
         <foreach item="processInstance" index="index" collection="processInstanceIds"
