@@ -160,7 +160,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     // eventMessage
     protected int eventMessageLength = 163;
-    protected int eventMessageSubLength = 163;
+    protected int eventMessageSubLength = 160;
 
     /** postprocessor for a task builder */
     protected TaskPostProcessor taskPostProcessor = null;
