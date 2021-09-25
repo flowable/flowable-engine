@@ -13,7 +13,6 @@
 
 package org.activiti.spring.test.jpa;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
