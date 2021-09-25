@@ -32,6 +32,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
+ * @author 盘古
  */
 public class AddCommentCmd implements Command<Comment> {
 
@@ -105,8 +106,8 @@ public class AddCommentCmd implements Command<Comment> {
         comment.setAction(Event.ACTION_ADD_COMMENT);
 
         String eventMessage = message.replaceAll("\\s+", " ");
-        if (eventMessage.length() > 163) {
-            eventMessage = eventMessage.substring(0, 160) + "...";
+        if (eventMessage.length() > processEngineConfiguration.getEventMessageLength()) {
+            eventMessage = eventMessage.substring(0, processEngineConfiguration.getEventMessageSubLength()) + "...";
         }
         comment.setMessage(eventMessage);
 

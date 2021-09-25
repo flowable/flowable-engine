@@ -81,6 +81,7 @@ import org.flowable.task.service.TaskPostProcessor;
  * 
  * @see ProcessEngines
  * @author Tom Baeyens
+ * @author 盘古
  */
 public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
 
@@ -157,6 +158,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected int cleanInstancesEndedAfterNumberOfDays = 365;
     protected HistoryCleaningManager historyCleaningManager;
 
+    // eventMessage
+    protected int eventMessageLength = 163;
+    protected int eventMessageSubLength = 163;
 
     /** postprocessor for a task builder */
     protected TaskPostProcessor taskPostProcessor = null;
@@ -841,5 +845,23 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     public ProcessEngineConfiguration setAlwaysUseArraysForDmnMultiHitPolicies(boolean alwaysUseArraysForDmnMultiHitPolicies) {
         this.alwaysUseArraysForDmnMultiHitPolicies = alwaysUseArraysForDmnMultiHitPolicies;
         return this;
+    }
+
+    public int getEventMessageLength() {
+        return eventMessageLength;
+    }
+
+    public ProcessEngineConfiguration setEventMessageLength(int eventMessageLength) {
+        this.eventMessageLength = eventMessageLength;
+        return  this;
+    }
+
+    public int getEventMessageSubLength() {
+        return eventMessageSubLength;
+    }
+
+    public ProcessEngineConfiguration setEventMessageSubLength(int eventMessageSubLength) {
+        this.eventMessageSubLength = eventMessageSubLength;
+        return  this;
     }
 }
