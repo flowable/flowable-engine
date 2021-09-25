@@ -10,19 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.standalone.testing;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+import java.util.List;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author 盘古BPM
  * @author 分享牛
