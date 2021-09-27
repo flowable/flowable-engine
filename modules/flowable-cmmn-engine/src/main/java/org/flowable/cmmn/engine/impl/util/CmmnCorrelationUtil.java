@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
