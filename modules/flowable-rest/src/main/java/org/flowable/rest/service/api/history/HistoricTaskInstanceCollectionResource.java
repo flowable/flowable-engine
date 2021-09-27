@@ -45,6 +45,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instances for the process instance and its children.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns historic task instances without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKeyLike", dataType = "string", value = "The process definition key of the historic task instance, which matches the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the historic task instance.", paramType = "query"),
@@ -87,6 +88,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic task instance global variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return historic task instances with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return historic task instances with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns historic task instances without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic task instances with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
@@ -112,6 +114,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
         
         if (allRequestParams.get("processInstanceIdWithChildren") != null) {
             queryRequest.setProcessInstanceIdWithChildren(allRequestParams.get("processInstanceIdWithChildren"));
+        }
+        
+        if (allRequestParams.get("withoutProcessInstanceId") != null) {
+            queryRequest.setWithoutProcessInstanceId(Boolean.valueOf(allRequestParams.get("withoutProcessInstanceId")));
         }
 
         if (allRequestParams.get("processBusinessKey") != null) {
@@ -296,6 +302,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("scopeId") != null) {
             queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+        
+        if (allRequestParams.get("withoutScopeId") != null) {
+            queryRequest.setWithoutScopeId(Boolean.valueOf(allRequestParams.get("withoutScopeId")));
         }
 
         if (allRequestParams.get("scopeType") != null) {

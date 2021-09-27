@@ -84,6 +84,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getProcessInstanceIdWithChildren() != null) {
             query.processInstanceIdWithChildren(queryRequest.getProcessInstanceIdWithChildren());
         }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutProcessInstanceId())) {
+            query.withoutProcessInstanceId();
+        }
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
         }
@@ -243,6 +246,9 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getScopeId() != null) {
             query.scopeId(queryRequest.getScopeId());
+        }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutScopeId())) {
+            query.withoutScopeId();
         }
         if (queryRequest.getScopeType() != null) {
             query.scopeType(queryRequest.getScopeType());

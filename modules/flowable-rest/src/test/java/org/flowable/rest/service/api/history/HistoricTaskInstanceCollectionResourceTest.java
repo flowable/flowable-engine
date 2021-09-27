@@ -107,6 +107,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?processInstanceIdWithChildren=" + processInstance.getId(), 2, task.getId());
         
         assertResultsPresentInDataResponse(url + "?processInstanceIdWithChildren=nonexisting", 0);
+        
+        assertResultsPresentInDataResponse(url + "?withoutProcessInstanceId=true", 0);
 
         assertResultsPresentInDataResponse(url + "?taskAssignee=kermit", 2, task2.getId());
 
@@ -142,6 +144,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Without tenant id
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 2, task.getId(), task1.getId());
+        
+        assertResultsPresentInDataResponse(url + "?withoutScopeId=true", 3, task.getId(), task1.getId(), task2.getId());
 
         // Tenant id
         assertResultsPresentInDataResponse(url + "?tenantId=myTenant", 1, task2.getId());

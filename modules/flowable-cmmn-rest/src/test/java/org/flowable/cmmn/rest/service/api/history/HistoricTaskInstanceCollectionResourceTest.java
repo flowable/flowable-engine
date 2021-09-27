@@ -61,7 +61,9 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         created.set(Calendar.MILLISECOND, 0);
         cmmnEngineConfiguration.getClock().setCurrentTime(created.getTime());
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").businessKey("myBusinessKey").variables(caseVariables)
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase")
+                .businessKey("myBusinessKey")
+                .variables(caseVariables)
                 .start();
         cmmnEngineConfiguration.getClock().reset();
         Task task1 = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -102,6 +104,9 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=" + caseInstance.getId(), 2, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=nonexisting", 0);
+            
+            // Without scope id
+            assertResultsPresentInDataResponse(url + "?withoutScopeId=true", 0);
 
             assertResultsPresentInDataResponse(url + "?taskAssignee=kermit", 2, task2.getId());
 
@@ -139,6 +144,9 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             // Tenant id like
             assertResultsPresentInDataResponse(url + "?tenantIdLike=" + encode("%enant"), 1, task2.getId());
             assertResultsPresentInDataResponse(url + "?tenantIdLike=anotherTenant", 0);
+            
+            // Without process instance id
+            assertResultsPresentInDataResponse(url + "?withoutProcessInstanceId=true", 3, task.getId(), task1.getId(), task2.getId());
 
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);

@@ -65,6 +65,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Collection<String> cmmnDeploymentIds;
     protected String processInstanceId;
     protected Collection<String> processInstanceIds;
+    protected boolean withoutProcessInstanceId;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -73,6 +74,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected boolean withoutScopeId;
     protected String propagatedStageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
@@ -279,6 +281,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl withoutProcessInstanceId() {
+        if (inOrStatement) {
+            currentOrQueryObject.withoutProcessInstanceId = true;
+        } else {
+            this.withoutProcessInstanceId = true;
+        }
+        return this;
+    }
 
     @Override
     public HistoricTaskInstanceQueryImpl processInstanceBusinessKey(String processInstanceBusinessKey) {
@@ -452,6 +464,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
         } else {
             this.scopeDefinitionId = scopeDefinitionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl withoutScopeId() {
+        if (inOrStatement) {
+            currentOrQueryObject.withoutScopeId = true;
+        } else {
+            this.withoutScopeId = true;
         }
         return this;
     }

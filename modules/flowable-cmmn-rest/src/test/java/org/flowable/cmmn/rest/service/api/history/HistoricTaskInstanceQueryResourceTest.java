@@ -170,7 +170,6 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode.put("caseDefinitionKeyLike", "%notExisting");
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
-
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseDefinitionKeyLikeIgnoreCase", "%case");
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
@@ -187,6 +186,10 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceIdWithChildren", "nonexisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutScopeId", true);
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
@@ -248,6 +251,10 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskDefinitionKey", "task1");
         assertResultsPresentInPostDataResponse(url, requestNode, finishedTaskCase1.getId(), task2.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutProcessInstanceId", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), finishedTaskCase1.getId(), task2.getId());
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })

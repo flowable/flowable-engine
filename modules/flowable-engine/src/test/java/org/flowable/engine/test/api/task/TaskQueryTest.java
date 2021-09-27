@@ -2836,6 +2836,15 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         assertThat(taskService.createTaskQuery().or().taskId("invalid").processInstanceIdIn(Arrays.asList("unexisting1", "unexisting2")).count()).isZero();
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testWithoutProcessInstanceId() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().withoutProcessInstanceId().count()).isEqualTo(12);
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
@@ -3813,6 +3822,15 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         deploymentIds.add("invalid");
         assertThat(taskService.createTaskQuery().deploymentIdIn(deploymentIds).singleResult()).isNull();
         assertThat(taskService.createTaskQuery().or().taskId("invalid").deploymentIdIn(deploymentIds).count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml" })
+    public void testWithoutScopeId() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        assertThat(taskService.createTaskQuery().withoutScopeId().count()).isEqualTo(13);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).withoutScopeId().count()).isEqualTo(1);
     }
 
     @Test

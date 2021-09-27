@@ -220,6 +220,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             caseDefinitionKeyIn.add("oneHumanTaskCase");
             caseDefinitionKeyIn.add("another");
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+            
+            // Without scope id filtering
+            requestNode.removeAll();
+            requestNode.put("withoutScopeId", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
             // CreatedOn filtering
             requestNode.removeAll();
@@ -270,6 +275,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("category", "some-category");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+            
+            // Without process instance id filtering
+            requestNode.removeAll();
+            requestNode.put("withoutProcessInstanceId", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), adhocTask.getId());
 
             // Filtering without duedate
             requestNode.removeAll();

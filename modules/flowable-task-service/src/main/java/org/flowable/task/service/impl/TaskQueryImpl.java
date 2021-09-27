@@ -87,6 +87,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean withoutTenantId;
     protected String processInstanceId;
     protected Collection<String> processInstanceIds;
+    protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String scopeId;
     protected String subScopeId;
@@ -118,6 +119,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected Collection<String> deploymentIds;
     protected String cmmnDeploymentId;
     protected Collection<String> cmmnDeploymentIds;
+    protected boolean withoutScopeId;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -703,6 +705,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.processInstanceIds = processInstanceIds;
         } else {
             this.processInstanceIds = processInstanceIds;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQueryImpl withoutProcessInstanceId() {
+        if (orActive) {
+            currentOrQueryObject.withoutProcessInstanceId = true;
+        } else {
+            this.withoutProcessInstanceId = true;
         }
         return this;
     }
@@ -1407,6 +1419,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
         } else {
             this.cmmnDeploymentIds = cmmnDeploymentIds;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery withoutScopeId() {
+        if (orActive) {
+            currentOrQueryObject.withoutScopeId = true;
+        } else {
+            this.withoutScopeId = true;
         }
         return this;
     }
