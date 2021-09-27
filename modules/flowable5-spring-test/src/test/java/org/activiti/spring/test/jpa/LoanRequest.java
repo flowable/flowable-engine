@@ -21,8 +21,6 @@ import javax.persistence.Id;
 
 /**
  * @author Frederik Heremans
- * @author 盘古BPM
- * @author 分享牛
  */
 @Entity(name = "SPRING_TEST_ORDER")
 public class LoanRequest {
