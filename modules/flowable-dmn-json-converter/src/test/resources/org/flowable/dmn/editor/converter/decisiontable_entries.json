@@ -25,6 +25,19 @@
       "label": "Input Two",
       "entries": [],
       "newVariable": false
+    },
+    {
+      "id": "4",
+      "variableId": "input3",
+      "variableType": null,
+      "type": "number",
+      "label": "Input Three",
+      "entries": [
+        20,
+        10,
+        30
+      ],
+      "newVariable": false
     }
   ],
   "outputExpressions": [
@@ -48,21 +61,27 @@
       "1_operator": "==",
       "1_expression": "AAA",
       "3_operator": "==",
-      "3_expression": "-"
+      "3_expression": "-",
+      "4_operator": "==",
+      "4_expression": 10
     },
     {
       "2": "SECOND",
       "1_operator": "==",
       "1_expression": "AAA",
       "3_operator": "==",
-      "3_expression": "-"
+      "3_expression": "-",
+      "4_operator": "==",
+      "4_expression": 10
     },
     {
       "2": "THIRD",
       "1_operator": "==",
       "1_expression": "AAA",
       "3_operator": "==",
-      "3_expression": "-"
+      "3_expression": "-",
+      "4_operator": "==",
+      "4_expression": 10
     }
   ]
 }
