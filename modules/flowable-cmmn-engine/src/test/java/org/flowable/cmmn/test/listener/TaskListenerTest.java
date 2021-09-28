@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -169,6 +170,16 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
                 .hasMessage("Illegal argument in listener");
     }
 
+    @Test
+    @CmmnDeployment
+    public void testListenerWithFieldExtension() {
+        CaseInstance caseInstance = cmmnRuntimeService
+            .createCaseInstanceBuilder()
+            .caseDefinitionKey("testTaskListeners")
+            .start();
+        assertVariable(caseInstance, "variableFromClassDelegate", "Hello from field");
+    }
+
     private void assertVariable(CaseInstance caseInstance, String varName, String value) {
         String variable = (String) cmmnRuntimeService.getVariable(caseInstance.getId(), varName);
         assertThat(variable).isEqualTo(value);
@@ -201,6 +212,20 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         @Override
         public void notify(DelegateTask delegateTask) {
             throw new RuntimeException("Illegal argument in listener");
+        }
+    }
+
+    public static class TaskListenerWithFieldExtensions implements TaskListener {
+
+        private Expression myField;
+
+        @Override
+        public void notify(DelegateTask delegateTask) {
+            delegateTask.setVariable("variableFromClassDelegate", myField.getValue(delegateTask));
+        }
+
+        public void setMyField(Expression myField) {
+            this.myField = myField;
         }
     }
 
