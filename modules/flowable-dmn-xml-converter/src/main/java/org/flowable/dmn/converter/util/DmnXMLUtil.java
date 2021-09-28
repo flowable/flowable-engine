@@ -26,6 +26,7 @@ import org.flowable.dmn.converter.child.BaseChildElementParser;
 import org.flowable.dmn.converter.child.InputClauseParser;
 import org.flowable.dmn.converter.child.InputEntryParser;
 import org.flowable.dmn.converter.child.InputExpressionParser;
+import org.flowable.dmn.converter.child.InputValuesParser;
 import org.flowable.dmn.converter.child.ItemComponentParser;
 import org.flowable.dmn.converter.child.OutputClauseParser;
 import org.flowable.dmn.converter.child.OutputEntryParser;
@@ -56,6 +57,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
         addGenericParser(new InputEntryParser());
         addGenericParser(new OutputEntryParser());
         addGenericParser(new InputExpressionParser());
+        addGenericParser(new InputValuesParser());
         addGenericParser(new OutputValuesParser());
         addGenericParser(new VariableParser());
         addGenericParser(new RequiredAuthorityParser());
