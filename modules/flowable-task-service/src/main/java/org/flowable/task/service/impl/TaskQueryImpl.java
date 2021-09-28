@@ -1867,12 +1867,20 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return processInstanceIds;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
     public String getExecutionId() {
         return executionId;
     }
 
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
     }
 
     public String getSubScopeId() {

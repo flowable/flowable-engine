@@ -1824,6 +1824,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return processInstanceIds;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
     public String getProcessInstanceBusinessKey() {
         return processInstanceBusinessKey;
     }
@@ -1834,6 +1838,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
     }
 
     public String getSubScopeId() {
