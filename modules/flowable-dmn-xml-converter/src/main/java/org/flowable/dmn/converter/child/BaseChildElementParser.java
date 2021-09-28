@@ -12,8 +12,17 @@
  */
 package org.flowable.dmn.converter.child;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
@@ -49,5 +58,51 @@ public abstract class BaseChildElementParser implements DmnXMLConstants {
 
     public boolean accepts(DmnElement element) {
         return element != null;
+    }
+
+    public List<Object> splitAndFormatInputOutputValues(String valuesText) {
+        if (StringUtils.isEmpty(valuesText)) {
+            return Collections.emptyList();
+        }
+
+        List<Object> result = new ArrayList<>();
+        int start = 0;
+        int subStart, subEnd;
+        boolean inQuotes = false;
+        for (int current = 0; current < valuesText.length(); current++) {
+            if (valuesText.charAt(current) == '\"') {
+                inQuotes = !inQuotes;
+            } else if (valuesText.charAt(current) == ',' && !inQuotes) {
+                subStart = getSubStringStartPos(start, valuesText);
+                subEnd = getSubStringEndPos(current, valuesText);
+
+                result.add(valuesText.substring(subStart, subEnd));
+
+                start = current + 1;
+                if (valuesText.charAt(start) == ' ') {
+                    start++;
+                }
+            }
+        }
+
+        subStart = getSubStringStartPos(start, valuesText);
+        subEnd = getSubStringEndPos(valuesText.length(), valuesText);
+        result.add(valuesText.substring(subStart, subEnd));
+
+        return result;
+    }
+
+    protected int getSubStringStartPos(int initialStart, String searchString) {
+        if (searchString.charAt(initialStart) == '\"') {
+            return initialStart + 1;
+        }
+        return initialStart;
+    }
+
+    protected int getSubStringEndPos(int initialEnd, String searchString) {
+        if (searchString.charAt(initialEnd - 1) == '\"') {
+            return initialEnd - 1;
+        }
+        return initialEnd;
     }
 }
