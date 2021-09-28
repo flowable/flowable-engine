@@ -52,6 +52,40 @@ public class HitPolicyOutputOrderTest {
 
     @Test
     @DmnDeployment
+    public void outputOrderHitPolicyNumberAsString() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(20D, 30D, 10D);
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyNumber() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(20D, 30D, 10D);
+    }
+
+    @Test
+    @DmnDeployment
     public void outputOrderHitPolicyNoOutputValuesStrictModeDisabled() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
