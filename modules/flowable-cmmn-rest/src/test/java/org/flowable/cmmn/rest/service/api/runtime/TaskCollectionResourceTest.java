@@ -287,6 +287,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Case instance with children filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?caseInstanceIdWithChildren=notexisting";
             assertResultsPresentInDataResponse(url);
+            
+            // Without scope id filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutScopeId=true";
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // CreatedOn filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdOn=" + getISODateString(adhocTaskCreate.getTime());
@@ -361,6 +365,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Category filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            // Without process instance id filtering
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=true";
+            assertResultsPresentInDataResponse(url, caseTask.getId(), adhocTask.getId());
 
         } finally {
             // Clean adhoc-tasks even if test fails

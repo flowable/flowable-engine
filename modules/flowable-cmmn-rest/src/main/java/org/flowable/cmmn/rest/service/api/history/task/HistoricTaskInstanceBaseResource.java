@@ -102,6 +102,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getPropagatedStageInstanceId() != null) {
             query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
         }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutScopeId())) {
+            query.withoutScopeId();
+        }
         if (queryRequest.getTaskName() != null) {
             query.taskName(queryRequest.getTaskName());
         }
@@ -238,6 +241,10 @@ public class HistoricTaskInstanceBaseResource {
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.taskWithoutTenantId();
+        }
+        
+        if (Boolean.TRUE.equals(queryRequest.getWithoutProcessInstanceId())) {
+            query.withoutProcessInstanceId();
         }
 
         if (queryRequest.getTaskCandidateGroup() != null) {

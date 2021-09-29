@@ -34,6 +34,9 @@ public interface HistoricProcessInstance {
 
     /** The user provided unique reference to this process instance. */
     String getBusinessKey();
+    
+    /** The user provided business status for this process instance. */
+    String getBusinessStatus();
 
     /** The process definition reference. */
     String getProcessDefinitionId();

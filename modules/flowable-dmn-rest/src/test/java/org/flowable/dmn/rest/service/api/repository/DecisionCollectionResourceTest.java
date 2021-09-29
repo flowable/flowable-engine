@@ -30,10 +30,18 @@ public class DecisionCollectionResourceTest extends BaseSpringDmnRestTestCase {
     public void testGetDecisions() throws Exception {
 
         try {
-            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment().name("Deployment 1").addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn").category("cat one")
+            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment()
+                    .name("Deployment 1")
+                    .parentDeploymentId("parent1")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .category("cat one")
                     .deploy();
 
-            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn").category("cat two")
+            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment()
+                    .name("Deployment 2")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .parentDeploymentId("parent2")
+                    .category("cat two")
                     .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple-2.dmn").deploy();
 
             DmnDecision firstDefinition = dmnRepositoryService.createDecisionQuery().decisionKey("decision").deploymentId(firstDeployment.getId()).singleResult();
@@ -88,6 +96,13 @@ public class DecisionCollectionResourceTest extends BaseSpringDmnRestTestCase {
             // Test deploymentId
             url = baseUrl + "?deploymentId=" + secondDeployment.getId();
             assertResultsPresentInDataResponse(url, latestDefinition.getId(), decisionTwo.getId());
+
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent2";
+            assertResultsPresentInDataResponse(url, latestDefinition.getId(), decisionTwo.getId());
+            // Test parentDeploymentId
+            url = baseUrl + "?parentDeploymentId=parent1";
+            assertResultsPresentInDataResponse(url, firstDefinition.getId());
         } finally {
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();

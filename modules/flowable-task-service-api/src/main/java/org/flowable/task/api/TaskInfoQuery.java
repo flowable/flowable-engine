@@ -192,6 +192,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given process ids.
      */
     T processInstanceIdIn(Collection<String> processInstanceIds);
+    
+    /**
+     * Only select tasks without a process instance id.
+     */
+    T withoutProcessInstanceId();
 
     /** Only select tasks for the given business key */
     T processInstanceBusinessKey(String processInstanceBusinessKey);
@@ -429,6 +434,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks which are related to a case instances for the given deployment id.
      */
     T cmmnDeploymentIdIn(Collection<String> cmmnDeploymentIds);
+    
+    /**
+     * Only select tasks which don't have a scope id set.
+     */
+    T withoutScopeId();
 
     /**
      * Only select tasks which have a local task variable with the given name set to the given value.

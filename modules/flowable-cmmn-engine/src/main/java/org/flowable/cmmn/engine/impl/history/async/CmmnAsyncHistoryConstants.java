@@ -28,6 +28,7 @@ public interface CmmnAsyncHistoryConstants {
     String TYPE_CASE_INSTANCE_REACTIVATE = "cmmn-case-instance-reactivate";
     String TYPE_UPDATE_CASE_INSTANCE_NAME = "cmmn-update-case-instance-name";
     String TYPE_UPDATE_CASE_INSTANCE_BUSINESS_KEY = "cmmn-update-case-business-key";
+    String TYPE_UPDATE_CASE_INSTANCE_BUSINESS_STATUS = "cmmn-update-case-business-status";
     String TYPE_HISTORIC_CASE_INSTANCE_DELETED = "cmmn-historic-case-instance-deleted";
     String TYPE_IDENTITY_LINK_CREATED = "cmmn-identity-link-created";
     String TYPE_IDENTITY_LINK_DELETED = "cmmn-identity-link-deleted";
@@ -116,6 +117,7 @@ public interface CmmnAsyncHistoryConstants {
 
     String FIELD_ASSIGNEE = "assignee";
     String FIELD_BUSINESS_KEY = "businessKey";
+    String FIELD_BUSINESS_STATUS = "businessStatus";
     String FIELD_CASE_DEFINITION_CATEGORY = "caseDefinitionCategory";
     String FIELD_CASE_DEFINITION_DEPLOYMENT_ID = "caseDefinitionDeploymentId";
     String FIELD_CASE_DEFINITION_DESCRIPTION = "caseDefinitionDescription";

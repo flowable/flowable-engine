@@ -563,6 +563,9 @@
           #{processInstance}
         </foreach>
       </if>
+      <if test="withoutProcessInstanceId">
+        and RES.PROC_INST_ID_ is NULL
+      </if>
       <if test="processInstanceBusinessKey != null || processInstanceBusinessKeyLike != null  || processInstanceBusinessKeyLikeIgnoreCase != null">
           and exists (
             select 1
@@ -595,6 +598,9 @@
       </if>
       <if test="scopeDefinitionId != null">
         and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="withoutScopeId">
+        and RES.SCOPE_ID_ is NULL
       </if>
       <if test="propagatedStageInstanceId != null">
         and RES.PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
@@ -1072,6 +1078,9 @@
                 #{processInstance}
               </foreach>
             </if>
+            <if test="orQueryObject.withoutProcessInstanceId">
+              or RES.PROC_INST_ID_ IS NULL
+            </if>
             <if test="orQueryObject.processInstanceBusinessKey != null || orQueryObject.processInstanceBusinessKeyLike != null || orQueryObject.processInstanceBusinessKeyLikeIgnoreCase != null">
                 or exists (
                     select 1
@@ -1104,6 +1113,9 @@
             </if>
             <if test="orQueryObject.scopeDefinitionId != null">
               or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+            </if>
+            <if test="orQueryObject.withoutScopeId">
+              or RES.SCOPE_ID_ IS NULL
             </if>
             <if test="orQueryObject.propagatedStageInstanceId != null">
               or RES.PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}

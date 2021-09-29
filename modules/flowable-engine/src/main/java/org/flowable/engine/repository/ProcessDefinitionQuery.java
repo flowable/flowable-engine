@@ -75,6 +75,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
     ProcessDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
     /**
+     * Only select process definitions that are deployed in a deployment with the given parent deployment id
+     */
+    ProcessDefinitionQuery parentDeploymentId(String deploymentId);
+
+    /**
      * Only select process definition with the given key.
      */
     ProcessDefinitionQuery processDefinitionKey(String processDefinitionKey);

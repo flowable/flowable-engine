@@ -12,9 +12,13 @@
  */
 package org.flowable.common.engine.impl.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
@@ -65,6 +69,61 @@ public class CollectionUtil {
 
     public static boolean isNotEmpty(@SuppressWarnings("rawtypes") Collection collection) {
         return !isEmpty(collection);
+    }
+
+    public static <T> List<List<T>> partition(Collection<T> values, int partitionSize) {
+        if (values == null) {
+            return null;
+        } else if (values.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<T> valuesList;
+        if (values instanceof List) {
+            valuesList = (List<T>) values;
+        } else {
+            valuesList = new ArrayList<>(values);
+        }
+
+        int valuesSize = values.size();
+
+        if (valuesSize <= partitionSize) {
+            return Collections.singletonList(valuesList);
+        }
+
+        List<List<T>> safeValuesList = new ArrayList<>();
+
+        consumePartitions(values, partitionSize, safeValuesList::add);
+
+        return safeValuesList;
+    }
+
+    public static <T> void consumePartitions(Collection<T> values, int partitionSize, Consumer<List<T>> partitionConsumer) {
+        int valuesSize = values.size();
+        List<T> valuesList;
+        if (values instanceof List) {
+            valuesList = (List<T>) values;
+        } else {
+            valuesList = new ArrayList<>(values);
+        }
+
+        if (valuesSize <= partitionSize) {
+            partitionConsumer.accept(valuesList);
+
+        } else {
+
+            for (int startIndex = 0; startIndex < valuesSize; startIndex += partitionSize) {
+
+                int endIndex = startIndex + partitionSize;
+                if (endIndex > valuesSize) {
+                    endIndex = valuesSize; // endIndex in #subList is exclusive
+                }
+
+                List<T> subList = valuesList.subList(startIndex, endIndex);
+                partitionConsumer.accept(subList);
+            }
+
+        }
     }
 
 }

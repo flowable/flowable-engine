@@ -58,6 +58,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                 .referenceType("testReferenceType")
                 .stageInstanceId("testStageInstanceId")
                 .start();
+        runtimeService.updateBusinessStatus(processInstance.getId(), "myBusinessStatus");
         Authentication.setAuthenticatedUserId(null);
 
         String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
@@ -75,6 +76,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                         + "startUserId: '" + processInstance.getStartUserId() + "',"
                         + "processDefinitionName: '" + processInstance.getProcessDefinitionName() + "',"
                         + "businessKey: 'myBusinessKey',"
+                        + "businessStatus: 'myBusinessStatus',"
                         + "callbackId: 'testCallbackId',"
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"

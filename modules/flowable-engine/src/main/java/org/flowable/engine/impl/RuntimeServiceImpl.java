@@ -68,6 +68,7 @@ import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessStatusCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
 import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
@@ -214,6 +215,11 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void updateBusinessKey(String processInstanceId, String businessKey) {
         commandExecutor.execute(new SetProcessInstanceBusinessKeyCmd(processInstanceId, businessKey));
+    }
+    
+    @Override
+    public void updateBusinessStatus(String processInstanceId, String businessStatus) {
+        commandExecutor.execute(new SetProcessInstanceBusinessStatusCmd(processInstanceId, businessStatus));
     }
 
     @Override

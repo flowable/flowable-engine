@@ -1074,6 +1074,7 @@ public class ExecutionEntityManagerImpl
     public void clearAllProcessInstanceLockTimes(String lockOwner) {
         dataManager.clearAllProcessInstanceLockTimes(lockOwner);
     }
+    
     @Override
     public String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey) {
         if (executionEntity.isProcessInstanceType() && businessKey != null) {
@@ -1086,6 +1087,22 @@ public class ExecutionEntityManagerImpl
             }
 
             return businessKey;
+        }
+        return null;
+    }
+    
+    @Override
+    public String updateProcessInstanceBusinessStatus(ExecutionEntity executionEntity, String businessStatus) {
+        if (executionEntity.isProcessInstanceType() && businessStatus != null) {
+            executionEntity.setBusinessStatus(businessStatus);
+            getHistoryManager().updateProcessBusinessStatusInHistory(executionEntity);
+
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, executionEntity),
+                        engineConfiguration.getEngineCfgKey());
+            }
+
+            return businessStatus;
         }
         return null;
     }

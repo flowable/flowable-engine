@@ -150,6 +150,22 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(task.getScopeType()).isEqualTo(ScopeTypes.CMMN);
         assertThat(task.getScopeDefinitionId()).isEqualTo(caseInstances.get(0).getCaseDefinitionId());
     }
+    
+    @Test
+    public void testQueryWithoutProcessInstanceId() {
+        assertThat(cmmnTaskService.createTaskQuery().withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("unexisting").withoutProcessInstanceId().list()).hasSize(0);
+    }
+    
+    @Test
+    public void testQueryWithoutScopeId() {
+        assertThat(cmmnTaskService.createTaskQuery().withoutScopeId().list()).hasSize(0);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().list()).hasSize(0);
+    }
 
     @Test
     public void testQueryByVariableValueEquals() {
@@ -283,6 +299,26 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKeyIn(Arrays.asList(caseDefinition.getKey(), "dummyKey")).list())
                 .hasSize(NR_CASE_INSTANCES);
+        }
+    }
+    
+    @Test
+    public void testHistoricTaskQueryWithoutProcessInstanceId() {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
+            
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey("oneTaskCase").withoutProcessInstanceId().list()).hasSize(NR_CASE_INSTANCES);
+            
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey("unexisting").withoutProcessInstanceId().list()).hasSize(0);
+        }
+    }
+    
+    @Test
+    public void testHistoricTaskQueryWithoutScopeId() {
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().withoutScopeId().list()).hasSize(0);
+            
+            assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().list()).hasSize(0);
         }
     }
 }

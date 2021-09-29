@@ -48,6 +48,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected String involvedUser;
     protected String processInstanceId;
     protected String processInstanceIdWithChildren;
+    protected Boolean withoutProcessInstanceId;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processDefinitionId;
@@ -72,6 +73,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected Boolean includeProcessVariables;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected Boolean withoutScopeId;
     protected String scopeType;
     protected String propagatedStageInstanceId;
     protected String tenantId;
@@ -241,6 +243,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setProcessInstanceIdWithChildren(String processInstanceIdWithChildren) {
         this.processInstanceIdWithChildren = processInstanceIdWithChildren;
+    }
+
+    public Boolean getWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
+    public void setWithoutProcessInstanceId(Boolean withoutProcessInstanceId) {
+        this.withoutProcessInstanceId = withoutProcessInstanceId;
     }
 
     public String getProcessInstanceBusinessKey() {
@@ -451,6 +461,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+
+    public Boolean getWithoutScopeId() {
+        return withoutScopeId;
+    }
+
+    public void setWithoutScopeId(Boolean withoutScopeId) {
+        this.withoutScopeId = withoutScopeId;
     }
 
     public String getScopeType() {

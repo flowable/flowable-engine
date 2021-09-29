@@ -192,6 +192,9 @@ public class TaskBaseResource {
         if (request.getProcessInstanceIdWithChildren() != null) {
             taskQuery.processInstanceIdWithChildren(request.getProcessInstanceIdWithChildren());
         }
+        if (Boolean.TRUE.equals(request.getWithoutProcessInstanceId())) {
+            taskQuery.withoutProcessInstanceId();
+        }
         if (request.getProcessInstanceBusinessKey() != null) {
             taskQuery.processInstanceBusinessKey(request.getProcessInstanceBusinessKey());
         }
@@ -295,6 +298,10 @@ public class TaskBaseResource {
         
         if (request.getScopeId() != null) {
             taskQuery.scopeId(request.getScopeId());
+        }
+        
+        if (Boolean.TRUE.equals(request.getWithoutScopeId())) {
+            taskQuery.withoutScopeId();
         }
         
         if (request.getScopeType() != null) {

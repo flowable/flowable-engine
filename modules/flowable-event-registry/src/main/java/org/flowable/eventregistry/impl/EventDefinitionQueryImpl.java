@@ -40,6 +40,7 @@ public class EventDefinitionQueryImpl extends AbstractQuery<EventDefinitionQuery
     protected String nameLike;
     protected String deploymentId;
     protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
     protected Integer version;
@@ -137,6 +138,15 @@ public class EventDefinitionQueryImpl extends AbstractQuery<EventDefinitionQuery
             throw new FlowableIllegalArgumentException("ids are null");
         }
         this.deploymentIds = deploymentIds;
+        return this;
+    }
+
+    @Override
+    public EventDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -301,6 +311,10 @@ public class EventDefinitionQueryImpl extends AbstractQuery<EventDefinitionQuery
 
     public Set<String> getDeploymentIds() {
         return deploymentIds;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getId() {

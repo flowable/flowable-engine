@@ -615,6 +615,7 @@ public class RestResponseFactory {
         result.setStartUserId(processInstance.getStartUserId());
         result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
+        result.setBusinessStatus(processInstance.getBusinessStatus());
         result.setId(processInstance.getId());
         result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
@@ -742,6 +743,7 @@ public class RestResponseFactory {
     public HistoricProcessInstanceResponse createHistoricProcessInstanceResponse(HistoricProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
+        result.setBusinessStatus(processInstance.getBusinessStatus());
         result.setDeleteReason(processInstance.getDeleteReason());
         result.setDurationInMillis(processInstance.getDurationInMillis());
         result.setEndActivityId(processInstance.getEndActivityId());

@@ -66,6 +66,11 @@ public interface EventDefinitionQuery extends Query<EventDefinitionQuery, EventD
     EventDefinitionQuery deploymentIds(Set<String> deploymentIds);
 
     /**
+     * Only select event definitions that are deployed in a deployment with the given parent deployment id
+     */
+    EventDefinitionQuery parentDeploymentId(String parentDeploymentId);
+
+    /**
      * Only select event definition with the given key.
      */
     EventDefinitionQuery eventDefinitionKey(String eventDefinitionKey);

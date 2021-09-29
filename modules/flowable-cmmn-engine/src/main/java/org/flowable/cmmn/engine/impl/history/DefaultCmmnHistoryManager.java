@@ -119,6 +119,19 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             }
         }
     }
+    
+    @Override
+    public void recordUpdateBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus) {
+        if (caseInstanceEntity != null) {
+            if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+                HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+                HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
+                if (historicCaseInstanceEntity != null) {
+                    historicCaseInstanceEntity.setBusinessStatus(businessStatus);
+                }
+            }
+        }
+    }
 
     @Override
     public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstance) {
