@@ -55,7 +55,21 @@ public class SimpleConverterTest extends AbstractConverterTest {
         List<InputClause> inputClauses = decisionTable.getInputs();
         assertThat(inputClauses).hasSize(3);
 
+        assertThat(inputClauses.get(0).getInputValues().getTextValues())
+                .containsOnly("val1", "val2");
+        assertThat(inputClauses.get(0).getInputValues().getText()).isEqualTo("\"val1\",\"val2\"");
+
+        assertThat(inputClauses.get(1).getInputValues().getTextValues())
+                .containsOnly("10", "20");
+        assertThat(inputClauses.get(1).getInputValues().getText()).isEqualTo("10,20");
+
+        assertThat(inputClauses.get(2).getInputValues()).isNull();
+
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertThat(outputClauses).hasSize(1);
+
+        assertThat(outputClauses.get(0).getOutputValues().getTextValues())
+                .containsOnly("val1", "val2");
+        assertThat(outputClauses.get(0).getOutputValues().getText()).isEqualTo("\"val1\",\"val2\"");
     }
 }

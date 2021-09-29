@@ -84,7 +84,7 @@ public class AdditionalConverterTest extends AbstractConverterTest {
 
         assertThat(decisionTable.getOutputs())
                 .extracting(outputs -> outputs.getOutputValues().getText())
-                .containsExactly("\"result2\",\"result1\"", "\"2\",\"1\"");
+                .containsExactly("\"result2\",\"result1\"", "2,1");
 
         List<DecisionRule> rules = decisionTable.getRules();
         assertThat(rules).hasSize(2);
