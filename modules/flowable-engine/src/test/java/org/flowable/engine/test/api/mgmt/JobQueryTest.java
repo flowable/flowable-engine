@@ -173,6 +173,20 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.createJobQuery().processInstanceId(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
+    
+    @Test
+    public void testTimerQueryWithoutProcessInstanceId() {
+        TimerJobQuery query = managementService.createTimerJobQuery().withoutProcessInstanceId();
+        verifyQueryResults(query, 0);
+    }
+    
+    @Test
+    public void testJobQueryWithoutProcessInstanceId() {
+        JobQuery query = managementService.createJobQuery().withoutProcessInstanceId();
+        verifyQueryResults(query, 1);
+        
+        assertThat(query.singleResult().getId()).isEqualTo(messageId);
+    }
 
     @Test
     public void testQueryByExecutionId() {
@@ -539,6 +553,20 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         JobQuery query = managementService.createJobQuery().withoutScopeType();
         verifyQueryResults(query, 1);
     }
+    
+    @Test
+    public void testTimerQueryWithoutScopeId() {
+        TimerJobQuery query = managementService.createTimerJobQuery().withoutScopeId();
+        verifyQueryResults(query, 3);
+    }
+    
+    @Test
+    public void testJobQueryWithoutScopeId() {
+        JobQuery query = managementService.createJobQuery().withoutScopeId();
+        verifyQueryResults(query, 1);
+        
+        assertThat(query.singleResult().getId()).isEqualTo(messageId);
+    }
 
     @Test
     public void testHistoryQueryWithoutScopeType() {
@@ -573,25 +601,46 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testDeadLetterJobQueryWithoutScopeType() {
-        managementService.executeCommand((Command<Void>) commandContext -> {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        DeadLetterJobEntity deadLetterJob = managementService.executeCommand((Command<DeadLetterJobEntity>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             DeadLetterJobEntityManager deadLetterJobEntityManager = jobServiceConfiguration.getDeadLetterJobEntityManager();
-            DeadLetterJobEntity deadLetterJob = deadLetterJobEntityManager.create();
-            deadLetterJob.setJobType(Job.JOB_TYPE_MESSAGE);
-            jobServiceConfiguration.getDeadLetterJobDataManager().insert(deadLetterJob);
-            return null;
+            DeadLetterJobEntity job = deadLetterJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setProcessInstanceId(processInstance.getId());
+            jobServiceConfiguration.getDeadLetterJobDataManager().insert(job);
+            return job;
+        });
+        
+        DeadLetterJobEntity deadLetterJob2 = managementService.executeCommand((Command<DeadLetterJobEntity>) commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            DeadLetterJobEntityManager deadLetterJobEntityManager = jobServiceConfiguration.getDeadLetterJobEntityManager();
+            DeadLetterJobEntity job = deadLetterJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeId("scope1");
+            jobServiceConfiguration.getDeadLetterJobDataManager().insert(job);
+            return job;
         });
 
         DeadLetterJobQuery query = managementService.createDeadLetterJobQuery().withoutScopeType();
-        assertThat(query.list().size()).isEqualTo(1);
+        assertThat(query.list().size()).isEqualTo(2);
+        
+        query = managementService.createDeadLetterJobQuery().withoutProcessInstanceId();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult().getId()).isEqualTo(deadLetterJob2.getId());
+        
+        query = managementService.createDeadLetterJobQuery().withoutScopeId();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult().getId()).isEqualTo(deadLetterJob.getId());
 
         managementService.executeCommand((Command<Void>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             DeadLetterJobEntityManager deadLetterJobService = jobServiceConfiguration.getDeadLetterJobEntityManager();
             List<Job> jobs = deadLetterJobService.findJobsByQueryCriteria(new DeadLetterJobQueryImpl(commandContext,jobServiceConfiguration));
-            for (Job deadLetterJob : jobs) {
-                deadLetterJobService.delete(deadLetterJob.getId());
+            for (Job job : jobs) {
+                deadLetterJobService.delete(job.getId());
             }
 
             return null;
@@ -599,25 +648,48 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     public void testSuspendedJobQueryWithoutScopeType() {
-        managementService.executeCommand((Command<Void>) commandContext -> {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        SuspendedJobEntity suspendedJob = managementService.executeCommand((Command<SuspendedJobEntity>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
-            SuspendedJobEntity suspendedJob = suspendedJobEntityManager.create();
-            suspendedJob.setJobType(Job.JOB_TYPE_MESSAGE);
-            jobServiceConfiguration.getSuspendedJobEntityManager().insert(suspendedJob);
-            return null;
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setProcessInstanceId(processInstance.getId());
+            jobServiceConfiguration.getSuspendedJobEntityManager().insert(job);
+            
+            return job;
+        });
+        
+        SuspendedJobEntity suspendedJob2 = managementService.executeCommand((Command<SuspendedJobEntity>) commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeId("scope1");
+            jobServiceConfiguration.getSuspendedJobEntityManager().insert(job);
+            
+            return job;
         });
 
         SuspendedJobQuery query = managementService.createSuspendedJobQuery().withoutScopeType();
-        assertThat(query.list().size()).isEqualTo(1);
+        assertThat(query.list().size()).isEqualTo(2);
+        
+        query = managementService.createSuspendedJobQuery().withoutProcessInstanceId();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult().getId()).isEqualTo(suspendedJob2.getId());
+        
+        query = managementService.createSuspendedJobQuery().withoutScopeId();
+        assertThat(query.count()).isEqualTo(1);
+        assertThat(query.singleResult().getId()).isEqualTo(suspendedJob.getId());
 
         managementService.executeCommand((Command<Void>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
-            List<Job> jobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl(commandContext,jobServiceConfiguration));
-            for (Job suspendedJob : jobs) {
-                suspendedJobEntityManager.delete(suspendedJob.getId());
+            List<Job> jobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl(commandContext, jobServiceConfiguration));
+            for (Job job : jobs) {
+                suspendedJobEntityManager.delete(job.getId());
             }
 
             return null;

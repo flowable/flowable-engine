@@ -39,6 +39,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     protected String id;
     protected String processInstanceId;
+    protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
@@ -47,6 +48,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String elementId;
     protected String elementName;
     protected String scopeId;
+    protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
@@ -96,6 +98,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
         }
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public JobQuery withoutProcessInstanceId() {
+        this.withoutProcessInstanceId = true;
         return this;
     }
 
@@ -150,6 +158,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
         this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public JobQuery withoutScopeId() {
+        this.withoutScopeId = true;
         return this;
     }
 
@@ -391,6 +405,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return processInstanceId;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
     public String getExecutionId() {
         return executionId;
     }
@@ -449,6 +467,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
     }
 
     public String getSubScopeId() {

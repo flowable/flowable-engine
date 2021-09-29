@@ -38,6 +38,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     
     protected String id;
     protected String processInstanceId;
+    protected boolean withoutProcessInstanceId;
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
@@ -46,6 +47,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     protected String elementId;
     protected String elementName;
     protected String scopeId;
+    protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
     protected boolean withoutScopeType;
@@ -96,6 +98,12 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
         }
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl withoutProcessInstanceId() {
+        this.withoutProcessInstanceId = true;
         return this;
     }
 
@@ -150,6 +158,12 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
         this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl withoutScopeId() {
+        this.withoutScopeId = true;
         return this;
     }
     
@@ -438,6 +452,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
         return processInstanceId;
     }
 
+    public boolean isWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
     public String getExecutionId() {
         return executionId;
     }
@@ -504,6 +522,10 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
     
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public boolean isWithoutScopeId() {
+        return withoutScopeId;
     }
 
     public String getSubScopeId() {

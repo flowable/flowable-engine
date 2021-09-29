@@ -30,6 +30,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
     /** Only select jobs which exist for the given process instance. **/
     JobQuery processInstanceId(String processInstanceId);
+    
+    /** Only select jobs without a process instance id value. **/
+    JobQuery withoutProcessInstanceId();
 
     /** Only select jobs which exist for the given execution */
     JobQuery executionId(String executionId);
@@ -54,6 +57,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
     
     /** Only select tasks for the given scope identifier. */
     JobQuery scopeId(String scopeId);
+    
+    /** Only select jobs without a scope id value. **/
+    JobQuery withoutScopeId();
 
     /** Only select tasks for the given sub scope identifier. */
     JobQuery subScopeId(String subScopeId);

@@ -1003,6 +1003,9 @@
           #{processInstance}
         </foreach>
       </if>
+      <if test="withoutProcessInstanceId">
+        and ${queryTablePrefix}PROC_INST_ID_ IS NULL
+      </if>
       <if test="taskDefinitionKey != null">
         and ${queryTablePrefix}TASK_DEF_KEY_ = #{taskDefinitionKey}
       </if>
@@ -1029,6 +1032,9 @@
       </if>
       <if test="scopeDefinitionId != null">
         and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
+      <if test="withoutScopeId">
+        and ${queryTablePrefix}SCOPE_ID_ IS NULL
       </if>
       <if test="propagatedStageInstanceId != null">
         and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
@@ -1257,6 +1263,9 @@
           #{processInstance}
         </foreach>
       </if>
+      <if test="orQueryObject.withoutProcessInstanceId">
+        or ${queryTablePrefix}PROC_INST_ID_ IS NULL
+      </if>
       <if test="orQueryObject.taskDefinitionKey != null">
         or ${queryTablePrefix}TASK_DEF_KEY_ = #{orQueryObject.taskDefinitionKey}
       </if>
@@ -1283,6 +1292,9 @@
       </if>
       <if test="orQueryObject.scopeDefinitionId != null">
         or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+      </if>
+      <if test="orQueryObject.withoutScopeId">
+        or ${queryTablePrefix}SCOPE_ID_ IS NULL
       </if>
       <if test="orQueryObject.propagatedStageInstanceId != null">
         or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}

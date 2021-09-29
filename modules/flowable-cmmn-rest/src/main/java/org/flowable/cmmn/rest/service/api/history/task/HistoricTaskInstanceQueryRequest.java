@@ -37,6 +37,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Collection<String> caseDefinitionKeys;
     protected String propagatedStageInstanceId;
+    protected Boolean withoutScopeId;
     protected String taskName;
     protected String taskNameLike;
     protected String taskDescription;
@@ -73,6 +74,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String tenantId;
     protected String tenantIdLike;
     protected Boolean withoutTenantId;
+    protected Boolean withoutProcessInstanceId;
     protected String taskCandidateGroup;
     protected boolean ignoreTaskAssignee;
 
@@ -146,6 +148,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
         this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    public Boolean getWithoutScopeId() {
+        return withoutScopeId;
+    }
+
+    public void setWithoutScopeId(Boolean withoutScopeId) {
+        this.withoutScopeId = withoutScopeId;
     }
 
     public String getTaskName() {
@@ -435,6 +445,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Boolean getWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
+    public void setWithoutProcessInstanceId(Boolean withoutProcessInstanceId) {
+        this.withoutProcessInstanceId = withoutProcessInstanceId;
     }
 
     public String getTaskCandidateGroup() {

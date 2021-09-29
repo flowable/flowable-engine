@@ -91,6 +91,7 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setDataSource(dataSource);
         cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         cmmnEngineConfiguration.setTransactionManager(transactionManager);
+        cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
         cmmnEngineConfiguration.addConfigurator(formEngineConfigurator);

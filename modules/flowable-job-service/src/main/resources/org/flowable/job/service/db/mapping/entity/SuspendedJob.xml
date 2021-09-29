@@ -256,6 +256,9 @@
             <if test="processInstanceId != null">
                 and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
             </if>
+            <if test="withoutProcessInstanceId">
+                and RES.PROCESS_INSTANCE_ID_ IS NULL
+            </if>
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId}
             </if>
@@ -279,6 +282,9 @@
             </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="withoutScopeId">
+                and RES.SCOPE_ID_ IS NULL
             </if>
             <if test="subScopeId != null">
                 and RES.SUB_SCOPE_ID_ = #{subScopeId}

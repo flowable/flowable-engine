@@ -73,6 +73,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "taskDefinitionKeys", dataType = "string", value = "Only return tasks with the given task definition ids.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return tasks which are part of the process instance with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the process instance and its children with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns tasks without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKey", dataType = "string", value = "Only return tasks which are part of the process instance with the given business key.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKeyLike", dataType = "string", value = "Only return tasks which are part of the process instance which has a business key like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return tasks which are part of a process instance which has a process definition with the given id.", paramType = "query"),
@@ -94,6 +95,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
@@ -214,6 +216,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (requestParams.containsKey("processInstanceIdWithChildren")) {
             request.setProcessInstanceIdWithChildren(requestParams.get("processInstanceIdWithChildren"));
         }
+        
+        if (requestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(requestParams.get("withoutProcessInstanceId"))) {
+            request.setWithoutProcessInstanceId(Boolean.TRUE);
+        }
 
         if (requestParams.containsKey("processInstanceBusinessKey")) {
             request.setProcessInstanceBusinessKey(requestParams.get("processInstanceBusinessKey"));
@@ -285,6 +291,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         if (requestParams.containsKey("scopeId")) {
             request.setScopeId(requestParams.get("scopeId"));
+        }
+        
+        if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {
+            request.setWithoutScopeId(Boolean.TRUE);
         }
         
         if (requestParams.containsKey("scopeType")) {

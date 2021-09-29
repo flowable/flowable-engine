@@ -34,6 +34,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
      * Only select jobs which exist for the given process instance.
      **/
     ExternalWorkerJobQuery processInstanceId(String processInstanceId);
+    
+    /** 
+     * Only select jobs without a process instance id value. 
+     **/
+    ExternalWorkerJobQuery withoutProcessInstanceId();
 
     /**
      * Only select jobs which exist for the given execution
@@ -74,6 +79,11 @@ public interface ExternalWorkerJobQuery extends Query<ExternalWorkerJobQuery, Ex
      * Only select tasks for the given scope identifier.
      */
     ExternalWorkerJobQuery scopeId(String scopeId);
+    
+    /** 
+     * Only select jobs without a scope id value. 
+     **/
+    ExternalWorkerJobQuery withoutScopeId();
 
     /**
      * Only select tasks for the given sub scope identifier.

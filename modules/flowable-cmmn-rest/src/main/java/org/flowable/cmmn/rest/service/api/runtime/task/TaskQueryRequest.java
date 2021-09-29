@@ -51,6 +51,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected String planItemInstanceId;
     protected String propagatedStageInstanceId;
     protected String scopeId;
+    protected Boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String caseDefinitionId;
@@ -74,6 +75,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected String tenantId;
     protected String tenantIdLike;
     protected Boolean withoutTenantId;
+    protected Boolean withoutProcessInstanceId;
     protected String candidateOrAssigned;
     protected String category;
 
@@ -303,6 +305,14 @@ public class TaskQueryRequest extends PaginateRequest {
         this.scopeId = scopeId;
     }
 
+    public Boolean getWithoutScopeId() {
+        return withoutScopeId;
+    }
+
+    public void setWithoutScopeId(Boolean withoutScopeId) {
+        this.withoutScopeId = withoutScopeId;
+    }
+
     public String getSubScopeId() {
         return subScopeId;
     }
@@ -451,6 +461,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public Boolean getWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public Boolean getWithoutProcessInstanceId() {
+        return withoutProcessInstanceId;
+    }
+
+    public void setWithoutProcessInstanceId(Boolean withoutProcessInstanceId) {
+        this.withoutProcessInstanceId = withoutProcessInstanceId;
     }
 
     public String getCandidateOrAssigned() {

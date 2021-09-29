@@ -205,6 +205,15 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("processInstanceIdWithChildren", "nonexisting");
             assertResultsPresentInPostDataResponse(url, requestNode);
+            
+            // Without process instance id filtering
+            requestNode.removeAll();
+            requestNode.put("withoutProcessInstanceId", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+            
+            requestNode.removeAll();
+            requestNode.put("withoutProcessInstanceId", false);
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId(), adhocTask.getId());
 
             // Execution filtering
             requestNode.removeAll();
@@ -309,6 +318,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             requestNode.removeAll();
             requestNode.put("category", "some-category");
             assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
+            
+            // Without scope id filtering
+            requestNode.removeAll();
+            requestNode.put("withoutScopeId", true);
+            assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId(), adhocTask.getId());
 
             // Filtering without duedate
             requestNode.removeAll();

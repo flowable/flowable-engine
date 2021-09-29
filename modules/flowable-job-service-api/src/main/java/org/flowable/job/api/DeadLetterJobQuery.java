@@ -30,6 +30,9 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
 
     /** Only select jobs which exist for the given process instance. **/
     DeadLetterJobQuery processInstanceId(String processInstanceId);
+    
+    /** Only select jobs without a process instance id value. **/
+    DeadLetterJobQuery withoutProcessInstanceId();
 
     /** Only select jobs which exist for the given execution */
     DeadLetterJobQuery executionId(String executionId);
@@ -54,6 +57,9 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     
     /** Only select jobs for the given scope identifier. */
     DeadLetterJobQuery scopeId(String scopeId);
+    
+    /** Only select jobs without a scope id value. **/
+    DeadLetterJobQuery withoutScopeId();
 
     /** Only select jobs for the given sub scope identifier. */
     DeadLetterJobQuery subScopeId(String subScopeId);

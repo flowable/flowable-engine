@@ -280,6 +280,13 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=nonexisting";
             assertResultsPresentInDataResponse(url);
+            
+            // Without process instance id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=true";
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=false";
+            assertResultsPresentInDataResponse(url, processTask.getId(), adhocTask.getId());
 
             // Execution filtering
             Execution taskExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
@@ -374,6 +381,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true";
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            
+            // Without scope id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutScopeId=true";
+            assertResultsPresentInDataResponse(url, processTask.getId(), adhocTask.getId());
 
             // Check status and size
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
