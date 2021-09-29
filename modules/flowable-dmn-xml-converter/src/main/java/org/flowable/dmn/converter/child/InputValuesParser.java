@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,48 +12,51 @@
  */
 package org.flowable.dmn.converter.child;
 
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.OutputClause;
+import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.UnaryTests;
 
 /**
  * @author Yvo Swillens
  */
-public class OutputValuesParser extends BaseChildElementParser {
+public class InputValuesParser extends BaseChildElementParser {
 
     @Override
     public String getElementName() {
-        return ELEMENT_OUTPUT_VALUES;
+        return ELEMENT_INPUT_VALUES;
     }
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof OutputClause))
+        if (!(parentElement instanceof InputClause))
             return;
 
-        OutputClause clause = (OutputClause) parentElement;
-        UnaryTests outputValues = new UnaryTests();
+        InputClause clause = (InputClause) parentElement;
+        UnaryTests inputValues = new UnaryTests();
 
-        boolean readyWithOutputValues = false;
+        boolean readyWithInputValues = false;
         try {
-            while (!readyWithOutputValues && xtr.hasNext()) {
+            while (!readyWithInputValues && xtr.hasNext()) {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_TEXT.equalsIgnoreCase(xtr.getLocalName())) {
-                    String outputValuesText = xtr.getElementText();
-                    outputValues.setText(outputValuesText);
+                    String inputValuesText = xtr.getElementText();
+                    inputValues.setText(inputValuesText);
 
-                    outputValues.setTextValues(splitAndFormatInputOutputValues(outputValuesText));
+                    List<Object> splitInputValues = splitAndFormatInputOutputValues(inputValuesText);
+                    inputValues.setTextValues(splitInputValues);
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
-                    readyWithOutputValues = true;
+                    readyWithInputValues = true;
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Error parsing output values", e);
+            LOGGER.warn("Error parsing input values", e);
         }
 
-        clause.setOutputValues(outputValues);
+        clause.setInputValues(inputValues);
     }
 }

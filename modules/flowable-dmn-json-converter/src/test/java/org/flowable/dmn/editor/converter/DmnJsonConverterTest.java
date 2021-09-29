@@ -307,6 +307,11 @@ public class DmnJsonConverterTest {
         assertThat(decisionTable.getInputs().get(0).getInputValues().getTextValues().get(0)).isEqualTo("AAA");
         assertThat(decisionTable.getInputs().get(0).getInputValues().getTextValues().get(1)).isEqualTo("BBB");
 
+        assertThat(decisionTable.getInputs().get(2).getInputValues().getText()).isEqualTo("20,10,30");
+        assertThat(decisionTable.getInputs().get(2).getInputValues().getTextValues().get(0)).isEqualTo("20");
+        assertThat(decisionTable.getInputs().get(2).getInputValues().getTextValues().get(1)).isEqualTo("10");
+        assertThat(decisionTable.getInputs().get(2).getInputValues().getTextValues().get(2)).isEqualTo("30");
+
         assertThat(decisionTable.getOutputs().get(0).getOutputValues().getText()).isEqualTo("\"THIRD\",\"FIRST\",\"SECOND\"");
         assertThat(decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(0)).isEqualTo("THIRD");
         assertThat(decisionTable.getOutputs().get(0).getOutputValues().getTextValues().get(1)).isEqualTo("FIRST");
