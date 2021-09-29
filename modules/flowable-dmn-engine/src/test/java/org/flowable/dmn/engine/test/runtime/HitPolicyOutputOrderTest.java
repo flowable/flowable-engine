@@ -22,6 +22,7 @@ import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -82,6 +83,40 @@ public class HitPolicyOutputOrderTest {
         assertThat(result)
                 .extracting("outputVariable1")
                 .containsExactly(20D, 30D, 10D);
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyDate() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(new DateTime("2000-01-01").toDate(), new DateTime("2020-01-01").toDate(), new DateTime("2010-01-01").toDate());
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyBoolean() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(Boolean.TRUE, Boolean.FALSE, Boolean.FALSE);
     }
 
     @Test

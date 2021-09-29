@@ -12,17 +12,13 @@
  */
 package org.flowable.dmn.converter.child;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnElement;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
