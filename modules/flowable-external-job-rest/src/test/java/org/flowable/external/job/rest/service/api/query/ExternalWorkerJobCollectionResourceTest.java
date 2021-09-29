@@ -189,6 +189,73 @@ class ExternalWorkerJobCollectionResourceTest {
                         + "}");
 
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/external/job/rest/service/api/parallelExternalWorkerJobs.bpmn20.xml")
+    @CmmnDeployment(resources = "org/flowable/external/job/rest/service/api/parallelExternalWorkerJobs.cmmn")
+    void testQueryWithoutProcessInstanceId() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/service/jobs?withoutProcessInstanceId=true", String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.OK);
+
+        String body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThatJson(body)
+                .when(Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  total: 4,"
+                        + "  start: 0,"
+                        + "  size: 4,"
+                        + "  sort: 'id',"
+                        + "  order: 'asc',"
+                        + "  data: ["
+                        + "    {"
+                        + "      scopeId: '" + caseInstance1.getId() + "',"
+                        + "      scopeDefinitionId: '" + caseInstance1.getCaseDefinitionId() + "',"
+                        + "      scopeType: 'cmmn',"
+                        + "      elementId: 'externalOrder',"
+                        + "      elementName: 'Order Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      scopeId: '" + caseInstance1.getId() + "',"
+                        + "      scopeDefinitionId: '" + caseInstance1.getCaseDefinitionId() + "',"
+                        + "      scopeType: 'cmmn',"
+                        + "      elementId: 'externalCustomer1',"
+                        + "      elementName: 'Customer Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      scopeId: '" + caseInstance2.getId() + "',"
+                        + "      scopeDefinitionId: '" + caseInstance2.getCaseDefinitionId() + "',"
+                        + "      scopeType: 'cmmn',"
+                        + "      elementId: 'externalOrder',"
+                        + "      elementName: 'Order Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      scopeId: '" + caseInstance2.getId() + "',"
+                        + "      scopeDefinitionId: '" + caseInstance2.getCaseDefinitionId() + "',"
+                        + "      scopeType: 'cmmn',"
+                        + "      elementId: 'externalCustomer1',"
+                        + "      elementName: 'Customer Service',"
+                        + "      retries: 3"
+                        + "    }"
+                        + "  ]"
+                        + "}");
+    }
 
     @Test
     @Deployment(resources = "org/flowable/external/job/rest/service/api/parallelExternalWorkerJobs.bpmn20.xml")
@@ -647,6 +714,69 @@ class ExternalWorkerJobCollectionResourceTest {
                         + "  sort: 'id',"
                         + "  order: 'asc',"
                         + "  data: []"
+                        + "}");
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/external/job/rest/service/api/parallelExternalWorkerJobs.bpmn20.xml")
+    @CmmnDeployment(resources = "org/flowable/external/job/rest/service/api/parallelExternalWorkerJobs.cmmn")
+    void testQueryWithoutScopeId() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        ResponseEntity<String> response = restTemplate
+                .getForEntity("/service/jobs?withoutScopeId=true", String.class);
+
+        assertThat(response.getStatusCode()).as(response.toString()).isEqualTo(HttpStatus.OK);
+
+        String body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThatJson(body)
+                .when(Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  total: 4,"
+                        + "  start: 0,"
+                        + "  size: 4,"
+                        + "  sort: 'id',"
+                        + "  order: 'asc',"
+                        + "  data: ["
+                        + "    {"
+                        + "      processInstanceId: '" + processInstance1.getId() + "',"
+                        + "      processDefinitionId: '" + processInstance1.getProcessDefinitionId() + "',"
+                        + "      elementId: 'externalOrder',"
+                        + "      elementName: 'Order Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      processInstanceId: '" + processInstance1.getId() + "',"
+                        + "      processDefinitionId: '" + processInstance1.getProcessDefinitionId() + "',"
+                        + "      elementId: 'externalCustomer1',"
+                        + "      elementName: 'Customer Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      processInstanceId: '" + processInstance2.getId() + "',"
+                        + "      processDefinitionId: '" + processInstance2.getProcessDefinitionId() + "',"
+                        + "      elementId: 'externalOrder',"
+                        + "      elementName: 'Order Service',"
+                        + "      retries: 3"
+                        + "    },"
+                        + "    {"
+                        + "      processInstanceId: '" + processInstance2.getId() + "',"
+                        + "      processDefinitionId: '" + processInstance2.getProcessDefinitionId() + "',"
+                        + "      elementId: 'externalCustomer1',"
+                        + "      elementName: 'Customer Service',"
+                        + "      retries: 3"
+                        + "    }"
+                        + "  ]"
                         + "}");
     }
 
