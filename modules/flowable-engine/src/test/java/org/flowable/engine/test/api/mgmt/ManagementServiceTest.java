@@ -429,13 +429,13 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             LockManager testLockManager2 = managementService.getLockManager(lockName);
             assertThat(testLockManager2.acquireLock()).isFalse();
 
-            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(1), processEngineConfiguration.getEngineCfgKey());
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(3), processEngineConfiguration.getEngineCfgKey());
             assertThat(testLockManager2.acquireLock()).isFalse();
 
             properties = managementService.getProperties();
             assertThat(properties.get(lockName)).isEqualTo(updatedPropertyValue);
 
-            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(3), processEngineConfiguration.getEngineCfgKey());
+            testLockManager2 = new LockManagerImpl(processEngineConfiguration.getCommandExecutor(), lockName, Duration.ofMinutes(1), Duration.ofHours(1), processEngineConfiguration.getEngineCfgKey());
             assertThat(testLockManager2.acquireLock()).isTrue();
 
             properties = managementService.getProperties();
