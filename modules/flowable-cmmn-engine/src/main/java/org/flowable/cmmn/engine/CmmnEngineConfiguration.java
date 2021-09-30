@@ -195,6 +195,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanIte
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
+import org.flowable.cmmn.engine.impl.persistence.tenant.CmmnMyBatisChangeTenantIdManager;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
@@ -266,6 +267,7 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -391,6 +393,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
+    protected ChangeTenantIdManager changeTenantIdManager;
     protected CmmnDynamicStateManager dynamicStateManager;
     protected CaseInstanceMigrationManager caseInstanceMigrationManager;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
@@ -809,6 +812,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCandidateManager();
         initVariableAggregator();
         initHistoryManager();
+        initChangeTenantIdManager();
         initDynamicStateManager();
         initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
@@ -1310,6 +1314,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             } else {
                 cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
             }
+        }
+    }
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new CmmnMyBatisChangeTenantIdManager(commandExecutor, isDbHistoryUsed);
         }
     }
     
@@ -2320,6 +2330,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setCmmnHistoryManager(CmmnHistoryManager cmmnHistoryManager) {
         this.cmmnHistoryManager = cmmnHistoryManager;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public CmmnEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
         return this;
     }
 

@@ -102,6 +102,7 @@ import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.engine.CandidateManager;
@@ -346,6 +347,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataMan
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.engine.impl.persistence.tenant.BpmnMyBatisChangeTenantIdManager;
 import org.flowable.engine.impl.repository.DefaultProcessDefinitionLocalizationManager;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -519,6 +521,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected boolean isAsyncHistoryJsonGroupingEnabled;
     protected int asyncHistoryJsonGroupingThreshold = 10;
     protected AsyncHistoryListener asyncHistoryListener;
+
+    // Change Tenant ID Manager
+
+    protected ChangeTenantIdManager changeTenantIdManager;
 
     // Job Manager
 
@@ -987,6 +993,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCandidateManager();
         initVariableAggregator();
         initHistoryManager();
+        initChangeTenantIdManager();
         initDynamicStateManager();
         initProcessInstanceMigrationValidationManager();
         initIdentityLinkInterceptor();
@@ -1297,6 +1304,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             } else {
                 historyManager = new DefaultHistoryManager(this);
             }
+        }
+    }
+
+    // Change Tenant ID manager ////////////////////////////////////////////////////
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new BpmnMyBatisChangeTenantIdManager(commandExecutor, isDbHistoryUsed);
         }
     }
 
@@ -4327,6 +4342,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public ProcessEngineConfigurationImpl setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
         return this;
     }
 

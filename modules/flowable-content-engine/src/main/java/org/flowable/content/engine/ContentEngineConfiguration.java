@@ -31,6 +31,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentManagementService;
 import org.flowable.content.api.ContentService;
@@ -48,6 +49,7 @@ import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityMana
 import org.flowable.content.engine.impl.persistence.entity.ContentItemEntityManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
+import org.flowable.content.engine.impl.persistence.tenant.ContentMyBatisChangeTenantIdManager;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
 
@@ -72,6 +74,8 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     protected ContentStorage contentStorage;
     protected String contentRootFolder;
     protected boolean createContentRootFolder = true;
+
+    protected ChangeTenantIdManager changeTenantIdManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
     protected ContentItemEntityManager contentItemEntityManager;
@@ -145,6 +149,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initDataManagers();
         initEntityManagers();
         initContentStorage();
+        initChangeTenantIdManager();
     }
 
     // services
@@ -190,6 +195,13 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
             }
 
             contentStorage = new SimpleFileSystemContentStorage(contentRootFile);
+        }
+    }
+
+
+    public void initChangeTenantIdManager() {
+        if (changeTenantIdManager == null) {
+            changeTenantIdManager = new ContentMyBatisChangeTenantIdManager(commandExecutor);
         }
     }
 
@@ -445,6 +457,15 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
 
     public ContentEngineConfiguration setContentStorage(ContentStorage contentStorage) {
         this.contentStorage = contentStorage;
+        return this;
+    }
+
+    public ChangeTenantIdManager getChangeTenantIdManager() {
+        return changeTenantIdManager;
+    }
+
+    public ContentEngineConfiguration setChangeTenantIdManager(ChangeTenantIdManager changeTenantIdManager) {
+        this.changeTenantIdManager = changeTenantIdManager;
         return this;
     }
 

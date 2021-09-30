@@ -20,6 +20,8 @@
     <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
     <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
+    <mapper resource="org/flowable/form/db/mapping/ChangeTenantForm.xml" />
+
     <!-- Engine mappers -->
     <mapper resource="org/flowable/form/db/mapping/entity/FormDeployment.xml" />
     <mapper resource="org/flowable/form/db/mapping/entity/FormDefinition.xml" />

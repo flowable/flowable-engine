@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePage;
 import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
@@ -496,5 +497,14 @@ public interface ManagementService {
      * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
      */
     ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the process instances
+     * and all the related instances. See {@link BpmnChangeTenantIdEntityTypes} for related instances.
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the BPMN scope
+     * will be changed to the target tenant id.
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
 
 }
